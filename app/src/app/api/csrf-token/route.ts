@@ -5,7 +5,8 @@ import cookie from "cookie";
 const tokens = new csrf();
 
 export async function GET(req: NextRequest) {
-	const csrfToken = tokens.create(process.env.CSRF_SECRET);
+	// TODO: env value
+	const csrfToken = tokens.create("process.env.CSRF_SECRET");
 
 	const response = NextResponse.json({ csrfToken });
 	response.headers.set(
