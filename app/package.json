@@ -10,16 +10,20 @@
     "format": "biome format --write src",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "chromatic": "npx chromatic --project-token=chpt_4045bcdac0ec50e"
+    "chromatic": "npx chromatic --project-token=chpt_4045bcdac0ec50e",
+    "codegen": "graphql-codegen"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
+    "@apollo/client": "^3.10.5",
     "@auth0/nextjs-auth0": "^3.5.0",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
     "@hookform/resolvers": "^3.6.0",
     "@types/cookie": "^0.6.0",
     "antd": "^5.18.0",
     "cookie": "^0.6.0",
     "csrf": "^3.1.0",
+    "graphql": "^16.8.2",
     "install": "^0.13.0",
     "next": "14.2.3",
     "npm": "^10.8.1",
@@ -31,6 +35,12 @@
   "devDependencies": {
     "@biomejs/biome": "1.8.0",
     "@chromatic-com/storybook": "^1.5.0",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/client-preset": "4.3.0",
+    "@graphql-codegen/typescript": "^4.0.7",
+    "@graphql-codegen/typescript-msw": "^3.0.0",
+    "@graphql-codegen/typescript-operations": "^4.2.1",
+    "@graphql-codegen/typescript-resolvers": "^4.1.0",
     "@storybook/addon-essentials": "^8.1.6",
     "@storybook/addon-interactions": "^8.1.6",
     "@storybook/addon-links": "^8.1.6",
@@ -45,6 +55,6 @@
     "biome": "^0.3.3",
     "chromatic": "^11.5.3",
     "storybook": "^8.1.6",
-    "typescript": "^5"
+    "typescript": "^5.4.5"
   }
 }
