@@ -16,6 +16,6 @@ export interface Content {
 
 export interface DataResult<T> {
 	loading: boolean;
-  data?: T;
-  error?: Error;
+	data?: T;
+	error?: Error;
 }
