@@ -1,22 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import csrf from "csrf";
-import cookie from "cookie";
+import Cookies from "universal-cookie";
 
 const tokens = new csrf();
+const cookies = new Cookies();
 
 export async function GET(req: NextRequest) {
 	// TODO: env value
-	const csrfToken = tokens.create("process.env.CSRF_SECRET");
+	const cookieName = "csrfToken";
+	const cookieValue = tokens.create("process.env.CSRF_SECRET");
 
-	const response = NextResponse.json({ csrfToken });
+	cookies.set(cookieName, cookieValue, {
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		path: "/",
+	});
+
+	const response = NextResponse.json({ cookieValue });
 	response.headers.set(
 		"Set-Cookie",
-		cookie.serialize("csrfToken", csrfToken, {
-			httpOnly: true,
-			secure: true,
-			sameSite: "strict",
-			path: "/",
-		}),
+		`${cookieName}=` + cookies.get(cookieName),
 	);
 
 	return response;
