@@ -2,8 +2,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { Body } from "./_component";
 import React from "react";
+import { ApolloProvider, ThemeProvider } from "@/component/containers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,9 +18,13 @@ type Props = React.PropsWithChildren<{
 
 const RootLayout: React.FC<Props> = ({ children }) => (
 	<html lang="en">
-		<Body className={inter.className}>
-			<AntdRegistry>{children}</AntdRegistry>
-		</Body>
+		<ThemeProvider>
+			<body className={inter.className}>
+				<AntdRegistry>
+					<ApolloProvider>{children}</ApolloProvider>
+				</AntdRegistry>
+			</body>
+		</ThemeProvider>
 	</html>
 );
 
