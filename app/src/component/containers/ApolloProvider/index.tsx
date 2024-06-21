@@ -1,10 +1,17 @@
 "use client";
-import { ApolloProvider as OriginProvider } from "@apollo/client";
+import {
+	ApolloProvider as OriginProvider,
+} from "@apollo/client";
 import { FC } from "react";
 import { ReactNode, memo, useMemo } from "react";
-import NewApolloClient from "@/graphql/client";
+import NewApolloClient from "@/graphql";
 
-const ApolloProvider: FC<{ children: ReactNode }> = ({ children }) => {
+type Props = {
+	children: ReactNode;
+};
+
+const ApolloProvider: FC<Props> = (props) => {
+	const { children } = props;
 	const client = useMemo(() => {
 		// 再レンダリングでclientを生成しないようにする
 		return NewApolloClient();
