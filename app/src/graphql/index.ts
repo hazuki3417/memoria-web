@@ -7,7 +7,6 @@ import {
 	OperationVariables,
 	MutationOptions,
 	DocumentNode,
-	DefaultContext,
 } from "@apollo/client";
 
 let apollo: OriginClient<NormalizedCacheObject> | null = null;
@@ -50,6 +49,9 @@ export interface Input {
 
 const client = NewApolloClient();
 
+/**
+ * useQueryと同じI/Fで利用可能にした関数
+ */
 const query = <
 	T = any,
 	TVariables extends OperationVariables = OperationVariables,
@@ -60,6 +62,9 @@ const query = <
 	return client.query<T, TVariables>({ query: gql, ...options });
 };
 
+/**
+ * useMutationと同じI/Fで利用可能にした関数
+ */
 const mutation = <
 	T = any,
 	TVariables extends OperationVariables = OperationVariables,
@@ -70,6 +75,11 @@ const mutation = <
 	return client.mutate<T, TVariables>({ mutation: gql, ...options });
 };
 
+/**
+ * 下記の関数で共通となる返り値の型定義
+ * - query（server side fetch）
+ * - useQuery（client side fetch）
+ */
 export interface ApolloClientResult<T> {
 	loading: boolean;
 	data?: T;

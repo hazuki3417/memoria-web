@@ -1,10 +1,8 @@
 "use client";
-import {
-	ApolloProvider as OriginProvider,
-} from "@apollo/client";
+import { ApolloProvider as OriginProvider } from "@apollo/client";
 import { FC } from "react";
 import { ReactNode, memo, useMemo } from "react";
-import NewApolloClient from "@/graphql";
+import NewApolloClient, { type ApolloClientResult } from "@/graphql";
 
 type Props = {
 	children: ReactNode;
@@ -21,3 +19,4 @@ const ApolloProvider: FC<Props> = (props) => {
 };
 
 export default memo(ApolloProvider);
+export { type ApolloClientResult };
