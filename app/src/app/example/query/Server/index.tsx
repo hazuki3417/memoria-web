@@ -7,6 +7,10 @@ const Server: FC = async () => {
 		variables: { id: "666fdc1f5229ae224fe83c96" },
 	});
 
+	// const result = await fetchQuery<Content, Input>(GQL, {
+	// 	variables: { id: "666fdc1f5229ae224fe83c96" },
+	// });
+
 	return <Presentation title="server component" {...result} />;
 };
 export default Server;

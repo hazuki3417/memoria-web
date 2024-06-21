@@ -1,7 +1,7 @@
 import { QueryOptions } from "@apollo/client";
 import { Input, Content } from "./type";
 import { GQL } from "./gql";
-import NewApolloClient from "@/graphql/client";
+import NewApolloClient from "@/graphql";
 
 const client = NewApolloClient();
 
