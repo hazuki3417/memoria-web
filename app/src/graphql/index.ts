@@ -3,6 +3,11 @@ import {
 	HttpLink,
 	InMemoryCache,
 	NormalizedCacheObject,
+	QueryOptions,
+	OperationVariables,
+	MutationOptions,
+	DocumentNode,
+	DefaultContext,
 } from "@apollo/client";
 
 let apollo: OriginClient<NormalizedCacheObject> | null = null;
@@ -39,5 +44,37 @@ const NewApolloClient = (init: NormalizedCacheObject | null = null) => {
 
 	return client;
 };
+export interface Input {
+	id: string;
+}
+
+const client = NewApolloClient();
+
+const query = <
+	T = any,
+	TVariables extends OperationVariables = OperationVariables,
+>(
+	gql: DocumentNode,
+	options?: Omit<QueryOptions<TVariables>, "query">,
+) => {
+	return client.query<T, TVariables>({ query: gql, ...options });
+};
+
+const mutation = <
+	T = any,
+	TVariables extends OperationVariables = OperationVariables,
+>(
+	gql: DocumentNode,
+	options: Omit<MutationOptions<T, TVariables>, "mutation">,
+) => {
+	return client.mutate<T, TVariables>({ mutation: gql, ...options });
+};
+
+export interface ApolloClientResult<T> {
+	loading: boolean;
+	data?: T;
+	error?: Error;
+}
 
 export default NewApolloClient;
+export { query, mutation };
