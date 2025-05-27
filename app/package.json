@@ -10,7 +10,9 @@
     "format": "biome format --write src",
     "dev:storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
-    "codegen:graphql": "graphql-codegen"
+    "codegen:graphql": "graphql-codegen",
+    "test:vrt": "playwright test --config=playwright.vrt.config.ts",
+    "test:app": "playwright test --config=playwright.app.config.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
