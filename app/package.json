@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev:next": "next dev",
+    "build:next": "next build",
     "start": "next start",
     "lint": "next lint",
     "format": "biome format --write src",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "codegen": "graphql-codegen"
+    "dev:storybook": "storybook dev -p 6006",
+    "build:storybook": "storybook build",
+    "codegen:graphql": "graphql-codegen"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
