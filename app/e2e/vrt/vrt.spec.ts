@@ -17,8 +17,8 @@ test.describe('Storybook VRT', () => {
   for (const entry of entryis) {
     test(`${entry.id}`, async ({ page }) => {
       await page.goto(`/iframe.html?id=${entry.id}`);
-      const root = page.locator('#root');
-      await expect(root).toHaveScreenshot(`${entry.id}.png`);
+      await expect(page).toHaveScreenshot(`${entry.id}.png`);
+      await page.close();
     });
   }
 });
