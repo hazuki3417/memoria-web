@@ -40,3 +40,4 @@ next-env.d.ts
 
 # playwright
 */test-results
+app/e2e/**/report
