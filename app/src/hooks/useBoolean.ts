@@ -11,12 +11,12 @@ export interface UseBoolean {
 
 export const useBoolean = (initial: boolean): UseBoolean => {
 	const [state, dispatch] = useReducer(booleanReducer, {
-		value: initial,
-		initial: initial,
+		current: { value: initial },
+		initial: { value: initial },
 	});
 
 	return {
-		state: state.value,
+		state: state.current.value,
 		setTrue: () => dispatch({ type: "true" }),
 		setFalse: () => dispatch({ type: "false" }),
 		toggle: () => dispatch({ type: "toggle" }),

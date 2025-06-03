@@ -1,6 +1,10 @@
 export interface BooleanState {
-	value: boolean;
-	initial: boolean;
+	current: {
+		value: boolean;
+	};
+	initial: {
+		value: boolean;
+	};
 }
 
 export type BooleanAction =
@@ -15,13 +19,13 @@ export const booleanReducer = (
 ): BooleanState => {
 	switch (action.type) {
 		case "true":
-			return { ...state, value: true };
+			return { ...state, current: { value: true } };
 		case "false":
-			return { ...state, value: false };
+			return { ...state, current: { value: false } };
 		case "toggle":
-			return { ...state, value: !state.value };
+			return { ...state, current: { value: !state.current.value } };
 		case "reset":
-			return { ...state, value: state.initial };
+			return { ...state, current: { value: state.initial.value } };
 		default:
 			throw new Error(`Unhandled action type: ${(action as any).type}`);
 	}
