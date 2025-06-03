@@ -3,55 +3,55 @@ import { booleanReducer, BooleanState, BooleanAction } from "./booleanReducer"; 
 
 describe("booleanReducer", () => {
 	it("should handle 'true' action", () => {
-		const result = booleanReducer(
+		const actual = booleanReducer(
 			{ current: { value: false }, initial: { value: false } },
 			{ type: "true" },
 		);
-		expect(result).toEqual({
+		expect(actual).toEqual({
 			current: { value: true },
 			initial: { value: false },
 		});
 	});
 
 	it("should handle 'false' action", () => {
-		const result = booleanReducer(
+		const actual = booleanReducer(
 			{ current: { value: true }, initial: { value: true } },
 			{ type: "false" },
 		);
-		expect(result).toEqual({
+		expect(actual).toEqual({
 			current: { value: false },
 			initial: { value: true },
 		});
 	});
 
 	it("should handle 'toggle' action from true to false", () => {
-		const result = booleanReducer(
+		const actual = booleanReducer(
 			{ current: { value: true }, initial: { value: false } },
 			{ type: "toggle" },
 		);
-		expect(result).toEqual({
+		expect(actual).toEqual({
 			current: { value: false },
 			initial: { value: false },
 		});
 	});
 
 	it("should handle 'toggle' action from false to true", () => {
-		const result = booleanReducer(
+		const actual = booleanReducer(
 			{ current: { value: false }, initial: { value: true } },
 			{ type: "toggle" },
 		);
-		expect(result).toEqual({
+		expect(actual).toEqual({
 			current: { value: true },
 			initial: { value: true },
 		});
 	});
 
 	it("should handle 'reset' action", () => {
-		const result = booleanReducer(
+		const actual = booleanReducer(
 			{ current: { value: true }, initial: { value: false } },
 			{ type: "reset" },
 		);
-		expect(result).toEqual({
+		expect(actual).toEqual({
 			current: { value: false },
 			initial: { value: false },
 		});

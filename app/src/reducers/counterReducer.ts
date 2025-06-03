@@ -44,7 +44,7 @@ export const counterReducer = (
 		const max = state.config.max ?? DEFAULT.CONFIG.MAX;
 		const success = min <= value && value <= max;
 		return {
-			value,
+			value: success ? value : state.current.value,
 			success,
 		};
 	};
@@ -55,7 +55,17 @@ export const counterReducer = (
 		const max = state.config.max ?? DEFAULT.CONFIG.MAX;
 		const success = min <= value && value <= max;
 		return {
-			value,
+			value: success ? value : state.current.value,
+			success,
+		};
+	};
+
+	const set = (value: number): CounterResult => {
+		const min = state.config.min ?? DEFAULT.CONFIG.MIN;
+		const max = state.config.max ?? DEFAULT.CONFIG.MAX;
+		const success = min <= value && value <= max;
+		return {
+			value: success ? value : state.current.value,
 			success,
 		};
 	};
@@ -65,6 +75,8 @@ export const counterReducer = (
 			return increment(action.step ?? DEFAULT.CONFIG.STEP);
 		case "decrement":
 			return decrement(action.step ?? DEFAULT.CONFIG.STEP);
+		case "set":
+			return set(action.value);
 		case "reset":
 			return {
 				value: state.initial.value ?? DEFAULT.INITIAL.VALUE,
