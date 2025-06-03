@@ -8,5 +8,16 @@
 		"rules": {
 			"recommended": true
 		}
+	},
+	"files": {
+		"ignore": [
+			"node_modules/",
+			"dist/",
+			"coverage/",
+			"*.snap",
+			".next/",
+			"storybook-static/",
+			"test-results/"
+		]
 	}
 }

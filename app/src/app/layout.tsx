@@ -1,5 +1,4 @@
 import "@mantine/core/styles.css";
-import "@xyflow/react/dist/style.css";
 import { ApolloProvider, ThemeProvider } from "@/component/containers";
 import { ColorSchemeScript, Container } from "@mantine/core";
 import { FC } from "react";
@@ -32,10 +31,10 @@ const RootLayout: FC<Props> = ({ children }) => {
 	return (
 		<html lang="en">
 			<head>
-				<ColorSchemeScript defaultColorScheme="light" />
+				<ColorSchemeScript defaultColorScheme="auto" />
 			</head>
 			<body>
-				<ThemeProvider defaultColorScheme="light" theme={theme}>
+				<ThemeProvider defaultColorScheme="auto" theme={theme}>
 					<ApolloProvider>
 						<Header />
 						<Container fluid style={style.container}>
