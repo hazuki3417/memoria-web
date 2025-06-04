@@ -1,0 +1,96 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev:next",
+      "type": "shell",
+      "isBackground": true,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run dev:next\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "dev:storybook",
+      "type": "shell",
+      "isBackground": true,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run dev:storybook\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "format",
+      "type": "shell",
+      "isBackground": false,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run format\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "test:unit",
+      "type": "shell",
+      "isBackground": false,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run test:unit\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "test:vrt",
+      "type": "shell",
+      "isBackground": false,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run test:vrt\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "test:vrt:update",
+      "type": "shell",
+      "isBackground": false,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run test:vrt:update\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "test:vrt:report",
+      "type": "shell",
+      "isBackground": false,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run test:vrt:report\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    }
+  ]
+}
