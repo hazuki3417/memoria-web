@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import data from "./index.json"; // 後述するJSON
+import data from "./../../storybook-static/index.json";
 
 // storybookのindex.jsonに記述されているentries要素オブジェクトの型定義
 type EntryType = {
