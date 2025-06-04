@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-	counterReducer,
-	CounterAction,
-	DEFAULT,
-} from "./counterReducer"; // パスは適宜修正
+import { counterReducer, CounterAction, DEFAULT } from "./counterReducer"; // パスは適宜修正
 
 describe("counterReducer", () => {
 	it("should increment with default step", () => {
