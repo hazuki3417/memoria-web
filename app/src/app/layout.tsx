@@ -1,47 +1,26 @@
 import "@mantine/core/styles.css";
-import { ApolloProvider, ThemeProvider } from "@/component/containers";
-import { ColorSchemeScript, Container } from "@mantine/core";
 import { FC } from "react";
 import { ReactNode } from "react";
 import type { Metadata } from "next";
-import { theme } from "@/lib/theme";
-import { Header } from "@/component/presentations/Header";
+import Head from "./Head";
+import Providers from "./Providers";
 
 const metadata: Metadata = {
 	title: "Memoria",
 	description: "Memoria",
 };
 
-type Props = {
+type RootLayoutProps = {
 	children: ReactNode;
 };
 
-const makeStyle = () => {
-	return {
-		container: {
-			height: "100vh",
-			minWidth: "1200px",
-		},
-	};
-};
-
-const RootLayout: FC<Props> = ({ children }) => {
-	const style = makeStyle();
-
+const RootLayout: FC<RootLayoutProps> = ({ children }) => {
 	return (
-		<html lang="en">
-			<head>
-				<ColorSchemeScript defaultColorScheme="auto" />
-			</head>
+		<html data-mantine-color-scheme="dark">
+			{/* FIX: data-mantine-color-scheme="dark"の記述がない場合、ハイドレーションの差分が発生してエラーになる */}
+			<Head />
 			<body>
-				<ThemeProvider defaultColorScheme="auto" theme={theme}>
-					<ApolloProvider>
-						<Header />
-						<Container fluid style={style.container}>
-							{children}
-						</Container>
-					</ApolloProvider>
-				</ThemeProvider>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);
