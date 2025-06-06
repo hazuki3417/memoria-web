@@ -1,2 +1,2 @@
 export * from "./useBoolean";
-export * from "./useDisclosure"
+export * from "./useDisclosure";

@@ -4,13 +4,13 @@ import { useDisclosure } from "./useDisclosure";
 
 describe("useDisclosure", () => {
 	it("should initialize with initial value", () => {
-		const { result } = renderHook(() => useDisclosure({opend: true}));
+		const { result } = renderHook(() => useDisclosure({ opend: true }));
 
 		expect(result.current.state.opend).toBe(true);
 	});
 
 	it("should set open", () => {
-		const { result } = renderHook(() => useDisclosure({opend: false}));
+		const { result } = renderHook(() => useDisclosure({ opend: false }));
 
 		act(() => {
 			result.current.handler.open();
@@ -20,7 +20,7 @@ describe("useDisclosure", () => {
 	});
 
 	it("should set close", () => {
-		const { result } = renderHook(() => useDisclosure({opend: true}));
+		const { result } = renderHook(() => useDisclosure({ opend: true }));
 
 		act(() => {
 			result.current.handler.close();
@@ -30,7 +30,7 @@ describe("useDisclosure", () => {
 	});
 
 	it("should toggle value", () => {
-		const { result } = renderHook(() => useDisclosure({opend: false}));
+		const { result } = renderHook(() => useDisclosure({ opend: false }));
 
 		act(() => {
 			result.current.handler.toggle();
@@ -46,7 +46,7 @@ describe("useDisclosure", () => {
 	});
 
 	it("should reset to initial", () => {
-		const { result } = renderHook(() => useDisclosure({opend: true}));
+		const { result } = renderHook(() => useDisclosure({ opend: true }));
 
 		act(() => {
 			result.current.handler.close();
