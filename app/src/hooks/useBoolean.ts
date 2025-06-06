@@ -1,25 +1,37 @@
 import { booleanReducer } from "@/reducers";
-import { useReducer } from "react";
+import { useCallback, useReducer } from "react";
 
-export interface UseBoolean {
-	state: boolean;
+export type UseBooleanState = boolean;
+
+export type UseBooleanHandler = {
 	setTrue: () => void;
 	setFalse: () => void;
 	toggle: () => void;
 	reset: () => void;
+};
+export interface UseBoolean {
+	state: UseBooleanState;
+	handler: UseBooleanHandler;
 }
 
-export const useBoolean = (initial: boolean): UseBoolean => {
+export const useBoolean = (initial: UseBooleanState): UseBoolean => {
 	const [state, dispatch] = useReducer(booleanReducer, {
 		current: { value: initial },
 		initial: { value: initial },
 	});
 
+	const setTrue = useCallback(() => dispatch({ type: "true" }), []);
+	const setFalse = useCallback(() => dispatch({ type: "false" }), []);
+	const toggle = useCallback(() => dispatch({ type: "toggle" }), []);
+	const reset = useCallback(() => dispatch({ type: "reset" }), []);
+
 	return {
 		state: state.current.value,
-		setTrue: () => dispatch({ type: "true" }),
-		setFalse: () => dispatch({ type: "false" }),
-		toggle: () => dispatch({ type: "toggle" }),
-		reset: () => dispatch({ type: "reset" }),
+		handler: {
+			setTrue,
+			setFalse,
+			toggle,
+			reset,
+		},
 	};
 };
