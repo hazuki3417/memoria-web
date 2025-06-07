@@ -1,135 +1,97 @@
 import { describe, expect, it } from "vitest";
-import { type CounterAction, DEFAULT, counterReducer } from "./counterReducer"; // パスは適宜修正
+import { type CounterAction, counterReducer } from "./counterReducer"; // パスは適宜修正
 
 describe("counterReducer", () => {
   it("should increment with default step", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 10 },
-        initial: { value: 0 },
-        config: {},
-      },
-      { type: "increment" },
-    );
-    expect(actual).toEqual({ value: 10 + DEFAULT.CONFIG.STEP, success: true });
+    const state = {
+      current: { value: 5 },
+      initial: { value: 0 },
+      config: { step: 1 },
+    };
+    const actual = counterReducer(state, { type: "increment" });
+
+    const expected = {
+      ...state,
+      current: { value: 6 },
+    };
+
+    expect(actual).toEqual(expected);
   });
 
   it("should increment with provided step", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 5 },
-        initial: { value: 0 },
-        config: {},
-      },
-      { type: "increment", step: 3 },
-    );
-    expect(actual).toEqual({ value: 5 + 3, success: true });
-  });
+    const state = {
+      current: { value: 5 },
+      initial: { value: 0 },
+      config: { step: 1 },
+    };
+    const actual = counterReducer(state, { type: "increment", step: 3 });
 
-  it("should not increment if exceeds max", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 10 },
-        initial: { value: 0 },
-        config: { max: 12 },
-      },
-      { type: "increment", step: 3 },
-    );
-    expect(actual).toEqual({ value: 10, success: false });
+    const expected = {
+      ...state,
+      current: { value: 8 },
+    };
+
+    expect(actual).toEqual(expected);
   });
 
   it("should decrement with default step", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 10 },
-        initial: { value: 0 },
-        config: {},
-      },
-      { type: "decrement" },
-    );
-    expect(actual).toEqual({ value: 10 - DEFAULT.CONFIG.STEP, success: true });
+    const state = {
+      current: { value: 10 },
+      initial: { value: 0 },
+      config: { step: 1 },
+    };
+    const actual = counterReducer(state, { type: "decrement" });
+
+    const expected = {
+      ...state,
+      current: { value: 9 },
+    };
+
+    expect(actual).toEqual(expected);
   });
 
   it("should decrement with provided step", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 5 },
-        initial: { value: 0 },
-        config: {},
-      },
-      { type: "decrement", step: 2 },
-    );
-    expect(actual).toEqual({ value: 5 - 2, success: true });
-  });
+    const state = {
+      current: { value: 10 },
+      initial: { value: 0 },
+      config: { step: 1 },
+    };
+    const actual = counterReducer(state, { type: "decrement", step: 2 });
 
-  it("should not decrement if falls below min", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 10 },
-        initial: { value: 0 },
-        config: { min: 8 },
-      },
-      { type: "decrement", step: 3 },
-    );
-    expect(actual).toEqual({ value: 10, success: false });
-  });
+    const expected = {
+      ...state,
+      current: { value: 8 },
+    };
 
-  it("should set value within bounds", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 10 },
-        initial: { value: 0 },
-        config: { min: 0, max: 20 },
-      },
-      { type: "set", value: 15 },
-    );
-    expect(actual).toEqual({ value: 15, success: true });
-  });
-
-  it("should not set value if out of bounds", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 10 },
-        initial: { value: 0 },
-        config: { min: 0, max: 20 },
-      },
-      { type: "set", value: 25 },
-    );
-    expect(actual).toEqual({ value: 10, success: false });
+    expect(actual).toEqual(expected);
   });
 
   it("should reset to initial value", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 100 },
-        initial: { value: 20 },
-        config: {},
-      },
-      { type: "reset" },
-    );
-    expect(actual).toEqual({ value: 20, success: true });
-  });
+    const state = {
+      current: { value: 100 },
+      initial: { value: 20 },
+      config: { step: 1 },
+    };
+    const actual = counterReducer(state, { type: "reset" });
 
-  it("should reset to default if initial not specified", () => {
-    const actual = counterReducer(
-      {
-        current: { value: 100 },
-        initial: {},
-        config: {},
-      },
-      { type: "reset" },
-    );
-    expect(actual).toEqual({ value: DEFAULT.INITIAL.VALUE, success: true });
+    const expected = {
+      ...state,
+      current: { value: state.initial.value },
+    };
+
+    expect(actual).toEqual(expected);
   });
 
   it("should throw error on unknown action", () => {
+    const state = {
+      current: { value: 100 },
+      initial: { value: 20 },
+      config: { step: 1 },
+    };
+
     expect(() => {
       counterReducer(
-        {
-          current: { value: 0 },
-          initial: { value: 0 },
-          config: {},
-        },
+        state,
         // @ts-expect-error: intentionally testing invalid action
         { type: "unknown" } as CounterAction,
       );

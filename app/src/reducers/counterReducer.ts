@@ -5,12 +5,10 @@ export interface CounterState {
     value: number;
   };
   initial: {
-    value?: number;
+    value: number;
   };
   config: {
-    step?: number;
-    min?: number;
-    max?: number;
+    step: number;
   };
 }
 
@@ -20,69 +18,46 @@ export type CounterAction =
   | { type: "set"; value: number }
   | { type: "reset" };
 
-export interface CounterResult {
-  value: number;
-  success: boolean;
-}
-
-export const DEFAULT = {
-  INITIAL: {
-    VALUE: 0,
-  },
-  CONFIG: {
-    MIN: Number.MIN_SAFE_INTEGER,
-    MAX: Number.MAX_SAFE_INTEGER,
-    STEP: 1,
-  },
-};
-
 export const counterReducer = (
   state: CounterState,
   action: CounterAction,
-): CounterResult => {
-  const increment = (step: number): CounterResult => {
-    const value = state.current.value + step;
-    const min = state.config.min ?? DEFAULT.CONFIG.MIN;
-    const max = state.config.max ?? DEFAULT.CONFIG.MAX;
-    const success = min <= value && value <= max;
+): CounterState => {
+  const increment = (step: number): CounterState => {
     return {
-      value: success ? value : state.current.value,
-      success,
+      ...state,
+      current: {
+        value: state.current.value + step,
+      },
     };
   };
 
-  const decrement = (step: number): CounterResult => {
-    const value = state.current.value - step;
-    const min = state.config.min ?? DEFAULT.CONFIG.MIN;
-    const max = state.config.max ?? DEFAULT.CONFIG.MAX;
-    const success = min <= value && value <= max;
+  const decrement = (step: number): CounterState => {
     return {
-      value: success ? value : state.current.value,
-      success,
-    };
-  };
-
-  const set = (value: number): CounterResult => {
-    const min = state.config.min ?? DEFAULT.CONFIG.MIN;
-    const max = state.config.max ?? DEFAULT.CONFIG.MAX;
-    const success = min <= value && value <= max;
-    return {
-      value: success ? value : state.current.value,
-      success,
+      ...state,
+      current: {
+        value: state.current.value - step,
+      },
     };
   };
 
   switch (action.type) {
     case "increment":
-      return increment(action.step ?? DEFAULT.CONFIG.STEP);
+      return increment(action.step ?? state.config.step);
     case "decrement":
-      return decrement(action.step ?? DEFAULT.CONFIG.STEP);
+      return decrement(action.step ?? state.config.step);
     case "set":
-      return set(action.value);
+      return {
+        ...state,
+        current: {
+          value: action.value,
+        },
+      };
     case "reset":
       return {
-        value: state.initial.value ?? DEFAULT.INITIAL.VALUE,
-        success: true,
+        ...state,
+        current: {
+          value: state.initial.value,
+        },
       };
     default:
       throw assertUnreachableActionType(action);
