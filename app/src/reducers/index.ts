@@ -1,2 +1,2 @@
 export * from "./booleanReducer";
-export * from "./counterReducer";
+export * from "./numberReducer";
