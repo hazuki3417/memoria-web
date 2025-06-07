@@ -1,9 +1,9 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { useSlider, UseSliderState } from "./useSlider";
+import { useSlider, UseSliderOption, UseSliderState } from "./useSlider";
 
 describe("useSlider", () => {
-  const createInitialState = (): UseSliderState => ({
+  const createInitialState = (): UseSliderOption => ({
     value: 5,
     config: {
       step: 2,

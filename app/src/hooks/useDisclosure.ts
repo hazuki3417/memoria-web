@@ -1,15 +1,17 @@
-import { UseBooleanHandler, UseBooleanState, useBoolean } from "./useBoolean";
+import { useBoolean } from "./useBoolean";
 
 export type UseDisclosureState = {
   opend: boolean;
 };
 
-export type UseDisclosureHandler = {
+export type UseDisclosureOption = UseDisclosureState;
+
+export interface UseDisclosureHandler {
   open: () => void;
   close: () => void;
   toggle: () => void;
   reset: () => void;
-};
+}
 
 export interface UseDisclosure {
   state: UseDisclosureState;
@@ -18,11 +20,11 @@ export interface UseDisclosure {
 
 /**
  * Modal, Dialog, Drawerの開閉状態を制御するカスタムフック
- * @param initial
+ * @param option
  * @returns
  */
-export const useDisclosure = (initial: UseDisclosureState): UseDisclosure => {
-  const { state, handler } = useBoolean(initial.opend);
+export const useDisclosure = (option: UseDisclosureOption): UseDisclosure => {
+  const { state, handler } = useBoolean(option.opend);
 
   return {
     state: { opend: state },

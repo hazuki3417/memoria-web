@@ -7,6 +7,9 @@ const clamp = (value: number, min: number, max: number): number => {
 
 export type UseSliderState = {
   value: number;
+  initial: {
+    value: number;
+  };
   config: {
     step: number;
     min: number;
@@ -14,44 +17,45 @@ export type UseSliderState = {
   };
 };
 
-export type UseSliderHandler = {
+export type UseSliderOption = Pick<UseSliderState, "value" | "config">;
+
+export interface UseSliderHandler {
   up: () => void;
   down: () => void;
   change: (value: number) => void;
   reset: () => void;
-};
+}
+
 export interface UseSlider {
   state: UseSliderState;
   handler: UseSliderHandler;
 }
 
-export const useSlider = (initial: UseSliderState): UseSlider => {
+export const useSlider = (option: UseSliderOption): UseSlider => {
   const [state, dispatch] = useReducer(numberReducer, {
-    current: { value: initial.value },
-    initial: { value: initial.value },
-    config: {
-      step: initial.config.step,
-    },
+    current: { value: option.value },
+    initial: { value: option.value },
+    config: option.config,
   });
 
   const up = useCallback(() => {
     const candidate = state.current.value + state.config.step;
-    const clamped = clamp(candidate, initial.config.min, initial.config.max);
+    const clamped = clamp(candidate, option.config.min, option.config.max);
     dispatch({ type: "set", value: clamped });
-  }, [state.current.value, initial.config]);
+  }, [state.current.value, option.config]);
 
   const down = useCallback(() => {
     const candidate = state.current.value - state.config.step;
-    const clamped = clamp(candidate, initial.config.min, initial.config.max);
+    const clamped = clamp(candidate, option.config.min, option.config.max);
     dispatch({ type: "set", value: clamped });
-  }, [state.current.value, initial.config]);
+  }, [state.current.value, option.config]);
 
   const change = useCallback(
     (value: number) => {
-      const clamped = clamp(value, initial.config.min, initial.config.max);
+      const clamped = clamp(value, option.config.min, option.config.max);
       dispatch({ type: "set", value: clamped });
     },
-    [initial.config],
+    [option.config],
   );
 
   const reset = useCallback(() => {
@@ -61,7 +65,10 @@ export const useSlider = (initial: UseSliderState): UseSlider => {
   return {
     state: {
       value: state.current.value,
-      config: initial.config,
+      initial: {
+        value: state.initial.value,
+      },
+      config: option.config,
     },
     handler: {
       up,

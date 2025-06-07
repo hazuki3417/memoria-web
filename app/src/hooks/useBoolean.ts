@@ -3,21 +3,23 @@ import { useCallback, useReducer } from "react";
 
 export type UseBooleanState = boolean;
 
-export type UseBooleanHandler = {
+export type UseBooleanOption = UseBooleanState;
+
+export interface UseBooleanHandler {
   setTrue: () => void;
   setFalse: () => void;
   toggle: () => void;
   reset: () => void;
-};
+}
 export interface UseBoolean {
   state: UseBooleanState;
   handler: UseBooleanHandler;
 }
 
-export const useBoolean = (initial: UseBooleanState): UseBoolean => {
+export const useBoolean = (option: UseBooleanOption): UseBoolean => {
   const [state, dispatch] = useReducer(booleanReducer, {
-    current: { value: initial },
-    initial: { value: initial },
+    current: { value: option },
+    initial: { value: option },
   });
 
   const setTrue = useCallback(() => dispatch({ type: "true" }), []);
