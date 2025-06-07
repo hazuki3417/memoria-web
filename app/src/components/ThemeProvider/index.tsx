@@ -1,3 +1,3 @@
-import { MantineProvider, MantineProviderProps } from "@mantine/core";
+import { MantineProvider, type MantineProviderProps } from "@mantine/core";
 export default MantineProvider;
-export { type MantineProviderProps };
+export type { MantineProviderProps };

@@ -1,61 +1,61 @@
-import { describe, it, expect } from "vitest";
 import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { useDisclosure } from "./useDisclosure";
 
 describe("useDisclosure", () => {
-	it("should initialize with initial value", () => {
-		const { result } = renderHook(() => useDisclosure({ opend: true }));
+  it("should initialize with initial value", () => {
+    const { result } = renderHook(() => useDisclosure({ opend: true }));
 
-		expect(result.current.state.opend).toBe(true);
-	});
+    expect(result.current.state.opend).toBe(true);
+  });
 
-	it("should set open", () => {
-		const { result } = renderHook(() => useDisclosure({ opend: false }));
+  it("should set open", () => {
+    const { result } = renderHook(() => useDisclosure({ opend: false }));
 
-		act(() => {
-			result.current.handler.open();
-		});
+    act(() => {
+      result.current.handler.open();
+    });
 
-		expect(result.current.state.opend).toBe(true);
-	});
+    expect(result.current.state.opend).toBe(true);
+  });
 
-	it("should set close", () => {
-		const { result } = renderHook(() => useDisclosure({ opend: true }));
+  it("should set close", () => {
+    const { result } = renderHook(() => useDisclosure({ opend: true }));
 
-		act(() => {
-			result.current.handler.close();
-		});
+    act(() => {
+      result.current.handler.close();
+    });
 
-		expect(result.current.state.opend).toBe(false);
-	});
+    expect(result.current.state.opend).toBe(false);
+  });
 
-	it("should toggle value", () => {
-		const { result } = renderHook(() => useDisclosure({ opend: false }));
+  it("should toggle value", () => {
+    const { result } = renderHook(() => useDisclosure({ opend: false }));
 
-		act(() => {
-			result.current.handler.toggle();
-		});
+    act(() => {
+      result.current.handler.toggle();
+    });
 
-		expect(result.current.state.opend).toBe(true);
+    expect(result.current.state.opend).toBe(true);
 
-		act(() => {
-			result.current.handler.toggle();
-		});
+    act(() => {
+      result.current.handler.toggle();
+    });
 
-		expect(result.current.state.opend).toBe(false);
-	});
+    expect(result.current.state.opend).toBe(false);
+  });
 
-	it("should reset to initial", () => {
-		const { result } = renderHook(() => useDisclosure({ opend: true }));
+  it("should reset to initial", () => {
+    const { result } = renderHook(() => useDisclosure({ opend: true }));
 
-		act(() => {
-			result.current.handler.close();
-		});
-		expect(result.current.state.opend).toBe(false);
+    act(() => {
+      result.current.handler.close();
+    });
+    expect(result.current.state.opend).toBe(false);
 
-		act(() => {
-			result.current.handler.reset();
-		});
-		expect(result.current.state.opend).toBe(true);
-	});
+    act(() => {
+      result.current.handler.reset();
+    });
+    expect(result.current.state.opend).toBe(true);
+  });
 });

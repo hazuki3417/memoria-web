@@ -1,19 +1,19 @@
-import { useBoolean, UseBooleanHandler, UseBooleanState } from "./useBoolean";
+import { UseBooleanHandler, UseBooleanState, useBoolean } from "./useBoolean";
 
 export type UseDisclosureState = {
-	opend: boolean;
+  opend: boolean;
 };
 
 export type UseDisclosureHandler = {
-	open: () => void;
-	close: () => void;
-	toggle: () => void;
-	reset: () => void;
+  open: () => void;
+  close: () => void;
+  toggle: () => void;
+  reset: () => void;
 };
 
 export interface UseDisclosure {
-	state: UseDisclosureState;
-	handler: UseDisclosureHandler;
+  state: UseDisclosureState;
+  handler: UseDisclosureHandler;
 }
 
 /**
@@ -22,15 +22,15 @@ export interface UseDisclosure {
  * @returns
  */
 export const useDisclosure = (initial: UseDisclosureState): UseDisclosure => {
-	const { state, handler } = useBoolean(initial.opend);
+  const { state, handler } = useBoolean(initial.opend);
 
-	return {
-		state: { opend: state },
-		handler: {
-			open: handler.setTrue,
-			close: handler.setFalse,
-			toggle: handler.toggle,
-			reset: handler.reset,
-		},
-	};
+  return {
+    state: { opend: state },
+    handler: {
+      open: handler.setTrue,
+      close: handler.setFalse,
+      toggle: handler.toggle,
+      reset: handler.reset,
+    },
+  };
 };

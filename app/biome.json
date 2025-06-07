@@ -1,23 +1,27 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.8.0/schema.json",
-	"organizeImports": {
-		"enabled": true
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true
-		}
-	},
-	"files": {
-		"ignore": [
-			"node_modules/",
-			"dist/",
-			"coverage/",
-			"*.snap",
-			".next/",
-			"storybook-static/",
-			"test-results/"
-		]
-	}
+  "$schema": "https://biomejs.dev/schemas/1.8.0/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    },
+    "include": ["src/**"]
+  },
+  "formatter": {
+    "indentStyle": "space"
+  },
+  "files": {
+    "ignore": [
+      "node_modules/",
+      "dist/",
+      "coverage/",
+      "*.snap",
+      ".next/",
+      "storybook-static/",
+      "test-results/"
+    ]
+  }
 }

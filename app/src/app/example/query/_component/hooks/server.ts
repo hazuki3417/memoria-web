@@ -1,7 +1,7 @@
-import { QueryOptions } from "@apollo/client";
-import { Input, Content } from "./type";
-import { GQL } from "./gql";
 import NewApolloClient from "@/graphql";
+import type { QueryOptions } from "@apollo/client";
+import { GQL } from "./gql";
+import type { Content, Input } from "./type";
 
 const client = NewApolloClient();
 
@@ -13,7 +13,7 @@ const client = NewApolloClient();
 
 type Options = Omit<QueryOptions<Input>, "query">;
 const fetchData = async (options: Options) => {
-	return await client.query<Content, Input>({ query: GQL, ...options });
+  return await client.query<Content, Input>({ query: GQL, ...options });
 };
 
 export default fetchData;

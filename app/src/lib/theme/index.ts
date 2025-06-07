@@ -1,6 +1,6 @@
 "use client";
 
-import { createTheme, DEFAULT_THEME, mergeMantineTheme } from "@mantine/core";
+import { DEFAULT_THEME, createTheme, mergeMantineTheme } from "@mantine/core";
 
 export const overrideThema = createTheme({});
 
