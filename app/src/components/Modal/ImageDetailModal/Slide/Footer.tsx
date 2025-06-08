@@ -1,14 +1,5 @@
 import { useSlider } from "@/hooks/useSlider";
-import {
-  ActionIcon,
-  Box,
-  type BoxProps,
-  Combobox,
-  NativeSelect,
-  Slider,
-  Text,
-} from "@mantine/core";
-import { useCounter } from "@mantine/hooks";
+import { ActionIcon, Box, type BoxProps, Slider, Text } from "@mantine/core";
 import {
   IconDownload,
   IconInfoCircle,
@@ -17,6 +8,7 @@ import {
   IconZoomReset,
 } from "@tabler/icons-react";
 import { useCallback } from "react";
+import { ZoomCombobox } from "./ZoomCombobox";
 
 export type FooterPayload = {
   current: number;
@@ -40,8 +32,8 @@ export interface FooterProps extends BoxProps {
 export const Footer = (props: FooterProps) => {
   const { payload, handler } = props;
   const slider = useSlider({
-    value: 0,
-    config: { step: 10, min: 0, max: 100 },
+    value: 100,
+    config: { step: 10, min: 100, max: 300 },
   });
 
   const zoomReset = useCallback(() => {
@@ -135,11 +127,19 @@ export const Footer = (props: FooterProps) => {
           <ActionIcon variant="subtle" color="gray" onClick={zoomReset}>
             <IconZoomReset />
           </ActionIcon>
+          <ZoomCombobox
+            value={slider.state.value}
+            config={slider.state.config}
+            handler={{
+              onOptionSubmit: zoomChange,
+              onBlur: zoomChange,
+            }}
+          />
           <ActionIcon variant="subtle" color="gray" onClick={zoomOut}>
             <IconZoomOut />
           </ActionIcon>
           <Slider
-            w={140}
+            w={120}
             color="gray"
             size="sm"
             radius="xs"
