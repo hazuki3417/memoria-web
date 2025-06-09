@@ -76,7 +76,12 @@ export const Info = (props: InfoProps) => {
             justifyContent: "center",
           })}
         >
-          <ActionIcon variant="subtle" color="gray" onClick={handler?.onClose}>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            data-testid="close-info"
+            onClick={handler?.onClose}
+          >
             <IconX />
           </ActionIcon>
         </Box>
@@ -152,7 +157,12 @@ export const Info = (props: InfoProps) => {
             justifyContent: "center",
           })}
         >
-          <ActionIcon variant="subtle" color="gray" onClick={handler?.onEdit}>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            data-testid="edit-info"
+            onClick={handler?.onEdit}
+          >
             <IconEdit />
           </ActionIcon>
         </Box>
@@ -163,7 +173,12 @@ export const Info = (props: InfoProps) => {
             justifyContent: "center",
           })}
         >
-          <ActionIcon variant="subtle" color="gray" onClick={handler?.onDelete}>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            data-testid="delete-image"
+            onClick={handler?.onDelete}
+          >
             <IconTrash />
           </ActionIcon>
         </Box>

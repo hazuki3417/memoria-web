@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn, userEvent, within } from "@storybook/test";
 import { Info } from "./Info";
 
 const meta = {
@@ -23,5 +24,16 @@ export const Default: Story = {
       },
       tags: ["SAO", "ジークアクス", "Fate"],
     },
+    handler: {
+      onClose: fn(),
+      onDelete: fn(),
+      onEdit: fn(),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByTestId("close-info"));
+    await userEvent.click(canvas.getByTestId("edit-info"));
+    await userEvent.click(canvas.getByTestId("delete-image"));
   },
 };
