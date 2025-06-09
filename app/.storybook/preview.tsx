@@ -1,10 +1,10 @@
 import type React from "react";
 import "@mantine/core/styles.css";
-import { MantineProvider, useMantineColorScheme } from "@mantine/core";
+import { useMantineColorScheme } from "@mantine/core";
 import { addons } from "@storybook/preview-api";
 import { useEffect } from "react";
 import { DARK_MODE_EVENT_NAME } from "storybook-dark-mode";
-import { theme } from "../src/lib/theme";
+import { ThemeProvider } from "@/components";
 
 const channel = addons.getChannel();
 
@@ -29,7 +29,5 @@ export const decorators = [
   (renderStory: any) => (
     <ColorSchemeWrapper>{renderStory()}</ColorSchemeWrapper>
   ),
-  (renderStory: any) => (
-    <MantineProvider theme={theme}>{renderStory()}</MantineProvider>
-  ),
+  (renderStory: any) => <ThemeProvider>{renderStory()}</ThemeProvider>,
 ];
