@@ -95,6 +95,7 @@ export const Footer = (props: FooterProps) => {
             variant="subtle"
             color="gray"
             onClick={handler?.onDownload}
+            data-testid="download-image"
           >
             <IconDownload />
           </ActionIcon>
@@ -124,7 +125,7 @@ export const Footer = (props: FooterProps) => {
             justifyContent: "end",
           })}
         >
-          <ActionIcon variant="subtle" color="gray" onClick={zoomReset}>
+          <ActionIcon data-testid="zoom-reset" onClick={zoomReset}>
             <IconZoomReset />
           </ActionIcon>
           <ZoomCombobox
@@ -135,7 +136,7 @@ export const Footer = (props: FooterProps) => {
               onBlur: zoomChange,
             }}
           />
-          <ActionIcon variant="subtle" color="gray" onClick={zoomOut}>
+          <ActionIcon data-testid="zoom-out" onClick={zoomOut}>
             <IconZoomOut />
           </ActionIcon>
           <Slider
@@ -150,7 +151,7 @@ export const Footer = (props: FooterProps) => {
             max={slider.state.config.max}
             onChange={zoomChange}
           />
-          <ActionIcon variant="subtle" color="gray" onClick={zoomIn}>
+          <ActionIcon data-testid="zoom-in" onClick={zoomIn}>
             <IconZoomIn />
           </ActionIcon>
         </Box>
@@ -164,7 +165,7 @@ export const Footer = (props: FooterProps) => {
           justifyContent: "center",
         })}
       >
-        <ActionIcon variant="subtle" color="gray" onClick={handler?.onInfo}>
+        <ActionIcon data-testid="open-info" onClick={handler?.onInfo}>
           <IconInfoCircle />
         </ActionIcon>
       </Box>

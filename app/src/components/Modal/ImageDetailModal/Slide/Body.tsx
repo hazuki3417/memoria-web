@@ -39,6 +39,7 @@ export const Body = (props: BodyProps) => {
             alignItems: "center",
             justifyContent: "center",
           })}
+          data-testid="prev-image"
           onClick={handler?.onPrev}
         >
           <IconChevronCompactLeft />
@@ -58,6 +59,7 @@ export const Body = (props: BodyProps) => {
             alignItems: "center",
             justifyContent: "center",
           })}
+          data-testid="next-image"
           onClick={handler?.onNext}
         >
           <IconChevronCompactRight />

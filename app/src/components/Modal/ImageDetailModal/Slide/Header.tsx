@@ -40,7 +40,12 @@ export const Header = (props: HeaderProps) => {
           justifyContent: "center",
         })}
       >
-        <ActionIcon variant="subtle" color="gray" onClick={handler?.onClose}>
+        <ActionIcon
+          variant="subtle"
+          color="gray"
+          data-testid="close-slide"
+          onClick={handler?.onClose}
+        >
           <IconX />
         </ActionIcon>
       </Box>

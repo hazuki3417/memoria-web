@@ -1,4 +1,4 @@
-import { Box, type BoxProps } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { Header, HeaderHandler } from "./Header";
 import { Body, BodyHandler } from "./Body";
 import { Footer, FooterHandler, FooterPayload } from "./Footer";
@@ -10,7 +10,7 @@ export type SlidePayload = {
 
 export type SlideHandler = HeaderHandler & BodyHandler & FooterHandler;
 
-export interface SlideProps extends BoxProps {
+export interface SlideProps {
   children: React.ReactNode;
   payload: SlidePayload;
   handler?: SlideHandler;
