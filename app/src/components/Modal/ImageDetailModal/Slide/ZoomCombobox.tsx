@@ -70,7 +70,7 @@ export const ZoomCombobox = (props: ZoomComboboxProps) => {
       combobox.openDropdown();
       combobox.updateSelectedOptionIndex();
 
-      const input = normalizeInput(event.currentTarget.value)
+      const input = normalizeInput(event.currentTarget.value);
 
       setChanged(true);
       setZoomLevel(input);
