@@ -1,5 +1,5 @@
 "use client";
-import { GraphQLProvider, ThemeProvider } from "@/components";
+import { GraphQLProvider, ThemeProvider } from "@/providers";
 import type React from "react";
 import { memo } from "react";
 
