@@ -1,4 +1,3 @@
-import { useSlider } from "@/hooks/useSlider";
 import { ActionIcon, Box, type BoxProps, Slider, Text } from "@mantine/core";
 import {
   IconDownload,
@@ -16,49 +15,34 @@ export type FooterPayload = {
   limit: number;
 };
 
+export type FooterUi = {
+  level: number;
+};
+
+export type FooterConfig = {
+  step: number;
+  min: number;
+  max: number;
+};
+
 export type FooterHandler = {
-  onZoomReset?: (value: number) => void;
-  onZoomIn?: (value: number) => void;
-  onZoomOut?: (value: number) => void;
-  onZoomChange?: (value: number) => void;
   onDownload?: React.MouseEventHandler<HTMLButtonElement>;
   onInfo?: React.MouseEventHandler<HTMLButtonElement>;
+  onZoomChange?: (value: number) => void;
+  onZoomIn?: React.MouseEventHandler<HTMLButtonElement>;
+  onZoomOut?: React.MouseEventHandler<HTMLButtonElement>;
+  onZoomReset?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 export interface FooterProps extends BoxProps {
   payload: FooterPayload;
+  ui: FooterUi;
+  config: FooterConfig;
   handler?: FooterHandler;
 }
 
 export const Footer = (props: FooterProps) => {
-  const { payload, handler } = props;
-  const slider = useSlider({
-    value: 100,
-    config: { step: 10, min: 100, max: 300 },
-  });
-
-  const zoomReset = useCallback(() => {
-    slider.handler.reset();
-    handler?.onZoomReset?.(slider.state.value);
-  }, [slider.handler, slider.state.value, handler?.onZoomReset]);
-
-  const zoomIn = useCallback(() => {
-    slider.handler.up();
-    handler?.onZoomIn?.(slider.state.value);
-  }, [slider.handler, slider.state.value, handler?.onZoomIn]);
-
-  const zoomOut = useCallback(() => {
-    slider.handler.down();
-    handler?.onZoomOut?.(slider.state.value);
-  }, [slider.handler, slider.state.value, handler?.onZoomOut]);
-
-  const zoomChange = useCallback(
-    (value: number) => {
-      slider.handler.change(value);
-      handler?.onZoomChange?.(value);
-    },
-    [slider.handler, slider.state.value, handler?.onZoomChange],
-  );
+  const { payload, ui, config, handler } = props;
 
   return (
     <Box
@@ -115,29 +99,28 @@ export const Footer = (props: FooterProps) => {
             justifyContent: "end",
           })}
         >
-          <ZoomResetButton onClick={zoomReset} />
+          <ZoomResetButton onClick={handler?.onZoomReset} />
           <ZoomCombobox
-            value={slider.state.value}
-            config={slider.state.config}
+            value={ui.level}
+            config={config}
             handler={{
-              onOptionSubmit: zoomChange,
-              onBlur: zoomChange,
+              onOptionSubmit: handler?.onZoomChange,
+              onBlur: handler?.onZoomChange,
             }}
           />
-          <ZoomOutButton onClick={zoomOut} />
+          <ZoomOutButton onClick={handler?.onZoomOut} />
           <Slider
             w={120}
             color="gray"
             size="sm"
             radius="xs"
             showLabelOnHover={false}
-            defaultValue={slider.state.initial.value}
-            value={slider.state.value}
-            min={slider.state.config.min}
-            max={slider.state.config.max}
-            onChange={zoomChange}
+            value={ui.level}
+            min={config.min}
+            max={config.max}
+            onChange={handler?.onZoomChange}
           />
-          <ZoomInButton onClick={zoomIn} />
+          <ZoomInButton onClick={handler?.onZoomIn} />
         </Box>
       </Box>
       <Box

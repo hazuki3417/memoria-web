@@ -13,10 +13,11 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     payload: {
-      footer: {
-        current: 1,
-        limit: 20,
-      },
+      current: 1,
+      limit: 20,
+    },
+    ui: {
+      level: 100,
     },
     children: (
       <>

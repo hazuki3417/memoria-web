@@ -1,25 +1,35 @@
 import { Box } from "@mantine/core";
 import { Header, HeaderHandler } from "./Header";
 import { Body, BodyHandler } from "./Body";
-import { Footer, FooterHandler, FooterPayload } from "./Footer";
+import { Footer, FooterHandler, FooterPayload, FooterUi } from "./Footer";
 import React from "react";
 
-export type SlidePayload = {
-  footer: FooterPayload;
-};
+export type SlidePayload = FooterPayload;
+
+export type SlideUi = FooterUi;
 
 export type SlideHandler = HeaderHandler & BodyHandler & FooterHandler;
 
 export interface SlideProps {
   children: React.ReactNode;
   payload: SlidePayload;
+  ui: SlideUi;
   handler?: SlideHandler;
 }
 
 export const Slide = (props: SlideProps) => {
-  const { children, payload, handler } = props;
-  const { onClose, onDownload, onInfo, onNext, onPrev, onZoomIn, onZoomOut } =
-    handler ?? {};
+  const { children, payload, ui, handler } = props;
+  const {
+    onClose,
+    onDownload,
+    onInfo,
+    onNext,
+    onPrev,
+    onZoomChange,
+    onZoomIn,
+    onZoomOut,
+    onZoomReset,
+  } = handler ?? {};
   return (
     <Box
       data-testid="slide"
@@ -41,12 +51,20 @@ export const Slide = (props: SlideProps) => {
         />
         <Body handler={{ onNext, onPrev }}>{children}</Body>
         <Footer
-          payload={payload.footer}
+          payload={payload}
+          ui={ui}
+          config={{
+            step: 10,
+            min: 100,
+            max: 300,
+          }}
           handler={{
             onDownload,
             onInfo,
+            onZoomChange,
             onZoomIn,
             onZoomOut,
+            onZoomReset,
           }}
         />
       </Box>
