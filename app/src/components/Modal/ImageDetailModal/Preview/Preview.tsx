@@ -1,5 +1,6 @@
 import { Image } from "@mantine/core";
 import type React from "react";
+import { useMemo } from "react";
 
 export type PreviewUi = {
   scale: number;
@@ -13,6 +14,10 @@ export interface PreviewProps {
 export const Preview = (props: PreviewProps) => {
   const { ui } = props;
 
+  const transition: React.CSSProperties | undefined = useMemo(() => {
+    return ui.rotate === 0 ? undefined : { transition: "transform 0.3s ease" };
+  }, [ui.rotate]);
+
   return (
     <Image
       src="sample/h.png"
@@ -22,7 +27,7 @@ export const Preview = (props: PreviewProps) => {
         maxWidth: "100%",
         objectFit: "contain",
         transform: `rotate(${ui.rotate}deg) scale(${ui.scale})`,
-        transition: "transform 0.3s ease",
+        ...transition,
       }}
     />
   );

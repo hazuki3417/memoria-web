@@ -29,45 +29,45 @@ export const Slide = (props: SlideProps) => {
     onZoomIn,
     onZoomOut,
     onZoomReset,
+    onRotateLeft,
+    onRotateReset,
+    onRotateRight,
   } = handler ?? {};
   return (
     <Box
       data-testid="slide"
       style={(theme) => ({
         display: "flex",
-        flexDirection: "row",
+        flexDirection: "column",
+        width: "100%",
       })}
     >
-      <Box
-        style={(theme) => ({
-          display: "flex",
-          flexDirection: "column",
-        })}
-      >
-        <Header
-          handler={{
-            onClose,
-          }}
-        />
-        <Body handler={{ onNext, onPrev }}>{children}</Body>
-        <Footer
-          payload={payload}
-          ui={ui}
-          config={{
-            step: 10,
-            min: 100,
-            max: 300,
-          }}
-          handler={{
-            onDownload,
-            onInfo,
-            onZoomChange,
-            onZoomIn,
-            onZoomOut,
-            onZoomReset,
-          }}
-        />
-      </Box>
+      <Header
+        handler={{
+          onClose,
+        }}
+      />
+      <Body handler={{ onNext, onPrev }}>{children}</Body>
+      <Footer
+        payload={payload}
+        ui={ui}
+        config={{
+          step: 10,
+          min: 100,
+          max: 300,
+        }}
+        handler={{
+          onDownload,
+          onInfo,
+          onZoomChange,
+          onZoomIn,
+          onZoomOut,
+          onZoomReset,
+          onRotateLeft,
+          onRotateReset,
+          onRotateRight,
+        }}
+      />
     </Box>
   );
 };

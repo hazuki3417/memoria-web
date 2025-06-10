@@ -23,50 +23,45 @@ export const Body = (props: BodyProps) => {
       style={(theme) => ({
         display: "flex",
         height: `calc(100% - ${styles.NAVIGATION_HEIGHT * 2}px)`,
+        width: "100%",
+        flexDirection: "row",
       })}
     >
+      <UnstyledButton
+        style={(theme) => ({
+          alignItems: "center",
+          display: "flex",
+          justifyContent: "center",
+          width: `${styles.SIDEBAR_WIDTH}px`,
+        })}
+        data-testid="prev-image"
+        onClick={handler?.onPrev}
+      >
+        <IconChevronCompactLeft />
+      </UnstyledButton>
       <Box
         style={(theme) => ({
+          alignItems: "center",
           display: "flex",
-          flexDirection: "row",
+          justifyContent: "center",
+          width: `calc(100% - ${styles.SIDEBAR_WIDTH * 2}px)`,
+          overflow: "hidden",
         })}
       >
-        <UnstyledButton
-          style={(theme) => ({
-            alignItems: "center",
-            display: "flex",
-            justifyContent: "center",
-            width: `${styles.SIDEBAR_WIDTH}px`,
-          })}
-          data-testid="prev-image"
-          onClick={handler?.onPrev}
-        >
-          <IconChevronCompactLeft />
-        </UnstyledButton>
-        <Box
-          style={(theme) => ({
-            alignItems: "center",
-            display: "flex",
-            justifyContent: "center",
-            width: `calc(100% - ${styles.SIDEBAR_WIDTH * 2}px)`,
-            overflow: "hidden",
-          })}
-        >
-          {children}
-        </Box>
-        <UnstyledButton
-          style={(theme) => ({
-            alignItems: "center",
-            display: "flex",
-            justifyContent: "center",
-            width: `${styles.SIDEBAR_WIDTH}px`,
-          })}
-          data-testid="next-image"
-          onClick={handler?.onNext}
-        >
-          <IconChevronCompactRight />
-        </UnstyledButton>
+        {children}
       </Box>
+      <UnstyledButton
+        style={(theme) => ({
+          alignItems: "center",
+          display: "flex",
+          justifyContent: "center",
+          width: `${styles.SIDEBAR_WIDTH}px`,
+        })}
+        data-testid="next-image"
+        onClick={handler?.onNext}
+      >
+        <IconChevronCompactRight />
+      </UnstyledButton>
     </Box>
   );
 };

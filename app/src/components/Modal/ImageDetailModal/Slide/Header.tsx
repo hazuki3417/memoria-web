@@ -18,6 +18,7 @@ export const Header = (props: HeaderProps) => {
       style={(theme) => ({
         display: "flex",
         height: `${styles.NAVIGATION_HEIGHT}px`,
+        width: "100%",
       })}
     >
       <Box

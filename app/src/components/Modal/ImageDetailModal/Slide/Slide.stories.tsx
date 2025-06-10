@@ -43,6 +43,9 @@ export const Default: Story = {
       onZoomIn: fn(),
       onZoomOut: fn(),
       onZoomReset: fn(),
+      onRotateLeft: fn(),
+      onRotateReset: fn(),
+      onRotateRight: fn(),
     },
   },
   play: async ({ canvasElement }) => {
@@ -56,5 +59,8 @@ export const Default: Story = {
     await userEvent.click(canvas.getByTestId("zoom-in"));
     await userEvent.click(canvas.getByTestId("zoom-out"));
     await userEvent.click(canvas.getByTestId("zoom-reset"));
+    await userEvent.click(canvas.getByTestId("rotate-left"));
+    await userEvent.click(canvas.getByTestId("rotate-reset"));
+    await userEvent.click(canvas.getByTestId("rotate-right"));
   },
 };

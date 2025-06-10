@@ -58,10 +58,11 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
     <Box
       data-testid="image-detail-modal"
       style={(theme) => ({
+        position: "flex",
         display: "flex",
         flexDirection: "row",
-        height: "100vh",
-        width: "100vw",
+        height: "100%",
+        width: "100%",
       })}
     >
       <Slide
@@ -79,6 +80,9 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
           onZoomChange: zoomSet,
           onZoomIn: zoomIn,
           onZoomOut: zoomOut,
+          onRotateLeft: imageRotate.handler.left,
+          onRotateReset: imageRotate.handler.reset,
+          onRotateRight: imageRotate.handler.right,
         }}
       >
         <Preview
