@@ -1,5 +1,5 @@
 import { numberReducer } from "@/reducers";
-import { useCallback, useReducer } from "react";
+import { useCallback, useMemo, useReducer } from "react";
 
 export type UseImageZoomState = {
   level: number; // 倍率
@@ -35,6 +35,11 @@ export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
     config: option.config,
   });
 
+  // NOTE: zoom levelを監視して常にscaleを計算する
+  const scale = useMemo(() => {
+    return state.current.value / 100;
+  }, [state.current.value]);
+
   const zoomIn = useCallback(() => {
     const candidate = state.current.value + state.config.step;
     const clamped = clamp(candidate, option.config.min, option.config.max);
@@ -62,7 +67,7 @@ export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
   return {
     state: {
       level: state.current.value,
-      scale: state.current.value,
+      scale,
       initial: {
         level: state.initial.value,
       },

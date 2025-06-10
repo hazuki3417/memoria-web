@@ -28,10 +28,8 @@ export default function Home() {
             <ImageDetailModal
               payload={{
                 slide: {
-                  footer: {
-                    current: 1,
-                    limit: 20,
-                  },
+                  current: 1,
+                  limit: 20,
                 },
                 info: {
                   file: {

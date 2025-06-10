@@ -49,6 +49,7 @@ export const Body = (props: BodyProps) => {
             display: "flex",
             justifyContent: "center",
             width: `calc(100% - ${styles.SIDEBAR_WIDTH * 2}px)`,
+            overflow: "hidden",
           })}
         >
           {children}

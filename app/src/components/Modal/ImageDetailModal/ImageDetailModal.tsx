@@ -3,16 +3,21 @@ import { Box, type BoxProps } from "@mantine/core";
 import { AnimatePresence, motion } from "framer-motion";
 import { Info, InfoHandler, InfoPayload } from "./Info/Info";
 import { Slide, SlideHandler, SlidePayload } from "./Slide";
-import React from "react";
+import React, { useCallback } from "react";
 import { Preview } from "./Preview";
+import { useImageRotate } from "@/hooks/useImageRotate";
+import { useImageZoom } from "@/hooks/useImageZoom";
 
 export type ImageDetailModalPayload = {
   slide: SlidePayload;
   info: InfoPayload;
 };
 
-export type ImageDetailModalHandler = Omit<SlideHandler, "onInfo"> &
-  Omit<InfoHandler, "onClose">;
+export type ImageDetailModalHandler = Omit<
+  SlideHandler,
+  "onInfo" | "onZoomIn" | "onZoomOut" | "onZoomChange"
+> &
+  Omit<InfoHandler, "onClose"> & {};
 
 export interface ImageDetailModalProps extends BoxProps {
   payload: ImageDetailModalPayload;
@@ -21,18 +26,34 @@ export interface ImageDetailModalProps extends BoxProps {
 
 export const ImageDetailModal = (props: ImageDetailModalProps) => {
   const { payload, handler } = props;
-  const {
-    onClose,
-    onDelete,
-    onDownload,
-    onEdit,
-    onNext,
-    onPrev,
-    onZoomIn,
-    onZoomOut,
-    onZoomChange,
-  } = handler ?? {};
+  const { onClose, onDelete, onDownload, onEdit, onNext, onPrev } =
+    handler ?? {};
   const drawer = useDisclosure({ opend: false });
+  const imageRotate = useImageRotate({ angle: 0 });
+  const imageZoom = useImageZoom({
+    level: 100,
+    config: { step: 10, min: 100, max: 300 },
+  });
+
+  const zoomReset = useCallback(() => {
+    imageZoom.handler.reset();
+  }, [imageZoom.handler, imageZoom.state.level]);
+
+  const zoomIn = useCallback(() => {
+    imageZoom.handler.zoomIn();
+  }, [imageZoom.handler, imageZoom.state.level]);
+
+  const zoomOut = useCallback(() => {
+    imageZoom.handler.zoomOut();
+  }, [imageZoom.handler, imageZoom.state.level]);
+
+  const zoomSet = useCallback(
+    (value: number) => {
+      imageZoom.handler.set(value);
+    },
+    [imageZoom.handler, imageZoom.state.level],
+  );
+
   return (
     <Box
       data-testid="image-detail-modal"
@@ -45,18 +66,27 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
     >
       <Slide
         payload={payload.slide}
+        ui={{
+          level: imageZoom.state.level,
+        }}
         handler={{
           onClose,
           onDownload,
           onInfo: drawer.handler.toggle,
           onNext,
           onPrev,
-          onZoomChange,
-          onZoomIn,
-          onZoomOut,
+          onZoomReset: zoomReset,
+          onZoomChange: zoomSet,
+          onZoomIn: zoomIn,
+          onZoomOut: zoomOut,
         }}
       >
-        <Preview />
+        <Preview
+          ui={{
+            rotate: imageRotate.state.angle,
+            scale: imageZoom.state.scale,
+          }}
+        />
       </Slide>
       <AnimatePresence>
         {drawer.state.opend && (
