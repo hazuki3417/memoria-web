@@ -3,7 +3,7 @@ import { Box, type BoxProps } from "@mantine/core";
 import { AnimatePresence, motion } from "framer-motion";
 import { Info, InfoHandler, InfoPayload } from "./Info/Info";
 import { Slide, SlideHandler, SlidePayload } from "./Slide";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Preview } from "./Preview";
 import { useImageRotate } from "@/hooks/useImageRotate";
 import { useImageZoom } from "@/hooks/useImageZoom";
@@ -54,6 +54,16 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
     [imageZoom.handler, imageZoom.state.level],
   );
 
+  const previewAction = useMemo(() => {
+    if (imageRotate.state.meta.action === "left") {
+      return "rotate";
+    }
+    if (imageRotate.state.meta.action === "right") {
+      return "rotate";
+    }
+    return "reset";
+  }, [imageRotate.state.meta.action]);
+
   return (
     <Box
       data-testid="image-detail-modal"
@@ -89,6 +99,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
           ui={{
             rotate: imageRotate.state.angle,
             scale: imageZoom.state.scale,
+            action: previewAction,
           }}
         />
       </Slide>

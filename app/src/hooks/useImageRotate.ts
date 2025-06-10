@@ -6,6 +6,7 @@ export type UseImageRotateState = {
   initial: {
     angle: number;
   };
+  meta: { action: "left" | "right" | "reset" | "idle" };
 };
 
 export type UseImageRotateOption = Pick<UseImageRotateState, "angle">;
@@ -27,6 +28,7 @@ export const useImageRotate = (
   const [state, dispatch] = useReducer(imageRotateReducer, {
     current: { angle: option.angle },
     initial: { angle: option.angle },
+    meta: { action: "idle" },
   });
 
   const right = useCallback(() => {
@@ -47,6 +49,7 @@ export const useImageRotate = (
       initial: {
         angle: state.initial.angle,
       },
+      meta: { action: state.meta.action } as const,
     },
     handler: {
       left,

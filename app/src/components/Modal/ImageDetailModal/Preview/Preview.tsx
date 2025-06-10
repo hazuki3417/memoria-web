@@ -5,6 +5,7 @@ import { useMemo } from "react";
 export type PreviewUi = {
   scale: number;
   rotate: number;
+  action: "rotate" | "reset";
 };
 
 export interface PreviewProps {
@@ -15,8 +16,10 @@ export const Preview = (props: PreviewProps) => {
   const { ui } = props;
 
   const transition: React.CSSProperties | undefined = useMemo(() => {
-    return ui.rotate === 0 ? undefined : { transition: "transform 0.3s ease" };
-  }, [ui.rotate]);
+    return ui.action === "reset"
+      ? undefined
+      : { transition: "transform 0.3s ease" };
+  }, [ui.action]);
 
   return (
     <Image
