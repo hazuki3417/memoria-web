@@ -1,14 +1,11 @@
 import { numberReducer } from "@/reducers";
 import { useCallback, useReducer } from "react";
 
-const clamp = (value: number, min: number, max: number): number => {
-  return Math.max(min, Math.min(value, max));
-};
-
-export type UseSliderState = {
-  value: number;
+export type UseImageZoomState = {
+  level: number; // 倍率
+  scale: number; // スケール
   initial: {
-    value: number;
+    level: number;
   };
   config: {
     step: number;
@@ -17,42 +14,42 @@ export type UseSliderState = {
   };
 };
 
-export type UseSliderOption = Pick<UseSliderState, "value" | "config">;
+export type UseImageZoomOption = Pick<UseImageZoomState, "level" | "config">;
 
-export interface UseSliderHandler {
-  up: () => void;
-  down: () => void;
-  change: (value: number) => void;
+export interface UseImageZoomHandler {
+  zoomIn: () => void;
+  zoomOut: () => void;
+  set: (level: number) => void;
   reset: () => void;
 }
 
-export interface UseSlider {
-  state: UseSliderState;
-  handler: UseSliderHandler;
+export interface UseImageZoom {
+  state: UseImageZoomState;
+  handler: UseImageZoomHandler;
 }
 
-export const useSlider = (option: UseSliderOption): UseSlider => {
+export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
   const [state, dispatch] = useReducer(numberReducer, {
-    current: { value: option.value },
-    initial: { value: option.value },
+    current: { value: option.level },
+    initial: { value: option.level },
     config: option.config,
   });
 
-  const up = useCallback(() => {
+  const zoomIn = useCallback(() => {
     const candidate = state.current.value + state.config.step;
     const clamped = clamp(candidate, option.config.min, option.config.max);
     dispatch({ type: "set", value: clamped });
   }, [state.current.value, option.config]);
 
-  const down = useCallback(() => {
+  const zoomOut = useCallback(() => {
     const candidate = state.current.value - state.config.step;
     const clamped = clamp(candidate, option.config.min, option.config.max);
     dispatch({ type: "set", value: clamped });
   }, [state.current.value, option.config]);
 
-  const change = useCallback(
-    (value: number) => {
-      const clamped = clamp(value, option.config.min, option.config.max);
+  const set = useCallback(
+    (level: number) => {
+      const clamped = clamp(level, option.config.min, option.config.max);
       dispatch({ type: "set", value: clamped });
     },
     [option.config],
@@ -64,17 +61,22 @@ export const useSlider = (option: UseSliderOption): UseSlider => {
 
   return {
     state: {
-      value: state.current.value,
+      level: state.current.value,
+      scale: state.current.value,
       initial: {
-        value: state.initial.value,
+        level: state.initial.value,
       },
       config: option.config,
     },
     handler: {
-      up,
-      down,
-      change,
+      zoomIn,
+      zoomOut,
+      set,
       reset,
     },
   };
+};
+
+const clamp = (level: number, min: number, max: number): number => {
+  return Math.max(min, Math.min(level, max));
 };

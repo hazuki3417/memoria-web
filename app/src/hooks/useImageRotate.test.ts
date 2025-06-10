@@ -4,14 +4,14 @@ import { useImageRotate, UseImageRotateOption } from "./useImageRotate";
 
 describe("useImageRotate", () => {
   const createInitialState = (): UseImageRotateOption => ({
-    value: 90,
+    angle: 90,
   });
 
-  it("should initialize with correct value", () => {
+  it("should initialize with correct angle", () => {
     const { result } = renderHook(() => useImageRotate(createInitialState()));
 
-    expect(result.current.state.value).toBe(90);
-    expect(result.current.state.initial.value).toBe(90);
+    expect(result.current.state.angle).toBe(90);
+    expect(result.current.state.initial.angle).toBe(90);
   });
 
   it("should rotate left by -90 degrees", () => {
@@ -21,7 +21,7 @@ describe("useImageRotate", () => {
       result.current.handler.left();
     });
 
-    expect(result.current.state.value).toBe(0); // 90 - 90 = 0
+    expect(result.current.state.angle).toBe(0); // 90 - 90 = 0
   });
 
   it("should rotate right by +90 degrees", () => {
@@ -31,10 +31,10 @@ describe("useImageRotate", () => {
       result.current.handler.right();
     });
 
-    expect(result.current.state.value).toBe(180); // 90 + 90 = 180
+    expect(result.current.state.angle).toBe(180); // 90 + 90 = 180
   });
 
-  it("should reset to initial value", () => {
+  it("should reset to initial angle", () => {
     const { result } = renderHook(() => useImageRotate(createInitialState()));
 
     act(() => {
@@ -45,7 +45,7 @@ describe("useImageRotate", () => {
       result.current.handler.reset(); // 180 -> 90
     });
 
-    expect(result.current.state.value).toBe(90);
+    expect(result.current.state.angle).toBe(90);
   });
 
   it("should support multiple left and right rotations", () => {
@@ -57,6 +57,6 @@ describe("useImageRotate", () => {
       result.current.handler.right(); // -90 → 0
     });
 
-    expect(result.current.state.value).toBe(0);
+    expect(result.current.state.angle).toBe(0);
   });
 });

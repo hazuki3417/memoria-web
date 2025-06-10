@@ -2,13 +2,13 @@ import { imageRotateReducer } from "@/reducers/imageRotateReducer";
 import { useCallback, useReducer } from "react";
 
 export type UseImageRotateState = {
-  value: number;
+  angle: number;
   initial: {
-    value: number;
+    angle: number;
   };
 };
 
-export type UseImageRotateOption = Pick<UseImageRotateState, "value">;
+export type UseImageRotateOption = Pick<UseImageRotateState, "angle">;
 
 export interface UseImageRotateHandler {
   right: () => void;
@@ -25,17 +25,17 @@ export const useImageRotate = (
   option: UseImageRotateOption,
 ): UseImageRotate => {
   const [state, dispatch] = useReducer(imageRotateReducer, {
-    current: { value: option.value },
-    initial: { value: option.value },
+    current: { angle: option.angle },
+    initial: { angle: option.angle },
   });
 
   const right = useCallback(() => {
     dispatch({ type: "right" });
-  }, [state.current.value]);
+  }, [state.current.angle]);
 
   const left = useCallback(() => {
     dispatch({ type: "left" });
-  }, [state.current.value]);
+  }, [state.current.angle]);
 
   const reset = useCallback(() => {
     dispatch({ type: "reset" });
@@ -43,9 +43,9 @@ export const useImageRotate = (
 
   return {
     state: {
-      value: state.current.value,
+      angle: state.current.angle,
       initial: {
-        value: state.initial.value,
+        angle: state.initial.angle,
       },
     },
     handler: {

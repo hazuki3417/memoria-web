@@ -4,35 +4,35 @@ import { imageRotateReducer, ImageRotateAction } from "./imageRotateReducer";
 describe("imageRotateReducer", () => {
   it("rotates left by 90 degrees", () => {
     const state = {
-      current: { value: 0 },
-      initial: { value: 0 },
+      current: { angle: 0 },
+      initial: { angle: 0 },
     };
     const nextState = imageRotateReducer(state, { type: "left" });
-    expect(nextState.current.value).toBe(-90);
+    expect(nextState.current.angle).toBe(-90);
   });
 
   it("rotates right by 90 degrees", () => {
     const state = {
-      current: { value: 0 },
-      initial: { value: 0 },
+      current: { angle: 0 },
+      initial: { angle: 0 },
     };
     const nextState = imageRotateReducer(state, { type: "right" });
-    expect(nextState.current.value).toBe(90);
+    expect(nextState.current.angle).toBe(90);
   });
 
   it("resets to initial value", () => {
     const state = {
-      current: { value: 180 },
-      initial: { value: 0 },
+      current: { angle: 180 },
+      initial: { angle: 0 },
     };
     const nextState = imageRotateReducer(state, { type: "reset" });
-    expect(nextState.current.value).toBe(0);
+    expect(nextState.current.angle).toBe(0);
   });
 
   it("throws on unknown action type", () => {
     const state = {
-      current: { value: 0 },
-      initial: { value: 0 },
+      current: { angle: 0 },
+      initial: { angle: 0 },
     };
 
     expect(() =>
