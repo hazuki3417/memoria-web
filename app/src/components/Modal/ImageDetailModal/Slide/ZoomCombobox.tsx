@@ -51,11 +51,6 @@ export const ZoomCombobox = (props: ZoomComboboxProps) => {
     return value;
   };
 
-  const normalizeInput = (input: string) => {
-    input = input.replace(/[^0-9]/g, "").slice(0, 3);
-    return input;
-  };
-
   const onOptionSubmit = useCallback(
     (value: string) => {
       combobox.closeDropdown();
@@ -148,4 +143,9 @@ const createZoomLevel = (config: {
   }
 
   return level;
+};
+
+const normalizeInput = (input: string) => {
+  input = input.replace(/[^0-9]/g, "").slice(0, 3);
+  return input;
 };

@@ -43,6 +43,7 @@ export const Info = (props: InfoProps) => {
 
   return (
     <Paper
+      data-testid="info"
       p={0}
       radius={0}
       style={(theme) => ({

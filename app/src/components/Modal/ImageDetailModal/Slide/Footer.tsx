@@ -7,8 +7,9 @@ import {
   IconZoomOut,
   IconZoomReset,
 } from "@tabler/icons-react";
-import { useCallback } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import { ZoomCombobox } from "./ZoomCombobox";
+import { styles } from "./styles";
 
 export type FooterPayload = {
   current: number;
@@ -39,44 +40,42 @@ export const Footer = (props: FooterProps) => {
   const zoomReset = useCallback(() => {
     slider.handler.reset();
     handler?.onZoomReset?.(slider.state.value);
-  }, [slider.state.value, handler?.onZoomReset]);
+  }, [slider.handler, slider.state.value, handler?.onZoomReset]);
 
   const zoomIn = useCallback(() => {
     slider.handler.up();
     handler?.onZoomIn?.(slider.state.value);
-  }, [slider.state.value, handler?.onZoomIn]);
+  }, [slider.handler, slider.state.value, handler?.onZoomIn]);
 
   const zoomOut = useCallback(() => {
     slider.handler.down();
     handler?.onZoomOut?.(slider.state.value);
-  }, [slider.state.value, handler?.onZoomOut]);
+  }, [slider.handler, slider.state.value, handler?.onZoomOut]);
 
   const zoomChange = useCallback(
     (value: number) => {
       slider.handler.change(value);
       handler?.onZoomChange?.(value);
     },
-    [slider.state.value, handler?.onZoomChange],
+    [slider.handler, slider.state.value, handler?.onZoomChange],
   );
 
   return (
     <Box
       style={(theme) => ({
-        height: "40px",
-        flexShrink: 0,
+        height: `${styles.NAVIGATION_HEIGHT}px`,
         display: "flex",
       })}
     >
       <Box
         style={(theme) => ({
-          width: "40px",
-          flexShrink: 0,
+          width: `${styles.SIDEBAR_WIDTH}px`,
         })}
       />
       <Box
         style={(theme) => ({
+          width: `calc(100% - ${styles.SIDEBAR_WIDTH * 2}px)`,
           display: "flex",
-          flexGrow: 1,
           justifyContent: "space-between",
         })}
       >
@@ -91,14 +90,7 @@ export const Footer = (props: FooterProps) => {
             justifyContent: "start",
           })}
         >
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            onClick={handler?.onDownload}
-            data-testid="download-image"
-          >
-            <IconDownload />
-          </ActionIcon>
+          <DownloadButton onClick={handler?.onDownload} />
         </Box>
         <Box
           style={(theme) => ({
@@ -110,9 +102,7 @@ export const Footer = (props: FooterProps) => {
             justifyContent: "center",
           })}
         >
-          <Text size="xs">
-            {payload.current} / {payload.limit}
-          </Text>
+          <Index {...payload} />
         </Box>
         <Box
           style={(theme) => ({
@@ -125,9 +115,7 @@ export const Footer = (props: FooterProps) => {
             justifyContent: "end",
           })}
         >
-          <ActionIcon data-testid="zoom-reset" onClick={zoomReset}>
-            <IconZoomReset />
-          </ActionIcon>
+          <ZoomResetButton onClick={zoomReset} />
           <ZoomCombobox
             value={slider.state.value}
             config={slider.state.config}
@@ -136,9 +124,7 @@ export const Footer = (props: FooterProps) => {
               onBlur: zoomChange,
             }}
           />
-          <ActionIcon data-testid="zoom-out" onClick={zoomOut}>
-            <IconZoomOut />
-          </ActionIcon>
+          <ZoomOutButton onClick={zoomOut} />
           <Slider
             w={120}
             color="gray"
@@ -151,24 +137,66 @@ export const Footer = (props: FooterProps) => {
             max={slider.state.config.max}
             onChange={zoomChange}
           />
-          <ActionIcon data-testid="zoom-in" onClick={zoomIn}>
-            <IconZoomIn />
-          </ActionIcon>
+          <ZoomInButton onClick={zoomIn} />
         </Box>
       </Box>
       <Box
         style={(theme) => ({
-          width: "40px",
+          width: `${styles.SIDEBAR_WIDTH}px`,
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         })}
       >
-        <ActionIcon data-testid="open-info" onClick={handler?.onInfo}>
-          <IconInfoCircle />
-        </ActionIcon>
+        <InfoButton onClick={handler?.onInfo} />
       </Box>
     </Box>
   );
 };
+
+const Index = memo((props: FooterPayload) => (
+  <Text size="xs">
+    {props.current} / {props.limit}
+  </Text>
+));
+
+const DownloadButton = memo(
+  (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
+    <ActionIcon onClick={props.onClick} data-testid="download-image">
+      <IconDownload />
+    </ActionIcon>
+  ),
+);
+
+const ZoomResetButton = memo(
+  (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
+    <ActionIcon onClick={props.onClick} data-testid="zoom-reset">
+      <IconZoomReset />
+    </ActionIcon>
+  ),
+);
+
+const ZoomOutButton = memo(
+  (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
+    <ActionIcon onClick={props.onClick} data-testid="zoom-out">
+      <IconZoomOut />
+    </ActionIcon>
+  ),
+);
+
+const ZoomInButton = memo(
+  (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
+    <ActionIcon onClick={props.onClick} data-testid="zoom-in">
+      <IconZoomIn />
+    </ActionIcon>
+  ),
+);
+
+const InfoButton = memo(
+  (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
+    <ActionIcon onClick={props.onClick} data-testid="open-info">
+      <IconInfoCircle />
+    </ActionIcon>
+  ),
+);

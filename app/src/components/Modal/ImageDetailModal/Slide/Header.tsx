@@ -1,6 +1,7 @@
-import { ActionIcon, Box, type BoxProps, UnstyledButton } from "@mantine/core";
+import { ActionIcon, Box, type BoxProps } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import type React from "react";
+import { styles } from "./styles";
 
 export type HeaderHandler = {
   onClose?: React.MouseEventHandler<HTMLButtonElement>;
@@ -15,29 +16,26 @@ export const Header = (props: HeaderProps) => {
   return (
     <Box
       style={(theme) => ({
-        height: "40px",
-        flexShrink: 0,
         display: "flex",
+        height: `${styles.NAVIGATION_HEIGHT}px`,
       })}
     >
       <Box
         style={(theme) => ({
-          width: "40px",
-          flexShrink: 0,
+          width: `${styles.SIDEBAR_WIDTH}px`,
         })}
       />
       <Box
         style={(theme) => ({
-          flexGrow: 1,
+          width: `calc(100% - ${styles.SIDEBAR_WIDTH * 2}px)`,
         })}
       />
       <Box
         style={(theme) => ({
-          width: "40px",
-          flexShrink: 0,
-          display: "flex",
           alignItems: "center",
+          display: "flex",
           justifyContent: "center",
+          width: `${styles.SIDEBAR_WIDTH}px`,
         })}
       >
         <ActionIcon

@@ -4,6 +4,7 @@ import {
   IconChevronCompactRight,
 } from "@tabler/icons-react";
 import type React from "react";
+import { styles } from "./styles";
 
 export type BodyHandler = {
   onPrev?: React.MouseEventHandler<HTMLButtonElement>;
@@ -21,23 +22,21 @@ export const Body = (props: BodyProps) => {
     <Box
       style={(theme) => ({
         display: "flex",
-        flexGrow: 1,
+        height: `calc(100% - ${styles.NAVIGATION_HEIGHT * 2}px)`,
       })}
     >
       <Box
         style={(theme) => ({
           display: "flex",
           flexDirection: "row",
-          flexGrow: 1,
         })}
       >
         <UnstyledButton
           style={(theme) => ({
-            width: "40px",
-            flexShrink: 0,
-            display: "flex",
             alignItems: "center",
+            display: "flex",
             justifyContent: "center",
+            width: `${styles.SIDEBAR_WIDTH}px`,
           })}
           data-testid="prev-image"
           onClick={handler?.onPrev}
@@ -46,18 +45,20 @@ export const Body = (props: BodyProps) => {
         </UnstyledButton>
         <Box
           style={(theme) => ({
-            flexGrow: 1,
+            alignItems: "center",
+            display: "flex",
+            justifyContent: "center",
+            width: `calc(100% - ${styles.SIDEBAR_WIDTH * 2}px)`,
           })}
         >
           {children}
         </Box>
         <UnstyledButton
           style={(theme) => ({
-            width: "40px",
-            flexShrink: 0,
-            display: "flex",
             alignItems: "center",
+            display: "flex",
             justifyContent: "center",
+            width: `${styles.SIDEBAR_WIDTH}px`,
           })}
           data-testid="next-image"
           onClick={handler?.onNext}

@@ -35,9 +35,12 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
   const drawer = useDisclosure({ opend: false });
   return (
     <Box
+      data-testid="image-detail-modal"
       style={(theme) => ({
         display: "flex",
         flexDirection: "row",
+        height: "100vh",
+        width: "100vw",
       })}
     >
       <Slide
@@ -58,6 +61,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
       <AnimatePresence>
         {drawer.state.opend && (
           <motion.div
+            data-testid="motion-div"
             animate={{ width: 340, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             initial={{ width: 0, opacity: 0 }}

@@ -17,10 +17,19 @@ export function CustomModal({ opened, onClose, children }: CustomModalProps) {
         timingFunction="ease"
       >
         {(styles) => (
-          <Box style={{ ...styles, position: "fixed", inset: 0 }}>
+          <Box
+            data-testid="custom-modal-base"
+            style={{ ...styles, position: "fixed", inset: 0 }}
+          >
             {/* NOTE: overlay: z-index: 200 */}
-            <Overlay onClick={onClose} opacity={0.5} blur={3} />
+            <Overlay
+              data-testid="overlay"
+              onClick={onClose}
+              opacity={0.5}
+              blur={3}
+            />
             <Box
+              data-testid="custom-modal-frame"
               style={(theme) => ({
                 position: "absolute",
                 top: "50%",

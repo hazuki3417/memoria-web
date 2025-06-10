@@ -22,18 +22,16 @@ export const Slide = (props: SlideProps) => {
     handler ?? {};
   return (
     <Box
+      data-testid="slide"
       style={(theme) => ({
         display: "flex",
         flexDirection: "row",
-        flexGrow: 1,
       })}
     >
       <Box
         style={(theme) => ({
           display: "flex",
           flexDirection: "column",
-          height: "100%",
-          flexGrow: 1,
         })}
       >
         <Header
