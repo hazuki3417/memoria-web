@@ -4,8 +4,22 @@ const config: CodegenConfig = {
   schema: "src/graphql/schema/**/*.graphql",
   documents: "src/graphql/operation/**/*.graphql",
   generates: {
-    "./src/graphql/gql/": {
-      preset: "client",
+    "./src/graphql/gql/index.ts": {
+      plugins: [
+        "typescript",
+        "typescript-operations",
+        "typescript-react-apollo",
+        "typescript-msw",
+      ],
+      config: {
+        withHooks: true,
+        withHOC: false,
+        withComponent: false,
+        useTypeImports: true,
+        scalars: {
+          DateTime: "string",
+        },
+      },
     },
   },
 };

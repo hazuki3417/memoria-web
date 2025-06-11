@@ -40,7 +40,7 @@
     "@biomejs/biome": "^1.9.4",
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript-msw": "^3.0.1",
-    "@graphql-codegen/typescript-resolvers": "^4.5.1",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "@playwright/test": "^1.52.0",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/addon-interactions": "^8.6.14",
