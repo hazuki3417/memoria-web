@@ -1,0 +1,18 @@
+directive @tag(validate: String) on INPUT_FIELD_DEFINITION
+
+# mutation input example
+# input {mutationName}Input {
+#   id: ID! @tag(validate: "mongodb")
+#   name: [String!]! @tag(validate: "min=1,dive,required")
+# }
+# 検索条件・実データどちらも含むように定義する。それぞれ分離して定義はしない。
+
+# mutation payload example
+# type {mutationName}Payload {
+#   id: ID!
+#   name: String!
+# }
+
+# mutation example
+# type Mutation {
+#   {mutationName}(input: {mutationName}Input): {mutationName}Payload!

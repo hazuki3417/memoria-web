@@ -3,6 +3,7 @@ import { Header, HeaderHandler } from "./Header";
 import { Body, BodyHandler } from "./Body";
 import { Footer, FooterHandler, FooterPayload, FooterUi } from "./Footer";
 import React from "react";
+import { useGetImagesQuery } from "@/graphql";
 
 export type SlidePayload = FooterPayload;
 
@@ -33,6 +34,22 @@ export const Slide = (props: SlideProps) => {
     onRotateReset,
     onRotateRight,
   } = handler ?? {};
+
+  const getImage = useGetImagesQuery({
+    fetchPolicy: "cache-first",
+    variables: {
+      input: {
+        pagination: {
+          first: 3,
+        },
+      },
+    },
+  });
+
+  console.debug("debug", {
+    getImage,
+  });
+
   return (
     <Box
       data-testid="slide"

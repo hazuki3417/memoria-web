@@ -16,6 +16,7 @@ const makeStyle = () => {
 export default function Home() {
   const style = makeStyle();
   const modal = useDisclosure({ opend: false });
+
   return (
     <Container fluid style={style.container}>
       <main>

@@ -1,0 +1,51 @@
+type Query {
+  images(input: ImageQueryInput): ImageConnection!
+}
+
+# === input ===
+
+input ImageQueryInput {
+  pagination: PaginationInput
+}
+
+# === data model ===
+
+type Image {
+  id: ID!
+  info: ImageInfo!
+  src: ImageSrc!
+}
+
+type ImageInfo {
+  file: ImageFile!
+  size: ImageSize!
+  tags: [String!]!
+}
+
+type ImageFile {
+  name: String!
+  size: Int!
+  date: String!
+}
+
+type ImageSize {
+  width: Int!
+  height: Int!
+}
+
+type ImageSrc {
+  thumbnail: String!
+  original: String!
+}
+
+# === relay model ===
+
+type ImageEdge {
+  node: Image!
+  cursor: String!
+}
+
+type ImageConnection {
+  edges: [ImageEdge!]!
+  pageInfo: PageInfo!
+}

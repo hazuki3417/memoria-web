@@ -1,0 +1,49 @@
+# realy cursor connectionのページネーション定義
+# https://relay.dev/graphql/connections.htm
+# https://graphql.org/learn/pagination/
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+input PaginationInput {
+  first: Int @tag(validate: "omitempty,min=1")
+  last: Int @tag(validate: "omitempty,min=1")
+  after: String @tag(validate: "omitempty,min=1")
+  before: String @tag(validate: "omitempty,min=1")
+}
+
+# example
+
+# type User {
+#   id: ID!
+#   name: String
+#   email: String
+# }
+
+# # ページネーションの接続単位（1件分）
+# type UserEdge {
+#   node: User!
+#   cursor: String!
+#   # cursor は次ページ取得のために必須なので非null
+# }
+
+# # ページネーション全体（クエリ単位）
+# type UserConnection {
+#   edges: [UserEdge!]!
+#   # edges は空配列にはなり得るが、nullにはならない設計が望ましい
+#   pageInfo: PageInfo!
+#   # pageInfo はページネーション制御に必須のため非null
+# }
+
+# # ページネーション制御情報
+# type PageInfo {
+#   hasNextPage: Boolean!
+#   hasPreviousPage: Boolean!
+#   startCursor: String
+#   endCursor: String
+#   # startCursor / endCursor はデータが存在しないときに null になるため nullable
+# }
