@@ -5,7 +5,8 @@ import { ApolloClient, InMemoryCache } from "@apollo/client";
  * NOTE: next.js をプロキシサーバーとして扱い、/api/graphqlへリクエストすると転送されるようにしている
  */
 export const client = new ApolloClient({
-  uri: "/api/graphql",
+  uri: "/api/mock",
+  // uri: "/api/graphql",
   cache: new InMemoryCache(),
   ssrMode: false,
 });
