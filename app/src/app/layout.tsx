@@ -4,6 +4,7 @@ import type { FC } from "react";
 import type { ReactNode } from "react";
 import Head from "./Head";
 import Providers from "./Providers";
+import { Header } from "@/components";
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -20,7 +21,10 @@ const RootLayout: FC<RootLayoutProps> = ({ children }) => {
       {/* FIX: data-mantine-color-scheme="dark"の記述がない場合、ハイドレーションの差分が発生してエラーになる */}
       <Head />
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Header />
+          <main>{children}</main>
+        </Providers>
       </body>
     </html>
   );
