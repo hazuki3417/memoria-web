@@ -24,6 +24,7 @@
     "@auth0/nextjs-auth0": "^4.6.0",
     "@hookform/resolvers": "^5.0.1",
     "@mantine/core": "^8.0.1",
+    "@mantine/dropzone": "^8.0.1",
     "@mantine/hooks": "^8.0.1",
     "@tabler/icons-react": "^3.33.0",
     "csrf": "^3.1.0",
