@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import Head from "./Head";
 import Providers from "./Providers";
 import { Header } from "@/components";
+import { Container } from "@mantine/core";
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -23,7 +24,11 @@ const RootLayout: FC<RootLayoutProps> = ({ children }) => {
       <body>
         <Providers>
           <Header />
-          <main>{children}</main>
+          <main>
+            <Container p={"lg"} m={0}>
+              {children}
+            </Container>
+          </main>
         </Providers>
       </body>
     </html>

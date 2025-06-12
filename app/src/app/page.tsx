@@ -2,23 +2,13 @@
 import { CustomModal } from "@/components/Modal/CustomModal/CustomModal";
 import { ImageDetailModal } from "@/components/Modal/ImageDetailModal";
 import { useDisclosure } from "@/hooks";
-import { Container } from "@mantine/core";
-
-const makeStyle = () => {
-  return {
-    container: {
-      // height: "100vh",
-      // minWidth: "1200px",
-    },
-  };
-};
+import { Box } from "@mantine/core";
 
 export default function Home() {
-  const style = makeStyle();
   const modal = useDisclosure({ opend: false });
 
   return (
-    <Container fluid style={style.container}>
+    <Box>
       <p>Next.js検証用リポジトリ</p>
       <button type="button" onClick={modal.handler.open}>
         modal
@@ -48,6 +38,6 @@ export default function Home() {
           }}
         />
       </CustomModal>
-    </Container>
+    </Box>
   );
 }
