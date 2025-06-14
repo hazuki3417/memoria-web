@@ -60,12 +60,14 @@ export const ImageInputForm = (props: ImageInputFormProps) => {
         <Controller
           control={control}
           name={[prefix, "tags"].join(".")}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <TagsInput
               size="xs"
               style={(theme) => ({
                 width: "100%",
               })}
+              error={fieldState.error?.message}
+              clearable
               {...field}
             />
           )}
