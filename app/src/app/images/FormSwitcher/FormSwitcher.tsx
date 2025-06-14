@@ -6,6 +6,17 @@ import {
   useFormSwitcherContext,
 } from "./FormSwitcherContext";
 
+export type SegmentedControlUi = {
+  disabled: {
+    single: boolean;
+    all: boolean;
+  };
+};
+
+export interface SegmentedControlProps {
+  ui: SegmentedControlUi;
+}
+
 export interface FormSwitcherProps {
   value: UseFormSwitcher;
   children: React.ReactNode;
@@ -16,7 +27,8 @@ export const FormSwitcher = (props: FormSwitcherProps) => {
   return <FormSwitcherProvider value={value}>{children}</FormSwitcherProvider>;
 };
 
-FormSwitcher.SegmentedControl = () => {
+FormSwitcher.SegmentedControl = (props: SegmentedControlProps) => {
+  const { ui } = props;
   const { state, handler } = useFormSwitcherContext();
 
   return (
@@ -25,8 +37,12 @@ FormSwitcher.SegmentedControl = () => {
       value={state.mode}
       onChange={handler.set}
       data={[
-        { label: "一括", value: MODE.TYPE.ALL },
-        { label: "個別", value: MODE.TYPE.SINGLE },
+        { label: "一括", value: MODE.TYPE.ALL, disabled: ui.disabled.all },
+        {
+          label: "個別",
+          value: MODE.TYPE.SINGLE,
+          disabled: ui.disabled.single,
+        },
       ]}
     />
   );
