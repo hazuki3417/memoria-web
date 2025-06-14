@@ -14,6 +14,7 @@ export const Default: Story = {
     ui: {
       rotate: 0,
       scale: 1,
+      action: "reset",
     },
   },
 };
