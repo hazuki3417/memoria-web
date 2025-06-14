@@ -1,0 +1,22 @@
+.droparea {
+  height: auto;
+  min-height: 368px;
+  border-radius: var(--mantine-radius-sm);
+  padding: var(--mantine-spacing-md);
+  background-color: var(--mantine-color-dark-6);
+  border-color: var(--mantine-color-dark-4);
+  border-style: dashed;
+  border-width: 1px;
+  margin-bottom: 5px;
+}
+
+.droparea[data-accept="true"] {
+  border-color: var(--mantine-color-blue-light);
+  background-color: var(--mantine-color-blue-light);
+}
+
+.droparea[data-reject="true"] {
+  border-color: var(--mantine-color-red-light);
+  background-color: var(--mantine-color-red-light);
+  cursor: no-drop;
+}

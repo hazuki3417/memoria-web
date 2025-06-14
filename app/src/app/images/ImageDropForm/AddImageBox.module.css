@@ -1,0 +1,16 @@
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  width: 160px;
+  background-color: var(--mantine-color-dark-6);
+  border-radius: var(--mantine-radius-sm);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.box:hover {
+  background-color: var(--mantine-color-gray-8);
+}
