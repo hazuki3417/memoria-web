@@ -1,4 +1,5 @@
 import "@mantine/core/styles.css";
+import "@mantine/dropzone/styles.css";
 import type { Metadata } from "next";
 import type { FC } from "react";
 import type { ReactNode } from "react";
@@ -25,7 +26,7 @@ const RootLayout: FC<RootLayoutProps> = ({ children }) => {
         <Providers>
           <Header />
           <main>
-            <Container p={"lg"} m={0}>
+            <Container p={"lg"} m={0} fluid>
               {children}
             </Container>
           </main>
