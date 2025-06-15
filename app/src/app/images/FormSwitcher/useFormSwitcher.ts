@@ -5,7 +5,7 @@ export const MODE = {
     SINGLE: "single",
     ALL: "all",
   },
-};
+} as const;
 
 export type UseFormSwitcherState = {
   mode: string;

@@ -20,3 +20,12 @@
   background-color: var(--mantine-color-red-light);
   cursor: no-drop;
 }
+
+.droparea[data-disabled="true"] {
+  cursor: no-drop;
+}
+
+.droparea[data-warning="true"] {
+  border-color: var(--mantine-color-yellow-light);
+  background-color: var(--mantine-color-yellow-light);
+}

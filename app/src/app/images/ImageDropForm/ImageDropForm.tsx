@@ -7,6 +7,8 @@ import classes from "./ImageDropForm.module.css";
 export type ImageDropFormUi = {
   reject: boolean;
   accept: boolean;
+  warning: boolean;
+  disabled: boolean;
 };
 
 export interface ImageDropFormProps {
@@ -23,14 +25,22 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
     event.preventDefault();
   };
 
+  const disableFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
   return (
     <Input.Wrapper>
       <Box
         className={classes.droparea}
-        onDrop={error === undefined ? onFileDrop : undefined}
-        onDragOver={error === undefined ? dragOver : undefined}
+        onDrop={
+          ui.disabled || error !== undefined ? disableFileDrop : onFileDrop
+        }
+        onDragOver={dragOver}
         data-accept={ui.accept}
+        data-warning={ui.warning}
         data-reject={ui.reject || error !== undefined}
+        data-disabled={ui.disabled}
       >
         <Box
           style={{
@@ -39,6 +49,7 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
             justifyContent: "center",
             flexWrap: "wrap",
             gap: "16px",
+            minHeight: "inherit"
           }}
         >
           {children}

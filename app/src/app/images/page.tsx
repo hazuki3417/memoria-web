@@ -1,5 +1,5 @@
 "use client";
-import { AlphaSlider, Box, Button, Stack } from "@mantine/core";
+import { Box, Button, Stack } from "@mantine/core";
 import {
   FormProvider,
   useFieldArray,
@@ -17,14 +17,30 @@ import { useFormSwitcher, FormSwitcher, MODE } from "./FormSwitcher";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageDropForm } from "./ImageDropForm";
+import { imageConfig } from "@/config";
+import { PreviewImageBoxType } from "./ImageDropForm/PreviewImageBox";
+
+const validFile = (file: File) => {
+  return {
+    size: file.size <= imageConfig.size.max,
+    type: imageConfig.type.includes(file.type),
+  };
+};
 
 const fileSchema = z.object({
-  file: z.custom<File>((file) => file instanceof File),
+  file: z
+    .custom<File>((file) => file instanceof File)
+    .refine((file) => validFile(file).size, {
+      message: "ファイルサイズが50MBを超えています",
+    })
+    .refine((file) => validFile(file).type, {
+      message: "対応していないファイル形式です",
+    }),
 });
 
 const inputFormSchema = z.object({
   share: imageFormSchema,
-  images: z.array(imageFormSchema.merge(fileSchema)).max(20),
+  images: z.array(imageFormSchema.merge(fileSchema)).max(imageConfig.count.max),
 });
 
 type FormSchema = z.infer<typeof inputFormSchema>;
@@ -33,40 +49,40 @@ type FormSchema = z.infer<typeof inputFormSchema>;
  * NOTE: 仕様
  *       - ドラッグ & ドロップ
  *         - 常に可能。下記のケースに一致するファイルも可能
- *           - サポートしていないファイル
- *           - サイズ上限を超えるファイル
+ *           - サポートしていないファイルのドロップ
+ *           - サイズ上限を超えている状態
  *       - ファイル選択
  *         - 対応しているファイル形式のみ可能。下記のケースに一致するファイルは選択可能
  *           - サイズ上限を超えるファイル
  *       - バリデーション
  *         - 全体
  *           - ファイルの登録上限を超えた場合
- *           - 追加ボタン非表示
- *           - ドラッグ & ドロップ不可
- *           - カーソル変更（no-drop）
- *           - 背景色変更（赤色）
+ *             - 追加ボタン非表示
+ *             - ドラッグ & ドロップ可能
+ *             - カーソル変更（no-drop）
+ *             - 背景色変更（赤色）
+ *           - ファイルの登録上限と一致した場合
+ *             - 追加ボタン非表示
+ *             - ドラッグ & ドロップ不可（イベント無効化）
+ *             - カーソル変更（no-drop）
+ *             - 背景色変更なし
  *         - ファイル単位
  *           - ファイルのサイズ上限を超えた場合
  *           - サポートしていないファイルのサイズ上限を超えた場合
  *
+ * NOTE: ファイルの重複チェックはやらない（厳密性を求めることができないため）
+ * NOTE: ファイルの破損チェックはやらない（厳密性を求めることができないため）
  *
  * ロジック
- * TODO: 登録上限に一致したら追加ボタンを非表示にして、no-dropを設定する
- * TODO: ファイルサイズの上限を検討（1枚）
  * TODO: ファイルサイズの上限を検討（全体）
- * TODO: 対応するファイル形式を検討
  * TODO: 一括の公開範囲、個別の公開範囲の優先度を検討
  *       - 公開で全適用ON > 個別の公開はそのまま、非公開は公開に変更?
  *       - 非公開で全適用ON > 個別の公開は非公開に変更、非公開はそのまま?
  * TODO: タグ情報の出し方を検討
  *       ユースケースを洗い出して検討した方が良さそう
- * NOTE: ファイルの重複チェックはやらない（厳密性を求めることができないため）
- * NOTE: ファイルの破損チェックはやらない（厳密性を求めることができないため）
  *
  * UI
  * TODO: ファイルドラッグ時に対応しているバリデーションOKなら背景色を青に、違反なら赤にする
- * TODO: 画像追加・削除時にすこしアニメーションを指定したい（できたら）
- *
  */
 
 export default function Page() {
@@ -95,53 +111,60 @@ export default function Page() {
     name: "images",
   });
 
+  const [previewImageBoxType, setPreviewImageBoxType] = useState<
+    PreviewImageBoxType[]
+  >([]);
   const [selected, setSelected] = useState<number | null>(null);
 
-  const previews = fields.map((preview, index) => {
-    const file = preview.file;
-    const src = URL.createObjectURL(file);
-    return (
-      <ImageDropForm.PreviewImageBox
-        key={index}
-        id={index}
-        selected={
-          formSwitcher.state.mode === MODE.TYPE.SINGLE
-            ? selected === index
-            : false
+  const addFiles = (files: FileList) => {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const valid = validFile(file);
+
+      console.debug("valid", valid);
+      setPreviewImageBoxType((prev) => {
+        if (!valid.type) {
+          return [...prev, "unsupported"];
         }
-        selectable={formSwitcher.state.mode === MODE.TYPE.SINGLE}
-        src={src}
-        name={file.name}
-        onSelect={(value) => {
-          setSelected(value);
-        }}
-        onRemove={(value) => remove(value)}
-      />
-    );
-  });
+        if (!valid.size) {
+          return [...prev, "invalid"];
+        }
+        return [...prev, "valid"];
+      });
+
+      append({
+        file,
+        ...imageFormDefaultValue,
+      });
+    }
+  };
 
   const fileDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    const newFiles = event.dataTransfer.files;
-    for (let i = 0; i < newFiles.length; i++) {
-      append({
-        file: newFiles[i],
-        ...imageFormDefaultValue,
-      });
-    }
+    addFiles(event.dataTransfer.files);
   }, []);
 
-  const fileSelect = useCallback((files: FileList | null) => {
-    if (files === null) {
+  const fileSelect = useCallback((newFiles: FileList | null) => {
+    if (newFiles === null) {
       return;
     }
-    for (let i = 0; i < files.length; i++) {
-      append({
-        file: files[i],
-        ...imageFormDefaultValue,
-      });
-    }
+    addFiles(newFiles);
   }, []);
+
+  const fileSelected = useCallback((value: number) => {
+    setSelected(value);
+  }, []);
+
+  const fileRemove = useCallback((value: number) => {
+    setPreviewImageBoxType((prev) =>
+      prev.filter((_, index) => index !== value),
+    );
+    remove(value);
+  }, []);
+
+  const imageDropFormWarning = useMemo(() => {
+    return previewImageBoxType.some((type) => type !== "valid");
+  }, [previewImageBoxType]);
 
   useEffect(() => {
     /**
@@ -154,6 +177,29 @@ export default function Page() {
     }
     setSelected(0);
   }, [formSwitcher.state.mode]);
+
+  const previews = fields.map((preview, index) => {
+    const type = previewImageBoxType[index];
+    return (
+      <ImageDropForm.PreviewImageBox
+        ui={{ type }}
+        key={index}
+        id={index}
+        selected={
+          formSwitcher.state.mode === MODE.TYPE.SINGLE
+            ? selected === index
+            : false
+        }
+        selectable={formSwitcher.state.mode === MODE.TYPE.SINGLE}
+        src={
+          type !== "unsupported" ? URL.createObjectURL(preview.file) : undefined
+        }
+        alt={type !== "unsupported" ? preview.file.name : undefined}
+        onSelect={fileSelected}
+        onRemove={fileRemove}
+      />
+    );
+  });
 
   return (
     <Box
@@ -204,13 +250,15 @@ export default function Page() {
       <ImageDropForm
         ui={{
           accept: false,
+          warning: imageDropFormWarning,
           reject: false,
+          disabled: imageConfig.count.max <= watchValueImages.length,
         }}
         error={watchStateImages.errors.images?.message}
         onFileDrop={fileDrop}
       >
         {previews}
-        {watchStateImages.errors.images?.message === undefined && (
+        {watchValueImages.length < imageConfig.count.max && (
           <ImageDropForm.AddImageBox onFileSelect={fileSelect} />
         )}
       </ImageDropForm>

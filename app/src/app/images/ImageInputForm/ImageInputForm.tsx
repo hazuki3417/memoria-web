@@ -1,3 +1,4 @@
+import { imageConfig } from "@/config";
 import { Grid, Group, Radio, TagsInput, Text } from "@mantine/core";
 import { Control, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -16,7 +17,7 @@ export const VISIBILITY = {
 
 export const imageFormSchema = z.object({
   visibility: z.enum([VISIBILITY.PUBLIC, VISIBILITY.PRIVATE]),
-  tags: z.array(z.string()).max(10),
+  tags: z.array(z.string()).max(imageConfig.tag.max),
 });
 
 export type ImageInputFormSchema = z.infer<typeof imageFormSchema>;

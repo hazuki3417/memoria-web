@@ -20,6 +20,16 @@
   outline: 1px solid var(--mantine-color-blue-7);
 }
 
+.box[data-type="invalid"] {
+  background-color: var(--mantine-color-red-light);
+  outline: 1px solid var(--mantine-color-red-light);
+}
+
+.box[data-type="unsupported"] {
+  background-color: var(--mantine-color-red-light);
+  outline: 1px solid var(--mantine-color-red-light);
+}
+
 .image {
   width: unset;
   height: unset;
