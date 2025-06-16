@@ -90,13 +90,13 @@ export const AddImageBox = (props: AddImageBoxProps) => {
               .join(" / ")}
           </List.Item>
           <List.Item>
-            {`${Math.round(size.single.value)} ${size.single.unit.toUpperCase()}B`}{" "}
+            {`${Math.round(size.single.value)} ${size.single.unit.toUpperCase()}B`}
             / 1 件
           </List.Item>
           <List.Item>最大 {config.count.max} 枚</List.Item>
           <List.Item>
-            合計{" "}
-            {`${Math.round(size.all.value)} ${size.all.unit.toUpperCase()}B`}{" "}
+            合計
+            {`${Math.round(size.all.value)} ${size.all.unit.toUpperCase()}B`}
           </List.Item>
         </List>
       </Stack>
