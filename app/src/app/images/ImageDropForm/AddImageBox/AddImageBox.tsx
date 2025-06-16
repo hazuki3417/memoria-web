@@ -5,7 +5,7 @@ import React, { useCallback, useRef } from "react";
 import { formatSize } from "@/lib/utils";
 
 export type AddImageBoxUi = {
-  valid?: "accept" | "warning" | "reject";
+  valid?: "idle" | "accept" | "warning" | "reject";
   disabled?: boolean;
 };
 

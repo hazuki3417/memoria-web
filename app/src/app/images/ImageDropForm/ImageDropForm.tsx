@@ -5,10 +5,8 @@ import { PreviewImageBox } from "./PreviewImageBox";
 import classes from "./ImageDropForm.module.css";
 
 export type ImageDropFormUi = {
-  reject: boolean;
-  accept: boolean;
-  warning: boolean;
-  disabled: boolean;
+  valid?: "idle" | "accept" | "warning" | "reject";
+  disabled?: boolean;
 };
 
 export interface ImageDropFormProps {
@@ -37,9 +35,7 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
           ui.disabled || error !== undefined ? disableFileDrop : onFileDrop
         }
         onDragOver={dragOver}
-        data-accept={ui.accept}
-        data-warning={ui.warning}
-        data-reject={ui.reject || error !== undefined}
+        data-valid={ui.valid || error !== undefined}
         data-disabled={ui.disabled}
       >
         <Box
