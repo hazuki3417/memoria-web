@@ -19,7 +19,7 @@
 
 /* 選択状態を表現 */
 .box[data-selected="true"] {
-  outline: 1px solid var(--mantine-color-blue-7);
+  outline: 1px solid var(--mantine-primary-color-filled);
 }
 
 /* サポート対象を表現 */

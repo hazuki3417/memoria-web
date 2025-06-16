@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Stack } from "@mantine/core";
+import { Box, Button, Flex, Space, Stack, Text } from "@mantine/core";
 import {
   FormProvider,
   useFieldArray,
@@ -18,7 +18,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageDropForm } from "./ImageDropForm";
 import { imageConfig } from "@/config";
-import { PreviewImageBoxType } from "./ImageDropForm/PreviewImageBox";
+import { formatSize } from "@/lib/utils";
 
 const validFile = (file: File) => {
   return {
@@ -111,25 +111,23 @@ export default function Page() {
     name: "images",
   });
 
-  const [previewImageBoxType, setPreviewImageBoxType] = useState<
-    PreviewImageBoxType[]
+  const [fileValid, setFileValid] = useState<
+    { size: boolean; type: boolean }[]
   >([]);
+
   const [selected, setSelected] = useState<number | null>(null);
+
+  const [total, setTotal] = useState<number>(0);
 
   const addFiles = (files: FileList) => {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const valid = validFile(file);
 
-      console.debug("valid", valid);
-      setPreviewImageBoxType((prev) => {
-        if (!valid.type) {
-          return [...prev, "unsupported"];
-        }
-        if (!valid.size) {
-          return [...prev, "invalid"];
-        }
-        return [...prev, "valid"];
+      setTotal((prev) => prev + file.size);
+
+      setFileValid((prev) => {
+        return [...prev, valid];
       });
 
       append({
@@ -155,16 +153,44 @@ export default function Page() {
     setSelected(value);
   }, []);
 
-  const fileRemove = useCallback((value: number) => {
-    setPreviewImageBoxType((prev) =>
-      prev.filter((_, index) => index !== value),
-    );
-    remove(value);
-  }, []);
+  const fileRemove = useCallback(
+    (value: number) => {
+      setTotal((prev) => {
+        const file = fields[value].file;
+        return prev - file.size;
+      });
 
-  const imageDropFormWarning = useMemo(() => {
-    return previewImageBoxType.some((type) => type !== "valid");
-  }, [previewImageBoxType]);
+      setFileValid((prev) => prev.filter((_, index) => index !== value));
+
+      remove(value);
+    },
+    [fields],
+  );
+
+  const imageDropFormValid = useMemo(() => {
+    if (imageConfig.count.max < watchValueImages.length) {
+      return "reject";
+    }
+
+    const empty = 0;
+    if (empty < fileValid.length) {
+      const size = fileValid.some((file) => file.size === false);
+      const type = fileValid.some((file) => file.type === false);
+      if (size || type) {
+        return "warning";
+      }
+    }
+
+    return "idle";
+  }, [fileValid, watchValueImages]);
+
+  const imageDropFormDisabled = useMemo(() => {
+    return imageConfig.count.max <= watchValueImages.length;
+  }, [watchValueImages]);
+
+  const totalSize = useMemo(() => {
+    return formatSize(total, "m");
+  }, [total]);
 
   useEffect(() => {
     /**
@@ -179,24 +205,27 @@ export default function Page() {
   }, [formSwitcher.state.mode]);
 
   const previews = fields.map((preview, index) => {
-    const type = previewImageBoxType[index];
     return (
       <ImageDropForm.PreviewImageBox
-        ui={{ type }}
         key={index}
         id={index}
-        selected={
-          formSwitcher.state.mode === MODE.TYPE.SINGLE
-            ? selected === index
-            : false
-        }
-        selectable={formSwitcher.state.mode === MODE.TYPE.SINGLE}
-        src={
-          type !== "unsupported" ? URL.createObjectURL(preview.file) : undefined
-        }
-        alt={type !== "unsupported" ? preview.file.name : undefined}
-        onSelect={fileSelected}
-        onRemove={fileRemove}
+        payload={{
+          src: URL.createObjectURL(preview.file),
+          alt: preview.file.name,
+        }}
+        ui={{
+          selected:
+            formSwitcher.state.mode === MODE.TYPE.SINGLE
+              ? selected === index
+              : false,
+          selectable: formSwitcher.state.mode === MODE.TYPE.SINGLE,
+          supported: fileValid[index].type,
+          valid: fileValid[index].size ? "idle" : "reject",
+        }}
+        handler={{
+          onSelect: fileSelected,
+          onRemove: fileRemove,
+        }}
       />
     );
   });
@@ -219,7 +248,12 @@ export default function Page() {
         >
           <FormSwitcher value={formSwitcher}>
             <Stack>
-              <Box>
+              <Flex
+                style={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
                 <FormSwitcher.SegmentedControl
                   ui={{
                     disabled: {
@@ -228,7 +262,11 @@ export default function Page() {
                     },
                   }}
                 />
-              </Box>
+                <Flex gap={8}>
+                  <Text size="sm">{`${watchValueImages.length} 件`}</Text>
+                  <Text size="sm">{`${Math.round(totalSize.value)} ${totalSize.unit.toUpperCase()}B`}</Text>
+                </Flex>
+              </Flex>
               <Box>
                 <FormSwitcher.All>
                   <ImageInputForm control={methods.control} prefix="share" />
@@ -249,10 +287,8 @@ export default function Page() {
 
       <ImageDropForm
         ui={{
-          accept: false,
-          warning: imageDropFormWarning,
-          reject: false,
-          disabled: imageConfig.count.max <= watchValueImages.length,
+          valid: imageDropFormValid,
+          disabled: imageDropFormDisabled,
         }}
         error={watchStateImages.errors.images?.message}
         onFileDrop={fileDrop}
@@ -263,6 +299,9 @@ export default function Page() {
             config={imageConfig}
             handler={{
               onFileSelect: fileSelect,
+            }}
+            ui={{
+              valid: imageDropFormValid,
             }}
           />
         )}
