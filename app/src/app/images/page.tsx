@@ -259,7 +259,12 @@ export default function Page() {
       >
         {previews}
         {watchValueImages.length < imageConfig.count.max && (
-          <ImageDropForm.AddImageBox onFileSelect={fileSelect} />
+          <ImageDropForm.AddImageBox
+            config={imageConfig}
+            handler={{
+              onFileSelect: fileSelect,
+            }}
+          />
         )}
       </ImageDropForm>
       <Button onClick={() => console.debug("submit", methods.getValues())}>

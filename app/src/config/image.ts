@@ -7,7 +7,7 @@ export const imageConfig = {
   },
   size: {
     max: 50 * 1024 * 1024,
-    // max: 1024,
+    total: 200 * 1024 * 1024,
   },
   type: ["image/jpeg", "image/png"],
 };

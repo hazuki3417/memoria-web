@@ -10,22 +10,22 @@
   margin-bottom: 5px;
 }
 
-.droparea[data-accept="true"] {
+.droparea[data-valid="accept"] {
   border-color: var(--mantine-color-blue-light);
   background-color: var(--mantine-color-blue-light);
 }
 
-.droparea[data-reject="true"] {
+.droparea[data-valid="reject"] {
   border-color: var(--mantine-color-red-light);
   background-color: var(--mantine-color-red-light);
   cursor: no-drop;
 }
 
-.droparea[data-disabled="true"] {
-  cursor: no-drop;
-}
-
-.droparea[data-warning="true"] {
+.droparea[data-valid="warning"] {
   border-color: var(--mantine-color-yellow-light);
   background-color: var(--mantine-color-yellow-light);
+}
+
+.droparea[data-disabled="true"] {
+  cursor: no-drop;
 }

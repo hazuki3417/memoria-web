@@ -49,7 +49,7 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
             justifyContent: "center",
             flexWrap: "wrap",
             gap: "16px",
-            minHeight: "inherit"
+            minHeight: "inherit",
           }}
         >
           {children}
