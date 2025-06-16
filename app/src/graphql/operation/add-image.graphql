@@ -1,0 +1,8 @@
+mutation UploadImage($input: UploadImageInput!) {
+  uploadImage(input: $input) {
+    id
+    url
+    tags
+    visibility
+  }
+}

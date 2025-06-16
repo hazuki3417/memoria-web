@@ -1,0 +1,23 @@
+scalar Upload
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+input UploadImageInput {
+  file: Upload!
+  tags: [String!]!
+  visibility: Visibility!
+}
+
+type UploadImagePayload {
+  id: ID!
+  url: String!
+  tags: [String!]!
+  visibility: Visibility!
+}
+
+type Mutation {
+  uploadImage(input: UploadImageInput!): UploadImagePayload!
+}
