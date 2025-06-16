@@ -5,47 +5,52 @@
   justify-content: center;
   height: 160px;
   width: 160px;
-  background-color: var(--mantine-color-dark-7);
   border-radius: var(--mantine-radius-sm);
+  filter: brightness(0.9);
+  transition: filter 0.2s ease;
   user-select: none;
-  transition: background-color 0.2s;
 }
 
 /* 選択可能状態を表現 */
 .box[data-selectable="true"]:hover {
-  background-color: var(--mantine-color-gray-8);
+  filter: brightness(1);
   cursor: pointer;
+}
+
+.box[data-selectable="false"] {
+  filter: brightness(1);
 }
 
 /* 選択状態を表現 */
 .box[data-selected="true"] {
+  filter: brightness(1);
   outline: 1px solid var(--mantine-primary-color-filled);
 }
 
 /* サポート対象を表現 */
 .box[data-supported="true"] {
-  background-color: var(--mantine-color-dark-7);
 }
 
 /* サポート対象外を表現 */
 .box[data-supported="false"] {
+  border-color: var(--mantine-color-red-light-color);
   background-color: var(--mantine-color-red-light);
   outline: 1px solid var(--mantine-color-red-light);
 }
 
 .box[data-valid="accept"] {
-  border-color: var(--mantine-color-blue-light);
+  border-color: var(--mantine-color-blue-light-color);
   background-color: var(--mantine-color-blue-light);
 }
 
 .box[data-valid="reject"] {
-  border-color: var(--mantine-color-red-light);
+  border-color: var(--mantine-color-red-light-color);
   background-color: var(--mantine-color-red-light);
   cursor: no-drop;
 }
 
 .box[data-valid="warning"] {
-  border-color: var(--mantine-color-yellow-light);
+  border-color: var(--mantine-color-yellow-light-color);
   background-color: var(--mantine-color-yellow-light);
 }
 
@@ -64,10 +69,27 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--mantine-color-gray-7);
   opacity: 0.2;
   transition: opacity 0.2s;
 }
 .actionIcon:hover {
   opacity: 1.0;
+}
+
+.labelBox {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  padding: 0px 4px;
+  border-end-start-radius: var(--mantine-radius-sm);
+  border-end-end-radius: var(--mantine-radius-sm);
+}
+
+.label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

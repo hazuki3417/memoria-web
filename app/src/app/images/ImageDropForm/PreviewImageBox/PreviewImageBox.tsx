@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Image } from "@mantine/core";
+import { ActionIcon, Box, Image, Paper, Text } from "@mantine/core";
 import classes from "./PreviewImageBox.module.css";
 import React, { useCallback } from "react";
 import { IconAlertTriangle, IconX } from "@tabler/icons-react";
@@ -43,7 +43,7 @@ export const PreviewImageBox = (props: PreviewImageBoxProps) => {
   );
 
   return (
-    <Box
+    <Paper
       className={classes.box}
       onClick={ui.supported ? select : undefined}
       data-selected={ui.supported ? ui.selected : false}
@@ -74,6 +74,13 @@ export const PreviewImageBox = (props: PreviewImageBoxProps) => {
           style={{ color: "var(--mantine-color-red-6)" }}
         />
       )}
-    </Box>
+      {payload.alt && (
+        <Box className={classes.labelBox}>
+          <Text className={classes.label} size="xs">
+            {payload.alt}
+          </Text>
+        </Box>
+      )}
+    </Paper>
   );
 };

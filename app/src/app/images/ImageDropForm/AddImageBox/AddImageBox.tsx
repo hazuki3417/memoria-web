@@ -1,4 +1,4 @@
-import { Box, List, Stack } from "@mantine/core";
+import { List, Paper, Stack } from "@mantine/core";
 import { IconPhotoPlus } from "@tabler/icons-react";
 import classes from "./AddImageBox.module.css";
 import React, { useCallback, useRef } from "react";
@@ -60,7 +60,7 @@ export const AddImageBox = (props: AddImageBoxProps) => {
   };
 
   return (
-    <Box
+    <Paper
       className={classes.box}
       onClick={click}
       data-valid={ui?.valid}
@@ -100,6 +100,6 @@ export const AddImageBox = (props: AddImageBoxProps) => {
           </List.Item>
         </List>
       </Stack>
-    </Box>
+    </Paper>
   );
 };

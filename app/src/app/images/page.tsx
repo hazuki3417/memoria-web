@@ -192,6 +192,11 @@ export default function Page() {
     return formatSize(total, "m");
   }, [total]);
 
+  const isEmpty = useMemo(() => {
+    const empty = 0;
+    return fields.length <= empty;
+  }, [fields]);
+
   useEffect(() => {
     /**
      * 一括フォーム状態のとき > サムネイルを未選択状態にする
@@ -262,9 +267,21 @@ export default function Page() {
                     },
                   }}
                 />
-                <Flex gap={8}>
+                <Flex
+                  gap={8}
+                  style={{
+                    alignItems: "center",
+                  }}
+                >
                   <Text size="sm">{`${watchValueImages.length} 件`}</Text>
                   <Text size="sm">{`${Math.round(totalSize.value)} ${totalSize.unit.toUpperCase()}B`}</Text>
+                  <Button
+                    size="xs"
+                    onClick={() => console.debug("submit", methods.getValues())}
+                    disabled={isEmpty}
+                  >
+                    登録
+                  </Button>
                 </Flex>
               </Flex>
               <Box>
@@ -306,9 +323,6 @@ export default function Page() {
           />
         )}
       </ImageDropForm>
-      <Button onClick={() => console.debug("submit", methods.getValues())}>
-        submit
-      </Button>
     </Box>
   );
 }

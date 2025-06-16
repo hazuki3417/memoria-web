@@ -10,7 +10,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const payload = { src: "sample/h.png", alt: "example.png" };
+const payload = { src: "sample/v.png", alt: "example.png" };
 
 export const Default: Story = {
   args: {
@@ -126,7 +126,7 @@ export const ValidReject: Story = {
       selected: false,
       selectable: true,
       supported: true,
-      valid: "warning",
+      valid: "reject",
     },
     handler: {
       onSelect: fn(),
@@ -148,7 +148,7 @@ export const ValidWarning: Story = {
       selected: false,
       selectable: true,
       supported: true,
-      valid: "reject",
+      valid: "warning",
     },
     handler: {
       onSelect: fn(),

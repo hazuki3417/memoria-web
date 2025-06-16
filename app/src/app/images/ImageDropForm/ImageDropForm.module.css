@@ -11,18 +11,18 @@
 }
 
 .droparea[data-valid="accept"] {
-  border-color: var(--mantine-color-blue-light);
+  border-color: var(--mantine-color-blue-light-color);
   background-color: var(--mantine-color-blue-light);
 }
 
 .droparea[data-valid="reject"] {
-  border-color: var(--mantine-color-red-light);
+  border-color: var(--mantine-color-red-light-color);
   background-color: var(--mantine-color-red-light);
   cursor: no-drop;
 }
 
 .droparea[data-valid="warning"] {
-  border-color: var(--mantine-color-yellow-light);
+  border-color: var(--mantine-color-yellow-light-color);
   background-color: var(--mantine-color-yellow-light);
 }
 
