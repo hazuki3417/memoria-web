@@ -11,23 +11,46 @@
   transition: background-color 0.2s;
 }
 
+/* 選択可能状態を表現 */
 .box[data-selectable="true"]:hover {
   background-color: var(--mantine-color-gray-8);
   cursor: pointer;
 }
 
+/* 選択状態を表現 */
 .box[data-selected="true"] {
   outline: 1px solid var(--mantine-color-blue-7);
 }
 
-.box[data-type="invalid"] {
+/* サポート対象を表現 */
+.box[data-supported="true"] {
+  background-color: var(--mantine-color-dark-7);
+}
+
+/* サポート対象外を表現 */
+.box[data-supported="false"] {
   background-color: var(--mantine-color-red-light);
   outline: 1px solid var(--mantine-color-red-light);
 }
 
-.box[data-type="unsupported"] {
+.box[data-valid="accept"] {
+  border-color: var(--mantine-color-blue-light);
+  background-color: var(--mantine-color-blue-light);
+}
+
+.box[data-valid="reject"] {
+  border-color: var(--mantine-color-red-light);
   background-color: var(--mantine-color-red-light);
-  outline: 1px solid var(--mantine-color-red-light);
+  cursor: no-drop;
+}
+
+.box[data-valid="warning"] {
+  border-color: var(--mantine-color-yellow-light);
+  background-color: var(--mantine-color-yellow-light);
+}
+
+.box[data-disabled="true"] {
+  cursor: no-drop;
 }
 
 .image {
