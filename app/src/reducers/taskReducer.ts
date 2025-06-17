@@ -25,7 +25,7 @@ export type TaskAction<D = undefined> =
   | {
       type: "update";
       key: TaskBase["id"];
-      payload: Partial<Omit<Task<D>, "id">>;
+      payload: Pick<TaskBase, "status" | "error"> & { data?: D };
     }
   | { type: "remove"; key: TaskBase["id"][] }
   | { type: "reset" };
