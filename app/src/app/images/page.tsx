@@ -1,6 +1,7 @@
 "use client";
-import { Box, Button, Flex, Space, Stack, Text } from "@mantine/core";
+import { Box, Button, Flex, Group, Paper, Stack, Text } from "@mantine/core";
 import {
+  Controller,
   FormProvider,
   useFieldArray,
   useForm,
@@ -19,6 +20,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageDropForm } from "./ImageDropForm";
 import { imageConfig } from "@/config";
 import { formatSize } from "@/lib/utils";
+import { useUploadImageMutation, Visibility } from "@/graphql";
+import { useTaskManager } from "@/hooks/useTaskManager";
+import { Task } from "@/reducers";
+import { nanoid } from "nanoid";
+import { render } from "@testing-library/react";
 
 const validFile = (file: File) => {
   return {
@@ -38,11 +44,13 @@ const fileSchema = z.object({
     }),
 });
 
+const imageSchema = imageFormSchema.merge(fileSchema);
+
 const inputFormSchema = z.object({
   share: imageFormSchema,
-  images: z.array(imageFormSchema.merge(fileSchema)).max(imageConfig.count.max),
+  images: z.array(imageSchema).max(imageConfig.count.max),
 });
-
+type ImageSchema = z.infer<typeof imageSchema>;
 type FormSchema = z.infer<typeof inputFormSchema>;
 
 /**
@@ -84,7 +92,6 @@ type FormSchema = z.infer<typeof inputFormSchema>;
  * UI
  * TODO: ファイルドラッグ時に対応しているバリデーションOKなら背景色を青に、違反なら赤にする
  */
-
 export default function Page() {
   const formSwitcher = useFormSwitcher();
   const methods = useForm<FormSchema>({
@@ -115,26 +122,68 @@ export default function Page() {
     { size: boolean; type: boolean }[]
   >([]);
 
+  const [uploadImage] = useUploadImageMutation();
+
+  const taskManager = useTaskManager({
+    mode: "parallel",
+    failOnError: false,
+  });
+
   const [selected, setSelected] = useState<number | null>(null);
 
   const [total, setTotal] = useState<number>(0);
 
+  const submit = async () => {
+    console.debug("submit", methods.formState.errors);
+    await methods.handleSubmit(async (value, errors) => {
+      console.debug("handleSubmit", { value, errors });
+      await taskManager.handler.submit(async (task, index) => {
+        const image = methods.getValues("images")[index];
+        await uploadImage({
+          variables: {
+            input: {
+              ...image,
+              visibility:
+                image.visibility === "public"
+                  ? Visibility.Public
+                  : Visibility.Private,
+            },
+          },
+        });
+      });
+    })();
+  };
+
   const addFiles = (files: FileList) => {
+    const newFileValids: { size: boolean; type: boolean }[] = [];
+    const newTasks: Task[] = [];
+    const newImages: ImageSchema[] = [];
+    let total = 0;
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const valid = validFile(file);
 
-      setTotal((prev) => prev + file.size);
-
-      setFileValid((prev) => {
-        return [...prev, valid];
+      total += file.size;
+      newFileValids.push(valid);
+      newTasks.push({
+        id: nanoid(),
+        status: "idle",
       });
 
-      append({
+      newImages.push({
         file,
         ...imageFormDefaultValue,
       });
     }
+
+    // まとめて更新
+    setTotal((prev) => prev + total);
+    setFileValid((prev) => [...prev, ...newFileValids]);
+    taskManager.handler.append(newTasks);
+    append(newImages);
+    // NOTE: バリデーションを発火させる
+    methods.trigger();
   };
 
   const fileDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -149,20 +198,21 @@ export default function Page() {
     addFiles(newFiles);
   }, []);
 
-  const fileSelected = useCallback((value: number) => {
-    setSelected(value);
+  const fileSelected = useCallback((index: number, id: string) => {
+    setSelected(index);
   }, []);
 
   const fileRemove = useCallback(
-    (value: number) => {
+    (index: number, id: string) => {
       setTotal((prev) => {
-        const file = fields[value].file;
+        const file = fields[index].file;
         return prev - file.size;
       });
 
-      setFileValid((prev) => prev.filter((_, index) => index !== value));
+      setFileValid((prev) => prev.filter((_, i) => i !== index));
 
-      remove(value);
+      taskManager.handler.remove([id]);
+      remove(index);
     },
     [fields],
   );
@@ -210,27 +260,38 @@ export default function Page() {
   }, [formSwitcher.state.mode]);
 
   const previews = fields.map((preview, index) => {
+    const task = taskManager.state.tasks[index];
+    const key = task.id;
     return (
-      <ImageDropForm.PreviewImageBox
-        key={index}
-        id={index}
-        payload={{
-          src: URL.createObjectURL(preview.file),
-          alt: preview.file.name,
-        }}
-        ui={{
-          selected:
-            formSwitcher.state.mode === MODE.TYPE.SINGLE
-              ? selected === index
-              : false,
-          selectable: formSwitcher.state.mode === MODE.TYPE.SINGLE,
-          supported: fileValid[index].type,
-          valid: fileValid[index].size ? "idle" : "reject",
-        }}
-        handler={{
-          onSelect: fileSelected,
-          onRemove: fileRemove,
-        }}
+      <Controller
+        key={key}
+        control={methods.control}
+        name={`images.${index}.file`}
+        render={({ field, fieldState }) => (
+          <ImageDropForm.PreviewImageBox
+            key={key}
+            index={index}
+            id={task.id}
+            payload={{
+              src: URL.createObjectURL(field.value),
+              alt: field.value.name,
+            }}
+            ui={{
+              selected:
+                formSwitcher.state.mode === MODE.TYPE.SINGLE
+                  ? selected === index
+                  : false,
+              selectable: formSwitcher.state.mode === MODE.TYPE.SINGLE,
+              supported: fileValid[index].type,
+              valid: fileValid[index].size ? "idle" : "warning",
+              error: fieldState.error?.message,
+            }}
+            handler={{
+              onSelect: fileSelected,
+              onRemove: fileRemove,
+            }}
+          />
+        )}
       />
     );
   });
@@ -275,11 +336,7 @@ export default function Page() {
                 >
                   <Text size="sm">{`${watchValueImages.length} 件`}</Text>
                   <Text size="sm">{`${Math.round(totalSize.value)} ${totalSize.unit.toUpperCase()}B`}</Text>
-                  <Button
-                    size="xs"
-                    onClick={() => console.debug("submit", methods.getValues())}
-                    disabled={isEmpty}
-                  >
+                  <Button size="xs" onClick={submit} disabled={isEmpty}>
                     登録
                   </Button>
                 </Flex>
@@ -323,6 +380,21 @@ export default function Page() {
           />
         )}
       </ImageDropForm>
+      {taskManager.state.tasks.map((task, index) => (
+        <Paper key={index} p="xs" withBorder radius="md">
+          <Group justify="space-between">
+            <Text size="sm">{task.id}</Text>
+            <Text size="sm" c={task.status === "error" ? "red" : "dimmed"}>
+              {task.status}
+            </Text>
+          </Group>
+          {task.status === "error" && (
+            <Text size="xs" c="red">
+              エラー: {task.error}
+            </Text>
+          )}
+        </Paper>
+      ))}
     </Box>
   );
 }
