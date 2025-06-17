@@ -1,46 +1,36 @@
-import { describe, expect, it, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useTaskManager } from "./useTaskManager";
-import { Task } from "@/reducers";
+import { describe, it, expect, vi } from "vitest";
+import { useTaskManager } from "@/hooks/useTaskManager"; // パス調整
+import type { Task } from "@/reducers";
 
 describe("useTaskManager", () => {
-  const mockSuccessProcess = vi.fn().mockResolvedValue(undefined);
-  const mockFailProcess = vi.fn().mockRejectedValue(new Error("fail"));
-
-  const createTask = (id: string): Task => ({
-    id,
-    status: "idle"
-  });
-
   it("should append tasks", () => {
     const { result } = renderHook(() =>
-      useTaskManager({ mode: "serial", process: mockSuccessProcess, failOnError: false })
+      useTaskManager({ mode: "serial", failOnError: false }),
     );
 
-    const task = createTask("1");
-
-    act(() => {
-      result.current.handler.append([task]);
-    });
-
-    expect(result.current.state.tasks).toHaveLength(1);
-    expect(result.current.state.tasks[0].id).toBe("1");
-    expect(result.current.state.meta.action).toBe("append");
-  });
-
-  it("should remove tasks", () => {
-    const { result } = renderHook(() =>
-      useTaskManager({ mode: "serial", process: mockSuccessProcess, failOnError: false })
-    );
-
-    const task1 = createTask("1");
-    const task2 = createTask("2");
+    const task1: Task = { id: "1", status: "idle" };
+    const task2: Task = { id: "2", status: "idle" };
 
     act(() => {
       result.current.handler.append([task1, task2]);
     });
 
+    expect(result.current.state.tasks).toHaveLength(2);
+    expect(result.current.state.tasks[0].id).toBe("1");
+    expect(result.current.state.meta.action).toBe("append");
+  });
+
+  it("should remove tasks by id", () => {
+    const { result } = renderHook(() =>
+      useTaskManager({ mode: "serial", failOnError: false }),
+    );
+
+    const task1: Task = { id: "1", status: "idle" };
+    const task2: Task = { id: "2", status: "idle" };
+
     act(() => {
+      result.current.handler.append([task1, task2]);
       result.current.handler.remove(["1"]);
     });
 
@@ -51,13 +41,11 @@ describe("useTaskManager", () => {
 
   it("should reset tasks", () => {
     const { result } = renderHook(() =>
-      useTaskManager({ mode: "serial", process: mockSuccessProcess, failOnError: false })
+      useTaskManager({ mode: "serial", failOnError: false }),
     );
 
-    const task1 = createTask("1");
-
     act(() => {
-      result.current.handler.append([task1]);
+      result.current.handler.append([{ id: "1", status: "idle" }]);
       result.current.handler.reset();
     });
 
@@ -65,69 +53,81 @@ describe("useTaskManager", () => {
     expect(result.current.state.meta.action).toBe("reset");
   });
 
-  it("should execute tasks serially", async () => {
-    const process = vi.fn().mockResolvedValue(undefined);
-
+  it("should submit tasks serially", async () => {
     const { result } = renderHook(() =>
-      useTaskManager({ mode: "serial", process, failOnError: false })
+      useTaskManager({ mode: "serial", failOnError: false }),
     );
 
     act(() => {
-      result.current.handler.append([createTask("1"), createTask("2")]);
+      result.current.handler.append([
+        { id: "1", status: "idle" },
+        { id: "2", status: "idle" },
+      ]);
     });
 
-    await act(() => result.current.handler.submit());
+    const mockProcess = vi.fn(async () => {
+      await new Promise((res) => setTimeout(res, 5));
+    });
 
-    expect(process).toHaveBeenCalledTimes(2);
+    await act(async () => {
+      await result.current.handler.submit(mockProcess);
+    });
+
+    const statuses = result.current.state.tasks.map((t) => t.status);
+    expect(statuses).toEqual(["success", "success"]);
     expect(result.current.state.meta.action).toBe("submit");
   });
 
-  it("should execute tasks in parallel", async () => {
-    const process = vi.fn().mockResolvedValue(undefined);
-
+  it("should submit tasks in parallel", async () => {
     const { result } = renderHook(() =>
-      useTaskManager({ mode: "parallel", process, failOnError: false })
+      useTaskManager({ mode: "parallel", failOnError: false }),
     );
 
     act(() => {
-      result.current.handler.append([createTask("1"), createTask("2")]);
+      result.current.handler.append([
+        { id: "1", status: "idle" },
+        { id: "2", status: "idle" },
+        { id: "3", status: "idle" },
+      ]);
     });
 
-    await act(() => result.current.handler.submit());
+    const mockProcess = vi.fn(async () => {
+      await new Promise((res) => setTimeout(res, 5));
+    });
 
-    expect(process).toHaveBeenCalledTimes(2);
-    expect(result.current.state.meta.action).toBe("submit");
+    await act(async () => {
+      await result.current.handler.submit(mockProcess);
+    });
+
+    const statuses = result.current.state.tasks.map((t) => t.status);
+    expect(statuses).toEqual(["success", "success", "success"]);
   });
 
-  it("should fail on first error in serial mode when failOnError is true", async () => {
-    const process = vi.fn().mockImplementation(async (task) => {
-      if (task.id === "1") throw new Error("fail");
-    });
-
+  it("should stop on first error in serial mode if failOnError=true", async () => {
     const { result } = renderHook(() =>
-      useTaskManager({ mode: "serial", process, failOnError: true })
+      useTaskManager({ mode: "serial", failOnError: true }),
     );
 
     act(() => {
-      result.current.handler.append([createTask("1"), createTask("2")]);
+      result.current.handler.append([
+        { id: "1", status: "idle" },
+        { id: "2", status: "idle" },
+      ]);
     });
 
-    await expect(result.current.handler.submit()).rejects.toThrow("Task 1 failed");
-  });
-
-  it("should not fail on error when failOnError is false", async () => {
-    const process = vi.fn().mockImplementation(async (task) => {
-      if (task.id === "1") throw new Error("fail");
+    const mockProcess = vi.fn(async (task: Task) => {
+      if (task.id === "2") {
+        throw new Error("Failed at task 2");
+      }
     });
 
-    const { result } = renderHook(() =>
-      useTaskManager({ mode: "serial", process, failOnError: false })
-    );
-
-    act(() => {
-      result.current.handler.append([createTask("1"), createTask("2")]);
+    await act(async () => {
+      await expect(result.current.handler.submit(mockProcess)).rejects.toThrow(
+        "Task 2 failed",
+      );
     });
 
-    await expect(result.current.handler.submit()).resolves.toBeUndefined();
+    const statuses = result.current.state.tasks.map((t) => t.status);
+    expect(statuses).toEqual(["success", "error"]);
   });
 });

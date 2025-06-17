@@ -15,15 +15,15 @@ export type UseTaskManagerState<D = undefined> = {
 
 export type UseTaskManagerOption<D = undefined> = {
   mode: "serial" | "parallel";
-  process: (task: Task<D>) => Promise<void>;
   failOnError: boolean;
 };
 
+export type Process<D> = (task: Task<D>, index: number) => Promise<void>;
 export interface UseTaskManagerHandler<D = undefined> {
   append: (task: Task<D>[]) => void;
   remove: (key: string[]) => void;
   reset: () => void;
-  submit: () => Promise<void>;
+  submit: (process: Process<D>) => Promise<void>;
 }
 export interface UseTaskManager<D = undefined> {
   state: UseTaskManagerState<D>;
@@ -33,7 +33,7 @@ export interface UseTaskManager<D = undefined> {
 export const useTaskManager = <D = undefined>(
   option: UseTaskManagerOption<D>,
 ): UseTaskManager<D> => {
-  const [task, dispatch] = useReducer(taskReducer<D>, {
+  const [state, dispatch] = useReducer(taskReducer<D>, {
     current: { tasks: [] },
     meta: { action: "idle" },
   });
@@ -86,44 +86,41 @@ export const useTaskManager = <D = undefined>(
     });
   }, []);
 
-  const execute = async (
-    task: Task<D>,
-    process: UseTaskManagerOption<D>["process"],
-    failOnError: boolean,
-  ) => {
+  const runner = async (task: Task<D>, index: number, callback: Process<D>) => {
     setRunning(task.id);
     try {
-      await process(task);
+      await callback(task, index);
       setSuccess(task.id);
     } catch (err: any) {
       setError(task.id, err.message || "Unknown error");
-      if (failOnError) throw new Error(`Task ${task.id} failed`);
+      if (option.failOnError) throw new Error(`Task ${task.id} failed`);
     }
   };
 
-  const serial = async (tasks: Task<D>[]) => {
-    for (const task of tasks) {
+  const serial = async (callback: Process<D>) => {
+    const tasks = state.current.tasks;
+    for (const [index, task] of tasks.entries()) {
       if (task.status === "success") continue;
-      await execute(task, option.process, option.failOnError);
+      await runner(task, index, callback);
     }
   };
 
-  const parallel = async (tasks: Task<D>[]) => {
-    const promises = tasks.map(async (task) => {
+  const parallel = async (callback: Process<D>) => {
+    const tasks = state.current.tasks;
+    const promises = tasks.map(async (task, index) => {
       if (task.status === "success") return;
-      await execute(task, option.process, option.failOnError);
+      await runner(task, index, callback);
     });
-
     return await Promise.all(promises);
   };
 
-  const submit = async () => {
+  const submit = async (process: Process<D>) => {
     setAction("submit");
     try {
       if (option.mode === "serial") {
-        await serial(task.current.tasks);
+        await serial(process);
       } else if (option.mode === "parallel") {
-        await parallel(task.current.tasks);
+        await parallel(process);
       } else {
         throw new Error(`Unknown execution mode: ${option.mode}`);
       }
@@ -133,7 +130,7 @@ export const useTaskManager = <D = undefined>(
   };
 
   return {
-    state: { tasks: task.current.tasks, meta: { action } },
+    state: { tasks: state.current.tasks, meta: { action } },
     handler: {
       append,
       remove,
