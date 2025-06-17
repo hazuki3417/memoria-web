@@ -12,7 +12,7 @@ describe("useTaskManager", () => {
     status: "idle"
   });
 
-  it("should add tasks", () => {
+  it("should append tasks", () => {
     const { result } = renderHook(() =>
       useTaskManager({ mode: "serial", process: mockSuccessProcess, failOnError: false })
     );
@@ -20,12 +20,12 @@ describe("useTaskManager", () => {
     const task = createTask("1");
 
     act(() => {
-      result.current.handler.add([task]);
+      result.current.handler.append([task]);
     });
 
     expect(result.current.state.tasks).toHaveLength(1);
     expect(result.current.state.tasks[0].id).toBe("1");
-    expect(result.current.state.meta.action).toBe("add");
+    expect(result.current.state.meta.action).toBe("append");
   });
 
   it("should remove tasks", () => {
@@ -37,7 +37,7 @@ describe("useTaskManager", () => {
     const task2 = createTask("2");
 
     act(() => {
-      result.current.handler.add([task1, task2]);
+      result.current.handler.append([task1, task2]);
     });
 
     act(() => {
@@ -57,7 +57,7 @@ describe("useTaskManager", () => {
     const task1 = createTask("1");
 
     act(() => {
-      result.current.handler.add([task1]);
+      result.current.handler.append([task1]);
       result.current.handler.reset();
     });
 
@@ -73,7 +73,7 @@ describe("useTaskManager", () => {
     );
 
     act(() => {
-      result.current.handler.add([createTask("1"), createTask("2")]);
+      result.current.handler.append([createTask("1"), createTask("2")]);
     });
 
     await act(() => result.current.handler.submit());
@@ -90,7 +90,7 @@ describe("useTaskManager", () => {
     );
 
     act(() => {
-      result.current.handler.add([createTask("1"), createTask("2")]);
+      result.current.handler.append([createTask("1"), createTask("2")]);
     });
 
     await act(() => result.current.handler.submit());
@@ -109,7 +109,7 @@ describe("useTaskManager", () => {
     );
 
     act(() => {
-      result.current.handler.add([createTask("1"), createTask("2")]);
+      result.current.handler.append([createTask("1"), createTask("2")]);
     });
 
     await expect(result.current.handler.submit()).rejects.toThrow("Task 1 failed");
@@ -125,7 +125,7 @@ describe("useTaskManager", () => {
     );
 
     act(() => {
-      result.current.handler.add([createTask("1"), createTask("2")]);
+      result.current.handler.append([createTask("1"), createTask("2")]);
     });
 
     await expect(result.current.handler.submit()).resolves.toBeUndefined();

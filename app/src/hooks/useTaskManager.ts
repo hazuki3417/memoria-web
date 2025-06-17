@@ -3,7 +3,7 @@ import { ActionType } from "@/reducers/util";
 import { useCallback, useReducer, useState } from "react";
 
 export type UseTaskManagerAction = ActionType<
-  "add" | "remove" | "reset" | "submit"
+  "append" | "remove" | "reset" | "submit"
 >;
 
 export type UseTaskManagerState<D = undefined> = {
@@ -20,7 +20,7 @@ export type UseTaskManagerOption<D = undefined> = {
 };
 
 export interface UseTaskManagerHandler<D = undefined> {
-  add: (task: Task<D>[]) => void;
+  append: (task: Task<D>[]) => void;
   remove: (key: string[]) => void;
   reset: () => void;
   submit: () => Promise<void>;
@@ -40,9 +40,9 @@ export const useTaskManager = <D = undefined>(
 
   const [action, setAction] = useState<UseTaskManagerAction>("idle");
 
-  const add = useCallback((task: Task<D>[]) => {
-    setAction("add");
-    dispatch({ type: "add", payload: task });
+  const append = useCallback((task: Task<D>[]) => {
+    setAction("append");
+    dispatch({ type: "append", payload: task });
   }, []);
 
   const remove = useCallback((key: string[]) => {
@@ -135,7 +135,7 @@ export const useTaskManager = <D = undefined>(
   return {
     state: { tasks: task.current.tasks, meta: { action } },
     handler: {
-      add,
+      append,
       remove,
       reset,
       submit,

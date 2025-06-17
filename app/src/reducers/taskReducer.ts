@@ -10,7 +10,7 @@ export type Task<D = undefined> = D extends undefined
   ? TaskBase
   : TaskBase & { data: D };
 
-export type TaskActionType = "add" | "update" | "remove" | "reset";
+export type TaskActionType = "append" | "update" | "remove" | "reset";
 export interface TaskState<D = undefined> {
   current: {
     tasks: Task<D>[];
@@ -21,7 +21,7 @@ export interface TaskState<D = undefined> {
 }
 
 export type TaskAction<D = undefined> =
-  | { type: "add"; payload: Task<D>[] }
+  | { type: "append"; payload: Task<D>[] }
   | {
       type: "update";
       key: TaskBase["id"];
@@ -35,11 +35,11 @@ export const taskReducer = <D = undefined>(
   action: TaskAction<D>,
 ): TaskState<D> => {
   switch (action.type) {
-    case "add":
+    case "append":
       return {
         ...state,
         current: { tasks: [...state.current.tasks, ...action.payload] },
-        meta: { action: "add" },
+        meta: { action: "append" },
       };
     case "update":
       return {

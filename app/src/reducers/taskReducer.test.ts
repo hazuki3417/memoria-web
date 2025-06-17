@@ -29,7 +29,7 @@ const sampleTask: Task<UploadData> = {
 describe("taskReducer (with payload)", () => {
   it("should add tasks with payload", () => {
     const action: TaskAction<UploadData> = {
-      type: "add",
+      type: "append",
       payload: [sampleTask],
     };
 
@@ -37,13 +37,13 @@ describe("taskReducer (with payload)", () => {
 
     expect(actual.current.tasks).toHaveLength(1);
     expect(actual.current.tasks[0]).toEqual(sampleTask);
-    expect(actual.meta.action).toBe("add");
+    expect(actual.meta.action).toBe("append");
   });
 
   it("should update a task and preserve payload", () => {
     const state: TaskState<UploadData> = {
       current: { tasks: [sampleTask] },
-      meta: { action: "add" },
+      meta: { action: "append" },
     };
 
     const data: UploadData = {
@@ -82,7 +82,7 @@ describe("taskReducer (with payload)", () => {
           },
         ],
       },
-      meta: { action: "add" },
+      meta: { action: "append" },
     };
 
     const action: TaskAction<UploadData> = {
@@ -100,7 +100,7 @@ describe("taskReducer (with payload)", () => {
   it("should reset tasks with payload", () => {
     const state: TaskState<UploadData> = {
       current: { tasks: [sampleTask] },
-      meta: { action: "add" },
+      meta: { action: "append" },
     };
 
     const actual = taskReducer(state, { type: "reset" });
