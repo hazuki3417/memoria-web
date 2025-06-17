@@ -1,10 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  useImageZoom,
-  UseImageZoomOption,
-  UseImageZoomState,
-} from "./useImageZoom";
+import { useImageZoom, UseImageZoomOption } from "./useImageZoom";
 
 describe("useImageZoom", () => {
   const createInitialState = (): UseImageZoomOption => ({
