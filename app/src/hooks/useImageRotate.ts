@@ -1,4 +1,4 @@
-import { imageRotateReducer } from "@/reducers/imageRotateReducer";
+import { imageRotateReducer } from "@/reducers";
 import { useCallback, useReducer } from "react";
 
 export type UseImageRotateState = {
