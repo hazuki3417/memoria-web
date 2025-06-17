@@ -14,7 +14,8 @@ const payload = { src: "sample/v.png", alt: "example.png" };
 
 export const Default: Story = {
   args: {
-    id: 0,
+    index: 0,
+    id: "0",
     payload,
     ui: {
       selected: false,
@@ -35,7 +36,8 @@ export const Default: Story = {
 
 export const Selected: Story = {
   args: {
-    id: 0,
+    index: 0,
+    id: "0",
     payload,
     ui: {
       selected: true,
@@ -56,7 +58,8 @@ export const Selected: Story = {
 
 export const NonSelectable: Story = {
   args: {
-    id: 0,
+    index: 0,
+    id: "0",
     payload,
     ui: {
       selected: false,
@@ -77,7 +80,8 @@ export const NonSelectable: Story = {
 
 export const UnSupported: Story = {
   args: {
-    id: 0,
+    index: 0,
+    id: "0",
     payload,
     ui: {
       selected: false,
@@ -98,7 +102,8 @@ export const UnSupported: Story = {
 
 export const ValidAccept: Story = {
   args: {
-    id: 0,
+    index: 0,
+    id: "0",
     payload,
     ui: {
       selected: false,
@@ -120,7 +125,8 @@ export const ValidAccept: Story = {
 
 export const ValidReject: Story = {
   args: {
-    id: 0,
+    index: 0,
+    id: "0",
     payload,
     ui: {
       selected: false,
@@ -142,7 +148,8 @@ export const ValidReject: Story = {
 
 export const ValidWarning: Story = {
   args: {
-    id: 0,
+    index: 0,
+    id: "0",
     payload,
     ui: {
       selected: false,

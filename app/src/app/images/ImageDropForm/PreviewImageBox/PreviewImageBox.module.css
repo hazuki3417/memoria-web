@@ -33,6 +33,8 @@
 
 /* サポート対象外を表現 */
 .box[data-supported="false"] {
+  padding: 20px;
+  text-align: center;
   border-color: var(--mantine-color-red-light-color);
   background-color: var(--mantine-color-red-light);
   outline: 1px solid var(--mantine-color-red-light);
