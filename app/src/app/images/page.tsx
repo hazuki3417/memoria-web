@@ -134,9 +134,7 @@ export default function Page() {
   const [total, setTotal] = useState<number>(0);
 
   const submit = async () => {
-    console.debug("submit", methods.formState.errors);
     await methods.handleSubmit(async (value, errors) => {
-      console.debug("handleSubmit", { value, errors });
       await taskManager.handler.submit(async (task, index) => {
         const image = methods.getValues("images")[index];
         await uploadImage({
