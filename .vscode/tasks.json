@@ -91,6 +91,32 @@
         "showReuseMessage": false,
         "clear": true
       }
+    },
+    {
+      "label": "build:next",
+      "type": "shell",
+      "isBackground": false,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run build:next\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "build:storybook",
+      "type": "shell",
+      "isBackground": false,
+      "problemMatcher": [],
+      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run build:storybook\"",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
     }
   ]
 }
