@@ -19,12 +19,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageDropForm } from "./ImageDropForm";
 import { imageConfig } from "@/config";
-import { formatSize } from "@/lib/utils";
 import { useUploadImageMutation, Visibility } from "@/graphql";
 import { useTaskManager } from "@/hooks/useTaskManager";
 import { Task } from "@/reducers";
 import { nanoid } from "nanoid";
-import { render } from "@testing-library/react";
 
 const validFile = (file: File) => {
   return {
@@ -246,15 +244,14 @@ export default function Page() {
 
   const previews = fields.map((preview, index) => {
     const task = taskManager.state.tasks[index];
-    const key = task.id;
     return (
       <Controller
-        key={key}
+        key={preview.id}
         control={methods.control}
         name={`images.${index}.file`}
         render={({ field, fieldState }) => (
           <ImageDropForm.PreviewImageBox
-            key={key}
+            key={preview.id}
             index={index}
             id={task.id}
             payload={{

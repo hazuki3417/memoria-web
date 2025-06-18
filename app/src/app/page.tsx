@@ -4,7 +4,7 @@ import { ImageDetailModal } from "@/components/Modal/ImageDetailModal";
 import { useDisclosure } from "@/hooks";
 import { Box } from "@mantine/core";
 
-export default function Home() {
+const Page = () => {
   const modal = useDisclosure({ opend: false });
 
   return (
@@ -40,4 +40,5 @@ export default function Home() {
       </CustomModal>
     </Box>
   );
-}
+};
+export default Page;

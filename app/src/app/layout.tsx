@@ -1,8 +1,7 @@
 import "@mantine/core/styles.css";
 import "@mantine/dropzone/styles.css";
+import "@/lib/zod";
 import type { Metadata } from "next";
-import type { FC } from "react";
-import type { ReactNode } from "react";
 import Head from "./Head";
 import Providers from "./Providers";
 import { Header } from "@/components";
@@ -14,12 +13,13 @@ const metadata: Metadata = {
 };
 
 type RootLayoutProps = {
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
-const RootLayout: FC<RootLayoutProps> = ({ children }) => {
+const RootLayout = (props: RootLayoutProps) => {
+  const { children } = props;
   return (
-    <html data-mantine-color-scheme="dark">
+    <html data-mantine-color-scheme="dark" lang="ja">
       {/* FIX: data-mantine-color-scheme="dark"の記述がない場合、ハイドレーションの差分が発生してエラーになる */}
       <Head />
       <body>
