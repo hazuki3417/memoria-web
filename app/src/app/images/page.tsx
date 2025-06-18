@@ -131,8 +131,6 @@ export default function Page() {
 
   const [selected, setSelected] = useState<number | null>(null);
 
-  const [total, setTotal] = useState<number>(0);
-
   const submit = async () => {
     await methods.handleSubmit(async (value, errors) => {
       await taskManager.handler.submit(async (task, index) => {
@@ -176,7 +174,6 @@ export default function Page() {
     }
 
     // まとめて更新
-    setTotal((prev) => prev + total);
     setFileValid((prev) => [...prev, ...newFileValids]);
     taskManager.handler.append(newTasks);
     append(newImages);
@@ -202,13 +199,7 @@ export default function Page() {
 
   const fileRemove = useCallback(
     (index: number, id: string) => {
-      setTotal((prev) => {
-        const file = fields[index].file;
-        return prev - file.size;
-      });
-
       setFileValid((prev) => prev.filter((_, i) => i !== index));
-
       taskManager.handler.remove([id]);
       remove(index);
     },
@@ -235,10 +226,6 @@ export default function Page() {
   const imageDropFormDisabled = useMemo(() => {
     return imageConfig.count.max <= watchValueImages.length;
   }, [watchValueImages]);
-
-  const totalSize = useMemo(() => {
-    return formatSize(total, "m");
-  }, [total]);
 
   const isEmpty = useMemo(() => {
     const empty = 0;
@@ -332,8 +319,7 @@ export default function Page() {
                     alignItems: "center",
                   }}
                 >
-                  <Text size="sm">{`${watchValueImages.length} 件`}</Text>
-                  <Text size="sm">{`${Math.round(totalSize.value)} ${totalSize.unit.toUpperCase()}B`}</Text>
+                  <Text size="xs">{`${watchValueImages.length} 件`}</Text>
                   <Button size="xs" onClick={submit} disabled={isEmpty}>
                     登録
                   </Button>
