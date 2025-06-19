@@ -3,8 +3,8 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { setLang as setLangCookie } from "./setLang";
-import { config } from "./config";
 import Cookie from "universal-cookie";
+import { langConfig } from "@/config";
 
 export type UseLangState = {
   value: string;
@@ -23,14 +23,14 @@ export const useLang = (): UseLang => {
 
   const [lang, setLangState] = useState<string>(() => {
     return (
-      cookie.get(config.cookie.name) ||
+      cookie.get(langConfig.cookie.name) ||
       navigator.language?.split("-")[0] || // "en-US" → "en"
-      config.default.lang
+      langConfig.default.lang
     );
   });
 
   useEffect(() => {
-    const stored = cookie.get(config.cookie.name);
+    const stored = cookie.get(langConfig.cookie.name);
     if (stored && stored !== lang) {
       setLangState(stored);
     }

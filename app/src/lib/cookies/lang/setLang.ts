@@ -1,14 +1,14 @@
 /**
  * CSR/SSR共用
  */
+import { langConfig } from "@/config";
 import Cookie from "universal-cookie";
-import { config } from "./config";
 
 const cookie = new Cookie();
 
 export const setLang = (value: string) => {
-  cookie.set(config.cookie.name, value, {
-    path: config.cookie.path,
-    maxAge: config.cookie.maxAge,
+  cookie.set(langConfig.cookie.name, value, {
+    path: langConfig.cookie.path,
+    maxAge: langConfig.cookie.maxAge,
   });
 };

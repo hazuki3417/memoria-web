@@ -1,4 +1,4 @@
-export const config = {
+export const langConfig = {
   default: {
     lang: "ja",
   },
