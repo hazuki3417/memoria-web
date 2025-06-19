@@ -1,7 +1,7 @@
 /**
  * CSR専用
  */
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 export type UseLangState = {
@@ -23,8 +23,12 @@ export const useLang = (): UseLang => {
     i18n.changeLanguage(value);
   }, []);
 
+  const lang = useMemo(() => {
+    return i18n.language.split(",")[0].split("-")[0];
+  }, [i18n.language]);
+
   return {
-    state: { value: i18n.language },
+    state: { value: lang },
     handler: {
       set,
     },
