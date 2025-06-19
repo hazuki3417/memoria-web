@@ -1,8 +1,5 @@
-export const ja = {
-  greeting: {
-    hello: "Hello",
-    goodbye: "Goodbye",
-  },
-} as const;
+import { TranslationSchema } from "./type";
 
-export type TranslationJaKeys = keyof (typeof ja)["greeting"];
+export const ja: TranslationSchema = {
+  hello: "おはよう",
+};

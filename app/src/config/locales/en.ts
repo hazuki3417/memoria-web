@@ -1,8 +1,5 @@
-export const en = {
-  greeting: {
-    hello: "Hello",
-    goodbye: "Goodbye",
-  },
-} as const;
+import { TranslationSchema } from "./type";
 
-export type TranslationEnKeys = keyof (typeof en)["greeting"];
+export const en: TranslationSchema = {
+  hello: "hello",
+};
