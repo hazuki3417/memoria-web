@@ -6,6 +6,7 @@ import Head from "./Head";
 import Providers from "./Providers";
 import { Header } from "@/components";
 import { Container } from "@mantine/core";
+import { getLang } from "@/lib/cookies/lang/getLang";
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -16,10 +17,11 @@ type RootLayoutProps = {
   children: React.ReactNode;
 };
 
-const RootLayout = (props: RootLayoutProps) => {
+const RootLayout = async (props: RootLayoutProps) => {
   const { children } = props;
+  const lang = await getLang();
   return (
-    <html data-mantine-color-scheme="dark" lang="ja">
+    <html data-mantine-color-scheme="dark" lang={lang}>
       {/* FIX: data-mantine-color-scheme="dark"の記述がない場合、ハイドレーションの差分が発生してエラーになる */}
       <Head />
       <body>
