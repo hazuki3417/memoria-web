@@ -3,39 +3,40 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { setLang as setLangCookie } from "./setLang";
+import { config } from "./config";
 import Cookie from "universal-cookie";
 
 export type UseLangState = {
   value: string;
 };
 
-export type UseLangOption = UseLangState;
-
 export interface UseLangHandler {
   set: (value: string) => void;
-  update: (value: string) => void;
 }
 export interface UseLang {
   state: UseLangState;
   handler: UseLangHandler;
 }
 
-export const useLang = ({ value = "ja" }: UseLangOption): UseLang => {
-  const [lang, setLangState] = useState<string>(value);
+export const useLang = (): UseLang => {
   const cookie = new Cookie();
 
+  const [lang, setLangState] = useState<string>(() => {
+    return (
+      cookie.get(config.cookie.name) ||
+      navigator.language?.split("-")[0] || // "en-US" → "en"
+      config.default.lang
+    );
+  });
+
   useEffect(() => {
-    const lang = cookie.get("lang");
-    if (lang) {
-      setLangState(lang);
+    const stored = cookie.get(config.cookie.name);
+    if (stored && stored !== lang) {
+      setLangState(stored);
     }
   }, []);
 
   const set = useCallback((value: string) => {
-    setLangState(value);
-  }, []);
-
-  const update = useCallback((value: string) => {
     setLangCookie(value);
     setLangState(value);
   }, []);
@@ -44,7 +45,6 @@ export const useLang = ({ value = "ja" }: UseLangOption): UseLang => {
     state: { value: lang },
     handler: {
       set,
-      update,
     },
   };
 };

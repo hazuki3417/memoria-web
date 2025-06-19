@@ -2,12 +2,13 @@
  * CSR/SSR共用
  */
 import Cookie from "universal-cookie";
+import { config } from "./config";
 
 const cookie = new Cookie();
 
 export const setLang = (value: string) => {
-  cookie.set("lang", value, {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30, // 30日
+  cookie.set(config.cookie.name, value, {
+    path: config.cookie.path,
+    maxAge: config.cookie.maxAge,
   });
 };
