@@ -7,7 +7,5 @@ export const langConfig = {
   },
   cookie: {
     name: "lang",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30, // 30日
   },
 };

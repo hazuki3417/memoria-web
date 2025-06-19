@@ -1,10 +1,8 @@
 /**
  * CSR専用
  */
-import { useCallback, useEffect, useState } from "react";
-import { setLang as setLangCookie } from "./setLang";
-import Cookie from "universal-cookie";
-import { langConfig } from "@/config";
+import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 export type UseLangState = {
   value: string;
@@ -19,30 +17,14 @@ export interface UseLang {
 }
 
 export const useLang = (): UseLang => {
-  const cookie = new Cookie();
-
-  const [lang, setLangState] = useState<string>(() => {
-    return (
-      cookie.get(langConfig.cookie.name) ||
-      navigator.language?.split("-")[0] || // "en-US" → "en"
-      langConfig.default.lang
-    );
-  });
-
-  useEffect(() => {
-    const stored = cookie.get(langConfig.cookie.name);
-    if (stored && stored !== lang) {
-      setLangState(stored);
-    }
-  }, []);
+  const { i18n } = useTranslation();
 
   const set = useCallback((value: string) => {
-    setLangCookie(value);
-    setLangState(value);
+    i18n.changeLanguage(value);
   }, []);
 
   return {
-    state: { value: lang },
+    state: { value: i18n.language },
     handler: {
       set,
     },
