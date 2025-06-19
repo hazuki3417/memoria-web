@@ -2,6 +2,7 @@
 import { Box } from "@mantine/core";
 import type { ComponentProps } from "react";
 import { styles } from "./styles";
+import { LangSelect } from "./LangSelect";
 
 type HeaderProps = ComponentProps<"header"> & {};
 
@@ -20,10 +21,12 @@ const Header = (props: HeaderProps) => (
       backgroundColor: theme.colors.dark[8],
       display: "flex",
       alignItems: "center",
+      justifyContent: "space-between",
     })}
     {...props}
   >
     <span>Memoria ver.β</span>
+    <LangSelect />
   </Box>
 );
 
