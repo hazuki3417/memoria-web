@@ -2,7 +2,8 @@ import { List, Paper, Stack } from "@mantine/core";
 import { IconPhotoPlus } from "@tabler/icons-react";
 import classes from "./AddImageBox.module.css";
 import React, { useCallback, useRef } from "react";
-import { formatSize } from "@/lib/utils";
+import { format } from "@/lib";
+import { viewConfig } from "@/config";
 
 export type AddImageBoxUi = {
   valid?: "idle" | "accept" | "warning" | "reject";
@@ -54,10 +55,10 @@ export const AddImageBox = (props: AddImageBoxProps) => {
     [handler?.onFileSelect],
   );
 
-  const size = {
-    single: formatSize(config.size.max, "m"),
-    all: formatSize(config.size.total, "m"),
-  };
+  const size = format.file.size(config.size.max, {
+    decimals: 0,
+    unit: viewConfig.file.size.unit,
+  });
 
   return (
     <Paper
@@ -89,15 +90,8 @@ export const AddImageBox = (props: AddImageBoxProps) => {
               .map((value) => value.replace("image/", ""))
               .join(" / ")}
           </List.Item>
-          <List.Item>
-            {`${Math.round(size.single.value)} ${size.single.unit.toUpperCase()}B`}
-            / 1 件
-          </List.Item>
-          <List.Item>最大 {config.count.max} 枚</List.Item>
-          <List.Item>
-            合計
-            {`${Math.round(size.all.value)} ${size.all.unit.toUpperCase()}B`}
-          </List.Item>
+          <List.Item>{`${size.value} ${size.unit} / 1件`}</List.Item>
+          <List.Item>{`最大 ${config.count.max} 枚`}</List.Item>
         </List>
       </Stack>
     </Paper>

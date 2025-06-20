@@ -1,7 +1,7 @@
-type SI = "B" | "KB" | "MB" | "GB" | "TB";
-type IEC = "B" | "KiB" | "MiB" | "GiB" | "TiB";
-type UnitType = "si" | "iec";
-type Unit = SI | IEC;
+export type SI = "B" | "KB" | "MB" | "GB" | "TB";
+export type IEC = "B" | "KiB" | "MiB" | "GiB" | "TiB";
+export type UnitType = "si" | "iec";
+export type Unit = SI | IEC;
 
 const BASE: { SI: number; IEC: number } = {
   SI: 1000,
@@ -13,12 +13,12 @@ const UNIT: { SI: SI[]; IEC: IEC[] } = {
   IEC: ["B", "KiB", "MiB", "GiB", "TiB"],
 };
 
-interface FormattedSizeOption {
+export interface FormattedSizeOption {
   unit?: UnitType;
   decimals?: number;
 }
 
-interface FormattedSize {
+export interface FormattedSize {
   value: number;
   unit: Unit;
 }
