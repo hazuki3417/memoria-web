@@ -1,4 +1,5 @@
 "use client";
+import { Auth } from "@/components";
 import { CustomModal } from "@/components/Modal/CustomModal/CustomModal";
 import { ImageDetailModal } from "@/components/Modal/ImageDetailModal";
 import { useDisclosure } from "@/hooks";
@@ -8,9 +9,13 @@ import { useTranslation } from "react-i18next";
 const Page = () => {
   const modal = useDisclosure({ opend: false });
   const { t } = useTranslation();
-
   return (
     <Box>
+      <Auth>
+        <Auth.Loading>loading</Auth.Loading>
+        <Auth.SignedIn>sign in</Auth.SignedIn>
+        <Auth.SignedOut>sign out</Auth.SignedOut>
+      </Auth>
       <p>Next.js検証用リポジトリ</p>
       <h1>{t("hello")}</h1>
       <button type="button" onClick={modal.handler.open}>

@@ -1,8 +1,9 @@
 "use client";
-import { Box } from "@mantine/core";
+import { Box, Flex } from "@mantine/core";
 import type { ComponentProps } from "react";
 import { styles } from "./styles";
 import { LangSelect } from "./LangSelect";
+import { SiginInButton } from "./SignInButton";
 
 type HeaderProps = ComponentProps<"header"> & {};
 
@@ -25,8 +26,13 @@ const Header = (props: HeaderProps) => (
     })}
     {...props}
   >
-    <span>Memoria ver.β</span>
-    <LangSelect />
+    <Flex gap={8}>
+      <span>Memoria ver.β</span>
+    </Flex>
+    <Flex gap={8}>
+      <LangSelect />
+      <SiginInButton size="xs" />
+    </Flex>
   </Box>
 );
 
