@@ -1,5 +1,10 @@
 "use client";
-import { GraphQLProvider, LangProvider, ThemeProvider } from "@/providers";
+import {
+  AuthProvider,
+  GraphQLProvider,
+  LangProvider,
+  ThemeProvider,
+} from "@/providers";
 import type React from "react";
 import { memo } from "react";
 export interface ProvidersProps {
@@ -13,7 +18,9 @@ const Providers = (props: ProvidersProps) => {
   return (
     <ThemeProvider defaultColorScheme="auto">
       <LangProvider>
-        <MemoGraphQLProvider>{children}</MemoGraphQLProvider>
+        <AuthProvider>
+          <MemoGraphQLProvider>{children}</MemoGraphQLProvider>
+        </AuthProvider>
       </LangProvider>
     </ThemeProvider>
   );
