@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Flex, Group, Paper, Stack, Text } from "@mantine/core";
+import { Box, Button, Flex, Stack, Text } from "@mantine/core";
 import {
   Controller,
   FormProvider,
@@ -23,23 +23,17 @@ import { useUploadImageMutation, Visibility } from "@/graphql";
 import { useTaskManager } from "@/hooks/useTaskManager";
 import { Task } from "@/reducers";
 import { nanoid } from "nanoid";
-
-const validFile = (file: File) => {
-  return {
-    size: file.size <= imageConfig.size.max,
-    type: imageConfig.type.includes(file.type),
-  };
-};
+import { useTranslation } from "react-i18next";
+import { zod, rhf } from "@/lib";
 
 const fileSchema = z.object({
-  file: z
-    .custom<File>((file) => file instanceof File)
-    .refine((file) => validFile(file).size, {
-      message: "ファイルサイズが50MBを超えています",
-    })
-    .refine((file) => validFile(file).type, {
-      message: "対応していないファイル形式です",
-    }),
+  file: zod.refine(
+    z.custom<File>((file) => file instanceof File),
+    [
+      zod.validate.file.type(imageConfig.type),
+      zod.validate.file.size.tooLarge(imageConfig.size.max),
+    ],
+  ),
 });
 
 const imageSchema = imageFormSchema.merge(fileSchema);
@@ -80,15 +74,11 @@ type FormSchema = z.infer<typeof inputFormSchema>;
  * NOTE: ファイルの破損チェックはやらない（厳密性を求めることができないため）
  *
  * ロジック
- * TODO: ファイルサイズの上限を検討（全体）
  * TODO: 一括の公開範囲、個別の公開範囲の優先度を検討
  *       - 公開で全適用ON > 個別の公開はそのまま、非公開は公開に変更?
  *       - 非公開で全適用ON > 個別の公開は非公開に変更、非公開はそのまま?
  * TODO: タグ情報の出し方を検討
  *       ユースケースを洗い出して検討した方が良さそう
- *
- * UI
- * TODO: ファイルドラッグ時に対応しているバリデーションOKなら背景色を青に、違反なら赤にする
  */
 export default function Page() {
   const formSwitcher = useFormSwitcher();
@@ -116,10 +106,6 @@ export default function Page() {
     name: "images",
   });
 
-  const [fileValid, setFileValid] = useState<
-    { size: boolean; type: boolean }[]
-  >([]);
-
   const [uploadImage] = useUploadImageMutation();
 
   const taskManager = useTaskManager({
@@ -128,6 +114,8 @@ export default function Page() {
   });
 
   const [selected, setSelected] = useState<number | null>(null);
+
+  const locale = useTranslation();
 
   const submit = async () => {
     await methods.handleSubmit(async (value, errors) => {
@@ -149,17 +137,12 @@ export default function Page() {
   };
 
   const addFiles = (files: FileList) => {
-    const newFileValids: { size: boolean; type: boolean }[] = [];
     const newTasks: Task[] = [];
     const newImages: ImageSchema[] = [];
-    let total = 0;
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const valid = validFile(file);
 
-      total += file.size;
-      newFileValids.push(valid);
       newTasks.push({
         id: nanoid(),
         status: "idle",
@@ -172,7 +155,6 @@ export default function Page() {
     }
 
     // まとめて更新
-    setFileValid((prev) => [...prev, ...newFileValids]);
     taskManager.handler.append(newTasks);
     append(newImages);
     // NOTE: バリデーションを発火させる
@@ -197,7 +179,6 @@ export default function Page() {
 
   const fileRemove = useCallback(
     (index: number, id: string) => {
-      setFileValid((prev) => prev.filter((_, i) => i !== index));
       taskManager.handler.remove([id]);
       remove(index);
     },
@@ -209,17 +190,15 @@ export default function Page() {
       return "reject";
     }
 
-    const empty = 0;
-    if (empty < fileValid.length) {
-      const size = fileValid.some((file) => file.size === false);
-      const type = fileValid.some((file) => file.type === false);
-      if (size || type) {
-        return "warning";
-      }
-    }
+    // const empty = 0;
+    // if (empty < fields.length) {
+    //   if (methods.formState.isValid) {
+    //     return "warning";
+    //   }
+    // }
 
     return "idle";
-  }, [fileValid, watchValueImages]);
+  }, [methods, fields, watchValueImages]);
 
   const imageDropFormDisabled = useMemo(() => {
     return imageConfig.count.max <= watchValueImages.length;
@@ -249,31 +228,40 @@ export default function Page() {
         key={preview.id}
         control={methods.control}
         name={`images.${index}.file`}
-        render={({ field, fieldState }) => (
-          <ImageDropForm.PreviewImageBox
-            key={preview.id}
-            index={index}
-            id={task.id}
-            payload={{
-              src: URL.createObjectURL(field.value),
-              alt: field.value.name,
-            }}
-            ui={{
-              selected:
-                formSwitcher.state.mode === MODE.TYPE.SINGLE
-                  ? selected === index
-                  : false,
-              selectable: formSwitcher.state.mode === MODE.TYPE.SINGLE,
-              supported: fileValid[index].type,
-              valid: fileValid[index].size ? "idle" : "warning",
-              error: fieldState.error?.message,
-            }}
-            handler={{
-              onSelect: fileSelected,
-              onRemove: fileRemove,
-            }}
-          />
-        )}
+        render={({ field, fieldState }) => {
+          const rhfFieldState = rhf.fieldState(fieldState);
+          return (
+            <ImageDropForm.PreviewImageBox
+              key={preview.id}
+              index={index}
+              id={task.id}
+              payload={{
+                src: URL.createObjectURL(field.value),
+                alt: field.value.name,
+              }}
+              ui={{
+                selected:
+                  formSwitcher.state.mode === MODE.TYPE.SINGLE
+                    ? selected === index
+                    : false,
+                selectable: formSwitcher.state.mode === MODE.TYPE.SINGLE,
+                supported: !rhfFieldState.error.message.match(
+                  "validate.file.type.unsupported",
+                ),
+                valid: rhfFieldState.error.message.match(
+                  "validate.file.size.tooLarge",
+                )
+                  ? "warning"
+                  : "idle",
+                error: rhfFieldState.error.message.resolver(locale.t),
+              }}
+              handler={{
+                onSelect: fileSelected,
+                onRemove: fileRemove,
+              }}
+            />
+          );
+        }}
       />
     );
   });
@@ -361,7 +349,7 @@ export default function Page() {
           />
         )}
       </ImageDropForm>
-      {taskManager.state.tasks.map((task, index) => (
+      {/* {taskManager.state.tasks.map((task, index) => (
         <Paper key={index} p="xs" withBorder radius="md">
           <Group justify="space-between">
             <Text size="sm">{task.id}</Text>
@@ -375,7 +363,7 @@ export default function Page() {
             </Text>
           )}
         </Paper>
-      ))}
+      ))} */}
     </Box>
   );
 }

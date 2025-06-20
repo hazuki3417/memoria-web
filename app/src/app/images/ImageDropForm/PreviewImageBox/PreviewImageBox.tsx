@@ -61,7 +61,7 @@ export const PreviewImageBox = (props: PreviewImageBoxProps) => {
           data-selected={ui.supported ? ui.selected : false}
           data-selectable={ui.supported ? ui.selectable : false}
           data-supported={ui.supported}
-          data-valid={ui.valid}
+          data-valid={ui.supported ? ui.valid : undefined}
           data-testid="select-file"
         >
           <ActionIcon
