@@ -2,7 +2,7 @@ import { TranslationSchema } from "./type";
 
 export const ja: TranslationSchema = {
   hello: "おはよう",
-  validation: {
+  validate: {
     file: {
       size: {
         tooLarge: "ファイルサイズが上限 {{maxSize}}{{unit}} を超えています。",
