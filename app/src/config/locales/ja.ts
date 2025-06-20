@@ -1,6 +1,11 @@
 import { TranslationSchema } from "./type";
 
 export const ja: TranslationSchema = {
+  auth: {
+    signIn: "サインイン",
+    signUp: "サインアップ",
+    signOut: "サインアウト",
+  },
   hello: "おはよう",
   validate: {
     file: {

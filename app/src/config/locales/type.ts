@@ -1,5 +1,10 @@
 // NOTE: 言語スキーマの型定義
 export type TranslationSchema = {
+  auth: {
+    signIn: string;
+    signUp: string;
+    signOut: string;
+  };
   hello: string;
   validate: {
     file: {
