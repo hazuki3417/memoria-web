@@ -1,5 +1,22 @@
 import { TranslationSchema } from "./type";
 
 export const en: TranslationSchema = {
-  hello: "hello",
+  hello: "Good morning",
+  validation: {
+    file: {
+      size: {
+        tooLarge:
+          "The file size exceeds the maximum allowed {{maxSize}}{{unit}}.",
+        tooSmall:
+          "The file size is below the minimum required {{minSize}}{{unit}}.",
+        unreadable: "Failed to read the file size.",
+      },
+      type: {
+        unsupported: "This file format {{ext}} is not supported.",
+        invalid: "Invalid file format.",
+        missing: "Could not determine the file format.",
+      },
+      tooManyFiles: "You can upload up to {{max}} files only.",
+    },
+  },
 };
