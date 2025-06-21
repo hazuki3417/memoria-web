@@ -1,6 +1,10 @@
 import {
   ActionIcon,
   DEFAULT_THEME,
+  Radio,
+  RadioGroup,
+  TagsInput,
+  Text,
   createTheme,
   mergeMantineTheme,
 } from "@mantine/core";
@@ -15,6 +19,26 @@ export const override = createTheme({
       defaultProps: {
         variant: "subtle",
         color: "gray",
+      },
+    }),
+    Radio: Radio.extend({
+      defaultProps: {
+        size: "xs",
+      },
+    }),
+    RadioGroup: RadioGroup.extend({
+      defaultProps: {
+        size: "xs",
+      },
+    }),
+    Text: Text.extend({
+      defaultProps: {
+        size: "xs",
+      },
+    }),
+    TagsInput: TagsInput.extend({
+      defaultProps: {
+        size: "xs",
       },
     }),
   },

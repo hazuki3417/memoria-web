@@ -4,11 +4,7 @@ type LayoutProps = {
 
 const Layout = (props: LayoutProps) => {
   const { children } = props;
-  return (
-    <>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 };
 
 export default Layout;
