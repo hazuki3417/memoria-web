@@ -4,6 +4,8 @@ import type { ComponentProps } from "react";
 import { styles } from "./styles";
 import { LangSelect } from "./LangSelect";
 import { SiginInButton } from "./SignInButton";
+import { Auth } from "@/components/Auth/Csr";
+import UserMenu from "./UserMenu";
 
 type HeaderProps = ComponentProps<"header"> & {};
 
@@ -29,9 +31,16 @@ const Header = (props: HeaderProps) => (
     <Flex gap={8}>
       <span>Memoria ver.β</span>
     </Flex>
-    <Flex gap={8}>
+    <Flex gap={8} style={{ alignItems: "center" }}>
       <LangSelect />
-      <SiginInButton size="xs" />
+      <Auth>
+        <Auth.SignedIn>
+          <UserMenu />
+        </Auth.SignedIn>
+        <Auth.SignedOut>
+          <SiginInButton size="xs" />
+        </Auth.SignedOut>
+      </Auth>
     </Flex>
   </Box>
 );

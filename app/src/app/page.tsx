@@ -1,5 +1,5 @@
 "use client";
-import { Auth } from "@/components";
+import { Auth } from "@/components/Auth/Csr";
 import { CustomModal } from "@/components/Modal/CustomModal/CustomModal";
 import { ImageDetailModal } from "@/components/Modal/ImageDetailModal";
 import { useDisclosure } from "@/hooks";
