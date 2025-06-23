@@ -1,5 +1,14 @@
 import { imageConfig } from "@/config";
-import { Grid, Group, Radio, TagsInput, Text } from "@mantine/core";
+import {
+  Grid,
+  Group,
+  Radio,
+  Select,
+  SelectProps,
+  TagsInput,
+  Text,
+} from "@mantine/core";
+import { IconSearch } from "@tabler/icons-react";
 import { Control, Controller } from "react-hook-form";
 import { z } from "zod";
 
@@ -36,44 +45,54 @@ export const ImageSearchForm = (props: ImageSearchFormProps) => {
   const { control } = props;
 
   return (
-    <Grid>
-      <Grid.Col span={2} style={styles.col}>
-        <Text>公開範囲</Text>
-      </Grid.Col>
-      <Grid.Col span={10} style={styles.col}>
-        <Controller
-          control={control}
-          name="visibility"
-          render={({ field }) => (
-            <Radio.Group {...field}>
-              <Group gap="sm">
-                <Radio value={VISIBILITY.ALL} label="すべて" />
-                <Radio value={VISIBILITY.PUBLIC} label="公開のみ" />
-                <Radio value={VISIBILITY.PRIVATE} label="非公開のみ" />
-              </Group>
-            </Radio.Group>
-          )}
-        />
-      </Grid.Col>
-      <Grid.Col span={2} style={styles.col}>
-        <Text>タグ</Text>
-      </Grid.Col>
-      <Grid.Col span={10} style={styles.col}>
-        <Controller
-          control={control}
-          name="tags"
-          render={({ field, fieldState }) => (
-            <TagsInput
-              style={(theme) => ({
-                width: "100%",
-              })}
-              error={fieldState.error?.message}
-              clearable
-              {...field}
+    <Controller
+      control={control}
+      name="tags"
+      render={({ field, fieldState }) => (
+        <TagsInput
+          style={(theme) => ({
+            width: "100%",
+          })}
+          placeholder="タグ"
+          leftSectionWidth={100}
+          leftSection={
+            <Controller
+              control={control}
+              name="visibility"
+              render={({ field }) => (
+                <VisibilitySelect
+                  w={100}
+                  variant="unstyled"
+                  size="xs"
+                  {...field}
+                  style={(theme) => ({
+                    borderRight: `1px solid ${theme.colors.dark[4]}`,
+                  })}
+                />
+              )}
             />
-          )}
+          }
+          rightSection={
+            <IconSearch size={20} onClick={() => console.debug("a")} />
+          }
+          error={fieldState.error?.message}
+          clearable
+          {...field}
         />
-      </Grid.Col>
-    </Grid>
+      )}
+    />
   );
+};
+
+export interface VisibilitySelectProps extends Omit<SelectProps, "data"> {}
+
+export const VisibilitySelect = (props: VisibilitySelectProps) => {
+  const { ...rest } = props;
+  const options = [
+    { label: "すべて", value: VISIBILITY.ALL },
+    { label: "公開のみ", value: VISIBILITY.PUBLIC },
+    { label: "非公開のみ", value: VISIBILITY.PRIVATE },
+  ];
+
+  return <Select data={options} {...rest} />;
 };

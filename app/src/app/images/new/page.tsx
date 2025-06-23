@@ -12,12 +12,16 @@ import {
   ImageInputForm,
   imageFormDefaultValue,
   imageFormSchema,
-} from "./ImageInputForm";
+} from "@/feature/new/ImageInputForm";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useFormSwitcher, FormSwitcher, MODE } from "./FormSwitcher";
+import {
+  useFormSwitcher,
+  FormSwitcher,
+  MODE,
+} from "@/feature/new/FormSwitcher";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageDropForm } from "./ImageDropForm";
+import { ImageDropForm } from "@/feature/new/ImageDropForm";
 import { imageConfig } from "@/config";
 import { useUploadImageMutation, Visibility } from "@/graphql";
 import { useTaskManager } from "@/hooks/useTaskManager";
