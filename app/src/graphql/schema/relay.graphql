@@ -4,7 +4,7 @@
 
 type PageInfo {
   hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
+  hasPrevPage: Boolean!
   startCursor: String
   endCursor: String
 }
@@ -42,7 +42,7 @@ input PaginationInput {
 # # ページネーション制御情報
 # type PageInfo {
 #   hasNextPage: Boolean!
-#   hasPreviousPage: Boolean!
+#   hasPrevPage: Boolean!
 #   startCursor: String
 #   endCursor: String
 #   # startCursor / endCursor はデータが存在しないときに null になるため nullable

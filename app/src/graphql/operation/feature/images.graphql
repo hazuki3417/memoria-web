@@ -1,4 +1,4 @@
-query GetImages($input: PaginationInput) {
+query GetImageConnection($input: PaginationInput) {
   images(input: $input) {
     edges {
       node {

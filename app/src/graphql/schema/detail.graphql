@@ -1,11 +1,5 @@
 type Query {
-  images(input: ImageQueryInput): ImageConnection!
-}
-
-# === input ===
-
-input ImageQueryInput {
-  pagination: PaginationInput
+  images(input: PaginationInput): ImageConnection!
 }
 
 # === data model ===
