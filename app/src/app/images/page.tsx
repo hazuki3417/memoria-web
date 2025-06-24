@@ -7,12 +7,14 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Box, Card, Text, Stack, Loader } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { ImageEdge, useGetImageConnectionQuery } from "@/graphql";
 import { useIntersection } from "../../hooks/useIntersection";
 import { useRelayConnection } from "../../hooks/useRelayConnection";
 import { nanoid } from "nanoid";
+import { Image } from "@/components";
+import { ImageLayout } from "@/components/ImageLayout/ImageLayout";
 
 type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>;
 
@@ -25,15 +27,6 @@ export default function Page() {
     },
   });
 
-  return (
-    <Box>
-      <ImageSearchForm control={methods.control} />
-      <ItemList />
-    </Box>
-  );
-}
-
-export const ItemList = () => {
   const [items, setItems] = useState<ImageEdge[]>([]);
 
   const relay = useRelayConnection({
@@ -64,24 +57,26 @@ export const ItemList = () => {
   }, [relay.state.edges, items.length]);
 
   return (
-    <Stack>
-      {items.map((item, index) => {
-        return (
-          <Card key={item.node.id} shadow="sm" padding="lg">
-            <Card.Section>
-              <Text>card</Text>
-            </Card.Section>
-            <Text mt="md">
-              {index + 1}. {item.node.id}
-            </Text>
-          </Card>
-        );
-      })}
-
-      {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
-      <Box ta="center" py="md" ref={intersection.ref}>
-        {relay.state.pageInfo?.hasNextPage && <Loader size="sm" />}
-      </Box>
-    </Stack>
+    <Box>
+      <ImageSearchForm control={methods.control} />
+      <ImageLayout>
+        <ImageLayout.Grid>
+          <Image>
+            {items.map((item, index) => {
+              return (
+                <Image.Frame key={nanoid()}>
+                  <Image.Tile src="sample/h.png" alt="example" />
+                </Image.Frame>
+              );
+            })}
+            {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
+            <Image.Intersection
+              ref={intersection.ref}
+              visible={relay.state.pageInfo?.hasNextPage || false}
+            />
+          </Image>
+        </ImageLayout.Grid>
+      </ImageLayout>
+    </Box>
   );
-};
+}
