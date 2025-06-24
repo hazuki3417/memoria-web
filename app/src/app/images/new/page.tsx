@@ -8,23 +8,21 @@ import {
   useFormState,
   useWatch,
 } from "react-hook-form";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ImageInputForm,
   imageFormDefaultValue,
   imageFormSchema,
-} from "@/feature/new/ImageInputForm";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
   useFormSwitcher,
   FormSwitcher,
   MODE,
-} from "@/feature/new/FormSwitcher";
+  ImageDropForm,
+} from "@/feature/images/new";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageDropForm } from "@/feature/new/ImageDropForm";
 import { imageConfig } from "@/config";
 import { useUploadImageMutation, Visibility } from "@/graphql";
-import { useTaskManager } from "@/hooks/useTaskManager";
+import { useTaskManager } from "@/hooks";
 import { Task } from "@/reducers";
 import { nanoid } from "nanoid";
 import { useTranslation } from "react-i18next";
