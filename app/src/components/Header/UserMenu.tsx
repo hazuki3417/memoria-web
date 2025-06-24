@@ -1,3 +1,4 @@
+"use client";
 import { Avatar, Flex, Menu, Text, UnstyledButton } from "@mantine/core";
 import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
 import Link from "next/link";

@@ -1,3 +1,4 @@
+"use client";
 import { useLang } from "@/lib/cookies/lang/useLang";
 import { Combobox, InputBase, Text, useCombobox } from "@mantine/core";
 import { IconLanguage } from "@tabler/icons-react";

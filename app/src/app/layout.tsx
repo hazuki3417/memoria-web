@@ -7,6 +7,10 @@ import Providers from "./Providers";
 import { Header } from "@/components";
 import { Container } from "@mantine/core";
 import { getLang } from "@/lib/cookies/lang/getLang";
+import { LangSelect } from "@/components/Header/LangSelect";
+import { Auth } from "@/components/Auth/Ssr";
+import UserMenu from "@/components/Header/UserMenu";
+import { SiginInButton } from "@/components/Header/SignInButton";
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -26,7 +30,22 @@ const RootLayout = async (props: RootLayoutProps) => {
       <Head />
       <body>
         <Providers>
-          <Header />
+          <Header
+            left={<span>Memoria ver.β</span>}
+            right={
+              <>
+                <LangSelect />
+                <Auth>
+                  <Auth.SignedIn>
+                    <UserMenu />
+                  </Auth.SignedIn>
+                  <Auth.SignedOut>
+                    <SiginInButton size="xs" />
+                  </Auth.SignedOut>
+                </Auth>
+              </>
+            }
+          />
           <main>
             <Container p={"lg"} m={0} fluid>
               {children}
