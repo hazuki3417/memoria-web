@@ -1,0 +1,33 @@
+.paper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  width: 160px;
+  border-radius: var(--mantine-radius-sm);
+}
+
+/* 選択可能状態を表現 */
+.paper[data-selectable="true"]:hover {
+  cursor: pointer;
+}
+
+/* 選択状態を表現 */
+.paper[data-selected="true"] {
+  outline: 1px solid var(--mantine-primary-color-filled);
+}
+
+.paper[data-valid="accept"] {
+  border-color: var(--mantine-color-blue-light-color);
+  background-color: var(--mantine-color-blue-light);
+}
+
+.paper[data-valid="reject"] {
+  border-color: var(--mantine-color-red-light-color);
+  background-color: var(--mantine-color-red-light);
+}
+
+.paper[data-valid="warning"] {
+  border-color: var(--mantine-color-yellow-light-color);
+  background-color: var(--mantine-color-yellow-light);
+}
