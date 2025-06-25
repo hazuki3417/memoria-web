@@ -1,4 +1,5 @@
 "use client";
+import { CreateGraphQLOption } from "@/lib/graphql/type";
 import {
   AuthProvider,
   GraphQLProvider,
@@ -10,18 +11,23 @@ import type React from "react";
 import { memo } from "react";
 export interface ProvidersProps {
   user: User | undefined;
+  option: {
+    graphql: CreateGraphQLOption;
+  };
   children: React.ReactNode;
 }
 
 const MemoGraphQLProvider = memo(GraphQLProvider);
 
 const Providers = (props: ProvidersProps) => {
-  const { user, children } = props;
+  const { user, option, children } = props;
   return (
     <ThemeProvider defaultColorScheme="auto">
       <LangProvider>
         <AuthProvider value={user}>
-          <MemoGraphQLProvider>{children}</MemoGraphQLProvider>
+          <MemoGraphQLProvider option={option.graphql}>
+            {children}
+          </MemoGraphQLProvider>
         </AuthProvider>
       </LangProvider>
     </ThemeProvider>

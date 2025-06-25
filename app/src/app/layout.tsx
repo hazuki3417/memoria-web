@@ -27,7 +27,10 @@ const RootLayout = async (props: RootLayoutProps) => {
       {/* FIX: data-mantine-color-scheme="dark"の記述がない場合、ハイドレーションの差分が発生してエラーになる */}
       <Head />
       <body>
-        <Providers user={session?.user}>
+        <Providers
+          user={session?.user}
+          option={{ graphql: { token: session?.tokenSet.accessToken } }}
+        >
           <Header />
           <main>
             <Container p={"lg"} m={0} fluid>

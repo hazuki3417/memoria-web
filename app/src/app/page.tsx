@@ -1,10 +1,9 @@
 "use client";
-import { LinkButton, AnchorButton } from "@/components";
 import { Auth } from "@/components/Auth/Csr";
 import { CustomModal } from "@/components/Modal/CustomModal/CustomModal";
 import { ImageDetailModal } from "@/components/Modal/ImageDetailModal";
 import { useDisclosure } from "@/hooks";
-import { Anchor, Box } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 
 const Page = () => {
