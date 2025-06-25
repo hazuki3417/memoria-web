@@ -12,7 +12,6 @@ const Page = () => {
   return (
     <Box>
       <Auth>
-        <Auth.Loading>loading</Auth.Loading>
         <Auth.SignedIn>sign in</Auth.SignedIn>
         <Auth.SignedOut>sign out</Auth.SignedOut>
       </Auth>

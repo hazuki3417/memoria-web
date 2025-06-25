@@ -1,21 +1,18 @@
 "use client";
 import { authConfig } from "@/config/auth";
-import { useAuth } from "@/providers";
+import { useUser } from "@/hooks";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 export const AuthGuard = () => {
-  const { user, isLoading } = useAuth();
+  const user = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!user && !isLoading) {
+    if (user === undefined) {
       router.push(authConfig.signedOut.redirect);
     }
-  }, [user, isLoading]);
+  }, [user]);
 
-  if (user || !isLoading) {
-    return <div>Loading...</div>;
-  }
   return null;
 };

@@ -1,24 +1,15 @@
 "use client";
-import { useUser } from "@auth0/nextjs-auth0";
-import { createContext, useContext } from "react";
+import { User } from "@auth0/nextjs-auth0/types";
+import { createContext } from "react";
 
-const AuthContext = createContext<ReturnType<typeof useUser> | null>(null);
+export const AuthContext = createContext<User | undefined>(undefined);
 
 export interface AuthProviderProps {
+  value: User | undefined;
   children: React.ReactNode;
 }
 
 export const AuthProvider = (props: AuthProviderProps) => {
-  const { children } = props;
-  const auth = useUser();
-
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-  return ctx;
+  const { value, children } = props;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

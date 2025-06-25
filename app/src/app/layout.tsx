@@ -11,6 +11,7 @@ import { LangSelect } from "@/components/Header/LangSelect";
 import { Auth } from "@/components/Auth/Ssr";
 import UserMenu from "@/components/Header/UserMenu";
 import { SiginInButton } from "@/components/Header/SignInButton";
+import { auth } from "@/lib/auth";
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -24,12 +25,13 @@ type RootLayoutProps = {
 const RootLayout = async (props: RootLayoutProps) => {
   const { children } = props;
   const lang = await getLang();
+  const session = await auth.getSession();
   return (
     <html data-mantine-color-scheme="dark" lang={lang}>
       {/* FIX: data-mantine-color-scheme="dark"の記述がない場合、ハイドレーションの差分が発生してエラーになる */}
       <Head />
       <body>
-        <Providers>
+        <Providers user={session?.user}>
           <Header
             left={<span>Memoria ver.β</span>}
             right={
