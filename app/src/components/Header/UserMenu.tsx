@@ -27,7 +27,7 @@ export default function UserMenu() {
           </Flex>
         </Menu.Item>
         <Menu.Divider />
-        <Menu.Item color="red" component={Link} href="/auth/logout">
+        <Menu.Item color="red" component="a" href="/auth/logout">
           <Flex gap={4} align={"center"}>
             <IconLogout size={16} />
             <Text>ログアウト</Text>
