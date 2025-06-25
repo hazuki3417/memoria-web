@@ -1,9 +1,9 @@
-"use client";
 import { Avatar, Flex, Menu, Text, UnstyledButton } from "@mantine/core";
 import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
-import Link from "next/link";
 
-export default function UserMenu() {
+export interface UserMenuProps {}
+
+export const UserMenu = (props: UserMenuProps) => {
   return (
     <Menu position="bottom-end" width={200}>
       <Menu.Target>
@@ -36,4 +36,4 @@ export default function UserMenu() {
       </Menu.Dropdown>
     </Menu>
   );
-}
+};

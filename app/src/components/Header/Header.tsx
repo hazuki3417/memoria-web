@@ -1,15 +1,18 @@
+"use client";
 import { Box, Flex } from "@mantine/core";
 import type { ComponentProps } from "react";
 import { styles } from "./styles";
 import React from "react";
 
-type HeaderProps = ComponentProps<"header"> & {
-  left: React.ReactNode;
-  right: React.ReactNode;
-};
+import { LangSelect } from "./LangSelect";
+import { Auth } from "@/components/Auth/Csr";
+import { UserMenu } from "./UserMenu";
+import { SiginInButton } from "./SignInButton";
 
-const Header = (props: HeaderProps) => {
-  const { left, right, ...rest } = props;
+export type HeaderProps = ComponentProps<"header"> & {};
+
+export const Header = (props: HeaderProps) => {
+  const { ...rest } = props;
 
   return (
     <Box
@@ -26,13 +29,19 @@ const Header = (props: HeaderProps) => {
       {...rest}
     >
       <Flex gap={8} style={{ alignItems: "center" }}>
-        {left}
+        <span>Memoria ver.β</span>
       </Flex>
       <Flex gap={8} style={{ alignItems: "center" }}>
-        {right}
+        <LangSelect />
+        <Auth>
+          <Auth.SignedIn>
+            <UserMenu />
+          </Auth.SignedIn>
+          <Auth.SignedOut>
+            <SiginInButton size="xs" />
+          </Auth.SignedOut>
+        </Auth>
       </Flex>
     </Box>
   );
 };
-
-export { type HeaderProps, Header };
