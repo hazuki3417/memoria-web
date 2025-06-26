@@ -16,7 +16,7 @@ const config: CodegenConfig = {
         withComponent: false,
         useTypeImports: true,
         scalars: {
-          DateTime: "string",
+          DateTime: "Date",
         },
       },
     },
