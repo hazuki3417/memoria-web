@@ -1,4 +1,4 @@
-type Query {
+extend type Query {
   images(input: PaginationInput): ImageConnection!
 }
 

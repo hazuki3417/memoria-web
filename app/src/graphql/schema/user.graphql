@@ -1,0 +1,16 @@
+extend type Query {
+  me: User!
+}
+
+type User {
+  id: ID!
+  sub: String!
+  profile: Profile!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Profile {
+  name: String
+  url: String
+}

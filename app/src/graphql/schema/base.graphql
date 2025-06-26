@@ -1,5 +1,8 @@
 directive @tag(validate: String) on INPUT_FIELD_DEFINITION
 
+scalar Upload
+scalar DateTime
+
 # mutation input example
 # input {mutationName}Input {
 #   id: ID! @tag(validate: "mongodb")
@@ -16,3 +19,4 @@ directive @tag(validate: String) on INPUT_FIELD_DEFINITION
 # mutation example
 # type Mutation {
 #   {mutationName}(input: {mutationName}Input): {mutationName}Payload!
+# }
