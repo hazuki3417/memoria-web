@@ -1,11 +1,24 @@
 "use client";
-import { User } from "@auth0/nextjs-auth0/types";
+import { User as AppUser } from "@/graphql";
+import { User as AuthUser } from "@auth0/nextjs-auth0/types";
 import { createContext } from "react";
 
-export const AuthContext = createContext<User | undefined>(undefined);
+export interface AuthContext {
+  auth: {
+    user: AuthUser | undefined;
+  };
+  app: {
+    user: AppUser | undefined;
+  };
+}
+
+export const AuthContext = createContext<AuthContext>({
+  auth: { user: undefined },
+  app: { user: undefined },
+});
 
 export interface AuthProviderProps {
-  value: User | undefined;
+  value: AuthContext;
   children: React.ReactNode;
 }
 

@@ -1,16 +1,16 @@
 "use client";
+import { User as AppUser } from "@/graphql";
 import { CreateGraphQLOption } from "@/lib/graphql/type";
 import {
+  AuthContext,
   AuthProvider,
   GraphQLProvider,
   LangProvider,
   ThemeProvider,
 } from "@/providers";
-import { User } from "@auth0/nextjs-auth0/types";
 import type React from "react";
 import { memo } from "react";
-export interface ProvidersProps {
-  user: User | undefined;
+export interface ProvidersProps extends AuthContext {
   option: {
     graphql: CreateGraphQLOption;
   };
@@ -20,11 +20,11 @@ export interface ProvidersProps {
 const MemoGraphQLProvider = memo(GraphQLProvider);
 
 const Providers = (props: ProvidersProps) => {
-  const { user, option, children } = props;
+  const { auth, app, option, children } = props;
   return (
     <ThemeProvider defaultColorScheme="auto">
       <LangProvider>
-        <AuthProvider value={user}>
+        <AuthProvider value={{ auth, app }}>
           <MemoGraphQLProvider option={option.graphql}>
             {children}
           </MemoGraphQLProvider>
