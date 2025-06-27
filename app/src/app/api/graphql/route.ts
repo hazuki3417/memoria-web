@@ -10,11 +10,20 @@ export async function POST(request: NextRequest) {
    * TODO: Env
    */
 
+  const auth = request.headers.get("authorization");
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // AuthorizationがあればGraphQL APIに転送
+  if (auth) {
+    headers["Authorization"] = auth;
+  }
+
   const response = await fetch("http://localhost:8080/graphql", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body,
   });
 
