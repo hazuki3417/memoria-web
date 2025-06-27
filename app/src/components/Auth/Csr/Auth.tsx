@@ -11,11 +11,12 @@ export const Auth = (props: AuthProps) => {
 };
 
 Auth.SignedIn = ({ children }: { children: React.ReactNode }) => {
-  const user = useAuth();
-  return user !== undefined ? <>{children}</> : null;
+  const auth = useAuth();
+  console.debug("auth", auth);
+  return auth.isSignIn ? <>{children}</> : null;
 };
 
 Auth.SignedOut = ({ children }: { children: React.ReactNode }) => {
-  const user = useAuth();
-  return user === undefined ? <>{children}</> : null;
+  const auth = useAuth();
+  return !auth.isSignIn ? <>{children}</> : null;
 };

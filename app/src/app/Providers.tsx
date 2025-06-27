@@ -10,7 +10,9 @@ import {
 } from "@/providers";
 import type React from "react";
 import { memo } from "react";
-export interface ProvidersProps extends AuthContext {
+
+export interface ProvidersProps {
+  auth: AuthContext;
   option: {
     graphql: CreateGraphQLOption;
   };
@@ -20,11 +22,11 @@ export interface ProvidersProps extends AuthContext {
 const MemoGraphQLProvider = memo(GraphQLProvider);
 
 const Providers = (props: ProvidersProps) => {
-  const { auth, app, option, children } = props;
+  const { auth, option, children } = props;
   return (
     <ThemeProvider defaultColorScheme="auto">
       <LangProvider>
-        <AuthProvider value={{ auth, app }}>
+        <AuthProvider value={auth}>
           <MemoGraphQLProvider option={option.graphql}>
             {children}
           </MemoGraphQLProvider>

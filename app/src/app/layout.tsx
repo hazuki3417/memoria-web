@@ -27,14 +27,17 @@ const RootLayout = async (props: RootLayoutProps) => {
   const session = await auth.getSession();
 
   const context: AuthContext = {
-    auth: {user: undefined},
-    app: {user: undefined}
-  }
-  if (session !== undefined) {
-    const client = createGraphQL({ token: session?.tokenSet.accessToken });
+    isSignIn: false,
+    auth: { user: undefined },
+    app: { user: undefined },
+  };
+
+  if (session !== null) {
+    context.isSignIn = true;
+    const client = createGraphQL({ token: session.tokenSet.accessToken });
     const result = await client.query<GetMeQuery>({ query: GetMeDocument });
-    context.auth.user = session?.user
-    context.app.user = result.data.me
+    context.auth.user = session.user;
+    context.app.user = result.data.me;
   }
 
   return (
@@ -43,7 +46,7 @@ const RootLayout = async (props: RootLayoutProps) => {
       <Head />
       <body>
         <Providers
-          {...context}
+          auth={context}
           option={{ graphql: { token: session?.tokenSet.accessToken } }}
         >
           <Header />

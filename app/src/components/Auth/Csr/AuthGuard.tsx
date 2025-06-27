@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export const AuthGuard = () => {
-  const user = useAuth();
+  const auth = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (user === undefined) {
+    if (!auth.isSignIn) {
       router.push(authConfig.signedOut.redirect);
     }
-  }, [user]);
+  }, [auth.isSignIn]);
 
   return null;
 };
