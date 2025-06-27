@@ -7,4 +7,4 @@ export * from "./useIntersection";
 export * from "./useLocalStorage";
 export * from "./useRelayConnection";
 export * from "./useTaskManager";
-export * from "./useUser";
+export * from "./useAuth";

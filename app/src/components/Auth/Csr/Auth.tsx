@@ -1,4 +1,4 @@
-import { useUser } from "@/hooks";
+import { useAuth } from "@/hooks";
 import React from "react";
 
 export interface AuthProps {
@@ -11,11 +11,11 @@ export const Auth = (props: AuthProps) => {
 };
 
 Auth.SignedIn = ({ children }: { children: React.ReactNode }) => {
-  const user = useUser();
+  const user = useAuth();
   return user !== undefined ? <>{children}</> : null;
 };
 
 Auth.SignedOut = ({ children }: { children: React.ReactNode }) => {
-  const user = useUser();
+  const user = useAuth();
   return user === undefined ? <>{children}</> : null;
 };
