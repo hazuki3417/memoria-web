@@ -29,5 +29,16 @@ export const decorators = [
   (renderStory: any) => (
     <ColorSchemeWrapper>{renderStory()}</ColorSchemeWrapper>
   ),
-  (renderStory: any) => <Providers>{renderStory()}</Providers>,
+  (renderStory: any) => (
+    <Providers
+      auth={{
+        isSignIn: false,
+        auth: { user: undefined },
+        app: { user: undefined },
+      }}
+      option={{ graphql: { token: undefined } }}
+    >
+      {renderStory()}
+    </Providers>
+  ),
 ];
