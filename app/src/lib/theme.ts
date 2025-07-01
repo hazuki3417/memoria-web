@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 
 export const override = createTheme({
+  primaryColor: "gray",
   components: {
     /**
      * NOTE: アプリケーション固有のデフォルトスタイルはここで初期値を指定して統一する。
@@ -19,7 +20,6 @@ export const override = createTheme({
     ActionIcon: ActionIcon.extend({
       defaultProps: {
         variant: "subtle",
-        color: "gray",
       },
     }),
     Radio: Radio.extend({

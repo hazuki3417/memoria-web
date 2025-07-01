@@ -13,8 +13,8 @@ export const createGraphQL = (option: CreateGraphQLOption) => {
   }
 
   return new ApolloClient({
-    //uri: "/api/graphql",
-    uri: "/api/mock",
+    uri: "/api/graphql",
+    // uri: "/api/mock",
     cache: new InMemoryCache(),
     ssrMode: false,
     headers,

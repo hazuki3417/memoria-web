@@ -8,3 +8,4 @@ export * from "./useLocalStorage";
 export * from "./useRelayConnection";
 export * from "./useTaskManager";
 export * from "./useAuth";
+export * from "./useNavLink";
