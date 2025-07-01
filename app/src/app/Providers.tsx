@@ -7,11 +7,13 @@ import {
   GraphQLProvider,
   LangProvider,
   ThemeProvider,
+  ThemeProviderProps,
 } from "@/providers";
 import type React from "react";
 import { memo } from "react";
 
 export interface ProvidersProps {
+  theme: ThemeProviderProps;
   auth: AuthContext;
   option: {
     graphql: CreateGraphQLOption;
@@ -22,9 +24,9 @@ export interface ProvidersProps {
 const MemoGraphQLProvider = memo(GraphQLProvider);
 
 const Providers = (props: ProvidersProps) => {
-  const { auth, option, children } = props;
+  const { theme, auth, option, children } = props;
   return (
-    <ThemeProvider defaultColorScheme="auto">
+    <ThemeProvider {...theme}>
       <LangProvider>
         <AuthProvider value={auth}>
           <MemoGraphQLProvider option={option.graphql}>
