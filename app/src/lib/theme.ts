@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   DEFAULT_THEME,
+  List,
   Radio,
   RadioGroup,
   TagsInput,
@@ -39,6 +40,13 @@ export const override = createTheme({
     TagsInput: TagsInput.extend({
       defaultProps: {
         size: "xs",
+      },
+    }),
+    List: List.extend({
+      defaultProps: {
+        style: {
+          listStyle: "none",
+        },
       },
     }),
   },
