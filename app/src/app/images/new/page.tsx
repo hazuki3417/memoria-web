@@ -82,7 +82,7 @@ type FormSchema = z.infer<typeof inputFormSchema>;
  * TODO: タグ情報の出し方を検討
  *       ユースケースを洗い出して検討した方が良さそう
  */
-export default function Page() {
+const Page = () => {
   const formSwitcher = useFormSwitcher();
   const methods = useForm<FormSchema>({
     resolver: zodResolver(inputFormSchema),
@@ -368,4 +368,6 @@ export default function Page() {
       ))} */}
     </Box>
   );
-}
+};
+
+export default Page;

@@ -18,7 +18,7 @@ import { ImageLayout } from "@/components/ImageLayout/ImageLayout";
 
 type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>;
 
-export default function Page() {
+const Page = () => {
   const methods = useForm<ImageSearchFormSchema>({
     resolver: zodResolver(imageSearchFormSchema),
     mode: "onChange",
@@ -79,4 +79,6 @@ export default function Page() {
       </ImageLayout>
     </Box>
   );
-}
+};
+
+export default Page;

@@ -1,6 +1,7 @@
-"use client";
 import { Box } from "@mantine/core";
 
-export default function Page() {
+const Page = () => {
   return <Box>ダッシュボード</Box>;
-}
+};
+
+export default Page;
