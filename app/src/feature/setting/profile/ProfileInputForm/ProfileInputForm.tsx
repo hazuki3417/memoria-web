@@ -22,7 +22,7 @@ export const ProfileInputForm = (props: ProfileInputFormProps) => {
   const { control } = props;
 
   return (
-    <Box component="section">
+    <Box>
       <Controller
         control={control}
         name="name"
