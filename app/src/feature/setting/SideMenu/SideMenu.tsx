@@ -12,7 +12,7 @@ export const SideMenu = (props: SideMenuProps) => {
   const userMenu = useNavLink({
     current,
     items: [
-      { label: "Profile", href: "/setting/profile", leftSection: <IconUser /> },
+      { label: "Profile", href: "/setting/profile", leftSection: <IconUser size={20} /> },
     ],
   });
 
@@ -24,7 +24,7 @@ export const SideMenu = (props: SideMenuProps) => {
             const { href, ...less } = item;
             return (
               <MenuList.Item key={href}>
-                <NavLink href={href} {...less} />
+                <NavLink href={href} style={(theme) => ({padding: "4px 8px"})} {...less} />
               </MenuList.Item>
             );
           })}
