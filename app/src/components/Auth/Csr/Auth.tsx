@@ -12,7 +12,6 @@ export const Auth = (props: AuthProps) => {
 
 Auth.SignedIn = ({ children }: { children: React.ReactNode }) => {
   const auth = useAuth();
-  console.debug("auth", auth);
   return auth.isSignIn ? <>{children}</> : null;
 };
 

@@ -39,15 +39,11 @@ export const Slide = (props: SlideProps) => {
     fetchPolicy: "cache-first",
     variables: {
       input: {
-        pagination: {
-          first: 3,
-        },
+        // pagination: {
+        //   first: 3,
+        // },
       },
     },
-  });
-
-  console.debug("debug", {
-    getImage,
   });
 
   return (

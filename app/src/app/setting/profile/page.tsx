@@ -1,33 +1,33 @@
 "use client";
+import {
+  ProfileInputForm,
+  profileInputFormDefaultValue,
+  profileInputFormSchema,
+} from "@/feature/setting/profile/ProfileInputForm";
 import { SideMenu } from "@/feature/setting/SideMenu";
-import { Box, SimpleGrid, TextInput } from "@mantine/core";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Flex } from "@mantine/core";
 import { usePathname } from "next/navigation";
+import { FormProvider, useForm } from "react-hook-form";
 
 const Page = () => {
   const pathname = usePathname();
-  return (
-    <SimpleGrid
-      cols={{ base: 1, sm: 1, md: 2 }} // md以上は2カラム、sm以下は1カラム
-      spacing="lg"
-    >
-      <SideMenu current={pathname} />
 
-      {/* メインコンテンツ */}
-      <Box component="section">
-        <TextInput
-          placeholder="John Doe"
-          label="UserName"
-          withAsterisk
-          size="xs"
-        />
-        <TextInput
-          placeholder="john.doe@memoria.com"
-          label="E-mail"
-          withAsterisk
-          size="xs"
-        />
-      </Box>
-    </SimpleGrid>
+  const methods = useForm({
+    resolver: zodResolver(profileInputFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      ...profileInputFormDefaultValue,
+    },
+  });
+
+  return (
+    <Flex direction={{ base: "column", sm: "row" }} gap={16}>
+      <SideMenu current={pathname} />
+      <FormProvider {...methods}>
+        <ProfileInputForm control={methods.control} />
+      </FormProvider>
+    </Flex>
   );
 };
 

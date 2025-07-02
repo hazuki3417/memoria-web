@@ -4,7 +4,6 @@ extend type Query {
 
 type User {
   id: ID!
-  sub: String!
   profile: Profile!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -12,5 +11,6 @@ type User {
 
 type Profile {
   name: String
-  url: String
+  email: String
+  picture: String
 }

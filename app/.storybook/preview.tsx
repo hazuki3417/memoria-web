@@ -5,6 +5,7 @@ import { addons } from "@storybook/preview-api";
 import { useEffect } from "react";
 import { DARK_MODE_EVENT_NAME } from "storybook-dark-mode";
 import Providers from "@/app/Providers";
+import { theme } from "@/lib/theme";
 
 const channel = addons.getChannel();
 
@@ -31,10 +32,13 @@ export const decorators = [
   ),
   (renderStory: any) => (
     <Providers
+      theme={{
+        theme,
+        defaultColorScheme: "auto",
+      }}
       auth={{
         isSignIn: false,
-        auth: { user: undefined },
-        app: { user: undefined },
+        user: undefined,
       }}
       option={{ graphql: { token: undefined } }}
     >

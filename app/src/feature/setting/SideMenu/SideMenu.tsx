@@ -1,6 +1,6 @@
 import { MenuList } from "@/components";
 import { useNavLink } from "@/hooks";
-import { NavLink, Stack } from "@mantine/core";
+import { Box, NavLink, Stack } from "@mantine/core";
 import { IconUser } from "@tabler/icons-react";
 export interface SideMenuProps {
   current: string;
@@ -17,17 +17,19 @@ export const SideMenu = (props: SideMenuProps) => {
   });
 
   return (
-    <Stack component="aside" gap={0}>
-      <MenuList>
-        {userMenu.map((item) => {
-          const { href, ...less } = item;
-          return (
-            <MenuList.Item key={href}>
-              <NavLink href={href} {...less} />
-            </MenuList.Item>
-          );
-        })}
-      </MenuList>
-    </Stack>
+    <Box component="aside" w={{ base: "100%", sm: 200 }}>
+      <Stack gap={0}>
+        <MenuList>
+          {userMenu.map((item) => {
+            const { href, ...less } = item;
+            return (
+              <MenuList.Item key={href}>
+                <NavLink href={href} {...less} />
+              </MenuList.Item>
+            );
+          })}
+        </MenuList>
+      </Stack>
+    </Box>
   );
 };

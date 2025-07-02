@@ -34,16 +34,16 @@ const RootLayout = async (props: RootLayoutProps) => {
 
   const context: AuthContext = {
     isSignIn: false,
-    auth: { user: undefined },
-    app: { user: undefined },
+    user: undefined,
   };
 
   if (session !== null) {
     context.isSignIn = true;
     const client = createGraphQL({ token: session.tokenSet.accessToken });
     const result = await client.query<GetMeQuery>({ query: GetMeDocument });
-    context.auth.user = session.user;
-    context.app.user = result.data.me;
+    context.user = {
+      id: result.data.me.id,
+    };
   }
 
   return (

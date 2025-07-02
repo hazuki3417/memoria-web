@@ -1,11 +1,6 @@
 query GetMe {
   me {
     id
-    sub
-    profile {
-      name
-      url
-    }
     createdAt
     updatedAt
   }
