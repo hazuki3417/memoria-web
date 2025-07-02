@@ -19,7 +19,7 @@ export function CustomModal({ opened, onClose, children }: CustomModalProps) {
         {(styles) => (
           <Box
             data-testid="custom-modal-base"
-            style={{ ...styles, position: "fixed", inset: 0 }}
+            style={{ ...styles, position: "fixed", inset: 0, zIndex: 150 }}
           >
             {/* NOTE: overlay: z-index: 200 */}
             <Overlay
@@ -35,7 +35,7 @@ export function CustomModal({ opened, onClose, children }: CustomModalProps) {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                zIndex: 300,
+                zIndex: 250,
                 // TODO: モーダルのサイズ指定ができるように改修する
                 width: "100%",
                 height: "100%",
