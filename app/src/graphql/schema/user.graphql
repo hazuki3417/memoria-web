@@ -10,7 +10,17 @@ type User {
 }
 
 type Profile {
-  name: String
-  email: String
-  picture: String
+  name: String!
+  email: String!
+  picture: String!
+}
+
+extend type Mutation {
+  updateProfile(input: UpdateProfile!): User!
+}
+
+input UpdateProfile {
+  name: String!
+  email: String!
+  picture: String!
 }

@@ -5,3 +5,29 @@ query GetMe {
     updatedAt
   }
 }
+
+query GetUserProfile {
+  me {
+    id
+    profile {
+      name
+      email
+      picture
+    }
+    createdAt
+    updatedAt
+  }
+}
+
+mutation UpdateProfile($input: UpdateProfile!) {
+  updateProfile(input: $input) {
+    id
+    profile {
+      name
+      email
+      picture
+    }
+    createdAt
+    updatedAt
+  }
+}

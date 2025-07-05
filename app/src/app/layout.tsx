@@ -1,5 +1,4 @@
 import "@mantine/core/styles.css";
-import "@mantine/dropzone/styles.css";
 import "@/lib/zod";
 import type { Metadata } from "next";
 import Head from "./Head";
@@ -17,6 +16,7 @@ import { createGraphQL } from "@/lib/graphql/server";
 import { GetMeDocument, GetMeQuery } from "@/graphql";
 import { AuthContext } from "@/providers";
 import { theme } from "@/lib/theme";
+import {format} from "date-fns"
 
 const metadata: Metadata = {
   title: "Memoria",
