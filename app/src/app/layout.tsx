@@ -16,7 +16,7 @@ import { createGraphQL } from "@/lib/graphql/server";
 import { GetMeDocument, GetMeQuery } from "@/graphql";
 import { AuthContext } from "@/providers";
 import { theme } from "@/lib/theme";
-import {format} from "date-fns"
+import { format } from "date-fns";
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -44,6 +44,14 @@ const RootLayout = async (props: RootLayoutProps) => {
     context.user = {
       id: result.data.me.id,
     };
+
+    // console.debug("debug", {
+    //   response: result.data.me,
+    //   createdAt: result.data.me.createdAt,
+    //   createdAtDate: new Date(result.data.me.createdAt),
+    //   createdAtDisp: format(new Date(result.data.me.createdAt), "yyyy-MM-dd HH:mm:ss"),
+    //   createdAtDisp2: format(new Date(result.data.me.createdAt), "yyyy-MM-dd HH:mm:ssXXX"),
+    // })
   }
 
   return (

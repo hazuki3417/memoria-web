@@ -1,7 +1,6 @@
-"use client";
-import { Box, Flex } from "@mantine/core";
+import { Box } from "@mantine/core";
 
-const Page = () => {
+const Page = async () => {
   return <Box>notifications</Box>;
 };
 

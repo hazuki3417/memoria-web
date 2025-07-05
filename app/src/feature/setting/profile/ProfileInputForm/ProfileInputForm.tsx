@@ -16,10 +16,11 @@ export const profileInputFormDefaultValue: ProfileInputFormSchema = {
 
 export interface ProfileInputFormProps {
   control: Control<any>;
+  isSubmitting: boolean;
 }
 
 export const ProfileInputForm = (props: ProfileInputFormProps) => {
-  const { control } = props;
+  const { control, isSubmitting } = props;
 
   return (
     <Box>
@@ -32,6 +33,7 @@ export const ProfileInputForm = (props: ProfileInputFormProps) => {
             label="Name"
             withAsterisk
             size="xs"
+            disabled={isSubmitting}
             {...field}
           />
         )}
@@ -45,6 +47,7 @@ export const ProfileInputForm = (props: ProfileInputFormProps) => {
             label="E-mail"
             withAsterisk
             size="xs"
+            disabled={isSubmitting}
             {...field}
           />
         )}
