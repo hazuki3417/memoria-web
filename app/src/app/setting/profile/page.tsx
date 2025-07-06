@@ -8,14 +8,18 @@ import {
 } from "@/feature/setting/profile/ProfileInputForm";
 import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, LoadingOverlay } from "@mantine/core";
+import { Button } from "@mantine/core";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useMutationNotifier } from "@/hooks/useMutationNotifier";
+import { useQueryNotifier } from "@/hooks/useQueryNotifier";
 
 const Page = () => {
-  const read = useGetUserProfileQuery();
+  const query = useGetUserProfileQuery();
+  const [updateProfileMutation, mutation] = useUpdateProfileMutation();
 
-  const [updateProfileMutation, write] = useUpdateProfileMutation();
+  useQueryNotifier({ ...query });
+  useMutationNotifier({ ...mutation });
 
   const form = useForm({
     resolver: zodResolver(profileInputFormSchema),
@@ -26,9 +30,8 @@ const Page = () => {
   });
 
   const submit = form.handleSubmit(async (value) => {
-    console.debug("submit", value);
     try {
-      const result = await updateProfileMutation({
+      await updateProfileMutation({
         variables: {
           input: {
             name: value.name,
@@ -38,27 +41,24 @@ const Page = () => {
           },
         },
       });
-      result;
-
-      console.log("更新成功:", result.data?.updateProfile);
     } catch (e) {
       console.error("更新失敗:", e);
     }
   });
 
   useEffect(() => {
-    const { data } = read;
+    const { data } = query;
     if (data?.me.profile) {
       form.reset({
         ...data.me.profile,
       });
     }
-  }, [read, form]);
+  }, [query, form]);
 
   return (
     <Form>
       <Form.Container>
-        <Form.LoadingOverlay visible={read.loading} />
+        <Form.LoadingOverlay visible={query.loading} />
         <FormProvider {...form}>
           <Form.Group onSubmit={submit}>
             <ProfileInputForm
