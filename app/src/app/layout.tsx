@@ -1,4 +1,5 @@
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import "@/lib/zod";
 import type { Metadata } from "next";
 import Head from "./Head";
@@ -17,6 +18,7 @@ import { GetMeDocument, GetMeQuery } from "@/graphql";
 import { AuthContext } from "@/providers";
 import { theme } from "@/lib/theme";
 import { format } from "date-fns";
+import { Notifications } from "@mantine/notifications";
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -67,6 +69,7 @@ const RootLayout = async (props: RootLayoutProps) => {
           auth={context}
           option={{ graphql: { token: session?.tokenSet.accessToken } }}
         >
+          <Notifications position="top-right" limit={3} autoClose={3000} />
           <AppShell header={{ height: theme.other.app.header.height }}>
             <AppShellHeader>
               <Header />
