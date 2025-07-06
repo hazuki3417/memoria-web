@@ -10,13 +10,7 @@ export type UseQueryNotifierOption = {
   error?: ApolloError;
 };
 
-export interface UseQueryNotifier {
-  state: UseQueryNotifierState;
-}
-
-export const useQueryNotifier = (
-  option: UseQueryNotifierOption,
-): UseQueryNotifier => {
+export const useQueryNotifier = (option: UseQueryNotifierOption) => {
   const { loading, error } = option;
   const hasExecuted = useRef(false); // query実行フラグ
 
@@ -47,8 +41,4 @@ export const useQueryNotifier = (
     // 通知を出したらフラグをリセット
     hasExecuted.current = false;
   }, [loading, error]);
-
-  return {
-    state: true,
-  };
 };

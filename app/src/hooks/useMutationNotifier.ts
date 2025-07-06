@@ -10,13 +10,7 @@ export type UseMutationNotifierOption = {
   error?: ApolloError;
 };
 
-export interface UseMutationNotifier {
-  state: UseMutationNotifierState;
-}
-
-export const useMutationNotifier = (
-  option: UseMutationNotifierOption,
-): UseMutationNotifier => {
+export const useMutationNotifier = (option: UseMutationNotifierOption) => {
   const { loading, error } = option;
   const hasExecuted = useRef(false); // mutation実行フラグ
 
@@ -51,8 +45,4 @@ export const useMutationNotifier = (
     // 通知を出したらフラグをリセット
     hasExecuted.current = false;
   }, [loading, error]);
-
-  return {
-    state: true,
-  };
 };
