@@ -11,8 +11,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@mantine/core";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useMutationNotifier } from "@/hooks/useMutationNotifier";
-import { useQueryNotifier } from "@/hooks/useQueryNotifier";
+import {
+  useMutationNotifier,
+  useQueryNotifier,
+  useSetFormDataFromQuery,
+} from "@/hooks";
 
 const Page = () => {
   const query = useGetUserProfileQuery();
@@ -26,6 +29,14 @@ const Page = () => {
     mode: "onChange",
     defaultValues: {
       ...profileInputFormDefaultValue,
+    },
+  });
+
+  useSetFormDataFromQuery({
+    query,
+    form,
+    selector: (value) => {
+      return { ...value.me.profile };
     },
   });
 
@@ -46,14 +57,14 @@ const Page = () => {
     }
   });
 
-  useEffect(() => {
-    const { data } = query;
-    if (data?.me.profile) {
-      form.reset({
-        ...data.me.profile,
-      });
-    }
-  }, [query, form]);
+  // useEffect(() => {
+  //   const { data } = query;
+  //   if (data?.me.profile) {
+  //     form.reset({
+  //       ...data.me.profile,
+  //     });
+  //   }
+  // }, [query, form]);
 
   return (
     <Form>
