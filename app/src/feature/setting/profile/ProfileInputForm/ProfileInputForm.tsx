@@ -1,10 +1,11 @@
+import { FormTextInput } from "@/components/FormTextInput";
 import { Box, TextInput } from "@mantine/core";
 import { Control, Controller } from "react-hook-form";
 import { z } from "zod";
 
 export const profileInputFormSchema = z.object({
-  name: z.string(),
-  email: z.string(),
+  name: z.string().nonempty(),
+  email: z.string().nonempty(),
 });
 
 export type ProfileInputFormSchema = z.infer<typeof profileInputFormSchema>;
@@ -14,43 +15,24 @@ export const profileInputFormDefaultValue: ProfileInputFormSchema = {
   email: "",
 };
 
-export interface ProfileInputFormProps {
-  control: Control<any>;
-  isSubmitting: boolean;
-}
+export interface ProfileInputFormProps {}
 
 export const ProfileInputForm = (props: ProfileInputFormProps) => {
-  const { control, isSubmitting } = props;
-
   return (
     <Box>
-      <Controller
-        control={control}
+      <FormTextInput
         name="name"
-        render={({ field }) => (
-          <TextInput
-            placeholder="John Doe"
-            label="Name"
-            withAsterisk
-            size="xs"
-            disabled={isSubmitting}
-            {...field}
-          />
-        )}
+        placeholder="John Doe"
+        label="Name"
+        withAsterisk
+        size="xs"
       />
-      <Controller
-        control={control}
+      <FormTextInput
         name="email"
-        render={({ field }) => (
-          <TextInput
-            placeholder="john.doe@memoria.com"
-            label="E-mail"
-            withAsterisk
-            size="xs"
-            disabled={isSubmitting}
-            {...field}
-          />
-        )}
+        placeholder="john.doe@memoria.com"
+        label="E-mail"
+        withAsterisk
+        size="xs"
       />
     </Box>
   );

@@ -62,10 +62,7 @@ const Page = () => {
         <Form.LoadingOverlay visible={query.loading} />
         <FormProvider {...form}>
           <Form.Group onSubmit={submit}>
-            <ProfileInputForm
-              control={form.control}
-              isSubmitting={form.formState.isSubmitting}
-            />
+            <ProfileInputForm />
           </Form.Group>
         </FormProvider>
         <ActionPanel
