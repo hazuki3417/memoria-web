@@ -1,6 +1,6 @@
-import { FormTextInput } from "@/components/FormTextInput";
-import { Box, TextInput } from "@mantine/core";
-import { Control, Controller } from "react-hook-form";
+import { FormTextInput } from "@/components";
+import { extractInteractivity, FormInteractivity } from "@/hooks";
+import { Box } from "@mantine/core";
 import { z } from "zod";
 
 export const profileInputFormSchema = z.object({
@@ -15,9 +15,11 @@ export const profileInputFormDefaultValue: ProfileInputFormSchema = {
   email: "",
 };
 
-export interface ProfileInputFormProps {}
+export interface ProfileInputFormProps extends FormInteractivity {}
 
 export const ProfileInputForm = (props: ProfileInputFormProps) => {
+  const {} = props;
+  const interactivity = extractInteractivity(props);
   return (
     <Box>
       <FormTextInput
@@ -26,6 +28,7 @@ export const ProfileInputForm = (props: ProfileInputFormProps) => {
         label="Name"
         withAsterisk
         size="xs"
+        {...interactivity}
       />
       <FormTextInput
         name="email"
@@ -33,6 +36,7 @@ export const ProfileInputForm = (props: ProfileInputFormProps) => {
         label="E-mail"
         withAsterisk
         size="xs"
+        {...interactivity}
       />
     </Box>
   );

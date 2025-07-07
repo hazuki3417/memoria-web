@@ -12,3 +12,4 @@ export * from "./useNavLink";
 export * from "./useQueryNotifier";
 export * from "./useMutationNotifier";
 export * from "./useSetFormDataFromQuery";
+export * from "./useFormInteractivity";

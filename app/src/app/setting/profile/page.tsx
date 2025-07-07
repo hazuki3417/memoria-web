@@ -8,20 +8,24 @@ import {
 } from "@/feature/setting/profile/ProfileInputForm";
 import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@mantine/core";
 import { FormProvider, useForm } from "react-hook-form";
 import {
+  useFormInteractivity,
   useMutationNotifier,
   useQueryNotifier,
   useSetFormDataFromQuery,
 } from "@/hooks";
+import { FormButton } from "@/components";
+import { Space } from "@mantine/core";
+import { createFormSubmitHandler } from "@/lib";
 
 const Page = () => {
   const query = useGetUserProfileQuery();
   const [updateProfileMutation, mutation] = useUpdateProfileMutation();
 
-  useQueryNotifier({ ...query });
-  useMutationNotifier({ ...mutation });
+  useQueryNotifier(query);
+  useMutationNotifier(mutation);
+  const interactivity = useFormInteractivity({ read: query, write: mutation });
 
   const form = useForm({
     resolver: zodResolver(profileInputFormSchema),
@@ -39,47 +43,40 @@ const Page = () => {
     },
   });
 
-  const submit = form.handleSubmit(async (value) => {
-    try {
-      await updateProfileMutation({
-        variables: {
-          input: {
-            name: value.name,
-            email: value.email,
-            picture:
-              "https://lh3.googleusercontent.com/a/ACg8ocKIWVfiXpZwpTYPahJMVMWgY4FXh3_tEC_FVoSCPrb0jnprqSxr=s96-c",
-          },
+  const submit = createFormSubmitHandler(form, (value) => {
+    return updateProfileMutation({
+      variables: {
+        input: {
+          name: value.name,
+          email: value.email,
+          picture:
+            "https://lh3.googleusercontent.com/a/ACg8ocKIWVfiXpZwpTYPahJMVMWgY4FXh3_tEC_FVoSCPrb0jnprqSxr=s96-c",
         },
-      });
-    } catch (e) {
-      console.error("更新失敗:", e);
-    }
+      },
+    });
   });
 
   return (
     <Form>
-      <Form.Container>
+      <Form.Container p={8}>
         <Form.LoadingOverlay visible={query.loading} />
         <FormProvider {...form}>
           <Form.Group onSubmit={submit}>
-            <ProfileInputForm />
+            <ProfileInputForm {...interactivity} />
+            <Space h={32} />
+            <ActionPanel
+              right={
+                <Form.Submit
+                  button={(props) => (
+                    <FormButton {...props} {...interactivity}>
+                      更新
+                    </FormButton>
+                  )}
+                />
+              }
+            />
           </Form.Group>
         </FormProvider>
-        <ActionPanel
-          right={
-            <Form.Submit
-              button={(props) => (
-                <Button
-                  {...props}
-                  loading={form.formState.isSubmitting}
-                  disabled={form.formState.isSubmitting}
-                >
-                  更新
-                </Button>
-              )}
-            />
-          }
-        />
       </Form.Container>
     </Form>
   );
