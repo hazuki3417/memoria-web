@@ -2,6 +2,16 @@ extend type Query {
   images(input: PaginationInput): ImageConnection!
 }
 
+extend type Mutation {
+  uploadImage(input: UploadImageInput!): Image!
+}
+
+input UploadImageInput {
+  file: Upload!
+  tags: [String!]!
+  visibility: Visibility!
+}
+
 # === data model ===
 
 type Image {

@@ -3,6 +3,11 @@ directive @tag(validate: String) on INPUT_FIELD_DEFINITION
 scalar Upload
 scalar DateTime
 
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
 # mutation input example
 # input {mutationName}Input {
 #   id: ID! @tag(validate: "mongodb")

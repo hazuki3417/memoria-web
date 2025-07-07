@@ -1,3 +1,25 @@
+mutation UploadImage($input: UploadImageInput!) {
+  uploadImage(input: $input) {
+    id
+    info {
+      file {
+        name
+        size
+        date
+      }
+      size {
+        width
+        height
+      }
+      tags
+    }
+    src {
+      thumbnail
+      original
+    }
+  }
+}
+
 query GetImages($input: PaginationInput) {
   images(input: $input) {
     edges {
