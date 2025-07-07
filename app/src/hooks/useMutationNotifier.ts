@@ -3,8 +3,6 @@ import { ApolloError } from "@apollo/client";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useRef } from "react";
 
-export type UseMutationNotifierState = boolean;
-
 export type UseMutationNotifierOption = {
   loading: boolean;
   error?: ApolloError;

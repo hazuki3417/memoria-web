@@ -3,8 +3,6 @@ import { ApolloError } from "@apollo/client";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useRef } from "react";
 
-export type UseQueryNotifierState = boolean;
-
 export type UseQueryNotifierOption = {
   loading: boolean;
   error?: ApolloError;
