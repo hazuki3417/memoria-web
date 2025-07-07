@@ -21,7 +21,7 @@ mutation UploadImage($input: UploadImageInput!) {
 }
 
 query GetImages($input: PaginationInput) {
-  images(input: $input) {
+  getImages(input: $input) {
     edges {
       node {
         id

@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Box } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { ImageEdge, useGetImageConnectionQuery } from "@/graphql";
+import { ImageEdge, useGetImagesQuery } from "@/graphql";
 import { useIntersection } from "../../hooks/useIntersection";
 import { useRelayConnection } from "../../hooks/useRelayConnection";
 import { nanoid } from "nanoid";
@@ -31,13 +31,13 @@ const Page = () => {
 
   const relay = useRelayConnection({
     hooks: () =>
-      useGetImageConnectionQuery({
+      useGetImagesQuery({
         variables: {
           input: { first: 5 },
         },
         notifyOnNetworkStatusChange: true,
       }),
-    extract: (data) => data.images,
+    extract: (data) => data.getImages,
     size: 10,
   });
 
@@ -45,7 +45,7 @@ const Page = () => {
     intersect: async () => {
       if (!relay.state.pageInfo?.hasNextPage) return;
       const res = await relay.handler.next();
-      setItems((prev) => [...prev, ...res.data.images.edges]);
+      setItems((prev) => [...prev, ...res.data.getImages.edges]);
     },
   });
 

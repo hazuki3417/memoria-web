@@ -1,5 +1,5 @@
 extend type Query {
-  images(input: PaginationInput): ImageConnection!
+  getImages(input: PaginationInput): ImageConnection!
 }
 
 extend type Mutation {
