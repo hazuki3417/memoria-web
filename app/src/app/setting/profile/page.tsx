@@ -9,7 +9,6 @@ import {
 import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@mantine/core";
-import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   useMutationNotifier,
@@ -56,15 +55,6 @@ const Page = () => {
       console.error("更新失敗:", e);
     }
   });
-
-  // useEffect(() => {
-  //   const { data } = query;
-  //   if (data?.me.profile) {
-  //     form.reset({
-  //       ...data.me.profile,
-  //     });
-  //   }
-  // }, [query, form]);
 
   return (
     <Form>
