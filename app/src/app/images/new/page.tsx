@@ -351,21 +351,6 @@ const Page = () => {
           />
         )}
       </ImageDropForm>
-      {/* {taskManager.state.tasks.map((task, index) => (
-        <Paper key={index} p="xs" withBorder radius="md">
-          <Group justify="space-between">
-            <Text size="sm">{task.id}</Text>
-            <Text size="sm" c={task.status === "error" ? "red" : "dimmed"}>
-              {task.status}
-            </Text>
-          </Group>
-          {task.status === "error" && (
-            <Text size="xs" c="red">
-              エラー: {task.error}
-            </Text>
-          )}
-        </Paper>
-      ))} */}
     </Box>
   );
 };
