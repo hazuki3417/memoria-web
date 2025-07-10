@@ -17,6 +17,7 @@ const config: CodegenConfig = {
         useTypeImports: true,
         scalars: {
           DateTime: "Date",
+          Upload: "File",
         },
       },
     },
