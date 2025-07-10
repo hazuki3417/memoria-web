@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { CreateGraphQLOption } from "./type";
+import { createUploadLink } from "apollo-upload-client";
 
 /**
  * client side fetch
@@ -13,10 +14,11 @@ export const createGraphQL = (option: CreateGraphQLOption) => {
   }
 
   return new ApolloClient({
-    uri: "/api/graphql",
-    // uri: "/api/mock",
+    link: createUploadLink({
+      uri: "/api/graphql",
+      headers,
+    }),
     cache: new InMemoryCache(),
     ssrMode: false,
-    headers,
   });
 };
