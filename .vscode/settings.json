@@ -1,0 +1,27 @@
+{
+  "files.exclude": {
+    "**/.devbox": true,
+    "**/.git": true,
+    "**/.gitignore": true,
+    "**/.vscode": true,
+    "**/.storybook": true,
+    "**/*.config.*": true,
+    "**/biome.json": true,
+    "**/codegen.ts": true,
+    "**/package.json": true,
+    "**/package-lock.json": true,
+  },
+  "search.exclude": {
+    "**/.devbox": true,
+    "**/.git": true,
+    "**/.gitignore": true,
+
+    "**/.vscode": true,
+    "**/.storybook": true,
+    "**/*.config.*": true,
+    "**/biome.json": true,
+    "**/codegen.ts": true,
+    "**/package.json": true,
+    "**/package-lock.json": true,
+  }
+}
