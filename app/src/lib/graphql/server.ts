@@ -1,10 +1,11 @@
+import "server-only"
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { CreateGraphQLOption } from "./type";
 import { createUploadLink } from "apollo-upload-client";
+import { serverEnv } from "@/env/server";
 
 /**
  * server side fetch
- * TODO: uriは環境変数から指定できるようにする
  */
 export const createGraphQL = (option: CreateGraphQLOption) => {
   const headers: Record<string, string> = {};
@@ -14,7 +15,7 @@ export const createGraphQL = (option: CreateGraphQLOption) => {
 
   return new ApolloClient({
     link: createUploadLink({
-      uri: "http://localhost:8080/graphql",
+      uri: serverEnv.API_URI,
       headers,
     }),
     cache: new InMemoryCache(),
