@@ -1,6 +1,8 @@
 import { Header } from "@/components";
+import { GetMeDocument, GetMeQuery } from "@/graphql";
 import { auth } from "@/lib/auth";
 import { getLang } from "@/lib/cookies/lang/getLang";
+import { createGraphQL } from "@/lib/graphql/server";
 import { theme } from "@/lib/theme";
 import "@/lib/zod";
 import { AuthContext } from "@/providers";
@@ -38,28 +40,16 @@ const RootLayout = async (props: RootLayoutProps) => {
 
   if (session !== null) {
     context.isSignIn = true;
-    // const client = createGraphQL({ token: session.tokenSet.accessToken });
+    const client = createGraphQL({ token: session.tokenSet.accessToken });
 
-    // FIX: 認証後のgetMeでエラーになるので原因を調べる
-    // try {
-    //   const result = await client.query<GetMeQuery>({ query: GetMeDocument });
-    //   context.user = {
-    //     id: result.data.me.id,
-    //   };
-    // } catch (error) {
-    //   console.debug("error", error)
-    // }
-    context.user = {
-      id: "example",
-    };
-
-    // console.debug("debug", {
-    //   response: result.data.me,
-    //   createdAt: result.data.me.createdAt,
-    //   createdAtDate: new Date(result.data.me.createdAt),
-    //   createdAtDisp: format(new Date(result.data.me.createdAt), "yyyy-MM-dd HH:mm:ss"),
-    //   createdAtDisp2: format(new Date(result.data.me.createdAt), "yyyy-MM-dd HH:mm:ssXXX"),
-    // })
+    try {
+      const result = await client.query<GetMeQuery>({ query: GetMeDocument });
+      context.user = {
+        id: result.data.me.id,
+      };
+    } catch (error) {
+      console.debug("error", error);
+    }
   }
 
   return (
