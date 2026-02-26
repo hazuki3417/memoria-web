@@ -5,7 +5,6 @@ mutation UploadImage($input: UploadImageInput!) {
       file {
         name
         size
-        date
       }
       size {
         width
@@ -15,7 +14,7 @@ mutation UploadImage($input: UploadImageInput!) {
     }
     src {
       thumbnail
-      original
+      preview
     }
   }
 }
@@ -29,7 +28,6 @@ query GetImages($input: PaginationInput) {
           file {
             name
             size
-            date
           }
           size {
             width
@@ -39,7 +37,7 @@ query GetImages($input: PaginationInput) {
         }
         src {
           thumbnail
-          original
+          preview
         }
       }
       cursor

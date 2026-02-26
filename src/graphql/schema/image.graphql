@@ -18,6 +18,8 @@ type Image {
   id: ID!
   info: ImageInfo!
   src: ImageSrc!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type ImageInfo {
@@ -29,7 +31,6 @@ type ImageInfo {
 type ImageFile {
   name: String!
   size: Int!
-  date: String!
 }
 
 type ImageSize {
@@ -39,7 +40,7 @@ type ImageSize {
 
 type ImageSrc {
   thumbnail: String!
-  original: String!
+  preview: String!
 }
 
 # === relay model ===
