@@ -15,14 +15,16 @@
   },
   "files": {
     "ignore": [
-      ".vscode/",
-      "node_modules/",
-      "dist/",
-      "coverage/",
       "*.snap",
-      ".next/",
-      "storybook-static/",
-      "test-results/"
+      "**/.devbox/**",
+      "**/.git/**",
+      "**/.next/**",
+      "**/.vscode/**",
+      "**/coverage/**",
+      "**/dist/**",
+      "**/node_modules/**",
+      "**/storybook-static/**",
+      "**/test-results/**"
     ]
   }
 }

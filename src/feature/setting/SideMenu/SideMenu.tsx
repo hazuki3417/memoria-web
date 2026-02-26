@@ -1,7 +1,9 @@
 import { MenuList } from "@/components";
 import { useNavLink } from "@/hooks";
+import { resolveUri } from "@/lib/url";
 import { Box, NavLink, Stack } from "@mantine/core";
 import { IconBell, IconUser } from "@tabler/icons-react";
+
 export interface SideMenuProps {
   current: string;
 }
@@ -14,12 +16,12 @@ export const SideMenu = (props: SideMenuProps) => {
     items: [
       {
         label: "Profile",
-        href: "/setting/profile",
+        href: resolveUri("/settings/profile"),
         leftSection: <IconUser size={20} />,
       },
       {
         label: "Notifications",
-        href: "/setting/notifications",
+        href: resolveUri("/settings/notifications"),
         leftSection: <IconBell size={20} />,
       },
     ],

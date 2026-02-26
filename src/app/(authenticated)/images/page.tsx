@@ -1,20 +1,20 @@
 "use client";
-import {
-  ImageSearchForm,
-  imageSearchFormSchema,
-  imageSearchFormDefaultValue,
-} from "@/feature/images";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Box } from "@mantine/core";
-import { useEffect, useState } from "react";
-import { ImageEdge, useGetImagesQuery } from "@/graphql";
-import { useIntersection } from "../../hooks/useIntersection";
-import { useRelayConnection } from "../../hooks/useRelayConnection";
-import { nanoid } from "nanoid";
 import { Image } from "@/components";
 import { ImageLayout } from "@/components/ImageLayout/ImageLayout";
+import {
+  ImageSearchForm,
+  imageSearchFormDefaultValue,
+  imageSearchFormSchema,
+} from "@/feature/images";
+import { ImageEdge, useGetImagesQuery } from "@/graphql";
+import { useIntersection } from "@/hooks/useIntersection";
+import { useRelayConnection } from "@/hooks/useRelayConnection";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Box } from "@mantine/core";
+import { nanoid } from "nanoid";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>;
 
