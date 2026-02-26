@@ -33,7 +33,7 @@ const Page = () => {
     hooks: () =>
       useGetImagesQuery({
         variables: {
-          input: { first: 5 },
+          input: { first: 25 },
         },
         notifyOnNetworkStatusChange: true,
       }),
@@ -65,7 +65,7 @@ const Page = () => {
             {items.map((item, index) => {
               return (
                 <Image.Frame key={nanoid()}>
-                  <Image.Tile src="sample/h.png" alt="example" />
+                  <Image.Tile src={item.node.src.thumbnail} alt={item.node.info.file.name} />
                 </Image.Frame>
               );
             })}
