@@ -6,7 +6,7 @@
       "type": "shell",
       "isBackground": true,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run dev:next\"",
+      "command": "devbox run bash -c \"npm run dev:next\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -19,7 +19,7 @@
       "type": "shell",
       "isBackground": true,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run dev:storybook\"",
+      "command": "devbox run bash -c \"npm run dev:storybook\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -32,7 +32,7 @@
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run format\"",
+      "command": "devbox run bash -c \"npm run format\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -45,7 +45,7 @@
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run test:unit\"",
+      "command": "devbox run bash -c \"npm run test:unit\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -58,7 +58,7 @@
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run test:vrt\"",
+      "command": "devbox run bash -c \"npm run test:vrt\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -71,7 +71,7 @@
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run test:vrt:update\"",
+      "command": "devbox run bash -c \"npm run test:vrt:update\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -84,7 +84,7 @@
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run test:vrt:report\"",
+      "command": "devbox run bash -c \"npm run test:vrt:report\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -97,7 +97,7 @@
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run build:next\"",
+      "command": "devbox run bash -c \"npm run build:next\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -110,7 +110,7 @@
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"cd ${workspaceFolder}/app && npm run build:storybook\"",
+      "command": "devbox run bash -c \"npm run build:storybook\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
