@@ -10,7 +10,7 @@
     "build:storybook": "storybook build",
     "start": "next start",
     "lint": "next lint",
-    "codegen:graphql": "graphql-codegen",
+    "gen:graphql": "graphql-codegen",
     "test:unit": "vitest run",
     "test:vrt": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts",
     "test:vrt:update": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts --update-snapshots",
