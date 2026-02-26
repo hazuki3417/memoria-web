@@ -1,6 +1,4 @@
-/**
- * CSR専用
- */
+import "client-only";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 

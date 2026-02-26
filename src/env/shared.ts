@@ -1,11 +1,11 @@
-import { z } from "zod"
+import { z } from "zod";
 
-export const BooleanFromString = z.enum(["true", "false"])
+export const BooleanFromString = z.enum(["true", "false"]);
 
 export const SharedEnvSchema = z.object({
   //NOTE: サーバー・クライアント共有の環境変数を定義
   USE_MSW: BooleanFromString,
-})
+});
 
 export const sharedEnv = SharedEnvSchema.parse({
   /**
@@ -14,4 +14,4 @@ export const sharedEnv = SharedEnvSchema.parse({
    *       NEXT_PUBLICがついている = サーバー・クライアントどちらでも利用可能な環境変数
    */
   USE_MSW: "true",
-})
+});

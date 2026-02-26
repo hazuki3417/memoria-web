@@ -1,11 +1,9 @@
 "use server";
 
-/**
- * SSR専用
- */
-import { headers } from "next/headers";
-import Cookie from "universal-cookie";
 import { langConfig } from "@/config";
+import { headers } from "next/headers";
+import "server-only";
+import Cookie from "universal-cookie";
 
 export const getLang = async () => {
   const cookieHeader = (await headers()).get("cookie") || "";

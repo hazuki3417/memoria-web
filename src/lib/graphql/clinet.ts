@@ -1,4 +1,4 @@
-import "client-only"
+import "client-only";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { CreateGraphQLOption } from "./type";
 import { createUploadLink } from "apollo-upload-client";
