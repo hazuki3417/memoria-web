@@ -8,7 +8,7 @@
   "scripts": {
     "dev:next": "next dev",
     "dev:storybook": "storybook dev -p 6006",
-    "format": "biome format . --write",
+    "format": "biome format --write",
     "build:next": "next build",
     "build:storybook": "storybook build",
     "start": "next start",
@@ -48,7 +48,7 @@
     "zod-i18n-map": "^2.27.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "^2.4.4",
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-codegen/typescript-operations": "^4.6.1",
@@ -58,10 +58,10 @@
     "@playwright/test": "^1.52.0",
     "@testing-library/react": "^16.3.0",
     "@types/apollo-upload-client": "^17.0.5",
-    "@types/node": "^22",
+    "@types/node": "^25.3.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "jsdom": "^26.1.0",
+    "jsdom": "^28.1.0",
     "typescript": "^5.8.3",
     "vitest": "^3.1.4"
   }
