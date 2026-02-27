@@ -67,14 +67,14 @@ const Page = () => {
     intersect: async () => {
       if (!relay.state.pageInfo?.hasNextPage) return;
       const res = await relay.handler.next();
-      setlists((prev) => [...prev, ...res.data.getImages.edges]);
+      setlists((prev) => [...prev, ...res.data.getImages.edges] as ImageEdge[]);
     },
   });
 
   // 初期レンダリング時の処理
   useEffect(() => {
     if (relay.state.edges.length > 0 && lists.length === 0) {
-      setlists(relay.state.edges);
+      setlists(relay.state.edges as ImageEdge[]);
     }
   }, [relay.state.edges, lists.length]);
 
