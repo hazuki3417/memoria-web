@@ -20,7 +20,9 @@
     "test:vrt:report": "playwright show-report ./e2e/vrt/report",
     "test:app": "playwright test --config=playwright.app.config.ts",
     "test:app:update": "playwright test --config=playwright.app.config.ts --update-snapshots",
-    "test:app:report": "playwright show-report ./e2e/app/report"
+    "test:app:report": "playwright show-report ./e2e/app/report",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -63,6 +65,16 @@
     "@types/react-dom": "^19",
     "jsdom": "^28.1.0",
     "typescript": "^5.8.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "storybook": "^10.2.13",
+    "@storybook/nextjs-vite": "^10.2.13",
+    "@chromatic-com/storybook": "^5.0.1",
+    "@storybook/addon-vitest": "^10.2.13",
+    "@storybook/addon-a11y": "^10.2.13",
+    "@storybook/addon-docs": "^10.2.13",
+    "vite": "^7.3.1",
+    "playwright": "^1.58.2",
+    "@vitest/browser-playwright": "^4.0.18",
+    "@vitest/coverage-v8": "^4.0.18"
   }
 }
