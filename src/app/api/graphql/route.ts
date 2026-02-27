@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
       status: upstream.status,
       headers: upstream.headers,
     });
-
   } catch (error) {
     clearTimeout(timeout);
 
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest) {
       {
         status: 502,
         headers: { "content-type": "application/json" },
-      }
+      },
     );
   }
 }

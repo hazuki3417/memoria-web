@@ -1,6 +1,22 @@
 import { TranslationSchema } from "./type";
 
 export const ja: TranslationSchema = {
+  button: {
+    search: "検索",
+    new: "新規",
+    delete: "削除",
+    edit: "編集",
+    download: "ダウンロード",
+  },
+  placeholder: {
+    tag: "タグ"
+  },
+  label: {
+    list: "リスト",
+    group: "グループ",
+    filter: "絞り込み",
+    bulk: "一括管理",
+  },
   auth: {
     signIn: "サインイン",
     signUp: "サインアップ",

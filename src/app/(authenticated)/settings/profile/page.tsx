@@ -1,5 +1,5 @@
 "use client";
-import { ActionPanel } from "@/components/ActionPanel";
+import { ActionPanel, FormButton } from "@/components";
 import { Form } from "@/components/Form";
 import {
   ProfileInputForm,
@@ -7,17 +7,16 @@ import {
   profileInputFormSchema,
 } from "@/feature/setting/profile/ProfileInputForm";
 import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormProvider, useForm } from "react-hook-form";
 import {
   useFormInteractivity,
   useMutationNotifier,
   useQueryNotifier,
   useSetFormDataFromQuery,
 } from "@/hooks";
-import { FormButton } from "@/components";
-import { Space } from "@mantine/core";
 import { createFormSubmitHandler } from "@/lib";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Space } from "@mantine/core";
+import { FormProvider, useForm } from "react-hook-form";
 
 const Page = () => {
   const query = useGetUserProfileQuery();
@@ -64,8 +63,8 @@ const Page = () => {
           <Form.Group onSubmit={submit}>
             <ProfileInputForm {...interactivity} />
             <Space h={32} />
-            <ActionPanel
-              right={
+            <ActionPanel>
+              <ActionPanel.Right>
                 <Form.Submit
                   button={(props) => (
                     <FormButton {...props} {...interactivity}>
@@ -73,8 +72,8 @@ const Page = () => {
                     </FormButton>
                   )}
                 />
-              }
-            />
+              </ActionPanel.Right>
+            </ActionPanel>
           </Form.Group>
         </FormProvider>
       </Form.Container>

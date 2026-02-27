@@ -1,11 +1,16 @@
-import { Box, BoxProps } from "@mantine/core";
+import { Flex, FlexProps } from "@mantine/core";
 import React from "react";
 
-export interface CenterProps extends BoxProps {
+export interface CenterProps extends Omit<FlexProps, "justify" | "align"> {
   children: React.ReactNode;
 }
 
 export const Center = (props: CenterProps) => {
-  const { children, ...less } = props;
-  return <Box {...less}>{children}</Box>;
+  const { children, ...lest } = props;
+  return (
+    <Flex flex={1} align="center" justify="flex-center" {...lest}>
+      {children}
+    </Flex>
+  );
 };
+Center.displayName = "ActionPanel.Center";

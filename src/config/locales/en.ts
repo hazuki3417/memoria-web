@@ -1,6 +1,22 @@
 import { TranslationSchema } from "./type";
 
 export const en: TranslationSchema = {
+  button: {
+    search: "Search",
+    new: "New",
+    delete: "Delete",
+    edit: "Edit",
+    download: "Download",
+  },
+  placeholder: {
+    tag: "Tag"
+  },
+  label: {
+    list: "List",
+    group: "Group",
+    filter: "Filter",
+    bulk: "Bulk",
+  },
   auth: {
     signIn: "Sign in",
     signUp: "Sign up",

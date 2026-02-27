@@ -1,23 +1,8 @@
 import { imageConfig } from "@/config";
-import {
-  Grid,
-  Group,
-  Radio,
-  Select,
-  SelectProps,
-  TagsInput,
-  Text,
-} from "@mantine/core";
+import { Select, SelectProps, TagsInput } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 import { Control, Controller } from "react-hook-form";
 import { z } from "zod";
-
-const styles = {
-  col: {
-    display: "flex",
-    alignItems: "center",
-  } as React.CSSProperties,
-};
 
 export const VISIBILITY = {
   ALL: "all",
@@ -54,27 +39,7 @@ export const ImageSearchForm = (props: ImageSearchFormProps) => {
             width: "100%",
           })}
           placeholder="タグ"
-          leftSectionWidth={100}
-          leftSection={
-            <Controller
-              control={control}
-              name="visibility"
-              render={({ field }) => (
-                <VisibilitySelect
-                  w={100}
-                  variant="unstyled"
-                  size="xs"
-                  {...field}
-                  style={(theme) => ({
-                    borderRight: `1px solid ${theme.colors.dark[4]}`,
-                  })}
-                />
-              )}
-            />
-          }
-          rightSection={
-            <IconSearch size={20} onClick={() => console.debug("a")} />
-          }
+          leftSection={<IconSearch size={16} />}
           error={fieldState.error?.message}
           clearable
           {...field}
