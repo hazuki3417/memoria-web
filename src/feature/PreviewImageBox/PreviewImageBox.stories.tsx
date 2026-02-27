@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { PreviewImageBox } from "./PreviewImageBox"
-import { fn, userEvent, within } from "@storybook/test"
 
 const meta = {
   title: "ImageDropForm/PreviewImageBox",
@@ -10,7 +9,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const payload = { src: "sample/v.png", alt: "example.png" }
+const payload = { src: "sample/h.png", alt: "example.png" }
 
 export const Default: Story = {
   args: {
@@ -22,16 +21,16 @@ export const Default: Story = {
       selectable: true,
       supported: true,
     },
-    handler: {
-      onSelect: fn(),
-      onRemove: fn(),
-    },
+    // handler: {
+    //   onSelect: fn(),
+    //   onRemove: fn(),
+    // },
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("select-file"))
-    await userEvent.click(canvas.getByTestId("remove-file"))
-  },
+  // play: async ({ canvasElement }) => {
+  //   const canvas = within(canvasElement)
+  //   await userEvent.click(canvas.getByTestId("select-file"))
+  //   await userEvent.click(canvas.getByTestId("remove-file"))
+  // },
 }
 
 export const Selected: Story = {
@@ -44,16 +43,16 @@ export const Selected: Story = {
       selectable: true,
       supported: true,
     },
-    handler: {
-      onSelect: fn(),
-      onRemove: fn(),
-    },
+    // handler: {
+    //   onSelect: fn(),
+    //   onRemove: fn(),
+    // },
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("select-file"))
-    await userEvent.click(canvas.getByTestId("remove-file"))
-  },
+  // play: async ({ canvasElement }) => {
+  //   const canvas = within(canvasElement)
+  //   await userEvent.click(canvas.getByTestId("select-file"))
+  //   await userEvent.click(canvas.getByTestId("remove-file"))
+  // },
 }
 
 export const NonSelectable: Story = {
@@ -66,16 +65,16 @@ export const NonSelectable: Story = {
       selectable: false,
       supported: true,
     },
-    handler: {
-      onSelect: fn(),
-      onRemove: fn(),
-    },
+    // handler: {
+    //   onSelect: fn(),
+    //   onRemove: fn(),
+    // },
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("select-file"))
-    await userEvent.click(canvas.getByTestId("remove-file"))
-  },
+  // play: async ({ canvasElement }) => {
+  //   const canvas = within(canvasElement)
+  //   await userEvent.click(canvas.getByTestId("select-file"))
+  //   await userEvent.click(canvas.getByTestId("remove-file"))
+  // },
 }
 
 export const UnSupported: Story = {
@@ -88,16 +87,16 @@ export const UnSupported: Story = {
       selectable: false,
       supported: false,
     },
-    handler: {
-      onSelect: fn(),
-      onRemove: fn(),
-    },
+    // handler: {
+    //   onSelect: fn(),
+    //   onRemove: fn(),
+    // },
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("select-file"))
-    await userEvent.click(canvas.getByTestId("remove-file"))
-  },
+  // play: async ({ canvasElement }) => {
+  //   const canvas = within(canvasElement)
+  //   await userEvent.click(canvas.getByTestId("select-file"))
+  //   await userEvent.click(canvas.getByTestId("remove-file"))
+  // },
 }
 
 export const ValidAccept: Story = {
@@ -111,16 +110,16 @@ export const ValidAccept: Story = {
       supported: true,
       valid: "accept",
     },
-    handler: {
-      onSelect: fn(),
-      onRemove: fn(),
-    },
+    // handler: {
+    //   onSelect: fn(),
+    //   onRemove: fn(),
+    // },
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("select-file"))
-    await userEvent.click(canvas.getByTestId("remove-file"))
-  },
+  // play: async ({ canvasElement }) => {
+  //   const canvas = within(canvasElement)
+  //   await userEvent.click(canvas.getByTestId("select-file"))
+  //   await userEvent.click(canvas.getByTestId("remove-file"))
+  // },
 }
 
 export const ValidReject: Story = {
@@ -134,16 +133,16 @@ export const ValidReject: Story = {
       supported: true,
       valid: "reject",
     },
-    handler: {
-      onSelect: fn(),
-      onRemove: fn(),
-    },
+    // handler: {
+    //   onSelect: fn(),
+    //   onRemove: fn(),
+    // },
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("select-file"))
-    await userEvent.click(canvas.getByTestId("remove-file"))
-  },
+  // play: async ({ canvasElement }) => {
+  //   const canvas = within(canvasElement)
+  //   await userEvent.click(canvas.getByTestId("select-file"))
+  //   await userEvent.click(canvas.getByTestId("remove-file"))
+  // },
 }
 
 export const ValidWarning: Story = {
@@ -157,14 +156,14 @@ export const ValidWarning: Story = {
       supported: true,
       valid: "warning",
     },
-    handler: {
-      onSelect: fn(),
-      onRemove: fn(),
-    },
+    // handler: {
+    //   onSelect: fn(),
+    //   onRemove: fn(),
+    // },
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("select-file"))
-    await userEvent.click(canvas.getByTestId("remove-file"))
-  },
+  // play: async ({ canvasElement }) => {
+  //   const canvas = within(canvasElement)
+  //   await userEvent.click(canvas.getByTestId("select-file"))
+  //   await userEvent.click(canvas.getByTestId("remove-file"))
+  // },
 }

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { ImageFrame } from "./ImageFrame"
-import { ImageTile } from "../ImageTile"
 import { fn, userEvent, within } from "@storybook/test"
+import { ImageTile } from "../ImageTile"
+import { ImageFrame } from "./ImageFrame"
 
 const meta = {
   title: "Image/ImageFrame",
@@ -11,7 +11,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const children = <ImageTile src="sample/v.png" alt="example" />
+const children = <ImageTile src="sample/h.png" alt="example" />
 
 export const Default: Story = {
   args: {

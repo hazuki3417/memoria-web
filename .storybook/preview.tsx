@@ -1,44 +1,33 @@
-import type React from "react";
 import "@mantine/core/styles.css";
-import { useMantineColorScheme } from "@mantine/core";
-import { addons } from "@storybook/preview-api";
-import { useEffect } from "react";
-import { DARK_MODE_EVENT_NAME } from "storybook-dark-mode";
-import Providers from "@/app/Providers";
-import { theme } from "@/lib/theme";
+import "@mantine/notifications/styles.css";
+import type { Preview } from '@storybook/nextjs-vite';
+import { theme } from "../src//lib/theme";
+import { ThemeProvider } from "../src/providers/ThemeProvider";
 
-const channel = addons.getChannel();
 
-function ColorSchemeWrapper({ children }: { children: React.ReactNode }) {
-  const { setColorScheme } = useMantineColorScheme();
-  const handleColorScheme = (value: boolean) =>
-    setColorScheme(value ? "dark" : "light");
+const preview: Preview = {
+  parameters: {
+    controls: {
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/i,
+      },
+    },
 
-  useEffect(() => {
-    channel.on(DARK_MODE_EVENT_NAME, handleColorScheme);
-    return () => channel.off(DARK_MODE_EVENT_NAME, handleColorScheme);
-  }, [channel]);
+    a11y: {
+      // 'todo' - show a11y violations in the test UI only
+      // 'error' - fail CI on a11y violations
+      // 'off' - skip a11y checks entirely
+      test: 'todo'
+    }
+  },
+  decorators: [
+    (Story) => (
+      <ThemeProvider theme={theme}>
+        <Story />
+      </ThemeProvider>
+    )
+  ]
+};
 
-  return <>{children}</>;
-}
-
-export const decorators = [
-  (renderStory: any) => (
-    <ColorSchemeWrapper>{renderStory()}</ColorSchemeWrapper>
-  ),
-  (renderStory: any) => (
-    <Providers
-      theme={{
-        theme,
-        defaultColorScheme: "auto",
-      }}
-      auth={{
-        isSignIn: false,
-        user: undefined,
-      }}
-      option={{ graphql: { token: undefined } }}
-    >
-      {renderStory()}
-    </Providers>
-  ),
-];
+export default preview;

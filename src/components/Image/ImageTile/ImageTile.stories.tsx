@@ -11,14 +11,14 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
-    src: "sample/v.png",
+    src: "sample/h.png",
     alt: "default",
   },
 }
 
 export const VerticalImage: Story = {
   args: {
-    src: "sample/v.png",
+    src: "sample/h.png",
     alt: "vertical image",
   },
 }
