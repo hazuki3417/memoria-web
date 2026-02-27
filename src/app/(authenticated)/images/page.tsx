@@ -172,7 +172,7 @@ const Page = () => {
             </ImageLayout.Grid>
           </ImageLayout>
         </Tabs.Panel>
-        <Tabs.Panel value={TAB_FIELDS.group}>b panel</Tabs.Panel>
+        <Tabs.Panel value={TAB_FIELDS.group}>group panel</Tabs.Panel>
       </Tabs>
     </Box>
   );

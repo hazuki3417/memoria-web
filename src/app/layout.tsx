@@ -1,4 +1,3 @@
-import { Header } from "@/components";
 import { GetMeDocument, GetMeQuery } from "@/graphql";
 import { auth } from "@/lib/auth";
 import { getLang } from "@/lib/cookies/lang/getLang";
@@ -16,6 +15,7 @@ import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import type { Metadata } from "next";
+import { Header } from "./_components";
 import Head from "./Head";
 import Providers from "./Providers";
 
