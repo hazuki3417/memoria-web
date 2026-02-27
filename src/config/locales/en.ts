@@ -9,7 +9,7 @@ export const en: TranslationSchema = {
     download: "Download",
   },
   placeholder: {
-    tag: "Tag"
+    tag: "Tag",
   },
   label: {
     list: "List",

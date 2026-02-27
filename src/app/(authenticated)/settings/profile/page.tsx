@@ -1,11 +1,6 @@
 "use client";
 import { ActionPanel, FormButton } from "@/components";
 import { Form } from "@/components/Form";
-import {
-  ProfileInputForm,
-  profileInputFormDefaultValue,
-  profileInputFormSchema,
-} from "@/feature/setting/profile/ProfileInputForm";
 import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql";
 import {
   useFormInteractivity,
@@ -17,6 +12,11 @@ import { createFormSubmitHandler } from "@/lib";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Space } from "@mantine/core";
 import { FormProvider, useForm } from "react-hook-form";
+import {
+  ProfileInputForm,
+  profileInputFormDefaultValue,
+  profileInputFormSchema,
+} from "./_components";
 
 const Page = () => {
   const query = useGetUserProfileQuery();

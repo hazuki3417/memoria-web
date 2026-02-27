@@ -8,11 +8,11 @@ export type TranslationSchema = {
     download: string;
   };
   placeholder: {
-    tag: string
-  },
+    tag: string;
+  };
   label: {
-    list: string,
-    group: string,
+    list: string;
+    group: string;
     filter: string;
     bulk: string;
   };

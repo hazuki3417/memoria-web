@@ -119,8 +119,11 @@ const Page = () => {
             </ActionPanel.Left>
             <ActionPanel.Right>
               <Flex align="center" gap="xs">
-                <LinkButton size="xs" leftSection={<IconLibraryPlus size={16} />}
-                  href={resolveUri("/images/new")}>
+                <LinkButton
+                  size="xs"
+                  leftSection={<IconLibraryPlus size={16} />}
+                  href={resolveUri("/images/new")}
+                >
                   {t("button.new")}
                 </LinkButton>
                 <SegmentedControl

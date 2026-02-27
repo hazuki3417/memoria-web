@@ -1,7 +1,7 @@
 "use client";
-import { SideMenu } from "@/feature/setting/SideMenu";
 import { Box, Flex } from "@mantine/core";
 import { usePathname } from "next/navigation";
+import { SideMenu } from "./_components";
 
 type LayoutProps = {
   children: React.ReactNode;

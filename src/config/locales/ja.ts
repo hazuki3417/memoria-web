@@ -9,7 +9,7 @@ export const ja: TranslationSchema = {
     download: "ダウンロード",
   },
   placeholder: {
-    tag: "タグ"
+    tag: "タグ",
   },
   label: {
     list: "リスト",
