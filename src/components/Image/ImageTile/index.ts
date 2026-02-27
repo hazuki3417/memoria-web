@@ -1,1 +1,1 @@
-export * from "./ImageTile";
+export * from "./ImageTile"

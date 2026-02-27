@@ -1,14 +1,14 @@
-"use client";
-import { Auth } from "@/components/Auth/Csr";
-import { CustomModal } from "@/components/Modal/CustomModal/CustomModal";
-import { ImageDetailModal } from "@/components/Modal/ImageDetailModal";
-import { useDisclosure } from "@/hooks";
-import { Box } from "@mantine/core";
-import { useTranslation } from "react-i18next";
+"use client"
+import { Auth } from "@/components/Auth/Csr"
+import { CustomModal } from "@/components/Modal/CustomModal/CustomModal"
+import { ImageDetailModal } from "@/components/Modal/ImageDetailModal"
+import { useDisclosure } from "@/hooks"
+import { Box } from "@mantine/core"
+import { useTranslation } from "react-i18next"
 
 const Page = () => {
-  const modal = useDisclosure({ opend: false });
-  const { t } = useTranslation();
+  const modal = useDisclosure({ opend: false })
+  const { t } = useTranslation()
   return (
     <Box>
       <Auth>
@@ -46,6 +46,6 @@ const Page = () => {
         />
       </CustomModal>
     </Box>
-  );
-};
-export default Page;
+  )
+}
+export default Page

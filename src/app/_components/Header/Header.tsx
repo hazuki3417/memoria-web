@@ -1,18 +1,18 @@
-"use client";
-import { Box, Flex } from "@mantine/core";
-import type { ComponentProps } from "react";
-import { styles } from "./styles";
-import React from "react";
+"use client"
+import { Box, Flex } from "@mantine/core"
+import type { ComponentProps } from "react"
+import { styles } from "./styles"
+import React from "react"
 
-import { LangSelect } from "./LangSelect";
-import { Auth } from "@/components/Auth/Csr";
-import { UserMenu } from "./UserMenu";
-import { SiginInButton } from "./SignInButton";
+import { LangSelect } from "./LangSelect"
+import { Auth } from "@/components/Auth/Csr"
+import { UserMenu } from "./UserMenu"
+import { SiginInButton } from "./SignInButton"
 
-export type HeaderProps = {};
+export type HeaderProps = {}
 
 export const Header = (props: HeaderProps) => {
-  const { ...rest } = props;
+  const { ...rest } = props
 
   return (
     <Box
@@ -42,5 +42,5 @@ export const Header = (props: HeaderProps) => {
         </Auth>
       </Flex>
     </Box>
-  );
-};
+  )
+}

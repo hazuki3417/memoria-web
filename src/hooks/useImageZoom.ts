@@ -1,31 +1,31 @@
-import { numberReducer } from "@/reducers";
-import { useCallback, useMemo, useReducer } from "react";
+import { numberReducer } from "@/reducers"
+import { useCallback, useMemo, useReducer } from "react"
 
 export type UseImageZoomState = {
-  level: number; // 倍率
-  scale: number; // スケール
+  level: number // 倍率
+  scale: number // スケール
   initial: {
-    level: number;
-  };
+    level: number
+  }
   config: {
-    step: number;
-    min: number;
-    max: number;
-  };
-};
+    step: number
+    min: number
+    max: number
+  }
+}
 
-export type UseImageZoomOption = Pick<UseImageZoomState, "level" | "config">;
+export type UseImageZoomOption = Pick<UseImageZoomState, "level" | "config">
 
 export interface UseImageZoomHandler {
-  zoomIn: () => void;
-  zoomOut: () => void;
-  set: (level: number) => void;
-  reset: () => void;
+  zoomIn: () => void
+  zoomOut: () => void
+  set: (level: number) => void
+  reset: () => void
 }
 
 export interface UseImageZoom {
-  state: UseImageZoomState;
-  handler: UseImageZoomHandler;
+  state: UseImageZoomState
+  handler: UseImageZoomHandler
 }
 
 export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
@@ -33,36 +33,36 @@ export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
     current: { value: option.level },
     initial: { value: option.level },
     config: option.config,
-  });
+  })
 
   // NOTE: zoom levelを監視して常にscaleを計算する
   const scale = useMemo(() => {
-    return state.current.value / 100;
-  }, [state.current.value]);
+    return state.current.value / 100
+  }, [state.current.value])
 
   const zoomIn = useCallback(() => {
-    const candidate = state.current.value + state.config.step;
-    const clamped = clamp(candidate, option.config.min, option.config.max);
-    dispatch({ type: "set", value: clamped });
-  }, [state.current.value, option.config]);
+    const candidate = state.current.value + state.config.step
+    const clamped = clamp(candidate, option.config.min, option.config.max)
+    dispatch({ type: "set", value: clamped })
+  }, [state.current.value, option.config])
 
   const zoomOut = useCallback(() => {
-    const candidate = state.current.value - state.config.step;
-    const clamped = clamp(candidate, option.config.min, option.config.max);
-    dispatch({ type: "set", value: clamped });
-  }, [state.current.value, option.config]);
+    const candidate = state.current.value - state.config.step
+    const clamped = clamp(candidate, option.config.min, option.config.max)
+    dispatch({ type: "set", value: clamped })
+  }, [state.current.value, option.config])
 
   const set = useCallback(
     (level: number) => {
-      const clamped = clamp(level, option.config.min, option.config.max);
-      dispatch({ type: "set", value: clamped });
+      const clamped = clamp(level, option.config.min, option.config.max)
+      dispatch({ type: "set", value: clamped })
     },
     [option.config],
-  );
+  )
 
   const reset = useCallback(() => {
-    dispatch({ type: "reset" });
-  }, []);
+    dispatch({ type: "reset" })
+  }, [])
 
   return {
     state: {
@@ -79,9 +79,9 @@ export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
       set,
       reset,
     },
-  };
-};
+  }
+}
 
 const clamp = (level: number, min: number, max: number): number => {
-  return Math.max(min, Math.min(level, max));
-};
+  return Math.max(min, Math.min(level, max))
+}

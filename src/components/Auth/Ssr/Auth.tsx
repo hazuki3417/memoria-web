@@ -1,21 +1,21 @@
-import { auth } from "@/lib/auth";
-import React from "react";
+import { auth } from "@/lib/auth"
+import React from "react"
 
 export interface AuthProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export const Auth = async (props: AuthProps) => {
-  const { children } = props;
-  return <>{children}</>;
-};
+  const { children } = props
+  return <>{children}</>
+}
 
 Auth.SignedIn = async ({ children }: { children: React.ReactNode }) => {
-  const session = await auth.getSession();
-  return session?.user ? <>{children}</> : null;
-};
+  const session = await auth.getSession()
+  return session?.user ? <>{children}</> : null
+}
 
 Auth.SignedOut = async ({ children }: { children: React.ReactNode }) => {
-  const session = await auth.getSession();
-  return !session?.user ? <>{children}</> : null;
-};
+  const session = await auth.getSession()
+  return !session?.user ? <>{children}</> : null
+}

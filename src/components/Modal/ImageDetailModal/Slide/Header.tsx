@@ -1,18 +1,18 @@
-import { ActionIcon, Box, type BoxProps } from "@mantine/core";
-import { IconX } from "@tabler/icons-react";
-import type React from "react";
-import { styles } from "./styles";
+import { ActionIcon, Box, type BoxProps } from "@mantine/core"
+import { IconX } from "@tabler/icons-react"
+import type React from "react"
+import { styles } from "./styles"
 
 export type HeaderHandler = {
-  onClose?: React.MouseEventHandler<HTMLButtonElement>;
-};
+  onClose?: React.MouseEventHandler<HTMLButtonElement>
+}
 
 export interface HeaderProps extends BoxProps {
-  handler?: HeaderHandler;
+  handler?: HeaderHandler
 }
 
 export const Header = (props: HeaderProps) => {
-  const { handler } = props;
+  const { handler } = props
   return (
     <Box
       style={(theme) => ({
@@ -49,5 +49,5 @@ export const Header = (props: HeaderProps) => {
         </ActionIcon>
       </Box>
     </Box>
-  );
-};
+  )
+}

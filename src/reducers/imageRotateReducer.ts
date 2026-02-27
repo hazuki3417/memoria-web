@@ -1,22 +1,22 @@
-import { ActionType, assertUnreachableActionType } from "./util";
+import { ActionType, assertUnreachableActionType } from "./util"
 
-export type ImageRotateActionType = "left" | "right" | "reset";
+export type ImageRotateActionType = "left" | "right" | "reset"
 export interface ImageRotateState {
   current: {
-    angle: number;
-  };
+    angle: number
+  }
   initial: {
-    angle: number;
-  };
+    angle: number
+  }
   meta: {
-    action: ActionType<ImageRotateActionType>;
-  };
+    action: ActionType<ImageRotateActionType>
+  }
 }
 
 export type ImageRotateAction =
   | { type: "left" }
   | { type: "right" }
-  | { type: "reset" };
+  | { type: "reset" }
 
 export const imageRotateReducer = (
   state: ImageRotateState,
@@ -28,20 +28,20 @@ export const imageRotateReducer = (
         ...state,
         current: { angle: state.current.angle - 90 },
         meta: { action: "left" },
-      };
+      }
     case "right":
       return {
         ...state,
         current: { angle: state.current.angle + 90 },
         meta: { action: "left" },
-      };
+      }
     case "reset":
       return {
         ...state,
         current: { angle: state.initial.angle },
         meta: { action: "reset" },
-      };
+      }
     default:
-      throw assertUnreachableActionType(action);
+      throw assertUnreachableActionType(action)
   }
-};
+}

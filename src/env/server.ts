@@ -1,6 +1,6 @@
-import "server-only";
-import { z } from "zod";
-import { sharedEnv, SharedEnvSchema } from "./shared";
+import "server-only"
+import { z } from "zod"
+import { sharedEnv, SharedEnvSchema } from "./shared"
 
 const ServerEnvSchema = z
   .object({
@@ -15,7 +15,7 @@ const ServerEnvSchema = z
     AUTH0_SCOPE: z.string().optional(),
     AUTH0_AUDIENCE: z.string().optional(),
   })
-  .extend(SharedEnvSchema.shape);
+  .extend(SharedEnvSchema.shape)
 
 export const serverEnv = ServerEnvSchema.parse({
   ...sharedEnv,
@@ -29,4 +29,4 @@ export const serverEnv = ServerEnvSchema.parse({
   AUTH0_SECRET: process.env.AUTH0_SECRET,
   AUTH0_SCOPE: process.env.AUTH0_SCOPE,
   AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE,
-});
+})

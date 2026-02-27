@@ -9,9 +9,9 @@ const file = (file: File) => {
       tooLarge: (max: number): boolean => file.size <= max,
       tooSmall: (min: number): boolean => file.size >= min,
     },
-  };
-};
+  }
+}
 
 export const validate = {
   file,
-};
+}

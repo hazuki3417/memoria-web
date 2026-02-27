@@ -1,4 +1,4 @@
-import { RouteNodes } from "@/types/routes";
+import { RouteNodes } from "@/types/routes"
 
 export const images = {
   images: {
@@ -15,4 +15,4 @@ export const images = {
       },
     },
   },
-} as const satisfies RouteNodes;
+} as const satisfies RouteNodes

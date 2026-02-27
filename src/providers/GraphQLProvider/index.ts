@@ -1,1 +1,1 @@
-export * from "./GraphQLProvider";
+export * from "./GraphQLProvider"

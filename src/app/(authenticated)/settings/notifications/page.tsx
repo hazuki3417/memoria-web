@@ -1,7 +1,7 @@
-import { Box } from "@mantine/core";
+import { Box } from "@mantine/core"
 
 const Page = async () => {
-  return <Box>notifications</Box>;
-};
+  return <Box>notifications</Box>
+}
 
-export default Page;
+export default Page

@@ -1,23 +1,23 @@
-"use client";
-import { useLang } from "@/lib/cookies/lang/useLang";
-import { Combobox, InputBase, Text, useCombobox } from "@mantine/core";
-import { IconLanguage } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+"use client"
+import { useLang } from "@/lib/cookies/lang/useLang"
+import { Combobox, InputBase, Text, useCombobox } from "@mantine/core"
+import { IconLanguage } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
+import { useCallback, useMemo } from "react"
 
-const langs = ["JA", "EN"];
+const langs = ["JA", "EN"]
 
 export interface LangSelectProps {}
 
 export const LangSelect = (props: LangSelectProps) => {
-  const {} = props;
+  const {} = props
 
-  const router = useRouter();
+  const router = useRouter()
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
-  });
+  })
 
-  const lang = useLang();
+  const lang = useLang()
 
   const options = useMemo(() => {
     return langs.map((code) => (
@@ -28,17 +28,17 @@ export const LangSelect = (props: LangSelectProps) => {
       >
         <Text size="xs">{code}</Text>
       </Combobox.Option>
-    ));
-  }, [langs]);
+    ))
+  }, [langs])
 
   const onOptionSubmit = useCallback(
     (value: string) => {
-      lang.handler.set(value.toLowerCase());
-      combobox.closeDropdown();
-      router.refresh();
+      lang.handler.set(value.toLowerCase())
+      combobox.closeDropdown()
+      router.refresh()
     },
     [combobox],
-  );
+  )
 
   return (
     <Combobox size="xs" store={combobox} onOptionSubmit={onOptionSubmit}>
@@ -58,5 +58,5 @@ export const LangSelect = (props: LangSelectProps) => {
         <Combobox.Options>{options}</Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>
-  );
-};
+  )
+}

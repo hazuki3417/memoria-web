@@ -1,21 +1,21 @@
-import { serverEnv } from "@/env/server";
-import { NextRequest } from "next/server";
+import { serverEnv } from "@/env/server"
+import { NextRequest } from "next/server"
 
-export const runtime = "nodejs";
+export const runtime = "nodejs"
 
 type NodeFetchInit = RequestInit & {
-  duplex?: "half";
-};
+  duplex?: "half"
+}
 
 export async function POST(request: NextRequest) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30_000); // 30秒タイムアウト
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30_000) // 30秒タイムアウト
 
   try {
-    const headers = new Headers(request.headers);
+    const headers = new Headers(request.headers)
 
     // Host は upstream 用に削除（安全対策）
-    headers.delete("host");
+    headers.delete("host")
 
     const upstream = await fetch(serverEnv.API_URI, {
       method: "POST",
@@ -23,19 +23,19 @@ export async function POST(request: NextRequest) {
       body: request.body,
       duplex: "half",
       signal: controller.signal,
-    } as NodeFetchInit);
+    } as NodeFetchInit)
 
-    clearTimeout(timeout);
+    clearTimeout(timeout)
 
     // レスポンスを完全透過
     return new Response(upstream.body, {
       status: upstream.status,
       headers: upstream.headers,
-    });
+    })
   } catch (error) {
-    clearTimeout(timeout);
+    clearTimeout(timeout)
 
-    console.error("GraphQL proxy error:", error);
+    console.error("GraphQL proxy error:", error)
 
     return new Response(
       JSON.stringify({
@@ -45,6 +45,6 @@ export async function POST(request: NextRequest) {
         status: 502,
         headers: { "content-type": "application/json" },
       },
-    );
+    )
   }
 }

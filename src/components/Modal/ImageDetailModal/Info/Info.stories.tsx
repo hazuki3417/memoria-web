@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn, userEvent, within } from "@storybook/test";
-import { Info } from "./Info";
+import type { Meta, StoryObj } from "@storybook/react"
+import { fn, userEvent, within } from "@storybook/test"
+import { Info } from "./Info"
 
 const meta = {
   title: "Modal/ImageDetailModal/Info",
   component: Info,
-} satisfies Meta<typeof Info>;
+} satisfies Meta<typeof Info>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
@@ -31,9 +31,9 @@ export const Default: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("close-info"));
-    await userEvent.click(canvas.getByTestId("edit-info"));
-    await userEvent.click(canvas.getByTestId("delete-image"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("close-info"))
+    await userEvent.click(canvas.getByTestId("edit-info"))
+    await userEvent.click(canvas.getByTestId("delete-image"))
   },
-};
+}

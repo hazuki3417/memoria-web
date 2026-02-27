@@ -1,30 +1,30 @@
-"use client";
-import { ActionPanel, FormButton } from "@/components";
-import { Form } from "@/components/Form";
-import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql";
+"use client"
+import { ActionPanel, FormButton } from "@/components"
+import { Form } from "@/components/Form"
+import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql"
 import {
   useFormInteractivity,
   useMutationNotifier,
   useQueryNotifier,
   useSetFormDataFromQuery,
-} from "@/hooks";
-import { createFormSubmitHandler } from "@/lib";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Space } from "@mantine/core";
-import { FormProvider, useForm } from "react-hook-form";
+} from "@/hooks"
+import { createFormSubmitHandler } from "@/lib"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Space } from "@mantine/core"
+import { FormProvider, useForm } from "react-hook-form"
 import {
   ProfileInputForm,
   profileInputFormDefaultValue,
   profileInputFormSchema,
-} from "./_components";
+} from "./_components"
 
 const Page = () => {
-  const query = useGetUserProfileQuery();
-  const [updateProfileMutation, mutation] = useUpdateProfileMutation();
+  const query = useGetUserProfileQuery()
+  const [updateProfileMutation, mutation] = useUpdateProfileMutation()
 
-  useQueryNotifier(query);
-  useMutationNotifier(mutation);
-  const interactivity = useFormInteractivity({ read: query, write: mutation });
+  useQueryNotifier(query)
+  useMutationNotifier(mutation)
+  const interactivity = useFormInteractivity({ read: query, write: mutation })
 
   const form = useForm({
     resolver: zodResolver(profileInputFormSchema),
@@ -32,15 +32,15 @@ const Page = () => {
     defaultValues: {
       ...profileInputFormDefaultValue,
     },
-  });
+  })
 
   useSetFormDataFromQuery({
     query,
     form,
     selector: (value) => {
-      return { ...value.me.profile };
+      return { ...value.me.profile }
     },
-  });
+  })
 
   const submit = createFormSubmitHandler(form, (value) => {
     return updateProfileMutation({
@@ -52,8 +52,8 @@ const Page = () => {
             "https://lh3.googleusercontent.com/a/ACg8ocKIWVfiXpZwpTYPahJMVMWgY4FXh3_tEC_FVoSCPrb0jnprqSxr=s96-c",
         },
       },
-    });
-  });
+    })
+  })
 
   return (
     <Form>
@@ -78,7 +78,7 @@ const Page = () => {
         </FormProvider>
       </Form.Container>
     </Form>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

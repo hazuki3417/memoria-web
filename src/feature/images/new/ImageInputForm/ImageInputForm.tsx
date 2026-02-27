@@ -1,39 +1,39 @@
-import { imageConfig } from "@/config";
-import { Grid, Group, Radio, TagsInput, Text } from "@mantine/core";
-import { Control, Controller } from "react-hook-form";
-import { z } from "zod";
+import { imageConfig } from "@/config"
+import { Grid, Group, Radio, TagsInput, Text } from "@mantine/core"
+import { Control, Controller } from "react-hook-form"
+import { z } from "zod"
 
 const styles = {
   col: {
     display: "flex",
     alignItems: "center",
   } as React.CSSProperties,
-};
+}
 
 export const VISIBILITY = {
   PUBLIC: "public",
   PRIVATE: "private",
-};
+}
 
 export const imageFormSchema = z.object({
   visibility: z.enum([VISIBILITY.PUBLIC, VISIBILITY.PRIVATE]),
   tags: z.array(z.string()).max(imageConfig.tag.max),
-});
+})
 
-export type ImageInputFormSchema = z.infer<typeof imageFormSchema>;
+export type ImageInputFormSchema = z.infer<typeof imageFormSchema>
 
 export const imageFormDefaultValue: ImageInputFormSchema = {
   visibility: VISIBILITY.PRIVATE,
   tags: [],
-};
+}
 
 export interface ImageInputFormProps {
-  control: Control<any>;
-  prefix: string;
+  control: Control<any>
+  prefix: string
 }
 
 export const ImageInputForm = (props: ImageInputFormProps) => {
-  const { control, prefix } = props;
+  const { control, prefix } = props
 
   return (
     <Grid>
@@ -75,5 +75,5 @@ export const ImageInputForm = (props: ImageInputFormProps) => {
         />
       </Grid.Col>
     </Grid>
-  );
-};
+  )
+}

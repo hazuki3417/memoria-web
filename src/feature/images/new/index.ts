@@ -1,3 +1,3 @@
-export * from "./FormSwitcher";
-export * from "./ImageDropForm";
-export * from "./ImageInputForm";
+export * from "./FormSwitcher"
+export * from "./ImageDropForm"
+export * from "./ImageInputForm"

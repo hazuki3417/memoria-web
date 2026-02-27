@@ -1,31 +1,31 @@
-import { PreviewImageBox } from "@/feature/PreviewImageBox";
-import { Box, Input, InputError } from "@mantine/core";
-import React from "react";
-import { AddImageBox } from "./AddImageBox";
-import classes from "./ImageDropForm.module.css";
+import { PreviewImageBox } from "@/feature/PreviewImageBox"
+import { Box, Input, InputError } from "@mantine/core"
+import React from "react"
+import { AddImageBox } from "./AddImageBox"
+import classes from "./ImageDropForm.module.css"
 
 export type ImageDropFormUi = {
-  valid?: "idle" | "accept" | "warning" | "reject";
-  disabled?: boolean;
-};
+  valid?: "idle" | "accept" | "warning" | "reject"
+  disabled?: boolean
+}
 
 export interface ImageDropFormProps {
-  children: React.ReactNode;
-  ui: ImageDropFormUi;
-  error?: React.ReactNode;
-  onFileDrop?: React.DragEventHandler<HTMLDivElement>;
+  children: React.ReactNode
+  ui: ImageDropFormUi
+  error?: React.ReactNode
+  onFileDrop?: React.DragEventHandler<HTMLDivElement>
 }
 
 export const ImageDropForm = (props: ImageDropFormProps) => {
-  const { children, ui, error, onFileDrop } = props;
+  const { children, ui, error, onFileDrop } = props
 
   const dragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  };
+    event.preventDefault()
+  }
 
   const disableFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  };
+    event.preventDefault()
+  }
 
   return (
     <Input.Wrapper>
@@ -53,8 +53,8 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
       </Box>
       {error && <InputError>{error}</InputError>}
     </Input.Wrapper>
-  );
-};
+  )
+}
 
-ImageDropForm.AddImageBox = AddImageBox;
-ImageDropForm.PreviewImageBox = PreviewImageBox;
+ImageDropForm.AddImageBox = AddImageBox
+ImageDropForm.PreviewImageBox = PreviewImageBox

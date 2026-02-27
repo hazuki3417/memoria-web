@@ -1,23 +1,23 @@
-import { Box, type BoxProps, UnstyledButton } from "@mantine/core";
+import { Box, type BoxProps, UnstyledButton } from "@mantine/core"
 import {
   IconChevronCompactLeft,
   IconChevronCompactRight,
-} from "@tabler/icons-react";
-import type React from "react";
-import { styles } from "./styles";
+} from "@tabler/icons-react"
+import type React from "react"
+import { styles } from "./styles"
 
 export type BodyHandler = {
-  onPrev?: React.MouseEventHandler<HTMLButtonElement>;
-  onNext?: React.MouseEventHandler<HTMLButtonElement>;
-};
+  onPrev?: React.MouseEventHandler<HTMLButtonElement>
+  onNext?: React.MouseEventHandler<HTMLButtonElement>
+}
 
 export interface BodyProps extends BoxProps {
-  children: React.ReactNode;
-  handler?: BodyHandler;
+  children: React.ReactNode
+  handler?: BodyHandler
 }
 
 export const Body = (props: BodyProps) => {
-  const { children, handler } = props;
+  const { children, handler } = props
   return (
     <Box
       style={(theme) => ({
@@ -63,5 +63,5 @@ export const Body = (props: BodyProps) => {
         <IconChevronCompactRight />
       </UnstyledButton>
     </Box>
-  );
-};
+  )
+}

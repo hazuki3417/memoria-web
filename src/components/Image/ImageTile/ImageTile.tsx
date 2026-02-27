@@ -1,13 +1,13 @@
-import { Image, Box } from "@mantine/core";
-import React from "react";
+import { Image, Box } from "@mantine/core"
+import React from "react"
 
 export interface ImageTileProps {
-  src?: string;
-  alt?: string;
+  src?: string
+  alt?: string
 }
 
 export const ImageTile = (props: ImageTileProps) => {
-  const { src, alt } = props;
+  const { src, alt } = props
 
   /**
    * 画像本体はポインタによるイベントをすべて無効化する
@@ -41,5 +41,5 @@ export const ImageTile = (props: ImageTileProps) => {
         })}
       />
     </Box>
-  );
-};
+  )
+}

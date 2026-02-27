@@ -1,11 +1,11 @@
-import { LoadingOverlay } from "@mantine/core";
+import { LoadingOverlay } from "@mantine/core"
 
 export interface FormLoadingOverlayProps {
-  visible: boolean;
+  visible: boolean
 }
 
 export const FormLoadingOverlay = (props: FormLoadingOverlayProps) => {
-  const { visible } = props;
+  const { visible } = props
   return (
     <LoadingOverlay
       visible={visible}
@@ -13,5 +13,5 @@ export const FormLoadingOverlay = (props: FormLoadingOverlayProps) => {
       overlayProps={{ radius: "sm" }}
       loaderProps={{ color: "blue", type: "oval" }}
     />
-  );
-};
+  )
+}

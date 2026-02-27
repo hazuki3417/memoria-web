@@ -1,12 +1,12 @@
-import { Box } from "@mantine/core";
-import React from "react";
+import { Box } from "@mantine/core"
+import React from "react"
 
 export interface GridProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export const Grid = (props: GridProps) => {
-  const { children } = props;
+  const { children } = props
   return (
     <Box
       style={{
@@ -19,5 +19,5 @@ export const Grid = (props: GridProps) => {
     >
       {children}
     </Box>
-  );
-};
+  )
+}

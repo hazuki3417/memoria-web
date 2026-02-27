@@ -1,64 +1,64 @@
-import { List, Paper, Stack } from "@mantine/core";
-import { IconPhotoPlus } from "@tabler/icons-react";
-import classes from "./AddImageBox.module.css";
-import React, { useCallback, useRef } from "react";
-import { format } from "@/lib";
-import { viewConfig } from "@/config";
+import { List, Paper, Stack } from "@mantine/core"
+import { IconPhotoPlus } from "@tabler/icons-react"
+import classes from "./AddImageBox.module.css"
+import React, { useCallback, useRef } from "react"
+import { format } from "@/lib"
+import { viewConfig } from "@/config"
 
 export type AddImageBoxUi = {
-  valid?: "idle" | "accept" | "warning" | "reject";
-  disabled?: boolean;
-};
+  valid?: "idle" | "accept" | "warning" | "reject"
+  disabled?: boolean
+}
 
 export type AddImageBoxConfig = {
   count: {
-    max: number;
-  };
+    max: number
+  }
   size: {
-    max: number;
-    total: number;
-  };
-  type: string[];
-};
+    max: number
+    total: number
+  }
+  type: string[]
+}
 
 export type AddImageBoxHandler = {
-  onFileSelect?: (files: FileList | null) => void;
-};
+  onFileSelect?: (files: FileList | null) => void
+}
 
 export interface AddImageBoxProps {
-  config: AddImageBoxConfig;
-  handler?: AddImageBoxHandler;
-  ui?: AddImageBoxUi;
+  config: AddImageBoxConfig
+  handler?: AddImageBoxHandler
+  ui?: AddImageBoxUi
 }
 
 export const AddImageBox = (props: AddImageBoxProps) => {
-  const { config, handler, ui } = props;
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { config, handler, ui } = props
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const click = () => {
     if (ui?.disabled) {
-      return;
+      return
     }
 
     if (ui?.valid === "reject") {
-      return;
+      return
     }
 
     // 間接的にinput type="file"のclickイベントを発火させる
-    inputRef.current?.click();
-  };
+    inputRef.current?.click()
+  }
 
   const fileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      handler?.onFileSelect?.(event.target.files);
+      handler?.onFileSelect?.(event.target.files)
     },
     [handler?.onFileSelect],
-  );
+  )
 
   const size = format.file.size(config.size.max, {
     decimals: 0,
     unit: viewConfig.file.size.unit,
-  });
+  })
 
   return (
     <Paper
@@ -95,5 +95,5 @@ export const AddImageBox = (props: AddImageBoxProps) => {
         </List>
       </Stack>
     </Paper>
-  );
-};
+  )
+}

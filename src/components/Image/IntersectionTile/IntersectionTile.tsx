@@ -1,15 +1,15 @@
-import { Box, LoadingOverlay } from "@mantine/core";
-import React, { forwardRef } from "react";
+import { Box, LoadingOverlay } from "@mantine/core"
+import React, { forwardRef } from "react"
 
 export interface IntersectionTileProps {
-  visible: boolean;
+  visible: boolean
 }
 
 export const IntersectionTile = forwardRef<
   HTMLDivElement,
   IntersectionTileProps
 >((props, ref) => {
-  const { visible } = props;
+  const { visible } = props
 
   return (
     <Box
@@ -33,5 +33,5 @@ export const IntersectionTile = forwardRef<
         loaderProps={{ children: "Loading..." }}
       />
     </Box>
-  );
-});
+  )
+})

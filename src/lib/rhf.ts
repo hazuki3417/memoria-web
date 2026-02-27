@@ -1,19 +1,19 @@
-import { TFunction } from "i18next";
-import { TranslationSchemaKey } from "./type";
-import { ControllerFieldState } from "react-hook-form";
-import { UseFormReturn, FieldValues } from "react-hook-form";
+import { TFunction } from "i18next"
+import { TranslationSchemaKey } from "./type"
+import { ControllerFieldState } from "react-hook-form"
+import { UseFormReturn, FieldValues } from "react-hook-form"
 
 const fieldState = (fieldState: ControllerFieldState) => {
   const match = (key: TranslationSchemaKey) => {
-    return fieldState.error?.message === key;
-  };
+    return fieldState.error?.message === key
+  }
 
   const resolver = (t: TFunction) => {
     if (fieldState.error?.message === undefined) {
-      return "";
+      return ""
     }
-    return t(fieldState.error.message as TranslationSchemaKey);
-  };
+    return t(fieldState.error.message as TranslationSchemaKey)
+  }
 
   return {
     error: {
@@ -22,12 +22,12 @@ const fieldState = (fieldState: ControllerFieldState) => {
         resolver,
       },
     },
-  };
-};
+  }
+}
 
 export const rhf = {
   fieldState,
-};
+}
 
 /**
  * createFormSubmitHandler
@@ -40,10 +40,10 @@ export const createFormSubmitHandler = <TFormValues extends FieldValues>(
 ) => {
   return form.handleSubmit(async (values) => {
     try {
-      await execute(values);
+      await execute(values)
     } catch (err) {
-      console.error(err);
+      console.error(err)
       // 通知はuseMutationNotifierなどで行う前提なのでここではログ出力のみ行う
     }
-  });
-};
+  })
+}

@@ -1,33 +1,33 @@
-import { routes } from "@/constants/routes";
-import { RouteNode, RouteNodes } from "@/types/routes";
-import { isParamSegment } from "./url";
+import { routes } from "@/constants/routes"
+import { RouteNode, RouteNodes } from "@/types/routes"
+import { isParamSegment } from "./url"
 
 export const resoluveRoutes = (path: string) => {
-  const segments = path.split("/").filter(Boolean);
+  const segments = path.split("/").filter(Boolean)
 
-  const result: RouteNode[] = [];
+  const result: RouteNode[] = []
 
-  let currentNodes: Readonly<RouteNodes> | undefined = routes;
+  let currentNodes: Readonly<RouteNodes> | undefined = routes
 
   for (const segment of segments) {
-    if (!currentNodes) break;
+    if (!currentNodes) break
 
     const node = Object.values(currentNodes).find((node) => {
       // 完全一致
-      if (node.segment === segment) return true;
+      if (node.segment === segment) return true
 
       // パスパラメータ（:id など）
-      if (isParamSegment(node.segment)) return true;
+      if (isParamSegment(node.segment)) return true
 
-      return false;
-    });
+      return false
+    })
 
-    if (!node) break;
+    if (!node) break
 
-    result.push(node);
+    result.push(node)
 
-    currentNodes = node.children as Readonly<RouteNodes> | undefined;
+    currentNodes = node.children as Readonly<RouteNodes> | undefined
   }
 
-  return result;
-};
+  return result
+}

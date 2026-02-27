@@ -1,4 +1,4 @@
-import { TranslationSchema } from "./type";
+import { TranslationSchema } from "./type"
 
 export const ja: TranslationSchema = {
   button: {
@@ -38,4 +38,4 @@ export const ja: TranslationSchema = {
       tooManyFiles: "アップロードできるファイルは最大 {{max}} 件までです。",
     },
   },
-};
+}

@@ -8,4 +8,4 @@ export const langConfig = {
   cookie: {
     name: "lang",
   },
-};
+}

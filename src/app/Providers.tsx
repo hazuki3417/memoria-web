@@ -1,6 +1,6 @@
-"use client";
-import { User as AppUser } from "@/graphql";
-import { CreateGraphQLOption } from "@/lib/graphql/type";
+"use client"
+import { User as AppUser } from "@/graphql"
+import { CreateGraphQLOption } from "@/lib/graphql/type"
 import {
   AuthContext,
   AuthProvider,
@@ -8,23 +8,23 @@ import {
   LangProvider,
   ThemeProvider,
   ThemeProviderProps,
-} from "@/providers";
-import type React from "react";
-import { memo } from "react";
+} from "@/providers"
+import type React from "react"
+import { memo } from "react"
 
 export interface ProvidersProps {
-  theme: ThemeProviderProps;
-  auth: AuthContext;
+  theme: ThemeProviderProps
+  auth: AuthContext
   option: {
-    graphql: CreateGraphQLOption;
-  };
-  children: React.ReactNode;
+    graphql: CreateGraphQLOption
+  }
+  children: React.ReactNode
 }
 
-const MemoGraphQLProvider = memo(GraphQLProvider);
+const MemoGraphQLProvider = memo(GraphQLProvider)
 
 const Providers = (props: ProvidersProps) => {
-  const { theme, auth, option, children } = props;
+  const { theme, auth, option, children } = props
   return (
     <ThemeProvider {...theme}>
       <LangProvider>
@@ -35,6 +35,6 @@ const Providers = (props: ProvidersProps) => {
         </AuthProvider>
       </LangProvider>
     </ThemeProvider>
-  );
-};
-export default Providers;
+  )
+}
+export default Providers

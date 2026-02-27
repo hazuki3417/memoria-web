@@ -1,68 +1,68 @@
-import { useDisclosure } from "@/hooks";
-import { Box, type BoxProps } from "@mantine/core";
-import { AnimatePresence, motion } from "framer-motion";
-import { Info, InfoHandler, InfoPayload } from "./Info/Info";
-import { Slide, SlideHandler, SlidePayload } from "./Slide";
-import React, { useCallback, useMemo } from "react";
-import { Preview } from "./Preview";
-import { useImageRotate } from "@/hooks/useImageRotate";
-import { useImageZoom } from "@/hooks/useImageZoom";
+import { useDisclosure } from "@/hooks"
+import { Box, type BoxProps } from "@mantine/core"
+import { AnimatePresence, motion } from "framer-motion"
+import { Info, InfoHandler, InfoPayload } from "./Info/Info"
+import { Slide, SlideHandler, SlidePayload } from "./Slide"
+import React, { useCallback, useMemo } from "react"
+import { Preview } from "./Preview"
+import { useImageRotate } from "@/hooks/useImageRotate"
+import { useImageZoom } from "@/hooks/useImageZoom"
 
 export type ImageDetailModalPayload = {
-  slide: SlidePayload;
-  info: InfoPayload;
-};
+  slide: SlidePayload
+  info: InfoPayload
+}
 
 export type ImageDetailModalHandler = Omit<
   SlideHandler,
   "onInfo" | "onZoomIn" | "onZoomOut" | "onZoomChange"
 > &
-  Omit<InfoHandler, "onClose"> & {};
+  Omit<InfoHandler, "onClose"> & {}
 
 export interface ImageDetailModalProps extends BoxProps {
-  payload: ImageDetailModalPayload;
-  handler?: ImageDetailModalHandler;
+  payload: ImageDetailModalPayload
+  handler?: ImageDetailModalHandler
 }
 
 export const ImageDetailModal = (props: ImageDetailModalProps) => {
-  const { payload, handler } = props;
+  const { payload, handler } = props
   const { onClose, onDelete, onDownload, onEdit, onNext, onPrev } =
-    handler ?? {};
-  const drawer = useDisclosure({ opend: false });
-  const imageRotate = useImageRotate({ angle: 0 });
+    handler ?? {}
+  const drawer = useDisclosure({ opend: false })
+  const imageRotate = useImageRotate({ angle: 0 })
   const imageZoom = useImageZoom({
     level: 100,
     config: { step: 10, min: 100, max: 300 },
-  });
+  })
 
   const zoomReset = useCallback(() => {
-    imageZoom.handler.reset();
-  }, [imageZoom.handler, imageZoom.state.level]);
+    imageZoom.handler.reset()
+  }, [imageZoom.handler, imageZoom.state.level])
 
   const zoomIn = useCallback(() => {
-    imageZoom.handler.zoomIn();
-  }, [imageZoom.handler, imageZoom.state.level]);
+    imageZoom.handler.zoomIn()
+  }, [imageZoom.handler, imageZoom.state.level])
 
   const zoomOut = useCallback(() => {
-    imageZoom.handler.zoomOut();
-  }, [imageZoom.handler, imageZoom.state.level]);
+    imageZoom.handler.zoomOut()
+  }, [imageZoom.handler, imageZoom.state.level])
 
   const zoomSet = useCallback(
     (value: number) => {
-      imageZoom.handler.set(value);
+      imageZoom.handler.set(value)
     },
     [imageZoom.handler, imageZoom.state.level],
-  );
+  )
 
   const previewAction = useMemo(() => {
     if (imageRotate.state.meta.action === "left") {
-      return "rotate";
+      return "rotate"
     }
     if (imageRotate.state.meta.action === "right") {
-      return "rotate";
+      return "rotate"
     }
-    return "reset";
-  }, [imageRotate.state.meta.action]);
+    return "reset"
+  }, [imageRotate.state.meta.action])
 
   return (
     <Box
@@ -124,5 +124,5 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
         )}
       </AnimatePresence>
     </Box>
-  );
-};
+  )
+}

@@ -1,16 +1,16 @@
-import { serverEnv } from "@/env/server";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { createUploadLink } from "apollo-upload-client";
-import "server-only";
-import { CreateGraphQLOption } from "./type";
+import { serverEnv } from "@/env/server"
+import { ApolloClient, InMemoryCache } from "@apollo/client"
+import { createUploadLink } from "apollo-upload-client"
+import "server-only"
+import { CreateGraphQLOption } from "./type"
 
 /**
  * server side fetch
  */
 export const createGraphQL = (option: CreateGraphQLOption) => {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = {}
   if (option.token) {
-    headers["Authorization"] = `Bearer ${option.token}`;
+    headers["Authorization"] = `Bearer ${option.token}`
   }
 
   return new ApolloClient({
@@ -20,5 +20,5 @@ export const createGraphQL = (option: CreateGraphQLOption) => {
     }),
     cache: new InMemoryCache(),
     ssrMode: true,
-  });
-};
+  })
+}

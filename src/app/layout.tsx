@@ -1,54 +1,54 @@
-import { GetMeDocument, GetMeQuery } from "@/graphql";
-import { auth } from "@/lib/auth";
-import { getLang } from "@/lib/cookies/lang/getLang";
-import { createGraphQL } from "@/lib/graphql/server";
-import { theme } from "@/lib/theme";
-import "@/lib/zod";
-import { AuthContext } from "@/providers";
+import { GetMeDocument, GetMeQuery } from "@/graphql"
+import { auth } from "@/lib/auth"
+import { getLang } from "@/lib/cookies/lang/getLang"
+import { createGraphQL } from "@/lib/graphql/server"
+import { theme } from "@/lib/theme"
+import "@/lib/zod"
+import { AuthContext } from "@/providers"
 import {
   AppShell,
   AppShellHeader,
   AppShellMain,
   Container,
-} from "@mantine/core";
-import "@mantine/core/styles.css";
-import { Notifications } from "@mantine/notifications";
-import "@mantine/notifications/styles.css";
-import type { Metadata } from "next";
-import { Header } from "./_components";
-import Head from "./Head";
-import Providers from "./Providers";
+} from "@mantine/core"
+import "@mantine/core/styles.css"
+import { Notifications } from "@mantine/notifications"
+import "@mantine/notifications/styles.css"
+import type { Metadata } from "next"
+import { Header } from "./_components"
+import Head from "./Head"
+import Providers from "./Providers"
 
 const metadata: Metadata = {
   title: "Memoria",
   description: "Memoria",
-};
+}
 
 type RootLayoutProps = {
-  children: React.ReactNode;
-};
+  children: React.ReactNode
+}
 
 const RootLayout = async (props: RootLayoutProps) => {
-  const { children } = props;
-  const lang = await getLang();
-  const session = await auth.getSession();
+  const { children } = props
+  const lang = await getLang()
+  const session = await auth.getSession()
 
   const context: AuthContext = {
     isSignIn: false,
     user: undefined,
-  };
+  }
 
   if (session !== null) {
-    context.isSignIn = true;
-    const client = createGraphQL({ token: session.tokenSet.accessToken });
+    context.isSignIn = true
+    const client = createGraphQL({ token: session.tokenSet.accessToken })
 
     try {
-      const result = await client.query<GetMeQuery>({ query: GetMeDocument });
+      const result = await client.query<GetMeQuery>({ query: GetMeDocument })
       context.user = {
         id: result.data.me.id,
-      };
+      }
     } catch (error) {
-      console.debug("error", error);
+      console.debug("error", error)
     }
   }
 
@@ -79,8 +79,8 @@ const RootLayout = async (props: RootLayoutProps) => {
         </Providers>
       </body>
     </html>
-  );
-};
+  )
+}
 
-export default RootLayout;
-export { metadata };
+export default RootLayout
+export { metadata }

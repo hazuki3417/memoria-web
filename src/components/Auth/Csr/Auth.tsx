@@ -1,21 +1,21 @@
-import { useAuth } from "@/hooks";
-import React from "react";
+import { useAuth } from "@/hooks"
+import React from "react"
 
 export interface AuthProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export const Auth = (props: AuthProps) => {
-  const { children } = props;
-  return <>{children}</>;
-};
+  const { children } = props
+  return <>{children}</>
+}
 
 Auth.SignedIn = ({ children }: { children: React.ReactNode }) => {
-  const auth = useAuth();
-  return auth.isSignIn ? <>{children}</> : null;
-};
+  const auth = useAuth()
+  return auth.isSignIn ? <>{children}</> : null
+}
 
 Auth.SignedOut = ({ children }: { children: React.ReactNode }) => {
-  const auth = useAuth();
-  return !auth.isSignIn ? <>{children}</> : null;
-};
+  const auth = useAuth()
+  return !auth.isSignIn ? <>{children}</> : null
+}

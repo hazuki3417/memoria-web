@@ -1,2 +1,2 @@
-export * from "./FormSwitcher";
-export * from "./useFormSwitcher";
+export * from "./FormSwitcher"
+export * from "./useFormSwitcher"

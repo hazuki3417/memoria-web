@@ -1,13 +1,13 @@
-"use client";
-import { useTranslation } from "react-i18next";
-import { AnchorButton, LinkButtonProps } from "@/components/Button";
-import { Text } from "@mantine/core";
+"use client"
+import { useTranslation } from "react-i18next"
+import { AnchorButton, LinkButtonProps } from "@/components/Button"
+import { Text } from "@mantine/core"
 
 export interface SiginInButtonProps extends Omit<LinkButtonProps, "href"> {}
 
 export const SiginInButton = (props: SiginInButtonProps) => {
-  const { ...rest } = props;
-  const { t } = useTranslation();
+  const { ...rest } = props
+  const { t } = useTranslation()
   return (
     <AnchorButton
       style={{
@@ -18,5 +18,5 @@ export const SiginInButton = (props: SiginInButtonProps) => {
     >
       <Text>{t("auth.signIn")}</Text>
     </AnchorButton>
-  );
-};
+  )
+}

@@ -1,4 +1,4 @@
-import { Combobox, InputBase, useCombobox } from "@mantine/core";
+import { Combobox, InputBase, useCombobox } from "@mantine/core"
 import {
   ChangeEvent,
   useCallback,
@@ -7,96 +7,96 @@ import {
   KeyboardEvent,
   FocusEvent,
   useEffect,
-} from "react";
+} from "react"
 
 export interface ZoomComboboxHandler {
-  onOptionSubmit?: (value: number) => void;
-  onBlur?: (value: number) => void;
+  onOptionSubmit?: (value: number) => void
+  onBlur?: (value: number) => void
 }
 
 export interface ZoomComboboxProps {
-  value: number;
+  value: number
   config: {
-    step: number;
-    min: number;
-    max: number;
-  };
-  handler?: ZoomComboboxHandler;
+    step: number
+    min: number
+    max: number
+  }
+  handler?: ZoomComboboxHandler
 }
 
 export const ZoomCombobox = (props: ZoomComboboxProps) => {
-  const { value, config, handler } = props;
+  const { value, config, handler } = props
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
-  });
+  })
 
-  const [zoomLevel, setZoomLevel] = useState(`${value}%`);
-  const [changed, setChanged] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(`${value}%`)
+  const [changed, setChanged] = useState(false)
 
   const options = useMemo(() => {
-    const levels = createZoomLevel(config);
+    const levels = createZoomLevel(config)
     return levels.map((level) => {
       return (
         <Combobox.Option value={level.toString()} key={level}>
           {`${level}%`}
         </Combobox.Option>
-      );
-    });
-  }, [config]);
+      )
+    })
+  }, [config])
 
   const clampZoomLevel = (value: number) => {
-    if (value < config.min) return config.min;
-    if (value > config.max) return config.max;
-    return value;
-  };
+    if (value < config.min) return config.min
+    if (value > config.max) return config.max
+    return value
+  }
 
   const onOptionSubmit = useCallback(
     (value: string) => {
-      combobox.closeDropdown();
-      setZoomLevel(`${value}%`);
-      handler?.onOptionSubmit?.(Number(value));
+      combobox.closeDropdown()
+      setZoomLevel(`${value}%`)
+      handler?.onOptionSubmit?.(Number(value))
     },
     [combobox, handler?.onOptionSubmit],
-  );
+  )
 
   const onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      combobox.openDropdown();
-      combobox.updateSelectedOptionIndex();
+      combobox.openDropdown()
+      combobox.updateSelectedOptionIndex()
 
-      const input = normalizeInput(event.currentTarget.value);
+      const input = normalizeInput(event.currentTarget.value)
 
-      setChanged(true);
-      setZoomLevel(input);
+      setChanged(true)
+      setZoomLevel(input)
     },
     [combobox, config],
-  );
+  )
 
   const onBlur = useCallback(
     (event: FocusEvent<HTMLInputElement>) => {
-      combobox.closeDropdown();
-      if (!changed) return;
+      combobox.closeDropdown()
+      if (!changed) return
 
-      setChanged(false);
+      setChanged(false)
       setZoomLevel((prev) => {
-        const next = clampZoomLevel(Number(prev));
-        handler?.onBlur?.(next);
-        return `${next}%`;
-      });
+        const next = clampZoomLevel(Number(prev))
+        handler?.onBlur?.(next)
+        return `${next}%`
+      })
     },
     [combobox, handler?.onBlur],
-  );
+  )
 
   const onKeyDown = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      event.currentTarget?.blur();
+      event.currentTarget?.blur()
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    setZoomLevel(`${value.toString()}%`);
-  }, [value]);
+    setZoomLevel(`${value.toString()}%`)
+  }, [value])
 
   return (
     <Combobox
@@ -128,24 +128,24 @@ export const ZoomCombobox = (props: ZoomComboboxProps) => {
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>
-  );
-};
+  )
+}
 
 const createZoomLevel = (config: {
-  step: number;
-  min: number;
-  max: number;
+  step: number
+  min: number
+  max: number
 }): number[] => {
-  const level: number[] = [];
+  const level: number[] = []
 
   for (let i = config.min; i <= config.max; i += config.step) {
-    level.push(i);
+    level.push(i)
   }
 
-  return level;
-};
+  return level
+}
 
 const normalizeInput = (input: string) => {
-  input = input.replace(/[^0-9]/g, "").slice(0, 3);
-  return input;
-};
+  input = input.replace(/[^0-9]/g, "").slice(0, 3)
+  return input
+}

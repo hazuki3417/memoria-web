@@ -1,13 +1,13 @@
-import { UnitType } from "@/lib";
+import { UnitType } from "@/lib"
 
 type ViewConfig = {
   file: {
     size: {
-      decimals: number;
-      unit: UnitType;
-    };
-  };
-};
+      decimals: number
+      unit: UnitType
+    }
+  }
+}
 
 export const viewConfig: ViewConfig = {
   file: {
@@ -16,4 +16,4 @@ export const viewConfig: ViewConfig = {
       unit: "si",
     },
   },
-};
+}

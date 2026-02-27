@@ -1,7 +1,7 @@
-import "client-only";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { CreateGraphQLOption } from "./type";
-import { createUploadLink } from "apollo-upload-client";
+import "client-only"
+import { ApolloClient, InMemoryCache } from "@apollo/client"
+import { CreateGraphQLOption } from "./type"
+import { createUploadLink } from "apollo-upload-client"
 
 /**
  * client side fetch
@@ -9,9 +9,9 @@ import { createUploadLink } from "apollo-upload-client";
  * NOTE: 上記の理由からuriはハードコーディングで問題ない
  */
 export const createGraphQL = (option: CreateGraphQLOption) => {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = {}
   if (option.token) {
-    headers["Authorization"] = `Bearer ${option.token}`;
+    headers["Authorization"] = `Bearer ${option.token}`
   }
 
   return new ApolloClient({
@@ -21,5 +21,5 @@ export const createGraphQL = (option: CreateGraphQLOption) => {
     }),
     cache: new InMemoryCache(),
     ssrMode: false,
-  });
-};
+  })
+}

@@ -10,4 +10,4 @@ export const imageConfig = {
     total: 200 * 1024 * 1024,
   },
   type: ["image/jpeg", "image/png"],
-};
+}

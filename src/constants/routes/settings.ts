@@ -1,4 +1,4 @@
-import { RouteNodes } from "@/types/routes";
+import { RouteNodes } from "@/types/routes"
 
 export const settings = {
   settings: {
@@ -21,4 +21,4 @@ export const settings = {
       },
     },
   },
-} as const satisfies RouteNodes;
+} as const satisfies RouteNodes

@@ -1,14 +1,14 @@
-import { ActionIcon } from "@mantine/core";
+import { ActionIcon } from "@mantine/core"
 import {
   IconRotate,
   IconRotate2,
   IconRotateClockwise2,
-} from "@tabler/icons-react";
+} from "@tabler/icons-react"
 
 export interface RotateButtonGroupProps {
-  onLeft?: React.MouseEventHandler<HTMLButtonElement>;
-  onRight?: React.MouseEventHandler<HTMLButtonElement>;
-  onReset?: React.MouseEventHandler<HTMLButtonElement>;
+  onLeft?: React.MouseEventHandler<HTMLButtonElement>
+  onRight?: React.MouseEventHandler<HTMLButtonElement>
+  onReset?: React.MouseEventHandler<HTMLButtonElement>
 }
 
 export const RotateButtonGroup = (props: RotateButtonGroupProps) => (
@@ -35,4 +35,4 @@ export const RotateButtonGroup = (props: RotateButtonGroupProps) => (
       <IconRotateClockwise2 />
     </ActionIcon>
   </ActionIcon.Group>
-);
+)

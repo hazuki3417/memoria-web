@@ -1,1 +1,1 @@
-export * from "./ImageFrame";
+export * from "./ImageFrame"

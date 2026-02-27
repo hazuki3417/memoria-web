@@ -7,39 +7,39 @@ import {
   Paper,
   type PaperProps,
   Text,
-} from "@mantine/core";
-import { IconEdit, IconTrash, IconX } from "@tabler/icons-react";
-import type React from "react";
-import { Body } from "./Body";
-import { Footer } from "./Footer";
-import { Header } from "./Header";
+} from "@mantine/core"
+import { IconEdit, IconTrash, IconX } from "@tabler/icons-react"
+import type React from "react"
+import { Body } from "./Body"
+import { Footer } from "./Footer"
+import { Header } from "./Header"
 
 export type InfoPayload = {
   file: {
-    name: string;
-    size: string;
-    date: string;
-  };
+    name: string
+    size: string
+    date: string
+  }
   image: {
-    width: number;
-    height: number;
-  };
-  tags: string[];
-};
+    width: number
+    height: number
+  }
+  tags: string[]
+}
 
 export type InfoHandler = {
-  onClose?: React.MouseEventHandler<HTMLButtonElement>;
-  onEdit?: React.MouseEventHandler<HTMLButtonElement>;
-  onDelete?: React.MouseEventHandler<HTMLButtonElement>;
-};
+  onClose?: React.MouseEventHandler<HTMLButtonElement>
+  onEdit?: React.MouseEventHandler<HTMLButtonElement>
+  onDelete?: React.MouseEventHandler<HTMLButtonElement>
+}
 
 export interface InfoProps extends PaperProps {
-  payload: InfoPayload;
-  handler?: InfoHandler;
+  payload: InfoPayload
+  handler?: InfoHandler
 }
 
 export const Info = (props: InfoProps) => {
-  const { payload, handler } = props;
+  const { payload, handler } = props
 
   return (
     <Paper
@@ -185,5 +185,5 @@ export const Info = (props: InfoProps) => {
         </Box>
       </Footer>
     </Paper>
-  );
-};
+  )
+}

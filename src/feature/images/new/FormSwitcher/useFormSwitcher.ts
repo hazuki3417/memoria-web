@@ -1,37 +1,37 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState } from "react"
 
 export const MODE = {
   TYPE: {
     SINGLE: "single",
     ALL: "all",
   },
-} as const;
+} as const
 
 export type UseFormSwitcherState = {
-  mode: string;
-};
+  mode: string
+}
 
 export interface UseFormSwitcherHandler {
-  single: () => void;
-  all: () => void;
-  set: (value: string) => void;
+  single: () => void
+  all: () => void
+  set: (value: string) => void
 }
 
 export interface UseFormSwitcher {
-  state: UseFormSwitcherState;
-  handler: UseFormSwitcherHandler;
+  state: UseFormSwitcherState
+  handler: UseFormSwitcherHandler
 }
 
 export const useFormSwitcher = (): UseFormSwitcher => {
-  const [mode, setMode] = useState<string>(MODE.TYPE.ALL);
+  const [mode, setMode] = useState<string>(MODE.TYPE.ALL)
 
   const single = useCallback(() => {
-    setMode(MODE.TYPE.SINGLE);
-  }, []);
+    setMode(MODE.TYPE.SINGLE)
+  }, [])
 
   const all = useCallback(() => {
-    setMode(MODE.TYPE.ALL);
-  }, []);
+    setMode(MODE.TYPE.ALL)
+  }, [])
 
   return {
     state: { mode },
@@ -40,5 +40,5 @@ export const useFormSwitcher = (): UseFormSwitcher => {
       all,
       set: setMode,
     },
-  };
-};
+  }
+}

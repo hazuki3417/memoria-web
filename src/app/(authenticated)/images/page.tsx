@@ -1,16 +1,16 @@
-"use client";
-import { ActionPanel, Image, LinkButton } from "@/components";
-import { ImageLayout } from "@/components/ImageLayout/ImageLayout";
+"use client"
+import { ActionPanel, Image, LinkButton } from "@/components"
+import { ImageLayout } from "@/components/ImageLayout/ImageLayout"
 import {
   imageSearchFormDefaultValue,
   imageSearchFormSchema,
-} from "@/feature/images";
-import { ImageEdge, useGetImagesQuery } from "@/graphql";
-import { useIntersection } from "@/hooks/useIntersection";
-import { useRelayConnection } from "@/hooks/useRelayConnection";
-import { defineFieldObject } from "@/lib/field";
-import { resolveUri } from "@/lib/url";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from "@/feature/images"
+import { ImageEdge, useGetImagesQuery } from "@/graphql"
+import { useIntersection } from "@/hooks/useIntersection"
+import { useRelayConnection } from "@/hooks/useRelayConnection"
+import { defineFieldObject } from "@/lib/field"
+import { resolveUri } from "@/lib/url"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Box,
   Button,
@@ -19,7 +19,7 @@ import {
   SegmentedControl,
   Tabs,
   TagsInput,
-} from "@mantine/core";
+} from "@mantine/core"
 import {
   IconCheckbox,
   IconDownload,
@@ -28,17 +28,17 @@ import {
   IconListSearch,
   IconSearch,
   IconTrash,
-} from "@tabler/icons-react";
-import { t } from "i18next";
-import { nanoid } from "nanoid";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+} from "@tabler/icons-react"
+import { t } from "i18next"
+import { nanoid } from "nanoid"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-const TAB_ID_LIST = ["list", "group"] as const;
-const TAB_FIELDS = defineFieldObject(TAB_ID_LIST);
+const TAB_ID_LIST = ["list", "group"] as const
+const TAB_FIELDS = defineFieldObject(TAB_ID_LIST)
 
-type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>;
+type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>
 
 const Page = () => {
   const methods = useForm<ImageSearchFormSchema>({
@@ -47,9 +47,9 @@ const Page = () => {
     defaultValues: {
       ...imageSearchFormDefaultValue,
     },
-  });
+  })
 
-  const [lists, setlists] = useState<ImageEdge[]>([]);
+  const [lists, setlists] = useState<ImageEdge[]>([])
 
   const relay = useRelayConnection({
     hooks: () =>
@@ -61,24 +61,24 @@ const Page = () => {
       }),
     extract: (data) => data.getImages,
     size: 10,
-  });
+  })
 
   const intersection = useIntersection({
     intersect: async () => {
-      if (!relay.state.pageInfo?.hasNextPage) return;
-      const res = await relay.handler.next();
-      setlists((prev) => [...prev, ...res.data.getImages.edges] as ImageEdge[]);
+      if (!relay.state.pageInfo?.hasNextPage) return
+      const res = await relay.handler.next()
+      setlists((prev) => [...prev, ...res.data.getImages.edges] as ImageEdge[])
     },
-  });
+  })
 
   // 初期レンダリング時の処理
   useEffect(() => {
     if (relay.state.edges.length > 0 && lists.length === 0) {
-      setlists(relay.state.edges as ImageEdge[]);
+      setlists(relay.state.edges as ImageEdge[])
     }
-  }, [relay.state.edges, lists.length]);
+  }, [relay.state.edges, lists.length])
 
-  const [mode, setMode] = useState<"filter" | "bulk">("filter");
+  const [mode, setMode] = useState<"filter" | "bulk">("filter")
 
   return (
     <Box>
@@ -164,7 +164,7 @@ const Page = () => {
                         alt={list.node.info.file.name}
                       />
                     </Image.Frame>
-                  );
+                  )
                 })}
                 {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
                 <Image.Intersection
@@ -178,7 +178,7 @@ const Page = () => {
         <Tabs.Panel value={TAB_FIELDS.group}>group panel</Tabs.Panel>
       </Tabs>
     </Box>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

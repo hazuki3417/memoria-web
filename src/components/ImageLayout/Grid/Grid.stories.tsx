@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { Grid } from "./Grid";
-import { Box } from "@mantine/core";
+import type { Meta, StoryObj } from "@storybook/react"
+import { Grid } from "./Grid"
+import { Box } from "@mantine/core"
 
 const meta = {
   title: "ImageLayout/Grid",
   component: Grid,
-} satisfies Meta<typeof Grid>;
+} satisfies Meta<typeof Grid>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 const Image = () => (
   <Box
@@ -23,7 +23,7 @@ const Image = () => (
   >
     image
   </Box>
-);
+)
 
 const children = (
   <>
@@ -38,10 +38,10 @@ const children = (
     <Image />
     <Image />
   </>
-);
+)
 
 export const Default: Story = {
   args: {
     children,
   },
-};
+}

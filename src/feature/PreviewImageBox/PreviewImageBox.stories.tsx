@@ -1,16 +1,16 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { PreviewImageBox } from "./PreviewImageBox";
-import { fn, userEvent, within } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react"
+import { PreviewImageBox } from "./PreviewImageBox"
+import { fn, userEvent, within } from "@storybook/test"
 
 const meta = {
   title: "ImageDropForm/PreviewImageBox",
   component: PreviewImageBox,
-} satisfies Meta<typeof PreviewImageBox>;
+} satisfies Meta<typeof PreviewImageBox>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
-const payload = { src: "sample/v.png", alt: "example.png" };
+const payload = { src: "sample/v.png", alt: "example.png" }
 
 export const Default: Story = {
   args: {
@@ -28,11 +28,11 @@ export const Default: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("select-file"));
-    await userEvent.click(canvas.getByTestId("remove-file"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("select-file"))
+    await userEvent.click(canvas.getByTestId("remove-file"))
   },
-};
+}
 
 export const Selected: Story = {
   args: {
@@ -50,11 +50,11 @@ export const Selected: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("select-file"));
-    await userEvent.click(canvas.getByTestId("remove-file"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("select-file"))
+    await userEvent.click(canvas.getByTestId("remove-file"))
   },
-};
+}
 
 export const NonSelectable: Story = {
   args: {
@@ -72,11 +72,11 @@ export const NonSelectable: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("select-file"));
-    await userEvent.click(canvas.getByTestId("remove-file"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("select-file"))
+    await userEvent.click(canvas.getByTestId("remove-file"))
   },
-};
+}
 
 export const UnSupported: Story = {
   args: {
@@ -94,11 +94,11 @@ export const UnSupported: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("select-file"));
-    await userEvent.click(canvas.getByTestId("remove-file"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("select-file"))
+    await userEvent.click(canvas.getByTestId("remove-file"))
   },
-};
+}
 
 export const ValidAccept: Story = {
   args: {
@@ -117,11 +117,11 @@ export const ValidAccept: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("select-file"));
-    await userEvent.click(canvas.getByTestId("remove-file"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("select-file"))
+    await userEvent.click(canvas.getByTestId("remove-file"))
   },
-};
+}
 
 export const ValidReject: Story = {
   args: {
@@ -140,11 +140,11 @@ export const ValidReject: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("select-file"));
-    await userEvent.click(canvas.getByTestId("remove-file"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("select-file"))
+    await userEvent.click(canvas.getByTestId("remove-file"))
   },
-};
+}
 
 export const ValidWarning: Story = {
   args: {
@@ -163,8 +163,8 @@ export const ValidWarning: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("select-file"));
-    await userEvent.click(canvas.getByTestId("remove-file"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("select-file"))
+    await userEvent.click(canvas.getByTestId("remove-file"))
   },
-};
+}

@@ -1,7 +1,7 @@
-import { Exact } from "@/graphql";
-import { QueryResult } from "@apollo/client";
-import { useEffect, useMemo } from "react";
-import { FieldValues, UseFormReturn } from "react-hook-form";
+import { Exact } from "@/graphql"
+import { QueryResult } from "@apollo/client"
+import { useEffect, useMemo } from "react"
+import { FieldValues, UseFormReturn } from "react-hook-form"
 
 export type UseSetFormDataFromQueryOption<
   TData,
@@ -10,12 +10,12 @@ export type UseSetFormDataFromQueryOption<
   query: QueryResult<
     TData,
     Exact<{
-      [key: string]: never;
+      [key: string]: never
     }>
-  >;
-  form: UseFormReturn<TFormValues>;
-  selector: (data: TData) => TFormValues | undefined;
-};
+  >
+  form: UseFormReturn<TFormValues>
+  selector: (data: TData) => TFormValues | undefined
+}
 
 export const useSetFormDataFromQuery = <TData, TFormValues extends FieldValues>(
   option: UseSetFormDataFromQueryOption<TData, TFormValues>,
@@ -23,7 +23,7 @@ export const useSetFormDataFromQuery = <TData, TFormValues extends FieldValues>(
   /**
    * NOTE: fetchが成功したときのみ値を設定する
    */
-  const { query, form, selector } = option;
+  const { query, form, selector } = option
 
   /**
    * NOTE: useEffectの発火回数を最小限にするため
@@ -36,10 +36,10 @@ export const useSetFormDataFromQuery = <TData, TFormValues extends FieldValues>(
       query.error === undefined &&
       query.data !== undefined
     ) {
-      return true;
+      return true
     }
-    return false;
-  }, [query.loading, query.error, query.data]);
+    return false
+  }, [query.loading, query.error, query.data])
 
   useEffect(() => {
     /**
@@ -47,10 +47,10 @@ export const useSetFormDataFromQuery = <TData, TFormValues extends FieldValues>(
      *       万が一条件が変わったりした場合に備えて防御的にチェックを残す
      */
     if (query.data) {
-      const selected = selector(query.data);
+      const selected = selector(query.data)
       if (selected) {
-        form.reset(selected);
+        form.reset(selected)
       }
     }
-  }, [trigger]);
-};
+  }, [trigger])
+}

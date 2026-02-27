@@ -1,1 +1,1 @@
-export * from "./ImageDetailModal";
+export * from "./ImageDetailModal"

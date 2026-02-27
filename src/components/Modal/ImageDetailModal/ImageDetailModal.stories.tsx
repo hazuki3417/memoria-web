@@ -1,13 +1,13 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { ImageDetailModal } from "./ImageDetailModal";
+import type { Meta, StoryObj } from "@storybook/react"
+import { ImageDetailModal } from "./ImageDetailModal"
 
 const meta = {
   title: "Modal/ImageDetailModal",
   component: ImageDetailModal,
-} satisfies Meta<typeof ImageDetailModal>;
+} satisfies Meta<typeof ImageDetailModal>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
@@ -30,4 +30,4 @@ export const Default: Story = {
       },
     },
   },
-};
+}

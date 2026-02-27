@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { Slide } from "./Slide";
-import { Box } from "@mantine/core";
+import type { Meta, StoryObj } from "@storybook/react"
+import { Slide } from "./Slide"
+import { Box } from "@mantine/core"
 
 const meta = {
   title: "ImageLayout/Slide",
   component: Slide,
-} satisfies Meta<typeof Slide>;
+} satisfies Meta<typeof Slide>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 const Image = () => (
   <Box
@@ -23,7 +23,7 @@ const Image = () => (
   >
     image
   </Box>
-);
+)
 
 const children = (
   <>
@@ -38,10 +38,10 @@ const children = (
     <Image />
     <Image />
   </>
-);
+)
 
 export const Default: Story = {
   args: {
     children,
   },
-};
+}

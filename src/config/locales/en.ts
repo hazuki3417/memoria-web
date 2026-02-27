@@ -1,4 +1,4 @@
-import { TranslationSchema } from "./type";
+import { TranslationSchema } from "./type"
 
 export const en: TranslationSchema = {
   button: {
@@ -40,4 +40,4 @@ export const en: TranslationSchema = {
       tooManyFiles: "You can upload up to {{max}} files only.",
     },
   },
-};
+}

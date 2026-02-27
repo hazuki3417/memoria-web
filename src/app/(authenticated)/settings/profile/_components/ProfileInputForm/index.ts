@@ -1,1 +1,1 @@
-export * from "./ProfileInputForm";
+export * from "./ProfileInputForm"

@@ -1,10 +1,10 @@
-import { Box, Overlay, Portal, Transition } from "@mantine/core";
-import type { ReactNode } from "react";
+import { Box, Overlay, Portal, Transition } from "@mantine/core"
+import type { ReactNode } from "react"
 
 interface CustomModalProps {
-  opened: boolean;
-  onClose: () => void;
-  children: ReactNode;
+  opened: boolean
+  onClose: () => void
+  children: ReactNode
 }
 
 export function CustomModal({ opened, onClose, children }: CustomModalProps) {
@@ -47,5 +47,5 @@ export function CustomModal({ opened, onClose, children }: CustomModalProps) {
         )}
       </Transition>
     </Portal>
-  );
+  )
 }

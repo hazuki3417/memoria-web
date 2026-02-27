@@ -1,7 +1,7 @@
-import { Box } from "@mantine/core";
+import { Box } from "@mantine/core"
 
 const Page = () => {
-  return <Box>ダッシュボード</Box>;
-};
+  return <Box>ダッシュボード</Box>
+}
 
-export default Page;
+export default Page

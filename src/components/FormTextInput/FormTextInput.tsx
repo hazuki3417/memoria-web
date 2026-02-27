@@ -1,13 +1,13 @@
-import { useFormContext, Controller } from "react-hook-form";
-import { TextInput, TextInputProps } from "@mantine/core";
+import { useFormContext, Controller } from "react-hook-form"
+import { TextInput, TextInputProps } from "@mantine/core"
 
 export interface FormTextInputProps extends TextInputProps {
-  name: string;
+  name: string
 }
 
 export const FormTextInput = (props: FormTextInputProps) => {
-  const { name, disabled, ...lest } = props;
-  const { control, formState } = useFormContext();
+  const { name, disabled, ...lest } = props
+  const { control, formState } = useFormContext()
 
   return (
     <Controller
@@ -22,5 +22,5 @@ export const FormTextInput = (props: FormTextInputProps) => {
         />
       )}
     />
-  );
-};
+  )
+}

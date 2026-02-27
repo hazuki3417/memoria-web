@@ -3,42 +3,42 @@ import {
   ApolloQueryResult,
   OperationVariables,
   QueryResult,
-} from "@apollo/client";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { PageInfo } from "@/graphql";
-import { ActionStateType } from "@/hooks/type";
+} from "@apollo/client"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { PageInfo } from "@/graphql"
+import { ActionStateType } from "@/hooks/type"
 
-export type UseRelayConnectionAction = ActionStateType<"prev" | "next">;
+export type UseRelayConnectionAction = ActionStateType<"prev" | "next">
 
 export type UseRelayConnectionState<TEdge> = {
-  edges: TEdge[];
-  pageInfo: PageInfo | undefined;
-  loading: boolean;
-  error: ApolloError | undefined;
-  meta: { action: UseRelayConnectionAction };
-};
+  edges: TEdge[]
+  pageInfo: PageInfo | undefined
+  loading: boolean
+  error: ApolloError | undefined
+  meta: { action: UseRelayConnectionAction }
+}
 
 export interface UseRelayConnectionOption<
   TData,
   TVariables extends OperationVariables,
   TEdge,
 > {
-  hooks: () => QueryResult<TData, TVariables>;
+  hooks: () => QueryResult<TData, TVariables>
   extract: (data: TData) => {
-    edges: TEdge[];
-    pageInfo: PageInfo;
-  };
-  size: number;
+    edges: TEdge[]
+    pageInfo: PageInfo
+  }
+  size: number
 }
 
 export interface UseRelayConnectionHandler<TData> {
-  prev: () => Promise<ApolloQueryResult<TData>>;
-  next: () => Promise<ApolloQueryResult<TData>>;
+  prev: () => Promise<ApolloQueryResult<TData>>
+  next: () => Promise<ApolloQueryResult<TData>>
 }
 
 export interface UseRelayConnection<TData, TEdge> {
-  state: UseRelayConnectionState<TEdge>;
-  handler: UseRelayConnectionHandler<TData>;
+  state: UseRelayConnectionState<TEdge>
+  handler: UseRelayConnectionHandler<TData>
 }
 
 export const useRelayConnection = <
@@ -48,22 +48,22 @@ export const useRelayConnection = <
 >(
   option: UseRelayConnectionOption<TData, TVariables, TEdge>,
 ): UseRelayConnection<TData, TEdge> => {
-  const { hooks, extract, size } = option;
-  const [action, setAction] = useState<UseRelayConnectionAction>("idle");
+  const { hooks, extract, size } = option
+  const [action, setAction] = useState<UseRelayConnectionAction>("idle")
 
-  const { data, loading, error, fetchMore, networkStatus } = hooks();
+  const { data, loading, error, fetchMore, networkStatus } = hooks()
 
   const connection = useMemo(
     () => (data ? extract(data) : undefined),
     [data, extract],
-  );
+  )
 
   const prev = useCallback(async () => {
     if (!connection?.pageInfo.hasPrevPage) {
-      return Promise.reject(new Error("no prev page"));
+      return Promise.reject(new Error("no prev page"))
     }
 
-    setAction("prev");
+    setAction("prev")
 
     return fetchMore({
       variables: {
@@ -72,15 +72,15 @@ export const useRelayConnection = <
           before: connection.pageInfo.startCursor,
         },
       },
-    });
-  }, [connection, fetchMore, size]);
+    })
+  }, [connection, fetchMore, size])
 
   const next = useCallback(async () => {
     if (!connection?.pageInfo.hasNextPage) {
-      return Promise.reject(new Error("no next page"));
+      return Promise.reject(new Error("no next page"))
     }
 
-    setAction("next");
+    setAction("next")
 
     return await fetchMore({
       variables: {
@@ -89,12 +89,12 @@ export const useRelayConnection = <
           after: connection.pageInfo.endCursor,
         },
       },
-    });
-  }, [connection, fetchMore, size]);
+    })
+  }, [connection, fetchMore, size])
 
   useEffect(() => {
-    if (!loading) setAction("idle");
-  }, [loading]);
+    if (!loading) setAction("idle")
+  }, [loading])
 
   return {
     state: {
@@ -105,5 +105,5 @@ export const useRelayConnection = <
       meta: { action },
     },
     handler: { prev, next },
-  };
-};
+  }
+}

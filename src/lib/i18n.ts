@@ -1,10 +1,10 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import { langConfig } from "@/config";
-import { ja, en, TranslationSchema } from "@/config/locales";
-import jaZod from "zod-i18n-map/locales/ja/zod.json";
-import enZod from "zod-i18n-map/locales/en/zod.json";
+import i18n from "i18next"
+import { initReactI18next } from "react-i18next"
+import LanguageDetector from "i18next-browser-languagedetector"
+import { langConfig } from "@/config"
+import { ja, en, TranslationSchema } from "@/config/locales"
+import jaZod from "zod-i18n-map/locales/ja/zod.json"
+import enZod from "zod-i18n-map/locales/en/zod.json"
 
 export const resources = {
   ja: {
@@ -15,15 +15,15 @@ export const resources = {
     translation: en,
     zod: enZod,
   },
-};
+}
 
 // NOTE: 型補完が適用されるように型情報を設定
 declare module "i18next" {
   interface CustomTypeOptions {
-    defaultNS: "translation";
+    defaultNS: "translation"
     resources: {
-      translation: TranslationSchema;
-    };
+      translation: TranslationSchema
+    }
   }
 }
 
@@ -43,6 +43,6 @@ i18n
       escapeValue: false,
     },
     resources,
-  });
+  })
 
-export default i18n;
+export default i18n

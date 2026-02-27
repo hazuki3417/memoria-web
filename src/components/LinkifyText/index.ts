@@ -1,1 +1,1 @@
-export * from "./LinkifyText";
+export * from "./LinkifyText"

@@ -1,15 +1,15 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { AddImageBox } from "./AddImageBox";
-import { imageConfig } from "@/config";
-import { fn, userEvent, within } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react"
+import { AddImageBox } from "./AddImageBox"
+import { imageConfig } from "@/config"
+import { fn, userEvent, within } from "@storybook/test"
 
 const meta = {
   title: "ImageDropForm/AddImageBox",
   component: AddImageBox,
-} satisfies Meta<typeof AddImageBox>;
+} satisfies Meta<typeof AddImageBox>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
@@ -18,7 +18,7 @@ export const Default: Story = {
       onFileSelect: fn(),
     },
   },
-};
+}
 
 export const Disabled: Story = {
   args: {
@@ -30,7 +30,7 @@ export const Disabled: Story = {
       disabled: true,
     },
   },
-};
+}
 
 export const ValidAccept: Story = {
   args: {
@@ -42,7 +42,7 @@ export const ValidAccept: Story = {
       valid: "accept",
     },
   },
-};
+}
 
 export const ValidReject: Story = {
   args: {
@@ -54,7 +54,7 @@ export const ValidReject: Story = {
       valid: "reject",
     },
   },
-};
+}
 
 export const ValidWarning: Story = {
   args: {
@@ -66,4 +66,4 @@ export const ValidWarning: Story = {
       valid: "warning",
     },
   },
-};
+}

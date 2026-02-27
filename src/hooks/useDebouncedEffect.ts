@@ -1,22 +1,22 @@
-import { useEffect } from "react";
+import { useEffect } from "react"
 
 export const useDebouncedEffect = (
   effect: () => void | (() => void),
   deps: ReadonlyArray<unknown>,
   delay: number,
 ): void => {
-  let cleanup: void | (() => void);
+  let cleanup: void | (() => void)
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      cleanup = effect();
-    }, delay);
+      cleanup = effect()
+    }, delay)
 
     return () => {
-      clearTimeout(handler);
+      clearTimeout(handler)
       if (typeof cleanup === "function") {
-        cleanup();
+        cleanup()
       }
-    };
-  }, [...deps, delay]);
-};
+    }
+  }, [...deps, delay])
+}

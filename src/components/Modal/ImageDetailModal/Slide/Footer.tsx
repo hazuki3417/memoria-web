@@ -1,4 +1,4 @@
-import { ActionIcon, Box, type BoxProps, Slider, Text } from "@mantine/core";
+import { ActionIcon, Box, type BoxProps, Slider, Text } from "@mantine/core"
 import {
   IconDownload,
   IconInfoCircle,
@@ -6,48 +6,48 @@ import {
   IconZoomIn,
   IconZoomOut,
   IconZoomReset,
-} from "@tabler/icons-react";
-import React, { memo } from "react";
-import { ZoomCombobox } from "./ZoomCombobox";
-import { styles } from "./styles";
-import { RotateButtonGroup } from "./RotateButtonGroup";
+} from "@tabler/icons-react"
+import React, { memo } from "react"
+import { ZoomCombobox } from "./ZoomCombobox"
+import { styles } from "./styles"
+import { RotateButtonGroup } from "./RotateButtonGroup"
 
 export type FooterPayload = {
-  current: number;
-  limit: number;
-};
+  current: number
+  limit: number
+}
 
 export type FooterUi = {
-  level: number;
-};
+  level: number
+}
 
 export type FooterConfig = {
-  step: number;
-  min: number;
-  max: number;
-};
+  step: number
+  min: number
+  max: number
+}
 
 export type FooterHandler = {
-  onDownload?: React.MouseEventHandler<HTMLButtonElement>;
-  onInfo?: React.MouseEventHandler<HTMLButtonElement>;
-  onZoomChange?: (value: number) => void;
-  onZoomIn?: React.MouseEventHandler<HTMLButtonElement>;
-  onZoomOut?: React.MouseEventHandler<HTMLButtonElement>;
-  onZoomReset?: React.MouseEventHandler<HTMLButtonElement>;
-  onRotateLeft?: React.MouseEventHandler<HTMLButtonElement>;
-  onRotateRight?: React.MouseEventHandler<HTMLButtonElement>;
-  onRotateReset?: React.MouseEventHandler<HTMLButtonElement>;
-};
+  onDownload?: React.MouseEventHandler<HTMLButtonElement>
+  onInfo?: React.MouseEventHandler<HTMLButtonElement>
+  onZoomChange?: (value: number) => void
+  onZoomIn?: React.MouseEventHandler<HTMLButtonElement>
+  onZoomOut?: React.MouseEventHandler<HTMLButtonElement>
+  onZoomReset?: React.MouseEventHandler<HTMLButtonElement>
+  onRotateLeft?: React.MouseEventHandler<HTMLButtonElement>
+  onRotateRight?: React.MouseEventHandler<HTMLButtonElement>
+  onRotateReset?: React.MouseEventHandler<HTMLButtonElement>
+}
 
 export interface FooterProps extends BoxProps {
-  payload: FooterPayload;
-  ui: FooterUi;
-  config: FooterConfig;
-  handler?: FooterHandler;
+  payload: FooterPayload
+  ui: FooterUi
+  config: FooterConfig
+  handler?: FooterHandler
 }
 
 export const Footer = (props: FooterProps) => {
-  const { payload, ui, config, handler } = props;
+  const { payload, ui, config, handler } = props
 
   return (
     <Box
@@ -146,14 +146,14 @@ export const Footer = (props: FooterProps) => {
         <MemoInfoButton onClick={handler?.onInfo} />
       </Box>
     </Box>
-  );
-};
+  )
+}
 
 const MemoIndex = memo((props: FooterPayload) => (
   <Text size="xs">
     {props.current} / {props.limit}
   </Text>
-));
+))
 
 const MemoDownloadButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
@@ -161,9 +161,9 @@ const MemoDownloadButton = memo(
       <IconDownload />
     </ActionIcon>
   ),
-);
+)
 
-const MemoRotateButtonGroup = memo(RotateButtonGroup);
+const MemoRotateButtonGroup = memo(RotateButtonGroup)
 
 const MemoZoomResetButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
@@ -171,7 +171,7 @@ const MemoZoomResetButton = memo(
       <IconZoomReset />
     </ActionIcon>
   ),
-);
+)
 
 const MemoZoomOutButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
@@ -179,7 +179,7 @@ const MemoZoomOutButton = memo(
       <IconZoomOut />
     </ActionIcon>
   ),
-);
+)
 
 const MemoZoomInButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
@@ -187,7 +187,7 @@ const MemoZoomInButton = memo(
       <IconZoomIn />
     </ActionIcon>
   ),
-);
+)
 
 const MemoInfoButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
@@ -195,4 +195,4 @@ const MemoInfoButton = memo(
       <IconInfoCircle />
     </ActionIcon>
   ),
-);
+)

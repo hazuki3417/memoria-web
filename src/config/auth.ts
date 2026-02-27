@@ -5,4 +5,4 @@ export const authConfig = {
   signedOut: {
     redirect: "/auth/login",
   },
-};
+}

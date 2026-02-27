@@ -1,25 +1,25 @@
-import { Box } from "@mantine/core";
-import { Header, HeaderHandler } from "./Header";
-import { Body, BodyHandler } from "./Body";
-import { Footer, FooterHandler, FooterPayload, FooterUi } from "./Footer";
-import React from "react";
-import { useGetImagesQuery } from "@/graphql";
+import { Box } from "@mantine/core"
+import { Header, HeaderHandler } from "./Header"
+import { Body, BodyHandler } from "./Body"
+import { Footer, FooterHandler, FooterPayload, FooterUi } from "./Footer"
+import React from "react"
+import { useGetImagesQuery } from "@/graphql"
 
-export type SlidePayload = FooterPayload;
+export type SlidePayload = FooterPayload
 
-export type SlideUi = FooterUi;
+export type SlideUi = FooterUi
 
-export type SlideHandler = HeaderHandler & BodyHandler & FooterHandler;
+export type SlideHandler = HeaderHandler & BodyHandler & FooterHandler
 
 export interface SlideProps {
-  children: React.ReactNode;
-  payload: SlidePayload;
-  ui: SlideUi;
-  handler?: SlideHandler;
+  children: React.ReactNode
+  payload: SlidePayload
+  ui: SlideUi
+  handler?: SlideHandler
 }
 
 export const Slide = (props: SlideProps) => {
-  const { children, payload, ui, handler } = props;
+  const { children, payload, ui, handler } = props
   const {
     onClose,
     onDownload,
@@ -33,7 +33,7 @@ export const Slide = (props: SlideProps) => {
     onRotateLeft,
     onRotateReset,
     onRotateRight,
-  } = handler ?? {};
+  } = handler ?? {}
 
   const getImage = useGetImagesQuery({
     fetchPolicy: "cache-first",
@@ -44,7 +44,7 @@ export const Slide = (props: SlideProps) => {
         // },
       },
     },
-  });
+  })
 
   return (
     <Box
@@ -82,5 +82,5 @@ export const Slide = (props: SlideProps) => {
         }}
       />
     </Box>
-  );
-};
+  )
+}

@@ -1,25 +1,25 @@
-import { Image } from "@mantine/core";
-import type React from "react";
-import { useMemo } from "react";
+import { Image } from "@mantine/core"
+import type React from "react"
+import { useMemo } from "react"
 
 export type PreviewUi = {
-  scale: number;
-  rotate: number;
-  action: "rotate" | "reset";
-};
+  scale: number
+  rotate: number
+  action: "rotate" | "reset"
+}
 
 export interface PreviewProps {
-  ui: PreviewUi;
+  ui: PreviewUi
 }
 
 export const Preview = (props: PreviewProps) => {
-  const { ui } = props;
+  const { ui } = props
 
   const transition: React.CSSProperties | undefined = useMemo(() => {
     return ui.action === "reset"
       ? undefined
-      : { transition: "transform 0.3s ease" };
-  }, [ui.action]);
+      : { transition: "transform 0.3s ease" }
+  }, [ui.action])
 
   return (
     <Image
@@ -33,5 +33,5 @@ export const Preview = (props: PreviewProps) => {
         ...transition,
       }}
     />
-  );
-};
+  )
+}

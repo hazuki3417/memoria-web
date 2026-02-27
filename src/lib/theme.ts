@@ -1,13 +1,13 @@
-import { DEFAULT_THEME, createTheme, mergeMantineTheme } from "@mantine/core";
+import { DEFAULT_THEME, createTheme, mergeMantineTheme } from "@mantine/core"
 
 declare module "@mantine/core" {
   export interface MantineThemeOther {
     // App内で利用する定数の型定義
     app: {
       header: {
-        height: number;
-      };
-    };
+        height: number
+      }
+    }
   }
 }
 
@@ -53,6 +53,6 @@ export const override = createTheme({
       },
     },
   },
-});
+})
 
-export const theme = mergeMantineTheme(DEFAULT_THEME, override);
+export const theme = mergeMantineTheme(DEFAULT_THEME, override)

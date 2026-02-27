@@ -1,5 +1,5 @@
-"use client";
-import { Box, Button, Flex, Stack, Text } from "@mantine/core";
+"use client"
+import { Box, Button, Flex, Stack, Text } from "@mantine/core"
 import {
   Controller,
   FormProvider,
@@ -7,8 +7,8 @@ import {
   useForm,
   useFormState,
   useWatch,
-} from "react-hook-form";
-import { useCallback, useEffect, useMemo, useState } from "react";
+} from "react-hook-form"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import {
   ImageInputForm,
   imageFormDefaultValue,
@@ -17,16 +17,16 @@ import {
   FormSwitcher,
   MODE,
   ImageDropForm,
-} from "@/feature/images/new";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { imageConfig } from "@/config";
-import { useUploadImageMutation, Visibility } from "@/graphql";
-import { useTaskManager } from "@/hooks";
-import { Task } from "@/reducers";
-import { nanoid } from "nanoid";
-import { useTranslation } from "react-i18next";
-import { zod, rhf } from "@/lib";
+} from "@/feature/images/new"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { imageConfig } from "@/config"
+import { useUploadImageMutation, Visibility } from "@/graphql"
+import { useTaskManager } from "@/hooks"
+import { Task } from "@/reducers"
+import { nanoid } from "nanoid"
+import { useTranslation } from "react-i18next"
+import { zod, rhf } from "@/lib"
 
 const fileSchema = z.object({
   file: zod.refine(
@@ -36,16 +36,16 @@ const fileSchema = z.object({
       zod.validate.file.size.tooLarge(imageConfig.size.max),
     ],
   ),
-});
+})
 
-const imageSchema = imageFormSchema.merge(fileSchema);
+const imageSchema = imageFormSchema.merge(fileSchema)
 
 const inputFormSchema = z.object({
   share: imageFormSchema,
   images: z.array(imageSchema).max(imageConfig.count.max),
-});
-type ImageSchema = z.infer<typeof imageSchema>;
-type FormSchema = z.infer<typeof inputFormSchema>;
+})
+type ImageSchema = z.infer<typeof imageSchema>
+type FormSchema = z.infer<typeof inputFormSchema>
 
 /**
  * NOTE: 仕様
@@ -83,7 +83,7 @@ type FormSchema = z.infer<typeof inputFormSchema>;
  *       ユースケースを洗い出して検討した方が良さそう
  */
 const Page = () => {
-  const formSwitcher = useFormSwitcher();
+  const formSwitcher = useFormSwitcher()
   const methods = useForm<FormSchema>({
     resolver: zodResolver(inputFormSchema),
     mode: "onChange",
@@ -91,38 +91,38 @@ const Page = () => {
       share: imageFormDefaultValue,
       images: [],
     },
-  });
+  })
 
   const watchValueImages = useWatch({
     control: methods.control,
     name: "images",
-  });
+  })
 
   const watchStateImages = useFormState({
     control: methods.control,
     name: "images",
-  });
+  })
 
   const { fields, append, remove } = useFieldArray({
     control: methods.control,
     name: "images",
-  });
+  })
 
-  const [uploadImage] = useUploadImageMutation();
+  const [uploadImage] = useUploadImageMutation()
 
   const taskManager = useTaskManager({
     mode: "parallel",
     failOnError: false,
-  });
+  })
 
-  const [selected, setSelected] = useState<number | null>(null);
+  const [selected, setSelected] = useState<number | null>(null)
 
-  const locale = useTranslation();
+  const locale = useTranslation()
 
   const submit = async () => {
     await methods.handleSubmit(async (value, errors) => {
       await taskManager.handler.submit(async (task, index) => {
-        const image = methods.getValues("images")[index];
+        const image = methods.getValues("images")[index]
         await uploadImage({
           variables: {
             input: {
@@ -133,63 +133,63 @@ const Page = () => {
                   : Visibility.Private,
             },
           },
-        });
-      });
-    })();
-  };
+        })
+      })
+    })()
+  }
 
   const addFiles = (files: FileList) => {
-    const newTasks: Task[] = [];
-    const newImages: ImageSchema[] = [];
+    const newTasks: Task[] = []
+    const newImages: ImageSchema[] = []
 
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+      const file = files[i]
 
       newTasks.push({
         id: nanoid(),
         status: "idle",
-      });
+      })
 
       newImages.push({
         file,
         ...imageFormDefaultValue,
-      });
+      })
     }
 
     // まとめて更新
-    taskManager.handler.append(newTasks);
-    append(newImages);
+    taskManager.handler.append(newTasks)
+    append(newImages)
     // NOTE: バリデーションを発火させる
-    methods.trigger();
-  };
+    methods.trigger()
+  }
 
   const fileDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    addFiles(event.dataTransfer.files);
-  }, []);
+    event.preventDefault()
+    addFiles(event.dataTransfer.files)
+  }, [])
 
   const fileSelect = useCallback((newFiles: FileList | null) => {
     if (newFiles === null) {
-      return;
+      return
     }
-    addFiles(newFiles);
-  }, []);
+    addFiles(newFiles)
+  }, [])
 
   const fileSelected = useCallback((index: number, id: string) => {
-    setSelected(index);
-  }, []);
+    setSelected(index)
+  }, [])
 
   const fileRemove = useCallback(
     (index: number, id: string) => {
-      taskManager.handler.remove([id]);
-      remove(index);
+      taskManager.handler.remove([id])
+      remove(index)
     },
     [fields],
-  );
+  )
 
   const imageDropFormValid = useMemo(() => {
     if (imageConfig.count.max < watchValueImages.length) {
-      return "reject";
+      return "reject"
     }
 
     // const empty = 0;
@@ -199,17 +199,17 @@ const Page = () => {
     //   }
     // }
 
-    return "idle";
-  }, [methods, fields, watchValueImages]);
+    return "idle"
+  }, [methods, fields, watchValueImages])
 
   const imageDropFormDisabled = useMemo(() => {
-    return imageConfig.count.max <= watchValueImages.length;
-  }, [watchValueImages]);
+    return imageConfig.count.max <= watchValueImages.length
+  }, [watchValueImages])
 
   const isEmpty = useMemo(() => {
-    const empty = 0;
-    return fields.length <= empty;
-  }, [fields]);
+    const empty = 0
+    return fields.length <= empty
+  }, [fields])
 
   useEffect(() => {
     /**
@@ -217,21 +217,21 @@ const Page = () => {
      * 個別フォーム状態のとき > サムネイルを選択状態にする
      */
     if (formSwitcher.state.mode === MODE.TYPE.ALL) {
-      setSelected(null);
-      return;
+      setSelected(null)
+      return
     }
-    setSelected(0);
-  }, [formSwitcher.state.mode]);
+    setSelected(0)
+  }, [formSwitcher.state.mode])
 
   const previews = fields.map((preview, index) => {
-    const task = taskManager.state.tasks[index];
+    const task = taskManager.state.tasks[index]
     return (
       <Controller
         key={preview.id}
         control={methods.control}
         name={`images.${index}.file`}
         render={({ field, fieldState }) => {
-          const rhfFieldState = rhf.fieldState(fieldState);
+          const rhfFieldState = rhf.fieldState(fieldState)
           return (
             <ImageDropForm.PreviewImageBox
               key={preview.id}
@@ -262,11 +262,11 @@ const Page = () => {
                 onRemove: fileRemove,
               }}
             />
-          );
+          )
         }}
       />
-    );
-  });
+    )
+  })
 
   return (
     <Box
@@ -352,7 +352,7 @@ const Page = () => {
         )}
       </ImageDropForm>
     </Box>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

@@ -1,5 +1,5 @@
-import { serverEnv } from "@/env/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { serverEnv } from "@/env/server"
+import { Auth0Client } from "@auth0/nextjs-auth0/server"
 
 export const auth = new Auth0Client({
   appBaseUrl: serverEnv.APP_BASE_URL,
@@ -12,4 +12,4 @@ export const auth = new Auth0Client({
     scope: serverEnv.AUTH0_SCOPE,
     audience: serverEnv.AUTH0_AUDIENCE,
   },
-});
+})

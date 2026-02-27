@@ -1,35 +1,35 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react"
 
 export interface UseIntersectionOption {
-  intersect: () => void;
-  init?: IntersectionObserverInit;
+  intersect: () => void
+  init?: IntersectionObserverInit
 }
 
 export const useIntersection = (option: UseIntersectionOption) => {
-  const ref = useRef(null);
-  const intersect = useRef(option.intersect);
+  const ref = useRef(null)
+  const intersect = useRef(option.intersect)
 
   const init = useMemo(
     () => option.init ?? { root: null, rootMargin: "400px", threshold: 0.1 },
     [option.init],
-  );
+  )
 
   useEffect(() => {
-    intersect.current = option.intersect;
-  }, [option.intersect]);
+    intersect.current = option.intersect
+  }, [option.intersect])
 
   useEffect(() => {
-    if (!ref.current) return;
+    if (!ref.current) return
 
     const observer = new IntersectionObserver((entries) => {
       if (entries.some((event) => event.isIntersecting)) {
-        intersect.current();
+        intersect.current()
       }
-    }, init);
+    }, init)
 
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [init]);
+    observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [init])
 
-  return { ref };
-};
+  return { ref }
+}

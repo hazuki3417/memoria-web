@@ -1,3 +1,3 @@
 export interface CreateGraphQLOption {
-  token?: string;
+  token?: string
 }

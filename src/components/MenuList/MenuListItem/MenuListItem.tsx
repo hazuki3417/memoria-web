@@ -1,12 +1,12 @@
-import { Box, BoxProps } from "@mantine/core";
-import React from "react";
+import { Box, BoxProps } from "@mantine/core"
+import React from "react"
 
 export interface MenuListItemProps extends Omit<BoxProps, "component"> {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export const MenuListItem = (props: MenuListItemProps) => {
-  const { children, style, ...less } = props;
+  const { children, style, ...less } = props
 
   return (
     <Box
@@ -20,5 +20,5 @@ export const MenuListItem = (props: MenuListItemProps) => {
     >
       {children}
     </Box>
-  );
-};
+  )
+}

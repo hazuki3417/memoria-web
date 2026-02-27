@@ -1,10 +1,10 @@
-import "client-only";
-import { useParams } from "next/navigation";
+import "client-only"
+import { useParams } from "next/navigation"
 
 /**
  * Next.js useParams が返す生の型
  */
-export type RawUriParams = Record<string, string | string[] | undefined>;
+export type RawUriParams = Record<string, string | string[] | undefined>
 
 /**
  * useUriParams のオプション
@@ -14,8 +14,8 @@ export type UseUriParamsOption<T> = {
    * 生の params をアプリ用に変換する関数
    * 指定しなければ raw をそのまま返す
    */
-  normalize?: (raw: RawUriParams) => T;
-};
+  normalize?: (raw: RawUriParams) => T
+}
 
 /**
  * URI path params を取得するアプリ用 hook
@@ -27,12 +27,12 @@ export type UseUriParamsOption<T> = {
 export const useUriParams = <T extends Record<string, any> = RawUriParams>(
   option?: UseUriParamsOption<T>,
 ): T => {
-  const raw = useParams() as RawUriParams;
+  const raw = useParams() as RawUriParams
 
   if (option?.normalize) {
-    return option.normalize(raw);
+    return option.normalize(raw)
   }
 
   // normalize 未指定時は raw をそのまま返す
-  return raw as unknown as T;
-};
+  return raw as unknown as T
+}

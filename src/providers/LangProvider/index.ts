@@ -1,1 +1,1 @@
-export * from "./LangProvider";
+export * from "./LangProvider"

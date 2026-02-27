@@ -1,25 +1,25 @@
-import { FormTextInput } from "@/components";
-import { extractInteractivity, FormInteractivity } from "@/hooks";
-import { Box } from "@mantine/core";
-import { z } from "zod";
+import { FormTextInput } from "@/components"
+import { extractInteractivity, FormInteractivity } from "@/hooks"
+import { Box } from "@mantine/core"
+import { z } from "zod"
 
 export const profileInputFormSchema = z.object({
   name: z.string().nonempty(),
   email: z.string().nonempty(),
-});
+})
 
-export type ProfileInputFormSchema = z.infer<typeof profileInputFormSchema>;
+export type ProfileInputFormSchema = z.infer<typeof profileInputFormSchema>
 
 export const profileInputFormDefaultValue: ProfileInputFormSchema = {
   name: "",
   email: "",
-};
+}
 
 export interface ProfileInputFormProps extends FormInteractivity {}
 
 export const ProfileInputForm = (props: ProfileInputFormProps) => {
-  const {} = props;
-  const interactivity = extractInteractivity(props);
+  const {} = props
+  const interactivity = extractInteractivity(props)
   return (
     <Box>
       <FormTextInput
@@ -39,5 +39,5 @@ export const ProfileInputForm = (props: ProfileInputFormProps) => {
         {...interactivity}
       />
     </Box>
-  );
-};
+  )
+}

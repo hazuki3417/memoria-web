@@ -1,17 +1,17 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { ImageFrame } from "./ImageFrame";
-import { ImageTile } from "../ImageTile";
-import { fn, userEvent, within } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react"
+import { ImageFrame } from "./ImageFrame"
+import { ImageTile } from "../ImageTile"
+import { fn, userEvent, within } from "@storybook/test"
 
 const meta = {
   title: "Image/ImageFrame",
   component: ImageFrame,
-} satisfies Meta<typeof ImageFrame>;
+} satisfies Meta<typeof ImageFrame>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
-const children = <ImageTile src="sample/v.png" alt="example" />;
+const children = <ImageTile src="sample/v.png" alt="example" />
 
 export const Default: Story = {
   args: {
@@ -22,10 +22,10 @@ export const Default: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("click-image-frame"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
-};
+}
 
 export const Selected: Story = {
   args: {
@@ -38,10 +38,10 @@ export const Selected: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("click-image-frame"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
-};
+}
 
 export const Selectable: Story = {
   args: {
@@ -54,10 +54,10 @@ export const Selectable: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("click-image-frame"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
-};
+}
 
 export const ValidAccept: Story = {
   args: {
@@ -70,10 +70,10 @@ export const ValidAccept: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("click-image-frame"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
-};
+}
 
 export const ValidReject: Story = {
   args: {
@@ -86,10 +86,10 @@ export const ValidReject: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("click-image-frame"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
-};
+}
 
 export const ValidWarning: Story = {
   args: {
@@ -102,7 +102,7 @@ export const ValidWarning: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId("click-image-frame"));
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
-};
+}

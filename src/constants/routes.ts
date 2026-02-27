@@ -1,5 +1,5 @@
-import { RouteNodes } from "@/types/routes";
-import { images, settings } from "./routes/index";
+import { RouteNodes } from "@/types/routes"
+import { images, settings } from "./routes/index"
 
 export const routes = {
   dashboard: {
@@ -10,4 +10,4 @@ export const routes = {
   },
   ...images,
   ...settings,
-} as const satisfies RouteNodes;
+} as const satisfies RouteNodes

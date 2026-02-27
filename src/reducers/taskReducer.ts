@@ -1,34 +1,34 @@
-import { ActionType, assertUnreachableActionType } from "./util";
+import { ActionType, assertUnreachableActionType } from "./util"
 
-export type TaskStatus = "idle" | "running" | "success" | "error";
+export type TaskStatus = "idle" | "running" | "success" | "error"
 export type TaskBase = {
-  id: string;
-  status: TaskStatus;
-  error?: string;
-};
+  id: string
+  status: TaskStatus
+  error?: string
+}
 export type Task<D = undefined> = D extends undefined
   ? TaskBase
-  : TaskBase & { data: D };
+  : TaskBase & { data: D }
 
-export type TaskActionType = "append" | "update" | "remove" | "reset";
+export type TaskActionType = "append" | "update" | "remove" | "reset"
 export interface TaskState<D = undefined> {
   current: {
-    tasks: Task<D>[];
-  };
+    tasks: Task<D>[]
+  }
   meta: {
-    action: ActionType<TaskActionType>;
-  };
+    action: ActionType<TaskActionType>
+  }
 }
 
 export type TaskAction<D = undefined> =
   | { type: "append"; payload: Task<D>[] }
   | {
-      type: "update";
-      key: TaskBase["id"];
-      payload: Pick<TaskBase, "status" | "error"> & { data?: D };
+      type: "update"
+      key: TaskBase["id"]
+      payload: Pick<TaskBase, "status" | "error"> & { data?: D }
     }
   | { type: "remove"; key: TaskBase["id"][] }
-  | { type: "reset" };
+  | { type: "reset" }
 
 export const taskReducer = <D = undefined>(
   state: TaskState<D>,
@@ -40,7 +40,7 @@ export const taskReducer = <D = undefined>(
         ...state,
         current: { tasks: [...state.current.tasks, ...action.payload] },
         meta: { action: "append" },
-      };
+      }
     case "update":
       return {
         ...state,
@@ -50,7 +50,7 @@ export const taskReducer = <D = undefined>(
           ),
         },
         meta: { action: "update" },
-      };
+      }
     case "remove":
       return {
         ...state,
@@ -60,14 +60,14 @@ export const taskReducer = <D = undefined>(
           ),
         },
         meta: { action: "remove" },
-      };
+      }
     case "reset":
       return {
         ...state,
         current: { tasks: [] },
         meta: { action: "reset" },
-      };
+      }
     default:
-      throw assertUnreachableActionType(action);
+      throw assertUnreachableActionType(action)
   }
-};
+}

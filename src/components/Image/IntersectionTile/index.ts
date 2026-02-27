@@ -1,1 +1,1 @@
-export * from "./IntersectionTile";
+export * from "./IntersectionTile"

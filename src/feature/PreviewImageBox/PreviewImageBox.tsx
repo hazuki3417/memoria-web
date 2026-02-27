@@ -6,51 +6,51 @@ import {
   Paper,
   Stack,
   Text,
-} from "@mantine/core";
-import classes from "./PreviewImageBox.module.css";
-import React, { useCallback } from "react";
-import { IconAlertTriangle, IconX } from "@tabler/icons-react";
+} from "@mantine/core"
+import classes from "./PreviewImageBox.module.css"
+import React, { useCallback } from "react"
+import { IconAlertTriangle, IconX } from "@tabler/icons-react"
 
 export type PreviewImageBoxPayload = {
-  src?: string;
-  alt?: string;
-};
+  src?: string
+  alt?: string
+}
 
 export type PreviewImageBoxUi = {
-  error?: string;
-  selected: boolean;
-  selectable: boolean;
-  supported: boolean;
-  valid?: "idle" | "accept" | "warning" | "reject";
-};
+  error?: string
+  selected: boolean
+  selectable: boolean
+  supported: boolean
+  valid?: "idle" | "accept" | "warning" | "reject"
+}
 
 export type PreviewImageBoxHandler = {
-  onSelect?: (index: number, id: string) => void;
-  onRemove?: (index: number, id: string) => void;
-};
+  onSelect?: (index: number, id: string) => void
+  onRemove?: (index: number, id: string) => void
+}
 
 export interface PreviewImageBoxProps {
-  index: number; // 要素番号
-  id: string; // 要素値のid
-  payload: PreviewImageBoxPayload;
-  handler?: PreviewImageBoxHandler;
-  ui: PreviewImageBoxUi;
+  index: number // 要素番号
+  id: string // 要素値のid
+  payload: PreviewImageBoxPayload
+  handler?: PreviewImageBoxHandler
+  ui: PreviewImageBoxUi
 }
 
 export const PreviewImageBox = (props: PreviewImageBoxProps) => {
-  const { index, id, payload, ui, handler } = props;
+  const { index, id, payload, ui, handler } = props
 
   const select = useCallback(() => {
-    handler?.onSelect?.(index, id);
-  }, [index, id]);
+    handler?.onSelect?.(index, id)
+  }, [index, id])
 
   const remove = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      handler?.onRemove?.(index, id);
+      event.stopPropagation()
+      handler?.onRemove?.(index, id)
     },
     [index, id],
-  );
+  )
 
   return (
     <HoverCard>
@@ -110,5 +110,5 @@ export const PreviewImageBox = (props: PreviewImageBoxProps) => {
         </HoverCard.Dropdown>
       )}
     </HoverCard>
-  );
-};
+  )
+}

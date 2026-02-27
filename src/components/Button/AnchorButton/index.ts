@@ -1,1 +1,1 @@
-export * from "./AnchorButton";
+export * from "./AnchorButton"

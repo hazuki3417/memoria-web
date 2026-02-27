@@ -1,18 +1,18 @@
-import { assertUnreachableActionType } from "./util";
+import { assertUnreachableActionType } from "./util"
 
 export interface NumberState {
   current: {
-    value: number;
-  };
+    value: number
+  }
   initial: {
-    value: number;
-  };
+    value: number
+  }
   config: {
-    step: number;
-  };
+    step: number
+  }
 }
 
-export type NumberAction = { type: "set"; value: number } | { type: "reset" };
+export type NumberAction = { type: "set"; value: number } | { type: "reset" }
 
 export const numberReducer = (
   state: NumberState,
@@ -25,15 +25,15 @@ export const numberReducer = (
         current: {
           value: action.value,
         },
-      };
+      }
     case "reset":
       return {
         ...state,
         current: {
           value: state.initial.value,
         },
-      };
+      }
     default:
-      throw assertUnreachableActionType(action);
+      throw assertUnreachableActionType(action)
   }
-};
+}

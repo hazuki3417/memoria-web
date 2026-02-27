@@ -1,12 +1,12 @@
-import { Box, ScrollArea } from "@mantine/core";
-import React from "react";
+import { Box, ScrollArea } from "@mantine/core"
+import React from "react"
 
 export interface SlideProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export const Slide = (props: SlideProps) => {
-  const { children } = props;
+  const { children } = props
   return (
     <ScrollArea
       type="always"
@@ -25,5 +25,5 @@ export const Slide = (props: SlideProps) => {
         {children}
       </Box>
     </ScrollArea>
-  );
-};
+  )
+}

@@ -1,11 +1,11 @@
-import { resolveUri } from "@/lib/url";
-import { Avatar, Menu, Text, UnstyledButton } from "@mantine/core";
+import { resolveUri } from "@/lib/url"
+import { Avatar, Menu, Text, UnstyledButton } from "@mantine/core"
 import {
   IconDashboard,
   IconLogout,
   IconPhoto,
   IconSettings,
-} from "@tabler/icons-react";
+} from "@tabler/icons-react"
 
 export interface UserMenuProps {}
 
@@ -55,5 +55,5 @@ export const UserMenu = (props: UserMenuProps) => {
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
-  );
-};
+  )
+}

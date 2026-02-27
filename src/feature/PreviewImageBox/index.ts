@@ -1,1 +1,1 @@
-export * from "./PreviewImageBox";
+export * from "./PreviewImageBox"

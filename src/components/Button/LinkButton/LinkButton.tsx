@@ -1,13 +1,13 @@
-import Link from "next/link";
-import { Button, ButtonProps } from "@mantine/core";
+import Link from "next/link"
+import { Button, ButtonProps } from "@mantine/core"
 
 export interface LinkButtonProps extends ButtonProps {
-  href: string;
+  href: string
 }
 
 /**
  * Next Pageへの遷移を提供するボタン
  */
 export const LinkButton = (props: LinkButtonProps) => {
-  return <Button component={Link} {...props} />;
-};
+  return <Button component={Link} {...props} />
+}
