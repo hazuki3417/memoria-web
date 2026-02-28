@@ -15,7 +15,7 @@ import "@mantine/core/styles.css"
 import { Notifications } from "@mantine/notifications"
 import "@mantine/notifications/styles.css"
 import type { Metadata } from "next"
-import { AppShellModal, Header } from "./_components"
+import { Header } from "./_components"
 import Head from "./Head"
 import Providers from "./Providers"
 
@@ -75,7 +75,6 @@ const RootLayout = async (props: RootLayoutProps) => {
                 {children}
               </Container>
             </AppShellMain>
-            <AppShellModal />
           </AppShell>
         </Providers>
       </body>

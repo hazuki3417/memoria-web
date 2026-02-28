@@ -1,9 +1,8 @@
 import { Box } from "@mantine/core"
-import { Header, HeaderHandler } from "./Header"
+import React from "react"
 import { Body, BodyHandler } from "./Body"
 import { Footer, FooterHandler, FooterPayload, FooterUi } from "./Footer"
-import React from "react"
-import { useGetImagesQuery } from "@/graphql"
+import { Header, HeaderHandler } from "./Header"
 
 export type SlidePayload = FooterPayload
 
@@ -34,17 +33,6 @@ export const Slide = (props: SlideProps) => {
     onRotateReset,
     onRotateRight,
   } = handler ?? {}
-
-  const getImage = useGetImagesQuery({
-    fetchPolicy: "cache-first",
-    variables: {
-      input: {
-        // pagination: {
-        //   first: 3,
-        // },
-      },
-    },
-  })
 
   return (
     <Box

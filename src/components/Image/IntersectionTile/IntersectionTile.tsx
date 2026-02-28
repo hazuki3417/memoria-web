@@ -1,5 +1,5 @@
-import { Box, LoadingOverlay } from "@mantine/core"
-import React, { forwardRef } from "react"
+import { Box } from "@mantine/core"
+import { forwardRef } from "react"
 
 export interface IntersectionTileProps {
   visible: boolean
@@ -25,13 +25,13 @@ export const IntersectionTile = forwardRef<
       })}
       ref={ref}
     >
-      <LoadingOverlay
+      {/* <LoadingOverlay
         visible={visible}
         style={(theme) => ({
           borderRadius: theme.radius.sm,
         })}
         loaderProps={{ children: "Loading..." }}
-      />
+      /> */}
     </Box>
   )
 })

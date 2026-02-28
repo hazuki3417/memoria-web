@@ -2,6 +2,11 @@ import { Image } from "@mantine/core"
 import type React from "react"
 import { useMemo } from "react"
 
+export type PreviewPayload = {
+  src: string
+  alt: string
+}
+
 export type PreviewUi = {
   scale: number
   rotate: number
@@ -9,11 +14,12 @@ export type PreviewUi = {
 }
 
 export interface PreviewProps {
+  payload: PreviewPayload
   ui: PreviewUi
 }
 
 export const Preview = (props: PreviewProps) => {
-  const { ui } = props
+  const { payload, ui } = props
 
   const transition: React.CSSProperties | undefined = useMemo(() => {
     return ui.action === "reset"
@@ -23,8 +29,8 @@ export const Preview = (props: PreviewProps) => {
 
   return (
     <Image
-      src="sample/h.png"
-      alt="表示画像"
+      src={payload.src}
+      alt={payload.alt}
       style={{
         maxHeight: "100%",
         maxWidth: "100%",

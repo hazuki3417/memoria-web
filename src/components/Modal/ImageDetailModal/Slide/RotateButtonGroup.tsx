@@ -14,6 +14,7 @@ export interface RotateButtonGroupProps {
 export const RotateButtonGroup = (props: RotateButtonGroupProps) => (
   <ActionIcon.Group>
     <ActionIcon
+      size={"input-xs"}
       variant="default"
       onClick={props.onLeft}
       data-testid="rotate-left"
@@ -21,6 +22,7 @@ export const RotateButtonGroup = (props: RotateButtonGroupProps) => (
       <IconRotate2 />
     </ActionIcon>
     <ActionIcon
+      size={"input-xs"}
       variant="default"
       onClick={props.onReset}
       data-testid="rotate-reset"
@@ -28,6 +30,7 @@ export const RotateButtonGroup = (props: RotateButtonGroupProps) => (
       <IconRotate />
     </ActionIcon>
     <ActionIcon
+      size={"input-xs"}
       variant="default"
       onClick={props.onRight}
       data-testid="rotate-right"

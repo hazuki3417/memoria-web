@@ -17,6 +17,7 @@ export const ActionPanel = (props: ActionPanelProps) => {
     </Flex>
   )
 }
+ActionPanel.displayName = "ActionPanel"
 ActionPanel.Left = memo(Left)
 ActionPanel.Center = memo(Center)
 ActionPanel.Right = memo(Right)

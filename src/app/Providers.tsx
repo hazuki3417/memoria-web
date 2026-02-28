@@ -28,13 +28,11 @@ const Providers = (props: ProvidersProps) => {
   return (
     <ThemeProvider {...theme}>
       <LangProvider>
-        <ImageDetailModalProvider>
-          <AuthProvider value={auth}>
-            <MemoGraphQLProvider option={option.graphql}>
-              {children}
-            </MemoGraphQLProvider>
-          </AuthProvider>
-        </ImageDetailModalProvider>
+        <AuthProvider value={auth}>
+          <MemoGraphQLProvider option={option.graphql}>
+            <ImageDetailModalProvider>{children}</ImageDetailModalProvider>
+          </MemoGraphQLProvider>
+        </AuthProvider>
       </LangProvider>
     </ThemeProvider>
   )

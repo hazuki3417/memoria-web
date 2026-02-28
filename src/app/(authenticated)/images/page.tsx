@@ -6,12 +6,12 @@ import {
   imageSearchFormDefaultValue,
   imageSearchFormSchema,
 } from "@/feature/images"
-import { ImageEdge, useGetImagesQuery } from "@/graphql"
+import { useGetImagesQuery } from "@/graphql"
 import { useIntersection } from "@/hooks/useIntersection"
 import { useRelayConnection } from "@/hooks/useRelayConnection"
 import { defineFieldObject } from "@/lib/field"
 import { resolveUri } from "@/lib/url"
-import { useImageDetailModalContext } from "@/providers"
+import { ImageDetailPayload, useImageDetailModalContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Box,
@@ -32,7 +32,6 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { t } from "i18next"
-import { nanoid } from "nanoid"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -52,7 +51,7 @@ const Page = () => {
   })
 
   const imageDetailModalContext = useImageDetailModalContext()
-  const [items, setItems] = useState<ImageEdge[]>([])
+  const [items, setItems] = useState<ImageDetailPayload[]>([])
 
   const relay = useRelayConnection({
     hooks: () =>
@@ -70,14 +69,61 @@ const Page = () => {
     intersect: async () => {
       if (!relay.state.pageInfo?.hasNextPage) return
       const res = await relay.handler.next()
-      setItems((prev) => [...prev, ...res.data.getImages.edges] as ImageEdge[])
+      setItems((prev) => [
+        ...prev,
+        ...res.data.getImages.edges.map((edge) => {
+          return {
+            id: edge.node.id,
+            info: {
+              file: {
+                name: edge.node.info.file.name,
+                size: String(edge.node.info.file.size),
+                date: "",
+              },
+              image: {
+                width: edge.node.info.size.width,
+                height: edge.node.info.size.height,
+              },
+              tags: edge.node.info.tags,
+            },
+            image: {
+              preview: edge.node.src.preview,
+              thumbnail: edge.node.src.thumbnail,
+              alt: "sample.png",
+            },
+          }
+        }),
+      ])
     },
   })
 
   // 初期レンダリング時の処理
   useEffect(() => {
     if (relay.state.edges.length > 0 && items.length === 0) {
-      setItems(relay.state.edges as ImageEdge[])
+      setItems(
+        relay.state.edges.map((edge) => {
+          return {
+            id: edge.node.id,
+            info: {
+              file: {
+                name: edge.node.info.file.name,
+                size: String(edge.node.info.file.size),
+                date: "",
+              },
+              image: {
+                width: edge.node.info.size.width,
+                height: edge.node.info.size.height,
+              },
+              tags: edge.node.info.tags,
+            },
+            image: {
+              preview: edge.node.src.preview,
+              thumbnail: edge.node.src.thumbnail,
+              alt: "sample.png",
+            },
+          }
+        }),
+      )
     }
   }, [relay.state.edges, items.length])
 
@@ -159,20 +205,25 @@ const Page = () => {
           <ImageLayout>
             <ImageLayout.Grid>
               <Image>
-                {items.map((list, index) => {
+                {items.map((item) => {
                   return (
                     <PreviewImageBox
-                      key={nanoid()}
+                      key={item.id}
                       ui={{
                         selected: false,
                         selectable: false,
                         supported: true,
                       }}
-                      onClick={imageDetailModalContext.control.open}
+                      onClick={() => {
+                        imageDetailModalContext.control.open({
+                          id: item.id,
+                          getImages: () => items,
+                        })
+                      }}
                     >
                       <PreviewImageBox.Image
-                        src={list.node.src.thumbnail}
-                        alt={list.node.info.file.name}
+                        src={item.image.thumbnail}
+                        alt={item.image.alt}
                       />
                     </PreviewImageBox>
                     // FIX: Image.Tile, Image.FrameとpreviewImageBoxの実装が類似しているので共通化を検討する

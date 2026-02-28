@@ -5,12 +5,13 @@ import { Box, type BoxProps } from "@mantine/core"
 import { AnimatePresence, motion } from "framer-motion"
 import { useCallback, useMemo } from "react"
 import { Info, InfoHandler, InfoPayload } from "./Info/Info"
-import { Preview } from "./Preview"
+import { Preview, PreviewPayload } from "./Preview"
 import { Slide, SlideHandler, SlidePayload } from "./Slide"
 
 export type ImageDetailModalPayload = {
   slide: SlidePayload
   info: InfoPayload
+  preview: PreviewPayload
 }
 
 export type ImageDetailModalHandler = Omit<
@@ -96,6 +97,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
         }}
       >
         <Preview
+          payload={payload.preview}
           ui={{
             rotate: imageRotate.state.angle,
             scale: imageZoom.state.scale,

@@ -1,5 +1,5 @@
 import { resolveUri } from "@/lib/url"
-import { Avatar, Menu, Text, UnstyledButton } from "@mantine/core"
+import { ActionIcon, Avatar, Menu, Text } from "@mantine/core"
 import {
   IconDashboard,
   IconLogout,
@@ -13,9 +13,9 @@ export const UserMenu = (props: UserMenuProps) => {
   return (
     <Menu position="bottom-end" width={200}>
       <Menu.Target>
-        <UnstyledButton>
-          <Avatar variant="filled" radius="sm" size={30} />
-        </UnstyledButton>
+        <ActionIcon size="input-xs" variant="gradient">
+          <Avatar variant="filled" radius="sm" />
+        </ActionIcon>
       </Menu.Target>
 
       <Menu.Dropdown>
@@ -23,7 +23,7 @@ export const UserMenu = (props: UserMenuProps) => {
         <Menu.Item
           component="a"
           href={resolveUri("/dashboard")}
-          leftSection={<IconDashboard size={16} />}
+          leftSection={<IconDashboard size={20} />}
         >
           <Text>ダッシュボード</Text>
         </Menu.Item>
@@ -32,7 +32,7 @@ export const UserMenu = (props: UserMenuProps) => {
         <Menu.Item
           component="a"
           href={resolveUri("/images")}
-          leftSection={<IconPhoto size={16} />}
+          leftSection={<IconPhoto size={20} />}
         >
           <Text>画像管理</Text>
         </Menu.Item>
@@ -40,7 +40,7 @@ export const UserMenu = (props: UserMenuProps) => {
         <Menu.Item
           component="a"
           href={resolveUri("/settings/profile")}
-          leftSection={<IconSettings size={16} />}
+          leftSection={<IconSettings size={20} />}
         >
           <Text>設定</Text>
         </Menu.Item>
@@ -49,7 +49,7 @@ export const UserMenu = (props: UserMenuProps) => {
           color="red"
           component="a"
           href="/auth/logout"
-          leftSection={<IconLogout size={16} />}
+          leftSection={<IconLogout size={20} />}
         >
           <Text>ログアウト</Text>
         </Menu.Item>

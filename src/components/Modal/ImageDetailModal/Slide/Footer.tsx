@@ -2,15 +2,14 @@ import { ActionIcon, Box, type BoxProps, Slider, Text } from "@mantine/core"
 import {
   IconDownload,
   IconInfoCircle,
-  IconRotateClockwise2,
   IconZoomIn,
   IconZoomOut,
   IconZoomReset,
 } from "@tabler/icons-react"
 import React, { memo } from "react"
+import { RotateButtonGroup } from "./RotateButtonGroup"
 import { ZoomCombobox } from "./ZoomCombobox"
 import { styles } from "./styles"
-import { RotateButtonGroup } from "./RotateButtonGroup"
 
 export type FooterPayload = {
   current: number
@@ -110,16 +109,8 @@ export const Footer = (props: FooterProps) => {
             justifyContent: "end",
           })}
         >
-          <MemoZoomResetButton onClick={handler?.onZoomReset} />
-          <ZoomCombobox
-            value={ui.level}
-            config={config}
-            handler={{
-              onOptionSubmit: handler?.onZoomChange,
-              onBlur: handler?.onZoomChange,
-            }}
-          />
           <MemoZoomOutButton onClick={handler?.onZoomOut} />
+          <MemoZoomResetButton onClick={handler?.onZoomReset} />
           <Slider
             w={120}
             color="gray"
@@ -132,6 +123,14 @@ export const Footer = (props: FooterProps) => {
             onChange={handler?.onZoomChange}
           />
           <MemoZoomInButton onClick={handler?.onZoomIn} />
+          <ZoomCombobox
+            value={ui.level}
+            config={config}
+            handler={{
+              onOptionSubmit: handler?.onZoomChange,
+              onBlur: handler?.onZoomChange,
+            }}
+          />
         </Box>
       </Box>
       <Box
@@ -157,7 +156,11 @@ const MemoIndex = memo((props: FooterPayload) => (
 
 const MemoDownloadButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
-    <ActionIcon onClick={props.onClick} data-testid="download-image">
+    <ActionIcon
+      size={"input-xs"}
+      onClick={props.onClick}
+      data-testid="download-image"
+    >
       <IconDownload />
     </ActionIcon>
   ),
@@ -167,7 +170,11 @@ const MemoRotateButtonGroup = memo(RotateButtonGroup)
 
 const MemoZoomResetButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
-    <ActionIcon onClick={props.onClick} data-testid="zoom-reset">
+    <ActionIcon
+      size={"input-xs"}
+      onClick={props.onClick}
+      data-testid="zoom-reset"
+    >
       <IconZoomReset />
     </ActionIcon>
   ),
@@ -175,7 +182,11 @@ const MemoZoomResetButton = memo(
 
 const MemoZoomOutButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
-    <ActionIcon onClick={props.onClick} data-testid="zoom-out">
+    <ActionIcon
+      size={"input-xs"}
+      onClick={props.onClick}
+      data-testid="zoom-out"
+    >
       <IconZoomOut />
     </ActionIcon>
   ),
@@ -183,7 +194,7 @@ const MemoZoomOutButton = memo(
 
 const MemoZoomInButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
-    <ActionIcon onClick={props.onClick} data-testid="zoom-in">
+    <ActionIcon size={"input-xs"} onClick={props.onClick} data-testid="zoom-in">
       <IconZoomIn />
     </ActionIcon>
   ),
@@ -191,7 +202,11 @@ const MemoZoomInButton = memo(
 
 const MemoInfoButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
-    <ActionIcon onClick={props.onClick} data-testid="open-info">
+    <ActionIcon
+      size={"input-xs"}
+      onClick={props.onClick}
+      data-testid="open-info"
+    >
       <IconInfoCircle />
     </ActionIcon>
   ),
