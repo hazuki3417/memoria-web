@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks"
+import { useAuthContext } from "@/providers"
 import React from "react"
 
 export interface AuthProps {
@@ -11,11 +11,11 @@ export const Auth = (props: AuthProps) => {
 }
 
 Auth.SignedIn = ({ children }: { children: React.ReactNode }) => {
-  const auth = useAuth()
+  const auth = useAuthContext()
   return auth.isSignIn ? <>{children}</> : null
 }
 
 Auth.SignedOut = ({ children }: { children: React.ReactNode }) => {
-  const auth = useAuth()
+  const auth = useAuthContext()
   return !auth.isSignIn ? <>{children}</> : null
 }

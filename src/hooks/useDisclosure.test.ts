@@ -4,58 +4,58 @@ import { useDisclosure } from "./useDisclosure"
 
 describe("useDisclosure", () => {
   it("should initialize with initial value", () => {
-    const { result } = renderHook(() => useDisclosure({ opend: true }))
+    const { result } = renderHook(() => useDisclosure({ status: "opened" }))
 
-    expect(result.current.state.opend).toBe(true)
+    expect(result.current.value.status).toBe("opened")
   })
 
   it("should set open", () => {
-    const { result } = renderHook(() => useDisclosure({ opend: false }))
+    const { result } = renderHook(() => useDisclosure({ status: "closed" }))
 
     act(() => {
-      result.current.handler.open()
+      result.current.control.open()
     })
 
-    expect(result.current.state.opend).toBe(true)
+    expect(result.current.value.status).toBe("opened")
   })
 
   it("should set close", () => {
-    const { result } = renderHook(() => useDisclosure({ opend: true }))
+    const { result } = renderHook(() => useDisclosure({ status: "opened" }))
 
     act(() => {
-      result.current.handler.close()
+      result.current.control.close()
     })
 
-    expect(result.current.state.opend).toBe(false)
+    expect(result.current.value.status).toBe("closed")
   })
 
   it("should toggle value", () => {
-    const { result } = renderHook(() => useDisclosure({ opend: false }))
+    const { result } = renderHook(() => useDisclosure({ status: "closed" }))
 
     act(() => {
-      result.current.handler.toggle()
+      result.current.control.toggle()
     })
 
-    expect(result.current.state.opend).toBe(true)
+    expect(result.current.value.status).toBe("opened")
 
     act(() => {
-      result.current.handler.toggle()
+      result.current.control.toggle()
     })
 
-    expect(result.current.state.opend).toBe(false)
+    expect(result.current.value.status).toBe("closed")
   })
 
   it("should reset to initial", () => {
-    const { result } = renderHook(() => useDisclosure({ opend: true }))
+    const { result } = renderHook(() => useDisclosure({ status: "opened" }))
 
     act(() => {
-      result.current.handler.close()
+      result.current.control.close()
     })
-    expect(result.current.state.opend).toBe(false)
+    expect(result.current.value.status).toBe("closed")
 
     act(() => {
-      result.current.handler.reset()
+      result.current.control.reset()
     })
-    expect(result.current.state.opend).toBe(true)
+    expect(result.current.value.status).toBe("opened")
   })
 })

@@ -1,12 +1,12 @@
 import { Combobox, InputBase, useCombobox } from "@mantine/core"
 import {
   ChangeEvent,
+  FocusEvent,
+  KeyboardEvent,
   useCallback,
+  useEffect,
   useMemo,
   useState,
-  KeyboardEvent,
-  FocusEvent,
-  useEffect,
 } from "react"
 
 export interface ZoomComboboxHandler {

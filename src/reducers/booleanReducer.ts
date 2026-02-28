@@ -1,12 +1,8 @@
 import { assertUnreachableActionType } from "./util"
 
-export interface BooleanState {
-  current: {
-    value: boolean
-  }
-  initial: {
-    value: boolean
-  }
+export interface BooleanValue {
+  current: boolean
+  initial: boolean
 }
 
 export type BooleanAction =
@@ -16,18 +12,18 @@ export type BooleanAction =
   | { type: "reset" }
 
 export const booleanReducer = (
-  state: BooleanState,
+  value: BooleanValue,
   action: BooleanAction,
-): BooleanState => {
+): BooleanValue => {
   switch (action.type) {
     case "true":
-      return { ...state, current: { value: true } }
+      return { ...value, current: true }
     case "false":
-      return { ...state, current: { value: false } }
+      return { ...value, current: false }
     case "toggle":
-      return { ...state, current: { value: !state.current.value } }
+      return { ...value, current: !value.current }
     case "reset":
-      return { ...state, current: { value: state.initial.value } }
+      return { ...value, current: value.initial }
     default:
       throw assertUnreachableActionType(action)
   }

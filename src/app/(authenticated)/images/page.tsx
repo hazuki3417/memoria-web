@@ -1,6 +1,7 @@
 "use client"
 import { ActionPanel, Image, LinkButton } from "@/components"
 import { ImageLayout } from "@/components/ImageLayout/ImageLayout"
+import { PreviewImageBox } from "@/feature"
 import {
   imageSearchFormDefaultValue,
   imageSearchFormSchema,
@@ -10,6 +11,7 @@ import { useIntersection } from "@/hooks/useIntersection"
 import { useRelayConnection } from "@/hooks/useRelayConnection"
 import { defineFieldObject } from "@/lib/field"
 import { resolveUri } from "@/lib/url"
+import { useImageDetailModalContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Box,
@@ -49,7 +51,8 @@ const Page = () => {
     },
   })
 
-  const [lists, setlists] = useState<ImageEdge[]>([])
+  const imageDetailModalContext = useImageDetailModalContext()
+  const [items, setItems] = useState<ImageEdge[]>([])
 
   const relay = useRelayConnection({
     hooks: () =>
@@ -67,16 +70,16 @@ const Page = () => {
     intersect: async () => {
       if (!relay.state.pageInfo?.hasNextPage) return
       const res = await relay.handler.next()
-      setlists((prev) => [...prev, ...res.data.getImages.edges] as ImageEdge[])
+      setItems((prev) => [...prev, ...res.data.getImages.edges] as ImageEdge[])
     },
   })
 
   // 初期レンダリング時の処理
   useEffect(() => {
-    if (relay.state.edges.length > 0 && lists.length === 0) {
-      setlists(relay.state.edges as ImageEdge[])
+    if (relay.state.edges.length > 0 && items.length === 0) {
+      setItems(relay.state.edges as ImageEdge[])
     }
-  }, [relay.state.edges, lists.length])
+  }, [relay.state.edges, items.length])
 
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
 
@@ -156,14 +159,29 @@ const Page = () => {
           <ImageLayout>
             <ImageLayout.Grid>
               <Image>
-                {lists.map((list, index) => {
+                {items.map((list, index) => {
                   return (
-                    <Image.Frame key={nanoid()}>
-                      <Image.Tile
+                    <PreviewImageBox
+                      key={nanoid()}
+                      ui={{
+                        selected: false,
+                        selectable: false,
+                        supported: true,
+                      }}
+                      onClick={imageDetailModalContext.control.open}
+                    >
+                      <PreviewImageBox.Image
                         src={list.node.src.thumbnail}
                         alt={list.node.info.file.name}
                       />
-                    </Image.Frame>
+                    </PreviewImageBox>
+                    // FIX: Image.Tile, Image.FrameとpreviewImageBoxの実装が類似しているので共通化を検討する
+                    // <Image.Frame key={nanoid()}>
+                    //   <Image.Tile
+                    //     src={list.node.src.thumbnail}
+                    //     alt={list.node.info.file.name}
+                    //   />
+                    // </Image.Frame>
                   )
                 })}
                 {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}

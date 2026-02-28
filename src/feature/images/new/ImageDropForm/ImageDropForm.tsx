@@ -1,8 +1,8 @@
-import { PreviewImageBox } from "@/feature/PreviewImageBox"
 import { Box, Input, InputError } from "@mantine/core"
 import React from "react"
 import { AddImageBox } from "./AddImageBox"
 import classes from "./ImageDropForm.module.css"
+import { PreviewImageBox } from "./PreviewImageBox"
 
 export type ImageDropFormUi = {
   valid?: "idle" | "accept" | "warning" | "reject"

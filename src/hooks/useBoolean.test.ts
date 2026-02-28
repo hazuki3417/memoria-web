@@ -6,56 +6,56 @@ describe("useBoolean", () => {
   it("should initialize with initial value", () => {
     const { result } = renderHook(() => useBoolean(true))
 
-    expect(result.current.state).toBe(true)
+    expect(result.current.value).toBe(true)
   })
 
   it("should set true", () => {
     const { result } = renderHook(() => useBoolean(false))
 
     act(() => {
-      result.current.handler.setTrue()
+      result.current.control.setTrue()
     })
 
-    expect(result.current.state).toBe(true)
+    expect(result.current.value).toBe(true)
   })
 
   it("should set false", () => {
     const { result } = renderHook(() => useBoolean(true))
 
     act(() => {
-      result.current.handler.setFalse()
+      result.current.control.setFalse()
     })
 
-    expect(result.current.state).toBe(false)
+    expect(result.current.value).toBe(false)
   })
 
   it("should toggle value", () => {
     const { result } = renderHook(() => useBoolean(false))
 
     act(() => {
-      result.current.handler.toggle()
+      result.current.control.toggle()
     })
 
-    expect(result.current.state).toBe(true)
+    expect(result.current.value).toBe(true)
 
     act(() => {
-      result.current.handler.toggle()
+      result.current.control.toggle()
     })
 
-    expect(result.current.state).toBe(false)
+    expect(result.current.value).toBe(false)
   })
 
   it("should reset to initial", () => {
     const { result } = renderHook(() => useBoolean(true))
 
     act(() => {
-      result.current.handler.setFalse()
+      result.current.control.setFalse()
     })
-    expect(result.current.state).toBe(false)
+    expect(result.current.value).toBe(false)
 
     act(() => {
-      result.current.handler.reset()
+      result.current.control.reset()
     })
-    expect(result.current.state).toBe(true)
+    expect(result.current.value).toBe(true)
   })
 })

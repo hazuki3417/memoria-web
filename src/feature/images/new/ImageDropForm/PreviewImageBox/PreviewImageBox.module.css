@@ -28,7 +28,8 @@
 }
 
 /* サポート対象を表現 */
-.box[data-supported="true"] {}
+.box[data-supported="true"] {
+}
 
 /* サポート対象外を表現 */
 .box[data-supported="false"] {
@@ -57,4 +58,40 @@
 
 .box[data-disabled="true"] {
   cursor: no-drop;
+}
+
+.image {
+  width: unset;
+  height: unset;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.actionIcon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: var(--mantine-color-gray-7);
+  opacity: 0.2;
+  transition: opacity 0.2s;
+}
+.actionIcon:hover {
+  opacity: 1.0;
+}
+
+.labelBox {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  padding: 0px 4px;
+  border-end-start-radius: var(--mantine-radius-sm);
+  border-end-end-radius: var(--mantine-radius-sm);
+}
+
+.label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

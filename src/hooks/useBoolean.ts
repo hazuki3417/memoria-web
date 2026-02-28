@@ -1,25 +1,29 @@
 import { booleanReducer } from "@/reducers"
 import { useCallback, useReducer } from "react"
 
-export type UseBooleanState = boolean
+export type UseBooleanOption = boolean
 
-export type UseBooleanOption = UseBooleanState
+export type UseBooleanValue = boolean
 
-export interface UseBooleanHandler {
+export interface UseBooleanControl {
   setTrue: () => void
   setFalse: () => void
   toggle: () => void
   reset: () => void
 }
+
+export interface UseBooleanAction {}
+
 export interface UseBoolean {
-  state: UseBooleanState
-  handler: UseBooleanHandler
+  value: UseBooleanValue
+  control: UseBooleanControl
+  // action: UseBooleanAction
 }
 
 export const useBoolean = (option: UseBooleanOption): UseBoolean => {
   const [state, dispatch] = useReducer(booleanReducer, {
-    current: { value: option },
-    initial: { value: option },
+    current: option,
+    initial: option,
   })
 
   const setTrue = useCallback(() => dispatch({ type: "true" }), [])
@@ -28,8 +32,8 @@ export const useBoolean = (option: UseBooleanOption): UseBoolean => {
   const reset = useCallback(() => dispatch({ type: "reset" }), [])
 
   return {
-    state: state.current.value,
-    handler: {
+    value: state.current,
+    control: {
       setTrue,
       setFalse,
       toggle,

@@ -1,12 +1,12 @@
 import { useDisclosure } from "@/hooks"
-import { Box, type BoxProps } from "@mantine/core"
-import { AnimatePresence, motion } from "framer-motion"
-import { Info, InfoHandler, InfoPayload } from "./Info/Info"
-import { Slide, SlideHandler, SlidePayload } from "./Slide"
-import React, { useCallback, useMemo } from "react"
-import { Preview } from "./Preview"
 import { useImageRotate } from "@/hooks/useImageRotate"
 import { useImageZoom } from "@/hooks/useImageZoom"
+import { Box, type BoxProps } from "@mantine/core"
+import { AnimatePresence, motion } from "framer-motion"
+import { useCallback, useMemo } from "react"
+import { Info, InfoHandler, InfoPayload } from "./Info/Info"
+import { Preview } from "./Preview"
+import { Slide, SlideHandler, SlidePayload } from "./Slide"
 
 export type ImageDetailModalPayload = {
   slide: SlidePayload
@@ -28,7 +28,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
   const { payload, handler } = props
   const { onClose, onDelete, onDownload, onEdit, onNext, onPrev } =
     handler ?? {}
-  const drawer = useDisclosure({ opend: false })
+  const drawer = useDisclosure({ status: "closed" })
   const imageRotate = useImageRotate({ angle: 0 })
   const imageZoom = useImageZoom({
     level: 100,
@@ -83,7 +83,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
         handler={{
           onClose,
           onDownload,
-          onInfo: drawer.handler.toggle,
+          onInfo: drawer.control.toggle,
           onNext,
           onPrev,
           onZoomReset: zoomReset,
@@ -104,7 +104,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
         />
       </Slide>
       <AnimatePresence>
-        {drawer.state.opend && (
+        {drawer.value.status === "opened" && (
           <motion.div
             data-testid="motion-div"
             animate={{ width: 340, opacity: 1 }}
@@ -115,7 +115,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
             <Info
               payload={payload.info}
               handler={{
-                onClose: drawer.handler.close,
+                onClose: drawer.control.close,
                 onDelete,
                 onEdit,
               }}

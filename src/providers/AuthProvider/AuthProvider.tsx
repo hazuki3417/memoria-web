@@ -1,19 +1,6 @@
 "use client"
-import { createContext } from "react"
-
-export type AuthUser = {
-  id: string
-}
-
-export type AuthContext = {
-  isSignIn: boolean
-  user: AuthUser | undefined
-}
-
-export const AuthContext = createContext<AuthContext>({
-  isSignIn: false,
-  user: undefined,
-})
+import "client-only"
+import { AuthContext } from "./AuthContext"
 
 export interface AuthProviderProps {
   value: AuthContext

@@ -1,11 +1,11 @@
 "use client"
 import { authConfig } from "@/config/auth"
-import { useAuth } from "@/hooks"
+import { useAuthContext } from "@/providers"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 export const AuthGuard = () => {
-  const auth = useAuth()
+  const auth = useAuthContext()
   const router = useRouter()
 
   useEffect(() => {

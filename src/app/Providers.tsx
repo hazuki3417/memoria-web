@@ -1,10 +1,10 @@
 "use client"
-import { User as AppUser } from "@/graphql"
 import { CreateGraphQLOption } from "@/lib/graphql/type"
 import {
   AuthContext,
   AuthProvider,
   GraphQLProvider,
+  ImageDetailModalProvider,
   LangProvider,
   ThemeProvider,
   ThemeProviderProps,
@@ -28,11 +28,13 @@ const Providers = (props: ProvidersProps) => {
   return (
     <ThemeProvider {...theme}>
       <LangProvider>
-        <AuthProvider value={auth}>
-          <MemoGraphQLProvider option={option.graphql}>
-            {children}
-          </MemoGraphQLProvider>
-        </AuthProvider>
+        <ImageDetailModalProvider>
+          <AuthProvider value={auth}>
+            <MemoGraphQLProvider option={option.graphql}>
+              {children}
+            </MemoGraphQLProvider>
+          </AuthProvider>
+        </ImageDetailModalProvider>
       </LangProvider>
     </ThemeProvider>
   )
