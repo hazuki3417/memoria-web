@@ -10,8 +10,9 @@ import {
 } from "@/hooks"
 import { createFormSubmitHandler } from "@/lib"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Space } from "@mantine/core"
 import { FormProvider, useForm } from "react-hook-form"
+import { SettingSectionDivider } from "../_components/SettingSectionDivider/SettingSection"
+import { SettingSectionTitle } from "../_components/SettingSectionTitle"
 import {
   ProfileInputForm,
   profileInputFormDefaultValue,
@@ -56,28 +57,31 @@ const Page = () => {
   })
 
   return (
-    <Form>
-      <Form.Container p={8}>
-        <Form.LoadingOverlay visible={query.loading} />
-        <FormProvider {...form}>
-          <Form.Group onSubmit={submit}>
-            <ProfileInputForm {...interactivity} />
-            <Space h={32} />
-            <ActionPanel>
-              <ActionPanel.Right>
-                <Form.Submit
-                  button={(props) => (
-                    <FormButton {...props} {...interactivity}>
-                      更新
-                    </FormButton>
-                  )}
-                />
-              </ActionPanel.Right>
-            </ActionPanel>
-          </Form.Group>
-        </FormProvider>
-      </Form.Container>
-    </Form>
+    <>
+      <SettingSectionTitle>Profile</SettingSectionTitle>
+      <SettingSectionDivider />
+      <Form>
+        <Form.Container>
+          <Form.LoadingOverlay visible={query.loading} />
+          <FormProvider {...form}>
+            <Form.Group onSubmit={submit}>
+              <ProfileInputForm {...interactivity} />
+              <ActionPanel>
+                <ActionPanel.Right>
+                  <Form.Submit
+                    button={(props) => (
+                      <FormButton {...props} {...interactivity}>
+                        更新
+                      </FormButton>
+                    )}
+                  />
+                </ActionPanel.Right>
+              </ActionPanel>
+            </Form.Group>
+          </FormProvider>
+        </Form.Container>
+      </Form>
+    </>
   )
 }
 

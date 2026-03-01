@@ -1,7 +1,13 @@
-import { Box } from "@mantine/core"
+import { SettingSectionDivider } from "../_components/SettingSectionDivider/SettingSection"
+import { SettingSectionTitle } from "../_components/SettingSectionTitle"
 
-const Page = async () => {
-  return <Box>notifications</Box>
+const Page = () => {
+  return (
+    <>
+      <SettingSectionTitle>Notifications</SettingSectionTitle>
+      <SettingSectionDivider />
+    </>
+  )
 }
 
 export default Page
