@@ -1,5 +1,5 @@
 "use client"
-import { Box, Flex } from "@mantine/core"
+import { Box, Container, Flex } from "@mantine/core"
 import { usePathname } from "next/navigation"
 import { SideMenu } from "./_components"
 
@@ -13,10 +13,14 @@ const Layout = (props: LayoutProps) => {
   const pathname = usePathname()
 
   return (
-    <Flex direction={{ base: "column", sm: "row" }} gap={16}>
-      <SideMenu current={pathname} />
-      <Box component="section">{children}</Box>
-    </Flex>
+    <Container size="xl" p="lg">
+      <Flex align="flex-start" gap="xl">
+        <SideMenu current={pathname} w={220} />
+        <Box component="section" flex={1}>
+          {children}
+        </Box>
+      </Flex>
+    </Container>
   )
 }
 

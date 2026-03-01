@@ -1,13 +1,10 @@
 "use client"
 import { Box, Flex } from "@mantine/core"
-import type { ComponentProps } from "react"
-import { styles } from "./styles"
-import React from "react"
 
-import { LangSelect } from "./LangSelect"
 import { Auth } from "@/components/Auth/Csr"
-import { UserMenu } from "./UserMenu"
+import { LangSelect } from "./LangSelect"
 import { SiginInButton } from "./SignInButton"
+import { UserMenu } from "./UserMenu"
 
 export type HeaderProps = {}
 

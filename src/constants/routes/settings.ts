@@ -19,6 +19,12 @@ export const settings = {
         breadcrumb: "通知",
         tags: [],
       },
+      preferences: {
+        segment: "preferences",
+        title: "プリファレンス",
+        breadcrumb: "プリファレンス",
+        tags: [],
+      },
     },
   },
 } as const satisfies RouteNodes

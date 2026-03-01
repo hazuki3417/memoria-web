@@ -12,6 +12,9 @@ declare module "@mantine/core" {
       header: {
         height: number
       }
+      navbar: {
+        width: number
+      }
       iconSize: MantineSize
     }
   }
@@ -32,13 +35,9 @@ export const override = createTheme({
       header: {
         height: 40,
       },
-    },
-    iconSize: {
-      xs: 12,
-      sm: 12,
-      md: 12,
-      lg: 12,
-      xl: 12,
+      navbar: {
+        width: 200,
+      },
     },
   },
 })

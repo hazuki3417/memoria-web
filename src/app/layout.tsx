@@ -5,12 +5,7 @@ import { createGraphQL } from "@/lib/graphql/server"
 import { theme } from "@/lib/theme"
 import "@/lib/zod"
 import { AuthContext } from "@/providers"
-import {
-  AppShell,
-  AppShellHeader,
-  AppShellMain,
-  Container,
-} from "@mantine/core"
+import { AppShell, AppShellHeader, AppShellMain } from "@mantine/core"
 import "@mantine/core/styles.css"
 import { Notifications } from "@mantine/notifications"
 import "@mantine/notifications/styles.css"
@@ -70,11 +65,7 @@ const RootLayout = async (props: RootLayoutProps) => {
             <AppShellHeader>
               <Header />
             </AppShellHeader>
-            <AppShellMain>
-              <Container p={"lg"} m={0} fluid>
-                {children}
-              </Container>
-            </AppShellMain>
+            <AppShellMain>{children}</AppShellMain>
           </AppShell>
         </Providers>
       </body>
