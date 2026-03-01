@@ -1,4 +1,6 @@
+"use client"
 import { numberReducer } from "@/reducers"
+import "client-only"
 import { useCallback, useMemo, useReducer } from "react"
 
 export type UseImageZoomValue = {

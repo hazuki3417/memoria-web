@@ -1,5 +1,4 @@
-import { SettingSectionDivider } from "../_components/SettingSectionDivider/SettingSection"
-import { SettingSectionTitle } from "../_components/SettingSectionTitle"
+import { SettingSectionDivider, SettingSectionTitle } from "../_components"
 
 const Page = () => {
   return (

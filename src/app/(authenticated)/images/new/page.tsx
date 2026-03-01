@@ -1,5 +1,22 @@
 "use client"
+import { imageConfig } from "@/config"
+import {
+  FormSwitcher,
+  ImageDropForm,
+  imageFormDefaultValue,
+  imageFormSchema,
+  ImageInputForm,
+  MODE,
+  useFormSwitcher,
+} from "@/feature/images/new"
+import { useUploadImageMutation, Visibility } from "@/graphql"
+import { useTaskManager } from "@/hooks"
+import { rhf, zod } from "@/lib"
+import { Task } from "@/reducers"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Box, Button, Flex, Stack, Text } from "@mantine/core"
+import { nanoid } from "nanoid"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import {
   Controller,
   FormProvider,
@@ -8,25 +25,8 @@ import {
   useFormState,
   useWatch,
 } from "react-hook-form"
-import { useCallback, useEffect, useMemo, useState } from "react"
-import {
-  ImageInputForm,
-  imageFormDefaultValue,
-  imageFormSchema,
-  useFormSwitcher,
-  FormSwitcher,
-  MODE,
-  ImageDropForm,
-} from "@/feature/images/new"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { imageConfig } from "@/config"
-import { useUploadImageMutation, Visibility } from "@/graphql"
-import { useTaskManager } from "@/hooks"
-import { Task } from "@/reducers"
-import { nanoid } from "nanoid"
 import { useTranslation } from "react-i18next"
-import { zod, rhf } from "@/lib"
+import { z } from "zod"
 
 const fileSchema = z.object({
   file: zod.refine(
@@ -121,7 +121,7 @@ const Page = () => {
 
   const submit = async () => {
     await methods.handleSubmit(async (value, errors) => {
-      await taskManager.handler.submit(async (task, index) => {
+      await taskManager.action.submit(async (task, index) => {
         const image = methods.getValues("images")[index]
         await uploadImage({
           variables: {
@@ -157,7 +157,7 @@ const Page = () => {
     }
 
     // まとめて更新
-    taskManager.handler.append(newTasks)
+    taskManager.action.append(newTasks)
     append(newImages)
     // NOTE: バリデーションを発火させる
     methods.trigger()
@@ -181,7 +181,7 @@ const Page = () => {
 
   const fileRemove = useCallback(
     (index: number, id: string) => {
-      taskManager.handler.remove([id])
+      taskManager.action.remove([id])
       remove(index)
     },
     [fields],
@@ -224,7 +224,7 @@ const Page = () => {
   }, [formSwitcher.state.mode])
 
   const previews = fields.map((preview, index) => {
-    const task = taskManager.state.tasks[index]
+    const task = taskManager.value.tasks[index]
     return (
       <Controller
         key={preview.id}

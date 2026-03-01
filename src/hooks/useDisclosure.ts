@@ -1,3 +1,5 @@
+"use client"
+import "client-only"
 import { useBoolean } from "./useBoolean"
 
 export type UseDisclosureStatus = "opened" | "closed"

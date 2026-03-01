@@ -1,4 +1,6 @@
+"use client"
 import { NavLinkProps } from "@mantine/core"
+import "client-only"
 import { useMemo } from "react"
 
 export type NavLink = NavLinkProps & {

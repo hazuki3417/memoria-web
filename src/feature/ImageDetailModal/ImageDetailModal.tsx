@@ -37,33 +37,33 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
   })
 
   const zoomReset = useCallback(() => {
-    imageZoom.handler.reset()
-  }, [imageZoom.handler, imageZoom.state.level])
+    imageZoom.action.reset()
+  }, [imageZoom.action, imageZoom.value.level])
 
   const zoomIn = useCallback(() => {
-    imageZoom.handler.zoomIn()
-  }, [imageZoom.handler, imageZoom.state.level])
+    imageZoom.control.zoomIn()
+  }, [imageZoom.control, imageZoom.value.level])
 
   const zoomOut = useCallback(() => {
-    imageZoom.handler.zoomOut()
-  }, [imageZoom.handler, imageZoom.state.level])
+    imageZoom.control.zoomOut()
+  }, [imageZoom.control, imageZoom.value.level])
 
   const zoomSet = useCallback(
     (value: number) => {
-      imageZoom.handler.set(value)
+      imageZoom.action.set(value)
     },
-    [imageZoom.handler, imageZoom.state.level],
+    [imageZoom.action, imageZoom.value.level],
   )
 
   const previewAction = useMemo(() => {
-    if (imageRotate.state.meta.action === "left") {
+    if (imageRotate.value.meta.action === "left") {
       return "rotate"
     }
-    if (imageRotate.state.meta.action === "right") {
+    if (imageRotate.value.meta.action === "right") {
       return "rotate"
     }
     return "reset"
-  }, [imageRotate.state.meta.action])
+  }, [imageRotate.value.meta.action])
 
   return (
     <Box
@@ -79,7 +79,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
       <Slide
         payload={payload.slide}
         ui={{
-          level: imageZoom.state.level,
+          level: imageZoom.value.level,
         }}
         handler={{
           onClose,
@@ -91,16 +91,16 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
           onZoomChange: zoomSet,
           onZoomIn: zoomIn,
           onZoomOut: zoomOut,
-          onRotateLeft: imageRotate.handler.left,
-          onRotateReset: imageRotate.handler.reset,
-          onRotateRight: imageRotate.handler.right,
+          onRotateLeft: imageRotate.control.left,
+          onRotateReset: imageRotate.action.reset,
+          onRotateRight: imageRotate.control.right,
         }}
       >
         <Preview
           payload={payload.preview}
           ui={{
-            rotate: imageRotate.state.angle,
-            scale: imageZoom.state.scale,
+            rotate: imageRotate.value.angle,
+            scale: imageZoom.value.scale,
             action: previewAction,
           }}
         />

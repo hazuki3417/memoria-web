@@ -1,3 +1,5 @@
+"use client"
+import "client-only"
 import { useCallback, useEffect, useState } from "react"
 
 export type UseLocalStorageValue<T> = T
@@ -7,7 +9,7 @@ export type UseLocalStorageOption<T> = {
   init: T
 }
 
-export interface UseLocalStorageControl<T> {}
+export interface UseLocalStorageControl<T> { }
 
 export interface UseLocalStorageAction<T> {
   set: (value: T) => void

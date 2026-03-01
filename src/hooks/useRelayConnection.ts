@@ -1,12 +1,14 @@
+"use client"
+import { PageInfo } from "@/graphql"
+import { ActionStateType } from "@/hooks/type"
 import {
   ApolloError,
   ApolloQueryResult,
   OperationVariables,
   QueryResult,
 } from "@apollo/client"
+import "client-only"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { PageInfo } from "@/graphql"
-import { ActionStateType } from "@/hooks/type"
 
 export type UseRelayConnectionAction = ActionStateType<"prev" | "next">
 

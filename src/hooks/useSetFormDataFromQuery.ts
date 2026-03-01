@@ -1,5 +1,7 @@
+"use client"
 import { Exact } from "@/graphql"
 import { QueryResult } from "@apollo/client"
+import "client-only"
 import { useEffect, useMemo } from "react"
 import { FieldValues, UseFormReturn } from "react-hook-form"
 

@@ -1,3 +1,4 @@
+"use client"
 import "client-only"
 import { useParams } from "next/navigation"
 

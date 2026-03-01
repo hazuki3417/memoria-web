@@ -1,4 +1,6 @@
+"use client"
 import { booleanReducer } from "@/reducers"
+import "client-only"
 import { useCallback, useReducer } from "react"
 
 export type UseBooleanOption = boolean

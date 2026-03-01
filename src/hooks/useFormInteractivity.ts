@@ -1,3 +1,5 @@
+"use client"
+import "client-only"
 import { useMemo } from "react"
 
 export interface FormInteractivity {

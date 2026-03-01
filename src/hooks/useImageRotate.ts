@@ -1,4 +1,6 @@
+"use client"
 import { imageRotateReducer } from "@/reducers"
+import "client-only"
 import { useCallback, useReducer } from "react"
 
 export type UseImageRotateValue = {

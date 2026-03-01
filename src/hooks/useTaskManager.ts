@@ -1,5 +1,7 @@
+"use client"
 import { Task, taskReducer } from "@/reducers"
 import { ActionType } from "@/reducers/util"
+import "client-only"
 import { useCallback, useReducer, useState } from "react"
 
 export type UseTaskManagerOption<D = undefined> = {

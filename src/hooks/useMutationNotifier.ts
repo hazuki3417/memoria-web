@@ -1,6 +1,8 @@
+"use client"
 import { createNotificationTypeData } from "@/lib/notifications"
 import { ApolloError } from "@apollo/client"
 import { notifications } from "@mantine/notifications"
+import "client-only"
 import { useEffect, useRef } from "react"
 
 export type UseMutationNotifierOption = {

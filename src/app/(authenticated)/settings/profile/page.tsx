@@ -11,8 +11,8 @@ import {
 import { createFormSubmitHandler } from "@/lib"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FormProvider, useForm } from "react-hook-form"
-import { SettingSectionDivider } from "../_components/SettingSectionDivider/SettingSection"
-import { SettingSectionTitle } from "../_components/SettingSectionTitle"
+import { SettingSectionDivider, SettingSectionTitle } from "../_components"
+
 import {
   ProfileInputForm,
   profileInputFormDefaultValue,

@@ -1,3 +1,4 @@
+"use client"
 import { uri } from "@/lib/url"
 import { QueryParams } from "@/types/url"
 import "client-only"

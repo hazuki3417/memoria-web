@@ -1,3 +1,5 @@
+"use client"
+import "client-only"
 import { useEffect } from "react"
 
 export const useDebouncedEffect = (

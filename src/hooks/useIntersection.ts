@@ -1,3 +1,5 @@
+"use client"
+import "client-only"
 import { useEffect, useMemo, useRef } from "react"
 
 export interface UseIntersectionOption {
