@@ -157,7 +157,7 @@ const MemoIndex = memo((props: FooterPayload) => (
 const MemoDownloadButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
     <ActionIcon
-      size={"input-xs"}
+      size="input-xs"
       onClick={props.onClick}
       data-testid="download-image"
     >
@@ -171,7 +171,7 @@ const MemoRotateButtonGroup = memo(RotateButtonGroup)
 const MemoZoomResetButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
     <ActionIcon
-      size={"input-xs"}
+      size="input-xs"
       onClick={props.onClick}
       data-testid="zoom-reset"
     >
@@ -182,11 +182,7 @@ const MemoZoomResetButton = memo(
 
 const MemoZoomOutButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
-    <ActionIcon
-      size={"input-xs"}
-      onClick={props.onClick}
-      data-testid="zoom-out"
-    >
+    <ActionIcon size="input-xs" onClick={props.onClick} data-testid="zoom-out">
       <IconZoomOut />
     </ActionIcon>
   ),
@@ -194,7 +190,7 @@ const MemoZoomOutButton = memo(
 
 const MemoZoomInButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
-    <ActionIcon size={"input-xs"} onClick={props.onClick} data-testid="zoom-in">
+    <ActionIcon size="input-xs" onClick={props.onClick} data-testid="zoom-in">
       <IconZoomIn />
     </ActionIcon>
   ),
@@ -202,11 +198,7 @@ const MemoZoomInButton = memo(
 
 const MemoInfoButton = memo(
   (props: { onClick?: React.MouseEventHandler<HTMLButtonElement> }) => (
-    <ActionIcon
-      size={"input-xs"}
-      onClick={props.onClick}
-      data-testid="open-info"
-    >
+    <ActionIcon size="input-xs" onClick={props.onClick} data-testid="open-info">
       <IconInfoCircle />
     </ActionIcon>
   ),

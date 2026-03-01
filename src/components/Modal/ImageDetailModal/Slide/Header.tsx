@@ -40,8 +40,9 @@ export const Header = (props: HeaderProps) => {
         })}
       >
         <ActionIcon
-          variant="subtle"
           color="gray"
+          size="input-xs"
+          variant="subtle"
           data-testid="close-slide"
           onClick={handler?.onClose}
         >

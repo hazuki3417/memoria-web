@@ -78,8 +78,9 @@ export const Info = (props: InfoProps) => {
           })}
         >
           <ActionIcon
-            variant="subtle"
             color="gray"
+            size="input-xs"
+            variant="subtle"
             data-testid="close-info"
             onClick={handler?.onClose}
           >
@@ -159,8 +160,9 @@ export const Info = (props: InfoProps) => {
           })}
         >
           <ActionIcon
-            variant="subtle"
             color="gray"
+            size="input-xs"
+            variant="subtle"
             data-testid="edit-info"
             onClick={handler?.onEdit}
           >
@@ -175,8 +177,9 @@ export const Info = (props: InfoProps) => {
           })}
         >
           <ActionIcon
-            variant="subtle"
             color="gray"
+            size="input-xs"
+            variant="subtle"
             data-testid="delete-image"
             onClick={handler?.onDelete}
           >
