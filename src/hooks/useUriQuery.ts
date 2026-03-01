@@ -3,12 +3,12 @@ import { QueryParams } from "@/types/url"
 import "client-only"
 import { useSearchParams } from "next/navigation"
 
-type UseUriQueryOptions<T> = {
+type UseUriQueryOption<T> = {
   normalize?: (raw: QueryParams) => T
 }
 
 export const useUriQuery = <T extends QueryParams>(
-  options?: UseUriQueryOptions<T>,
+  option?: UseUriQueryOption<T>,
 ): T | undefined => {
   const searchParams = useSearchParams()
 
@@ -24,8 +24,8 @@ export const useUriQuery = <T extends QueryParams>(
 
   const raw: QueryParams = uri.query.decode(q)
 
-  if (options?.normalize) {
-    return options.normalize(raw)
+  if (option?.normalize) {
+    return option.normalize(raw)
   }
 
   return raw as unknown as T

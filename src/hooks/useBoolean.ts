@@ -5,19 +5,20 @@ export type UseBooleanOption = boolean
 
 export type UseBooleanValue = boolean
 
-export interface UseBooleanControl {
+// export interface UseBooleanControl {
+// }
+
+export interface UseBooleanAction {
   setTrue: () => void
   setFalse: () => void
   toggle: () => void
   reset: () => void
 }
 
-export interface UseBooleanAction {}
-
 export interface UseBoolean {
   value: UseBooleanValue
-  control: UseBooleanControl
-  // action: UseBooleanAction
+  // control: UseBooleanControl
+  action: UseBooleanAction
 }
 
 export const useBoolean = (option: UseBooleanOption): UseBoolean => {
@@ -33,7 +34,7 @@ export const useBoolean = (option: UseBooleanOption): UseBoolean => {
 
   return {
     value: state.current,
-    control: {
+    action: {
       setTrue,
       setFalse,
       toggle,

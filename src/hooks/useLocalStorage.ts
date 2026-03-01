@@ -1,23 +1,24 @@
 import { useCallback, useEffect, useState } from "react"
 
-export type UseLocalStorageState<T> = {
-  value: T
-}
+export type UseLocalStorageValue<T> = T
 
 export type UseLocalStorageOption<T> = {
   key: string
   init: T
 }
 
-export interface UseLocalStorageHandler<T> {
+export interface UseLocalStorageControl<T> {}
+
+export interface UseLocalStorageAction<T> {
   set: (value: T) => void
   get: () => T
   reset: () => void
 }
 
 export interface UseLocalStorage<T> {
-  state: UseLocalStorageState<T>
-  handler: UseLocalStorageHandler<T>
+  value: UseLocalStorageValue<T>
+  // control: UseLocalStorageControl<T>
+  action: UseLocalStorageAction<T>
 }
 
 export const useLocalStorage = <T>(
@@ -53,8 +54,8 @@ export const useLocalStorage = <T>(
   const reset = useCallback(() => setStorage(init), [init])
 
   return {
-    state: { value: storage },
-    handler: {
+    value: storage,
+    action: {
       set,
       get,
       reset,

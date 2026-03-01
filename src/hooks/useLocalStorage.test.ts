@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react"
+import { act, renderHook } from "@testing-library/react"
+import { beforeEach, describe, expect, it } from "vitest"
 import { useLocalStorage } from "./useLocalStorage"
-import { describe, it, expect, beforeEach } from "vitest"
 
 beforeEach(() => {
   localStorage.clear()
@@ -12,7 +12,7 @@ describe("useLocalStorage", () => {
       useLocalStorage({ key: "testKey", init: "default" }),
     )
 
-    expect(result.current.state.value).toBe("default")
+    expect(result.current.value).toBe("default")
   })
 
   it("should read from localStorage if value exists", () => {
@@ -22,7 +22,7 @@ describe("useLocalStorage", () => {
       useLocalStorage({ key: "testKey", init: "default" }),
     )
 
-    expect(result.current.state.value).toBe("saved")
+    expect(result.current.value).toBe("saved")
   })
 
   it("should update value and reflect it in localStorage", () => {
@@ -31,10 +31,10 @@ describe("useLocalStorage", () => {
     )
 
     act(() => {
-      result.current.handler.set(42)
+      result.current.action.set(42)
     })
 
-    expect(result.current.state.value).toBe(42)
+    expect(result.current.value).toBe(42)
     expect(JSON.parse(localStorage.getItem("testKey")!)).toBe(42)
   })
 
@@ -44,16 +44,16 @@ describe("useLocalStorage", () => {
     )
 
     act(() => {
-      result.current.handler.set(99)
+      result.current.action.set(99)
     })
 
-    expect(result.current.state.value).toBe(99)
+    expect(result.current.value).toBe(99)
 
     act(() => {
-      result.current.handler.reset()
+      result.current.action.reset()
     })
 
-    expect(result.current.state.value).toBe(10)
+    expect(result.current.value).toBe(10)
     expect(JSON.parse(localStorage.getItem("testKey")!)).toBe(10)
   })
 
@@ -62,12 +62,12 @@ describe("useLocalStorage", () => {
       useLocalStorage({ key: "testKey", init: "value" }),
     )
 
-    expect(result.current.handler.get()).toBe("value")
+    expect(result.current.action.get()).toBe("value")
 
     act(() => {
-      result.current.handler.set("updated")
+      result.current.action.set("updated")
     })
 
-    expect(result.current.handler.get()).toBe("updated")
+    expect(result.current.action.get()).toBe("updated")
   })
 })

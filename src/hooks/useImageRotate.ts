@@ -1,7 +1,7 @@
 import { imageRotateReducer } from "@/reducers"
 import { useCallback, useReducer } from "react"
 
-export type UseImageRotateState = {
+export type UseImageRotateValue = {
   angle: number
   initial: {
     angle: number
@@ -9,23 +9,27 @@ export type UseImageRotateState = {
   meta: { action: "left" | "right" | "reset" | "idle" }
 }
 
-export type UseImageRotateOption = Pick<UseImageRotateState, "angle">
+export type UseImageRotateOption = Pick<UseImageRotateValue, "angle">
 
-export interface UseImageRotateHandler {
+export interface UseImageRotateControl {
   right: () => void
   left: () => void
+}
+
+export interface UseImageRotateAction {
   reset: () => void
 }
 
 export interface UseImageRotate {
-  state: UseImageRotateState
-  handler: UseImageRotateHandler
+  value: UseImageRotateValue
+  control: UseImageRotateControl
+  action: UseImageRotateAction
 }
 
 export const useImageRotate = (
   option: UseImageRotateOption,
 ): UseImageRotate => {
-  const [state, dispatch] = useReducer(imageRotateReducer, {
+  const [value, dispatch] = useReducer(imageRotateReducer, {
     current: { angle: option.angle },
     initial: { angle: option.angle },
     meta: { action: "idle" },
@@ -33,27 +37,29 @@ export const useImageRotate = (
 
   const right = useCallback(() => {
     dispatch({ type: "right" })
-  }, [state.current.angle])
+  }, [value.current.angle])
 
   const left = useCallback(() => {
     dispatch({ type: "left" })
-  }, [state.current.angle])
+  }, [value.current.angle])
 
   const reset = useCallback(() => {
     dispatch({ type: "reset" })
   }, [])
 
   return {
-    state: {
-      angle: state.current.angle,
+    value: {
+      angle: value.current.angle,
       initial: {
-        angle: state.initial.angle,
+        angle: value.initial.angle,
       },
-      meta: { action: state.meta.action } as const,
+      meta: { action: value.meta.action } as const,
     },
-    handler: {
+    control: {
       left,
       right,
+    },
+    action: {
       reset,
     },
   }

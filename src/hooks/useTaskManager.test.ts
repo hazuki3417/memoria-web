@@ -1,7 +1,7 @@
-import { renderHook, act } from "@testing-library/react"
-import { describe, it, expect, vi } from "vitest"
 import { useTaskManager } from "@/hooks/useTaskManager" // パス調整
 import type { Task } from "@/reducers"
+import { act, renderHook } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
 
 describe("useTaskManager", () => {
   it("should append tasks", () => {
@@ -13,12 +13,12 @@ describe("useTaskManager", () => {
     const task2: Task = { id: "2", status: "idle" }
 
     act(() => {
-      result.current.handler.append([task1, task2])
+      result.current.action.append([task1, task2])
     })
 
-    expect(result.current.state.tasks).toHaveLength(2)
-    expect(result.current.state.tasks[0].id).toBe("1")
-    expect(result.current.state.meta.action).toBe("append")
+    expect(result.current.value.tasks).toHaveLength(2)
+    expect(result.current.value.tasks[0].id).toBe("1")
+    expect(result.current.value.meta.action).toBe("append")
   })
 
   it("should remove tasks by id", () => {
@@ -30,13 +30,13 @@ describe("useTaskManager", () => {
     const task2: Task = { id: "2", status: "idle" }
 
     act(() => {
-      result.current.handler.append([task1, task2])
-      result.current.handler.remove(["1"])
+      result.current.action.append([task1, task2])
+      result.current.action.remove(["1"])
     })
 
-    expect(result.current.state.tasks).toHaveLength(1)
-    expect(result.current.state.tasks[0].id).toBe("2")
-    expect(result.current.state.meta.action).toBe("remove")
+    expect(result.current.value.tasks).toHaveLength(1)
+    expect(result.current.value.tasks[0].id).toBe("2")
+    expect(result.current.value.meta.action).toBe("remove")
   })
 
   it("should reset tasks", () => {
@@ -45,12 +45,12 @@ describe("useTaskManager", () => {
     )
 
     act(() => {
-      result.current.handler.append([{ id: "1", status: "idle" }])
-      result.current.handler.reset()
+      result.current.action.append([{ id: "1", status: "idle" }])
+      result.current.action.reset()
     })
 
-    expect(result.current.state.tasks).toHaveLength(0)
-    expect(result.current.state.meta.action).toBe("reset")
+    expect(result.current.value.tasks).toHaveLength(0)
+    expect(result.current.value.meta.action).toBe("reset")
   })
 
   it("should submit tasks serially", async () => {
@@ -59,7 +59,7 @@ describe("useTaskManager", () => {
     )
 
     act(() => {
-      result.current.handler.append([
+      result.current.action.append([
         { id: "1", status: "idle" },
         { id: "2", status: "idle" },
       ])
@@ -70,12 +70,12 @@ describe("useTaskManager", () => {
     })
 
     await act(async () => {
-      await result.current.handler.submit(mockProcess)
+      await result.current.action.submit(mockProcess)
     })
 
-    const statuses = result.current.state.tasks.map((t) => t.status)
+    const statuses = result.current.value.tasks.map((t) => t.status)
     expect(statuses).toEqual(["success", "success"])
-    expect(result.current.state.meta.action).toBe("submit")
+    expect(result.current.value.meta.action).toBe("submit")
   })
 
   it("should submit tasks in parallel", async () => {
@@ -84,7 +84,7 @@ describe("useTaskManager", () => {
     )
 
     act(() => {
-      result.current.handler.append([
+      result.current.action.append([
         { id: "1", status: "idle" },
         { id: "2", status: "idle" },
         { id: "3", status: "idle" },
@@ -96,10 +96,10 @@ describe("useTaskManager", () => {
     })
 
     await act(async () => {
-      await result.current.handler.submit(mockProcess)
+      await result.current.action.submit(mockProcess)
     })
 
-    const statuses = result.current.state.tasks.map((t) => t.status)
+    const statuses = result.current.value.tasks.map((t) => t.status)
     expect(statuses).toEqual(["success", "success", "success"])
   })
 
@@ -109,7 +109,7 @@ describe("useTaskManager", () => {
     )
 
     act(() => {
-      result.current.handler.append([
+      result.current.action.append([
         { id: "1", status: "idle" },
         { id: "2", status: "idle" },
       ])
@@ -122,12 +122,12 @@ describe("useTaskManager", () => {
     })
 
     await act(async () => {
-      await expect(result.current.handler.submit(mockProcess)).rejects.toThrow(
+      await expect(result.current.action.submit(mockProcess)).rejects.toThrow(
         "Task 2 failed",
       )
     })
 
-    const statuses = result.current.state.tasks.map((t) => t.status)
+    const statuses = result.current.value.tasks.map((t) => t.status)
     expect(statuses).toEqual(["success", "error"])
   })
 })

@@ -54,7 +54,7 @@ describe("useDisclosure", () => {
     expect(result.current.value.status).toBe("closed")
 
     act(() => {
-      result.current.control.reset()
+      result.current.action.reset()
     })
     expect(result.current.value.status).toBe("opened")
   })

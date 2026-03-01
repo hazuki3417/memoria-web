@@ -1,7 +1,7 @@
 import { numberReducer } from "@/reducers"
 import { useCallback, useMemo, useReducer } from "react"
 
-export type UseImageZoomState = {
+export type UseImageZoomValue = {
   level: number // 倍率
   scale: number // スケール
   initial: {
@@ -14,22 +14,26 @@ export type UseImageZoomState = {
   }
 }
 
-export type UseImageZoomOption = Pick<UseImageZoomState, "level" | "config">
+export type UseImageZoomOption = Pick<UseImageZoomValue, "level" | "config">
 
-export interface UseImageZoomHandler {
+export interface UseImageZoomControl {
   zoomIn: () => void
   zoomOut: () => void
+}
+
+export interface UseImageZoomAction {
   set: (level: number) => void
   reset: () => void
 }
 
 export interface UseImageZoom {
-  state: UseImageZoomState
-  handler: UseImageZoomHandler
+  value: UseImageZoomValue
+  control: UseImageZoomControl
+  action: UseImageZoomAction
 }
 
 export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
-  const [state, dispatch] = useReducer(numberReducer, {
+  const [value, dispatch] = useReducer(numberReducer, {
     current: { value: option.level },
     initial: { value: option.level },
     config: option.config,
@@ -37,20 +41,20 @@ export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
 
   // NOTE: zoom levelを監視して常にscaleを計算する
   const scale = useMemo(() => {
-    return state.current.value / 100
-  }, [state.current.value])
+    return value.current.value / 100
+  }, [value.current.value])
 
   const zoomIn = useCallback(() => {
-    const candidate = state.current.value + state.config.step
+    const candidate = value.current.value + value.config.step
     const clamped = clamp(candidate, option.config.min, option.config.max)
     dispatch({ type: "set", value: clamped })
-  }, [state.current.value, option.config])
+  }, [value.current.value, option.config])
 
   const zoomOut = useCallback(() => {
-    const candidate = state.current.value - state.config.step
+    const candidate = value.current.value - value.config.step
     const clamped = clamp(candidate, option.config.min, option.config.max)
     dispatch({ type: "set", value: clamped })
-  }, [state.current.value, option.config])
+  }, [value.current.value, option.config])
 
   const set = useCallback(
     (level: number) => {
@@ -65,17 +69,19 @@ export const useImageZoom = (option: UseImageZoomOption): UseImageZoom => {
   }, [])
 
   return {
-    state: {
-      level: state.current.value,
+    value: {
+      level: value.current.value,
       scale,
       initial: {
-        level: state.initial.value,
+        level: value.initial.value,
       },
       config: option.config,
     },
-    handler: {
+    control: {
       zoomIn,
       zoomOut,
+    },
+    action: {
       set,
       reset,
     },

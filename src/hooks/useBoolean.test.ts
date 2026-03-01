@@ -13,7 +13,7 @@ describe("useBoolean", () => {
     const { result } = renderHook(() => useBoolean(false))
 
     act(() => {
-      result.current.control.setTrue()
+      result.current.action.setTrue()
     })
 
     expect(result.current.value).toBe(true)
@@ -23,7 +23,7 @@ describe("useBoolean", () => {
     const { result } = renderHook(() => useBoolean(true))
 
     act(() => {
-      result.current.control.setFalse()
+      result.current.action.setFalse()
     })
 
     expect(result.current.value).toBe(false)
@@ -33,13 +33,13 @@ describe("useBoolean", () => {
     const { result } = renderHook(() => useBoolean(false))
 
     act(() => {
-      result.current.control.toggle()
+      result.current.action.toggle()
     })
 
     expect(result.current.value).toBe(true)
 
     act(() => {
-      result.current.control.toggle()
+      result.current.action.toggle()
     })
 
     expect(result.current.value).toBe(false)
@@ -49,12 +49,12 @@ describe("useBoolean", () => {
     const { result } = renderHook(() => useBoolean(true))
 
     act(() => {
-      result.current.control.setFalse()
+      result.current.action.setFalse()
     })
     expect(result.current.value).toBe(false)
 
     act(() => {
-      result.current.control.reset()
+      result.current.action.reset()
     })
     expect(result.current.value).toBe(true)
   })
