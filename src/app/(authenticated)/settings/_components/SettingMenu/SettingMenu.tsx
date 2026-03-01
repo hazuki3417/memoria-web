@@ -3,11 +3,11 @@ import { resolveUri } from "@/lib/url"
 import { Box, BoxProps, NavLink, Stack } from "@mantine/core"
 import { IconAdjustments, IconBell, IconUser } from "@tabler/icons-react"
 
-export interface SideMenuProps extends Omit<BoxProps, "component"> {
+export interface SettingMenuProps extends Omit<BoxProps, "component"> {
   current: string
 }
 
-export const SideMenu = (props: SideMenuProps) => {
+export const SettingMenu = (props: SettingMenuProps) => {
   const { current, ...rest } = props
 
   const userMenu = useNavLink({

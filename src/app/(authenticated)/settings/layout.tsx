@@ -1,7 +1,7 @@
 "use client"
 import { Box, Container, Flex } from "@mantine/core"
 import { usePathname } from "next/navigation"
-import { SideMenu } from "./_components"
+import { SettingMenu } from "./_components"
 
 type LayoutProps = {
   children: React.ReactNode
@@ -15,7 +15,7 @@ const Layout = (props: LayoutProps) => {
   return (
     <Container size="xl" p="lg">
       <Flex align="flex-start" gap="xl">
-        <SideMenu current={pathname} w={220} />
+        <SettingMenu current={pathname} w={220} />
         <Box component="section" flex={1}>
           {children}
         </Box>
