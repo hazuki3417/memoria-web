@@ -109,8 +109,8 @@ export const Footer = (props: FooterProps) => {
             justifyContent: "end",
           })}
         >
-          <MemoZoomOutButton onClick={handler?.onZoomOut} />
           <MemoZoomResetButton onClick={handler?.onZoomReset} />
+          <MemoZoomOutButton onClick={handler?.onZoomOut} />
           <Slider
             w={120}
             color="gray"
