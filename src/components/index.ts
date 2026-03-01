@@ -1,6 +1,8 @@
 export * from "./ActionPanel"
 export * from "./Button"
+export * from "./CustomModal"
 export * from "./FormButton"
 export * from "./FormTextInput"
 export * from "./Image"
 export * from "./Toggle"
+

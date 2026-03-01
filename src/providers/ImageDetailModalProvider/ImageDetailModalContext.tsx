@@ -1,5 +1,5 @@
 "use client"
-import { InfoPayload } from "@/components/Modal/ImageDetailModal/Info"
+import { InfoPayload } from "@/feature/ImageDetailModal/Info"
 import { UseDisclosureStatus } from "@/hooks"
 import "client-only"
 import { createContext } from "react"

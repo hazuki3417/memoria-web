@@ -1,6 +1,6 @@
 "use client"
-import { CustomModal } from "@/components/Modal/CustomModal/CustomModal"
-import { ImageDetailModal } from "@/components/Modal/ImageDetailModal"
+import { CustomModal } from "@/components/CustomModal/CustomModal"
+import { ImageDetailModal } from "@/feature/ImageDetailModal"
 import { useDisclosure } from "@/hooks"
 import "client-only"
 import React, { useCallback, useState } from "react"
@@ -85,9 +85,9 @@ export const ImageDetailModalProvider = (
             }}
             handler={{
               onClose: handleClose,
-              onDelete: () => {},
-              onDownload: () => {},
-              onEdit: () => {},
+              onDelete: () => { },
+              onDownload: () => { },
+              onEdit: () => { },
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })
