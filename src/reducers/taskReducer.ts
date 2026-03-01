@@ -1,9 +1,9 @@
 import { ActionType, assertUnreachableActionType } from "./util"
 
-export type TaskStatus = "idle" | "running" | "success" | "error"
+export type TaskValue = "idle" | "running" | "success" | "error"
 export type TaskBase = {
   id: string
-  status: TaskStatus
+  status: TaskValue
   error?: string
 }
 export type Task<D = undefined> = D extends undefined

@@ -1,6 +1,6 @@
 import { assertUnreachableActionType } from "./util"
 
-export interface NumberState {
+export interface NumberValue {
   current: {
     value: number
   }
@@ -15,9 +15,9 @@ export interface NumberState {
 export type NumberAction = { type: "set"; value: number } | { type: "reset" }
 
 export const numberReducer = (
-  state: NumberState,
+  state: NumberValue,
   action: NumberAction,
-): NumberState => {
+): NumberValue => {
   switch (action.type) {
     case "set":
       return {

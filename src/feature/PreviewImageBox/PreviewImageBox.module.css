@@ -5,7 +5,7 @@
   justify-content: center;
   height: 160px;
   width: 160px;
-  border-radius: var(--mantine-radius-sm);
+  /* border-radius: var(--mantine-radius-sm); */
   filter: brightness(0.9);
   transition: filter 0.2s ease;
   user-select: none;
@@ -24,7 +24,7 @@
 /* 選択状態を表現 */
 .box[data-selected="true"] {
   filter: brightness(1);
-  outline: 1px solid var(--mantine-primary-color-filled);
+  /* outline: 1px solid var(--mantine-primary-color-filled); */
 }
 
 /* サポート対象を表現 */

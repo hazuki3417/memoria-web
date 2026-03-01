@@ -1,7 +1,7 @@
 import { ActionType, assertUnreachableActionType } from "./util"
 
 export type ImageRotateActionType = "left" | "right" | "reset"
-export interface ImageRotateState {
+export interface ImageRotateValue {
   current: {
     angle: number
   }
@@ -19,9 +19,9 @@ export type ImageRotateAction =
   | { type: "reset" }
 
 export const imageRotateReducer = (
-  state: ImageRotateState,
+  state: ImageRotateValue,
   action: ImageRotateAction,
-): ImageRotateState => {
+): ImageRotateValue => {
   switch (action.type) {
     case "left":
       return {

@@ -85,9 +85,9 @@ export const ImageDetailModalProvider = (
             }}
             handler={{
               onClose: handleClose,
-              onDelete: () => { },
-              onDownload: () => { },
-              onEdit: () => { },
+              onDelete: () => {},
+              onDownload: () => {},
+              onEdit: () => {},
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

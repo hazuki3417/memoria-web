@@ -51,13 +51,15 @@ const Page = () => {
   })
 
   const imageDetailModalContext = useImageDetailModalContext()
+  const [mode, setMode] = useState<"filter" | "bulk">("filter")
   const [items, setItems] = useState<ImageDetailPayload[]>([])
+  const [selectable, setSelectable] = useState<ImageDetailPayload["id"][]>([])
 
   const relay = useRelayConnection({
     hooks: () =>
       useGetImagesQuery({
         variables: {
-          input: { first: 25 },
+          input: { first: 100 },
         },
         notifyOnNetworkStatusChange: true,
       }),
@@ -89,7 +91,7 @@ const Page = () => {
             image: {
               preview: edge.node.src.preview,
               thumbnail: edge.node.src.thumbnail,
-              alt: "sample.png",
+              alt: edge.node.info.file.name,
             },
           }
         }),
@@ -119,15 +121,13 @@ const Page = () => {
             image: {
               preview: edge.node.src.preview,
               thumbnail: edge.node.src.thumbnail,
-              alt: "sample.png",
+              alt: edge.node.info.file.name,
             },
           }
         }),
       )
     }
   }, [relay.state.edges, items.length])
-
-  const [mode, setMode] = useState<"filter" | "bulk">("filter")
 
   return (
     <Box>
@@ -162,7 +162,7 @@ const Page = () => {
                   <Button size="xs" leftSection={<IconDownload size={16} />}>
                     {t("button.download")}
                   </Button>
-                  <div>0 件選択中</div>
+                  <div>{selectable.length} 件選択中</div>
                 </Flex>
               )}
             </ActionPanel.Left>
@@ -177,7 +177,16 @@ const Page = () => {
                 </LinkButton>
                 <SegmentedControl
                   value={mode}
-                  onChange={(value) => setMode(value as "filter" | "bulk")}
+                  onChange={(value) => {
+                    const mode = value as "filter" | "bulk"
+                    if (mode === "filter") {
+                      // 一括選択 -> 絞り込みへの切り替えなので選択したアイテムをクリアする
+                      setSelectable([])
+                    } else {
+                      // 絞り込み -> 一括選択への切り替えなので検索条件をクリアする
+                    }
+                    setMode(mode)
+                  }}
                   data={[
                     {
                       value: "filter",
@@ -210,15 +219,34 @@ const Page = () => {
                     <PreviewImageBox
                       key={item.id}
                       ui={{
-                        selected: false,
-                        selectable: false,
+                        selected:
+                          selectable.find((value) => value === item.id) !==
+                          undefined,
+                        selectable: mode === "bulk",
                         supported: true,
                       }}
                       onClick={() => {
-                        imageDetailModalContext.control.open({
-                          id: item.id,
-                          getImages: () => items,
-                        })
+                        if (mode === "bulk") {
+                          const target = selectable.find(
+                            (value) => value === item.id,
+                          )
+
+                          if (target === undefined) {
+                            // 追加
+                            setSelectable((prev) => [...prev, item.id])
+                          } else {
+                            // 除外
+                            setSelectable((prev) =>
+                              prev.filter((value) => value !== item.id),
+                            )
+                          }
+                        } else {
+                          // filter
+                          imageDetailModalContext.control.open({
+                            id: item.id,
+                            getImages: () => items,
+                          })
+                        }
                       }}
                     >
                       <PreviewImageBox.Image
