@@ -3,13 +3,72 @@ extend type Query {
 }
 
 extend type Mutation {
-  uploadImage(input: UploadImageInput!): Image!
+  uploadImage(input: UploadImageInput!): UploadImagePayload!
+
+  updateImage(input: UpdateImageInput!): UpdateImagePayload!
+  updateImages(input: UpdateImagesInput!): UpdateImagesPayload!
+
+  deleteImage(input: DeleteImageInput!): DeleteImagePayload!
+  deleteImages(input: DeleteImagesInput!): DeleteImagesPayload!
 }
 
 input UploadImageInput {
   file: Upload!
   tags: [String!]!
   visibility: Visibility!
+}
+
+input UpdateImageInput {
+  id: ID!
+  tags: [String!]!
+}
+
+input UpdateImagesInput {
+  targets: [UpdateImageInput!]!
+}
+
+input DeleteImageInput {
+  id: ID!
+}
+
+input DeleteImagesInput {
+  ids: [ID!]!
+}
+
+input DownloadImageInput {
+  id: ID!
+}
+
+input DownloadImagesInput {
+  ids: [ID!]!
+}
+
+
+# === payload ===
+
+type UploadImagePayload {
+  id: ID!
+}
+
+type UpdateImagePayload {
+  id: ID!
+}
+
+type UpdateImagesPayload {
+  ids: [ID!]!
+}
+
+type DeleteImagePayload {
+  id: ID!
+}
+
+type DeleteImagesPayload {
+  ids: [ID!]!
+}
+
+type FailedError {
+  id: ID!
+  reason: String!
 }
 
 # === data model ===

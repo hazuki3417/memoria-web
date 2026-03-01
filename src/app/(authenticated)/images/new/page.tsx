@@ -123,10 +123,13 @@ const Page = () => {
     await methods.handleSubmit(async (value, errors) => {
       await taskManager.action.submit(async (task, index) => {
         const image = methods.getValues("images")[index]
+        const date = new Date()
+        const tagId = date.getMilliseconds()
         await uploadImage({
           variables: {
             input: {
               ...image,
+              tags: [`tag-${tagId}`, "example", "sample"],
               visibility:
                 image.visibility === "public"
                   ? Visibility.Public

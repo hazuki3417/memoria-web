@@ -1,21 +1,6 @@
 mutation UploadImage($input: UploadImageInput!) {
   uploadImage(input: $input) {
     id
-    info {
-      file {
-        name
-        size
-      }
-      size {
-        width
-        height
-      }
-      tags
-    }
-    src {
-      thumbnail
-      preview
-    }
   }
 }
 
