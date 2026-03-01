@@ -9,7 +9,7 @@ export type UseLocalStorageOption<T> = {
   init: T
 }
 
-export interface UseLocalStorageControl<T> { }
+export interface UseLocalStorageControl<T> {}
 
 export interface UseLocalStorageAction<T> {
   set: (value: T) => void

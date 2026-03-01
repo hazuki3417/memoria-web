@@ -23,7 +23,7 @@ export interface ProvidersProps {
 
 const MemoGraphQLProvider = memo(GraphQLProvider)
 
-const Providers = (props: ProvidersProps) => {
+export const Providers = (props: ProvidersProps) => {
   const { theme, auth, option, children } = props
   return (
     <ThemeProvider {...theme}>
@@ -37,4 +37,3 @@ const Providers = (props: ProvidersProps) => {
     </ThemeProvider>
   )
 }
-export default Providers
