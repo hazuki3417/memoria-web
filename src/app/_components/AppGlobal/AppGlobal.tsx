@@ -1,11 +1,11 @@
 "use client"
 import { ActionPanel } from "@/components"
 import { useConfirmContext } from "@/providers"
-import { Box, Button, Flex, Modal } from "@mantine/core"
+import { Box, Button, Divider, Modal } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
 import "client-only"
 
-export interface AppGlobalProps {}
+export interface AppGlobalProps { }
 
 export const AppGlobal = (props: AppGlobalProps) => {
   const confirm = useConfirmContext()
@@ -19,14 +19,13 @@ export const AppGlobal = (props: AppGlobalProps) => {
         onClose={confirm.control.dismiss}
         centered
       >
-        <Box>{confirm.value.payload?.body}</Box>
+        <Divider />
+        <Box py="lg">{confirm.value.payload?.body}</Box>
+        <Divider mb={"md"} />
         <ActionPanel>
           <ActionPanel.Left></ActionPanel.Left>
           <ActionPanel.Center>
-            <Flex gap="xs">
-              <Button onClick={confirm.control.cancel}>キャンセル</Button>
-              <Button onClick={confirm.control.confirm}>OK</Button>
-            </Flex>
+            <Button onClick={confirm.control.confirm}>OK</Button>
           </ActionPanel.Center>
           <ActionPanel.Right></ActionPanel.Right>
         </ActionPanel>

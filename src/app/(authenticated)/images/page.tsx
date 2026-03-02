@@ -6,18 +6,19 @@ import {
   imageSearchFormDefaultValue,
   imageSearchFormSchema,
 } from "@/feature/images"
-import { useGetImagesQuery } from "@/graphql"
+import { useDeleteImagesMutation, useGetImagesQuery } from "@/graphql"
 import { useIntersection } from "@/hooks/useIntersection"
 import { useRelayConnection } from "@/hooks/useRelayConnection"
 import { defineFieldObject } from "@/lib/field"
 import { resolveUri } from "@/lib/url"
-import { ImageDetailPayload, useImageDetailModalContext } from "@/providers"
+import { ImageDetailPayload, useConfirmContext, useImageDetailModalContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Box,
   Button,
   Center,
   Flex,
+  ScrollArea,
   SegmentedControl,
   Tabs,
   TagsInput,
@@ -50,6 +51,7 @@ const Page = () => {
     },
   })
 
+  const confirm = useConfirmContext()
   const imageDetailModalContext = useImageDetailModalContext()
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
   const [items, setItems] = useState<ImageDetailPayload[]>([])
@@ -129,6 +131,34 @@ const Page = () => {
     }
   }, [relay.state.edges, items.length])
 
+  const handleEdit = async () => {
+    console.debug("edit")
+  }
+
+  const [deleteImages, deleteImagesResult] = useDeleteImagesMutation()
+
+  const handleDelete = async () => {
+    const result = await confirm.action.confirm({
+      body: "削除します。よろしいですか？"
+    })
+
+    if (result === "confirmed") {
+      return
+    }
+
+    await deleteImages({
+      variables: {
+        input: {
+          ids: selectable
+        }
+      }
+    })
+  }
+
+  const handleDownload = async () => {
+    console.debug("edit")
+  }
+
   return (
     <Box>
       <Tabs color="gray" variant="pills" defaultValue={TAB_FIELDS.list}>
@@ -153,13 +183,13 @@ const Page = () => {
               )}
               {mode === "bulk" && (
                 <Flex align="center" gap="xs">
-                  <Button size="xs" leftSection={<IconEdit size={16} />}>
+                  <Button size="xs" leftSection={<IconEdit size={16} />} onClick={handleEdit}>
                     {t("button.edit")}
                   </Button>
-                  <Button size="xs" leftSection={<IconTrash size={16} />}>
+                  <Button size="xs" leftSection={<IconTrash size={16} />} onClick={handleDelete}>
                     {t("button.delete")}
                   </Button>
-                  <Button size="xs" leftSection={<IconDownload size={16} />}>
+                  <Button size="xs" leftSection={<IconDownload size={16} />} onClick={handleDownload}>
                     {t("button.download")}
                   </Button>
                   <div>{selectable.length} 件選択中</div>
@@ -212,64 +242,67 @@ const Page = () => {
             </ActionPanel.Right>
           </ActionPanel>
           <ImageLayout>
-            <ImageLayout.Grid>
-              <Image>
-                {items.map((item) => {
-                  return (
-                    <PreviewImageBox
-                      key={item.id}
-                      ui={{
-                        selected:
-                          selectable.find((value) => value === item.id) !==
-                          undefined,
-                        selectable: mode === "bulk",
-                        supported: true,
-                      }}
-                      onClick={() => {
-                        if (mode === "bulk") {
-                          const target = selectable.find(
-                            (value) => value === item.id,
-                          )
-
-                          if (target === undefined) {
-                            // 追加
-                            setSelectable((prev) => [...prev, item.id])
-                          } else {
-                            // 除外
-                            setSelectable((prev) =>
-                              prev.filter((value) => value !== item.id),
+            {/* FIX: スクロール仮実装 */}
+            <ScrollArea h={"76vh"} scrollbarSize={6}>
+              <ImageLayout.Grid>
+                <Image>
+                  {items.map((item) => {
+                    return (
+                      <PreviewImageBox
+                        key={item.id}
+                        ui={{
+                          selected:
+                            selectable.find((value) => value === item.id) !==
+                            undefined,
+                          selectable: mode === "bulk",
+                          supported: true,
+                        }}
+                        onClick={() => {
+                          if (mode === "bulk") {
+                            const target = selectable.find(
+                              (value) => value === item.id,
                             )
+
+                            if (target === undefined) {
+                              // 追加
+                              setSelectable((prev) => [...prev, item.id])
+                            } else {
+                              // 除外
+                              setSelectable((prev) =>
+                                prev.filter((value) => value !== item.id),
+                              )
+                            }
+                          } else {
+                            // filter
+                            imageDetailModalContext.control.open({
+                              id: item.id,
+                              getImages: () => items,
+                            })
                           }
-                        } else {
-                          // filter
-                          imageDetailModalContext.control.open({
-                            id: item.id,
-                            getImages: () => items,
-                          })
-                        }
-                      }}
-                    >
-                      <PreviewImageBox.Image
-                        src={item.image.thumbnail}
-                        alt={item.image.alt}
-                      />
-                    </PreviewImageBox>
-                    // FIX: Image.Tile, Image.FrameとpreviewImageBoxの実装が類似しているので共通化を検討する
-                    // <Image.Frame key={nanoid()}>
-                    //   <Image.Tile
-                    //     src={list.node.src.thumbnail}
-                    //     alt={list.node.info.file.name}
-                    //   />
-                    // </Image.Frame>
-                  )
-                })}
-                {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
-                <Image.Intersection
-                  ref={intersection.ref}
-                  visible={relay.state.pageInfo?.hasNextPage || false}
-                />
-              </Image>
-            </ImageLayout.Grid>
+                        }}
+                      >
+                        <PreviewImageBox.Image
+                          src={item.image.thumbnail}
+                          alt={item.image.alt}
+                        />
+                      </PreviewImageBox>
+                      // FIX: Image.Tile, Image.FrameとpreviewImageBoxの実装が類似しているので共通化を検討する
+                      // <Image.Frame key={nanoid()}>
+                      //   <Image.Tile
+                      //     src={list.node.src.thumbnail}
+                      //     alt={list.node.info.file.name}
+                      //   />
+                      // </Image.Frame>
+                    )
+                  })}
+                  {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
+                  <Image.Intersection
+                    ref={intersection.ref}
+                    visible={relay.state.pageInfo?.hasNextPage || false}
+                  />
+                </Image>
+              </ImageLayout.Grid>
+            </ScrollArea>
           </ImageLayout>
         </Tabs.Panel>
         <Tabs.Panel value={TAB_FIELDS.group}>group panel</Tabs.Panel>

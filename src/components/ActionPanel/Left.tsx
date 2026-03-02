@@ -8,7 +8,7 @@ export interface LeftProps extends Omit<FlexProps, "justify" | "align"> {
 export const Left = (props: LeftProps) => {
   const { children, ...lest } = props
   return (
-    <Flex flex={1} align="center" justify="flex-start" {...lest}>
+    <Flex flex={1} align="center" justify="start" {...lest}>
       {children}
     </Flex>
   )

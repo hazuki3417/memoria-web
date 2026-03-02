@@ -8,7 +8,7 @@ export interface RightProps extends Omit<FlexProps, "justify" | "align"> {
 export const Right = (props: RightProps) => {
   const { children, ...lest } = props
   return (
-    <Flex flex={1} align="center" justify="flex-end" {...lest}>
+    <Flex flex={1} align="center" justify="end" {...lest}>
       {children}
     </Flex>
   )

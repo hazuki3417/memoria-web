@@ -4,6 +4,32 @@ mutation UploadImage($input: UploadImageInput!) {
   }
 }
 
+mutation UpdateImage($input: UpdateImageInput!) {
+  updateImage(input: $input) {
+    id
+  }
+}
+
+
+mutation UpdateImages($input: UpdateImagesInput!) {
+  updateImages(input: $input) {
+    ids
+  }
+}
+
+mutation DeleteImage($input: DeleteImageInput!) {
+  deleteImage(input: $input) {
+    id
+  }
+}
+
+
+mutation DeleteImages($input: DeleteImagesInput!) {
+  deleteImages(input: $input) {
+    ids
+  }
+}
+
 query GetImages($input: PaginationInput) {
   getImages(input: $input) {
     edges {
@@ -35,3 +61,4 @@ query GetImages($input: PaginationInput) {
     }
   }
 }
+

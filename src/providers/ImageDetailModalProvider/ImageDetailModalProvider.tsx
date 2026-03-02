@@ -1,6 +1,7 @@
 "use client"
 import { CustomModal } from "@/components/CustomModal/CustomModal"
 import { ImageDetailModal } from "@/feature/ImageDetailModal"
+import { useDeleteImageMutation } from "@/graphql"
 import { useDisclosure } from "@/hooks"
 import "client-only"
 import React, { useCallback, useState } from "react"
@@ -46,6 +47,8 @@ export const ImageDetailModalProvider = (
   const limit = images.length
   const image = images.find((image) => image.id === imageDetail.id)
 
+  const [deleteImage, deleteImageResult] = useDeleteImageMutation()
+
   return (
     <ImageDetailModalContext.Provider
       value={{
@@ -88,17 +91,22 @@ export const ImageDetailModalProvider = (
             handler={{
               onClose: handleClose,
               onDelete: async () => {
-                const result = await confirm.action.confirm()
+                const result = await confirm.action.confirm({
+                  body: "削除します。よろしいですか？"
+                })
 
                 if (result != "confirmed") {
                   return
                 }
-
-                // 削除処理
-                console.debug("delete")
+                await deleteImage({
+                  variables: {
+                    input: { id: image.id }
+                  }
+                })
+                // 画面の再レンダリングをサせる処理を実装する
               },
-              onDownload: () => {},
-              onEdit: () => {},
+              onDownload: () => { },
+              onEdit: () => { },
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

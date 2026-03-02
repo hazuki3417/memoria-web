@@ -8,7 +8,7 @@ export interface CenterProps extends Omit<FlexProps, "justify" | "align"> {
 export const Center = (props: CenterProps) => {
   const { children, ...lest } = props
   return (
-    <Flex flex={1} align="center" justify="flex-center" {...lest}>
+    <Flex flex={1} align="center" justify="center" {...lest}>
       {children}
     </Flex>
   )
