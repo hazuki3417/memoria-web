@@ -1,5 +1,5 @@
 extend type Query {
-  getImages(input: PaginationInput): ImageConnection!
+  getImages(input: GetImagesInput!): ImageConnection!
 }
 
 extend type Mutation {
@@ -10,6 +10,18 @@ extend type Mutation {
 
   deleteImage(input: DeleteImageInput!): DeleteImagePayload!
   deleteImages(input: DeleteImagesInput!): DeleteImagesPayload!
+
+  downloadImage(input: DownloadImageInput!): DownloadImagePayload!
+  downloadImages(input: DownloadImagesInput!): DownloadImagesPayload!
+}
+
+input GetImagesPaginationsInput {
+  tags: [String!]
+}
+
+input GetImagesInput {
+  conditions: GetImagesPaginationsInput
+  pagination: PaginationInput!
 }
 
 input UploadImageInput {
@@ -66,12 +78,15 @@ type DeleteImagesPayload {
   ids: [ID!]!
 }
 
-type FailedError {
-  id: ID!
-  reason: String!
+type DownloadImagePayload {
+  target: DownloadUrl!
 }
 
-# === data model ===
+type DownloadImagesPayload {
+  targets: [DownloadUrl!]!
+}
+
+# === domain model ===
 
 type Image {
   id: ID!
@@ -100,6 +115,15 @@ type ImageSize {
 type ImageSrc {
   thumbnail: String!
   preview: String!
+}
+
+# === shared model ===
+
+type DownloadUrl {
+  url: String!
+  expiresAt: DateTime!
+  fileName: String!
+  contentType: String!
 }
 
 # === relay model ===

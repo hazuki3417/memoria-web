@@ -30,7 +30,7 @@ mutation DeleteImages($input: DeleteImagesInput!) {
   }
 }
 
-query GetImages($input: PaginationInput) {
+query GetImages($input: GetImagesInput!) {
   getImages(input: $input) {
     edges {
       node {

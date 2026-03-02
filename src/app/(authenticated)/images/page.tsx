@@ -2,15 +2,12 @@
 import { ActionPanel, Image, LinkButton } from "@/components"
 import { ImageLayout } from "@/components/ImageLayout/ImageLayout"
 import { PreviewImageBox } from "@/feature"
-import {
-  imageSearchFormDefaultValue,
-  imageSearchFormSchema,
-} from "@/feature/images"
 import { useDeleteImagesMutation, useGetImagesQuery } from "@/graphql"
+import { useUriQuery } from "@/hooks"
 import { useIntersection } from "@/hooks/useIntersection"
 import { useRelayConnection } from "@/hooks/useRelayConnection"
 import { defineFieldObject } from "@/lib/field"
-import { resolveUri } from "@/lib/url"
+import { resolveUri, resolveUriQuery } from "@/lib/url"
 import { ImageDetailPayload, useConfirmContext, useImageDetailModalContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -33,23 +30,37 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { t } from "i18next"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, FieldErrors, FormProvider, useForm } from "react-hook-form"
 import { z } from "zod"
+
+
+const imageSearchFormSchema = z.object({
+  tags: z.array(z.string()),
+})
+
+type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>
+
+const imageSearchFormDefaultValue: ImageSearchFormSchema = {
+  tags: [],
+}
+
 
 const TAB_ID_LIST = ["list", "group"] as const
 const TAB_FIELDS = defineFieldObject(TAB_ID_LIST)
 
-type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>
-
 const Page = () => {
+  const query = useUriQuery<ImageSearchFormSchema>()
+  const router = useRouter()
+
   const methods = useForm<ImageSearchFormSchema>({
     resolver: zodResolver(imageSearchFormSchema),
-    mode: "onChange",
     defaultValues: {
       ...imageSearchFormDefaultValue,
     },
   })
+  const { handleSubmit, control } = methods
 
   const confirm = useConfirmContext()
   const imageDetailModalContext = useImageDetailModalContext()
@@ -57,11 +68,20 @@ const Page = () => {
   const [items, setItems] = useState<ImageDetailPayload[]>([])
   const [selectable, setSelectable] = useState<ImageDetailPayload["id"][]>([])
 
+  // FIX: 検索を押下したあとの検索結果を画面に反映するように修正
+
   const relay = useRelayConnection({
     hooks: () =>
       useGetImagesQuery({
         variables: {
-          input: { first: 100 },
+          input: {
+            conditions: {
+              tags: query !== undefined ? query.tags : [],
+            },
+            pagination: {
+              first: 100
+            }
+          },
         },
         notifyOnNetworkStatusChange: true,
       }),
@@ -137,6 +157,14 @@ const Page = () => {
 
   const [deleteImages, deleteImagesResult] = useDeleteImagesMutation()
 
+  const searchValid = async (values: ImageSearchFormSchema) => {
+    console.log("submit values:", values)
+    router.push(resolveUriQuery({ ...values }))
+  }
+  const searchInvalid = async (errors: FieldErrors<ImageSearchFormSchema>) => {
+    console.log("submit error:", errors)
+  }
+
   const handleDelete = async () => {
     const result = await confirm.action.confirm({
       body: "削除します。よろしいですか？"
@@ -170,16 +198,27 @@ const Page = () => {
           <ActionPanel mb="xs">
             <ActionPanel.Left>
               {mode === "filter" && (
-                <Flex align="center" gap="xs" w="100%">
-                  <TagsInput
-                    size="xs"
-                    placeholder={t("placeholder.tag")}
-                    leftSection={<IconSearch size={16} />}
-                    clearable
-                    flex={1}
-                  />
-                  <Button size="xs">{t("button.search")}</Button>
-                </Flex>
+                <FormProvider {...methods}>
+                  <form onSubmit={handleSubmit(searchValid, searchInvalid)} style={{ flex: 1 }}>
+                    <Flex align="center" gap="xs" w="100%">
+                      <Controller
+                        name="tags"
+                        control={control}
+                        render={({ field }) => (
+                          <TagsInput
+                            {...field}
+                            size="xs"
+                            placeholder={t("placeholder.tag")}
+                            leftSection={<IconSearch size={16} />}
+                            clearable
+                            flex="1"
+                          />
+                        )}
+                      />
+                      <Button size="xs" type="submit">{t("button.search")}</Button>
+                    </Flex>
+                  </form>
+                </FormProvider>
               )}
               {mode === "bulk" && (
                 <Flex align="center" gap="xs">
