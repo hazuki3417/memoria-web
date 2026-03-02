@@ -2,7 +2,7 @@ import { Flex, FlexProps } from "@mantine/core"
 import React from "react"
 
 export interface LeftProps extends Omit<FlexProps, "justify" | "align"> {
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 export const Left = (props: LeftProps) => {

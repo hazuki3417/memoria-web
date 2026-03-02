@@ -7,10 +7,9 @@ import "@/lib/zod"
 import { AuthContext } from "@/providers"
 import { AppShell, AppShellHeader, AppShellMain } from "@mantine/core"
 import "@mantine/core/styles.css"
-import { Notifications } from "@mantine/notifications"
 import "@mantine/notifications/styles.css"
 import type { Metadata } from "next"
-import { Head, Header, Providers } from "./_components"
+import { AppGlobal, Head, Header, Providers } from "./_components"
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -58,7 +57,7 @@ const RootLayout = async (props: RootLayoutProps) => {
           auth={context}
           option={{ graphql: { token: session?.tokenSet.accessToken } }}
         >
-          <Notifications position="top-right" limit={3} autoClose={3000} />
+          <AppGlobal />
           <AppShell header={{ height: theme.other.app.header.height }}>
             <AppShellHeader>
               <Header />

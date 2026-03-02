@@ -3,6 +3,7 @@ import { CreateGraphQLOption } from "@/lib/graphql/type"
 import {
   AuthContext,
   AuthProvider,
+  ConfirmProvider,
   GraphQLProvider,
   ImageDetailModalProvider,
   LangProvider,
@@ -30,7 +31,9 @@ export const Providers = (props: ProvidersProps) => {
       <LangProvider>
         <AuthProvider value={auth}>
           <MemoGraphQLProvider option={option.graphql}>
-            <ImageDetailModalProvider>{children}</ImageDetailModalProvider>
+            <ConfirmProvider>
+              <ImageDetailModalProvider>{children}</ImageDetailModalProvider>
+            </ConfirmProvider>
           </MemoGraphQLProvider>
         </AuthProvider>
       </LangProvider>

@@ -2,7 +2,7 @@ import { Flex, FlexProps } from "@mantine/core"
 import React from "react"
 
 export interface CenterProps extends Omit<FlexProps, "justify" | "align"> {
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 export const Center = (props: CenterProps) => {

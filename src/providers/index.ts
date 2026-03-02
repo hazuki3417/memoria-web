@@ -1,4 +1,5 @@
 export * from "./AuthProvider"
+export * from "./ConfirmProvider"
 export * from "./GraphQLProvider"
 export * from "./ImageDetailModalProvider"
 export * from "./LangProvider"

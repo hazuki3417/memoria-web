@@ -4,6 +4,7 @@ import { ImageDetailModal } from "@/feature/ImageDetailModal"
 import { useDisclosure } from "@/hooks"
 import "client-only"
 import React, { useCallback, useState } from "react"
+import { useConfirmContext } from "../ConfirmProvider"
 import {
   ImageDetail,
   ImageDetailModalContext,
@@ -20,6 +21,7 @@ export const ImageDetailModalProvider = (
   const { children } = props
 
   const disclosure = useDisclosure({ status: "closed" })
+  const confirm = useConfirmContext()
   const [imageDetail, setImageDetail] = useState<ImageDetail>({
     id: "",
     getImages: null,
@@ -85,7 +87,16 @@ export const ImageDetailModalProvider = (
             }}
             handler={{
               onClose: handleClose,
-              onDelete: () => {},
+              onDelete: async () => {
+                const result = await confirm.action.confirm()
+
+                if (result != "confirmed") {
+                  return
+                }
+
+                // 削除処理
+                console.debug("delete")
+              },
               onDownload: () => {},
               onEdit: () => {},
               onNext: () => {
