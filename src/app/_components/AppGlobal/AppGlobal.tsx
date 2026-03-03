@@ -1,18 +1,44 @@
 "use client"
 import { ActionPanel } from "@/components"
-import { useConfirmContext } from "@/providers"
+import { FeedbackKind, useConfirmContext } from "@/providers"
+import { useFeedbackContext } from "@/providers/FeedbackProvider"
 import { Box, Button, Divider, Modal } from "@mantine/core"
-import { Notifications } from "@mantine/notifications"
+import {
+  NotificationData,
+  notifications,
+  Notifications,
+} from "@mantine/notifications"
 import "client-only"
+import { useEffect } from "react"
+
+const mapKindColor: Record<FeedbackKind, NotificationData["color"]> = {
+  success: "green",
+  info: "blue",
+  warning: "yellow",
+  error: "red",
+}
 
 export interface AppGlobalProps {}
 
 export const AppGlobal = (props: AppGlobalProps) => {
+  const feedback = useFeedbackContext()
   const confirm = useConfirmContext()
+
+  useEffect(() => {
+    if (feedback.value.kind !== null) {
+      notifications.show({
+        color: mapKindColor[feedback.value.kind],
+        title: feedback.value.payload?.title,
+        message: feedback.value.payload?.body,
+      })
+    }
+  }, [feedback.value.kind])
 
   return (
     <>
+      {/* feedback context*/}
       <Notifications position="top-right" limit={3} autoClose={3000} />
+      {/* confirm context */}
       <Modal
         title={confirm.value.payload?.title}
         opened={confirm.value.payload !== null}

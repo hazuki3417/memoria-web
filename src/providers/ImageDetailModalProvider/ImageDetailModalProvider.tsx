@@ -6,6 +6,7 @@ import { useDisclosure } from "@/hooks"
 import "client-only"
 import React, { useCallback, useState } from "react"
 import { useConfirmContext } from "../ConfirmProvider"
+import { useFeedbackContext } from "../FeedbackProvider"
 import {
   ImageDetail,
   ImageDetailModalContext,
@@ -21,8 +22,9 @@ export const ImageDetailModalProvider = (
 ) => {
   const { children } = props
 
-  const disclosure = useDisclosure({ status: "closed" })
+  const feedback = useFeedbackContext()
   const confirm = useConfirmContext()
+  const disclosure = useDisclosure({ status: "closed" })
   const [imageDetail, setImageDetail] = useState<ImageDetail>({
     id: "",
     getImages: null,
@@ -112,6 +114,10 @@ export const ImageDetailModalProvider = (
                   },
                 })
                 handleClose()
+                feedback.action.success({
+                  title: "成功",
+                  body: "削除しました。",
+                })
               },
               onDownload: () => {},
               onEdit: () => {},

@@ -11,6 +11,7 @@ import { resolveUri, resolveUriQuery } from "@/lib/url"
 import {
   ImageDetailPayload,
   useConfirmContext,
+  useFeedbackContext,
   useImageDetailModalContext,
 } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -64,6 +65,7 @@ const Page = () => {
   })
   const { handleSubmit, control } = methods
 
+  const feedback = useFeedbackContext()
   const confirm = useConfirmContext()
   const imageDetailModalContext = useImageDetailModalContext()
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
@@ -187,9 +189,11 @@ const Page = () => {
       },
     })
 
-    // 選択を解除
+    feedback.action.success({
+      title: "成功",
+      body: "削除しました。",
+    })
     setSelectable([])
-    // 削除の通知をだす
   }
 
   const handleDownloadImages = async () => {

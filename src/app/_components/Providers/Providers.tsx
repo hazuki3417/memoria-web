@@ -10,6 +10,7 @@ import {
   ThemeProvider,
   ThemeProviderProps,
 } from "@/providers"
+import { FeedbackProvider } from "@/providers/FeedbackProvider"
 import type React from "react"
 import { memo } from "react"
 
@@ -31,9 +32,11 @@ export const Providers = (props: ProvidersProps) => {
       <LangProvider>
         <AuthProvider value={auth}>
           <MemoGraphQLProvider option={option.graphql}>
-            <ConfirmProvider>
-              <ImageDetailModalProvider>{children}</ImageDetailModalProvider>
-            </ConfirmProvider>
+            <FeedbackProvider>
+              <ConfirmProvider>
+                <ImageDetailModalProvider>{children}</ImageDetailModalProvider>
+              </ConfirmProvider>
+            </FeedbackProvider>
           </MemoGraphQLProvider>
         </AuthProvider>
       </LangProvider>
