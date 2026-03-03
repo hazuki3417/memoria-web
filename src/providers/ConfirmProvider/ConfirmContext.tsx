@@ -2,13 +2,13 @@
 import "client-only"
 import React, { createContext } from "react"
 
-export const confirmResult = {
+export const CONFIRM_RESULT = {
   CONFIRMED: "confirmed",
   CANCELLED: "cancelled",
   DISMISSED: "dismissed",
 } as const
 
-export type ConfirmResult = (typeof confirmResult)[keyof typeof confirmResult]
+export type ConfirmResult = (typeof CONFIRM_RESULT)[keyof typeof CONFIRM_RESULT]
 
 export type ConfirmPayload = {
   title?: React.ReactNode

@@ -2,9 +2,9 @@
 import "client-only"
 import React, { useCallback, useRef, useState } from "react"
 import {
+  CONFIRM_RESULT,
   ConfirmContext,
   ConfirmPayload,
-  confirmResult,
   ConfirmResult,
   defaultConfirmPayload,
 } from "./ConfirmContext"
@@ -22,7 +22,7 @@ export const ConfirmProvider = (props: ConfirmProviderProps) => {
   const confirm = (args?: ConfirmPayload) => {
     return new Promise<ConfirmResult>((resolve) => {
       if (resolveRef.current) {
-        resolveRef.current(confirmResult.DISMISSED)
+        resolveRef.current(CONFIRM_RESULT.DISMISSED)
       }
       resolveRef.current = resolve
 
@@ -42,15 +42,15 @@ export const ConfirmProvider = (props: ConfirmProviderProps) => {
   }
 
   const handleConfirm = useCallback(() => {
-    close(confirmResult.CONFIRMED)
+    close(CONFIRM_RESULT.CONFIRMED)
   }, [])
 
   const handleCancel = useCallback(() => {
-    close(confirmResult.CANCELLED)
+    close(CONFIRM_RESULT.CANCELLED)
   }, [])
 
   const handelDismiss = useCallback(() => {
-    close(confirmResult.DISMISSED)
+    close(CONFIRM_RESULT.DISMISSED)
   }, [])
 
   return (
