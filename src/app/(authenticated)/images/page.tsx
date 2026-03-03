@@ -4,7 +4,6 @@ import { ImageLayout } from "@/components/ImageLayout/ImageLayout"
 import { PreviewImageBox } from "@/feature"
 import { useDeleteImagesMutation, useGetImagesQuery } from "@/graphql"
 import { useUriQuery } from "@/hooks"
-import { useIntersection } from "@/hooks/useIntersection"
 import { useRelayConnection } from "@/hooks/useRelayConnection"
 import { defineFieldObject } from "@/lib/field"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
@@ -31,7 +30,7 @@ import {
 } from "@tabler/icons-react"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useMemo, useState } from "react"
 import { Controller, FieldErrors, FormProvider, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -65,7 +64,6 @@ const Page = () => {
   const confirm = useConfirmContext()
   const imageDetailModalContext = useImageDetailModalContext()
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
-  const [items, setItems] = useState<ImageDetailPayload[]>([])
   const [selectable, setSelectable] = useState<ImageDetailPayload["id"][]>([])
 
   // FIX: 検索を押下したあとの検索結果を画面に反映するように修正
@@ -76,7 +74,7 @@ const Page = () => {
         variables: {
           input: {
             conditions: {
-              tags: query !== undefined ? query.tags : [],
+              tags: query === undefined ? [] : query.tags,
             },
             pagination: {
               first: 100
@@ -89,67 +87,62 @@ const Page = () => {
     size: 10,
   })
 
-  const intersection = useIntersection({
-    intersect: async () => {
-      if (!relay.state.pageInfo?.hasNextPage) return
-      const res = await relay.handler.next()
-      setItems((prev) => [
-        ...prev,
-        ...res.data.getImages.edges.map((edge) => {
-          return {
-            id: edge.node.id,
-            info: {
-              file: {
-                name: edge.node.info.file.name,
-                size: String(edge.node.info.file.size),
-                date: "",
-              },
-              image: {
-                width: edge.node.info.size.width,
-                height: edge.node.info.size.height,
-              },
-              tags: edge.node.info.tags,
-            },
-            image: {
-              preview: edge.node.src.preview,
-              thumbnail: edge.node.src.thumbnail,
-              alt: edge.node.info.file.name,
-            },
-          }
-        }),
-      ])
-    },
-  })
+  // const intersection = useIntersection({
+  //   intersect: async () => {
+  //     if (!relay.state.pageInfo?.hasNextPage) return
+  //     const res = await relay.handler.next()
+  //     setItems((prev) => [
+  //       ...prev,
+  //       ...res.data.getImages.edges.map((edge) => {
+  //         return {
+  //           id: edge.node.id,
+  //           info: {
+  //             file: {
+  //               name: edge.node.info.file.name,
+  //               size: String(edge.node.info.file.size),
+  //               date: "",
+  //             },
+  //             image: {
+  //               width: edge.node.info.size.width,
+  //               height: edge.node.info.size.height,
+  //             },
+  //             tags: edge.node.info.tags,
+  //           },
+  //           image: {
+  //             preview: edge.node.src.preview,
+  //             thumbnail: edge.node.src.thumbnail,
+  //             alt: edge.node.info.file.name,
+  //           },
+  //         }
+  //       }),
+  //     ])
+  //   },
+  // })
 
-  // 初期レンダリング時の処理
-  useEffect(() => {
-    if (relay.state.edges.length > 0 && items.length === 0) {
-      setItems(
-        relay.state.edges.map((edge) => {
-          return {
-            id: edge.node.id,
-            info: {
-              file: {
-                name: edge.node.info.file.name,
-                size: String(edge.node.info.file.size),
-                date: "",
-              },
-              image: {
-                width: edge.node.info.size.width,
-                height: edge.node.info.size.height,
-              },
-              tags: edge.node.info.tags,
-            },
-            image: {
-              preview: edge.node.src.preview,
-              thumbnail: edge.node.src.thumbnail,
-              alt: edge.node.info.file.name,
-            },
-          }
-        }),
-      )
-    }
-  }, [relay.state.edges, items.length])
+  const items = useMemo(() => {
+    return relay.state.edges.map((edge) => {
+      return {
+        id: edge.node.id,
+        info: {
+          file: {
+            name: edge.node.info.file.name,
+            size: String(edge.node.info.file.size),
+            date: "",
+          },
+          image: {
+            width: edge.node.info.size.width,
+            height: edge.node.info.size.height,
+          },
+          tags: edge.node.info.tags,
+        },
+        image: {
+          preview: edge.node.src.preview,
+          thumbnail: edge.node.src.thumbnail,
+          alt: edge.node.info.file.name,
+        },
+      } satisfies ImageDetailPayload
+    })
+  }, [relay.state.edges])
 
   const handleEdit = async () => {
     console.debug("edit")
@@ -170,7 +163,7 @@ const Page = () => {
       body: "削除します。よろしいですか？"
     })
 
-    if (result === "confirmed") {
+    if (result !== "confirmed") {
       return
     }
 
@@ -335,10 +328,10 @@ const Page = () => {
                     )
                   })}
                   {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
-                  <Image.Intersection
+                  {/* <Image.Intersection
                     ref={intersection.ref}
                     visible={relay.state.pageInfo?.hasNextPage || false}
-                  />
+                  /> */}
                 </Image>
               </ImageLayout.Grid>
             </ScrollArea>
