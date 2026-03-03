@@ -113,14 +113,14 @@ export const ImageDetailModalProvider = (
                     input: { id: image.id },
                   },
                 })
-                handleClose()
                 feedback.action.success({
                   title: "成功",
                   body: "削除しました。",
                 })
+                handleClose()
               },
-              onDownload: () => {},
-              onEdit: () => {},
+              onDownload: () => { },
+              onEdit: () => { },
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

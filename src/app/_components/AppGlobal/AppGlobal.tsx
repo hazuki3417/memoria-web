@@ -18,7 +18,7 @@ const mapKindColor: Record<FeedbackKind, NotificationData["color"]> = {
   error: "red",
 }
 
-export interface AppGlobalProps {}
+export interface AppGlobalProps { }
 
 export const AppGlobal = (props: AppGlobalProps) => {
   const feedback = useFeedbackContext()
@@ -30,6 +30,9 @@ export const AppGlobal = (props: AppGlobalProps) => {
         color: mapKindColor[feedback.value.kind],
         title: feedback.value.payload?.title,
         message: feedback.value.payload?.body,
+        onClose: () => {
+          feedback.control.close()
+        }
       })
     }
   }, [feedback.value.kind])
