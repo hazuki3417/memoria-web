@@ -47,7 +47,15 @@ export const ImageDetailModalProvider = (
   const limit = images.length
   const image = images.find((image) => image.id === imageDetail.id)
 
-  const [deleteImage, deleteImageResult] = useDeleteImageMutation()
+  const [deleteImage] = useDeleteImageMutation({
+    update(cache, { data }) {
+      const id = data?.deleteImage.id
+      cache.evict({
+        id: cache.identify({ __typename: "Image", id }),
+      })
+      cache.gc()
+    },
+  })
 
   return (
     <ImageDetailModalContext.Provider
@@ -92,21 +100,21 @@ export const ImageDetailModalProvider = (
               onClose: handleClose,
               onDelete: async () => {
                 const result = await confirm.action.confirm({
-                  body: "削除します。よろしいですか？"
+                  body: "削除します。よろしいですか？",
                 })
 
-                if (result != "confirmed") {
+                if (result !== "confirmed") {
                   return
                 }
                 await deleteImage({
                   variables: {
-                    input: { id: image.id }
-                  }
+                    input: { id: image.id },
+                  },
                 })
-                // 画面の再レンダリングをサせる処理を実装する
+                handleClose()
               },
-              onDownload: () => { },
-              onEdit: () => { },
+              onDownload: () => {},
+              onEdit: () => {},
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

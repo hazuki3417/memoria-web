@@ -5,7 +5,7 @@ import { Box, Button, Divider, Modal } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
 import "client-only"
 
-export interface AppGlobalProps { }
+export interface AppGlobalProps {}
 
 export const AppGlobal = (props: AppGlobalProps) => {
   const confirm = useConfirmContext()

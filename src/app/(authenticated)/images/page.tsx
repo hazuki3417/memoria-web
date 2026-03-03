@@ -6,8 +6,13 @@ import { useDeleteImagesMutation, useGetImagesQuery } from "@/graphql"
 import { useUriQuery } from "@/hooks"
 import { useRelayConnection } from "@/hooks/useRelayConnection"
 import { defineFieldObject } from "@/lib/field"
+import { createFormDefaults } from "@/lib/form"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
-import { ImageDetailPayload, useConfirmContext, useImageDetailModalContext } from "@/providers"
+import {
+  ImageDetailPayload,
+  useConfirmContext,
+  useImageDetailModalContext,
+} from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Box,
@@ -34,17 +39,15 @@ import { useMemo, useState } from "react"
 import { Controller, FieldErrors, FormProvider, useForm } from "react-hook-form"
 import { z } from "zod"
 
-
 const imageSearchFormSchema = z.object({
   tags: z.array(z.string()),
 })
 
 type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>
 
-const imageSearchFormDefaultValue: ImageSearchFormSchema = {
+const imageSearchFormDefaultValues = createFormDefaults<ImageSearchFormSchema>({
   tags: [],
-}
-
+})
 
 const TAB_ID_LIST = ["list", "group"] as const
 const TAB_FIELDS = defineFieldObject(TAB_ID_LIST)
@@ -56,7 +59,7 @@ const Page = () => {
   const methods = useForm<ImageSearchFormSchema>({
     resolver: zodResolver(imageSearchFormSchema),
     defaultValues: {
-      ...imageSearchFormDefaultValue,
+      ...imageSearchFormDefaultValues({ ...query }),
     },
   })
   const { handleSubmit, control } = methods
@@ -65,8 +68,6 @@ const Page = () => {
   const imageDetailModalContext = useImageDetailModalContext()
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
   const [selectable, setSelectable] = useState<ImageDetailPayload["id"][]>([])
-
-  // FIX: 検索を押下したあとの検索結果を画面に反映するように修正
 
   const relay = useRelayConnection({
     hooks: () =>
@@ -77,8 +78,8 @@ const Page = () => {
               tags: query === undefined ? [] : query.tags,
             },
             pagination: {
-              first: 100
-            }
+              first: 100,
+            },
           },
         },
         notifyOnNetworkStatusChange: true,
@@ -144,23 +145,34 @@ const Page = () => {
     })
   }, [relay.state.edges])
 
-  const handleEdit = async () => {
-    console.debug("edit")
-  }
-
-  const [deleteImages, deleteImagesResult] = useDeleteImagesMutation()
-
   const searchValid = async (values: ImageSearchFormSchema) => {
     console.log("submit values:", values)
     router.push(resolveUriQuery({ ...values }))
   }
+
   const searchInvalid = async (errors: FieldErrors<ImageSearchFormSchema>) => {
     console.log("submit error:", errors)
   }
 
-  const handleDelete = async () => {
+  const handleEditImages = async () => {
+    console.debug("edit")
+  }
+
+  const [deleteImages] = useDeleteImagesMutation({
+    update(cache, { data }) {
+      const ids = data?.deleteImages.ids
+      ids?.forEach((id) => {
+        cache.evict({
+          id: cache.identify({ __typename: "Image", id }),
+        })
+      })
+      cache.gc()
+    },
+  })
+
+  const handleDeleteImages = async () => {
     const result = await confirm.action.confirm({
-      body: "削除します。よろしいですか？"
+      body: "削除します。よろしいですか？",
     })
 
     if (result !== "confirmed") {
@@ -170,13 +182,17 @@ const Page = () => {
     await deleteImages({
       variables: {
         input: {
-          ids: selectable
-        }
-      }
+          ids: selectable,
+        },
+      },
     })
+
+    // 選択を解除
+    setSelectable([])
+    // 削除の通知をだす
   }
 
-  const handleDownload = async () => {
+  const handleDownloadImages = async () => {
     console.debug("edit")
   }
 
@@ -192,7 +208,10 @@ const Page = () => {
             <ActionPanel.Left>
               {mode === "filter" && (
                 <FormProvider {...methods}>
-                  <form onSubmit={handleSubmit(searchValid, searchInvalid)} style={{ flex: 1 }}>
+                  <form
+                    onSubmit={handleSubmit(searchValid, searchInvalid)}
+                    style={{ flex: 1 }}
+                  >
                     <Flex align="center" gap="xs" w="100%">
                       <Controller
                         name="tags"
@@ -208,20 +227,34 @@ const Page = () => {
                           />
                         )}
                       />
-                      <Button size="xs" type="submit">{t("button.search")}</Button>
+                      <Button size="xs" type="submit">
+                        {t("button.search")}
+                      </Button>
                     </Flex>
                   </form>
                 </FormProvider>
               )}
               {mode === "bulk" && (
                 <Flex align="center" gap="xs">
-                  <Button size="xs" leftSection={<IconEdit size={16} />} onClick={handleEdit}>
+                  <Button
+                    size="xs"
+                    leftSection={<IconEdit size={16} />}
+                    onClick={handleEditImages}
+                  >
                     {t("button.edit")}
                   </Button>
-                  <Button size="xs" leftSection={<IconTrash size={16} />} onClick={handleDelete}>
+                  <Button
+                    size="xs"
+                    leftSection={<IconTrash size={16} />}
+                    onClick={handleDeleteImages}
+                  >
                     {t("button.delete")}
                   </Button>
-                  <Button size="xs" leftSection={<IconDownload size={16} />} onClick={handleDownload}>
+                  <Button
+                    size="xs"
+                    leftSection={<IconDownload size={16} />}
+                    onClick={handleDownloadImages}
+                  >
                     {t("button.download")}
                   </Button>
                   <div>{selectable.length} 件選択中</div>
