@@ -124,8 +124,8 @@ export const ImageDetailModalProvider = (
               onDownload: async () => {
                 const res = await downloadImage({
                   variables: {
-                    input: { id: image.id }
-                  }
+                    input: { id: image.id },
+                  },
                 })
 
                 if (!res.data) {
@@ -140,7 +140,7 @@ export const ImageDetailModalProvider = (
                 link.click()
                 document.body.removeChild(link)
               },
-              onEdit: () => { },
+              onEdit: () => {},
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

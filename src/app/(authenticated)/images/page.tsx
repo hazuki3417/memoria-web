@@ -19,6 +19,7 @@ import {
   Box,
   Button,
   Center,
+  Checkbox,
   Flex,
   ScrollArea,
   SegmentedControl,
@@ -172,6 +173,16 @@ const Page = () => {
     },
   })
 
+  const selectableCount = selectable.length
+  const itemCount = items.length
+  const hasSelectable = 0 < selectableCount
+  const allSelectable = selectableCount === itemCount
+  const indeterminate = selectableCount > 0 && selectableCount < itemCount
+
+  const toggleAll = (checked: boolean) => {
+    checked ? setSelectable(items.map((item) => item.id)) : setSelectable([])
+  }
+
   const handleDeleteImages = async () => {
     const result = await confirm.action.confirm({
       body: "削除します。よろしいですか？",
@@ -197,16 +208,30 @@ const Page = () => {
   }
 
   const handleDownloadImages = async () => {
-    console.debug("edit")
+    console.debug("download images")
   }
 
   return (
     <Box>
       <Tabs color="gray" variant="pills" defaultValue={TAB_FIELDS.list}>
-        <Tabs.List mb="xs">
-          <Tabs.Tab value={TAB_FIELDS.list}>{t("label.list")}</Tabs.Tab>
-          <Tabs.Tab value={TAB_FIELDS.group}>{t("label.group")}</Tabs.Tab>
-        </Tabs.List>
+        <ActionPanel mb="xs">
+          <ActionPanel.Left>
+            <Tabs.List>
+              <Tabs.Tab value={TAB_FIELDS.list}>{t("label.list")}</Tabs.Tab>
+              <Tabs.Tab value={TAB_FIELDS.group}>{t("label.group")}</Tabs.Tab>
+            </Tabs.List>
+          </ActionPanel.Left>
+          <ActionPanel.Center></ActionPanel.Center>
+          <ActionPanel.Right>
+            <LinkButton
+              size="xs"
+              leftSection={<IconLibraryPlus size={16} />}
+              href={resolveUri("/images/new")}
+            >
+              {t("button.new")}
+            </LinkButton>
+          </ActionPanel.Right>
+        </ActionPanel>
         <Tabs.Panel value={TAB_FIELDS.list}>
           <ActionPanel mb="xs">
             <ActionPanel.Left>
@@ -240,40 +265,49 @@ const Page = () => {
               )}
               {mode === "bulk" && (
                 <Flex align="center" gap="xs">
-                  <Button
+                  <Checkbox
                     size="xs"
-                    leftSection={<IconEdit size={16} />}
-                    onClick={handleEditImages}
-                  >
-                    {t("button.edit")}
-                  </Button>
-                  <Button
-                    size="xs"
-                    leftSection={<IconTrash size={16} />}
-                    onClick={handleDeleteImages}
-                  >
-                    {t("button.delete")}
-                  </Button>
-                  <Button
-                    size="xs"
-                    leftSection={<IconDownload size={16} />}
-                    onClick={handleDownloadImages}
-                  >
-                    {t("button.download")}
-                  </Button>
-                  <div>{selectable.length} 件選択中</div>
+                    variant="filled"
+                    color="blue"
+                    label={`${selectableCount} 件選択`}
+                    checked={allSelectable}
+                    indeterminate={indeterminate}
+                    onChange={(event) => toggleAll(event.currentTarget.checked)}
+                  />
+                  <div></div>
                 </Flex>
               )}
             </ActionPanel.Left>
             <ActionPanel.Right>
               <Flex align="center" gap="xs">
-                <LinkButton
-                  size="xs"
-                  leftSection={<IconLibraryPlus size={16} />}
-                  href={resolveUri("/images/new")}
-                >
-                  {t("button.new")}
-                </LinkButton>
+                {mode === "bulk" && (
+                  <Flex align="center" gap="xs">
+                    <Button
+                      size="xs"
+                      leftSection={<IconEdit size={16} />}
+                      disabled={!hasSelectable}
+                      onClick={handleEditImages}
+                    >
+                      {t("button.edit")}
+                    </Button>
+                    <Button
+                      size="xs"
+                      leftSection={<IconTrash size={16} />}
+                      disabled={!hasSelectable}
+                      onClick={handleDeleteImages}
+                    >
+                      {t("button.delete")}
+                    </Button>
+                    <Button
+                      size="xs"
+                      leftSection={<IconDownload size={16} />}
+                      disabled={!hasSelectable}
+                      onClick={handleDownloadImages}
+                    >
+                      {t("button.download")}
+                    </Button>
+                  </Flex>
+                )}
                 <SegmentedControl
                   value={mode}
                   onChange={(value) => {
