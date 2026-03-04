@@ -15,7 +15,7 @@ export const ja: TranslationSchema = {
     list: "リスト",
     group: "グループ",
     filter: "絞り込み",
-    bulk: "一括管理",
+    bulk: "一括操作",
   },
   auth: {
     signIn: "サインイン",
