@@ -30,6 +30,26 @@ mutation DeleteImages($input: DeleteImagesInput!) {
   }
 }
 
+
+mutation DownloadImage($input: DownloadImageInput!) {
+  downloadImage(input: $input) {
+    url
+    expiresAt
+    fileName
+    contentType
+  }
+}
+
+
+mutation DownloadImages($input: DownloadImagesInput!) {
+  downloadImages(input: $input) {
+    url
+    expiresAt
+    fileName
+    contentType
+  }
+}
+
 query GetImages($input: GetImagesInput!) {
   getImages(input: $input) {
     edges {

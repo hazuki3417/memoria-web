@@ -11,8 +11,8 @@ extend type Mutation {
   deleteImage(input: DeleteImageInput!): DeleteImagePayload!
   deleteImages(input: DeleteImagesInput!): DeleteImagesPayload!
 
-  downloadImage(input: DownloadImageInput!): DownloadImagePayload!
-  downloadImages(input: DownloadImagesInput!): DownloadImagesPayload!
+  downloadImage(input: DownloadImageInput!): DownloadUrl!
+  downloadImages(input: DownloadImagesInput!): DownloadUrl!
 }
 
 input GetImagesPaginationsInput {
@@ -76,14 +76,6 @@ type DeleteImagePayload {
 
 type DeleteImagesPayload {
   ids: [ID!]!
-}
-
-type DownloadImagePayload {
-  target: DownloadUrl!
-}
-
-type DownloadImagesPayload {
-  targets: [DownloadUrl!]!
 }
 
 # === domain model ===

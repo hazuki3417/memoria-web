@@ -1,7 +1,7 @@
 "use client"
 import { CustomModal } from "@/components/CustomModal/CustomModal"
 import { ImageDetailModal } from "@/feature/ImageDetailModal"
-import { useDeleteImageMutation } from "@/graphql"
+import { useDeleteImageMutation, useDownloadImageMutation } from "@/graphql"
 import { useDisclosure } from "@/hooks"
 import "client-only"
 import React, { useCallback, useState } from "react"
@@ -58,6 +58,8 @@ export const ImageDetailModalProvider = (
       cache.gc()
     },
   })
+
+  const [downloadImage] = useDownloadImageMutation()
 
   return (
     <ImageDetailModalContext.Provider
@@ -119,8 +121,26 @@ export const ImageDetailModalProvider = (
                 })
                 handleClose()
               },
-              onDownload: () => {},
-              onEdit: () => {},
+              onDownload: async () => {
+                const res = await downloadImage({
+                  variables: {
+                    input: { id: image.id }
+                  }
+                })
+
+                if (!res.data) {
+                  return
+                }
+
+                const downloadUrl = res.data.downloadImage
+                const link = document.createElement("a")
+                link.href = downloadUrl.url
+                link.download = downloadUrl.fileName
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+              },
+              onEdit: () => { },
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })
