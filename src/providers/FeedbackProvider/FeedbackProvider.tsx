@@ -1,11 +1,11 @@
 "use client"
-import { useCallback, useState } from "react"
+import { useCallback, useRef } from "react"
 import {
   FEEDBACK_KIND,
   FeedbackContext,
+  FeedbackEvent,
   FeedbackKind,
   FeedbackPayload,
-  FeedbackValue,
 } from "./FeedbackContext"
 
 export interface FeedbackProviderProps {
@@ -15,53 +15,47 @@ export interface FeedbackProviderProps {
 export const FeedbackProvider = (props: FeedbackProviderProps) => {
   const { children } = props
 
-  // TODO(architecture):
-  // 通知は一過性イベントのため、本来はstateではなくイベント駆動で扱うべき。
-  // Mantineとの疎結合は維持しつつ、将来的にPub/Sub型へ改善を検討する。
-  const [value, setValue] = useState<FeedbackValue>({
-    kind: null,
-    payload: null,
-  })
+  const ref = useRef(new Set<(event: FeedbackEvent) => void>())
 
-  const feedback = (kind: FeedbackKind, args?: FeedbackPayload) => {
-    const normalized: FeedbackPayload = {
-      ...args,
-    }
-
-    setValue({
+  const emit = useCallback((kind: FeedbackKind, payload?: FeedbackPayload) => {
+    const event: FeedbackEvent = {
+      id: crypto.randomUUID(),
       kind,
-      payload: { ...normalized },
-    })
-  }
-
-  const close = () => {
-    if (value.payload !== null) {
-      value.payload.onOk?.()
+      payload,
     }
-    setValue({ kind: null, payload: null })
-  }
+
+    ref.current.forEach((listener) => {
+      listener(event)
+    })
+  }, [])
+
+  const subscribe = useCallback((listener: (event: FeedbackEvent) => void) => {
+    ref.current.add(listener)
+    return () => {
+      ref.current.delete(listener)
+    }
+  }, [])
 
   const success = useCallback((args?: FeedbackPayload) => {
-    feedback(FEEDBACK_KIND.SUCCESS, args)
+    emit(FEEDBACK_KIND.SUCCESS, args)
   }, [])
 
   const info = useCallback((args?: FeedbackPayload) => {
-    feedback(FEEDBACK_KIND.INFO, args)
+    emit(FEEDBACK_KIND.INFO, args)
   }, [])
 
   const warning = useCallback((args?: FeedbackPayload) => {
-    feedback(FEEDBACK_KIND.WARNING, args)
+    emit(FEEDBACK_KIND.WARNING, args)
   }, [])
 
   const error = useCallback((args?: FeedbackPayload) => {
-    feedback(FEEDBACK_KIND.ERROR, args)
+    emit(FEEDBACK_KIND.ERROR, args)
   }, [])
 
   return (
     <FeedbackContext.Provider
       value={{
-        value,
-        control: { close },
+        control: { subscribe },
         action: {
           success,
           info,

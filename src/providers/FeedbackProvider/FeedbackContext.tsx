@@ -18,13 +18,17 @@ export type FeedbackPayload = {
   onOk?: () => void
 }
 
-export type FeedbackValue = {
-  kind: FeedbackKind | null
-  payload: FeedbackPayload | null
+export type FeedbackEvent = {
+  id: string
+  kind: FeedbackKind
+  payload?: FeedbackPayload
 }
 
+// export type FeedbackValue = {
+// }
+
 export interface FeedbackControl {
-  close: () => void
+  subscribe: (listener: (value: FeedbackEvent) => void) => () => void
 }
 
 export interface FeedbackAction {
@@ -35,7 +39,7 @@ export interface FeedbackAction {
 }
 
 export interface FeedbackContextValue {
-  value: FeedbackValue
+  // value: FeedbackValue
   control: FeedbackControl
   action: FeedbackAction
 }

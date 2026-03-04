@@ -18,24 +18,23 @@ const mapKindColor: Record<FeedbackKind, NotificationData["color"]> = {
   error: "red",
 }
 
-export interface AppGlobalProps { }
+export interface AppGlobalProps {}
 
 export const AppGlobal = (props: AppGlobalProps) => {
   const feedback = useFeedbackContext()
   const confirm = useConfirmContext()
 
   useEffect(() => {
-    if (feedback.value.kind !== null) {
+    const unsubscribe = feedback.control.subscribe((event) => {
       notifications.show({
-        color: mapKindColor[feedback.value.kind],
-        title: feedback.value.payload?.title,
-        message: feedback.value.payload?.body,
-        onClose: () => {
-          feedback.control.close()
-        }
+        color: mapKindColor[event.kind],
+        title: event.payload?.title,
+        message: event.payload?.body,
       })
-    }
-  }, [feedback.value.kind])
+    })
+
+    return unsubscribe
+  }, [feedback])
 
   return (
     <>
