@@ -157,7 +157,7 @@ const Page = () => {
   }
 
   const handleEditImages = async () => {
-    console.debug("edit")
+    router.push(resolveUri("/images/edit", { query: { targets: selectable } }))
   }
 
   const [deleteImages] = useDeleteImagesMutation({

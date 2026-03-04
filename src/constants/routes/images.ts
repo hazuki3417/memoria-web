@@ -13,6 +13,12 @@ export const images = {
         breadcrumb: "画像登録",
         tags: [],
       },
+      edit: {
+        segment: "edit",
+        title: "画像編集",
+        breadcrumb: "画像編集",
+        tags: [],
+      },
     },
   },
 } as const satisfies RouteNodes
