@@ -133,11 +133,13 @@ export const ImageDetailModalProvider = (
                   return
                 }
 
-
                 const downloadUrl = res.data.downloadImage
-                action.download({ url: downloadUrl.url, fileName: downloadUrl.fileName })
+                action.download({
+                  url: downloadUrl.url,
+                  fileName: downloadUrl.fileName,
+                })
               },
-              onEdit: () => { },
+              onEdit: () => {},
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

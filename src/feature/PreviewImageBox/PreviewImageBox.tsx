@@ -7,29 +7,35 @@ import { RemoveButton } from "./RemoveButton"
 import { SelectableCheckbox } from "./SelectableCheckbox"
 
 export type PreviewImageBoxUi = {
-  selected: boolean
-  selectable: boolean
-  supported: boolean
+  selected?: boolean
+  selectable?: boolean
+  supported?: boolean
   valid?: "idle" | "accept" | "warning" | "reject"
 }
 
 export interface PreviewImageBoxProps {
   children: React.ReactNode
   onClick?: React.MouseEventHandler<HTMLDivElement>
-  ui: PreviewImageBoxUi
+  ui?: PreviewImageBoxUi
 }
 
 export const PreviewImageBox = (props: PreviewImageBoxProps) => {
   const { children, ui, ...rest } = props
+  const {
+    selected = false,
+    selectable = false,
+    supported = true,
+    valid = " idle",
+  } = ui ?? {}
 
   return (
     <Paper
       className={classes.box}
       {...rest}
-      data-selected={ui.supported ? ui.selected : false}
-      data-selectable={ui.supported ? ui.selectable : false}
-      data-supported={ui.supported}
-      data-valid={ui.supported ? ui.valid : undefined}
+      data-selected={supported ? selected : false}
+      data-selectable={supported ? selectable : false}
+      data-supported={supported}
+      data-valid={supported ? valid : undefined}
       data-testid="select-file"
     >
       {children}

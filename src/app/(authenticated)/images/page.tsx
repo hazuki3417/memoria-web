@@ -1,8 +1,12 @@
 "use client"
-import { ActionPanel, Image, LinkButton } from "@/components"
+import { ActionPanel, ButtonGroup, Image, LinkButton } from "@/components"
 import { ImageLayout } from "@/components/ImageLayout/ImageLayout"
 import { PreviewImageBox } from "@/feature"
-import { useDeleteImagesMutation, useDownloadImagesMutation, useGetImagesQuery } from "@/graphql"
+import {
+  useDeleteImagesMutation,
+  useDownloadImagesMutation,
+  useGetImagesQuery,
+} from "@/graphql"
 import { useUriQuery } from "@/hooks"
 import { useRelayConnection } from "@/hooks/useRelayConnection"
 import { action } from "@/lib/action"
@@ -184,7 +188,6 @@ const Page = () => {
     },
   })
 
-
   const handleDeleteImages = async () => {
     const result = await confirm.action.confirm({
       body: "削除します。よろしいですか？",
@@ -296,7 +299,7 @@ const Page = () => {
             <ActionPanel.Right>
               <Flex align="center" gap="xs">
                 {mode === "bulk" && (
-                  <Flex align="center" gap="xs">
+                  <ButtonGroup>
                     <Button
                       size="xs"
                       leftSection={<IconEdit size={16} />}
@@ -321,7 +324,7 @@ const Page = () => {
                     >
                       {t("button.download")}
                     </Button>
-                  </Flex>
+                  </ButtonGroup>
                 )}
                 <SegmentedControl
                   value={mode}

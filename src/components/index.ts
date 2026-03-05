@@ -1,5 +1,6 @@
 export * from "./ActionPanel"
 export * from "./Button"
+export * from "./ButtonGroup"
 export * from "./CustomModal"
 export * from "./FormButton"
 export * from "./FormTextInput"

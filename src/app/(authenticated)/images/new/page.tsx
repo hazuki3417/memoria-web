@@ -1,45 +1,51 @@
 "use client"
+import { ActionPanel, ButtonGroup } from "@/components"
 import { imageConfig } from "@/config"
-import {
-  ImageDropForm,
-  imageFormDefaultValue,
-  imageFormSchema,
-} from "@/feature/images/new"
-import { useUploadImageMutation, Visibility } from "@/graphql"
+import { PreviewImageBox } from "@/feature"
 import { useTaskManager } from "@/hooks"
 import { zod } from "@/lib"
 import { Task } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Box } from "@mantine/core"
-import { nanoid } from "nanoid"
-import { useCallback, useMemo } from "react"
 import {
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useFormState,
-  useWatch
-} from "react-hook-form"
+  Box,
+  Button,
+  Divider,
+  Flex,
+  ScrollArea,
+  Stack,
+  TagsInput,
+  Text,
+} from "@mantine/core"
+import { nanoid } from "nanoid"
+import React, { useCallback, useMemo } from "react"
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form"
 import { z } from "zod"
+import { ImageDropForm } from "./_components"
 
-const fileSchema = z.object({
-  file: zod.refine(
-    z.custom<File>((file) => file instanceof File),
-    [
-      zod.validate.file.type(imageConfig.type),
-      zod.validate.file.size.tooLarge(imageConfig.size.max),
-    ],
-  ),
+const fileSchema = zod.refine(
+  z.custom<File>((file) => file instanceof File),
+  [
+    zod.validate.file.type(imageConfig.type),
+    zod.validate.file.size.tooLarge(imageConfig.size.max),
+  ],
+)
+
+const tagsSchema = z.array(z.string())
+
+const imageSchema = z.object({
+  file: fileSchema,
+  tags: tagsSchema,
 })
-
-const imageSchema = imageFormSchema.merge(fileSchema)
+type ImageValues = z.infer<typeof imageSchema>
 
 const inputFormSchema = z.object({
-  share: imageFormSchema,
+  bulk: z.object({
+    tags: tagsSchema,
+  }),
   images: z.array(imageSchema).max(imageConfig.count.max),
 })
-type ImageSchema = z.infer<typeof imageSchema>
-type FormSchema = z.infer<typeof inputFormSchema>
+
+type InputFormValues = z.infer<typeof inputFormSchema>
 
 /**
  * NOTE: 仕様
@@ -77,126 +83,134 @@ type FormSchema = z.infer<typeof inputFormSchema>
  *       ユースケースを洗い出して検討した方が良さそう
  */
 const Page = () => {
-  const methods = useForm<FormSchema>({
+  const methods = useForm<InputFormValues>({
     resolver: zodResolver(inputFormSchema),
     mode: "onChange",
     defaultValues: {
-      share: imageFormDefaultValue,
+      bulk: {
+        tags: [],
+      },
       images: [],
     },
   })
+
+  const { getValues, setValue } = methods
 
   const watchValueImages = useWatch({
     control: methods.control,
     name: "images",
   })
 
-  const watchStateImages = useFormState({
+  const { fields, append, remove, replace } = useFieldArray({
     control: methods.control,
     name: "images",
   })
 
-  const { fields, append, remove } = useFieldArray({
-    control: methods.control,
-    name: "images",
-  })
-
-  const [uploadImage] = useUploadImageMutation()
-
-  const taskManager = useTaskManager({
+  // const [uploadImage] = useUploadImageMutation()
+  const manager = useTaskManager({
     mode: "parallel",
     failOnError: false,
   })
 
-
-  const submit = async () => {
-    await methods.handleSubmit(async (value, errors) => {
-      await taskManager.action.submit(async (task, index) => {
-        const image = methods.getValues("images")[index]
-        await uploadImage({
-          variables: {
-            input: {
-              ...image,
-              visibility: Visibility.Private,
-            },
-          },
-        })
-      })
-    })()
-  }
+  // const submit = async () => {
+  //   await methods.handleSubmit(async (value, errors) => {
+  //     await task.action.submit(async (task, index) => {
+  //       const image = methods.getValues("images")[index]
+  //       await uploadImage({
+  //         variables: {
+  //           input: {
+  //             ...image,
+  //             visibility: Visibility.Private,
+  //           },
+  //         },
+  //       })
+  //     })
+  //   })()
+  // }
 
   const addFiles = (files: FileList) => {
-    const newTasks: Task[] = []
-    const newImages: ImageSchema[] = []
-
+    const images: ImageValues[] = []
+    const tasks: Task[] = []
     for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-
-      newTasks.push({
-        id: nanoid(),
-        status: "idle",
-      })
-
-      newImages.push({
-        file,
-        ...imageFormDefaultValue,
-      })
+      images.push({ file: files[i], tags: [] })
+      tasks.push({ id: nanoid(), status: "idle" })
     }
-
-    // まとめて更新
-    taskManager.action.append(newTasks)
-    append(newImages)
-    // NOTE: バリデーションを発火させる
-    methods.trigger()
+    append(images)
+    manager.action.append(tasks)
   }
 
-  const fileDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    addFiles(event.dataTransfer.files)
-  }, [])
+  const removeFile = (index: number, id: string) => {
+    remove(index)
+    manager.action.remove([id])
+  }
 
-  const fileSelect = useCallback((newFiles: FileList | null) => {
+  const handleAddTags = () => {
+    const images = getValues("images")
+    const tags = getValues("bulk.tags")
+    images.forEach((image, index) => {
+      setValue(`images.${index}.tags`, addTags(image.tags, tags))
+    })
+  }
+
+  const handleRemoveTags = () => {
+    const images = getValues("images")
+    const tags = getValues("bulk.tags")
+    images.forEach((image, index) => {
+      setValue(`images.${index}.tags`, removeTags(image.tags, tags))
+    })
+  }
+
+  const handleReplaceTags = () => {
+    const images = getValues("images")
+    const tags = getValues("bulk.tags")
+    images.forEach((_, index) => {
+      setValue(`images.${index}.tags`, tags)
+    })
+  }
+
+  const handleRemoveFiles = () => {
+    replace([])
+    manager.action.reset()
+  }
+
+  const handleFileDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      addFiles(event.dataTransfer.files)
+    },
+    [],
+  )
+
+  const handleFileSelect = useCallback((newFiles: FileList | null) => {
     if (newFiles === null) {
       return
     }
     addFiles(newFiles)
   }, [])
 
-  const fileRemove = useCallback(
-    (index: number, id: string) => {
-      taskManager.action.remove([id])
-      remove(index)
-    },
-    [fields],
-  )
+  const imageDropFormDisabled = useMemo(() => {
+    return imageConfig.count.max <= watchValueImages.length
+  }, [watchValueImages])
 
   const imageDropFormValid = useMemo(() => {
     if (imageConfig.count.max < watchValueImages.length) {
       return "reject"
     }
 
-    const empty = 0;
+    const empty = 0
     if (empty < fields.length) {
       if (methods.formState.isValid) {
-        return "warning";
+        return "warning"
       }
     }
 
     return "idle"
   }, [methods, fields, watchValueImages])
 
-  const imageDropFormDisabled = useMemo(() => {
-    return imageConfig.count.max <= watchValueImages.length
-  }, [watchValueImages])
-
-  const isEmpty = useMemo(() => {
-    const empty = 0
-    return fields.length <= empty
-  }, [fields])
-
+  const disabled = fields.length === 0
 
   // const previews = fields.map((preview, index) => {
-  //   const task = taskManager.value.tasks[index]
+  //   const task = task.value.tasks[index]
   //   return (
   //     <Controller
   //       key={preview.id}
@@ -230,7 +244,7 @@ const Page = () => {
   //               error: rhfFieldState.error.message.resolver(locale.t),
   //             }}
   //             handler={{
-  //               onSelect: fileSelected,
+  //               onSelect: handleFileSelected,
   //               onRemove: fileRemove,
   //             }}
   //           />
@@ -241,46 +255,177 @@ const Page = () => {
   // })
 
   return (
-    <Box
-      style={(theme) => ({
-        display: "flex",
-        flexDirection: "column",
-        gap: "8px",
-      })}
-    >
-      <FormProvider {...methods}>
-        <Box
-          style={(theme) => ({
-            backgroundColor: theme.colors.dark[7],
-            borderBottom: `1px solid ${theme.colors.dark[8]}`,
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-          })}
-        >
-        </Box>
-      </FormProvider>
-
+    <Box>
       <ImageDropForm
         ui={{
           valid: imageDropFormValid,
           disabled: imageDropFormDisabled,
         }}
-        error={watchStateImages.errors.images?.message}
-        onFileDrop={fileDrop}
+        onFileDrop={handleFileDrop}
+        mb="xl"
       >
-        {watchValueImages.length < imageConfig.count.max && (
-          <ImageDropForm.AddImageBox
-            config={imageConfig}
-            handler={{
-              onFileSelect: fileSelect,
-            }}
-            ui={{
-              valid: imageDropFormValid,
-            }}
-          />
-        )}
+        <ImageDropForm.AddImageBox
+          ui={{
+            valid: imageDropFormValid,
+            disabled: imageDropFormDisabled,
+          }}
+          onFileSelect={handleFileSelect}
+          config={imageConfig}
+        />
       </ImageDropForm>
+      <ActionPanel mb="sm">
+        <ActionPanel.Left>
+          <Flex align="center" gap="xs" w="100%">
+            <Controller
+              control={methods.control}
+              name={`bulk.tags`}
+              render={({ field }) => {
+                return (
+                  <TagsInput
+                    size="xs"
+                    flex="1"
+                    disabled={disabled}
+                    styles={{
+                      root: { height: "100%" },
+                      wrapper: { height: "100%" },
+                      input: { height: "100%" },
+                    }}
+                    {...field}
+                    placeholder="タグ"
+                    clearable
+                  />
+                )
+              }}
+            />
+            <ButtonGroup>
+              <Button size="xs" disabled={disabled} onClick={handleAddTags}>
+                追加
+              </Button>
+              <Button size="xs" disabled={disabled} onClick={handleRemoveTags}>
+                除去
+              </Button>
+              <Button size="xs" disabled={disabled} onClick={handleReplaceTags}>
+                置換
+              </Button>
+            </ButtonGroup>
+          </Flex>
+        </ActionPanel.Left>
+        <ActionPanel.Right>
+          <Button size="xs" disabled={disabled} onClick={handleRemoveFiles}>
+            すべて取消
+          </Button>
+        </ActionPanel.Right>
+      </ActionPanel>
+
+      <Box>
+        <Divider />
+        <ScrollArea h={"500px"} scrollbarSize={6}>
+          <Stack mb="xs" gap={0}>
+            {fields.map((image, index) => {
+              const task = manager.value.tasks[index]
+              return (
+                <React.Fragment key={task.id}>
+                  <Box py="xs" pr="xs">
+                    <Flex gap="xs">
+                      <Controller
+                        control={methods.control}
+                        name={`images.${index}.file`}
+                        render={({ field }) => {
+                          return (
+                            <PreviewImageBox>
+                              <PreviewImageBox.Image
+                                src={URL.createObjectURL(field.value)}
+                                alt={field.value.name}
+                              />
+                            </PreviewImageBox>
+                          )
+                        }}
+                      />
+                      <Divider orientation="vertical" />
+                      <Box
+                        style={(theme) => ({
+                          display: "grid",
+                          gridTemplateColumns: "auto 1fr",
+                          gridTemplateRows: "auto auto 1fr",
+                          flex: 1,
+                          gap: theme.spacing.xs,
+                          alignContent: "start",
+                        })}
+                      >
+                        <Box>
+                          <Text size="xs">ファイル名</Text>
+                        </Box>
+                        <Box>
+                          <Text size="xs">{image.file.name}</Text>
+                        </Box>
+                        <Box>
+                          <Text size="xs">ファイルサイズ</Text>
+                        </Box>
+                        <Box>
+                          <Text size="xs">{image.file.size}</Text>
+                        </Box>
+                        <Box>
+                          <Text size="xs">タグ</Text>
+                        </Box>
+                        <Box>
+                          <Controller
+                            control={methods.control}
+                            name={`images.${index}.tags`}
+                            render={({ field }) => {
+                              return (
+                                <TagsInput
+                                  size="xs"
+                                  styles={{
+                                    root: { height: "100%" },
+                                    wrapper: { height: "100%" },
+                                    input: { height: "100%" },
+                                  }}
+                                  {...field}
+                                  clearable
+                                />
+                              )
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                      <Divider orientation="vertical" />
+                      <Box style={{ display: "flex", alignItems: "center" }}>
+                        <Button
+                          size="xs"
+                          onClick={() => removeFile(index, task.id)}
+                        >
+                          取消
+                        </Button>
+                      </Box>
+                    </Flex>
+                  </Box>
+                  <Divider />
+                </React.Fragment>
+              )
+            })}
+          </Stack>
+        </ScrollArea>
+        <Divider />
+      </Box>
     </Box>
   )
 }
 
 export default Page
+
+/**
+ * 入力タグを元の配列に追加する（重複なし）
+ */
+const addTags = (base: string[], add: string[]) => {
+  return [...new Set([...base, ...add])]
+}
+
+/**
+ * 入力タグを元の配列から除去する
+ * @param base
+ * @param remove
+ * @returns
+ */
+const removeTags = (base: string[], remove: string[]) => {
+  return base.filter((tag) => !remove.includes(tag))
+}

@@ -1,14 +1,9 @@
+import { viewConfig } from "@/config"
+import { format } from "@/lib"
 import { List, Paper, Stack } from "@mantine/core"
 import { IconPhotoPlus } from "@tabler/icons-react"
+import React, { useRef } from "react"
 import classes from "./AddImageBox.module.css"
-import React, { useCallback, useRef } from "react"
-import { format } from "@/lib"
-import { viewConfig } from "@/config"
-
-export type AddImageBoxUi = {
-  valid?: "idle" | "accept" | "warning" | "reject"
-  disabled?: boolean
-}
 
 export type AddImageBoxConfig = {
   count: {
@@ -21,21 +16,22 @@ export type AddImageBoxConfig = {
   type: string[]
 }
 
-export type AddImageBoxHandler = {
-  onFileSelect?: (files: FileList | null) => void
+export type AddImageBoxUi = {
+  valid?: "idle" | "accept" | "warning" | "reject"
+  disabled?: boolean
 }
 
 export interface AddImageBoxProps {
+  ui: AddImageBoxUi
+  onFileSelect?: (files: FileList | null) => void
   config: AddImageBoxConfig
-  handler?: AddImageBoxHandler
-  ui?: AddImageBoxUi
 }
 
 export const AddImageBox = (props: AddImageBoxProps) => {
-  const { config, handler, ui } = props
+  const { config, ui, onFileSelect } = props
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const click = () => {
+  const handleClick = () => {
     if (ui?.disabled) {
       return
     }
@@ -48,12 +44,12 @@ export const AddImageBox = (props: AddImageBoxProps) => {
     inputRef.current?.click()
   }
 
-  const fileSelect = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      handler?.onFileSelect?.(event.target.files)
-    },
-    [handler?.onFileSelect],
-  )
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (ui.disabled) {
+      return
+    }
+    onFileSelect?.(event.target.files)
+  }
 
   const size = format.file.size(config.size.max, {
     decimals: 0,
@@ -63,7 +59,7 @@ export const AddImageBox = (props: AddImageBoxProps) => {
   return (
     <Paper
       className={classes.box}
-      onClick={click}
+      onClick={handleClick}
       data-valid={ui?.valid}
       data-disabled={ui?.disabled}
       data-testid="add-file"
@@ -74,7 +70,7 @@ export const AddImageBox = (props: AddImageBoxProps) => {
         multiple
         accept="image/*"
         style={{ display: "none" }}
-        onChange={fileSelect}
+        onChange={handleChange}
       />
       <Stack
         gap={8}
