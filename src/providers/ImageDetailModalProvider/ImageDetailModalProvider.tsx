@@ -3,6 +3,7 @@ import { CustomModal } from "@/components/CustomModal/CustomModal"
 import { ImageDetailModal } from "@/feature/ImageDetailModal"
 import { useDeleteImageMutation, useDownloadImageMutation } from "@/graphql"
 import { useDisclosure } from "@/hooks"
+import { action } from "@/lib/action"
 import "client-only"
 import React, { useCallback, useState } from "react"
 import { useConfirmContext } from "../ConfirmProvider"
@@ -132,15 +133,11 @@ export const ImageDetailModalProvider = (
                   return
                 }
 
+
                 const downloadUrl = res.data.downloadImage
-                const link = document.createElement("a")
-                link.href = downloadUrl.url
-                link.download = downloadUrl.fileName
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
+                action.download({ url: downloadUrl.url, fileName: downloadUrl.fileName })
               },
-              onEdit: () => {},
+              onEdit: () => { },
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

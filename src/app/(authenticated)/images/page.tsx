@@ -2,9 +2,10 @@
 import { ActionPanel, Image, LinkButton } from "@/components"
 import { ImageLayout } from "@/components/ImageLayout/ImageLayout"
 import { PreviewImageBox } from "@/feature"
-import { useDeleteImagesMutation, useGetImagesQuery } from "@/graphql"
+import { useDeleteImagesMutation, useDownloadImagesMutation, useGetImagesQuery } from "@/graphql"
 import { useUriQuery } from "@/hooks"
 import { useRelayConnection } from "@/hooks/useRelayConnection"
+import { action } from "@/lib/action"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
@@ -157,6 +158,16 @@ const Page = () => {
     console.log("submit error:", errors)
   }
 
+  const selectableCount = selectable.length
+  const itemCount = items.length
+  const hasSelectable = 0 < selectableCount
+  const allSelectable = selectableCount === itemCount
+  const indeterminate = selectableCount > 0 && selectableCount < itemCount
+
+  const toggleAll = (checked: boolean) => {
+    checked ? setSelectable(items.map((item) => item.id)) : setSelectable([])
+  }
+
   const handleEditImages = async () => {
     router.push(resolveUri("/images/edit", { query: { targets: selectable } }))
   }
@@ -173,15 +184,6 @@ const Page = () => {
     },
   })
 
-  const selectableCount = selectable.length
-  const itemCount = items.length
-  const hasSelectable = 0 < selectableCount
-  const allSelectable = selectableCount === itemCount
-  const indeterminate = selectableCount > 0 && selectableCount < itemCount
-
-  const toggleAll = (checked: boolean) => {
-    checked ? setSelectable(items.map((item) => item.id)) : setSelectable([])
-  }
 
   const handleDeleteImages = async () => {
     const result = await confirm.action.confirm({
@@ -207,8 +209,21 @@ const Page = () => {
     setSelectable([])
   }
 
+  const [downloadImages] = useDownloadImagesMutation()
+
   const handleDownloadImages = async () => {
-    console.debug("download images")
+    const res = await downloadImages({
+      variables: {
+        input: { ids: selectable },
+      },
+    })
+
+    if (!res.data) {
+      return
+    }
+
+    const downloadUrl = res.data.downloadImages
+    action.download({ url: downloadUrl.url, fileName: downloadUrl.fileName })
   }
 
   return (
