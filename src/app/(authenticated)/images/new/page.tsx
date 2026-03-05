@@ -1,31 +1,25 @@
 "use client"
 import { imageConfig } from "@/config"
 import {
-  FormSwitcher,
   ImageDropForm,
   imageFormDefaultValue,
   imageFormSchema,
-  ImageInputForm,
-  MODE,
-  useFormSwitcher,
 } from "@/feature/images/new"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { useTaskManager } from "@/hooks"
-import { rhf, zod } from "@/lib"
+import { zod } from "@/lib"
 import { Task } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Box, Button, Flex, Stack, Text } from "@mantine/core"
+import { Box } from "@mantine/core"
 import { nanoid } from "nanoid"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import {
-  Controller,
   FormProvider,
   useFieldArray,
   useForm,
   useFormState,
-  useWatch,
+  useWatch
 } from "react-hook-form"
-import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 const fileSchema = z.object({
@@ -83,7 +77,6 @@ type FormSchema = z.infer<typeof inputFormSchema>
  *       ユースケースを洗い出して検討した方が良さそう
  */
 const Page = () => {
-  const formSwitcher = useFormSwitcher()
   const methods = useForm<FormSchema>({
     resolver: zodResolver(inputFormSchema),
     mode: "onChange",
@@ -115,25 +108,16 @@ const Page = () => {
     failOnError: false,
   })
 
-  const [selected, setSelected] = useState<number | null>(null)
-
-  const locale = useTranslation()
 
   const submit = async () => {
     await methods.handleSubmit(async (value, errors) => {
       await taskManager.action.submit(async (task, index) => {
         const image = methods.getValues("images")[index]
-        const date = new Date()
-        const tagId = date.getMilliseconds()
         await uploadImage({
           variables: {
             input: {
               ...image,
-              tags: [`tag-${tagId}`, "example", "sample"],
-              visibility:
-                image.visibility === "public"
-                  ? Visibility.Public
-                  : Visibility.Private,
+              visibility: Visibility.Private,
             },
           },
         })
@@ -178,10 +162,6 @@ const Page = () => {
     addFiles(newFiles)
   }, [])
 
-  const fileSelected = useCallback((index: number, id: string) => {
-    setSelected(index)
-  }, [])
-
   const fileRemove = useCallback(
     (index: number, id: string) => {
       taskManager.action.remove([id])
@@ -195,12 +175,12 @@ const Page = () => {
       return "reject"
     }
 
-    // const empty = 0;
-    // if (empty < fields.length) {
-    //   if (methods.formState.isValid) {
-    //     return "warning";
-    //   }
-    // }
+    const empty = 0;
+    if (empty < fields.length) {
+      if (methods.formState.isValid) {
+        return "warning";
+      }
+    }
 
     return "idle"
   }, [methods, fields, watchValueImages])
@@ -214,62 +194,51 @@ const Page = () => {
     return fields.length <= empty
   }, [fields])
 
-  useEffect(() => {
-    /**
-     * 一括フォーム状態のとき > サムネイルを未選択状態にする
-     * 個別フォーム状態のとき > サムネイルを選択状態にする
-     */
-    if (formSwitcher.state.mode === MODE.TYPE.ALL) {
-      setSelected(null)
-      return
-    }
-    setSelected(0)
-  }, [formSwitcher.state.mode])
 
-  const previews = fields.map((preview, index) => {
-    const task = taskManager.value.tasks[index]
-    return (
-      <Controller
-        key={preview.id}
-        control={methods.control}
-        name={`images.${index}.file`}
-        render={({ field, fieldState }) => {
-          const rhfFieldState = rhf.fieldState(fieldState)
-          return (
-            <ImageDropForm.PreviewImageBox
-              key={preview.id}
-              index={index}
-              id={task.id}
-              payload={{
-                src: URL.createObjectURL(field.value),
-                alt: field.value.name,
-              }}
-              ui={{
-                selected:
-                  formSwitcher.state.mode === MODE.TYPE.SINGLE
-                    ? selected === index
-                    : false,
-                selectable: formSwitcher.state.mode === MODE.TYPE.SINGLE,
-                supported: !rhfFieldState.error.message.match(
-                  "validate.file.type.unsupported",
-                ),
-                valid: rhfFieldState.error.message.match(
-                  "validate.file.size.tooLarge",
-                )
-                  ? "warning"
-                  : "idle",
-                error: rhfFieldState.error.message.resolver(locale.t),
-              }}
-              handler={{
-                onSelect: fileSelected,
-                onRemove: fileRemove,
-              }}
-            />
-          )
-        }}
-      />
-    )
-  })
+  // const previews = fields.map((preview, index) => {
+  //   const task = taskManager.value.tasks[index]
+  //   return (
+  //     <Controller
+  //       key={preview.id}
+  //       control={methods.control}
+  //       name={`images.${index}.file`}
+  //       render={({ field, fieldState }) => {
+  //         const rhfFieldState = rhf.fieldState(fieldState)
+  //         return (
+  //           <ImageDropForm.PreviewImageBox
+  //             key={preview.id}
+  //             index={index}
+  //             id={task.id}
+  //             payload={{
+  //               src: URL.createObjectURL(field.value),
+  //               alt: field.value.name,
+  //             }}
+  //             ui={{
+  //               selected:
+  //                 formSwitcher.state.mode === MODE.TYPE.SINGLE
+  //                   ? selected === index
+  //                   : false,
+  //               selectable: formSwitcher.state.mode === MODE.TYPE.SINGLE,
+  //               supported: !rhfFieldState.error.message.match(
+  //                 "validate.file.type.unsupported",
+  //               ),
+  //               valid: rhfFieldState.error.message.match(
+  //                 "validate.file.size.tooLarge",
+  //               )
+  //                 ? "warning"
+  //                 : "idle",
+  //               error: rhfFieldState.error.message.resolver(locale.t),
+  //             }}
+  //             handler={{
+  //               onSelect: fileSelected,
+  //               onRemove: fileRemove,
+  //             }}
+  //           />
+  //         )
+  //       }}
+  //     />
+  //   )
+  // })
 
   return (
     <Box
@@ -287,49 +256,6 @@ const Page = () => {
             boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
           })}
         >
-          <FormSwitcher value={formSwitcher}>
-            <Stack>
-              <Flex
-                style={{
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <FormSwitcher.SegmentedControl
-                  ui={{
-                    disabled: {
-                      all: false,
-                      single: 0 === watchValueImages.length,
-                    },
-                  }}
-                />
-                <Flex
-                  gap={8}
-                  style={{
-                    alignItems: "center",
-                  }}
-                >
-                  <Text size="xs">{`${watchValueImages.length} 件`}</Text>
-                  <Button size="xs" onClick={submit} disabled={isEmpty}>
-                    登録
-                  </Button>
-                </Flex>
-              </Flex>
-              <Box>
-                <FormSwitcher.All>
-                  <ImageInputForm control={methods.control} prefix="share" />
-                </FormSwitcher.All>
-                <FormSwitcher.Single>
-                  <ImageInputForm
-                    // NOTE: keyを指定することでreact-hook-formのcontrollerも更新されるようにしている
-                    key={`images.${selected}`}
-                    control={methods.control}
-                    prefix={`images.${selected}`}
-                  />
-                </FormSwitcher.Single>
-              </Box>
-            </Stack>
-          </FormSwitcher>
         </Box>
       </FormProvider>
 
@@ -341,7 +267,6 @@ const Page = () => {
         error={watchStateImages.errors.images?.message}
         onFileDrop={fileDrop}
       >
-        {previews}
         {watchValueImages.length < imageConfig.count.max && (
           <ImageDropForm.AddImageBox
             config={imageConfig}

@@ -2,7 +2,6 @@ import { Box, Input, InputError } from "@mantine/core"
 import React from "react"
 import { AddImageBox } from "./AddImageBox"
 import classes from "./ImageDropForm.module.css"
-import { PreviewImageBox } from "./PreviewImageBox"
 
 export type ImageDropFormUi = {
   valid?: "idle" | "accept" | "warning" | "reject"
@@ -57,4 +56,3 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
 }
 
 ImageDropForm.AddImageBox = AddImageBox
-ImageDropForm.PreviewImageBox = PreviewImageBox
