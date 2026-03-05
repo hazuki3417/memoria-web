@@ -30,7 +30,16 @@ const Page = () => {
 
         <Toggle
           label="画像切り替えの繰り返し"
-          description="画像詳細画面で画像を順番に表示したとき、最後の画像の次に最初の画像へ戻るかどうかを設定します。"
+          description="プレビューで画像を順番に表示したとき、最後の画像の次に最初の画像へ戻るかどうかを設定します。"
+          value="isImageSlideLoopEnabled"
+          onChange={(event) => console.debug("debug", event.target.checked)}
+        />
+
+        <Divider />
+
+        <Toggle
+          label="画像詳細の常時表示"
+          description="プレビューによる初期表示時に画像の詳細も合わせて表示するかどうか設定します。"
           value="isImageSlideLoopEnabled"
           onChange={(event) => console.debug("debug", event.target.checked)}
         />
