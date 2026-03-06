@@ -1,6 +1,6 @@
 "use client"
 import { PageInfo } from "@/graphql"
-import { ActionStateType } from "@/hooks/type"
+import { ActionStateType } from "@/hooks"
 import {
   ApolloError,
   ApolloQueryResult,

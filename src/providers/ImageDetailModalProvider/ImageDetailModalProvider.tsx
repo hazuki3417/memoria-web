@@ -1,13 +1,12 @@
 "use client"
-import { CustomModal } from "@/components/CustomModal/CustomModal"
-import { ImageDetailModal } from "@/feature/ImageDetailModal"
+import { CustomModal } from "@/components"
+import { ImageDetailModal } from "@/feature"
 import { useDeleteImageMutation, useDownloadImageMutation } from "@/graphql"
 import { useDisclosure } from "@/hooks"
 import { action } from "@/lib/action"
+import { useConfirmContext, useFeedbackContext } from "@/providers"
 import "client-only"
 import React, { useCallback, useState } from "react"
-import { useConfirmContext } from "../ConfirmProvider"
-import { useFeedbackContext } from "../FeedbackProvider"
 import {
   ImageDetail,
   ImageDetailModalContext,
@@ -139,7 +138,7 @@ export const ImageDetailModalProvider = (
                   fileName: downloadUrl.fileName,
                 })
               },
-              onEdit: () => {},
+              onEdit: () => { },
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

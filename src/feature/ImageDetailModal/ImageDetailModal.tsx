@@ -1,6 +1,4 @@
-import { useDisclosure } from "@/hooks"
-import { useImageRotate } from "@/hooks/useImageRotate"
-import { useImageZoom } from "@/hooks/useImageZoom"
+import { useDisclosure, useImageRotate, useImageZoom } from "@/hooks"
 import { Box, type BoxProps } from "@mantine/core"
 import { AnimatePresence, motion } from "framer-motion"
 import { useCallback, useMemo } from "react"

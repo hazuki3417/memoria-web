@@ -5,4 +5,6 @@ export * from "./CustomModal"
 export * from "./FormButton"
 export * from "./FormTextInput"
 export * from "./Image"
+export * from "./ImageLayout"
 export * from "./Toggle"
+

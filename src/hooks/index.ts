@@ -14,3 +14,5 @@ export * from "./useSetFormDataFromQuery"
 export * from "./useTaskManager"
 export * from "./useUriParams"
 export * from "./useUriQuery"
+
+export * from "./type"
