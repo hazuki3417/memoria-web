@@ -12,10 +12,22 @@ type UploadData = {
   size: number
 }
 
+const summary = {
+  total: 0,
+  error: 0,
+  idle: 0,
+  running: 0,
+  success: 0
+}
+
 const initialState: TaskState<UploadData> = {
   current: { tasks: [] },
-  meta: { action: "reset" },
+  meta: {
+    action: "reset",
+    summary,
+  },
 }
+
 
 const sampleTask: Task<UploadData> = {
   id: "upload-1",
@@ -41,9 +53,10 @@ describe("taskReducer (with payload)", () => {
   })
 
   it("should update a task and preserve payload", () => {
+    const tasks = [sampleTask]
     const state: TaskState<UploadData> = {
-      current: { tasks: [sampleTask] },
-      meta: { action: "append" },
+      current: { tasks: tasks },
+      meta: { action: "append", summary },
     }
 
     const data: UploadData = {
@@ -82,7 +95,7 @@ describe("taskReducer (with payload)", () => {
           },
         ],
       },
-      meta: { action: "append" },
+      meta: { action: "append", summary },
     }
 
     const action: TaskAction<UploadData> = {
@@ -100,7 +113,7 @@ describe("taskReducer (with payload)", () => {
   it("should reset tasks with payload", () => {
     const state: TaskState<UploadData> = {
       current: { tasks: [sampleTask] },
-      meta: { action: "append" },
+      meta: { action: "append", summary },
     }
 
     const actual = taskReducer(state, { type: "reset" })

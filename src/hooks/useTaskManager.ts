@@ -1,18 +1,22 @@
 "use client"
-import { Task, taskReducer } from "@/reducers"
+import { Task, taskReducer, TaskSummary } from "@/reducers"
 import { ActionType } from "@/reducers/util"
 import "client-only"
-import { useCallback, useEffect, useReducer, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
 
-export type UseTaskManagerOption<D = undefined> = {
+export type UseTaskManagerOption = {
   mode: "serial" | "parallel"
   failOnError?: boolean
 }
+
+export type UseTaskManagerTaskResult = "idle" | "running" | "success" | "partial-success" | "error"
 
 export type UseTaskManagerValue<D = undefined> = {
   tasks: Task<D>[]
   meta: {
     action: UseTaskManagerActionState
+    result: UseTaskManagerTaskResult
+    summary: TaskSummary
   }
 }
 
@@ -34,13 +38,22 @@ export interface UseTaskManager<D = undefined> {
 }
 
 export const useTaskManager = <D = undefined>(
-  option: UseTaskManagerOption<D>,
+  option: UseTaskManagerOption,
 ): UseTaskManager<D> => {
   const { mode, failOnError = false } = option
 
   const [value, dispatch] = useReducer(taskReducer<D>, {
     current: { tasks: [] },
-    meta: { action: "idle" },
+    meta: {
+      action: "idle",
+      summary: {
+        total: 0,
+        error: 0,
+        idle: 0,
+        running: 0,
+        success: 0
+      }
+    },
   })
 
   const [action, setAction] = useState<UseTaskManagerActionState>("idle")
@@ -49,6 +62,10 @@ export const useTaskManager = <D = undefined>(
 
   useEffect(() => {
     tasksRef.current = value.current.tasks
+  }, [value.current.tasks])
+
+  const taskResult = useMemo(() => {
+    return calcTaskResult(value.current.tasks)
   }, [value.current.tasks])
 
   const append = useCallback((task: Task<D>[]) => {
@@ -140,7 +157,14 @@ export const useTaskManager = <D = undefined>(
   }
 
   return {
-    value: { tasks: value.current.tasks, meta: { action } },
+    value: {
+      tasks: value.current.tasks,
+      meta: {
+        action,
+        result: taskResult,
+        summary: value.meta.summary,
+      }
+    },
     action: {
       append,
       remove,
@@ -148,4 +172,23 @@ export const useTaskManager = <D = undefined>(
       submit,
     },
   }
+}
+
+const calcTaskResult = (tasks: Task[]): UseTaskManagerTaskResult => {
+
+  if (tasks.length === 0) return "idle"
+
+  const success = tasks.filter(t => t.status === "success").length
+  const error = tasks.filter(t => t.status === "error").length
+  const running = tasks.filter(t => t.status === "running").length
+
+  if (running > 0) return "running"
+
+  if (success === tasks.length) return "success"
+
+  if (error === tasks.length) return "error"
+
+  if (success > 0 || error > 0) return "partial-success"
+
+  return "idle"
 }
