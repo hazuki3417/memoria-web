@@ -6,7 +6,7 @@ import { useCallback, useReducer, useState } from "react"
 
 export type UseTaskManagerOption<D = undefined> = {
   mode: "serial" | "parallel"
-  failOnError: boolean
+  failOnError?: boolean
 }
 
 export type UseTaskManagerValue<D = undefined> = {
@@ -36,6 +36,8 @@ export interface UseTaskManager<D = undefined> {
 export const useTaskManager = <D = undefined>(
   option: UseTaskManagerOption<D>,
 ): UseTaskManager<D> => {
+  const { mode, failOnError = false } = option
+
   const [value, dispatch] = useReducer(taskReducer<D>, {
     current: { tasks: [] },
     meta: { action: "idle" },
@@ -95,8 +97,9 @@ export const useTaskManager = <D = undefined>(
       await callback(task, index)
       setSuccess(task.id)
     } catch (err: any) {
-      setError(task.id, err.message || "Unknown error")
-      if (option.failOnError) throw new Error(`Task ${task.id} failed`)
+      const message = err instanceof Error ? err.message : "Unknown error"
+      setError(task.id, message)
+      if (failOnError) throw new Error(`Task ${task.id} failed`)
     }
   }
 
@@ -121,12 +124,12 @@ export const useTaskManager = <D = undefined>(
 
   const submit = async (process: Process<D>) => {
     setAction("submit")
-    if (option.mode === "serial") {
+    if (mode === "serial") {
       await serial(process)
-    } else if (option.mode === "parallel") {
+    } else if (mode === "parallel") {
       await parallel(process)
     } else {
-      throw new Error(`Unknown execution mode: ${option.mode}`)
+      throw new Error(`Unknown execution mode: ${mode}`)
     }
   }
 
