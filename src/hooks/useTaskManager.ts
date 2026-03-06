@@ -2,7 +2,7 @@
 import { Task, taskReducer } from "@/reducers"
 import { ActionType } from "@/reducers/util"
 import "client-only"
-import { useCallback, useReducer, useState } from "react"
+import { useCallback, useEffect, useReducer, useRef, useState } from "react"
 
 export type UseTaskManagerOption<D = undefined> = {
   mode: "serial" | "parallel"
@@ -44,6 +44,12 @@ export const useTaskManager = <D = undefined>(
   })
 
   const [action, setAction] = useState<UseTaskManagerActionState>("idle")
+
+  const tasksRef = useRef<Task<D>[]>([])
+
+  useEffect(() => {
+    tasksRef.current = value.current.tasks
+  }, [value.current.tasks])
 
   const append = useCallback((task: Task<D>[]) => {
     setAction("append")
@@ -104,7 +110,7 @@ export const useTaskManager = <D = undefined>(
   }
 
   const serial = async (callback: Process<D>) => {
-    const tasks = value.current.tasks
+    const tasks = tasksRef.current
     for (let i = 0; i < tasks.length; i++) {
       const task = tasks[i]
       if (task.status === "success") continue
@@ -113,7 +119,7 @@ export const useTaskManager = <D = undefined>(
   }
 
   const parallel = async (callback: Process<D>) => {
-    const tasks = value.current.tasks
+    const tasks = tasksRef.current
     const promises = tasks
       .filter((task) => task.status !== "success")
       .map((task, index) => {
