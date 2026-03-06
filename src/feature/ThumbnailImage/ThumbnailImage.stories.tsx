@@ -1,22 +1,22 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { PreviewImageBox } from "./PreviewImageBox"
+import { ThumbnailImage } from "./ThumbnailImage"
 
 const payload = { src: "sample/h.png", alt: "example.png" }
 
 const meta = {
-  title: "features/PreviewImageBox",
-  component: PreviewImageBox,
+  title: "features/ThumbnailImage",
+  component: ThumbnailImage,
   args: {
     children: (
       <>
-        <PreviewImageBox.SelectableCheckbox />
-        <PreviewImageBox.RemoveButton />
-        <PreviewImageBox.Image {...payload} />
-        <PreviewImageBox.Label {...payload} />
+        <ThumbnailImage.SelectableCheckbox />
+        <ThumbnailImage.RemoveButton />
+        <ThumbnailImage.Image {...payload} />
+        <ThumbnailImage.Label {...payload} />
       </>
     ),
   },
-} satisfies Meta<typeof PreviewImageBox>
+} satisfies Meta<typeof ThumbnailImage>
 
 export default meta
 type Story = StoryObj<typeof meta>

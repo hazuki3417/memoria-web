@@ -1,7 +1,7 @@
 "use client"
 import { ActionPanel, ButtonGroup } from "@/components"
 import { imageConfig } from "@/config"
-import { PreviewImageBox } from "@/feature"
+import { ThumbnailImage } from "@/feature"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { useTaskManager } from "@/hooks"
 import { zod } from "@/lib"
@@ -442,7 +442,7 @@ const Page = () => {
                 <React.Fragment key={image.id}>
                   <Box p="xs">
                     <Flex gap="xs">
-                      <PreviewImageBox
+                      <ThumbnailImage
                         ui={{
                           outline: true,
                         }}
@@ -454,7 +454,7 @@ const Page = () => {
                           render={({ field }) => {
                             const { value, ...rest } = field
                             return (
-                              <PreviewImageBox.SelectableCheckbox
+                              <ThumbnailImage.SelectableCheckbox
                                 {...rest}
                                 checked={value}
                               />
@@ -466,14 +466,14 @@ const Page = () => {
                           name={`images.${index}.file`}
                           render={({ field }) => {
                             return (
-                              <PreviewImageBox.Image
+                              <ThumbnailImage.Image
                                 src={URL.createObjectURL(field.value)}
                                 alt={field.value.name}
                               />
                             )
                           }}
                         />
-                      </PreviewImageBox>
+                      </ThumbnailImage>
                       <Divider orientation="vertical" />
                       <Box
                         style={(theme) => ({

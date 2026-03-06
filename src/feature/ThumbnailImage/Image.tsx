@@ -11,4 +11,4 @@ export const Image = (props: ImageProps) => {
     <Base {...rest} w="auto" h="auto" mah="100%" maw="100%" draggable={false} />
   )
 }
-Image.displayName = "PreviewImageBox.Image"
+Image.displayName = "ThumbnailImage.Image"

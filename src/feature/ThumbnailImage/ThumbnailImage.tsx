@@ -2,11 +2,11 @@ import { Box } from "@mantine/core"
 import React, { memo } from "react"
 import { Image } from "./Image"
 import { Label } from "./Label"
-import classes from "./PreviewImageBox.module.css"
 import { RemoveButton } from "./RemoveButton"
 import { SelectableCheckbox } from "./SelectableCheckbox"
+import classes from "./ThumbnailImage.module.css"
 
-export type PreviewImageBoxUi = {
+export type ThumbnailImageUi = {
   outline?: boolean
   selected?: boolean
   selectable?: boolean
@@ -14,13 +14,13 @@ export type PreviewImageBoxUi = {
   valid?: "idle" | "accept" | "warning" | "reject"
 }
 
-export interface PreviewImageBoxProps {
+export interface ThumbnailImageProps {
   children: React.ReactNode
   onClick?: React.MouseEventHandler<HTMLDivElement>
-  ui?: PreviewImageBoxUi
+  ui?: ThumbnailImageUi
 }
 
-export const PreviewImageBox = (props: PreviewImageBoxProps) => {
+export const ThumbnailImage = (props: ThumbnailImageProps) => {
   const { children, ui, ...rest } = props
   const {
     outline = false,
@@ -46,7 +46,7 @@ export const PreviewImageBox = (props: PreviewImageBoxProps) => {
   )
 }
 
-PreviewImageBox.Image = memo(Image)
-PreviewImageBox.Label = memo(Label)
-PreviewImageBox.RemoveButton = memo(RemoveButton)
-PreviewImageBox.SelectableCheckbox = memo(SelectableCheckbox)
+ThumbnailImage.Image = memo(Image)
+ThumbnailImage.Label = memo(Label)
+ThumbnailImage.RemoveButton = memo(RemoveButton)
+ThumbnailImage.SelectableCheckbox = memo(SelectableCheckbox)

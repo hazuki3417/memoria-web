@@ -32,4 +32,4 @@ export const Label = (props: LabelProps) => {
     </Box>
   )
 }
-Label.displayName = "PreviewImageBox.Label"
+Label.displayName = "ThumbnailImage.Label"

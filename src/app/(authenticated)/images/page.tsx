@@ -1,6 +1,6 @@
 "use client"
 import { ActionPanel, ButtonGroup, Image, ImageLayout, LinkButton } from "@/components"
-import { PreviewImageBox } from "@/feature"
+import { ThumbnailImage } from "@/feature"
 import {
   useDeleteImagesMutation,
   useDownloadImagesMutation,
@@ -365,7 +365,7 @@ const Page = () => {
                 <Image>
                   {items.map((item) => {
                     return (
-                      <PreviewImageBox
+                      <ThumbnailImage
                         key={item.id}
                         ui={{
                           selected:
@@ -398,12 +398,12 @@ const Page = () => {
                           }
                         }}
                       >
-                        <PreviewImageBox.Image
+                        <ThumbnailImage.Image
                           bdrs="sm"
                           src={item.image.thumbnail}
                           alt={item.image.alt}
                         />
-                      </PreviewImageBox>
+                      </ThumbnailImage>
                     )
                   })}
                   {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
