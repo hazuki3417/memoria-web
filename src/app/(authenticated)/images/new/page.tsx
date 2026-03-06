@@ -5,6 +5,7 @@ import { PreviewImageBox } from "@/feature"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { useTaskManager } from "@/hooks"
 import { zod } from "@/lib"
+import { useFeedbackContext } from "@/providers"
 import { Task } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -18,7 +19,7 @@ import {
   Text,
 } from "@mantine/core"
 import { nanoid } from "nanoid"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { Controller, FieldErrors, useFieldArray, useForm, useWatch } from "react-hook-form"
 import { z } from "zod"
 import { ImageDropForm } from "./_components"
@@ -34,6 +35,7 @@ const fileSchema = zod.refine(
 const tagsSchema = z.array(z.string())
 
 const imageSchema = z.object({
+  id: z.string(),
   selectable: z.boolean(),
   file: fileSchema,
   tags: tagsSchema,
@@ -98,6 +100,8 @@ const Page = () => {
 
   const { getValues, setValue, handleSubmit } = methods
 
+  const feedback = useFeedbackContext()
+
   const watchValueImages = useWatch({
     control: methods.control,
     name: "images",
@@ -111,17 +115,22 @@ const Page = () => {
   const [uploadImage] = useUploadImageMutation()
   const manager = useTaskManager({
     mode: "parallel",
-    failOnError: false,
   })
 
   const inputValid = async (values: InputFormValues) => {
     console.log("submit values:", values)
-    await manager.action.submit(async (task, index) => {
-      const image = values.images[index]
-      if (!image.selectable) {
-        return // skip
+    await manager.action.submit(async (task) => {
+      const image = values.images.find((image) => task.id === image.id)
+
+      if (!image) {
+        return { status: "error", error: Error("image form data not found.") }
       }
-      const result = await uploadImage({
+
+      if (!image.selectable) {
+        return { status: "skip" }
+      }
+
+      await uploadImage({
         variables: {
           input: {
             file: image.file,
@@ -130,7 +139,7 @@ const Page = () => {
           },
         },
       })
-      console.debug("request result:", result)
+      return { status: "success" }
     })
   }
 
@@ -138,12 +147,54 @@ const Page = () => {
     console.log("submit error:", errors)
   }
 
+  useEffect(() => {
+    switch (manager.value.meta.result) {
+      case "running":
+        feedback.action.info({
+          title: "登録",
+          body: "登録処理を開始しました。",
+        })
+        return
+      case "success":
+        feedback.action.success({
+          title: "登録",
+          body: "正常に終了しました。",
+        })
+        // form reset （アイテムのみ）
+        return
+      case "partial-success":
+        feedback.action.warning({
+          title: "登録",
+          body: "一部登録に失敗しました。",
+        })
+        // 成功したものみformをdisabledする
+        return
+      case "error":
+        feedback.action.warning({
+          title: "登録",
+          body: "登録に失敗しました。",
+        })
+        return
+      case "idle":
+      default:
+        break;
+    }
+  }, [manager.value.meta.result])
+
+  useEffect(() => {
+    console.debug("debug task manager", {
+      tasks: manager.value.tasks,
+      summary: manager.value.meta.summary,
+    })
+  }, [manager.value.tasks])
+
   const addFiles = (files: FileList) => {
     const images: ImageValues[] = []
     const tasks: Task[] = []
     for (let i = 0; i < files.length; i++) {
-      images.push({ selectable: true, file: files[i], tags: [] })
-      tasks.push({ id: nanoid(), status: "idle" })
+      const id = nanoid()
+      images.push({ id, selectable: true, file: files[i], tags: [] })
+      tasks.push({ id, status: "idle" })
     }
     append(images)
     manager.action.append(tasks)
@@ -336,9 +387,8 @@ const Page = () => {
         <ScrollArea h={"500px"} scrollbarSize={6}>
           <Stack mb="xs" gap={0}>
             {fields.map((image, index) => {
-              const task = manager.value.tasks[index]
               return (
-                <React.Fragment key={task.id}>
+                <React.Fragment key={image.id}>
                   <Box p="xs">
                     <Flex gap="xs">
                       <PreviewImageBox
@@ -421,7 +471,7 @@ const Page = () => {
                         <Button
                           size="xs"
                           type="button"
-                          onClick={() => removeFile(index, task.id)}
+                          onClick={() => removeFile(index, image.id)}
                         >
                           取消
                         </Button>

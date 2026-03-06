@@ -1,5 +1,5 @@
 "use client"
-import { Task, taskReducer, TaskSummary } from "@/reducers"
+import { Task, taskReducer, TaskSummary, TaskValue } from "@/reducers"
 import { ActionType } from "@/reducers/util"
 import "client-only"
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
@@ -24,7 +24,25 @@ export type UseTaskManagerActionState = ActionType<
   "append" | "remove" | "reset" | "submit"
 >
 
-export type Process<D> = (task: Task<D>, index: number) => Promise<void>
+type CallbackSuccessResult = {
+  status: Extract<TaskValue, "success">
+}
+
+type CallbackSkipResult = {
+  status: Extract<TaskValue, "skip">
+}
+
+type CallbackErrorResult = {
+  status: Extract<TaskValue, "error">
+  error: Error
+}
+
+
+export type Process<D> = (task: Task<D>, index: number) => Promise<
+  CallbackSuccessResult |
+  CallbackSkipResult |
+  CallbackErrorResult
+>
 
 export interface UseTaskManagerAction<D = undefined> {
   append: (task: Task<D>[]) => void
@@ -51,7 +69,8 @@ export const useTaskManager = <D = undefined>(
         error: 0,
         idle: 0,
         running: 0,
-        success: 0
+        success: 0,
+        skip: 0,
       }
     },
   })
@@ -103,6 +122,16 @@ export const useTaskManager = <D = undefined>(
     })
   }, [])
 
+  const setSkip = useCallback((key: string) => {
+    dispatch({
+      type: "update",
+      key,
+      payload: {
+        status: "skip",
+      },
+    })
+  }, [])
+
   const setError = useCallback((key: string, error?: string) => {
     dispatch({
       type: "update",
@@ -117,8 +146,19 @@ export const useTaskManager = <D = undefined>(
   const runner = async (task: Task<D>, index: number, callback: Process<D>) => {
     setRunning(task.id)
     try {
-      await callback(task, index)
-      setSuccess(task.id)
+      const result = await callback(task, index)
+      switch (result.status) {
+        case "success":
+          setSuccess(task.id)
+          break
+
+        case "skip":
+          setSkip(task.id)
+          break
+        case "error":
+        default:
+          throw result.error
+      }
     } catch (err: any) {
       const message = err instanceof Error ? err.message : "Unknown error"
       setError(task.id, message)
@@ -181,10 +221,11 @@ const calcTaskResult = (tasks: Task[]): UseTaskManagerTaskResult => {
   const success = tasks.filter(t => t.status === "success").length
   const error = tasks.filter(t => t.status === "error").length
   const running = tasks.filter(t => t.status === "running").length
+  const skip = tasks.filter(t => t.status === "skip").length
 
-  if (running > 0) return "running"
+  if (running > 0 || skip > 0) return "running"
 
-  if (success === tasks.length) return "success"
+  if ((success + skip) === tasks.length) return "success"
 
   if (error === tasks.length) return "error"
 
