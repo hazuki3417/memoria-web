@@ -29,10 +29,10 @@ export interface TaskState<D = undefined> {
 export type TaskAction<D = undefined> =
   | { type: "append"; payload: Task<D>[] }
   | {
-    type: "update"
-    key: TaskBase["id"]
-    payload: Pick<TaskBase, "status" | "error"> & { data?: D }
-  }
+      type: "update"
+      key: TaskBase["id"]
+      payload: Pick<TaskBase, "status" | "error"> & { data?: D }
+    }
   | { type: "remove"; key: TaskBase["id"][] }
   | { type: "reset" }
 
@@ -50,7 +50,9 @@ export const taskReducer = <D = undefined>(
       }
     }
     case "update": {
-      const tasks = state.current.tasks.map((task) => task.id === action.key ? { ...task, ...action.payload } : task)
+      const tasks = state.current.tasks.map((task) =>
+        task.id === action.key ? { ...task, ...action.payload } : task,
+      )
       return {
         ...state,
         current: { tasks },
@@ -58,7 +60,9 @@ export const taskReducer = <D = undefined>(
       }
     }
     case "remove": {
-      const tasks = state.current.tasks.filter((task) => !action.key.includes(task.id))
+      const tasks = state.current.tasks.filter(
+        (task) => !action.key.includes(task.id),
+      )
       return {
         ...state,
         current: { tasks },
@@ -78,16 +82,14 @@ export const taskReducer = <D = undefined>(
   }
 }
 
-
 const calcSummary = <D>(tasks: Task<D>[]): TaskSummary => {
-
   const summary: TaskSummary = {
     total: tasks.length,
     idle: 0,
     running: 0,
     success: 0,
     error: 0,
-    skip: 0
+    skip: 0,
   }
 
   for (const task of tasks) {

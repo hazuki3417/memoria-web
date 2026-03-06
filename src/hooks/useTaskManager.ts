@@ -2,14 +2,26 @@
 import { Task, taskReducer, TaskSummary, TaskValue } from "@/reducers"
 import { ActionType } from "@/reducers/util"
 import "client-only"
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react"
 
 export type UseTaskManagerOption = {
   mode: "serial" | "parallel"
   failOnError?: boolean
 }
 
-export type UseTaskManagerTaskResult = "idle" | "running" | "success" | "partial-success" | "error"
+export type UseTaskManagerTaskResult =
+  | "idle"
+  | "running"
+  | "success"
+  | "partial-success"
+  | "error"
 
 export type UseTaskManagerValue<D = undefined> = {
   tasks: Task<D>[]
@@ -37,12 +49,10 @@ type CallbackErrorResult = {
   error: Error
 }
 
-
-export type Process<D> = (task: Task<D>, index: number) => Promise<
-  CallbackSuccessResult |
-  CallbackSkipResult |
-  CallbackErrorResult
->
+export type Process<D> = (
+  task: Task<D>,
+  index: number,
+) => Promise<CallbackSuccessResult | CallbackSkipResult | CallbackErrorResult>
 
 export interface UseTaskManagerAction<D = undefined> {
   append: (task: Task<D>[]) => void
@@ -71,7 +81,7 @@ export const useTaskManager = <D = undefined>(
         running: 0,
         success: 0,
         skip: 0,
-      }
+      },
     },
   })
 
@@ -203,7 +213,7 @@ export const useTaskManager = <D = undefined>(
         action,
         result: taskResult,
         summary: value.meta.summary,
-      }
+      },
     },
     action: {
       append,
@@ -215,17 +225,16 @@ export const useTaskManager = <D = undefined>(
 }
 
 const calcTaskResult = (tasks: Task[]): UseTaskManagerTaskResult => {
-
   if (tasks.length === 0) return "idle"
 
-  const success = tasks.filter(t => t.status === "success").length
-  const error = tasks.filter(t => t.status === "error").length
-  const running = tasks.filter(t => t.status === "running").length
-  const skip = tasks.filter(t => t.status === "skip").length
+  const success = tasks.filter((t) => t.status === "success").length
+  const error = tasks.filter((t) => t.status === "error").length
+  const running = tasks.filter((t) => t.status === "running").length
+  const skip = tasks.filter((t) => t.status === "skip").length
 
   if (running > 0 || skip > 0) return "running"
 
-  if ((success + skip) === tasks.length) return "success"
+  if (success + skip === tasks.length) return "success"
 
   if (error === tasks.length) return "error"
 

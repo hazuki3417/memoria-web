@@ -29,7 +29,6 @@ const initialState: TaskState<UploadData> = {
   },
 }
 
-
 const sampleTask: Task<UploadData> = {
   id: "upload-1",
   status: "idle",

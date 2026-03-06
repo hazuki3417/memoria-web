@@ -370,7 +370,10 @@ const Page = () => {
                       <PreviewImageBox
                         key={item.id}
                         ui={{
-                          selected: typeof selectable.find((value) => value === item.id) === "string",
+                          selected:
+                            typeof selectable.find(
+                              (value) => value === item.id,
+                            ) === "string",
                           selectable: mode === "bulk",
                         }}
                         onClick={() => {

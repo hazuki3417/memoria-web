@@ -20,7 +20,13 @@ import {
 } from "@mantine/core"
 import { nanoid } from "nanoid"
 import React, { useCallback, useEffect, useMemo } from "react"
-import { Controller, FieldErrors, useFieldArray, useForm, useWatch } from "react-hook-form"
+import {
+  Controller,
+  FieldErrors,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form"
 import { z } from "zod"
 import { ImageDropForm } from "./_components"
 
@@ -177,7 +183,7 @@ const Page = () => {
         return
       case "idle":
       default:
-        break;
+        break
     }
   }, [manager.value.meta.result])
 
@@ -358,13 +364,28 @@ const Page = () => {
               }}
             />
             <ButtonGroup>
-              <Button size="xs" type="button" disabled={disabled} onClick={handleAddTags}>
+              <Button
+                size="xs"
+                type="button"
+                disabled={disabled}
+                onClick={handleAddTags}
+              >
                 追加
               </Button>
-              <Button size="xs" type="button" disabled={disabled} onClick={handleRemoveTags}>
+              <Button
+                size="xs"
+                type="button"
+                disabled={disabled}
+                onClick={handleRemoveTags}
+              >
                 除去
               </Button>
-              <Button size="xs" type="button" disabled={disabled} onClick={handleReplaceTags}>
+              <Button
+                size="xs"
+                type="button"
+                disabled={disabled}
+                onClick={handleReplaceTags}
+              >
                 置換
               </Button>
             </ButtonGroup>
@@ -372,10 +393,21 @@ const Page = () => {
         </ActionPanel.Left>
         <ActionPanel.Right>
           <ButtonGroup>
-            <Button size="xs" type="submit" color="green" form="new-image" disabled={disabled}>
+            <Button
+              size="xs"
+              type="submit"
+              color="green"
+              form="new-image"
+              disabled={disabled}
+            >
               登録
             </Button>
-            <Button size="xs" type="button" disabled={disabled} onClick={handleRemoveFiles}>
+            <Button
+              size="xs"
+              type="button"
+              disabled={disabled}
+              onClick={handleRemoveFiles}
+            >
               すべて取消
             </Button>
           </ButtonGroup>
@@ -393,7 +425,7 @@ const Page = () => {
                     <Flex gap="xs">
                       <PreviewImageBox
                         ui={{
-                          outline: true
+                          outline: true,
                         }}
                       >
                         <Controller
@@ -402,9 +434,13 @@ const Page = () => {
                           render={({ field }) => {
                             const { value, ...rest } = field
                             return (
-                              <PreviewImageBox.SelectableCheckbox {...rest} checked={value} />
+                              <PreviewImageBox.SelectableCheckbox
+                                {...rest}
+                                checked={value}
+                              />
                             )
-                          }} />
+                          }}
+                        />
                         <Controller
                           control={methods.control}
                           name={`images.${index}.file`}
@@ -417,7 +453,6 @@ const Page = () => {
                             )
                           }}
                         />
-
                       </PreviewImageBox>
                       <Divider orientation="vertical" />
                       <Box
