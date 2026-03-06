@@ -1,6 +1,4 @@
 import React from "react"
-import { ImageFrame } from "./ImageFrame"
-import { ImageTile } from "./ImageTile"
 import { IntersectionTile } from "./IntersectionTile"
 
 export interface ImageProps {
@@ -12,6 +10,4 @@ export const Image = (props: ImageProps) => {
   return <>{children}</>
 }
 
-Image.Frame = ImageFrame
-Image.Tile = ImageTile
 Image.Intersection = IntersectionTile

@@ -406,13 +406,6 @@ const Page = () => {
                           alt={item.image.alt}
                         />
                       </PreviewImageBox>
-                      // FIX: Image.Tile, Image.FrameとpreviewImageBoxの実装が類似しているので共通化を検討する
-                      // <Image.Frame key={nanoid()}>
-                      //   <Image.Tile
-                      //     src={list.node.src.thumbnail}
-                      //     alt={list.node.info.file.name}
-                      //   />
-                      // </Image.Frame>
                     )
                   })}
                   {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
