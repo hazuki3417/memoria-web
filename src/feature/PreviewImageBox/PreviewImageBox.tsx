@@ -1,4 +1,4 @@
-import { Paper } from "@mantine/core"
+import { Box } from "@mantine/core"
 import React, { memo } from "react"
 import { Image } from "./Image"
 import { Label } from "./Label"
@@ -7,6 +7,7 @@ import { RemoveButton } from "./RemoveButton"
 import { SelectableCheckbox } from "./SelectableCheckbox"
 
 export type PreviewImageBoxUi = {
+  outline?: boolean
   selected?: boolean
   selectable?: boolean
   supported?: boolean
@@ -22,6 +23,7 @@ export interface PreviewImageBoxProps {
 export const PreviewImageBox = (props: PreviewImageBoxProps) => {
   const { children, ui, ...rest } = props
   const {
+    outline = false,
     selected = false,
     selectable = false,
     supported = true,
@@ -29,17 +31,18 @@ export const PreviewImageBox = (props: PreviewImageBoxProps) => {
   } = ui ?? {}
 
   return (
-    <Paper
+    <Box
+      bdrs="sm"
       className={classes.box}
       {...rest}
+      data-outline={outline}
       data-selected={supported ? selected : false}
       data-selectable={supported ? selectable : false}
       data-supported={supported}
       data-valid={supported ? valid : undefined}
-      data-testid="select-file"
     >
       {children}
-    </Paper>
+    </Box>
   )
 }
 

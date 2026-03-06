@@ -372,11 +372,8 @@ const Page = () => {
                       <PreviewImageBox
                         key={item.id}
                         ui={{
-                          selected:
-                            selectable.find((value) => value === item.id) !==
-                            undefined,
+                          selected: typeof selectable.find((value) => value === item.id) === "string",
                           selectable: mode === "bulk",
-                          supported: true,
                         }}
                         onClick={() => {
                           if (mode === "bulk") {
@@ -403,6 +400,7 @@ const Page = () => {
                         }}
                       >
                         <PreviewImageBox.Image
+                          bdrs="sm"
                           src={item.image.thumbnail}
                           alt={item.image.alt}
                         />

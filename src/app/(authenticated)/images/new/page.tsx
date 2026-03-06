@@ -325,18 +325,23 @@ const Page = () => {
               const task = manager.value.tasks[index]
               return (
                 <React.Fragment key={task.id}>
-                  <Box py="xs" pr="xs">
+                  <Box p="xs">
                     <Flex gap="xs">
                       <Controller
                         control={methods.control}
                         name={`images.${index}.file`}
                         render={({ field }) => {
                           return (
-                            <PreviewImageBox>
+                            <PreviewImageBox
+                              ui={{
+                                outline: true
+                              }}
+                            >
                               <PreviewImageBox.Image
                                 src={URL.createObjectURL(field.value)}
                                 alt={field.value.name}
                               />
+                              <PreviewImageBox.SelectableCheckbox />
                             </PreviewImageBox>
                           )
                         }}

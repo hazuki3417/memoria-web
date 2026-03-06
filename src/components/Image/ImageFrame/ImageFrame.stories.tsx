@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { fn, userEvent, within } from "@storybook/test"
 import { ImageTile } from "../ImageTile"
 import { ImageFrame } from "./ImageFrame"
 
@@ -17,13 +16,6 @@ export const Default: Story = {
   args: {
     children,
     ui: {},
-    handler: {
-      onClick: fn(),
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
 }
 
@@ -33,13 +25,6 @@ export const Selected: Story = {
     ui: {
       selected: true,
     },
-    handler: {
-      onClick: fn(),
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
 }
 
@@ -49,13 +34,6 @@ export const Selectable: Story = {
     ui: {
       selectable: true,
     },
-    handler: {
-      onClick: fn(),
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
 }
 
@@ -65,13 +43,6 @@ export const ValidAccept: Story = {
     ui: {
       valid: "accept",
     },
-    handler: {
-      onClick: fn(),
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
 }
 
@@ -81,13 +52,6 @@ export const ValidReject: Story = {
     ui: {
       valid: "reject",
     },
-    handler: {
-      onClick: fn(),
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
 }
 
@@ -97,12 +61,5 @@ export const ValidWarning: Story = {
     ui: {
       valid: "warning",
     },
-    handler: {
-      onClick: fn(),
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId("click-image-frame"))
   },
 }

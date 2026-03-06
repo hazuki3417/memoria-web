@@ -9,17 +9,12 @@ export const SelectableCheckbox = (props: SelectableCheckboxProps) => {
   return (
     <Checkbox
       size="18px"
+      color="blue"
       styles={(theme) => ({
         root: {
           position: "absolute",
           top: 8,
           left: 8,
-          // backgroundColor: theme.colors.gray[7],
-          // opacity: 0.2,
-          // transition: "opacity 0.2s",
-          // "&:hover": {
-          //   opacity: 1,
-          // },
         },
       })}
       {...rest}

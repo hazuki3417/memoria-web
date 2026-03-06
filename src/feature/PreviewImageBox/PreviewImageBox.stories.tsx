@@ -22,31 +22,20 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: {
-    ui: {
-      selected: false,
-      selectable: true,
-      supported: true,
-    },
-  },
 }
 
 export const Selected: Story = {
   args: {
     ui: {
       selected: true,
-      selectable: true,
-      supported: true,
     },
   },
 }
 
-export const NonSelectable: Story = {
+export const Selectable: Story = {
   args: {
     ui: {
-      selected: false,
-      selectable: false,
-      supported: true,
+      selectable: true,
     },
   },
 }
@@ -54,8 +43,6 @@ export const NonSelectable: Story = {
 export const UnSupported: Story = {
   args: {
     ui: {
-      selected: false,
-      selectable: false,
       supported: false,
     },
   },
@@ -64,9 +51,6 @@ export const UnSupported: Story = {
 export const ValidAccept: Story = {
   args: {
     ui: {
-      selected: false,
-      selectable: true,
-      supported: true,
       valid: "accept",
     },
   },
@@ -75,9 +59,6 @@ export const ValidAccept: Story = {
 export const ValidReject: Story = {
   args: {
     ui: {
-      selected: false,
-      selectable: true,
-      supported: true,
       valid: "reject",
     },
   },
@@ -86,10 +67,8 @@ export const ValidReject: Story = {
 export const ValidWarning: Story = {
   args: {
     ui: {
-      selected: false,
-      selectable: true,
-      supported: true,
       valid: "warning",
+      selectable: true
     },
   },
 }

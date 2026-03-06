@@ -5,56 +5,57 @@
   justify-content: center;
   height: 160px;
   width: 160px;
-  /* border-radius: var(--mantine-radius-sm); */
-  filter: brightness(0.9);
   transition: filter 0.2s ease;
   user-select: none;
+
+}
+
+/* 通常時のoutline有無を表現 */
+.box[data-outline="true"] {
+  background-color: var(--mantine-color-gray-light);
+  outline: 1px solid var(--mantine-color-gray-filled);
 }
 
 /* 選択可能状態を表現 */
-.box[data-selectable="true"]:hover {
-  filter: brightness(1);
-  cursor: pointer;
+.box[data-selectable="false"] {
+  cursor: default;
 }
 
-.box[data-selectable="false"] {
-  filter: brightness(1);
+.box[data-selectable="true"] {
+  cursor: pointer;
+  filter: brightness(0.9);
+}
+
+.box[data-selectable="true"]:hover {
+  cursor: pointer;
+  filter: brightness(1.1);
 }
 
 /* 選択状態を表現 */
 .box[data-selected="true"] {
-  filter: brightness(1);
-  /* outline: 1px solid var(--mantine-primary-color-filled); */
+  background-color: var(--mantine-color-green-light);
+  outline: 1px solid var(--mantine-color-green-filled);
+  filter: brightness(1.1);
 }
 
-/* サポート対象を表現 */
-.box[data-supported="true"] {}
 
 /* サポート対象外を表現 */
 .box[data-supported="false"] {
-  padding: 20px;
-  text-align: center;
-  border-color: var(--mantine-color-red-light-color);
   background-color: var(--mantine-color-red-light);
-  outline: 1px solid var(--mantine-color-red-light);
+  outline: 1px solid var(--mantine-color-red-filled);
 }
 
 .box[data-valid="accept"] {
-  border-color: var(--mantine-color-blue-light-color);
   background-color: var(--mantine-color-blue-light);
+  outline: 1px solid var(--mantine-color-blue-filled);
 }
 
 .box[data-valid="reject"] {
-  border-color: var(--mantine-color-red-light-color);
   background-color: var(--mantine-color-red-light);
-  cursor: no-drop;
+  outline: 1px solid var(--mantine-color-red-filled);
 }
 
 .box[data-valid="warning"] {
-  border-color: var(--mantine-color-yellow-light-color);
   background-color: var(--mantine-color-yellow-light);
-}
-
-.box[data-disabled="true"] {
-  cursor: no-drop;
+  outline: 1px solid var(--mantine-color-yellow-filled);
 }
