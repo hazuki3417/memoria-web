@@ -2,6 +2,7 @@
 import { ActionPanel, ButtonGroup } from "@/components"
 import { imageConfig } from "@/config"
 import { PreviewImageBox } from "@/feature"
+import { useUploadImageMutation, Visibility } from "@/graphql"
 import { useTaskManager } from "@/hooks"
 import { zod } from "@/lib"
 import { Task } from "@/reducers"
@@ -18,7 +19,7 @@ import {
 } from "@mantine/core"
 import { nanoid } from "nanoid"
 import React, { useCallback, useMemo } from "react"
-import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form"
+import { Controller, FieldErrors, useFieldArray, useForm, useWatch } from "react-hook-form"
 import { z } from "zod"
 import { ImageDropForm } from "./_components"
 
@@ -33,6 +34,7 @@ const fileSchema = zod.refine(
 const tagsSchema = z.array(z.string())
 
 const imageSchema = z.object({
+  selectable: z.boolean(),
   file: fileSchema,
   tags: tagsSchema,
 })
@@ -94,7 +96,7 @@ const Page = () => {
     },
   })
 
-  const { getValues, setValue } = methods
+  const { getValues, setValue, handleSubmit } = methods
 
   const watchValueImages = useWatch({
     control: methods.control,
@@ -106,33 +108,41 @@ const Page = () => {
     name: "images",
   })
 
-  // const [uploadImage] = useUploadImageMutation()
+  const [uploadImage] = useUploadImageMutation()
   const manager = useTaskManager({
     mode: "parallel",
     failOnError: false,
   })
 
-  // const submit = async () => {
-  //   await methods.handleSubmit(async (value, errors) => {
-  //     await task.action.submit(async (task, index) => {
-  //       const image = methods.getValues("images")[index]
-  //       await uploadImage({
-  //         variables: {
-  //           input: {
-  //             ...image,
-  //             visibility: Visibility.Private,
-  //           },
-  //         },
-  //       })
-  //     })
-  //   })()
-  // }
+  const inputValid = async (values: InputFormValues) => {
+    console.log("submit values:", values)
+    await manager.action.submit(async (task, index) => {
+      const image = values.images[index]
+      if (!image.selectable) {
+        return // skip
+      }
+      const result = await uploadImage({
+        variables: {
+          input: {
+            file: image.file,
+            tags: image.tags,
+            visibility: Visibility.Private,
+          },
+        },
+      })
+      console.debug("request result:", result)
+    })
+  }
+
+  const inputInvalid = async (errors: FieldErrors<InputFormValues>) => {
+    console.log("submit error:", errors)
+  }
 
   const addFiles = (files: FileList) => {
     const images: ImageValues[] = []
     const tasks: Task[] = []
     for (let i = 0; i < files.length; i++) {
-      images.push({ file: files[i], tags: [] })
+      images.push({ selectable: true, file: files[i], tags: [] })
       tasks.push({ id: nanoid(), status: "idle" })
     }
     append(images)
@@ -284,7 +294,6 @@ const Page = () => {
                   <TagsInput
                     size="xs"
                     flex="1"
-                    disabled={disabled}
                     styles={{
                       root: { height: "100%" },
                       wrapper: { height: "100%" },
@@ -298,26 +307,31 @@ const Page = () => {
               }}
             />
             <ButtonGroup>
-              <Button size="xs" disabled={disabled} onClick={handleAddTags}>
+              <Button size="xs" type="button" disabled={disabled} onClick={handleAddTags}>
                 追加
               </Button>
-              <Button size="xs" disabled={disabled} onClick={handleRemoveTags}>
+              <Button size="xs" type="button" disabled={disabled} onClick={handleRemoveTags}>
                 除去
               </Button>
-              <Button size="xs" disabled={disabled} onClick={handleReplaceTags}>
+              <Button size="xs" type="button" disabled={disabled} onClick={handleReplaceTags}>
                 置換
               </Button>
             </ButtonGroup>
           </Flex>
         </ActionPanel.Left>
         <ActionPanel.Right>
-          <Button size="xs" disabled={disabled} onClick={handleRemoveFiles}>
-            すべて取消
-          </Button>
+          <ButtonGroup>
+            <Button size="xs" type="submit" color="green" form="new-image" disabled={disabled}>
+              登録
+            </Button>
+            <Button size="xs" type="button" disabled={disabled} onClick={handleRemoveFiles}>
+              すべて取消
+            </Button>
+          </ButtonGroup>
         </ActionPanel.Right>
       </ActionPanel>
 
-      <Box>
+      <form id="new-image" onSubmit={handleSubmit(inputValid, inputInvalid)}>
         <Divider />
         <ScrollArea h={"500px"} scrollbarSize={6}>
           <Stack mb="xs" gap={0}>
@@ -327,25 +341,34 @@ const Page = () => {
                 <React.Fragment key={task.id}>
                   <Box p="xs">
                     <Flex gap="xs">
-                      <Controller
-                        control={methods.control}
-                        name={`images.${index}.file`}
-                        render={({ field }) => {
-                          return (
-                            <PreviewImageBox
-                              ui={{
-                                outline: true
-                              }}
-                            >
+                      <PreviewImageBox
+                        ui={{
+                          outline: true
+                        }}
+                      >
+                        <Controller
+                          control={methods.control}
+                          name={`images.${index}.selectable`}
+                          render={({ field }) => {
+                            const { value, ...rest } = field
+                            return (
+                              <PreviewImageBox.SelectableCheckbox {...rest} checked={value} />
+                            )
+                          }} />
+                        <Controller
+                          control={methods.control}
+                          name={`images.${index}.file`}
+                          render={({ field }) => {
+                            return (
                               <PreviewImageBox.Image
                                 src={URL.createObjectURL(field.value)}
                                 alt={field.value.name}
                               />
-                              <PreviewImageBox.SelectableCheckbox />
-                            </PreviewImageBox>
-                          )
-                        }}
-                      />
+                            )
+                          }}
+                        />
+
+                      </PreviewImageBox>
                       <Divider orientation="vertical" />
                       <Box
                         style={(theme) => ({
@@ -397,6 +420,7 @@ const Page = () => {
                       <Box style={{ display: "flex", alignItems: "center" }}>
                         <Button
                           size="xs"
+                          type="button"
                           onClick={() => removeFile(index, task.id)}
                         >
                           取消
@@ -411,7 +435,7 @@ const Page = () => {
           </Stack>
         </ScrollArea>
         <Divider />
-      </Box>
+      </form>
     </Box>
   )
 }

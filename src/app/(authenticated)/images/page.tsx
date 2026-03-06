@@ -43,16 +43,16 @@ import {
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
-import { Controller, FieldErrors, FormProvider, useForm } from "react-hook-form"
+import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
-const imageSearchFormSchema = z.object({
+const searchFormSchema = z.object({
   tags: z.array(z.string()),
 })
 
-type ImageSearchFormSchema = z.infer<typeof imageSearchFormSchema>
+type SearchFormValues = z.infer<typeof searchFormSchema>
 
-const imageSearchFormDefaultValues = createFormDefaults<ImageSearchFormSchema>({
+const searchFormDefaultValues = createFormDefaults<SearchFormValues>({
   tags: [],
 })
 
@@ -60,13 +60,13 @@ const TAB_ID_LIST = ["list", "group"] as const
 const TAB_FIELDS = defineFieldObject(TAB_ID_LIST)
 
 const Page = () => {
-  const query = useUriQuery<ImageSearchFormSchema>()
+  const query = useUriQuery<SearchFormValues>()
   const router = useRouter()
 
-  const methods = useForm<ImageSearchFormSchema>({
-    resolver: zodResolver(imageSearchFormSchema),
+  const methods = useForm<SearchFormValues>({
+    resolver: zodResolver(searchFormSchema),
     defaultValues: {
-      ...imageSearchFormDefaultValues({ ...query }),
+      ...searchFormDefaultValues({ ...query }),
     },
   })
   const { handleSubmit, control } = methods
@@ -153,12 +153,12 @@ const Page = () => {
     })
   }, [relay.state.edges])
 
-  const searchValid = async (values: ImageSearchFormSchema) => {
+  const searchValid = async (values: SearchFormValues) => {
     console.log("submit values:", values)
     router.push(resolveUriQuery({ ...values }))
   }
 
-  const searchInvalid = async (errors: FieldErrors<ImageSearchFormSchema>) => {
+  const searchInvalid = async (errors: FieldErrors<SearchFormValues>) => {
     console.log("submit error:", errors)
   }
 
@@ -254,32 +254,30 @@ const Page = () => {
           <ActionPanel mb="xs">
             <ActionPanel.Left>
               {mode === "filter" && (
-                <FormProvider {...methods}>
-                  <form
-                    onSubmit={handleSubmit(searchValid, searchInvalid)}
-                    style={{ flex: 1 }}
-                  >
-                    <Flex align="center" gap="xs" w="100%">
-                      <Controller
-                        name="tags"
-                        control={control}
-                        render={({ field }) => (
-                          <TagsInput
-                            {...field}
-                            size="xs"
-                            placeholder={t("placeholder.tag")}
-                            leftSection={<IconSearch size={16} />}
-                            clearable
-                            flex="1"
-                          />
-                        )}
-                      />
-                      <Button size="xs" type="submit">
-                        {t("button.search")}
-                      </Button>
-                    </Flex>
-                  </form>
-                </FormProvider>
+                <form
+                  onSubmit={handleSubmit(searchValid, searchInvalid)}
+                  style={{ flex: 1 }}
+                >
+                  <Flex align="center" gap="xs" w="100%">
+                    <Controller
+                      name="tags"
+                      control={control}
+                      render={({ field }) => (
+                        <TagsInput
+                          {...field}
+                          size="xs"
+                          placeholder={t("placeholder.tag")}
+                          leftSection={<IconSearch size={16} />}
+                          clearable
+                          flex="1"
+                        />
+                      )}
+                    />
+                    <Button size="xs" type="submit">
+                      {t("button.search")}
+                    </Button>
+                  </Flex>
+                </form>
               )}
               {mode === "bulk" && (
                 <Flex align="center" gap="xs">

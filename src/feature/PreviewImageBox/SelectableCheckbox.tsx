@@ -1,13 +1,15 @@
-import { Checkbox } from "@mantine/core"
+import { Checkbox, CheckboxProps } from "@mantine/core"
+import React from "react"
 
-export interface SelectableCheckboxProps {
-  onChange?: React.ChangeEventHandler<HTMLInputElement, HTMLInputElement>
+
+export interface SelectableCheckboxProps extends CheckboxProps {
 }
 
-export const SelectableCheckbox = (props: SelectableCheckboxProps) => {
+export const SelectableCheckbox = React.forwardRef<HTMLInputElement, SelectableCheckboxProps>((props, ref) => {
   const { ...rest } = props
   return (
     <Checkbox
+      ref={ref}
       size="18px"
       color="blue"
       styles={(theme) => ({
@@ -21,5 +23,5 @@ export const SelectableCheckbox = (props: SelectableCheckboxProps) => {
       data-testid="preview-image-box-selectable-checkbox"
     />
   )
-}
+})
 SelectableCheckbox.displayName = "PreviewImageBox.SelectableCheckbox"
