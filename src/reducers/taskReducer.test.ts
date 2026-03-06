@@ -17,7 +17,8 @@ const summary = {
   error: 0,
   idle: 0,
   running: 0,
-  success: 0
+  success: 0,
+  skip: 0,
 }
 
 const initialState: TaskState<UploadData> = {

@@ -1,6 +1,6 @@
 import { ActionType, assertUnreachableActionType } from "./util"
 
-export type TaskValue = "idle" | "running" | "success" | "error"
+export type TaskValue = "idle" | "running" | "success" | "error" | "skip"
 
 export type TaskSummary = Record<TaskValue, number> & {
   total: number
@@ -87,6 +87,7 @@ const calcSummary = <D>(tasks: Task<D>[]): TaskSummary => {
     running: 0,
     success: 0,
     error: 0,
+    skip: 0
   }
 
   for (const task of tasks) {
