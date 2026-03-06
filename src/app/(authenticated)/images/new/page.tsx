@@ -5,6 +5,7 @@ import { PreviewImageBox } from "@/feature"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { useTaskManager } from "@/hooks"
 import { zod } from "@/lib"
+import { wait } from "@/lib/wait"
 import { useFeedbackContext } from "@/providers"
 import { Task } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -13,6 +14,7 @@ import {
   Button,
   Divider,
   Flex,
+  Progress,
   ScrollArea,
   Stack,
   TagsInput,
@@ -41,7 +43,7 @@ const fileSchema = zod.refine(
 const tagsSchema = z.array(z.string())
 
 const imageSchema = z.object({
-  id: z.string(),
+  taskId: z.string(),
   selectable: z.boolean(),
   file: fileSchema,
   tags: tagsSchema,
@@ -126,7 +128,7 @@ const Page = () => {
   const inputValid = async (values: InputFormValues) => {
     console.log("submit values:", values)
     await manager.action.submit(async (task) => {
-      const image = values.images.find((image) => task.id === image.id)
+      const image = values.images.find((image) => task.id === image.taskId)
 
       if (!image) {
         return { status: "error", error: Error("image form data not found.") }
@@ -135,6 +137,8 @@ const Page = () => {
       if (!image.selectable) {
         return { status: "skip" }
       }
+
+      await wait(1)
 
       await uploadImage({
         variables: {
@@ -166,6 +170,7 @@ const Page = () => {
           title: "登録",
           body: "正常に終了しました。",
         })
+        // resetFiles()
         // form reset （アイテムのみ）
         return
       case "partial-success":
@@ -189,17 +194,18 @@ const Page = () => {
 
   useEffect(() => {
     console.debug("debug task manager", {
+      images: watchValueImages,
       tasks: manager.value.tasks,
       summary: manager.value.meta.summary,
     })
-  }, [manager.value.tasks])
+  }, [manager.value.tasks, watchValueImages])
 
   const addFiles = (files: FileList) => {
     const images: ImageValues[] = []
     const tasks: Task[] = []
     for (let i = 0; i < files.length; i++) {
       const id = nanoid()
-      images.push({ id, selectable: true, file: files[i], tags: [] })
+      images.push({ taskId: id, selectable: true, file: files[i], tags: [] })
       tasks.push({ id, status: "idle" })
     }
     append(images)
@@ -209,6 +215,11 @@ const Page = () => {
   const removeFile = (index: number, id: string) => {
     remove(index)
     manager.action.remove([id])
+  }
+
+  const resetFiles = () => {
+    replace([])
+    manager.action.reset()
   }
 
   const handleAddTags = () => {
@@ -274,52 +285,35 @@ const Page = () => {
     return "idle"
   }, [methods, fields, watchValueImages])
 
-  const disabled = fields.length === 0
 
-  // const previews = fields.map((preview, index) => {
-  //   const task = task.value.tasks[index]
-  //   return (
-  //     <Controller
-  //       key={preview.id}
-  //       control={methods.control}
-  //       name={`images.${index}.file`}
-  //       render={({ field, fieldState }) => {
-  //         const rhfFieldState = rhf.fieldState(fieldState)
-  //         return (
-  //           <ImageDropForm.PreviewImageBox
-  //             key={preview.id}
-  //             index={index}
-  //             id={task.id}
-  //             payload={{
-  //               src: URL.createObjectURL(field.value),
-  //               alt: field.value.name,
-  //             }}
-  //             ui={{
-  //               selected:
-  //                 formSwitcher.state.mode === MODE.TYPE.SINGLE
-  //                   ? selected === index
-  //                   : false,
-  //               selectable: formSwitcher.state.mode === MODE.TYPE.SINGLE,
-  //               supported: !rhfFieldState.error.message.match(
-  //                 "validate.file.type.unsupported",
-  //               ),
-  //               valid: rhfFieldState.error.message.match(
-  //                 "validate.file.size.tooLarge",
-  //               )
-  //                 ? "warning"
-  //                 : "idle",
-  //               error: rhfFieldState.error.message.resolver(locale.t),
-  //             }}
-  //             handler={{
-  //               onSelect: handleFileSelected,
-  //               onRemove: fileRemove,
-  //             }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //   )
-  // })
+  const bulkFormDisabled = (() => {
+    if (fields.length === 0) {
+      return true
+    }
+  })()
+
+  const allFormDisabled = (() => {
+    if (manager.value.meta.result === "running") {
+      return true
+    }
+    return false
+  })()
+
+  const progres = useMemo(() => {
+    const { total, success, error, skip } = manager.value.meta.summary
+    return {
+      value: {
+        success: total === 0 ? 0 : (success / total) * 100,
+        error: total === 0 ? 0 : (error / total) * 100,
+        skip: total === 0 ? 0 : (skip / total) * 100,
+      },
+      count: {
+        success,
+        skip,
+        error,
+      }
+    }
+  }, [manager.value.tasks])
 
   return (
     <Box>
@@ -359,6 +353,7 @@ const Page = () => {
                     {...field}
                     placeholder="タグ"
                     clearable
+                    disabled={allFormDisabled}
                   />
                 )
               }}
@@ -367,7 +362,7 @@ const Page = () => {
               <Button
                 size="xs"
                 type="button"
-                disabled={disabled}
+                disabled={allFormDisabled || bulkFormDisabled}
                 onClick={handleAddTags}
               >
                 追加
@@ -375,7 +370,7 @@ const Page = () => {
               <Button
                 size="xs"
                 type="button"
-                disabled={disabled}
+                disabled={allFormDisabled || bulkFormDisabled}
                 onClick={handleRemoveTags}
               >
                 除去
@@ -383,7 +378,7 @@ const Page = () => {
               <Button
                 size="xs"
                 type="button"
-                disabled={disabled}
+                disabled={allFormDisabled || bulkFormDisabled}
                 onClick={handleReplaceTags}
               >
                 置換
@@ -398,14 +393,14 @@ const Page = () => {
               type="submit"
               color="green"
               form="new-image"
-              disabled={disabled}
+              disabled={allFormDisabled || bulkFormDisabled}
             >
               登録
             </Button>
             <Button
               size="xs"
               type="button"
-              disabled={disabled}
+              disabled={allFormDisabled || bulkFormDisabled}
               onClick={handleRemoveFiles}
             >
               すべて取消
@@ -415,10 +410,34 @@ const Page = () => {
       </ActionPanel>
 
       <form id="new-image" onSubmit={handleSubmit(inputValid, inputInvalid)}>
+        <Box mb="xs">
+          <Progress.Root size="sm" radius="xs">
+            <Progress.Section styles={{
+              section: {
+                transition: "width 300ms ease"
+              }
+            }} value={progres.value.success} color="blue">
+            </Progress.Section>
+            <Progress.Section styles={{
+              section: {
+                transition: "width 300ms ease"
+              }
+            }} value={progres.value.skip} color="yellow">
+            </Progress.Section>
+            <Progress.Section styles={{
+              section: {
+                transition: "width 300ms ease"
+              }
+            }} value={progres.value.error} color="red">
+            </Progress.Section>
+          </Progress.Root>
+        </Box>
         <Divider />
         <ScrollArea h={"500px"} scrollbarSize={6}>
           <Stack mb="xs" gap={0}>
             {fields.map((image, index) => {
+              const task = manager.value.tasks.find((task) => image.taskId === task.id)
+              const itemDisabled = task?.status === "success"
               return (
                 <React.Fragment key={image.id}>
                   <Box p="xs">
@@ -431,6 +450,7 @@ const Page = () => {
                         <Controller
                           control={methods.control}
                           name={`images.${index}.selectable`}
+                          disabled={allFormDisabled || itemDisabled}
                           render={({ field }) => {
                             const { value, ...rest } = field
                             return (
@@ -484,6 +504,7 @@ const Page = () => {
                           <Controller
                             control={methods.control}
                             name={`images.${index}.tags`}
+                            disabled={allFormDisabled || itemDisabled}
                             render={({ field }) => {
                               return (
                                 <TagsInput
@@ -506,6 +527,7 @@ const Page = () => {
                         <Button
                           size="xs"
                           type="button"
+                          disabled={allFormDisabled}
                           onClick={() => removeFile(index, image.id)}
                         >
                           取消
