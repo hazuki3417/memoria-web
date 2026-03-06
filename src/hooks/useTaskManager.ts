@@ -102,33 +102,31 @@ export const useTaskManager = <D = undefined>(
 
   const serial = async (callback: Process<D>) => {
     const tasks = value.current.tasks
-    for (const [index, task] of tasks.entries()) {
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i]
       if (task.status === "success") continue
-      await runner(task, index, callback)
+      await runner(task, i, callback)
     }
   }
 
   const parallel = async (callback: Process<D>) => {
     const tasks = value.current.tasks
-    const promises = tasks.map(async (task, index) => {
-      if (task.status === "success") return
-      await runner(task, index, callback)
-    })
-    return await Promise.all(promises)
+    const promises = tasks
+      .filter((task) => task.status !== "success")
+      .map((task, index) => {
+        runner(task, index, callback)
+      })
+    return await Promise.allSettled(promises)
   }
 
   const submit = async (process: Process<D>) => {
     setAction("submit")
-    try {
-      if (option.mode === "serial") {
-        await serial(process)
-      } else if (option.mode === "parallel") {
-        await parallel(process)
-      } else {
-        throw new Error(`Unknown execution mode: ${option.mode}`)
-      }
-    } catch (e) {
-      throw e
+    if (option.mode === "serial") {
+      await serial(process)
+    } else if (option.mode === "parallel") {
+      await parallel(process)
+    } else {
+      throw new Error(`Unknown execution mode: ${option.mode}`)
     }
   }
 
