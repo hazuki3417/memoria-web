@@ -1,10 +1,12 @@
 "use client"
+import { FieldValid } from "@/components"
 import { imageConfig } from "@/config"
 import { ThumbnailImage } from "@/feature"
 import { zod } from "@/lib"
 import { Box, Button, Divider, Flex, TagsInput, Text } from "@mantine/core"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
 import z from "zod"
+import classes from "./ImageItem.module.css"
 
 export const fileSchema = zod.refine(
   z.custom<File>((file) => file instanceof File),
@@ -18,7 +20,7 @@ export const tagsSchema = z.array(z.string())
 
 export const imageSchema = z.object({
   taskId: z.string(),
-  selectable: z.boolean(),
+  selected: z.boolean(),
   file: fileSchema,
   tags: tagsSchema,
 })
@@ -31,14 +33,21 @@ export const imageItemSchema = z.object({
 
 export type ImageItemValues = z.infer<typeof imageItemSchema>
 
+export type ImageItemUi = {
+  selected?: boolean
+  valid?: FieldValid
+}
+
 export interface ImageItemProps {
   index: number
   disabled?: boolean
   onRemove?: (index: number, taskId: string) => void
+  ui?: ImageItemUi
 }
 
 export const ImageItem = (props: ImageItemProps) => {
-  const { index, disabled = false, onRemove } = props
+  const { index, disabled = false, onRemove, ui } = props
+  const { selected, valid = "idle" } = ui ?? {}
   const { control } = useFormContext<ImageItemValues>()
   const image = useWatch({
     control,
@@ -46,7 +55,12 @@ export const ImageItem = (props: ImageItemProps) => {
   })
 
   return (
-    <Box p="xs">
+    <Box
+      className={classes.box}
+      data-selected={selected}
+      data-valid={valid}
+      data-disabled={disabled}
+    >
       <Flex gap="xs">
         <ThumbnailImage
           ui={{
@@ -55,7 +69,7 @@ export const ImageItem = (props: ImageItemProps) => {
         >
           <Controller
             control={control}
-            name={`images.${index}.selectable`}
+            name={`images.${index}.selected`}
             disabled={disabled}
             render={({ field }) => {
               const { value, ...rest } = field
@@ -132,7 +146,7 @@ export const ImageItem = (props: ImageItemProps) => {
             type="button"
             onClick={() => onRemove?.(index, image.taskId)}
           >
-            取消
+            消去
           </Button>
         </Box>
       </Flex>

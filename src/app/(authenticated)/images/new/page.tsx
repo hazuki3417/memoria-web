@@ -1,11 +1,11 @@
 "use client"
-import { ActionPanel, ButtonGroup } from "@/components"
+import { ActionPanel, ButtonGroup, FieldValid } from "@/components"
 import { imageConfig } from "@/config"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { useTaskManager } from "@/hooks"
 import { wait } from "@/lib/wait"
 import { useFeedbackContext } from "@/providers"
-import { Task } from "@/reducers"
+import { Task, TaskValue } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Box,
@@ -118,7 +118,7 @@ const Page = () => {
         return { status: "error", error: Error("image form data not found.") }
       }
 
-      if (!image.selectable) {
+      if (!image.selected) {
         return { status: "skip" }
       }
 
@@ -189,7 +189,7 @@ const Page = () => {
     const tasks: Task[] = []
     for (let i = 0; i < files.length; i++) {
       const id = nanoid()
-      images.push({ taskId: id, selectable: true, file: files[i], tags: [] })
+      images.push({ taskId: id, selected: true, file: files[i], tags: [] })
       tasks.push({ id, status: "idle" })
     }
     append(images)
@@ -366,7 +366,7 @@ const Page = () => {
               disabled={allFormDisabled || bulkFormDisabled}
               onClick={handleRemoveFiles}
             >
-              すべて取消
+              すべて消去
             </Button>
           </ButtonGroup>
         </ActionPanel.Right>
@@ -388,7 +388,7 @@ const Page = () => {
               }}
               value={progres.value.success}
               color="blue"
-            ></Progress.Section>
+            />
             <Progress.Section
               styles={{
                 section: {
@@ -397,7 +397,7 @@ const Page = () => {
               }}
               value={progres.value.skip}
               color="yellow"
-            ></Progress.Section>
+            />
             <Progress.Section
               styles={{
                 section: {
@@ -406,7 +406,7 @@ const Page = () => {
               }}
               value={progres.value.error}
               color="red"
-            ></Progress.Section>
+            />
           </Progress.Root>
         </Box>
         <Divider />
@@ -420,6 +420,10 @@ const Page = () => {
               <React.Fragment key={image.id}>
                 <ImageInputForm.ImageItem
                   index={index}
+                  ui={{
+                    selected: image.selected,
+                    valid: calcTaskValid(task?.status),
+                  }}
                   disabled={allFormDisabled || itemDisabled}
                   onRemove={removeFile}
                 />
@@ -434,6 +438,20 @@ const Page = () => {
 }
 
 export default Page
+
+const calcTaskValid = (status: TaskValue | undefined): FieldValid => {
+  switch (status) {
+    case "success":
+      return "accept"
+    case "error":
+      return "reject"
+    case "skip":
+    case "idle":
+    case "running":
+    default:
+      return "idle"
+  }
+}
 
 /**
  * 入力タグを元の配列に追加する（重複なし）

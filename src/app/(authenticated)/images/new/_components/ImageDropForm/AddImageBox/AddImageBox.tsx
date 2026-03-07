@@ -1,3 +1,4 @@
+import { FieldValid } from "@/components"
 import { Box, BoxProps, List, Stack } from "@mantine/core"
 import { IconPhotoPlus } from "@tabler/icons-react"
 import React, { useRef } from "react"
@@ -15,7 +16,7 @@ export type AddImageBoxPayload = {
 }
 
 export type AddImageBoxUi = {
-  valid?: "idle" | "accept" | "warning" | "reject"
+  valid?: FieldValid
 }
 
 export interface AddImageBoxProps

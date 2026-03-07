@@ -1,10 +1,11 @@
+import { FieldValid } from "@/components"
 import { Box, BoxProps } from "@mantine/core"
 import React, { useState } from "react"
 import { AddImageBox } from "./AddImageBox"
 import classes from "./ImageDropForm.module.css"
 
 export type ImageDropFormUi = {
-  valid?: "idle" | "accept" | "warning" | "reject"
+  valid?: FieldValid
 }
 
 export interface ImageDropFormProps

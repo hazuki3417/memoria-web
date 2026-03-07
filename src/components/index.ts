@@ -7,3 +7,5 @@ export * from "./FormTextInput"
 export * from "./Image"
 export * from "./ImageLayout"
 export * from "./Toggle"
+
+export * from "./type"

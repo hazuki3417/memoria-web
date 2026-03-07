@@ -1,3 +1,4 @@
+import { FieldValid } from "@/components"
 import { Box } from "@mantine/core"
 import React, { memo } from "react"
 import { Image } from "./Image"
@@ -11,7 +12,7 @@ export type ThumbnailImageUi = {
   selected?: boolean
   selectable?: boolean
   supported?: boolean
-  valid?: "idle" | "accept" | "warning" | "reject"
+  valid?: FieldValid
 }
 
 export interface ThumbnailImageProps {

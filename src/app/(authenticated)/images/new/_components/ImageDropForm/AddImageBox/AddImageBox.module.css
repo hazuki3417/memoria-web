@@ -17,17 +17,14 @@
 
 .box[data-valid="accept"] {
   background-color: var(--mantine-color-blue-light);
-  outline: 1px solid var(--mantine-color-blue-filled);
 }
 
 .box[data-valid="reject"] {
   background-color: var(--mantine-color-red-light);
-  outline: 1px solid var(--mantine-color-red-filled);
 }
 
 .box[data-valid="warning"] {
   background-color: var(--mantine-color-yellow-light);
-  outline: 1px solid var(--mantine-color-yellow-filled);
 }
 
 .box[data-disabled="true"] {
