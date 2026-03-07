@@ -5,34 +5,33 @@
   justify-content: center;
   height: 160px;
   width: 160px;
-  border-radius: var(--mantine-radius-sm);
-  filter: brightness(1);
   transition: filter 0.2s ease;
   user-select: none;
-  cursor: pointer;
+  background-color: var(--mantine-color-gray-light);
+  outline: 1px solid var(--mantine-color-gray-filled);
 }
 
 .box:hover {
-  filter: brightness(0.9);
   cursor: pointer;
+  filter: brightness(1.1);
 }
 
 .box[data-valid="accept"] {
-  border-color: var(--mantine-color-blue-light-color);
   background-color: var(--mantine-color-blue-light);
+  outline: 1px solid var(--mantine-color-blue-filled);
 }
 
 .box[data-valid="reject"] {
-  border-color: var(--mantine-color-red-light-color);
   background-color: var(--mantine-color-red-light);
-  cursor: no-drop;
+  outline: 1px solid var(--mantine-color-red-filled);
 }
 
 .box[data-valid="warning"] {
-  border-color: var(--mantine-color-yellow-light-color);
   background-color: var(--mantine-color-yellow-light);
+  outline: 1px solid var(--mantine-color-yellow-filled);
 }
 
 .box[data-disabled="true"] {
   cursor: no-drop;
+  filter: brightness(0.6);
 }

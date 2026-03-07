@@ -328,10 +328,10 @@ const Page = () => {
         <ImageDropForm.AddImageBox
           ui={{
             valid: imageDropFormValid,
-            disabled: imageDropFormDisabled,
           }}
+          disabled={imageDropFormDisabled}
           onFileSelect={handleFileSelect}
-          config={imageConfig}
+          payload={imageConfig}
         />
       </ImageDropForm>
       <ActionPanel mb="sm">

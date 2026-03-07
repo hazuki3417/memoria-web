@@ -1,42 +1,42 @@
-import { viewConfig } from "@/config"
-import { format } from "@/lib"
-import { List, Paper, Stack } from "@mantine/core"
+import { Box, BoxProps, List, Stack } from "@mantine/core"
 import { IconPhotoPlus } from "@tabler/icons-react"
 import React, { useRef } from "react"
 import classes from "./AddImageBox.module.css"
 
-export type AddImageBoxConfig = {
+export type AddImageBoxPayload = {
   count: {
     max: number
   }
   size: {
     max: number
-    total: number
   }
-  type: string[]
+  accept?: string
+  type?: string[]
 }
 
 export type AddImageBoxUi = {
   valid?: "idle" | "accept" | "warning" | "reject"
+}
+
+export interface AddImageBoxProps extends BoxProps {
+  payload: AddImageBoxPayload
+  onFileSelect?: (files: FileList | null) => void
+  ui?: AddImageBoxUi
   disabled?: boolean
 }
 
-export interface AddImageBoxProps {
-  ui: AddImageBoxUi
-  onFileSelect?: (files: FileList | null) => void
-  config: AddImageBoxConfig
-}
-
 export const AddImageBox = (props: AddImageBoxProps) => {
-  const { config, ui, onFileSelect } = props
+  const { payload, ui, onFileSelect, disabled = false } = props
+  const { valid = "idle" } = ui ?? {}
+  const { count, size, accept = "image/*", type = ["jpeg", "png"] } = payload
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleClick = () => {
-    if (ui?.disabled) {
+    if (disabled) {
       return
     }
 
-    if (ui?.valid === "reject") {
+    if (valid === "reject") {
       return
     }
 
@@ -45,24 +45,19 @@ export const AddImageBox = (props: AddImageBoxProps) => {
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (ui.disabled) {
+    if (disabled) {
       return
     }
     onFileSelect?.(event.target.files)
   }
 
-  const size = format.file.size(config.size.max, {
-    decimals: 0,
-    unit: viewConfig.file.size.unit,
-  })
-
   return (
-    <Paper
+    <Box
+      bdrs="sm"
       className={classes.box}
       onClick={handleClick}
-      data-valid={ui?.valid}
-      data-disabled={ui?.disabled}
-      data-testid="add-file"
+      data-valid={valid}
+      data-disabled={disabled}
     >
       <input
         ref={inputRef}
@@ -82,14 +77,12 @@ export const AddImageBox = (props: AddImageBoxProps) => {
         <IconPhotoPlus size={40} />
         <List size="xs">
           <List.Item>
-            {config.type
-              .map((value) => value.replace("image/", ""))
-              .join(" / ")}
+            {type.join(" / ")}
           </List.Item>
-          <List.Item>{`${size.value} ${size.unit} / 1件`}</List.Item>
-          <List.Item>{`最大 ${config.count.max} 枚`}</List.Item>
+          <List.Item>{`${size.max} / 1件`}</List.Item>
+          <List.Item>{`最大 ${count.max} 件`}</List.Item>
         </List>
       </Stack>
-    </Paper>
+    </Box>
   )
 }
