@@ -1,10 +1,8 @@
 "use client"
 import { ActionPanel, ButtonGroup } from "@/components"
 import { imageConfig } from "@/config"
-import { ThumbnailImage } from "@/feature"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { useTaskManager } from "@/hooks"
-import { zod } from "@/lib"
 import { wait } from "@/lib/wait"
 import { useFeedbackContext } from "@/providers"
 import { Task } from "@/reducers"
@@ -15,10 +13,8 @@ import {
   Divider,
   Flex,
   Progress,
-  ScrollArea,
   Stack,
   TagsInput,
-  Text,
 } from "@mantine/core"
 import { nanoid } from "nanoid"
 import React, { useCallback, useEffect, useMemo } from "react"
@@ -30,34 +26,22 @@ import {
   useWatch,
 } from "react-hook-form"
 import { z } from "zod"
+import {
+  ImageInputForm,
+  imageItemSchema,
+  ImageValues,
+  tagsSchema,
+} from "../_components"
 import { ImageDropForm } from "./_components"
-
-const fileSchema = zod.refine(
-  z.custom<File>((file) => file instanceof File),
-  [
-    zod.validate.file.type(imageConfig.type),
-    zod.validate.file.size.tooLarge(imageConfig.size.max),
-  ],
-)
-
-const tagsSchema = z.array(z.string())
-
-const imageSchema = z.object({
-  taskId: z.string(),
-  selectable: z.boolean(),
-  file: fileSchema,
-  tags: tagsSchema,
-})
-type ImageValues = z.infer<typeof imageSchema>
 
 const inputFormSchema = z.object({
   bulk: z.object({
     tags: tagsSchema,
   }),
-  images: z.array(imageSchema).max(imageConfig.count.max),
+  ...imageItemSchema.shape,
 })
 
-type InputFormValues = z.infer<typeof inputFormSchema>
+type ImageInputFormValues = z.infer<typeof inputFormSchema>
 
 /**
  * NOTE: 仕様
@@ -95,7 +79,7 @@ type InputFormValues = z.infer<typeof inputFormSchema>
  *       ユースケースを洗い出して検討した方が良さそう
  */
 const Page = () => {
-  const methods = useForm<InputFormValues>({
+  const methods = useForm<ImageInputFormValues>({
     resolver: zodResolver(inputFormSchema),
     mode: "onChange",
     defaultValues: {
@@ -125,7 +109,7 @@ const Page = () => {
     mode: "parallel",
   })
 
-  const inputValid = async (values: InputFormValues) => {
+  const inputValid = async (values: ImageInputFormValues) => {
     console.log("submit values:", values)
     await manager.action.submit(async (task) => {
       const image = values.images.find((image) => task.id === image.taskId)
@@ -153,7 +137,7 @@ const Page = () => {
     })
   }
 
-  const inputInvalid = async (errors: FieldErrors<InputFormValues>) => {
+  const inputInvalid = async (errors: FieldErrors<ImageInputFormValues>) => {
     console.log("submit error:", errors)
   }
 
@@ -388,7 +372,12 @@ const Page = () => {
         </ActionPanel.Right>
       </ActionPanel>
 
-      <form id="new-image" onSubmit={handleSubmit(inputValid, inputInvalid)}>
+      <ImageInputForm
+        methods={methods}
+        id="new-image"
+        submitValid={inputValid}
+        submitInvalid={inputInvalid}
+      >
         <Box mb="xs">
           <Progress.Root size="sm" radius="xs">
             <Progress.Section
@@ -421,118 +410,25 @@ const Page = () => {
           </Progress.Root>
         </Box>
         <Divider />
-        <ScrollArea h={"500px"} scrollbarSize={6}>
-          <Stack mb="xs" gap={0}>
-            {fields.map((image, index) => {
-              const task = manager.value.tasks.find(
-                (task) => image.taskId === task.id,
-              )
-              const itemDisabled = task?.status === "success"
-              return (
-                <React.Fragment key={image.id}>
-                  <Box p="xs">
-                    <Flex gap="xs">
-                      <ThumbnailImage
-                        ui={{
-                          outline: true,
-                        }}
-                      >
-                        <Controller
-                          control={methods.control}
-                          name={`images.${index}.selectable`}
-                          disabled={allFormDisabled || itemDisabled}
-                          render={({ field }) => {
-                            const { value, ...rest } = field
-                            return (
-                              <ThumbnailImage.SelectableCheckbox
-                                {...rest}
-                                checked={value}
-                              />
-                            )
-                          }}
-                        />
-                        <Controller
-                          control={methods.control}
-                          name={`images.${index}.file`}
-                          render={({ field }) => {
-                            return (
-                              <ThumbnailImage.Image
-                                src={URL.createObjectURL(field.value)}
-                                alt={field.value.name}
-                              />
-                            )
-                          }}
-                        />
-                      </ThumbnailImage>
-                      <Divider orientation="vertical" />
-                      <Box
-                        style={(theme) => ({
-                          display: "grid",
-                          gridTemplateColumns: "auto 1fr",
-                          gridTemplateRows: "auto auto 1fr",
-                          flex: 1,
-                          gap: theme.spacing.xs,
-                          alignContent: "start",
-                        })}
-                      >
-                        <Box>
-                          <Text size="xs">ファイル名</Text>
-                        </Box>
-                        <Box>
-                          <Text size="xs">{image.file.name}</Text>
-                        </Box>
-                        <Box>
-                          <Text size="xs">ファイルサイズ</Text>
-                        </Box>
-                        <Box>
-                          <Text size="xs">{image.file.size}</Text>
-                        </Box>
-                        <Box>
-                          <Text size="xs">タグ</Text>
-                        </Box>
-                        <Box>
-                          <Controller
-                            control={methods.control}
-                            name={`images.${index}.tags`}
-                            disabled={allFormDisabled || itemDisabled}
-                            render={({ field }) => {
-                              return (
-                                <TagsInput
-                                  size="xs"
-                                  styles={{
-                                    root: { height: "100%" },
-                                    wrapper: { height: "100%" },
-                                    input: { height: "100%" },
-                                  }}
-                                  {...field}
-                                  clearable
-                                />
-                              )
-                            }}
-                          />
-                        </Box>
-                      </Box>
-                      <Divider orientation="vertical" />
-                      <Box style={{ display: "flex", alignItems: "center" }}>
-                        <Button
-                          size="xs"
-                          type="button"
-                          disabled={allFormDisabled}
-                          onClick={() => removeFile(index, image.id)}
-                        >
-                          取消
-                        </Button>
-                      </Box>
-                    </Flex>
-                  </Box>
-                  <Divider />
-                </React.Fragment>
-              )
-            })}
-          </Stack>
-        </ScrollArea>
-        <Divider />
-      </form>
+        <Stack mb="xs" gap={0}>
+          {fields.map((image, index) => {
+            const task = manager.value.tasks.find(
+              (task) => image.taskId === task.id,
+            )
+            const itemDisabled = task?.status === "success"
+            return (
+              <React.Fragment key={image.id}>
+                <ImageInputForm.ImageItem
+                  index={index}
+                  disabled={allFormDisabled || itemDisabled}
+                  onRemove={removeFile}
+                />
+                <Divider />
+              </React.Fragment>
+            )
+          })}
+        </Stack>
+      </ImageInputForm>
     </Box>
   )
 }
