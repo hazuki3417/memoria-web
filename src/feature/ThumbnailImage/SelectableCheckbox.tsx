@@ -1,7 +1,7 @@
 import { Checkbox, CheckboxProps } from "@mantine/core"
 import React from "react"
 
-export interface SelectableCheckboxProps extends CheckboxProps { }
+export interface SelectableCheckboxProps extends CheckboxProps {}
 
 export const SelectableCheckbox = React.forwardRef<
   HTMLInputElement,

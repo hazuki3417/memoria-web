@@ -1,5 +1,11 @@
 "use client"
-import { ActionPanel, ButtonGroup, Image, ImageLayout, LinkButton } from "@/components"
+import {
+  ActionPanel,
+  ButtonGroup,
+  Image,
+  ImageLayout,
+  LinkButton,
+} from "@/components"
 import { ThumbnailImage } from "@/feature"
 import {
   useDeleteImagesMutation,

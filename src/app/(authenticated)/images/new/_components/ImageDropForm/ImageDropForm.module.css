@@ -1,31 +1,30 @@
-.droparea {
-  height: auto;
-  min-height: 368px;
-  border-radius: var(--mantine-radius-sm);
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: inherit;
   padding: var(--mantine-spacing-md);
   background-color: var(--mantine-color-dark-6);
-  border-color: var(--mantine-color-dark-4);
-  border-style: dashed;
-  border-width: 1px;
-  margin-bottom: 5px;
+  border: 1px dashed var(--mantine-color-dark-4);
+  border-radius: var(--mantine-radius-sm);
 }
 
-.droparea[data-valid="accept"] {
-  border-color: var(--mantine-color-blue-light-color);
+.box[data-valid="accept"] {
   background-color: var(--mantine-color-blue-light);
+  outline: 1px solid var(--mantine-color-blue-filled);
 }
 
-.droparea[data-valid="reject"] {
-  border-color: var(--mantine-color-red-light-color);
+.box[data-valid="reject"] {
   background-color: var(--mantine-color-red-light);
-  cursor: no-drop;
+  outline: 1px solid var(--mantine-color-red-filled);
 }
 
-.droparea[data-valid="warning"] {
-  border-color: var(--mantine-color-yellow-light-color);
+.box[data-valid="warning"] {
   background-color: var(--mantine-color-yellow-light);
+  outline: 1px solid var(--mantine-color-yellow-filled);
 }
 
-.droparea[data-disabled="true"] {
+.box[data-disabled="true"] {
   cursor: no-drop;
+  filter: brightness(0.6);
 }

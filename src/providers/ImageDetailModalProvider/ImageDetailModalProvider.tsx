@@ -138,7 +138,7 @@ export const ImageDetailModalProvider = (
                   fileName: downloadUrl.fileName,
                 })
               },
-              onEdit: () => { },
+              onEdit: () => {},
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

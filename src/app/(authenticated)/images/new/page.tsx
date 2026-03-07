@@ -285,7 +285,6 @@ const Page = () => {
     return "idle"
   }, [methods, fields, watchValueImages])
 
-
   const bulkFormDisabled = (() => {
     if (fields.length === 0) {
       return true
@@ -311,7 +310,7 @@ const Page = () => {
         success,
         skip,
         error,
-      }
+      },
     }
   }, [manager.value.tasks])
 
@@ -329,7 +328,7 @@ const Page = () => {
           ui={{
             valid: imageDropFormValid,
           }}
-          disabled={imageDropFormDisabled}
+          disabled={true}
           onFileSelect={handleFileSelect}
           payload={imageConfig}
         />
@@ -412,31 +411,42 @@ const Page = () => {
       <form id="new-image" onSubmit={handleSubmit(inputValid, inputInvalid)}>
         <Box mb="xs">
           <Progress.Root size="sm" radius="xs">
-            <Progress.Section styles={{
-              section: {
-                transition: "width 300ms ease"
-              }
-            }} value={progres.value.success} color="blue">
-            </Progress.Section>
-            <Progress.Section styles={{
-              section: {
-                transition: "width 300ms ease"
-              }
-            }} value={progres.value.skip} color="yellow">
-            </Progress.Section>
-            <Progress.Section styles={{
-              section: {
-                transition: "width 300ms ease"
-              }
-            }} value={progres.value.error} color="red">
-            </Progress.Section>
+            <Progress.Section
+              styles={{
+                section: {
+                  transition: "width 300ms ease",
+                },
+              }}
+              value={progres.value.success}
+              color="blue"
+            ></Progress.Section>
+            <Progress.Section
+              styles={{
+                section: {
+                  transition: "width 300ms ease",
+                },
+              }}
+              value={progres.value.skip}
+              color="yellow"
+            ></Progress.Section>
+            <Progress.Section
+              styles={{
+                section: {
+                  transition: "width 300ms ease",
+                },
+              }}
+              value={progres.value.error}
+              color="red"
+            ></Progress.Section>
           </Progress.Root>
         </Box>
         <Divider />
         <ScrollArea h={"500px"} scrollbarSize={6}>
           <Stack mb="xs" gap={0}>
             {fields.map((image, index) => {
-              const task = manager.value.tasks.find((task) => image.taskId === task.id)
+              const task = manager.value.tasks.find(
+                (task) => image.taskId === task.id,
+              )
               const itemDisabled = task?.status === "success"
               return (
                 <React.Fragment key={image.id}>

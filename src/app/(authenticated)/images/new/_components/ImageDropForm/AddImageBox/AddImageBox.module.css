@@ -3,10 +3,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 160px;
-  width: 160px;
   transition: filter 0.2s ease;
   user-select: none;
+  border-radius: var(--mantine-radius-sm);
   background-color: var(--mantine-color-gray-light);
   outline: 1px solid var(--mantine-color-gray-filled);
 }

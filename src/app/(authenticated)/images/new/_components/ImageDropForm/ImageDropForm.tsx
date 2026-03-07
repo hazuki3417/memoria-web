@@ -5,25 +5,26 @@ import classes from "./ImageDropForm.module.css"
 
 export type ImageDropFormUi = {
   valid?: "idle" | "accept" | "warning" | "reject"
-  disabled?: boolean
 }
 
 export interface ImageDropFormProps
   extends Omit<BoxProps, "className" | "style" | "onDrop" | "onDropOver"> {
   children: React.ReactNode
-  ui: ImageDropFormUi
   onFileDrop?: React.DragEventHandler<HTMLDivElement>
+  ui?: ImageDropFormUi
+  disabled?: boolean
 }
 
 export const ImageDropForm = (props: ImageDropFormProps) => {
-  const { children, ui, onFileDrop, ...rest } = props
+  const { children, ui, onFileDrop, disabled = false, ...rest } = props
+  const { valid = "idle" } = ui ?? {}
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
   }
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    if (ui.disabled) {
+    if (disabled) {
       event.preventDefault()
       return
     }
@@ -32,19 +33,11 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
 
   return (
     <Box
-      className={classes.droparea}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        gap: "16px",
-        minHeight: "inherit",
-      }}
+      className={classes.box}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
-      data-valid={ui.valid}
-      data-disabled={ui.disabled}
+      data-valid={valid}
+      data-disabled={disabled}
       {...rest}
     >
       {children}

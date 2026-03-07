@@ -18,7 +18,8 @@ export type AddImageBoxUi = {
   valid?: "idle" | "accept" | "warning" | "reject"
 }
 
-export interface AddImageBoxProps extends BoxProps {
+export interface AddImageBoxProps
+  extends Omit<BoxProps, "className" | "style" | "onClick"> {
   payload: AddImageBoxPayload
   onFileSelect?: (files: FileList | null) => void
   ui?: AddImageBoxUi
@@ -26,7 +27,7 @@ export interface AddImageBoxProps extends BoxProps {
 }
 
 export const AddImageBox = (props: AddImageBoxProps) => {
-  const { payload, ui, onFileSelect, disabled = false } = props
+  const { payload, ui, onFileSelect, disabled = false, ...rest } = props
   const { valid = "idle" } = ui ?? {}
   const { count, size, accept = "image/*", type = ["jpeg", "png"] } = payload
   const inputRef = useRef<HTMLInputElement>(null)
@@ -53,17 +54,19 @@ export const AddImageBox = (props: AddImageBoxProps) => {
 
   return (
     <Box
-      bdrs="sm"
+      h={"160px"}
+      w={"160px"}
       className={classes.box}
       onClick={handleClick}
       data-valid={valid}
       data-disabled={disabled}
+      {...rest}
     >
       <input
         ref={inputRef}
         type="file"
         multiple
-        accept="image/*"
+        accept={accept}
         style={{ display: "none" }}
         onChange={handleChange}
       />
@@ -76,9 +79,7 @@ export const AddImageBox = (props: AddImageBoxProps) => {
       >
         <IconPhotoPlus size={40} />
         <List size="xs">
-          <List.Item>
-            {type.join(" / ")}
-          </List.Item>
+          <List.Item>{type.join(" / ")}</List.Item>
           <List.Item>{`${size.max} / 1件`}</List.Item>
           <List.Item>{`最大 ${count.max} 件`}</List.Item>
         </List>

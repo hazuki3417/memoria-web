@@ -1,2 +1,1 @@
-export * from "./ThumbnailImage";
-
+export * from "./ThumbnailImage"
