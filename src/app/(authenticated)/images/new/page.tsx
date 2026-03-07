@@ -34,14 +34,14 @@ import {
 } from "../_components"
 import { ImageDropForm } from "./_components"
 
-const inputFormSchema = z.object({
+const imageInputFormSchema = z.object({
   bulk: z.object({
     tags: tagsSchema,
   }),
   ...imageItemSchema.shape,
 })
 
-type ImageInputFormValues = z.infer<typeof inputFormSchema>
+type ImageInputFormValues = z.infer<typeof imageInputFormSchema>
 
 /**
  * NOTE: 仕様
@@ -80,7 +80,7 @@ type ImageInputFormValues = z.infer<typeof inputFormSchema>
  */
 const Page = () => {
   const methods = useForm<ImageInputFormValues>({
-    resolver: zodResolver(inputFormSchema),
+    resolver: zodResolver(imageInputFormSchema),
     mode: "onChange",
     defaultValues: {
       bulk: {
@@ -90,7 +90,7 @@ const Page = () => {
     },
   })
 
-  const { getValues, setValue, handleSubmit } = methods
+  const { getValues, setValue } = methods
 
   const feedback = useFeedbackContext()
 
@@ -105,9 +105,7 @@ const Page = () => {
   })
 
   const [uploadImage] = useUploadImageMutation()
-  const manager = useTaskManager({
-    mode: "parallel",
-  })
+  const manager = useTaskManager({ mode: "parallel" })
 
   const inputValid = async (values: ImageInputFormValues) => {
     console.log("submit values:", values)
@@ -137,7 +135,7 @@ const Page = () => {
     })
   }
 
-  const inputInvalid = async (errors: FieldErrors<ImageInputFormValues>) => {
+  const inputInValid = async (errors: FieldErrors<ImageInputFormValues>) => {
     console.log("submit error:", errors)
   }
 
@@ -376,7 +374,7 @@ const Page = () => {
         methods={methods}
         id="new-image"
         submitValid={inputValid}
-        submitInvalid={inputInvalid}
+        submitInvalid={inputInValid}
       >
         <Box mb="xs">
           <Progress.Root size="sm" radius="xs">

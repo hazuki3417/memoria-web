@@ -1,86 +1,226 @@
 "use client"
-import { ActionPanel, FormButton } from "@/components"
-import { Form } from "@/components/Form"
+import { ActionPanel } from "@/components"
 import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql"
-import {
-  useFormInteractivity,
-  useMutationNotifier,
-  useQueryNotifier,
-  useSetFormDataFromQuery,
-} from "@/hooks"
-import { createFormSubmitHandler } from "@/lib"
+import { useFeedbackContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FormProvider, useForm } from "react-hook-form"
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Group,
+  Paper,
+  Select,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core"
+import { IconDatabase, IconUpload } from "@tabler/icons-react"
+import { useEffect } from "react"
+import { FieldErrors, FormProvider, useForm } from "react-hook-form"
+import z from "zod"
 import { SettingSectionDivider, SettingSectionTitle } from "../_components"
 
-import {
-  ProfileInputForm,
-  profileInputFormDefaultValue,
-  profileInputFormSchema,
-} from "./_components"
+const profileInputFormSchema = z.object({
+  name: z.string().nonempty(),
+  email: z.string().nonempty(),
+})
+
+type ProfileInputFormValues = z.infer<typeof profileInputFormSchema>
+
+const profileInputFormDefaultValue: ProfileInputFormValues = {
+  name: "",
+  email: "",
+}
 
 const Page = () => {
-  const query = useGetUserProfileQuery()
-  const [updateProfileMutation, mutation] = useUpdateProfileMutation()
+  const getProfile = useGetUserProfileQuery()
+  const [updateProfile] = useUpdateProfileMutation()
 
-  useQueryNotifier(query)
-  useMutationNotifier(mutation)
-  const interactivity = useFormInteractivity({ read: query, write: mutation })
-
-  const form = useForm({
+  const methods = useForm<ProfileInputFormValues>({
     resolver: zodResolver(profileInputFormSchema),
-    mode: "onChange",
     defaultValues: {
       ...profileInputFormDefaultValue,
     },
   })
 
-  useSetFormDataFromQuery({
-    query,
-    form,
-    selector: (value) => {
-      return { ...value.me.profile }
-    },
-  })
+  const { register, handleSubmit, reset } = methods
 
-  const submit = createFormSubmitHandler(form, (value) => {
-    return updateProfileMutation({
+  const feedback = useFeedbackContext()
+
+  useEffect(() => {
+    if (getProfile.data) {
+      const formData = getProfile.data.me.profile
+      reset({
+        ...formData,
+      })
+    }
+  }, [getProfile.data, reset])
+
+  const inputValid = async (values: ProfileInputFormValues) => {
+    console.log("submit values:", values)
+
+    await updateProfile({
       variables: {
         input: {
-          name: value.name,
-          email: value.email,
+          ...values,
           picture:
             "https://lh3.googleusercontent.com/a/ACg8ocKIWVfiXpZwpTYPahJMVMWgY4FXh3_tEC_FVoSCPrb0jnprqSxr=s96-c",
         },
       },
     })
-  })
+
+    feedback.action.success({
+      title: "保存",
+      body: "正常に終了しました。",
+    })
+  }
+
+  const inputInValid = (errors: FieldErrors<ProfileInputFormValues>) => {
+    console.log("submit error:", errors)
+  }
 
   return (
     <>
       <SettingSectionTitle>Profile</SettingSectionTitle>
       <SettingSectionDivider />
-      <Form>
-        <Form.Container>
-          <Form.LoadingOverlay visible={query.loading} />
-          <FormProvider {...form}>
-            <Form.Group onSubmit={submit}>
-              <ProfileInputForm {...interactivity} />
+      <Flex gap="lg">
+        <Box flex="1">
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(inputValid, inputInValid)}>
+              <Stack gap="md" mb="xs">
+                <TextInput
+                  size="xs"
+                  withAsterisk
+                  {...register("name")}
+                  label="Name"
+                  placeholder="John Doe"
+                />
+                <TextInput
+                  size="xs"
+                  withAsterisk
+                  {...register("email")}
+                  label="E-mail"
+                  placeholder="john.doe@memoria.com"
+                />
+                <Select
+                  size="xs"
+                  label="言語"
+                  placeholder="lan"
+                  defaultValue={"jp"}
+                  data={[
+                    { label: "Japanese", value: "jp" },
+                    { label: "English", value: "en" },
+                  ]}
+                />
+              </Stack>
               <ActionPanel>
+                <ActionPanel.Left></ActionPanel.Left>
+                <ActionPanel.Center></ActionPanel.Center>
                 <ActionPanel.Right>
-                  <Form.Submit
-                    button={(props) => (
-                      <FormButton {...props} {...interactivity}>
-                        更新
-                      </FormButton>
-                    )}
-                  />
+                  <Button size="xs" type="submit">
+                    保存
+                  </Button>
                 </ActionPanel.Right>
               </ActionPanel>
-            </Form.Group>
+            </form>
           </FormProvider>
-        </Form.Container>
-      </Form>
+        </Box>
+        <Box flex="1">
+          <Stack gap="md">
+            <Paper shadow="xs" withBorder>
+              <Group gap={4} p="xs">
+                <IconUpload size={16} />
+                <Title order={6}>アップロード制限</Title>
+              </Group>
+              <Divider />
+              <Box
+                p="xs"
+                style={(theme) => ({
+                  display: "grid",
+                  gridTemplateColumns: "auto auto 1fr",
+                })}
+              >
+                <Box>
+                  <Text size="xs">・ファイル数</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">：</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">20 件</Text>
+                </Box>
+
+                <Box>
+                  <Text size="xs">・ファイルサイズ</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">：</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">100 MB / 1 件</Text>
+                </Box>
+
+                <Box>
+                  <Text size="xs">・ファイルタイプ</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">：</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">jpg / png</Text>
+                </Box>
+              </Box>
+            </Paper>
+
+            <Paper shadow="xs" withBorder>
+              <Group gap={4} p="xs">
+                <IconDatabase size={16} />
+                <Title order={6}>使用量</Title>
+              </Group>
+              <Divider />
+              <Box
+                p="xs"
+                style={(theme) => ({
+                  display: "grid",
+                  gridTemplateColumns: "auto auto 1fr",
+                })}
+              >
+                <Box>
+                  <Text size="xs">・ファイル数</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">：</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">20 件</Text>
+                </Box>
+
+                <Box>
+                  <Text size="xs">・ファイルサイズ</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">：</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">100 MB / 1 件</Text>
+                </Box>
+
+                <Box>
+                  <Text size="xs">・ファイルタイプ</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">：</Text>
+                </Box>
+                <Box>
+                  <Text size="xs">jpg / png</Text>
+                </Box>
+              </Box>
+            </Paper>
+          </Stack>
+        </Box>
+      </Flex>
     </>
   )
 }
