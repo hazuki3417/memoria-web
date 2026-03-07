@@ -1,5 +1,5 @@
 import { Box, BoxProps } from "@mantine/core"
-import React from "react"
+import React, { useState } from "react"
 import { AddImageBox } from "./AddImageBox"
 import classes from "./ImageDropForm.module.css"
 
@@ -8,7 +8,15 @@ export type ImageDropFormUi = {
 }
 
 export interface ImageDropFormProps
-  extends Omit<BoxProps, "className" | "style" | "onDrop" | "onDropOver"> {
+  extends Omit<
+    BoxProps,
+    | "className"
+    | "style"
+    | "onDrop"
+    | "onDragEnter"
+    | "ondragLeave"
+    | "onDropOver"
+  > {
   children: React.ReactNode
   onFileDrop?: React.DragEventHandler<HTMLDivElement>
   ui?: ImageDropFormUi
@@ -19,13 +27,26 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
   const { children, ui, onFileDrop, disabled = false, ...rest } = props
   const { valid = "idle" } = ui ?? {}
 
+  const [isActive, setIsActive] = useState(false)
+
+  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    if (!disabled) setIsActive(true)
+  }
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsActive(false)
+  }
+
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
   }
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsActive(false)
     if (disabled) {
-      event.preventDefault()
       return
     }
     onFileDrop?.(event)
@@ -35,7 +56,10 @@ export const ImageDropForm = (props: ImageDropFormProps) => {
     <Box
       className={classes.box}
       onDrop={handleDrop}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
+      data-active={isActive}
       data-valid={valid}
       data-disabled={disabled}
       {...rest}

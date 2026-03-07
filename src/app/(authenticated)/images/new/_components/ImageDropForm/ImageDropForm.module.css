@@ -4,9 +4,15 @@
   justify-content: center;
   min-height: inherit;
   padding: var(--mantine-spacing-md);
+  transition: filter 0.2s ease;
   background-color: var(--mantine-color-dark-6);
   border: 1px dashed var(--mantine-color-dark-4);
   border-radius: var(--mantine-radius-sm);
+}
+
+.box[data-active="true"] {
+  background-color: var(--mantine-color-blue-light);
+  outline: 1px solid var(--mantine-color-blue-filled);
 }
 
 .box[data-valid="accept"] {
@@ -26,5 +32,5 @@
 
 .box[data-disabled="true"] {
   cursor: no-drop;
-  filter: brightness(0.6);
+  filter: brightness(0.9);
 }

@@ -254,6 +254,7 @@ const Page = () => {
   const handleFileDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault()
+      console.debug("drop", event.dataTransfer.files)
       addFiles(event.dataTransfer.files)
     },
     [],
@@ -269,21 +270,6 @@ const Page = () => {
   const imageDropFormDisabled = useMemo(() => {
     return imageConfig.count.max <= watchValueImages.length
   }, [watchValueImages])
-
-  const imageDropFormValid = useMemo(() => {
-    if (imageConfig.count.max < watchValueImages.length) {
-      return "reject"
-    }
-
-    const empty = 0
-    if (empty < fields.length) {
-      if (methods.formState.isValid) {
-        return "warning"
-      }
-    }
-
-    return "idle"
-  }, [methods, fields, watchValueImages])
 
   const bulkFormDisabled = (() => {
     if (fields.length === 0) {
@@ -317,20 +303,14 @@ const Page = () => {
   return (
     <Box>
       <ImageDropForm
-        ui={{
-          valid: imageDropFormValid,
-          disabled: imageDropFormDisabled,
-        }}
+        disabled={imageDropFormDisabled}
         onFileDrop={handleFileDrop}
         mb="xl"
       >
         <ImageDropForm.AddImageBox
-          ui={{
-            valid: imageDropFormValid,
-          }}
-          disabled={true}
-          onFileSelect={handleFileSelect}
           payload={imageConfig}
+          disabled={imageDropFormDisabled}
+          onFileSelect={handleFileSelect}
         />
       </ImageDropForm>
       <ActionPanel mb="sm">
