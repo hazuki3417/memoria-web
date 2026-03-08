@@ -8,7 +8,12 @@ import { useEffect } from "react"
 import { FieldErrors, FormProvider, useForm } from "react-hook-form"
 import z from "zod"
 import { SettingSectionDivider, SettingSectionTitle } from "../_components"
-import { FileInfoPanel, StorageInfoPanel, UploadInfoPanel } from "./_components"
+import {
+  FileCountInfoPanel,
+  FileSizeInfoPanel,
+  StorageInfoPanel,
+  UploadInfoPanel,
+} from "./_components"
 
 const profileInputFormSchema = z.object({
   name: z.string().nonempty(),
@@ -116,8 +121,9 @@ const Page = () => {
         <Box flex="1">
           <Stack gap="md">
             <UploadInfoPanel />
+            <FileCountInfoPanel />
             <StorageInfoPanel />
-            <FileInfoPanel />
+            <FileSizeInfoPanel />
           </Stack>
         </Box>
       </Flex>

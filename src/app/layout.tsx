@@ -6,10 +6,18 @@ import { theme } from "@/lib/theme"
 import "@/lib/zod"
 import { AuthContext } from "@/providers"
 import { AppShell, AppShellHeader, AppShellMain } from "@mantine/core"
-import "@mantine/core/styles.css"
-import "@mantine/notifications/styles.css"
 import type { Metadata } from "next"
 import { AppGlobal, Head, Header, Providers } from "./_components"
+
+/**
+ * NOTE: 下記の順番でimportすること
+ *       core, notifications, charts
+ */
+import "@mantine/core/styles.css"
+
+import "@mantine/notifications/styles.css"
+
+import "@mantine/charts/styles.css"
 
 const metadata: Metadata = {
   title: "Memoria",

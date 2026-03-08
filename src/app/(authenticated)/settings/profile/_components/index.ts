@@ -1,4 +1,5 @@
 export * from "./ColorSwatchText"
-export * from "./FileInfoPanel"
+export * from "./FileCountInfoPanel"
+export * from "./FileSizeInfoPanel"
 export * from "./StorageInfoPanel"
 export * from "./UploadInfoPanel"
