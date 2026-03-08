@@ -73,7 +73,7 @@ const Page = () => {
 
   return (
     <>
-      <SettingSectionTitle>Profile</SettingSectionTitle>
+      <SettingSectionTitle>Usage</SettingSectionTitle>
       <SettingSectionDivider />
       <Flex gap="lg">
         <Box flex="1">
