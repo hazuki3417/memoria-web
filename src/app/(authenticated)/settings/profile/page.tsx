@@ -3,24 +3,12 @@ import { ActionPanel } from "@/components"
 import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql"
 import { useFeedbackContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Group,
-  Paper,
-  Select,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core"
-import { IconDatabase, IconUpload } from "@tabler/icons-react"
+import { Box, Button, Flex, Select, Stack, TextInput } from "@mantine/core"
 import { useEffect } from "react"
 import { FieldErrors, FormProvider, useForm } from "react-hook-form"
 import z from "zod"
 import { SettingSectionDivider, SettingSectionTitle } from "../_components"
+import { FileInfoPanel, StorageInfoPanel, UploadInfoPanel } from "./_components"
 
 const profileInputFormSchema = z.object({
   name: z.string().nonempty(),
@@ -127,95 +115,9 @@ const Page = () => {
         </Box>
         <Box flex="1">
           <Stack gap="md">
-            <Paper shadow="xs" withBorder>
-              <Group gap={4} p="xs">
-                <IconUpload size={16} />
-                <Title order={6}>アップロード制限</Title>
-              </Group>
-              <Divider />
-              <Box
-                p="xs"
-                style={(theme) => ({
-                  display: "grid",
-                  gridTemplateColumns: "auto auto 1fr",
-                })}
-              >
-                <Box>
-                  <Text size="xs">・ファイル数</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">：</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">20 件</Text>
-                </Box>
-
-                <Box>
-                  <Text size="xs">・ファイルサイズ</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">：</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">100 MB / 1 件</Text>
-                </Box>
-
-                <Box>
-                  <Text size="xs">・ファイルタイプ</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">：</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">jpg / png</Text>
-                </Box>
-              </Box>
-            </Paper>
-
-            <Paper shadow="xs" withBorder>
-              <Group gap={4} p="xs">
-                <IconDatabase size={16} />
-                <Title order={6}>使用量</Title>
-              </Group>
-              <Divider />
-              <Box
-                p="xs"
-                style={(theme) => ({
-                  display: "grid",
-                  gridTemplateColumns: "auto auto 1fr",
-                })}
-              >
-                <Box>
-                  <Text size="xs">・ファイル数</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">：</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">20 件</Text>
-                </Box>
-
-                <Box>
-                  <Text size="xs">・ファイルサイズ</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">：</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">100 MB / 1 件</Text>
-                </Box>
-
-                <Box>
-                  <Text size="xs">・ファイルタイプ</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">：</Text>
-                </Box>
-                <Box>
-                  <Text size="xs">jpg / png</Text>
-                </Box>
-              </Box>
-            </Paper>
+            <UploadInfoPanel />
+            <StorageInfoPanel />
+            <FileInfoPanel />
           </Stack>
         </Box>
       </Flex>
