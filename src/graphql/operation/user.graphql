@@ -12,7 +12,6 @@ query GetUserProfile {
     profile {
       name
       email
-      picture
     }
     createdAt
     updatedAt
@@ -25,7 +24,6 @@ mutation UpdateProfile($input: UpdateProfile!) {
     profile {
       name
       email
-      picture
     }
     createdAt
     updatedAt

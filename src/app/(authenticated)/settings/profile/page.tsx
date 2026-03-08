@@ -65,8 +65,6 @@ const Page = () => {
       variables: {
         input: {
           ...values,
-          picture:
-            "https://lh3.googleusercontent.com/a/ACg8ocKIWVfiXpZwpTYPahJMVMWgY4FXh3_tEC_FVoSCPrb0jnprqSxr=s96-c",
         },
       },
     })
