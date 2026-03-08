@@ -12,18 +12,33 @@ const Page = () => {
 
   return (
     <>
-      <SettingSectionTitle>Usage</SettingSectionTitle>
+      <SettingSectionTitle>Limits</SettingSectionTitle>
       <SettingSectionDivider />
-      <Flex gap="lg">
+
+      <Flex gap="lg" mb="lg">
         <Box flex="1">
           <Stack gap="md">
-            <UploadInfoPanel mih={152} />
-            <FileCountInfoPanel />
+            <UploadInfoPanel />
           </Stack>
         </Box>
         <Box flex="1">
           <Stack gap="md">
-            <StorageInfoPanel mih={152} />
+          </Stack>
+        </Box>
+      </Flex>
+
+      <SettingSectionTitle>Usage</SettingSectionTitle>
+      <SettingSectionDivider />
+
+      <Flex gap="lg" mb="lg">
+        <Box flex="1">
+          <Stack gap="md">
+            <FileCountInfoPanel />
+            <StorageInfoPanel />
+          </Stack>
+        </Box>
+        <Box flex="1">
+          <Stack gap="md">
             <FileSizeInfoPanel />
           </Stack>
         </Box>
