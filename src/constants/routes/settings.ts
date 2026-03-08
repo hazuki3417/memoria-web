@@ -3,26 +3,32 @@ import { RouteNodes } from "@/types/routes"
 export const settings = {
   settings: {
     segment: "settings",
-    title: "設定",
-    breadcrumb: "設定",
+    title: "settings",
+    breadcrumb: "settings",
     tags: [],
     children: {
       profile: {
         segment: "profile",
-        title: "プロファイル",
-        breadcrumb: "プロファイル",
+        title: "profile",
+        breadcrumb: "profile",
         tags: [],
       },
       notifications: {
         segment: "notifications",
-        title: "通知",
-        breadcrumb: "通知",
+        title: "notifications",
+        breadcrumb: "notifications",
         tags: [],
       },
       preferences: {
         segment: "preferences",
-        title: "プリファレンス",
-        breadcrumb: "プリファレンス",
+        title: "preferences",
+        breadcrumb: "preferences",
+        tags: [],
+      },
+      usage: {
+        segment: "usage",
+        title: "usage",
+        breadcrumb: "usage",
         tags: [],
       },
     },

@@ -1,13 +1,18 @@
 "use client"
-import { ActionPanel } from "@/components"
 import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql"
 import { useFeedbackContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Box, Button, Flex, Select, Stack, TextInput } from "@mantine/core"
+import { Box, Flex, Stack } from "@mantine/core"
 import { useEffect } from "react"
-import { FieldErrors, FormProvider, useForm } from "react-hook-form"
+import { FieldErrors, useForm } from "react-hook-form"
 import z from "zod"
 import { SettingSectionDivider, SettingSectionTitle } from "../_components"
+import {
+  FileCountInfoPanel,
+  FileSizeInfoPanel,
+  StorageInfoPanel,
+  UploadInfoPanel,
+} from "./_components"
 
 const profileInputFormSchema = z.object({
   name: z.string().nonempty(),
@@ -72,48 +77,16 @@ const Page = () => {
       <SettingSectionDivider />
       <Flex gap="lg">
         <Box flex="1">
-          <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(inputValid, inputInValid)}>
-              <Stack gap="md" mb="xs">
-                <TextInput
-                  size="xs"
-                  withAsterisk
-                  {...register("name")}
-                  label="Name"
-                  placeholder="John Doe"
-                />
-                <TextInput
-                  size="xs"
-                  withAsterisk
-                  {...register("email")}
-                  label="E-mail"
-                  placeholder="john.doe@memoria.com"
-                />
-                <Select
-                  size="xs"
-                  label="言語"
-                  placeholder="lan"
-                  defaultValue={"jp"}
-                  data={[
-                    { label: "Japanese", value: "jp" },
-                    { label: "English", value: "en" },
-                  ]}
-                />
-              </Stack>
-              <ActionPanel>
-                <ActionPanel.Left></ActionPanel.Left>
-                <ActionPanel.Center></ActionPanel.Center>
-                <ActionPanel.Right>
-                  <Button size="xs" type="submit">
-                    保存
-                  </Button>
-                </ActionPanel.Right>
-              </ActionPanel>
-            </form>
-          </FormProvider>
+          <Stack gap="md">
+            <UploadInfoPanel mih={152} />
+            <FileCountInfoPanel />
+          </Stack>
         </Box>
         <Box flex="1">
-          <Stack gap="md"></Stack>
+          <Stack gap="md">
+            <StorageInfoPanel mih={152} />
+            <FileSizeInfoPanel />
+          </Stack>
         </Box>
       </Flex>
     </>

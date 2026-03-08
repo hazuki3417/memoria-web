@@ -1,11 +1,21 @@
-import { Box, Divider, Group, Paper, Text, Title } from "@mantine/core"
+import {
+  Box,
+  Divider,
+  Group,
+  Paper,
+  PaperProps,
+  Text,
+  Title,
+} from "@mantine/core"
 import { IconUpload } from "@tabler/icons-react"
 
-export interface UploadInfoPanelProps {}
+export interface UploadInfoPanelProps
+  extends Omit<PaperProps, "shadow" | "withBorder"> {}
 
 export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
+  const { ...rest } = props
   return (
-    <Paper shadow="xs" withBorder>
+    <Paper shadow="xs" withBorder {...props}>
       <Group gap={4} p="xs">
         <IconUpload size={16} />
         <Title order={6}>アップロード</Title>

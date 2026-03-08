@@ -1,13 +1,23 @@
 import { DonutChart } from "@mantine/charts"
-import { Box, Divider, Group, Paper, Text, Title } from "@mantine/core"
+import {
+  Box,
+  Divider,
+  Group,
+  Paper,
+  PaperProps,
+  Text,
+  Title,
+} from "@mantine/core"
 import { IconScale } from "@tabler/icons-react"
 import { ColorSwatchText } from "../ColorSwatchText"
 
-export interface FileSizeInfoPanelProps {}
+export interface FileSizeInfoPanelProps
+  extends Omit<PaperProps, "shadow" | "withBorder"> {}
 
 export const FileSizeInfoPanel = (props: FileSizeInfoPanelProps) => {
+  const { ...rest } = props
   return (
-    <Paper shadow="xs" withBorder>
+    <Paper shadow="xs" withBorder {...props}>
       <Group gap={4} p="xs">
         <IconScale size={16} />
         <Title order={6}>ファイルサイズ</Title>
@@ -20,10 +30,10 @@ export const FileSizeInfoPanel = (props: FileSizeInfoPanelProps) => {
             startAngle={90}
             endAngle={-270}
             withTooltip={false}
-            chartLabel="100"
+            chartLabel="200 MB"
             data={[
-              { name: "USA", value: 200, color: "blue" },
-              { name: "Other", value: 200, color: "dark.4" },
+              { name: "jpg", value: 200, color: "blue" },
+              { name: "png", value: 200, color: "yellow" },
             ]}
           />
         </Box>
@@ -43,23 +53,26 @@ export const FileSizeInfoPanel = (props: FileSizeInfoPanelProps) => {
             <Text size="xs">：</Text>
           </Box>
           <Box>
-            <Text size="xs">100 件</Text>
+            <Text size="xs">100 MB</Text>
           </Box>
           <Box>
-            <Text size="xs">（ 10 % ）</Text>
+            <Text size="xs">（ 50 % ）</Text>
           </Box>
 
           <Box>
-            <ColorSwatchText color="var(--mantine-color-dark-4)" label="png" />
+            <ColorSwatchText
+              color="var(--mantine-color-yellow-filled)"
+              label="png"
+            />
           </Box>
           <Box>
             <Text size="xs">：</Text>
           </Box>
           <Box>
-            <Text size="xs">100 件</Text>
+            <Text size="xs">100 MB</Text>
           </Box>
           <Box>
-            <Text size="xs">（ 10 % ）</Text>
+            <Text size="xs">（ 50 % ）</Text>
           </Box>
         </Box>
       </Group>

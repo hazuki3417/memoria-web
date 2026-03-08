@@ -1,7 +1,12 @@
 import { useNavLink } from "@/hooks"
 import { resolveUri } from "@/lib/url"
 import { Box, BoxProps, NavLink, Stack } from "@mantine/core"
-import { IconAdjustments, IconBell, IconUser } from "@tabler/icons-react"
+import {
+  IconActivity,
+  IconAdjustments,
+  IconBell,
+  IconUser,
+} from "@tabler/icons-react"
 
 export interface SettingMenuProps extends Omit<BoxProps, "component"> {
   current: string
@@ -27,6 +32,11 @@ export const SettingMenu = (props: SettingMenuProps) => {
         label: "Preferences",
         href: resolveUri("/settings/preferences"),
         leftSection: <IconAdjustments size={20} />,
+      },
+      {
+        label: "Usage",
+        href: resolveUri("/settings/usage"),
+        leftSection: <IconActivity size={20} />,
       },
     ],
   })

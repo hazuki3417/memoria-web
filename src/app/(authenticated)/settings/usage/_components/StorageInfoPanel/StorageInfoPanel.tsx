@@ -4,6 +4,7 @@ import {
   Flex,
   Group,
   Paper,
+  PaperProps,
   Progress,
   Text,
   Title,
@@ -11,11 +12,13 @@ import {
 import { IconDatabase } from "@tabler/icons-react"
 import { ColorSwatchText } from "../ColorSwatchText"
 
-export interface StorageInfoPanelProps {}
+export interface StorageInfoPanelProps
+  extends Omit<PaperProps, "shadow" | "withBorder"> {}
 
 export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
+  const { ...rest } = props
   return (
-    <Paper shadow="xs" withBorder>
+    <Paper shadow="xs" withBorder {...props}>
       <Group gap={4} p="xs">
         <IconDatabase size={16} />
         <Title order={6}>ストレージ</Title>
@@ -35,7 +38,7 @@ export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
         >
           <Box mb="xs">
             <Flex justify="flex-end">
-              <Text size="xs">10 MB / 1 GB （ 10 % ）</Text>
+              <Text size="xs">200 MB / 1 GB （ 20 % ）</Text>
             </Flex>
             <Progress.Root radius="xs">
               <Progress.Section value={20} color="blue" />
@@ -62,10 +65,10 @@ export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">100 MB</Text>
+          <Text size="xs">200 MB</Text>
         </Box>
         <Box>
-          <Text size="xs">（ 10 % ）</Text>
+          <Text size="xs">（ 20 % ）</Text>
         </Box>
 
         <Box>
@@ -78,10 +81,10 @@ export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">100 MB</Text>
+          <Text size="xs">800 MB</Text>
         </Box>
         <Box>
-          <Text size="xs">（ 10 % ）</Text>
+          <Text size="xs">（ 80 % ）</Text>
         </Box>
       </Box>
     </Paper>

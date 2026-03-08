@@ -1,13 +1,23 @@
 import { DonutChart } from "@mantine/charts"
-import { Box, Divider, Group, Paper, Text, Title } from "@mantine/core"
+import {
+  Box,
+  Divider,
+  Group,
+  Paper,
+  PaperProps,
+  Text,
+  Title,
+} from "@mantine/core"
 import { IconFile } from "@tabler/icons-react"
 import { ColorSwatchText } from "../ColorSwatchText"
 
-export interface FileCountInfoPanelProps {}
+export interface FileCountInfoPanelProps
+  extends Omit<PaperProps, "shadow" | "withBorder"> {}
 
 export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
+  const { ...rest } = props
   return (
-    <Paper shadow="xs" withBorder>
+    <Paper shadow="xs" withBorder {...props}>
       <Group gap={4} p="xs">
         <IconFile size={16} />
         <Title order={6}>ファイル数</Title>
@@ -20,10 +30,10 @@ export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
             startAngle={90}
             endAngle={-270}
             withTooltip={false}
-            chartLabel="100"
+            chartLabel="200 件"
             data={[
-              { name: "USA", value: 200, color: "blue" },
-              { name: "Other", value: 200, color: "dark.4" },
+              { name: "jpg", value: 200, color: "blue" },
+              { name: "png", value: 200, color: "yellow" },
             ]}
           />
         </Box>
@@ -46,11 +56,14 @@ export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
             <Text size="xs">100 件</Text>
           </Box>
           <Box>
-            <Text size="xs">（ 10 % ）</Text>
+            <Text size="xs">（ 50 % ）</Text>
           </Box>
 
           <Box>
-            <ColorSwatchText color="var(--mantine-color-dark-4)" label="png" />
+            <ColorSwatchText
+              color="var(--mantine-color-yellow-filled)"
+              label="png"
+            />
           </Box>
           <Box>
             <Text size="xs">：</Text>
@@ -59,7 +72,7 @@ export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
             <Text size="xs">100 件</Text>
           </Box>
           <Box>
-            <Text size="xs">（ 10 % ）</Text>
+            <Text size="xs">（ 50 % ）</Text>
           </Box>
         </Box>
       </Group>
