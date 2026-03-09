@@ -29,3 +29,31 @@ mutation UpdateProfile($input: UpdateProfile!) {
     updatedAt
   }
 }
+
+query GetUserUsage {
+  viewer {
+    id
+  	limit {
+      upload {
+        maxCount
+        maxSize
+        allowedFileType
+      }
+    }
+    usage {
+      storage {
+      	used
+      	total
+    	}
+      fileStats {
+        totalCount
+        totalSize
+        byType {
+          fileType
+          fileCount
+          fileSize
+        }
+      }
+    }
+  }
+}
