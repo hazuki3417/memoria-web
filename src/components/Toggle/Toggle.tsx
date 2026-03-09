@@ -53,7 +53,14 @@ export const Toggle = (props: ToggleProps) => {
   }
 
   return (
-    <InputWrapper {...inputWrapperProps}>
+    <InputWrapper
+      {...inputWrapperProps}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "start",
+      }}
+    >
       <Switch
         mt={8}
         mb={4}

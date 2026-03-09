@@ -9,7 +9,6 @@ import {
 } from "./_components"
 
 const Page = () => {
-
   return (
     <>
       <SettingSectionTitle>Limits</SettingSectionTitle>
@@ -22,8 +21,7 @@ const Page = () => {
           </Stack>
         </Box>
         <Box flex="1">
-          <Stack gap="md">
-          </Stack>
+          <Stack gap="md"></Stack>
         </Box>
       </Flex>
 
