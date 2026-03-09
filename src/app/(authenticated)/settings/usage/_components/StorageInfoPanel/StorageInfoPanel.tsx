@@ -10,15 +10,54 @@ import {
   Title,
 } from "@mantine/core"
 import { IconDatabase } from "@tabler/icons-react"
+import { useMemo } from "react"
 import { ColorSwatchText } from "../ColorSwatchText"
 
+export type StorageInfoPanelPayload = {
+  used?: number
+  total?: number
+}
+
 export interface StorageInfoPanelProps
-  extends Omit<PaperProps, "shadow" | "withBorder"> {}
+  extends Omit<PaperProps, "shadow" | "withBorder"> {
+  payload?: StorageInfoPanelPayload
+}
 
 export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
-  const { ...rest } = props
+  const { payload, ...rest } = props
+  const { total = 0, used = 0 } = payload ?? {}
+
+  const info = useMemo(() => {
+    const byte = {
+      used,
+      free: Math.max(total - used, 0),
+      total,
+    }
+    const percent = (() => {
+      if (total <= 0) {
+        return {
+          used: 0,
+          free: 0,
+        }
+      }
+
+      const usedPercent = (used / total) * 100
+      const safeUsed = Math.min(Math.max(usedPercent, 0), 100)
+
+      return {
+        used: safeUsed,
+        free: 100 - safeUsed,
+      }
+    })()
+
+    return {
+      byte,
+      percent,
+    }
+  }, [total, used])
+
   return (
-    <Paper shadow="xs" withBorder {...props}>
+    <Paper shadow="xs" withBorder {...rest}>
       <Group gap={4} p="xs">
         <IconDatabase size={16} />
         <Title order={6}>ストレージ</Title>
@@ -38,10 +77,12 @@ export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
         >
           <Box mb="xs">
             <Flex justify="flex-end">
-              <Text size="xs">200 MB / 1 GB （ 20 % ）</Text>
+              <Text size="xs">
+                {info.byte.used} / {info.byte.total} （ {info.percent.used} % ）
+              </Text>
             </Flex>
             <Progress.Root radius="xs">
-              <Progress.Section value={20} color="blue" />
+              <Progress.Section value={info.percent.used} color="blue" />
             </Progress.Root>
           </Box>
         </Box>
@@ -52,7 +93,7 @@ export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box style={{ gridColumn: "span 2" }}>
-          <Text size="xs"> 1 GB</Text>
+          <Text size="xs">{info.byte.total}</Text>
         </Box>
 
         <Box>
@@ -65,10 +106,10 @@ export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">200 MB</Text>
+          <Text size="xs">{info.byte.used}</Text>
         </Box>
         <Box>
-          <Text size="xs">（ 20 % ）</Text>
+          <Text size="xs">（ {info.percent.used} % ）</Text>
         </Box>
 
         <Box>
@@ -81,10 +122,10 @@ export const StorageInfoPanel = (props: StorageInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">800 MB</Text>
+          <Text size="xs">{info.byte.free}</Text>
         </Box>
         <Box>
-          <Text size="xs">（ 80 % ）</Text>
+          <Text size="xs">（ {info.percent.free} % ）</Text>
         </Box>
       </Box>
     </Paper>

@@ -9,13 +9,22 @@ import {
 } from "@mantine/core"
 import { IconUpload } from "@tabler/icons-react"
 
+export type UploadInfoPanelPayload = {
+  limitFiles?: number
+  limitSize?: number
+  allowType?: string[]
+}
+
 export interface UploadInfoPanelProps
-  extends Omit<PaperProps, "shadow" | "withBorder"> {}
+  extends Omit<PaperProps, "shadow" | "withBorder"> {
+  payload?: UploadInfoPanelPayload
+}
 
 export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
-  const { ...rest } = props
+  const { payload, ...rest } = props
+  const { limitFiles = 0, limitSize = 0, allowType = [] } = payload ?? {}
   return (
-    <Paper shadow="xs" withBorder {...props}>
+    <Paper shadow="xs" withBorder {...rest}>
       <Group gap={4} p="xs">
         <IconUpload size={16} />
         <Title order={6}>アップロード</Title>
@@ -35,7 +44,7 @@ export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">20 件</Text>
+          <Text size="xs">{limitFiles} 件</Text>
         </Box>
 
         <Box>
@@ -45,7 +54,7 @@ export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">100 MB / 1 件</Text>
+          <Text size="xs">{limitSize} MB / 1 件</Text>
         </Box>
 
         <Box>
@@ -55,7 +64,7 @@ export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">jpg / png</Text>
+          <Text size="xs">{allowType.join(" / ")}</Text>
         </Box>
       </Box>
     </Paper>
