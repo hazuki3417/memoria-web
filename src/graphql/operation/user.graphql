@@ -1,12 +1,26 @@
 query GetMe {
   me {
     id
+    preference {
+      file {
+      dateFormat
+      fileSizeUnit
+      }
+      thumbnail {
+        size
+        spacing
+      }
+      preview {
+        loop
+        show
+      }
+    }
     createdAt
     updatedAt
   }
 }
 
-query GetUserProfile {
+query GetProfile {
   me {
     id
     profile {
@@ -18,7 +32,7 @@ query GetUserProfile {
   }
 }
 
-mutation UpdateProfile($input: UpdateProfile!) {
+mutation UpdateProfile($input: UpdateProfileInput!) {
   updateProfile(input: $input) {
     id
     profile {
@@ -30,8 +44,48 @@ mutation UpdateProfile($input: UpdateProfile!) {
   }
 }
 
-query GetUserUsage {
-  viewer {
+
+query GetPreference {
+  me {
+    id
+    preference {
+      file {
+      dateFormat
+      fileSizeUnit
+      }
+      thumbnail {
+        size
+        spacing
+      }
+      preview {
+        loop
+        show
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+
+mutation UpdatePreference($input: UpdatePreferenceInput!) {
+  updatePreference(input: $input) {
+    file {
+      dateFormat
+      fileSizeUnit
+    }
+    thumbnail {
+      size
+      spacing
+    }
+    preview {
+      loop
+      show
+    }
+  }
+}
+
+query GetUsage {
+  me {
     id
   	limit {
       upload {

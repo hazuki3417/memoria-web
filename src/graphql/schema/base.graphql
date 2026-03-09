@@ -2,6 +2,7 @@ directive @tag(validate: String) on INPUT_FIELD_DEFINITION
 
 scalar Upload
 scalar DateTime
+scalar Int64
 
 enum Visibility {
   PUBLIC

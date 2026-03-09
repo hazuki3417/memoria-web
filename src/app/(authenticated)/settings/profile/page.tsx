@@ -1,6 +1,6 @@
 "use client"
 import { ActionPanel } from "@/components"
-import { useGetUserProfileQuery, useUpdateProfileMutation } from "@/graphql"
+import { useGetProfileQuery, useUpdateProfileMutation } from "@/graphql"
 import { useFeedbackContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Box, Button, Flex, Select, Stack, TextInput } from "@mantine/core"
@@ -22,7 +22,7 @@ const profileInputFormDefaultValue: ProfileInputFormValues = {
 }
 
 const Page = () => {
-  const getProfile = useGetUserProfileQuery()
+  const getProfile = useGetProfileQuery()
   const [updateProfile] = useUpdateProfileMutation()
 
   const methods = useForm<ProfileInputFormValues>({

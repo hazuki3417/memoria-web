@@ -5,6 +5,9 @@ extend type Query {
 type User {
   id: ID!
   profile: Profile!
+  limit: Limit!
+  usage: Usage!
+  preference: Preference!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -14,11 +17,104 @@ type Profile {
   email: String!
 }
 
-extend type Mutation {
-  updateProfile(input: UpdateProfile!): User!
+type Limit {
+  upload: UploadLimit!
 }
 
-input UpdateProfile {
+type Usage {
+  storage: StorageUsage!
+  fileStats: FileStats!
+}
+
+enum FileType {
+  JPG
+  PNG
+}
+
+type UploadLimit {
+  maxCount: Int!
+  maxSize: Int64!
+  allowedFileType: [FileType!]!
+}
+
+type StorageUsage {
+  used: Int64!
+  total: Int64!
+}
+
+type FileStats {
+  totalCount: Int!
+  totalSize: Int64!
+  byType: [FileTypeStats!]!
+}
+
+type FileTypeStats {
+  fileType: FileType!
+  fileCount: Int!
+  fileSize: Int64!
+}
+
+enum DateFormat {
+  YYYY_MM_DD
+}
+
+enum FileSizeUnit {
+  SI
+  BINARY
+}
+
+type FilePreference {
+  dateFormat: DateFormat!
+  fileSizeUnit: FileSizeUnit!
+}
+
+type ThumbnailPreference {
+  size: Int!
+  spacing: Int!
+}
+
+
+type PreviewPreference {
+  loop: Boolean!
+  show: Boolean!
+}
+
+type Preference {
+  file: FilePreference!
+  thumbnail: ThumbnailPreference!
+  preview: PreviewPreference!
+}
+
+
+
+extend type Mutation {
+  updateProfile(input: UpdateProfileInput!): User!
+  updatePreference(input: UpdatePreferenceInput!): Preference!
+}
+
+input UpdateProfileInput {
   name: String!
   email: String!
+}
+
+input FilePreferenceInput {
+  dateFormat: DateFormat
+  fileSizeUnit: FileSizeUnit
+}
+
+input ThumbnailPreferenceInput {
+  size: Int
+  spacing: Int
+}
+
+
+input PreviewPreferenceInput {
+  loop: Boolean
+  show: Boolean
+}
+
+input UpdatePreferenceInput {
+  file: FilePreferenceInput
+  thumbnail: ThumbnailPreferenceInput
+  preview: PreviewPreferenceInput
 }
