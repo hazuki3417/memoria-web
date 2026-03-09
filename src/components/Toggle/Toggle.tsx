@@ -5,7 +5,7 @@ import {
   SwitchProps,
 } from "@mantine/core"
 import { IconLetterISmall, IconLetterOSmall } from "@tabler/icons-react"
-import { useState } from "react"
+import React, { useState } from "react"
 
 export interface ToggleProps
   extends Pick<InputWrapperProps, "label" | "description" | "error" | "size">,
@@ -21,60 +21,63 @@ export interface ToggleProps
       | "label"
     > {}
 
-export const Toggle = (props: ToggleProps) => {
-  const {
-    label,
-    description,
-    error,
-    size,
-    checked,
-    defaultChecked,
-    onChange,
-    ...rest
-  } = props
-  const inputWrapperProps = { label, description, error, size }
+export const Toggle = React.forwardRef<HTMLInputElement, ToggleProps>(
+  (props, ref) => {
+    const {
+      label,
+      description,
+      error,
+      size,
+      checked,
+      defaultChecked,
+      onChange,
+      ...rest
+    } = props
+    const inputWrapperProps = { label, description, error, size }
 
-  const isControlled = typeof checked === "boolean"
-  const [internalChecked, setInternalChecked] = useState(
-    defaultChecked ?? false,
-  )
+    const isControlled = typeof checked === "boolean"
+    const [internalChecked, setInternalChecked] = useState(
+      defaultChecked ?? false,
+    )
 
-  const currentChecked = isControlled ? checked : internalChecked
+    const currentChecked = isControlled ? checked : internalChecked
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-  ) => {
-    const next = event.currentTarget.checked
+    const handleChange = (
+      event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+    ) => {
+      const next = event.currentTarget.checked
 
-    if (!isControlled) {
-      setInternalChecked(next)
+      if (!isControlled) {
+        setInternalChecked(next)
+      }
+      onChange?.(event)
     }
-    onChange?.(event)
-  }
 
-  return (
-    <InputWrapper
-      {...inputWrapperProps}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "start",
-      }}
-    >
-      <Switch
-        mt={8}
-        mb={4}
-        color="blue"
-        radius="sm"
-        withThumbIndicator={false}
-        onLabel={<IconLetterISmall size={24} />}
-        offLabel={<IconLetterOSmall size={24} />}
-        size={size}
-        checked={currentChecked}
-        label={currentChecked ? "on" : "off"}
-        onChange={handleChange}
-        {...rest}
-      />
-    </InputWrapper>
-  )
-}
+    return (
+      <InputWrapper
+        {...inputWrapperProps}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "start",
+        }}
+      >
+        <Switch
+          ref={ref}
+          mt={8}
+          mb={4}
+          color="blue"
+          radius="sm"
+          withThumbIndicator={false}
+          onLabel={<IconLetterISmall size={24} />}
+          offLabel={<IconLetterOSmall size={24} />}
+          size={size}
+          checked={currentChecked}
+          label={currentChecked ? "on" : "off"}
+          onChange={handleChange}
+          {...rest}
+        />
+      </InputWrapper>
+    )
+  },
+)
