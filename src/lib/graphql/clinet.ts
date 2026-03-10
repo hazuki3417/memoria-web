@@ -1,7 +1,8 @@
-import "client-only"
-import { ApolloClient, InMemoryCache } from "@apollo/client"
-import { CreateGraphQLOption } from "./type"
+import { ApolloClient } from "@apollo/client"
 import { createUploadLink } from "apollo-upload-client"
+import "client-only"
+import { cache } from "./cache"
+import { CreateGraphQLOption } from "./type"
 
 /**
  * client side fetch
@@ -19,7 +20,7 @@ export const createGraphQL = (option: CreateGraphQLOption) => {
       uri: "/api/graphql",
       headers,
     }),
-    cache: new InMemoryCache(),
+    cache: cache,
     ssrMode: false,
   })
 }

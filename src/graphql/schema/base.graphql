@@ -1,13 +1,9 @@
-directive @tag(validate: String) on INPUT_FIELD_DEFINITION
+# NOTE: go-playground/validatorを利用したバリデーションの定義
+directive @tag(validate: String) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 
 scalar Upload
 scalar DateTime
 scalar Int64
-
-enum Visibility {
-  PUBLIC
-  PRIVATE
-}
 
 # mutation input example
 # input {mutationName}Input {

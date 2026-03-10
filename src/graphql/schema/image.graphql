@@ -1,5 +1,12 @@
 extend type Query {
-  getImages(input: GetImagesInput!): ImageConnection!
+  # NOTE: relay connection の引数はトップレベルに配置すること（apollo clientのキャッシュ設定が面倒になるため）
+  getImages(
+    first: Int @tag(validate: "omitempty,min=1,max=100")
+    last: Int @tag(validate: "omitempty,min=1,max=100")
+    after: String @tag(validate: "omitempty,min=1")
+    before: String @tag(validate: "omitempty,min=1")
+    filter: GetImagesFilterInput
+  ): ImageConnection!
 }
 
 extend type Mutation {
@@ -15,13 +22,13 @@ extend type Mutation {
   downloadImages(input: DownloadImagesInput!): DownloadUrl!
 }
 
-input GetImagesPaginationsInput {
+input GetImagesFilterInput {
   tags: [String!]
 }
 
-input GetImagesInput {
-  conditions: GetImagesPaginationsInput
-  pagination: PaginationInput!
+enum Visibility {
+  PUBLIC
+  PRIVATE
 }
 
 input UploadImageInput {

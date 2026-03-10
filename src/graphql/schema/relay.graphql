@@ -9,13 +9,6 @@ type PageInfo {
   endCursor: String
 }
 
-input PaginationInput {
-  first: Int @tag(validate: "omitempty,min=1")
-  last: Int @tag(validate: "omitempty,min=1")
-  after: String @tag(validate: "omitempty,min=1")
-  before: String @tag(validate: "omitempty,min=1")
-}
-
 # example
 
 # type User {

@@ -12,7 +12,7 @@ import {
   useDownloadImagesMutation,
   useGetImagesQuery,
 } from "@/graphql"
-import { useRelayConnection, useUriQuery } from "@/hooks"
+import { useIntersection, useUriQuery } from "@/hooks"
 import { action } from "@/lib/action"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
@@ -46,7 +46,7 @@ import {
 } from "@tabler/icons-react"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -81,59 +81,44 @@ const Page = () => {
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
   const [selectable, setSelectable] = useState<ImageDetailPayload["id"][]>([])
 
-  const relay = useRelayConnection({
-    hooks: () =>
-      useGetImagesQuery({
-        variables: {
-          input: {
-            conditions: {
-              tags: query === undefined ? [] : query.tags,
-            },
-            pagination: {
-              first: 100,
-            },
-          },
-        },
-        notifyOnNetworkStatusChange: true,
-      }),
-    extract: (data) => data.getImages,
-    size: 10,
+  const filter = {
+    tags: query === undefined ? [] : query.tags,
+  }
+
+  const { data, fetchMore } = useGetImagesQuery({
+    variables: {
+      first: 50,
+      filter,
+    },
+    notifyOnNetworkStatusChange: true,
   })
 
-  // const intersection = useIntersection({
-  //   intersect: async () => {
-  //     if (!relay.state.pageInfo?.hasNextPage) return
-  //     const res = await relay.handler.next()
-  //     setItems((prev) => [
-  //       ...prev,
-  //       ...res.data.getImages.edges.map((edge) => {
-  //         return {
-  //           id: edge.node.id,
-  //           info: {
-  //             file: {
-  //               name: edge.node.info.file.name,
-  //               size: String(edge.node.info.file.size),
-  //               date: "",
-  //             },
-  //             image: {
-  //               width: edge.node.info.size.width,
-  //               height: edge.node.info.size.height,
-  //             },
-  //             tags: edge.node.info.tags,
-  //           },
-  //           image: {
-  //             preview: edge.node.src.preview,
-  //             thumbnail: edge.node.src.thumbnail,
-  //             alt: edge.node.info.file.name,
-  //           },
-  //         }
-  //       }),
-  //     ])
-  //   },
-  // })
+  const intersection = useIntersection({
+    intersect: async () => {
+      const pageInfo = data?.getImages.pageInfo
+      if (!pageInfo?.hasNextPage) return
+      fetchMore({
+        variables: {
+          first: 50,
+          after: pageInfo.endCursor,
+          filter,
+        }
+      })
+    },
+  })
+
+  useEffect(() => {
+    console.log(data?.getImages.edges.length)
+  }, [data])
 
   const items = useMemo(() => {
-    return relay.state.edges.map((edge) => {
+    if (!data) {
+      return []
+    }
+
+    const edges = data.getImages.edges
+
+    return edges.map((edge) => {
       return {
         id: edge.node.id,
         info: {
@@ -155,7 +140,7 @@ const Page = () => {
         },
       } satisfies ImageDetailPayload
     })
-  }, [relay.state.edges])
+  }, [data])
 
   const searchValid = async (values: SearchFormValues) => {
     console.log("submit values:", values)
@@ -413,10 +398,10 @@ const Page = () => {
                     )
                   })}
                   {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
-                  {/* <Image.Intersection
+                  <Image.Intersection
                     ref={intersection.ref}
-                    visible={relay.state.pageInfo?.hasNextPage || false}
-                  /> */}
+                    visible={data?.getImages.pageInfo.hasNextPage || false}
+                  />
                 </Image>
               </ImageLayout.Grid>
             </ScrollArea>

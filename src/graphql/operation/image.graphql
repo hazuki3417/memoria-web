@@ -50,8 +50,20 @@ mutation DownloadImages($input: DownloadImagesInput!) {
   }
 }
 
-query GetImages($input: GetImagesInput!) {
-  getImages(input: $input) {
+query GetImages(
+  $first: Int
+  $last: Int
+  $after: String
+  $before: String
+  $filter: GetImagesFilterInput
+) {
+  getImages(
+    first: $first
+    last: $last
+    after: $after
+    before: $before
+    filter: $filter
+  ) {
     edges {
       node {
         id

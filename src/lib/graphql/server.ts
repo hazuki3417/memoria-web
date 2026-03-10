@@ -1,7 +1,8 @@
 import { serverEnv } from "@/env/server"
-import { ApolloClient, InMemoryCache } from "@apollo/client"
+import { ApolloClient } from "@apollo/client"
 import { createUploadLink } from "apollo-upload-client"
 import "server-only"
+import { cache } from "./cache"
 import { CreateGraphQLOption } from "./type"
 
 /**
@@ -18,7 +19,7 @@ export const createGraphQL = (option: CreateGraphQLOption) => {
       uri: serverEnv.API_URI,
       headers,
     }),
-    cache: new InMemoryCache(),
+    cache: cache,
     ssrMode: true,
   })
 }
