@@ -3,6 +3,11 @@ import { FieldValid } from "@/components"
 import { imageConfig } from "@/config"
 import { ThumbnailImage } from "@/feature"
 import { zod } from "@/lib"
+import {
+  DEFAULT_FILE_SIZE_PREFIX,
+  FileSizePrefix,
+  transform,
+} from "@/lib/transform"
 import { Box, Button, Divider, Flex, TagsInput, Text } from "@mantine/core"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
 import z from "zod"
@@ -40,19 +45,28 @@ export type ImageItemUi = {
 
 export interface ImageItemProps {
   index: number
+  prefix?: FileSizePrefix
   disabled?: boolean
   onRemove?: (index: number, taskId: string) => void
   ui?: ImageItemUi
 }
 
 export const ImageItem = (props: ImageItemProps) => {
-  const { index, disabled = false, onRemove, ui } = props
+  const {
+    index,
+    prefix = DEFAULT_FILE_SIZE_PREFIX,
+    disabled = false,
+    onRemove,
+    ui,
+  } = props
   const { selected, valid = "idle" } = ui ?? {}
   const { control } = useFormContext<ImageItemValues>()
   const image = useWatch({
     control,
     name: `images.${index}`,
   })
+
+  const size = transform.file.size({ bytes: image.file.size, prefix })
 
   return (
     <Box
@@ -112,7 +126,7 @@ export const ImageItem = (props: ImageItemProps) => {
             <Text size="xs">ファイルサイズ</Text>
           </Box>
           <Box>
-            <Text size="xs">{image.file.size}</Text>
+            <Text size="xs">{`${size.value} ${size.unit}`}</Text>
           </Box>
           <Box>
             <Text size="xs">タグ</Text>

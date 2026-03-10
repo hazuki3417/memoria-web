@@ -1,16 +1,13 @@
 import { FieldValid } from "@/components"
+import { DEFAULT_FILE_SIZE_PREFIX, FileSizePrefix, transform } from "@/lib/transform"
 import { Box, BoxProps, List, Stack } from "@mantine/core"
 import { IconPhotoPlus } from "@tabler/icons-react"
 import React, { useRef } from "react"
 import classes from "./AddImageBox.module.css"
 
 export type AddImageBoxPayload = {
-  count: {
-    max: number
-  }
-  size: {
-    max: number
-  }
+  count?: number
+  size?: number
   accept?: string
   type?: string[]
 }
@@ -22,15 +19,16 @@ export type AddImageBoxUi = {
 export interface AddImageBoxProps
   extends Omit<BoxProps, "className" | "style" | "onClick"> {
   payload: AddImageBoxPayload
+  prefix?: FileSizePrefix
   onFileSelect?: (files: FileList | null) => void
   ui?: AddImageBoxUi
   disabled?: boolean
 }
 
 export const AddImageBox = (props: AddImageBoxProps) => {
-  const { payload, ui, onFileSelect, disabled = false, ...rest } = props
+  const { payload, prefix = DEFAULT_FILE_SIZE_PREFIX, ui, onFileSelect, disabled = false, ...rest } = props
   const { valid = "idle" } = ui ?? {}
-  const { count, size, accept = "image/*", type = ["jpeg", "png"] } = payload
+  const { count = 0, size = 0, accept = "image/*", type = [] } = payload
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleClick = () => {
@@ -52,6 +50,7 @@ export const AddImageBox = (props: AddImageBoxProps) => {
     }
     onFileSelect?.(event.target.files)
   }
+  const fileSize = transform.file.size({ bytes: size, prefix })
 
   return (
     <Box
@@ -80,9 +79,9 @@ export const AddImageBox = (props: AddImageBoxProps) => {
       >
         <IconPhotoPlus size={40} />
         <List size="xs">
-          <List.Item>{type.join(" / ")}</List.Item>
-          <List.Item>{`${size.max} / 1件`}</List.Item>
-          <List.Item>{`最大 ${count.max} 件`}</List.Item>
+          <List.Item>{`最大 ${count} 件`}</List.Item>
+          <List.Item>{`${fileSize.value} ${fileSize.unit} / 1件`}</List.Item>
+          <List.Item>{type.map((value) => value.toLowerCase()).join(" / ")}</List.Item>
         </List>
       </Stack>
     </Box>

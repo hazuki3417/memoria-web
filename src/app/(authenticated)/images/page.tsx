@@ -139,7 +139,7 @@ const Page = () => {
         info: {
           file: {
             name: edge.node.info.file.name,
-            size: String(edge.node.info.file.size),
+            size: edge.node.info.file.size,
             date: "",
           },
           image: {
@@ -336,7 +336,7 @@ const Page = () => {
                       // 一括選択 -> 絞り込みへの切り替えなので選択したアイテムをクリアする
                       setSelectable([])
                     } else {
-                      // 絞り込み -> 一括選択への切り替えなので検索条件をクリアする
+                      // 絞り込み -> 一括選択への切り替えなので検索条件はそのままにする
                     }
                     setMode(mode)
                   }}

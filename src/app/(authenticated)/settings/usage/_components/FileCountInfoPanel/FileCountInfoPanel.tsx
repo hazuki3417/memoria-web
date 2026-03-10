@@ -82,7 +82,10 @@ export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
           {items.map((item) => (
             <React.Fragment key={item.type}>
               <Box>
-                <ColorSwatchText color={item.color} label={item.type.toLowerCase()} />
+                <ColorSwatchText
+                  color={item.color}
+                  label={item.type.toLowerCase()}
+                />
               </Box>
               <Box>
                 <Text size="xs">：</Text>

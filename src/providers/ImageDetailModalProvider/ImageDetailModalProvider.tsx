@@ -4,7 +4,11 @@ import { ImageDetailModal } from "@/feature"
 import { useDeleteImageMutation, useDownloadImageMutation } from "@/graphql"
 import { useDisclosure } from "@/hooks"
 import { action } from "@/lib/action"
-import { useConfirmContext, useFeedbackContext } from "@/providers"
+import {
+  useAuthContext,
+  useConfirmContext,
+  useFeedbackContext,
+} from "@/providers"
 import "client-only"
 import React, { useCallback, useState } from "react"
 import {
@@ -22,6 +26,7 @@ export const ImageDetailModalProvider = (
 ) => {
   const { children } = props
 
+  const auth = useAuthContext()
   const feedback = useFeedbackContext()
   const confirm = useConfirmContext()
   const disclosure = useDisclosure({ status: "closed" })
@@ -78,6 +83,7 @@ export const ImageDetailModalProvider = (
           onClose={handleClose}
         >
           <ImageDetailModal
+            prefix={auth.user?.preference.file.fileSizeUnit}
             payload={{
               slide: {
                 current: current + 1,

@@ -1,4 +1,9 @@
 import {
+  DEFAULT_FILE_SIZE_PREFIX,
+  FileSizePrefix,
+  transform,
+} from "@/lib/transform"
+import {
   ActionIcon,
   Badge,
   Box,
@@ -17,7 +22,7 @@ import { Header } from "./Header"
 export type InfoPayload = {
   file: {
     name: string
-    size: string
+    size: number
     date: string
   }
   image: {
@@ -35,11 +40,13 @@ export type InfoHandler = {
 
 export interface InfoProps extends PaperProps {
   payload: InfoPayload
+  prefix?: FileSizePrefix
   handler?: InfoHandler
 }
 
 export const Info = (props: InfoProps) => {
-  const { payload, handler } = props
+  const { payload, prefix = DEFAULT_FILE_SIZE_PREFIX, handler } = props
+  const size = transform.file.size({ bytes: payload.file.size, prefix })
 
   return (
     <Paper
@@ -106,14 +113,14 @@ export const Info = (props: InfoProps) => {
             <Text size="xs">ファイルサイズ</Text>
           </Grid.Col>
           <Grid.Col span={8}>
-            <Text size="xs">{payload.file.size}</Text>
+            <Text size="xs">{`${size.value} ${size.unit}`}</Text>
           </Grid.Col>
           <Grid.Col span={4}>
             <Text size="xs">サイズ</Text>
           </Grid.Col>
           <Grid.Col span={8}>
             <Text size="xs">
-              {payload.image.width} (w) x {payload.image.height} (h)
+              {payload.image.width} x {payload.image.height}
             </Text>
           </Grid.Col>
           <Grid.Col span={4}>

@@ -1,4 +1,5 @@
 import { useDisclosure, useImageRotate, useImageZoom } from "@/hooks"
+import { DEFAULT_FILE_SIZE_PREFIX, FileSizePrefix } from "@/lib/transform"
 import { Box, type BoxProps } from "@mantine/core"
 import { AnimatePresence, motion } from "framer-motion"
 import { useCallback, useMemo } from "react"
@@ -20,11 +21,12 @@ export type ImageDetailModalHandler = Omit<
 
 export interface ImageDetailModalProps extends BoxProps {
   payload: ImageDetailModalPayload
+  prefix?: FileSizePrefix
   handler?: ImageDetailModalHandler
 }
 
 export const ImageDetailModal = (props: ImageDetailModalProps) => {
-  const { payload, handler } = props
+  const { payload, prefix = DEFAULT_FILE_SIZE_PREFIX, handler } = props
   const { onClose, onDelete, onDownload, onEdit, onNext, onPrev } =
     handler ?? {}
   const drawer = useDisclosure({ status: "closed" })
@@ -113,6 +115,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
             transition={{ duration: 0.3 }}
           >
             <Info
+              prefix={prefix}
               payload={payload.info}
               handler={{
                 onClose: drawer.control.close,

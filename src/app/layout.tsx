@@ -45,7 +45,7 @@ const RootLayout = async (props: RootLayoutProps) => {
     try {
       const result = await client.query<GetMeQuery>({ query: GetMeDocument })
       context.user = {
-        id: result.data.me.id,
+        ...result.data.me,
       }
     } catch (error) {
       console.debug("error", error)

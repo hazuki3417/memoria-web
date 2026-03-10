@@ -1,6 +1,18 @@
 query GetMe {
   me {
     id
+    limit {
+      upload {
+        file {
+          count
+          size
+          type
+        }
+        tag {
+          count
+        }
+      }
+    }
     preference {
       file {
       dateFormat
@@ -89,9 +101,14 @@ query GetUsage {
     id
   	limit {
       upload {
-        maxCount
-        maxSize
-        allowedFileType
+        file {
+          count
+          size
+          type
+        }
+        tag {
+          count
+        }
       }
     }
     usage {

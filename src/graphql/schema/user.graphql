@@ -31,10 +31,20 @@ enum FileType {
   PNG
 }
 
+type UploadFileLimit {
+  count: Int!
+  size: Int64!
+  type: [FileType!]!
+}
+
+
+type UploadTagLimit {
+  count: Int!
+}
+
 type UploadLimit {
-  maxCount: Int!
-  maxSize: Int64!
-  allowedFileType: [FileType!]!
+  file: UploadFileLimit!
+  tag: UploadTagLimit!
 }
 
 type StorageUsage {
