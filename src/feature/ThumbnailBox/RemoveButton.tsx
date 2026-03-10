@@ -30,4 +30,4 @@ export const RemoveButton = (props: RemoveButtonProps) => {
     </ActionIcon>
   )
 }
-RemoveButton.displayName = "ThumbnailImage.RemoveButton"
+RemoveButton.displayName = "ThumbnailBox.RemoveButton"

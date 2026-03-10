@@ -1,2 +1,3 @@
 export * from "./ImageDetailModal"
-export * from "./ThumbnailImage"
+export * from "./ThumbnailBox"
+

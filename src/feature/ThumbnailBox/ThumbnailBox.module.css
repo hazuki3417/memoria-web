@@ -33,8 +33,8 @@
 
 /* 選択状態を表現 */
 .box[data-selected="true"] {
-  background-color: var(--mantine-color-green-light);
-  outline: 1px solid var(--mantine-color-green-filled);
+  background-color: var(--mantine-color-blue-light);
+  outline: 1px solid var(--mantine-color-blue-filled);
   filter: brightness(1.1);
 }
 
@@ -46,8 +46,8 @@
 }
 
 .box[data-valid="accept"] {
-  background-color: var(--mantine-color-blue-light);
-  outline: 1px solid var(--mantine-color-blue-filled);
+  background-color: var(--mantine-color-green-light);
+  outline: 1px solid var(--mantine-color-green-filled);
 }
 
 .box[data-valid="reject"] {

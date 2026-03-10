@@ -15,7 +15,7 @@
 }
 
 .box[data-valid="accept"] {
-  background-color: var(--mantine-color-blue-light);
+  background-color: var(--mantine-color-green-light);
 }
 
 .box[data-valid="reject"] {

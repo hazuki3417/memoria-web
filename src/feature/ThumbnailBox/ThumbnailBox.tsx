@@ -5,9 +5,9 @@ import { Image } from "./Image"
 import { Label } from "./Label"
 import { RemoveButton } from "./RemoveButton"
 import { SelectableCheckbox } from "./SelectableCheckbox"
-import classes from "./ThumbnailImage.module.css"
+import classes from "./ThumbnailBox.module.css"
 
-export type ThumbnailImageUi = {
+export type ThumbnailBoxUi = {
   outline?: boolean
   selected?: boolean
   selectable?: boolean
@@ -15,13 +15,13 @@ export type ThumbnailImageUi = {
   valid?: FieldValid
 }
 
-export interface ThumbnailImageProps {
+export interface ThumbnailBoxProps {
   children: React.ReactNode
   onClick?: React.MouseEventHandler<HTMLDivElement>
-  ui?: ThumbnailImageUi
+  ui?: ThumbnailBoxUi
 }
 
-export const ThumbnailImage = (props: ThumbnailImageProps) => {
+export const ThumbnailBox = (props: ThumbnailBoxProps) => {
   const { children, ui, ...rest } = props
   const {
     outline = false,
@@ -47,7 +47,7 @@ export const ThumbnailImage = (props: ThumbnailImageProps) => {
   )
 }
 
-ThumbnailImage.Image = memo(Image)
-ThumbnailImage.Label = memo(Label)
-ThumbnailImage.RemoveButton = memo(RemoveButton)
-ThumbnailImage.SelectableCheckbox = memo(SelectableCheckbox)
+ThumbnailBox.Image = memo(Image)
+ThumbnailBox.Label = memo(Label)
+ThumbnailBox.RemoveButton = memo(RemoveButton)
+ThumbnailBox.SelectableCheckbox = memo(SelectableCheckbox)

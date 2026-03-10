@@ -6,7 +6,7 @@ import {
   ImageLayout,
   LinkButton,
 } from "@/components"
-import { ThumbnailImage } from "@/feature"
+import { ThumbnailBox } from "@/feature"
 import {
   useDeleteImagesMutation,
   useDownloadImagesMutation,
@@ -371,7 +371,7 @@ const Page = () => {
                 <Image>
                   {items.map((item) => {
                     return (
-                      <ThumbnailImage
+                      <ThumbnailBox
                         key={item.id}
                         ui={{
                           selected:
@@ -404,12 +404,12 @@ const Page = () => {
                           }
                         }}
                       >
-                        <ThumbnailImage.Image
+                        <ThumbnailBox.Image
                           bdrs="sm"
                           src={item.image.thumbnail}
                           alt={item.image.alt}
                         />
-                      </ThumbnailImage>
+                      </ThumbnailBox>
                     )
                   })}
                   {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}

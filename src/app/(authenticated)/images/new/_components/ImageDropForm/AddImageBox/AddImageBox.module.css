@@ -15,8 +15,12 @@
   filter: brightness(1.1);
 }
 
-.box[data-valid="accept"] {
+.box[data-active="true"] {
   background-color: var(--mantine-color-blue-light);
+}
+
+.box[data-valid="accept"] {
+  background-color: var(--mantine-color-green-light);
 }
 
 .box[data-valid="reject"] {

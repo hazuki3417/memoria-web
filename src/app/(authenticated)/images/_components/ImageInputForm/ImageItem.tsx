@@ -1,7 +1,7 @@
 "use client"
 import { FieldValid } from "@/components"
 import { imageConfig } from "@/config"
-import { ThumbnailImage } from "@/feature"
+import { ThumbnailBox } from "@/feature"
 import { zod } from "@/lib"
 import {
   DEFAULT_FILE_SIZE_PREFIX,
@@ -76,7 +76,7 @@ export const ImageItem = (props: ImageItemProps) => {
       data-disabled={disabled}
     >
       <Flex gap="xs">
-        <ThumbnailImage
+        <ThumbnailBox
           ui={{
             outline: true,
           }}
@@ -88,7 +88,7 @@ export const ImageItem = (props: ImageItemProps) => {
             render={({ field }) => {
               const { value, ...rest } = field
               return (
-                <ThumbnailImage.SelectableCheckbox {...rest} checked={value} />
+                <ThumbnailBox.SelectableCheckbox {...rest} checked={value} />
               )
             }}
           />
@@ -97,14 +97,14 @@ export const ImageItem = (props: ImageItemProps) => {
             name={`images.${index}.file`}
             render={({ field }) => {
               return (
-                <ThumbnailImage.Image
+                <ThumbnailBox.Image
                   src={URL.createObjectURL(field.value)}
                   alt={field.value.name}
                 />
               )
             }}
           />
-        </ThumbnailImage>
+        </ThumbnailBox>
         <Divider orientation="vertical" />
         <Box
           style={(theme) => ({
