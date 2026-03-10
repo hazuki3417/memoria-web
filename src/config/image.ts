@@ -3,7 +3,7 @@ export const imageConfig = {
     max: 10,
   },
   count: {
-    max: 20,
+    max: 100,
   },
   size: {
     max: 50 * 1024 * 1024,

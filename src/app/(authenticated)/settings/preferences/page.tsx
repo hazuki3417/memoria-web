@@ -69,7 +69,6 @@ const Page = () => {
   useEffect(() => {
     if (getPreference.data) {
       const formData = getPreference.data.me.preference
-      console.debug("formData", formData)
       reset({
         ...formData,
       })

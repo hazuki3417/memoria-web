@@ -102,7 +102,7 @@ const Page = () => {
           first: 50,
           after: pageInfo.endCursor,
           filter,
-        }
+        },
       })
     },
   })

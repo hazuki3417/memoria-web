@@ -48,7 +48,7 @@ const RootLayout = async (props: RootLayoutProps) => {
         ...result.data.me,
       }
     } catch (error) {
-      console.debug("error", error)
+      console.error(error)
     }
   }
 

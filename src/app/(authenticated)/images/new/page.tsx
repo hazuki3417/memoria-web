@@ -90,7 +90,6 @@ const Page = () => {
     },
   })
 
-
   const { getValues, setValue } = methods
 
   const feedback = useFeedbackContext()
@@ -175,14 +174,6 @@ const Page = () => {
     }
   }, [manager.value.meta.result])
 
-  useEffect(() => {
-    console.debug("debug task manager", {
-      images: watchValueImages,
-      tasks: manager.value.tasks,
-      summary: manager.value.meta.summary,
-    })
-  }, [manager.value.tasks, watchValueImages])
-
   const addFiles = (files: FileList) => {
     const images: ImageValues[] = []
     const tasks: Task[] = []
@@ -237,7 +228,6 @@ const Page = () => {
   const handleFileDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault()
-      console.debug("drop", event.dataTransfer.files)
       addFiles(event.dataTransfer.files)
     },
     [],
@@ -296,7 +286,7 @@ const Page = () => {
         <ImageDropForm.AddImageBox
           prefix={auth.user?.preference.file.fileSizeUnit}
           payload={{
-            ...auth.user?.limit.upload.file
+            ...auth.user?.limit.upload.file,
           }}
           disabled={imageDropFormDisabled}
           onFileSelect={handleFileSelect}
