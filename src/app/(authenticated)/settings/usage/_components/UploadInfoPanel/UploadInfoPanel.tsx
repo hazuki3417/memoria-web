@@ -1,4 +1,9 @@
 import {
+  DEFAULT_FILE_SIZE_PREFIX,
+  FileSizePrefix,
+  transform,
+} from "@/lib/transform"
+import {
   Box,
   Divider,
   Group,
@@ -17,12 +22,16 @@ export type UploadInfoPanelPayload = {
 
 export interface UploadInfoPanelProps
   extends Omit<PaperProps, "shadow" | "withBorder"> {
+  prefix?: FileSizePrefix
   payload?: UploadInfoPanelPayload
 }
 
 export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
-  const { payload, ...rest } = props
+  const { payload, prefix = DEFAULT_FILE_SIZE_PREFIX, ...rest } = props
   const { limitFiles = 0, limitSize = 0, allowType = [] } = payload ?? {}
+
+  const size = transform.file.size({ bytes: limitSize, prefix })
+
   return (
     <Paper shadow="xs" withBorder {...rest}>
       <Group gap={4} p="xs">
@@ -44,7 +53,7 @@ export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">{limitFiles} 件</Text>
+          <Text size="xs">{`${limitFiles} 件`}</Text>
         </Box>
 
         <Box>
@@ -54,7 +63,7 @@ export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">{limitSize} MB / 1 件</Text>
+          <Text size="xs">{`${size.value} ${size.unit} / 1 件`}</Text>
         </Box>
 
         <Box>
@@ -64,7 +73,9 @@ export const UploadInfoPanel = (props: UploadInfoPanelProps) => {
           <Text size="xs">：</Text>
         </Box>
         <Box>
-          <Text size="xs">{allowType.join(" / ")}</Text>
+          <Text size="xs">
+            {allowType.map((type) => type.toLowerCase()).join(" / ")}
+          </Text>
         </Box>
       </Box>
     </Paper>

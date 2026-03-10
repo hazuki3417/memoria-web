@@ -1,3 +1,4 @@
+import { transform } from "@/lib/transform"
 import { DonutChart } from "@mantine/charts"
 import {
   Box,
@@ -18,12 +19,6 @@ export type FileCountInfo = {
   value: number
 }
 
-export type FileCountItem = FileCountInfo & {
-  color: string
-  size: string
-  persent: string
-}
-
 export type FileCountInfoPanelPayload = {
   total?: number
   files?: FileCountInfo[]
@@ -38,14 +33,14 @@ export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
   const { payload, ...rest } = props
   const { total = 0, files = [] } = payload ?? {}
 
-  const items = useMemo((): FileCountItem[] => {
+  const items = useMemo(() => {
     return files.map((file) => {
       const persent = 0 < file.value ? (file.value / total) * 100 : 0
       return {
         ...file,
         color: FILE_TYPE_COLOR[file.type.toLowerCase()],
-        size: String(file.value),
-        persent: String(persent),
+        size: transform.num.en({ value: file.value }),
+        persent: Math.round(persent),
       }
     })
   }, [files, total])
@@ -57,6 +52,8 @@ export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
       color: item.color,
     }
   })
+
+  const totalSize = transform.num.en({ value: total })
 
   return (
     <Paper shadow="xs" withBorder {...rest}>
@@ -72,7 +69,7 @@ export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
             startAngle={90}
             endAngle={-270}
             withTooltip={false}
-            chartLabel={`${total} 件`}
+            chartLabel={`${totalSize} 件`}
             data={data}
           />
         </Box>
@@ -85,16 +82,16 @@ export const FileCountInfoPanel = (props: FileCountInfoPanelProps) => {
           {items.map((item) => (
             <React.Fragment key={item.type}>
               <Box>
-                <ColorSwatchText color={item.color} label={item.type} />
+                <ColorSwatchText color={item.color} label={item.type.toLowerCase()} />
               </Box>
               <Box>
                 <Text size="xs">：</Text>
               </Box>
-              <Box>
-                <Text size="xs">{item.size} 件</Text>
+              <Box style={{ display: "flex", justifyContent: "end" }}>
+                <Text size="xs">{`${item.size} 件`}</Text>
               </Box>
               <Box>
-                <Text size="xs">（ {item.persent} % ）</Text>
+                <Text size="xs">{`（ ${item.persent} % ）`}</Text>
               </Box>
             </React.Fragment>
           ))}

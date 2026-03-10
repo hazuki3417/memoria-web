@@ -74,7 +74,7 @@ const Page = () => {
             <StorageInfoPanel
               payload={{
                 used: storage?.used,
-                total: storage?.total,
+                capacity: storage?.total,
               }}
             />
           </Stack>

@@ -1,3 +1,8 @@
+import {
+  DEFAULT_FILE_SIZE_PREFIX,
+  FileSizePrefix,
+  transform,
+} from "@/lib/transform"
 import { DonutChart } from "@mantine/charts"
 import {
   Box,
@@ -18,12 +23,6 @@ export type FileSizeInfo = {
   value: number
 }
 
-export type FileSizeItem = FileSizeInfo & {
-  color: string
-  size: string
-  persent: string
-}
-
 export type FileSizeInfoPanelPayload = {
   total?: number
   files?: FileSizeInfo[]
@@ -31,22 +30,22 @@ export type FileSizeInfoPanelPayload = {
 
 export interface FileSizeInfoPanelProps
   extends Omit<PaperProps, "shadow" | "withBorder"> {
+  prefix?: FileSizePrefix
   payload?: FileSizeInfoPanelPayload
 }
 
 export const FileSizeInfoPanel = (props: FileSizeInfoPanelProps) => {
-  const { payload, ...rest } = props
+  const { payload, prefix = DEFAULT_FILE_SIZE_PREFIX, ...rest } = props
   const { total = 0, files = [] } = payload ?? {}
 
-  const items = useMemo((): FileSizeItem[] => {
+  const items = useMemo(() => {
     return files.map((file) => {
       const persent = 0 < file.value ? (file.value / total) * 100 : 0
-      console.debug("file", file)
       return {
         ...file,
         color: FILE_TYPE_COLOR[file.type.toLowerCase()],
-        size: String(file.value),
-        persent: String(persent),
+        size: transform.file.size({ bytes: file.value, prefix }),
+        persent: Math.round(persent),
       }
     })
   }, [files, total])
@@ -58,6 +57,8 @@ export const FileSizeInfoPanel = (props: FileSizeInfoPanelProps) => {
       color: item.color,
     }
   })
+
+  const totalSize = transform.file.size({ bytes: total, prefix })
 
   return (
     <Paper shadow="xs" withBorder {...rest}>
@@ -73,7 +74,7 @@ export const FileSizeInfoPanel = (props: FileSizeInfoPanelProps) => {
             startAngle={90}
             endAngle={-270}
             withTooltip={false}
-            chartLabel={`${total}`}
+            chartLabel={`${totalSize.value} ${totalSize.unit}`}
             data={data}
           />
         </Box>
@@ -86,16 +87,16 @@ export const FileSizeInfoPanel = (props: FileSizeInfoPanelProps) => {
           {items.map((item) => (
             <React.Fragment key={item.type}>
               <Box>
-                <ColorSwatchText color={item.color} label={item.type} />
+                <ColorSwatchText color={item.color} label={item.type.toLowerCase()} />
               </Box>
               <Box>
                 <Text size="xs">：</Text>
               </Box>
-              <Box>
-                <Text size="xs">{item.size}</Text>
+              <Box style={{ display: "flex", justifyContent: "end" }}>
+                <Text size="xs">{`${item.size.value} ${item.size.unit}`}</Text>
               </Box>
               <Box>
-                <Text size="xs">（ {item.persent} % ）</Text>
+                <Text size="xs">{`（ ${item.persent} % ）`}</Text>
               </Box>
             </React.Fragment>
           ))}
