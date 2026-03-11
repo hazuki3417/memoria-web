@@ -22,7 +22,8 @@ const Layout = async (props: LayoutProps) => {
     return null
   }
 
-  const client = createGraphQL({ token: session.tokenSet.accessToken })
+  const graphql = { token: session.tokenSet.accessToken }
+  const client = createGraphQL(graphql)
   const result = await client.query<GetMeQuery>({ query: GetMeDocument })
 
   const user: UserContext = {
@@ -30,7 +31,7 @@ const Layout = async (props: LayoutProps) => {
   }
 
   return (
-    <Providers user={user} graphql={{ token: session?.tokenSet.accessToken }}>
+    <Providers user={user} graphql={graphql}>
       <AppGlobal />
       <AppShell header={{ height: theme.other.app.header.height }}>
         <AppShellHeader>
