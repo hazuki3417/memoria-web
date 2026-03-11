@@ -4,10 +4,7 @@ import { ImageDetailModal } from "@/feature"
 import { useDeleteImageMutation, useDownloadImageMutation } from "@/graphql"
 import { useDisclosure, usePreference } from "@/hooks"
 import { action } from "@/lib/action"
-import {
-  useConfirmContext,
-  useFeedbackContext
-} from "@/providers"
+import { useConfirmContext, useFeedbackContext } from "@/providers"
 import "client-only"
 import React, { useCallback, useState } from "react"
 import {
@@ -143,7 +140,7 @@ export const ImageDetailModalProvider = (
                   fileName: downloadUrl.fileName,
                 })
               },
-              onEdit: () => { },
+              onEdit: () => {},
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

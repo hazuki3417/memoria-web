@@ -4,7 +4,7 @@ import { resolveUri } from "@/lib/url"
 import { Text } from "@mantine/core"
 import { useTranslation } from "react-i18next"
 
-export interface SiginInButtonProps extends Omit<LinkButtonProps, "href"> { }
+export interface SiginInButtonProps extends Omit<LinkButtonProps, "href"> {}
 
 export const SiginInButton = (props: SiginInButtonProps) => {
   const { ...rest } = props

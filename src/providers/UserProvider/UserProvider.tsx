@@ -1,5 +1,4 @@
 "use client"
-import "client-only"
 import { UserContext } from "./UserContext"
 
 export interface UserProviderProps {

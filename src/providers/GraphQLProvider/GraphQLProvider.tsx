@@ -1,7 +1,8 @@
-import { ApolloProvider } from "@apollo/client"
+"use client"
 import { createGraphQL } from "@/lib/graphql/clinet"
-import React from "react"
 import { CreateGraphQLOption } from "@/lib/graphql/type"
+import { ApolloProvider } from "@apollo/client"
+import React from "react"
 
 export interface GraphQLProviderProps {
   children: React.ReactNode

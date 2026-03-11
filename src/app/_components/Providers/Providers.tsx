@@ -37,7 +37,9 @@ export const Providers = (props: ProvidersProps) => {
             <MemoGraphQLProvider option={option.graphql}>
               <FeedbackProvider>
                 <ConfirmProvider>
-                  <ImageDetailModalProvider>{children}</ImageDetailModalProvider>
+                  <ImageDetailModalProvider>
+                    {children}
+                  </ImageDetailModalProvider>
                 </ConfirmProvider>
               </FeedbackProvider>
             </MemoGraphQLProvider>

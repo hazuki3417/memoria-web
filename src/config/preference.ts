@@ -12,5 +12,5 @@ export const preferenceConfig: Preference = {
   preview: {
     loop: false,
     show: false,
-  }
+  },
 }

@@ -1,5 +1,4 @@
 "use client"
-import "client-only"
 import React, { useCallback, useRef, useState } from "react"
 import {
   CONFIRM_RESULT,

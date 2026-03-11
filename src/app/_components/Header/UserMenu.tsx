@@ -7,7 +7,7 @@ import {
   IconSettings,
 } from "@tabler/icons-react"
 
-export interface UserMenuProps { }
+export interface UserMenuProps {}
 
 export const UserMenu = (props: UserMenuProps) => {
   return (

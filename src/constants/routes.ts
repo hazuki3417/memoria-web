@@ -20,7 +20,7 @@ export const routes = {
         breadcrumb: "ログアウト",
         tags: [],
       },
-    }
+    },
   },
   dashboard: {
     segment: "dashboard",

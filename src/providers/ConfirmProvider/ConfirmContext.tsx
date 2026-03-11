@@ -1,5 +1,4 @@
 "use client"
-import "client-only"
 import React, { createContext } from "react"
 
 export const CONFIRM_RESULT = {
