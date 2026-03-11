@@ -33,7 +33,7 @@ import {
   ScrollArea,
   SegmentedControl,
   Tabs,
-  TagsInput,
+  TagsInput
 } from "@mantine/core"
 import {
   IconCheckbox,
@@ -87,7 +87,7 @@ const Page = () => {
 
   const { data, fetchMore } = useGetImagesQuery({
     variables: {
-      first: 50,
+      first: 80,
       filter,
     },
     notifyOnNetworkStatusChange: true,
@@ -236,115 +236,118 @@ const Page = () => {
           </ActionPanel.Right>
         </ActionPanel>
         <Tabs.Panel value={TAB_FIELDS.list}>
-          <ActionPanel mb="xs">
-            <ActionPanel.Left>
-              {mode === "filter" && (
-                <form
-                  onSubmit={handleSubmit(searchValid, searchInvalid)}
-                  style={{ flex: 1 }}
-                >
-                  <Flex align="center" gap="xs" w="100%">
-                    <Controller
-                      name="tags"
-                      control={control}
-                      render={({ field }) => (
-                        <TagsInput
-                          {...field}
-                          size="xs"
-                          placeholder={t("placeholder.tag")}
-                          leftSection={<IconSearch size={16} />}
-                          clearable
-                          flex="1"
-                        />
-                      )}
-                    />
-                    <Button size="xs" type="submit">
-                      {t("button.search")}
-                    </Button>
-                  </Flex>
-                </form>
-              )}
-              {mode === "bulk" && (
-                <Flex align="center" gap="xs">
-                  <Checkbox
-                    size="xs"
-                    variant="filled"
-                    color="blue"
-                    label={`${selectableCount} 件選択`}
-                    checked={allSelectable}
-                    indeterminate={indeterminate}
-                    onChange={(event) => toggleAll(event.currentTarget.checked)}
-                  />
-                  <div></div>
-                </Flex>
-              )}
-            </ActionPanel.Left>
-            <ActionPanel.Right>
-              <Flex align="center" gap="xs">
-                {mode === "bulk" && (
-                  <ButtonGroup>
-                    <Button
-                      size="xs"
-                      leftSection={<IconEdit size={16} />}
-                      disabled={!hasSelectable}
-                      onClick={handleEditImages}
-                    >
-                      {t("button.edit")}
-                    </Button>
-                    <Button
-                      size="xs"
-                      leftSection={<IconTrash size={16} />}
-                      disabled={!hasSelectable}
-                      onClick={handleDeleteImages}
-                    >
-                      {t("button.delete")}
-                    </Button>
-                    <Button
-                      size="xs"
-                      leftSection={<IconDownload size={16} />}
-                      disabled={!hasSelectable}
-                      onClick={handleDownloadImages}
-                    >
-                      {t("button.download")}
-                    </Button>
-                  </ButtonGroup>
+          <Box>
+
+            <ActionPanel mb="xs">
+              <ActionPanel.Left>
+                {mode === "filter" && (
+                  <form
+                    onSubmit={handleSubmit(searchValid, searchInvalid)}
+                    style={{ flex: 1 }}
+                  >
+                    <Flex align="center" gap="xs" w="100%">
+                      <Controller
+                        name="tags"
+                        control={control}
+                        render={({ field }) => (
+                          <TagsInput
+                            {...field}
+                            size="xs"
+                            placeholder={t("placeholder.tag")}
+                            leftSection={<IconSearch size={16} />}
+                            clearable
+                            flex="1"
+                          />
+                        )}
+                      />
+                      <Button size="xs" type="submit">
+                        {t("button.search")}
+                      </Button>
+                    </Flex>
+                  </form>
                 )}
-                <SegmentedControl
-                  value={mode}
-                  onChange={(value) => {
-                    const mode = value as "filter" | "bulk"
-                    if (mode === "filter") {
-                      // 一括選択 -> 絞り込みへの切り替えなので選択したアイテムをクリアする
-                      setSelectable([])
-                    } else {
-                      // 絞り込み -> 一括選択への切り替えなので検索条件はそのままにする
-                    }
-                    setMode(mode)
-                  }}
-                  data={[
-                    {
-                      value: "filter",
-                      label: (
-                        <Center style={{ gap: 10 }}>
-                          <IconListSearch size={16} />
-                          <span>{t("label.filter")}</span>
-                        </Center>
-                      ),
-                    },
-                    {
-                      value: "bulk",
-                      label: (
-                        <Center style={{ gap: 10 }}>
-                          <IconCheckbox size={16} />
-                          <span>{t("label.bulk")}</span>
-                        </Center>
-                      ),
-                    },
-                  ]}
-                />
-              </Flex>
-            </ActionPanel.Right>
-          </ActionPanel>
+                {mode === "bulk" && (
+                  <Flex align="center" gap="xs">
+                    <Checkbox
+                      size="xs"
+                      variant="filled"
+                      color="blue"
+                      label={`${selectableCount} 件選択`}
+                      checked={allSelectable}
+                      indeterminate={indeterminate}
+                      onChange={(event) => toggleAll(event.currentTarget.checked)}
+                    />
+                    <div></div>
+                  </Flex>
+                )}
+              </ActionPanel.Left>
+              <ActionPanel.Right>
+                <Flex align="center" gap="xs">
+                  {mode === "bulk" && (
+                    <ButtonGroup>
+                      <Button
+                        size="xs"
+                        leftSection={<IconEdit size={16} />}
+                        disabled={!hasSelectable}
+                        onClick={handleEditImages}
+                      >
+                        {t("button.edit")}
+                      </Button>
+                      <Button
+                        size="xs"
+                        leftSection={<IconTrash size={16} />}
+                        disabled={!hasSelectable}
+                        onClick={handleDeleteImages}
+                      >
+                        {t("button.delete")}
+                      </Button>
+                      <Button
+                        size="xs"
+                        leftSection={<IconDownload size={16} />}
+                        disabled={!hasSelectable}
+                        onClick={handleDownloadImages}
+                      >
+                        {t("button.download")}
+                      </Button>
+                    </ButtonGroup>
+                  )}
+                  <SegmentedControl
+                    value={mode}
+                    onChange={(value) => {
+                      const mode = value as "filter" | "bulk"
+                      if (mode === "filter") {
+                        // 一括選択 -> 絞り込みへの切り替えなので選択したアイテムをクリアする
+                        setSelectable([])
+                      } else {
+                        // 絞り込み -> 一括選択への切り替えなので検索条件はそのままにする
+                      }
+                      setMode(mode)
+                    }}
+                    data={[
+                      {
+                        value: "filter",
+                        label: (
+                          <Center style={{ gap: 10 }}>
+                            <IconListSearch size={16} />
+                            <span>{t("label.filter")}</span>
+                          </Center>
+                        ),
+                      },
+                      {
+                        value: "bulk",
+                        label: (
+                          <Center style={{ gap: 10 }}>
+                            <IconCheckbox size={16} />
+                            <span>{t("label.bulk")}</span>
+                          </Center>
+                        ),
+                      },
+                    ]}
+                  />
+                </Flex>
+              </ActionPanel.Right>
+            </ActionPanel>
+          </Box>
           <ImageLayout>
             {/* FIX: スクロール仮実装 */}
             <ScrollArea h={"76vh"} scrollbarSize={6}>

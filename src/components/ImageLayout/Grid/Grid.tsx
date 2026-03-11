@@ -1,15 +1,18 @@
-import { Box } from "@mantine/core"
+import { Box, BoxProps } from "@mantine/core"
 import React from "react"
 
-export interface GridProps {
+export interface GridProps extends BoxProps {
   children: React.ReactNode
 }
 
 export const Grid = (props: GridProps) => {
-  const { children } = props
+  const { children, style, ...rest } = props
   return (
     <Box
+      {...rest}
       style={{
+        ...style,
+        padding: "3px 0px", // NOTE: outline分の調整（0pxにするとoutlineが潰れる）
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
