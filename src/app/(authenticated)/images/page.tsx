@@ -46,7 +46,7 @@ import {
 } from "@tabler/icons-react"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -106,10 +106,6 @@ const Page = () => {
       })
     },
   })
-
-  useEffect(() => {
-    console.log(data?.getImages.edges.length)
-  }, [data])
 
   const items = useMemo(() => {
     if (!data) {

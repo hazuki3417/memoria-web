@@ -1,10 +1,6 @@
-import { GetMeDocument, GetMeQuery } from "@/graphql"
-import { auth } from "@/lib/auth"
 import { getLang } from "@/lib/cookies/lang/getLang"
-import { createGraphQL } from "@/lib/graphql/server"
 import { theme } from "@/lib/theme"
 import "@/lib/ze"
-import { UserContext } from "@/providers"
 import type { Metadata } from "next"
 import { Head, Providers } from "./_components"
 
@@ -32,22 +28,6 @@ type RootLayoutProps = {
 const RootLayout = async (props: RootLayoutProps) => {
   const { children } = props
   const lang = await getLang()
-  const session = await auth.getSession()
-
-  let user: UserContext = null
-
-  if (session !== null) {
-    const client = createGraphQL({ token: session.tokenSet.accessToken })
-
-    try {
-      const result = await client.query<GetMeQuery>({ query: GetMeDocument })
-      user = {
-        ...result.data.me,
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
 
   const config: AppConfig = {
     preference: preferenceConfig,
@@ -64,8 +44,6 @@ const RootLayout = async (props: RootLayoutProps) => {
             defaultColorScheme: "auto",
           }}
           config={config}
-          user={user}
-          option={{ graphql: { token: session?.tokenSet.accessToken } }}
         >
           {children}
         </Providers>
