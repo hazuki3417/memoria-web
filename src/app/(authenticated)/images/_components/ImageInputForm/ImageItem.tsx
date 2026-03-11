@@ -23,8 +23,8 @@ export const fileSchema = (config: FileSchemaConfig) => {
   return ze.refine(
     z.custom<File>((file) => file instanceof File),
     [
-      ze.verify.file.type(config.type),
-      ze.verify.file.size.tooLarge(config.size.max),
+      // ze.verify.file.type(config.type),
+      // ze.verify.file.size.tooLarge(config.size.max),
     ],
   )
 }

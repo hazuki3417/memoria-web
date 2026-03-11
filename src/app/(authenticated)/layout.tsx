@@ -7,6 +7,7 @@ import { createGraphQL } from "@/lib/graphql/server"
 import { theme } from "@/lib/theme"
 import { UserContext } from "@/providers"
 import { AppShell, AppShellHeader, AppShellMain } from "@mantine/core"
+import { AppGlobal } from "../_components"
 import { Providers } from "./_components"
 
 type LayoutProps = {
@@ -17,23 +18,20 @@ const Layout = async (props: LayoutProps) => {
   const { children } = props
   const session = await auth.getSession()
 
-  let user: UserContext = null
+  if (session === null) {
+    return null
+  }
 
-  if (session !== null) {
-    const client = createGraphQL({ token: session.tokenSet.accessToken })
+  const client = createGraphQL({ token: session.tokenSet.accessToken })
+  const result = await client.query<GetMeQuery>({ query: GetMeDocument })
 
-    try {
-      const result = await client.query<GetMeQuery>({ query: GetMeDocument })
-      user = {
-        ...result.data.me,
-      }
-    } catch (error) {
-      console.error(error)
-    }
+  const user: UserContext = {
+    ...result.data.me,
   }
 
   return (
     <Providers user={user} graphql={{ token: session?.tokenSet.accessToken }}>
+      <AppGlobal />
       <AppShell header={{ height: theme.other.app.header.height }}>
         <AppShellHeader>
           <Header>
