@@ -5,9 +5,8 @@ import { createGraphQL } from "@/lib/graphql/server"
 import { theme } from "@/lib/theme"
 import "@/lib/ze"
 import { UserContext } from "@/providers"
-import { AppShell, AppShellHeader, AppShellMain } from "@mantine/core"
 import type { Metadata } from "next"
-import { AppGlobal, Head, Header, Providers } from "./_components"
+import { Head, Providers } from "./_components"
 
 /**
  * NOTE: 下記の順番でimportすること
@@ -68,13 +67,7 @@ const RootLayout = async (props: RootLayoutProps) => {
           user={user}
           option={{ graphql: { token: session?.tokenSet.accessToken } }}
         >
-          <AppGlobal />
-          <AppShell header={{ height: theme.other.app.header.height }}>
-            <AppShellHeader>
-              <Header />
-            </AppShellHeader>
-            <AppShellMain>{children}</AppShellMain>
-          </AppShell>
+          {children}
         </Providers>
       </body>
     </html>

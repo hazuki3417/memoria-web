@@ -1,3 +1,4 @@
+"use client"
 import { resolveUri } from "@/lib/url"
 import { ActionIcon, Avatar, Menu, Text } from "@mantine/core"
 import {

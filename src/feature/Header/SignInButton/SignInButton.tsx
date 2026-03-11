@@ -1,12 +1,11 @@
 "use client"
 import { AnchorButton, LinkButtonProps } from "@/components"
-import { resolveUri } from "@/lib/url"
 import { Text } from "@mantine/core"
 import { useTranslation } from "react-i18next"
 
-export interface SiginInButtonProps extends Omit<LinkButtonProps, "href"> {}
+export interface SignInButtonProps extends Omit<LinkButtonProps, "href"> {}
 
-export const SiginInButton = (props: SiginInButtonProps) => {
+export const SignInButton = (props: SignInButtonProps) => {
   const { ...rest } = props
   const { t } = useTranslation()
   return (
@@ -15,7 +14,7 @@ export const SiginInButton = (props: SiginInButtonProps) => {
         minWidth: "90px",
       }}
       {...rest}
-      href={resolveUri("/auth/login")}
+      href={"/auth/login?returnTo=/dashboard"}
     >
       <Text>{t("auth.signIn")}</Text>
     </AnchorButton>

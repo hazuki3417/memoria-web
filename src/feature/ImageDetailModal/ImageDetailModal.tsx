@@ -1,3 +1,4 @@
+"use client"
 import { useDisclosure, useImageRotate, useImageZoom } from "@/hooks"
 import { DEFAULT_FILE_SIZE_PREFIX, FileSizePrefix } from "@/lib/transform"
 import { Box, type BoxProps } from "@mantine/core"
