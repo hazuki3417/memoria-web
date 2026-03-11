@@ -1,7 +1,7 @@
 import { z, type ZodType } from "zod"
 import { zodI18nMap } from "zod-i18n-map"
 import { TranslationSchemaKey } from "./type"
-import { validate } from "./validate"
+import { validator } from "./validator"
 
 z.setErrorMap(zodI18nMap)
 
@@ -26,24 +26,24 @@ const refine = <T>(
 
 const file = {
   type: (type: string[]): RefineCondition<File> => ({
-    valid: (file) => validate.file(file).type(type),
+    valid: (file) => validator.file(file).type(type),
     key: "validate.file.type.unsupported",
   }),
   size: {
     tooLarge: (max: number): RefineCondition<File> => ({
-      valid: (file) => validate.file(file).size.tooLarge(max),
+      valid: (file) => validator.file(file).size.tooLarge(max),
       key: "validate.file.size.tooLarge",
     }),
     tooSmall: (min: number): RefineCondition<File> => ({
-      valid: (file) => validate.file(file).size.tooSmall(min),
+      valid: (file) => validator.file(file).size.tooSmall(min),
       key: "validate.file.size.tooSmall",
     }),
   },
 }
 
-export const zod = {
+export const ze = {
   refine,
-  validate: {
+  verify: {
     file,
   },
 }

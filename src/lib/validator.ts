@@ -1,7 +1,3 @@
-/**
- * validate util
- */
-
 const file = (file: File) => {
   return {
     type: (type: string[]): boolean => type.includes(file.type),
@@ -12,6 +8,6 @@ const file = (file: File) => {
   }
 }
 
-export const validate = {
+export const validator = {
   file,
 }

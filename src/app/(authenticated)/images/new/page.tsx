@@ -28,19 +28,23 @@ import { z } from "zod"
 import {
   ImageInputForm,
   imageItemSchema,
+  ImageItemSchemaConfig,
   ImageValues,
   tagsSchema,
 } from "../_components"
 import { ImageDropForm } from "./_components"
 
-const imageInputFormSchema = z.object({
-  bulk: z.object({
-    tags: tagsSchema,
-  }),
-  ...imageItemSchema.shape,
-})
+type ImageInputFormSchemaConfig = ImageItemSchemaConfig
+const imageInputFormSchema = (config: ImageInputFormSchemaConfig) => {
+  return z.object({
+    bulk: z.object({
+      tags: tagsSchema(config.image.tags),
+    }),
+    ...imageItemSchema(config).shape,
+  })
+}
 
-type ImageInputFormValues = z.infer<typeof imageInputFormSchema>
+type ImageInputFormValues = z.infer<ReturnType<typeof imageInputFormSchema>>
 
 /**
  * NOTE: 仕様
@@ -79,8 +83,24 @@ type ImageInputFormValues = z.infer<typeof imageInputFormSchema>
  */
 const Page = () => {
   const auth = useAuthContext()
+  const inputSchema = useMemo(() => {
+    return imageInputFormSchema({
+      count: {
+        max: 29,
+      },
+      image: {
+        file: {
+          type: ["image/png", "image/jpg"],
+          size: {
+            max: 100,
+          },
+        },
+        tags: { count: { max: 30 } },
+      },
+    })
+  }, [auth])
   const methods = useForm<ImageInputFormValues>({
-    resolver: zodResolver(imageInputFormSchema),
+    resolver: zodResolver(inputSchema),
     mode: "onChange",
     defaultValues: {
       bulk: {

@@ -1,8 +1,7 @@
 "use client"
 import { FieldValid } from "@/components"
-import { imageConfig } from "@/config"
 import { ThumbnailBox } from "@/feature"
-import { zod } from "@/lib"
+import { ze } from "@/lib"
 import {
   DEFAULT_FILE_SIZE_PREFIX,
   FileSizePrefix,
@@ -13,30 +12,62 @@ import { Controller, useFormContext, useWatch } from "react-hook-form"
 import z from "zod"
 import classes from "./ImageItem.module.css"
 
-export const fileSchema = zod.refine(
-  z.custom<File>((file) => file instanceof File),
-  [
-    zod.validate.file.type(imageConfig.type),
-    zod.validate.file.size.tooLarge(imageConfig.size.max),
-  ],
-)
+export type FileSchemaConfig = {
+  type: string[]
+  size: {
+    max: number
+  }
+}
 
-export const tagsSchema = z.array(z.string())
+export const fileSchema = (config: FileSchemaConfig) => {
+  return ze.refine(
+    z.custom<File>((file) => file instanceof File),
+    [
+      ze.verify.file.type(config.type),
+      ze.verify.file.size.tooLarge(config.size.max),
+    ],
+  )
+}
 
-export const imageSchema = z.object({
-  taskId: z.string(),
-  selected: z.boolean(),
-  file: fileSchema,
-  tags: tagsSchema,
-})
+export type TagsSchemaConfig = {
+  count: {
+    max: number
+  }
+}
 
-export type ImageValues = z.infer<typeof imageSchema>
+export const tagsSchema = (config: TagsSchemaConfig) => {
+  return z.array(z.string()).max(config.count.max)
+}
 
-export const imageItemSchema = z.object({
-  images: z.array(imageSchema).max(imageConfig.count.max),
-})
+export type ImageSchemaConfig = {
+  file: FileSchemaConfig
+  tags: TagsSchemaConfig
+}
+export const imageSchema = (config: ImageSchemaConfig) => {
+  return z.object({
+    taskId: z.string(),
+    selected: z.boolean(),
+    file: fileSchema(config.file),
+    tags: tagsSchema(config.tags),
+  })
+}
 
-export type ImageItemValues = z.infer<typeof imageItemSchema>
+export type ImageValues = z.infer<ReturnType<typeof imageSchema>>
+
+export type ImageItemSchemaConfig = {
+  image: ImageSchemaConfig
+  count: {
+    max: number
+  }
+}
+
+export const imageItemSchema = (config: ImageItemSchemaConfig) => {
+  return z.object({
+    images: z.array(imageSchema(config.image)).max(config.count.max),
+  })
+}
+
+export type ImageItemValues = z.infer<ReturnType<typeof imageItemSchema>>
 
 export type ImageItemUi = {
   selected?: boolean
