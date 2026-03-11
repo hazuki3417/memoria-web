@@ -21,7 +21,7 @@ const Layout = async (props: LayoutProps) => {
             <SignInButton size="xs" />
           </Header>
         </AppShellHeader>
-        <AppShellMain>{children}</AppShellMain>
+        <AppShellMain style={{ height: "100vh" }}>{children}</AppShellMain>
       </AppShell>
     </Providers>
   )

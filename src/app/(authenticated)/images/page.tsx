@@ -25,7 +25,6 @@ import {
 } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
-  Box,
   Button,
   Center,
   Checkbox,
@@ -33,7 +32,7 @@ import {
   ScrollArea,
   SegmentedControl,
   Tabs,
-  TagsInput
+  TagsInput,
 } from "@mantine/core"
 import {
   IconCheckbox,
@@ -215,200 +214,214 @@ const Page = () => {
   }
 
   return (
-    <Box>
-      <Tabs color="gray" variant="pills" defaultValue={TAB_FIELDS.list}>
+    <Tabs
+      color="gray"
+      variant="pills"
+      defaultValue={TAB_FIELDS.list}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
+      <ActionPanel mb="xs">
+        <ActionPanel.Left>
+          <Tabs.List>
+            <Tabs.Tab value={TAB_FIELDS.list}>{t("label.list")}</Tabs.Tab>
+            <Tabs.Tab value={TAB_FIELDS.group}>{t("label.group")}</Tabs.Tab>
+          </Tabs.List>
+        </ActionPanel.Left>
+        <ActionPanel.Center></ActionPanel.Center>
+        <ActionPanel.Right>
+          <LinkButton
+            size="xs"
+            leftSection={<IconLibraryPlus size={16} />}
+            href={resolveUri("/images/new")}
+          >
+            {t("button.new")}
+          </LinkButton>
+        </ActionPanel.Right>
+      </ActionPanel>
+      <Tabs.Panel
+        value={TAB_FIELDS.list}
+        style={{
+          display: "flex",
+          flex: "1",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
         <ActionPanel mb="xs">
           <ActionPanel.Left>
-            <Tabs.List>
-              <Tabs.Tab value={TAB_FIELDS.list}>{t("label.list")}</Tabs.Tab>
-              <Tabs.Tab value={TAB_FIELDS.group}>{t("label.group")}</Tabs.Tab>
-            </Tabs.List>
+            {mode === "filter" && (
+              <form
+                onSubmit={handleSubmit(searchValid, searchInvalid)}
+                style={{ flex: 1 }}
+              >
+                <Flex align="center" gap="xs" w="100%">
+                  <Controller
+                    name="tags"
+                    control={control}
+                    render={({ field }) => (
+                      <TagsInput
+                        {...field}
+                        size="xs"
+                        placeholder={t("placeholder.tag")}
+                        leftSection={<IconSearch size={16} />}
+                        clearable
+                        flex="1"
+                      />
+                    )}
+                  />
+                  <Button size="xs" type="submit">
+                    {t("button.search")}
+                  </Button>
+                </Flex>
+              </form>
+            )}
+            {mode === "bulk" && (
+              <Flex align="center" gap="xs">
+                <Checkbox
+                  size="xs"
+                  variant="filled"
+                  color="blue"
+                  label={`${selectableCount} 件選択`}
+                  checked={allSelectable}
+                  indeterminate={indeterminate}
+                  onChange={(event) => toggleAll(event.currentTarget.checked)}
+                />
+                <div></div>
+              </Flex>
+            )}
           </ActionPanel.Left>
-          <ActionPanel.Center></ActionPanel.Center>
           <ActionPanel.Right>
-            <LinkButton
-              size="xs"
-              leftSection={<IconLibraryPlus size={16} />}
-              href={resolveUri("/images/new")}
-            >
-              {t("button.new")}
-            </LinkButton>
+            <Flex align="center" gap="xs">
+              {mode === "bulk" && (
+                <ButtonGroup>
+                  <Button
+                    size="xs"
+                    leftSection={<IconEdit size={16} />}
+                    disabled={!hasSelectable}
+                    onClick={handleEditImages}
+                  >
+                    {t("button.edit")}
+                  </Button>
+                  <Button
+                    size="xs"
+                    leftSection={<IconTrash size={16} />}
+                    disabled={!hasSelectable}
+                    onClick={handleDeleteImages}
+                  >
+                    {t("button.delete")}
+                  </Button>
+                  <Button
+                    size="xs"
+                    leftSection={<IconDownload size={16} />}
+                    disabled={!hasSelectable}
+                    onClick={handleDownloadImages}
+                  >
+                    {t("button.download")}
+                  </Button>
+                </ButtonGroup>
+              )}
+              <SegmentedControl
+                value={mode}
+                onChange={(value) => {
+                  const mode = value as "filter" | "bulk"
+                  if (mode === "filter") {
+                    // 一括選択 -> 絞り込みへの切り替えなので選択したアイテムをクリアする
+                    setSelectable([])
+                  } else {
+                    // 絞り込み -> 一括選択への切り替えなので検索条件はそのままにする
+                  }
+                  setMode(mode)
+                }}
+                data={[
+                  {
+                    value: "filter",
+                    label: (
+                      <Center style={{ gap: 10 }}>
+                        <IconListSearch size={16} />
+                        <span>{t("label.filter")}</span>
+                      </Center>
+                    ),
+                  },
+                  {
+                    value: "bulk",
+                    label: (
+                      <Center style={{ gap: 10 }}>
+                        <IconCheckbox size={16} />
+                        <span>{t("label.bulk")}</span>
+                      </Center>
+                    ),
+                  },
+                ]}
+              />
+            </Flex>
           </ActionPanel.Right>
         </ActionPanel>
-        <Tabs.Panel value={TAB_FIELDS.list}>
-          <Box>
+        <ImageLayout>
+          <ScrollArea flex={1} scrollbarSize={6}>
+            <ImageLayout.Grid>
+              <Image>
+                {items.map((item) => {
+                  return (
+                    <ThumbnailBox
+                      key={item.id}
+                      ui={{
+                        selected:
+                          typeof selectable.find(
+                            (value) => value === item.id,
+                          ) === "string",
+                        selectable: mode === "bulk",
+                      }}
+                      onClick={() => {
+                        if (mode === "bulk") {
+                          const target = selectable.find(
+                            (value) => value === item.id,
+                          )
 
-            <ActionPanel mb="xs">
-              <ActionPanel.Left>
-                {mode === "filter" && (
-                  <form
-                    onSubmit={handleSubmit(searchValid, searchInvalid)}
-                    style={{ flex: 1 }}
-                  >
-                    <Flex align="center" gap="xs" w="100%">
-                      <Controller
-                        name="tags"
-                        control={control}
-                        render={({ field }) => (
-                          <TagsInput
-                            {...field}
-                            size="xs"
-                            placeholder={t("placeholder.tag")}
-                            leftSection={<IconSearch size={16} />}
-                            clearable
-                            flex="1"
-                          />
-                        )}
-                      />
-                      <Button size="xs" type="submit">
-                        {t("button.search")}
-                      </Button>
-                    </Flex>
-                  </form>
-                )}
-                {mode === "bulk" && (
-                  <Flex align="center" gap="xs">
-                    <Checkbox
-                      size="xs"
-                      variant="filled"
-                      color="blue"
-                      label={`${selectableCount} 件選択`}
-                      checked={allSelectable}
-                      indeterminate={indeterminate}
-                      onChange={(event) => toggleAll(event.currentTarget.checked)}
-                    />
-                    <div></div>
-                  </Flex>
-                )}
-              </ActionPanel.Left>
-              <ActionPanel.Right>
-                <Flex align="center" gap="xs">
-                  {mode === "bulk" && (
-                    <ButtonGroup>
-                      <Button
-                        size="xs"
-                        leftSection={<IconEdit size={16} />}
-                        disabled={!hasSelectable}
-                        onClick={handleEditImages}
-                      >
-                        {t("button.edit")}
-                      </Button>
-                      <Button
-                        size="xs"
-                        leftSection={<IconTrash size={16} />}
-                        disabled={!hasSelectable}
-                        onClick={handleDeleteImages}
-                      >
-                        {t("button.delete")}
-                      </Button>
-                      <Button
-                        size="xs"
-                        leftSection={<IconDownload size={16} />}
-                        disabled={!hasSelectable}
-                        onClick={handleDownloadImages}
-                      >
-                        {t("button.download")}
-                      </Button>
-                    </ButtonGroup>
-                  )}
-                  <SegmentedControl
-                    value={mode}
-                    onChange={(value) => {
-                      const mode = value as "filter" | "bulk"
-                      if (mode === "filter") {
-                        // 一括選択 -> 絞り込みへの切り替えなので選択したアイテムをクリアする
-                        setSelectable([])
-                      } else {
-                        // 絞り込み -> 一括選択への切り替えなので検索条件はそのままにする
-                      }
-                      setMode(mode)
-                    }}
-                    data={[
-                      {
-                        value: "filter",
-                        label: (
-                          <Center style={{ gap: 10 }}>
-                            <IconListSearch size={16} />
-                            <span>{t("label.filter")}</span>
-                          </Center>
-                        ),
-                      },
-                      {
-                        value: "bulk",
-                        label: (
-                          <Center style={{ gap: 10 }}>
-                            <IconCheckbox size={16} />
-                            <span>{t("label.bulk")}</span>
-                          </Center>
-                        ),
-                      },
-                    ]}
-                  />
-                </Flex>
-              </ActionPanel.Right>
-            </ActionPanel>
-          </Box>
-          <ImageLayout>
-            {/* FIX: スクロール仮実装 */}
-            <ScrollArea h={"76vh"} scrollbarSize={6}>
-              <ImageLayout.Grid>
-                <Image>
-                  {items.map((item) => {
-                    return (
-                      <ThumbnailBox
-                        key={item.id}
-                        ui={{
-                          selected:
-                            typeof selectable.find(
-                              (value) => value === item.id,
-                            ) === "string",
-                          selectable: mode === "bulk",
-                        }}
-                        onClick={() => {
-                          if (mode === "bulk") {
-                            const target = selectable.find(
-                              (value) => value === item.id,
-                            )
-
-                            if (target === undefined) {
-                              // 追加
-                              setSelectable((prev) => [...prev, item.id])
-                            } else {
-                              // 除外
-                              setSelectable((prev) =>
-                                prev.filter((value) => value !== item.id),
-                              )
-                            }
+                          if (target === undefined) {
+                            // 追加
+                            setSelectable((prev) => [...prev, item.id])
                           } else {
-                            // filter
-                            imageDetailModalContext.control.open({
-                              id: item.id,
-                              getImages: () => items,
-                            })
+                            // 除外
+                            setSelectable((prev) =>
+                              prev.filter((value) => value !== item.id),
+                            )
                           }
-                        }}
-                      >
-                        <ThumbnailBox.Image
-                          bdrs="sm"
-                          src={item.image.thumbnail}
-                          alt={item.image.alt}
-                        />
-                      </ThumbnailBox>
-                    )
-                  })}
-                  {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
-                  <Image.Intersection
-                    ref={intersection.ref}
-                    visible={data?.getImages.pageInfo.hasNextPage || false}
-                  />
-                </Image>
-              </ImageLayout.Grid>
-            </ScrollArea>
-          </ImageLayout>
-        </Tabs.Panel>
-        <Tabs.Panel value={TAB_FIELDS.group}>group panel</Tabs.Panel>
-      </Tabs>
-    </Box>
+                        } else {
+                          // filter
+                          imageDetailModalContext.control.open({
+                            id: item.id,
+                            getImages: () => items,
+                          })
+                        }
+                      }}
+                    >
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src={item.image.thumbnail}
+                        alt={item.image.alt}
+                      />
+                    </ThumbnailBox>
+                  )
+                })}
+                {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
+                <Image.Intersection
+                  ref={intersection.ref}
+                  visible={data?.getImages.pageInfo.hasNextPage || false}
+                />
+              </Image>
+            </ImageLayout.Grid>
+          </ScrollArea>
+        </ImageLayout>
+        {/* </Flex> */}
+      </Tabs.Panel>
+      <Tabs.Panel value={TAB_FIELDS.group} flex={1}>
+        group panel
+      </Tabs.Panel>
+    </Tabs>
   )
 }
 

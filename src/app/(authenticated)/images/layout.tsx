@@ -10,7 +10,7 @@ const Layout = (props: LayoutProps) => {
   const { children } = props
 
   return (
-    <Container p="lg" m={0} fluid>
+    <Container h="100%" p="lg" m={0} fluid>
       {children}
     </Container>
   )
