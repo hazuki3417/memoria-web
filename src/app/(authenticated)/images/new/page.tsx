@@ -83,25 +83,21 @@ type ImageInputFormValues = z.infer<ReturnType<typeof imageInputFormSchema>>
  */
 const Page = () => {
   const user = useUserContext()
-
-  if (user === null) {
-    return null
-  }
-
   const preference = usePreference()
+
   const inputSchema = useMemo(() => {
     return imageInputFormSchema({
-      count: {
-        max: user?.limit.upload.tag.count || 0,
-      },
       image: {
         file: {
-          type: ["image/png", "image/jpg"],
+          type: user.limit.upload.file.type,
           size: {
-            max: 100,
+            max: user.limit.upload.file.size,
           },
         },
-        tags: { count: { max: 30 } },
+        tags: { count: { max: user.limit.upload.tag.count } },
+      },
+      count: {
+        max: user.limit.upload.file.count,
       },
     })
   }, [user])
@@ -313,7 +309,7 @@ const Page = () => {
         <ImageDropForm.AddImageBox
           prefix={preference.file.fileSizeUnit}
           payload={{
-            ...user?.limit.upload.file,
+            ...user.limit.upload.file,
           }}
           disabled={imageDropFormDisabled}
           onFileSelect={handleFileSelect}
