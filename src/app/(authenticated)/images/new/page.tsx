@@ -1,9 +1,9 @@
 "use client"
 import { ActionPanel, ButtonGroup, FieldValid } from "@/components"
 import { useUploadImageMutation, Visibility } from "@/graphql"
-import { useTaskManager } from "@/hooks"
+import { usePreference, useTaskManager } from "@/hooks"
 import { wait } from "@/lib/wait"
-import { useAuthContext, useFeedbackContext } from "@/providers"
+import { useFeedbackContext, useUserContext } from "@/providers"
 import { Task, TaskValue } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -82,11 +82,17 @@ type ImageInputFormValues = z.infer<ReturnType<typeof imageInputFormSchema>>
  *       ユースケースを洗い出して検討した方が良さそう
  */
 const Page = () => {
-  const auth = useAuthContext()
+  const user = useUserContext()
+
+  if (user === null) {
+    return null
+  }
+
+  const preference = usePreference()
   const inputSchema = useMemo(() => {
     return imageInputFormSchema({
       count: {
-        max: 29,
+        max: user?.limit.upload.tag.count || 0,
       },
       image: {
         file: {
@@ -98,7 +104,8 @@ const Page = () => {
         tags: { count: { max: 30 } },
       },
     })
-  }, [auth])
+  }, [user])
+
   const methods = useForm<ImageInputFormValues>({
     resolver: zodResolver(inputSchema),
     mode: "onChange",
@@ -261,10 +268,10 @@ const Page = () => {
   }, [])
 
   const imageDropFormDisabled = useMemo(() => {
-    if (!auth.user) {
+    if (!user) {
       return true
     }
-    return auth.user.limit.upload.file.count <= watchValueImages.length
+    return user.limit.upload.file.count <= watchValueImages.length
   }, [watchValueImages])
 
   const bulkFormDisabled = (() => {
@@ -304,9 +311,9 @@ const Page = () => {
         mb="xl"
       >
         <ImageDropForm.AddImageBox
-          prefix={auth.user?.preference.file.fileSizeUnit}
+          prefix={preference.file.fileSizeUnit}
           payload={{
-            ...auth.user?.limit.upload.file,
+            ...user?.limit.upload.file,
           }}
           disabled={imageDropFormDisabled}
           onFileSelect={handleFileSelect}
@@ -435,7 +442,7 @@ const Page = () => {
               <React.Fragment key={image.id}>
                 <ImageInputForm.ImageItem
                   index={index}
-                  prefix={auth.user?.preference.file.fileSizeUnit}
+                  prefix={preference.file.fileSizeUnit}
                   ui={{
                     selected: image.selected,
                     valid: calcTaskValid(task?.status),

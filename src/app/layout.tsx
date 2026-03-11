@@ -4,7 +4,7 @@ import { getLang } from "@/lib/cookies/lang/getLang"
 import { createGraphQL } from "@/lib/graphql/server"
 import { theme } from "@/lib/theme"
 import "@/lib/ze"
-import { AuthContext } from "@/providers"
+import { UserContext } from "@/providers"
 import { AppShell, AppShellHeader, AppShellMain } from "@mantine/core"
 import type { Metadata } from "next"
 import { AppGlobal, Head, Header, Providers } from "./_components"
@@ -17,6 +17,8 @@ import "@mantine/core/styles.css"
 
 import "@mantine/notifications/styles.css"
 
+import { preferenceConfig } from "@/config/preference"
+import { AppConfig } from "@/types/app-config"
 import "@mantine/charts/styles.css"
 
 const metadata: Metadata = {
@@ -33,23 +35,23 @@ const RootLayout = async (props: RootLayoutProps) => {
   const lang = await getLang()
   const session = await auth.getSession()
 
-  const context: AuthContext = {
-    isSignIn: false,
-    user: undefined,
-  }
+  let user: UserContext = null
 
   if (session !== null) {
-    context.isSignIn = true
     const client = createGraphQL({ token: session.tokenSet.accessToken })
 
     try {
       const result = await client.query<GetMeQuery>({ query: GetMeDocument })
-      context.user = {
+      user = {
         ...result.data.me,
       }
     } catch (error) {
       console.error(error)
     }
+  }
+
+  const config: AppConfig = {
+    preference: preferenceConfig,
   }
 
   return (
@@ -62,7 +64,8 @@ const RootLayout = async (props: RootLayoutProps) => {
             theme,
             defaultColorScheme: "auto",
           }}
-          auth={context}
+          config={config}
+          user={user}
           option={{ graphql: { token: session?.tokenSet.accessToken } }}
         >
           <AppGlobal />

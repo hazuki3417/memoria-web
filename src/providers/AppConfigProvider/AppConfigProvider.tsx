@@ -9,5 +9,9 @@ export interface AppConfigProviderProps {
 
 export const AppConfigProvider = (props: AppConfigProviderProps) => {
   const { value, children } = props
-  return <AppConfigContext.Provider value={value}>{children}</AppConfigContext.Provider>
+  return (
+    <AppConfigContext.Provider value={value}>
+      {children}
+    </AppConfigContext.Provider>
+  )
 }

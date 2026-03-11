@@ -1,6 +1,6 @@
 "use client"
 import { useGetUsageQuery } from "@/graphql"
-import { useAuthContext } from "@/providers"
+import { usePreference } from "@/hooks"
 import { Box, Flex, Stack } from "@mantine/core"
 import { useMemo } from "react"
 import { SettingSectionDivider, SettingSectionTitle } from "../_components"
@@ -12,7 +12,7 @@ import {
 } from "./_components"
 
 const Page = () => {
-  const auth = useAuthContext()
+  const preference = usePreference()
 
   const getUsage = useGetUsageQuery()
 
@@ -49,7 +49,7 @@ const Page = () => {
         <Box flex="1">
           <Stack gap="md">
             <UploadInfoPanel
-              prefix={auth.user?.preference.file.fileSizeUnit}
+              prefix={preference.file.fileSizeUnit}
               payload={{
                 limitFiles: upload?.file.count,
                 limitSize: upload?.file.size,
@@ -76,7 +76,7 @@ const Page = () => {
               }}
             />
             <StorageInfoPanel
-              prefix={auth.user?.preference.file.fileSizeUnit}
+              prefix={preference.file.fileSizeUnit}
               payload={{
                 used: storage?.used,
                 capacity: storage?.total,
@@ -87,7 +87,7 @@ const Page = () => {
         <Box flex="1">
           <Stack gap="md">
             <FileSizeInfoPanel
-              prefix={auth.user?.preference.file.fileSizeUnit}
+              prefix={preference.file.fileSizeUnit}
               payload={{
                 total: fileStats?.totalSize,
                 files: fileInfo.size,

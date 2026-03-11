@@ -7,7 +7,7 @@ import {
   IconSettings,
 } from "@tabler/icons-react"
 
-export interface UserMenuProps {}
+export interface UserMenuProps { }
 
 export const UserMenu = (props: UserMenuProps) => {
   return (
@@ -48,7 +48,7 @@ export const UserMenu = (props: UserMenuProps) => {
         <Menu.Item
           color="red"
           component="a"
-          href="/auth/logout"
+          href={resolveUri("/auth/logout")}
           leftSection={<IconLogout size={20} />}
         >
           <Text>ログアウト</Text>

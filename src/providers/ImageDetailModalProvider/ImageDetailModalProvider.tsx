@@ -2,12 +2,11 @@
 import { CustomModal } from "@/components"
 import { ImageDetailModal } from "@/feature"
 import { useDeleteImageMutation, useDownloadImageMutation } from "@/graphql"
-import { useDisclosure } from "@/hooks"
+import { useDisclosure, usePreference } from "@/hooks"
 import { action } from "@/lib/action"
 import {
-  useAuthContext,
   useConfirmContext,
-  useFeedbackContext,
+  useFeedbackContext
 } from "@/providers"
 import "client-only"
 import React, { useCallback, useState } from "react"
@@ -26,7 +25,7 @@ export const ImageDetailModalProvider = (
 ) => {
   const { children } = props
 
-  const auth = useAuthContext()
+  const preference = usePreference()
   const feedback = useFeedbackContext()
   const confirm = useConfirmContext()
   const disclosure = useDisclosure({ status: "closed" })
@@ -83,7 +82,7 @@ export const ImageDetailModalProvider = (
           onClose={handleClose}
         >
           <ImageDetailModal
-            prefix={auth.user?.preference.file.fileSizeUnit}
+            prefix={preference.file.fileSizeUnit}
             payload={{
               slide: {
                 current: current + 1,
@@ -144,7 +143,7 @@ export const ImageDetailModalProvider = (
                   fileName: downloadUrl.fileName,
                 })
               },
-              onEdit: () => {},
+              onEdit: () => { },
               onNext: () => {
                 const next = images[current + 1]
                 handleOpen({ id: next.id, getImages: () => images })

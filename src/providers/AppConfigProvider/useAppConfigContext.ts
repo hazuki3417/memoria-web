@@ -6,7 +6,9 @@ import { AppConfigContext } from "./AppConfigContext"
 export const useAppConfigContext = () => {
   const context = useContext(AppConfigContext)
   if (context === undefined) {
-    throw new Error("useAppConfigContext must be used within a AppConfigContextProvider")
+    throw new Error(
+      "useAppConfigContext must be used within a AppConfigContextProvider",
+    )
   }
   return context
 }

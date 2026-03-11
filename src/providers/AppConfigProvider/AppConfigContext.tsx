@@ -1,35 +1,10 @@
 "use client"
-import { FileSizePrefix } from "@/lib/transform"
+import { AppConfig } from "@/types/app-config"
 import "client-only"
 import { createContext } from "react"
 
-export type AppConfigContext = {
-  limit: {
-    upload: {
-      file: {
-        count: number
-        size: number
-        type: string[]
-      }
-      tag: {
-        count: number
-      }
-    }
-  }
-  preference: {
-    file: {
-      dateFormat: string
-      fileSizeUnit: FileSizePrefix
-    }
-    thumbnail: {
-      size: number
-      spacing: number
-    }
-    preview: {
-      loop: boolean
-      show: boolean
-    }
-  }
-}
+export type AppConfigContext = AppConfig
 
-export const AppConfigContext = createContext<AppConfigContext | undefined>(undefined)
+export const AppConfigContext = createContext<AppConfigContext | undefined>(
+  undefined,
+)

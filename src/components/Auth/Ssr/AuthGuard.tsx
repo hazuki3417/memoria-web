@@ -1,12 +1,12 @@
-import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
-import { authConfig } from "@/config/auth"
+import { resolveUri } from "@/lib/url"
+import { redirect } from "next/navigation"
 
 export const AuthGuard = async () => {
   const session = await auth.getSession()
 
   if (!session) {
-    redirect(authConfig.signedOut.redirect)
+    redirect(resolveUri("/auth/login"))
   }
   return null
 }
