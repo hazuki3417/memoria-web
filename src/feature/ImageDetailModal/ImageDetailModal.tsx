@@ -8,6 +8,11 @@ import { Info, InfoHandler, InfoPayload } from "./Info/Info"
 import { Preview, PreviewPayload } from "./Preview"
 import { Slide, SlideHandler, SlidePayload } from "./Slide"
 
+export type ImageDetailModalConfig = {
+  fileSizePrefix?: FileSizePrefix
+  showInfoByDefault?: boolean
+}
+
 export type ImageDetailModalPayload = {
   slide: SlidePayload
   info: InfoPayload
@@ -21,16 +26,22 @@ export type ImageDetailModalHandler = Omit<
   Omit<InfoHandler, "onClose"> & {}
 
 export interface ImageDetailModalProps extends BoxProps {
+  config?: ImageDetailModalConfig
   payload: ImageDetailModalPayload
-  prefix?: FileSizePrefix
   handler?: ImageDetailModalHandler
 }
 
 export const ImageDetailModal = (props: ImageDetailModalProps) => {
-  const { payload, prefix = DEFAULT_FILE_SIZE_PREFIX, handler } = props
+  const { config, payload, handler } = props
+  const {
+    fileSizePrefix = DEFAULT_FILE_SIZE_PREFIX,
+    showInfoByDefault = false,
+  } = config ?? {}
   const { onClose, onDelete, onDownload, onEdit, onNext, onPrev } =
     handler ?? {}
-  const drawer = useDisclosure({ status: "closed" })
+  const drawer = useDisclosure({
+    status: showInfoByDefault ? "opened" : "closed",
+  })
   const imageRotate = useImageRotate({ angle: 0 })
   const imageZoom = useImageZoom({
     level: 100,
@@ -116,7 +127,7 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
             transition={{ duration: 0.3 }}
           >
             <Info
-              prefix={prefix}
+              prefix={fileSizePrefix}
               payload={payload.info}
               handler={{
                 onClose: drawer.control.close,

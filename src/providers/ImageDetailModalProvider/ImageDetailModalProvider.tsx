@@ -62,6 +62,92 @@ export const ImageDetailModalProvider = (
 
   const [downloadImage] = useDownloadImageMutation()
 
+  const handleDelete = useCallback(
+    async (id: string) => {
+      const result = await confirm.action.confirm({
+        body: "削除します。よろしいですか？",
+      })
+
+      if (result !== "confirmed") {
+        return
+      }
+      await deleteImage({
+        variables: {
+          input: { id },
+        },
+      })
+      feedback.action.success({
+        title: "成功",
+        body: "削除しました。",
+      })
+      handleClose()
+    },
+    [confirm, deleteImage, feedback],
+  )
+
+  const handleDownload = useCallback(
+    async (id: string) => {
+      const res = await downloadImage({
+        variables: {
+          input: { id },
+        },
+      })
+
+      if (!res.data) {
+        return
+      }
+
+      const downloadUrl = res.data.downloadImage
+      action.download({
+        url: downloadUrl.url,
+        fileName: downloadUrl.fileName,
+      })
+    },
+    [downloadImage],
+  )
+
+  const handleEdit = (id: string) => {}
+
+  const handleNext = () => {
+    const length = images.length
+    const next = current + 1
+    const last = next === length
+
+    const loop = preference.preview.loop
+    if (loop) {
+      const image = last ? images[0] : images[next]
+      handleOpen({ id: image.id, getImages: () => images })
+      return
+    }
+
+    if (last) {
+      return
+    }
+
+    const image = images[next]
+    handleOpen({ id: image.id, getImages: () => images })
+  }
+
+  const handlePrev = () => {
+    const length = images.length
+    const prev = current - 1
+    const first = prev <= 0
+
+    const loop = preference.preview.loop
+    if (loop) {
+      const image = first ? images[length - 1] : images[prev]
+      handleOpen({ id: image.id, getImages: () => images })
+      return
+    }
+
+    if (first) {
+      return
+    }
+
+    const image = images[prev]
+    handleOpen({ id: image.id, getImages: () => images })
+  }
+
   return (
     <ImageDetailModalContext.Provider
       value={{
@@ -79,7 +165,10 @@ export const ImageDetailModalProvider = (
           onClose={handleClose}
         >
           <ImageDetailModal
-            prefix={preference.file.fileSizeUnit}
+            config={{
+              fileSizePrefix: preference.file.fileSizeUnit,
+              showInfoByDefault: preference.preview.show,
+            }}
             payload={{
               slide: {
                 current: current + 1,
@@ -104,51 +193,11 @@ export const ImageDetailModalProvider = (
             }}
             handler={{
               onClose: handleClose,
-              onDelete: async () => {
-                const result = await confirm.action.confirm({
-                  body: "削除します。よろしいですか？",
-                })
-
-                if (result !== "confirmed") {
-                  return
-                }
-                await deleteImage({
-                  variables: {
-                    input: { id: image.id },
-                  },
-                })
-                feedback.action.success({
-                  title: "成功",
-                  body: "削除しました。",
-                })
-                handleClose()
-              },
-              onDownload: async () => {
-                const res = await downloadImage({
-                  variables: {
-                    input: { id: image.id },
-                  },
-                })
-
-                if (!res.data) {
-                  return
-                }
-
-                const downloadUrl = res.data.downloadImage
-                action.download({
-                  url: downloadUrl.url,
-                  fileName: downloadUrl.fileName,
-                })
-              },
-              onEdit: () => {},
-              onNext: () => {
-                const next = images[current + 1]
-                handleOpen({ id: next.id, getImages: () => images })
-              },
-              onPrev: () => {
-                const prev = images[current - 1]
-                handleOpen({ id: prev.id, getImages: () => images })
-              },
+              onDelete: () => handleDelete(image.id),
+              onDownload: () => handleDownload(image.id),
+              onEdit: () => handleEdit(image.id),
+              onNext: handleNext,
+              onPrev: handlePrev,
             }}
           />
         </CustomModal>
