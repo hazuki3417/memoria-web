@@ -2,7 +2,12 @@
 import { CustomModal } from "@/components"
 import { ImageDetailModal } from "@/feature"
 import { useDeleteImageMutation, useDownloadImageMutation } from "@/graphql"
-import { useCollectionNavigation, useDisclosure, usePreference } from "@/hooks"
+import {
+  useCollectionNavigation,
+  useCollectionPreload,
+  useDisclosure,
+  usePreference,
+} from "@/hooks"
 import { action } from "@/lib/action"
 import { useConfirmContext, useFeedbackContext } from "@/providers"
 import "client-only"
@@ -53,6 +58,14 @@ export const ImageDetailModalProvider = (
     loop: preference.preview.loop,
   })
 
+  useCollectionPreload({
+    items: images,
+    index: nav.current.index,
+    loop: nav.loop,
+    distance: 2,
+    getSrc: (item) => item.image.preview,
+  })
+
   const [deleteImage] = useDeleteImageMutation({
     update(cache, { data }) {
       const id = data?.deleteImage.id
@@ -62,7 +75,6 @@ export const ImageDetailModalProvider = (
       cache.gc()
     },
   })
-
 
   const handleDelete = useCallback(async () => {
     if (!nav.current.exists) {
@@ -109,7 +121,7 @@ export const ImageDetailModalProvider = (
     })
   }, [nav.current, downloadImage])
 
-  const handleEdit = () => { }
+  const handleEdit = () => {}
 
   const handleNext = () => {
     if (nav.next.exists) {
