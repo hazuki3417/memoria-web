@@ -184,15 +184,3 @@ export const ImageDetailModalProvider = (
     </ImageDetailModalContext.Provider>
   )
 }
-
-export function findWithIndex<T>(
-  items: T[],
-  predicate: (item: T, index: number, array: T[]) => boolean,
-): { index: number; item: T | undefined } {
-  const index = items.findIndex(predicate)
-
-  return {
-    index,
-    item: index === -1 ? undefined : items[index],
-  }
-}
