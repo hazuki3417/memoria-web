@@ -27,9 +27,17 @@ export const getNext = <T>(args: GetNextArgs<T>): NavigationNode<T> => {
 
   const exists = items[nextIndex] !== undefined
 
+  if (!exists) {
+    return {
+      index: nextIndex,
+      item: undefined,
+      exists: false,
+    }
+  }
+
   return {
     index: nextIndex,
-    item: exists ? items[nextIndex] : undefined,
-    exists,
+    item: items[nextIndex],
+    exists: true,
   }
 }

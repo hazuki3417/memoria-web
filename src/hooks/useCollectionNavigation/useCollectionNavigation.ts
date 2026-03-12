@@ -14,6 +14,7 @@ export type UseCollectionNavigationArgs<T> = {
 
 export type CollectionNavigation<T> = {
   length: number
+  loop: boolean
   current: NavigationNode<T>
   prev: NavigationNode<T>
   next: NavigationNode<T>
@@ -33,6 +34,7 @@ export function useCollectionNavigation<T>(
 
     return {
       length: items.length,
+      loop,
       current,
       prev,
       next,

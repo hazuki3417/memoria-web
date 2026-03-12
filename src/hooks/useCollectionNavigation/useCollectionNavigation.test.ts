@@ -14,6 +14,8 @@ describe("useCollectionNavigation", () => {
       }),
     )
 
+    expect(result.current.loop).toBe(false)
+
     expect(result.current.current.item).toBe("b")
     expect(result.current.prev.item).toBe("a")
     expect(result.current.next.item).toBe("c")
@@ -30,6 +32,8 @@ describe("useCollectionNavigation", () => {
         loop: true,
       }),
     )
+
+    expect(result.current.loop).toBe(true)
 
     expect(result.current.prev.item).toBe("c")
     expect(result.current.next.item).toBe("b")

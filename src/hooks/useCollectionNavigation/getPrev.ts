@@ -27,9 +27,17 @@ export const getPrev = <T>(args: GetPrevArgs<T>): NavigationNode<T> => {
 
   const exists = items[prevIndex] !== undefined
 
+  if (!exists) {
+    return {
+      index: prevIndex,
+      item: undefined,
+      exists: false,
+    }
+  }
+
   return {
     index: prevIndex,
-    item: exists ? items[prevIndex] : undefined,
-    exists,
+    item: items[prevIndex],
+    exists: true,
   }
 }

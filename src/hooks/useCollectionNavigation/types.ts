@@ -1,5 +1,11 @@
-export type NavigationNode<T> = {
-  index: number
-  item: T | undefined
-  exists: boolean
-}
+export type NavigationNode<T> =
+  | {
+      index: number
+      exists: true
+      item: T
+    }
+  | {
+      index: number
+      exists: false
+      item: undefined
+    }
