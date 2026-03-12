@@ -1,14 +1,22 @@
 import { Box } from "@mantine/core"
 import React from "react"
-import { Body, BodyHandler } from "./Body"
+import { Body } from "./Body/Body"
 import { Footer, FooterHandler, FooterPayload, FooterUi } from "./Footer"
 import { Header, HeaderHandler } from "./Header"
+import { NextButton } from "./NextButton"
+import { PrevButton } from "./PrevButton"
 
 export type SlidePayload = FooterPayload
 
-export type SlideUi = FooterUi
+export type SlideUi = {
+  showPrev?: boolean
+  showNext?: boolean
+} & FooterUi
 
-export type SlideHandler = HeaderHandler & BodyHandler & FooterHandler
+export type SlideHandler = HeaderHandler & {
+  onPrev?: React.MouseEventHandler<HTMLButtonElement>
+  onNext?: React.MouseEventHandler<HTMLButtonElement>
+} & FooterHandler
 
 export interface SlideProps {
   children: React.ReactNode
@@ -19,6 +27,7 @@ export interface SlideProps {
 
 export const Slide = (props: SlideProps) => {
   const { children, payload, ui, handler } = props
+  const { showPrev = true, showNext = false, level } = ui ?? {}
   const {
     onClose,
     onDownload,
@@ -48,10 +57,14 @@ export const Slide = (props: SlideProps) => {
           onClose,
         }}
       />
-      <Body handler={{ onNext, onPrev }}>{children}</Body>
+      <Body>
+        <Body.Left>{showPrev && <PrevButton onClick={onPrev} />}</Body.Left>
+        <Body.Center>{children}</Body.Center>
+        <Body.Right>{showNext && <NextButton onClick={onNext} />}</Body.Right>
+      </Body>
       <Footer
         payload={payload}
-        ui={ui}
+        ui={{ level }}
         config={{
           step: 10,
           min: 100,

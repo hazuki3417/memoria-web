@@ -6,7 +6,7 @@ import { useDisclosure, usePreference } from "@/hooks"
 import { action } from "@/lib/action"
 import { useConfirmContext, useFeedbackContext } from "@/providers"
 import "client-only"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import {
   ImageDetail,
   ImageDetailModalContext,
@@ -47,8 +47,28 @@ export const ImageDetailModalProvider = (
 
   const images = imageDetail.getImages?.() ?? []
   const current = images.findIndex((image) => image.id === imageDetail.id)
-  const limit = images.length
+  const length = images.length
   const image = images.find((image) => image.id === imageDetail.id)
+  const loop = false
+  // const loop = preference.preview.loop
+
+  const next = useMemo(() => {
+    const next = current + 1
+    const last = next === length
+    return {
+      index: next,
+      last,
+    }
+  }, [current, length])
+
+  const prev = useMemo(() => {
+    const prev = current - 1
+    const first = prev <= 0
+    return {
+      index: prev,
+      first,
+    }
+  }, [current, length])
 
   const [deleteImage] = useDeleteImageMutation({
     update(cache, { data }) {
@@ -109,42 +129,32 @@ export const ImageDetailModalProvider = (
   const handleEdit = (id: string) => {}
 
   const handleNext = () => {
-    const length = images.length
-    const next = current + 1
-    const last = next === length
-
-    const loop = preference.preview.loop
     if (loop) {
-      const image = last ? images[0] : images[next]
+      const image = next.last ? images[0] : images[next.index]
       handleOpen({ id: image.id, getImages: () => images })
       return
     }
 
-    if (last) {
+    if (next.last) {
       return
     }
 
-    const image = images[next]
+    const image = images[next.index]
     handleOpen({ id: image.id, getImages: () => images })
   }
 
   const handlePrev = () => {
-    const length = images.length
-    const prev = current - 1
-    const first = prev <= 0
-
-    const loop = preference.preview.loop
     if (loop) {
-      const image = first ? images[length - 1] : images[prev]
+      const image = prev.first ? images[length - 1] : images[prev.index]
       handleOpen({ id: image.id, getImages: () => images })
       return
     }
 
-    if (first) {
+    if (prev.first) {
       return
     }
 
-    const image = images[prev]
+    const image = images[prev.index]
     handleOpen({ id: image.id, getImages: () => images })
   }
 
@@ -169,10 +179,14 @@ export const ImageDetailModalProvider = (
               fileSizePrefix: preference.file.fileSizeUnit,
               showInfoByDefault: preference.preview.show,
             }}
+            ui={{
+              showPrev: loop ? true : !prev.first,
+              showNext: loop ? true : !next.last,
+            }}
             payload={{
               slide: {
                 current: current + 1,
-                limit,
+                limit: length,
               },
               info: {
                 file: {
@@ -204,4 +218,16 @@ export const ImageDetailModalProvider = (
       )}
     </ImageDetailModalContext.Provider>
   )
+}
+
+export function findWithIndex<T>(
+  items: T[],
+  predicate: (item: T, index: number, array: T[]) => boolean,
+): { index: number; item: T | undefined } {
+  const index = items.findIndex(predicate)
+
+  return {
+    index,
+    item: index === -1 ? undefined : items[index],
+  }
 }

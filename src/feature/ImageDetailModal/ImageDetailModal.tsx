@@ -6,12 +6,14 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useCallback, useMemo } from "react"
 import { Info, InfoHandler, InfoPayload } from "./Info/Info"
 import { Preview, PreviewPayload } from "./Preview"
-import { Slide, SlideHandler, SlidePayload } from "./Slide"
+import { Slide, SlideHandler, SlidePayload, SlideUi } from "./Slide"
 
 export type ImageDetailModalConfig = {
   fileSizePrefix?: FileSizePrefix
   showInfoByDefault?: boolean
 }
+
+export type ImageDetailModalUi = Omit<SlideUi, "level"> & {}
 
 export type ImageDetailModalPayload = {
   slide: SlidePayload
@@ -27,12 +29,14 @@ export type ImageDetailModalHandler = Omit<
 
 export interface ImageDetailModalProps extends BoxProps {
   config?: ImageDetailModalConfig
+  ui?: ImageDetailModalUi
   payload: ImageDetailModalPayload
   handler?: ImageDetailModalHandler
 }
 
 export const ImageDetailModal = (props: ImageDetailModalProps) => {
-  const { config, payload, handler } = props
+  const { config, ui, payload, handler } = props
+  const { showPrev, showNext } = ui ?? {}
   const {
     fileSizePrefix = DEFAULT_FILE_SIZE_PREFIX,
     showInfoByDefault = false,
@@ -91,6 +95,8 @@ export const ImageDetailModal = (props: ImageDetailModalProps) => {
       <Slide
         payload={payload.slide}
         ui={{
+          showPrev,
+          showNext,
           level: imageZoom.value.level,
         }}
         handler={{

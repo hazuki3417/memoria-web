@@ -1,4 +1,5 @@
 export * from "./useBoolean"
+export * from "./useCollectionNavigation"
 export * from "./useDebouncedEffect"
 export * from "./useDisclosure"
 export * from "./useFormInteractivity"
