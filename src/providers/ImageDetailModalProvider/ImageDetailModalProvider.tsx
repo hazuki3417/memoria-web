@@ -2,11 +2,11 @@
 import { CustomModal } from "@/components"
 import { ImageDetailModal } from "@/feature"
 import { useDeleteImageMutation, useDownloadImageMutation } from "@/graphql"
-import { useDisclosure, usePreference } from "@/hooks"
+import { useCollectionNavigation, useDisclosure, usePreference } from "@/hooks"
 import { action } from "@/lib/action"
 import { useConfirmContext, useFeedbackContext } from "@/providers"
 import "client-only"
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useState } from "react"
 import {
   ImageDetail,
   ImageDetailModalContext,
@@ -46,29 +46,12 @@ export const ImageDetailModalProvider = (
   }, [disclosure])
 
   const images = imageDetail.getImages?.() ?? []
-  const current = images.findIndex((image) => image.id === imageDetail.id)
-  const length = images.length
-  const image = images.find((image) => image.id === imageDetail.id)
-  const loop = false
-  // const loop = preference.preview.loop
 
-  const next = useMemo(() => {
-    const next = current + 1
-    const last = next === length
-    return {
-      index: next,
-      last,
-    }
-  }, [current, length])
-
-  const prev = useMemo(() => {
-    const prev = current - 1
-    const first = prev <= 0
-    return {
-      index: prev,
-      first,
-    }
-  }, [current, length])
+  const nav = useCollectionNavigation({
+    items: images,
+    predicate: (image) => image.id === imageDetail.id,
+    loop: preference.preview.loop,
+  })
 
   const [deleteImage] = useDeleteImageMutation({
     update(cache, { data }) {
@@ -80,82 +63,64 @@ export const ImageDetailModalProvider = (
     },
   })
 
+
+  const handleDelete = useCallback(async () => {
+    if (!nav.current.exists) {
+      return
+    }
+    const result = await confirm.action.confirm({
+      body: "削除します。よろしいですか？",
+    })
+
+    if (result !== "confirmed") {
+      return
+    }
+    await deleteImage({
+      variables: {
+        input: { id: nav.current.item.id },
+      },
+    })
+    feedback.action.success({
+      title: "成功",
+      body: "削除しました。",
+    })
+    handleClose()
+  }, [nav.current, confirm, deleteImage, feedback])
+
   const [downloadImage] = useDownloadImageMutation()
+  const handleDownload = useCallback(async () => {
+    if (!nav.current.exists) {
+      return
+    }
+    const res = await downloadImage({
+      variables: {
+        input: { id: nav.current.item.id },
+      },
+    })
 
-  const handleDelete = useCallback(
-    async (id: string) => {
-      const result = await confirm.action.confirm({
-        body: "削除します。よろしいですか？",
-      })
+    if (!res.data) {
+      return
+    }
 
-      if (result !== "confirmed") {
-        return
-      }
-      await deleteImage({
-        variables: {
-          input: { id },
-        },
-      })
-      feedback.action.success({
-        title: "成功",
-        body: "削除しました。",
-      })
-      handleClose()
-    },
-    [confirm, deleteImage, feedback],
-  )
+    const downloadUrl = res.data.downloadImage
+    action.download({
+      url: downloadUrl.url,
+      fileName: downloadUrl.fileName,
+    })
+  }, [nav.current, downloadImage])
 
-  const handleDownload = useCallback(
-    async (id: string) => {
-      const res = await downloadImage({
-        variables: {
-          input: { id },
-        },
-      })
-
-      if (!res.data) {
-        return
-      }
-
-      const downloadUrl = res.data.downloadImage
-      action.download({
-        url: downloadUrl.url,
-        fileName: downloadUrl.fileName,
-      })
-    },
-    [downloadImage],
-  )
-
-  const handleEdit = (id: string) => {}
+  const handleEdit = () => { }
 
   const handleNext = () => {
-    if (loop) {
-      const image = next.last ? images[0] : images[next.index]
-      handleOpen({ id: image.id, getImages: () => images })
-      return
+    if (nav.next.exists) {
+      handleOpen({ id: nav.next.item.id, getImages: () => images })
     }
-
-    if (next.last) {
-      return
-    }
-
-    const image = images[next.index]
-    handleOpen({ id: image.id, getImages: () => images })
   }
 
   const handlePrev = () => {
-    if (loop) {
-      const image = prev.first ? images[length - 1] : images[prev.index]
-      handleOpen({ id: image.id, getImages: () => images })
-      return
+    if (nav.prev.exists) {
+      handleOpen({ id: nav.prev.item.id, getImages: () => images })
     }
-
-    if (prev.first) {
-      return
-    }
-
-    const image = images[prev.index]
-    handleOpen({ id: image.id, getImages: () => images })
   }
 
   return (
@@ -169,7 +134,7 @@ export const ImageDetailModalProvider = (
       }}
     >
       {children}
-      {image !== undefined && (
+      {nav.current.exists && (
         <CustomModal
           opened={disclosure.value.status === "opened"}
           onClose={handleClose}
@@ -180,36 +145,36 @@ export const ImageDetailModalProvider = (
               showInfoByDefault: preference.preview.show,
             }}
             ui={{
-              showPrev: loop ? true : !prev.first,
-              showNext: loop ? true : !next.last,
+              showPrev: nav.prev.exists,
+              showNext: nav.next.exists,
             }}
             payload={{
               slide: {
-                current: current + 1,
-                limit: length,
+                current: nav.current.index + 1,
+                limit: nav.length,
               },
               info: {
                 file: {
-                  name: image.info.file.name,
-                  size: image.info.file.size,
-                  date: image.info.file.date,
+                  name: nav.current.item.info.file.name,
+                  size: nav.current.item.info.file.size,
+                  date: nav.current.item.info.file.date,
                 },
                 image: {
-                  width: image.info.image.width,
-                  height: image.info.image.height,
+                  width: nav.current.item.info.image.width,
+                  height: nav.current.item.info.image.height,
                 },
-                tags: image.info.tags,
+                tags: nav.current.item.info.tags,
               },
               preview: {
-                src: image.image.preview,
-                alt: image.info.file.name,
+                src: nav.current.item.image.preview,
+                alt: nav.current.item.info.file.name,
               },
             }}
             handler={{
               onClose: handleClose,
-              onDelete: () => handleDelete(image.id),
-              onDownload: () => handleDownload(image.id),
-              onEdit: () => handleEdit(image.id),
+              onDelete: handleDelete,
+              onDownload: handleDownload,
+              onEdit: handleEdit,
               onNext: handleNext,
               onPrev: handlePrev,
             }}
