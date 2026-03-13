@@ -14,6 +14,8 @@ export type UseCollectionSelectionValue<T, Id> = {
   ids: Id[]
   items: T[]
   size: number
+  min: number
+  max: number
 
   allSelected: boolean
   indeterminate: boolean
@@ -85,6 +87,8 @@ export function useCollectionSelection<T, Id extends string | number>(
       ids: selectedIds,
       items: selectedItems,
       size: selectedCount,
+      min,
+      max,
       allSelected,
       indeterminate,
     },

@@ -12,7 +12,7 @@ import {
   useDownloadImagesMutation,
   useGetImagesQuery,
 } from "@/graphql"
-import { useIntersection, useUriQuery } from "@/hooks"
+import { useCollectionSelection, useIntersection, useUriQuery } from "@/hooks"
 import { action } from "@/lib/action"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
@@ -49,12 +49,6 @@ import { useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
-const limitConfig = {
-  update: 30,
-  delete: 30,
-  download: 30,
-}
-
 const searchFormSchema = z.object({
   tags: z.array(z.string()),
 })
@@ -84,7 +78,6 @@ const Page = () => {
   const confirm = useConfirmContext()
   const imageDetailModalContext = useImageDetailModalContext()
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
-  const [selectable, setSelectable] = useState<ImageDetailPayload["id"][]>([])
 
   const filter = {
     tags: query === undefined ? [] : query.tags,
@@ -152,26 +145,26 @@ const Page = () => {
     console.log("submit error:", errors)
   }
 
-  const selectableCount = selectable.length
-  const itemCount = items.length
-  const hasSelectable = 0 < selectableCount
-  const allSelectable = selectableCount === itemCount
-  const indeterminate = selectableCount > 0 && selectableCount < itemCount
+  const selection = useCollectionSelection({
+    items,
+    getKey: (item) => item.id,
+    max: 30,
+  })
 
-  const toggleAll = (checked: boolean) => {
-    checked ? setSelectable(items.map((item) => item.id)) : setSelectable([])
-  }
+  const hasSelectable = selection.value.size > 0
 
   const handleEditImages = async () => {
-    if (limitConfig.update < selectable.length) {
+    if (selection.value.max < selection.value.size) {
       feedback.action.warning({
         title: "一括操作（編集）",
-        body: `${limitConfig.update} 件以内に収まるよう選択してください。`,
+        body: `${selection.value.max} 件以内に収まるよう選択してください。`,
       })
       return
     }
 
-    router.push(resolveUri("/images/edit", { query: { targets: selectable } }))
+    router.push(
+      resolveUri("/images/edit", { query: { targets: selection.value.ids } }),
+    )
   }
 
   const [deleteImages] = useDeleteImagesMutation({
@@ -187,10 +180,10 @@ const Page = () => {
   })
 
   const handleDeleteImages = async () => {
-    if (limitConfig.delete < selectable.length) {
+    if (selection.value.max < selection.value.size) {
       feedback.action.warning({
         title: "一括操作（削除）",
-        body: `${limitConfig.delete} 件以内に収まるよう選択してください。`,
+        body: `${selection.value.max} 件以内に収まるよう選択してください。`,
       })
       return
     }
@@ -206,7 +199,7 @@ const Page = () => {
     await deleteImages({
       variables: {
         input: {
-          ids: selectable,
+          ids: selection.value.ids,
         },
       },
     })
@@ -215,23 +208,23 @@ const Page = () => {
       title: "成功",
       body: "削除しました。",
     })
-    setSelectable([])
+    selection.action.clear()
   }
 
   const [downloadImages] = useDownloadImagesMutation()
 
   const handleDownloadImages = async () => {
-    if (limitConfig.download < selectable.length) {
+    if (selection.value.max < selection.value.size) {
       feedback.action.warning({
         title: "一括操作（ダウンロード）",
-        body: `${limitConfig.download} 件以内に収まるよう選択してください。`,
+        body: `${selection.value.max} 件以内に収まるよう選択してください。`,
       })
       return
     }
 
     const res = await downloadImages({
       variables: {
-        input: { ids: selectable },
+        input: { ids: selection.value.ids },
       },
     })
 
@@ -315,10 +308,14 @@ const Page = () => {
                   size="xs"
                   variant="filled"
                   color="blue"
-                  label={`${selectableCount} 件選択`}
-                  checked={allSelectable}
-                  indeterminate={indeterminate}
-                  onChange={(event) => toggleAll(event.currentTarget.checked)}
+                  label={`選択：${selection.value.size} / ${selection.value.max}`}
+                  checked={selection.value.allSelected}
+                  indeterminate={selection.value.indeterminate}
+                  onChange={(event) =>
+                    event.currentTarget.checked
+                      ? selection.action.selectAll()
+                      : selection.action.clear()
+                  }
                 />
                 <div></div>
               </Flex>
@@ -360,7 +357,7 @@ const Page = () => {
                   const mode = value as "filter" | "bulk"
                   if (mode === "filter") {
                     // 一括選択 -> 絞り込みへの切り替えなので選択したアイテムをクリアする
-                    setSelectable([])
+                    selection.action.clear()
                   } else {
                     // 絞り込み -> 一括選択への切り替えなので検索条件はそのままにする
                   }
@@ -399,27 +396,12 @@ const Page = () => {
                     <ThumbnailBox
                       key={item.id}
                       ui={{
-                        selected:
-                          typeof selectable.find(
-                            (value) => value === item.id,
-                          ) === "string",
+                        selected: selection.value.ids.includes(item.id),
                         selectable: mode === "bulk",
                       }}
                       onClick={() => {
                         if (mode === "bulk") {
-                          const target = selectable.find(
-                            (value) => value === item.id,
-                          )
-
-                          if (target === undefined) {
-                            // 追加
-                            setSelectable((prev) => [...prev, item.id])
-                          } else {
-                            // 除外
-                            setSelectable((prev) =>
-                              prev.filter((value) => value !== item.id),
-                            )
-                          }
+                          selection.action.toggle(item)
                         } else {
                           // filter
                           imageDetailModalContext.control.open({
