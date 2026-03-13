@@ -49,6 +49,12 @@ import { useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 
+const limitConfig = {
+  update: 30,
+  delete: 30,
+  download: 30,
+}
+
 const searchFormSchema = z.object({
   tags: z.array(z.string()),
 })
@@ -157,6 +163,14 @@ const Page = () => {
   }
 
   const handleEditImages = async () => {
+    if (limitConfig.update < selectable.length) {
+      feedback.action.warning({
+        title: "一括操作（編集）",
+        body: `${limitConfig.update} 件以内に収まるよう選択してください。`,
+      })
+      return
+    }
+
     router.push(resolveUri("/images/edit", { query: { targets: selectable } }))
   }
 
@@ -173,6 +187,14 @@ const Page = () => {
   })
 
   const handleDeleteImages = async () => {
+    if (limitConfig.delete < selectable.length) {
+      feedback.action.warning({
+        title: "一括操作（削除）",
+        body: `${limitConfig.delete} 件以内に収まるよう選択してください。`,
+      })
+      return
+    }
+
     const result = await confirm.action.confirm({
       body: "削除します。よろしいですか？",
     })
@@ -199,6 +221,14 @@ const Page = () => {
   const [downloadImages] = useDownloadImagesMutation()
 
   const handleDownloadImages = async () => {
+    if (limitConfig.download < selectable.length) {
+      feedback.action.warning({
+        title: "一括操作（ダウンロード）",
+        body: `${limitConfig.download} 件以内に収まるよう選択してください。`,
+      })
+      return
+    }
+
     const res = await downloadImages({
       variables: {
         input: { ids: selectable },
