@@ -310,21 +310,30 @@ const Page = () => {
                   variant="filled"
                   color="blue"
                   label={`選択：${selection.value.size} / ${selection.value.max}`}
-                  checked={selection.value.allSelected}
                   indeterminate={selection.value.indeterminate}
-                  onChange={(event) =>
-                    event.currentTarget.checked
-                      ? selection.action.selectAll()
-                      : selection.action.clear()
-                  }
+                  checked={selection.value.allSelected}
+                  onChange={(event) => {
+                    if (
+                      selection.value.allSelected ||
+                      selection.value.indeterminate
+                    ) {
+                      selection.action.clear()
+                      return
+                    }
+                    if (!selection.value.allSelected) {
+                      selection.action.selectAll()
+                      return
+                    }
+                  }}
                 />
-                <div></div>
               </Flex>
             )}
           </ActionPanel.Left>
           <ActionPanel.Right>
             <Flex align="center" gap="xs">
-              {mode === "filter" && <Text size="xs">{`${items.length} 件`}</Text>}
+              {mode === "filter" && (
+                <Text size="xs">{`${items.length} 件`}</Text>
+              )}
               {mode === "bulk" && (
                 <ButtonGroup>
                   <Button
@@ -403,7 +412,14 @@ const Page = () => {
                       }}
                       onClick={() => {
                         if (mode === "bulk") {
-                          selection.action.toggle(item)
+                          const result = selection.action.toggle(item)
+                          if (result) {
+                            return
+                          }
+                          feedback.action.warning({
+                            title: "一括操作（選択）",
+                            body: `選択可能な数を超えています。`,
+                          })
                         } else {
                           // filter
                           imageDetailModalContext.control.open({

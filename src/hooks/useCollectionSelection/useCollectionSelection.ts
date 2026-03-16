@@ -22,7 +22,7 @@ export type UseCollectionSelectionValue<T, Id> = {
 }
 
 export type UseCollectionSelectionAction<T> = {
-  toggle: (item: T) => void
+  toggle: (item: T) => boolean
   selectAll: () => void
   clear: () => void
 }
@@ -39,16 +39,14 @@ export function useCollectionSelection<T, Id extends string | number>(
 
   const selection = useSelection<Id>()
 
-  const ids = useMemo(() => items.map(getKey), [items, getKey])
-
   const selectedIds = selection.value.list
-
+  const selectedCount = selectedIds.length
   const selectedItems = useMemo(
     () => items.filter((item) => selection.value.selected.has(getKey(item))),
     [items, selection.value.selected, getKey],
   )
 
-  const selectedCount = selectedIds.length
+  const ids = useMemo(() => items.map(getKey), [items, getKey])
 
   const allSelected =
     ids.length > 0 && ids.every((id) => selection.value.selected.has(id))
@@ -60,20 +58,20 @@ export function useCollectionSelection<T, Id extends string | number>(
       const id = getKey(item)
 
       if (selection.value.selected.has(id)) {
-        if (selectedCount <= min) return
+        if (selectedCount <= min) return false
         selection.action.deselect(id)
       } else {
-        if (selectedCount >= max) return
+        if (selectedCount >= max) return false
         selection.action.select(id)
       }
+      return true
     },
     [selection, getKey, selectedCount, min, max],
   )
 
   const selectAll = useCallback(() => {
-    for (const id of ids) {
-      if (selection.value.selected.size >= max) break
-      selection.action.select(id)
+    for (let i = 0; i < max; i++) {
+      selection.action.select(ids[i])
     }
   }, [ids, selection, max])
 
