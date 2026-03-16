@@ -14,14 +14,15 @@ import { InputCounter } from "../InputCounter"
 
 export interface TagsInputProps
   extends Pick<InputWrapperProps, "label" | "description" | "error" | "size">,
-  BaseProps {
+    BaseProps {
   current: number
   limit: number
 }
 
 export const TagsInput = React.forwardRef<HTMLInputElement, TagsInputProps>(
   (props, ref) => {
-    const { size, label, description, error, styles, current, limit, ...rest } = props
+    const { size, label, description, error, styles, current, limit, ...rest } =
+      props
 
     return (
       <InputWrapper

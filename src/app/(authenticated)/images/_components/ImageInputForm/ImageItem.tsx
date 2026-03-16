@@ -69,12 +69,10 @@ export const imageItemSchema = (config: ImageItemSchemaConfig) => {
 
 export type ImageItemValues = z.infer<ReturnType<typeof imageItemSchema>>
 
-
 export type ImageItemConfig = {
   prefix?: FileSizePrefix
   limit?: number
 }
-
 
 export type ImageItemUi = {
   selected?: boolean
@@ -90,13 +88,7 @@ export interface ImageItemProps {
 }
 
 export const ImageItem = (props: ImageItemProps) => {
-  const {
-    index,
-    disabled = false,
-    onRemove,
-    ui,
-    config,
-  } = props
+  const { index, disabled = false, onRemove, ui, config } = props
   const { selected, valid = "idle" } = ui ?? {}
   const { prefix = DEFAULT_FILE_SIZE_PREFIX, limit = 30 } = config ?? {}
   const { control } = useFormContext<ImageItemValues>()

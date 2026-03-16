@@ -30,6 +30,8 @@ type ImageInputFormSchemaConfig = ImageItemSchemaConfig
 const imageInputFormSchema = (config: ImageInputFormSchemaConfig) => {
   return z.object({
     bulk: z.object({
+      selected: z.boolean(),
+      reflection: z.boolean(),
       tags: tagsSchema(config.image.tags),
     }),
     ...imageItemSchema(config).shape,
@@ -64,6 +66,8 @@ const Page = () => {
     mode: "onChange",
     defaultValues: {
       bulk: {
+        selected: true,
+        reflection: true,
         tags: [],
       },
       images: [],
@@ -74,12 +78,10 @@ const Page = () => {
 
   const feedback = useFeedbackContext()
 
-
   const watchValueBulkTags = useWatch({
     control: methods.control,
     name: "bulk.tags",
   })
-
 
   const watchValueImages = useWatch({
     control: methods.control,
@@ -274,15 +276,26 @@ const Page = () => {
       <Box>
         <Flex align="center" w="100%">
           <Box w="160px" m="xs" pl="8px">
-            <Checkbox
-              size="xs"
-              variant="filled"
-              color="blue"
-              label={`選択：${count.selected} / ${count.total}`}
-              styles={{
-                label: {
-                  paddingLeft: "calc(.625rem * 0.5)",
-                },
+            <Controller
+              control={methods.control}
+              name={`bulk.selected`}
+              render={({ field }) => {
+                const { value, ...rest } = field
+                return (
+                  <Checkbox
+                    size="xs"
+                    variant="filled"
+                    color="blue"
+                    label={`選択：${count.selected} / ${count.total}`}
+                    styles={{
+                      label: {
+                        paddingLeft: "calc(.625rem * 0.5)",
+                      },
+                    }}
+                    checked={value}
+                    {...rest}
+                  />
+                )
               }}
             />
           </Box>
@@ -307,15 +320,26 @@ const Page = () => {
                 }}
               />
               <Flex justify="space-between" gap="xs">
-                <Checkbox
-                  size="xs"
-                  color="blue"
-                  styles={{
-                    label: {
-                      paddingLeft: "calc(.625rem * 0.5)",
-                    },
+                <Controller
+                  control={methods.control}
+                  name={`bulk.reflection`}
+                  render={({ field }) => {
+                    const { value, ...rest } = field
+                    return (
+                      <Checkbox
+                        size="xs"
+                        color="blue"
+                        styles={{
+                          label: {
+                            paddingLeft: "calc(.625rem * 0.5)",
+                          },
+                        }}
+                        label="アップロード時に設定したタグを反映する"
+                        {...rest}
+                        checked={value}
+                      />
+                    )
                   }}
-                  label="アップロード時に設定したタグを反映する"
                 />
                 <ButtonGroup>
                   <Button
