@@ -78,7 +78,6 @@ export function useCollectionSelection<T, Id extends string | number>(
   }, [ids, selection, max])
 
   const clear = useCallback(() => {
-    if (min > 0) return
     selection.action.clear()
   }, [selection, min])
 
