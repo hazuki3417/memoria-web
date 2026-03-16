@@ -33,6 +33,7 @@ import {
   SegmentedControl,
   Tabs,
   TagsInput,
+  Text,
 } from "@mantine/core"
 import {
   IconCheckbox,
@@ -323,6 +324,7 @@ const Page = () => {
           </ActionPanel.Left>
           <ActionPanel.Right>
             <Flex align="center" gap="xs">
+              {mode === "filter" && <Text size="xs">{`${items.length} 件`}</Text>}
               {mode === "bulk" && (
                 <ButtonGroup>
                   <Button
