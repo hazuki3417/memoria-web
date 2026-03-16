@@ -74,6 +74,13 @@ const Page = () => {
 
   const feedback = useFeedbackContext()
 
+
+  const watchValueBulkTags = useWatch({
+    control: methods.control,
+    name: "bulk.tags",
+  })
+
+
   const watchValueImages = useWatch({
     control: methods.control,
     name: "images",
@@ -290,6 +297,8 @@ const Page = () => {
                     <TagsInput
                       size="xs"
                       label="タグ"
+                      current={watchValueBulkTags.length}
+                      limit={user.limit.upload.tag.count}
                       clearable
                       {...field}
                       disabled={allFormDisabled}
@@ -368,10 +377,13 @@ const Page = () => {
               <React.Fragment key={image.id}>
                 <ImageInputForm.ImageItem
                   index={index}
-                  prefix={preference.file.fileSizeUnit}
                   ui={{
                     selected: image.selected,
                     valid: calcTaskValid(task?.status),
+                  }}
+                  config={{
+                    prefix: preference.file.fileSizeUnit,
+                    limit: user.limit.upload.tag.count,
                   }}
                   disabled={allFormDisabled || itemDisabled}
                   onRemove={removeFile}

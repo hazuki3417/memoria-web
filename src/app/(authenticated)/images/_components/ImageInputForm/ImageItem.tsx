@@ -69,6 +69,13 @@ export const imageItemSchema = (config: ImageItemSchemaConfig) => {
 
 export type ImageItemValues = z.infer<ReturnType<typeof imageItemSchema>>
 
+
+export type ImageItemConfig = {
+  prefix?: FileSizePrefix
+  limit?: number
+}
+
+
 export type ImageItemUi = {
   selected?: boolean
   valid?: FieldValid
@@ -76,21 +83,22 @@ export type ImageItemUi = {
 
 export interface ImageItemProps {
   index: number
-  prefix?: FileSizePrefix
   disabled?: boolean
   onRemove?: (index: number, taskId: string) => void
+  config?: ImageItemConfig
   ui?: ImageItemUi
 }
 
 export const ImageItem = (props: ImageItemProps) => {
   const {
     index,
-    prefix = DEFAULT_FILE_SIZE_PREFIX,
     disabled = false,
     onRemove,
     ui,
+    config,
   } = props
   const { selected, valid = "idle" } = ui ?? {}
+  const { prefix = DEFAULT_FILE_SIZE_PREFIX, limit = 30 } = config ?? {}
   const { control } = useFormContext<ImageItemValues>()
   const image = useWatch({
     control,
@@ -173,6 +181,8 @@ export const ImageItem = (props: ImageItemProps) => {
                   <TagsInput
                     size="xs"
                     label="タグ"
+                    current={image.tags.length}
+                    limit={limit}
                     styles={{
                       root: { height: "100%" },
                       wrapper: { height: "100%" },
