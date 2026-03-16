@@ -11,7 +11,7 @@ export const SelectableCheckbox = React.forwardRef<
   return (
     <Checkbox
       ref={ref}
-      size="18px"
+      size="xs"
       color="blue"
       styles={(theme) => ({
         root: {

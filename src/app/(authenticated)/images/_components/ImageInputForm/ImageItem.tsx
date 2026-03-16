@@ -1,5 +1,5 @@
 "use client"
-import { FieldValid } from "@/components"
+import { FieldValid, TagsInput } from "@/components"
 import { ThumbnailBox } from "@/feature"
 import { ze } from "@/lib"
 import {
@@ -7,7 +7,7 @@ import {
   FileSizePrefix,
   transform,
 } from "@/lib/transform"
-import { Box, Button, Divider, Flex, TagsInput, Text } from "@mantine/core"
+import { Box, Button, Divider, Flex, Text } from "@mantine/core"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
 import z from "zod"
 import classes from "./ImageItem.module.css"
@@ -106,8 +106,9 @@ export const ImageItem = (props: ImageItemProps) => {
       data-valid={valid}
       data-disabled={disabled}
     >
-      <Flex gap="xs">
+      <Flex>
         <ThumbnailBox
+          m="xs"
           ui={{
             outline: true,
           }}
@@ -138,13 +139,16 @@ export const ImageItem = (props: ImageItemProps) => {
         </ThumbnailBox>
         <Divider orientation="vertical" />
         <Box
+          m="xs"
           style={(theme) => ({
             display: "grid",
-            gridTemplateColumns: "auto 1fr",
+            gridTemplateColumns: "0.1fr 1fr",
             gridTemplateRows: "auto auto 1fr",
             flex: 1,
             gap: theme.spacing.xs,
+            // justifyContent: "center",
             alignContent: "start",
+            // alignItems: "center"
           })}
         >
           <Box>
@@ -159,10 +163,7 @@ export const ImageItem = (props: ImageItemProps) => {
           <Box>
             <Text size="xs">{`${size.value} ${size.unit}`}</Text>
           </Box>
-          <Box>
-            <Text size="xs">タグ</Text>
-          </Box>
-          <Box>
+          <Box style={{ gridColumn: "span 2" }}>
             <Controller
               control={control}
               name={`images.${index}.tags`}
@@ -171,6 +172,7 @@ export const ImageItem = (props: ImageItemProps) => {
                 return (
                   <TagsInput
                     size="xs"
+                    label="タグ"
                     styles={{
                       root: { height: "100%" },
                       wrapper: { height: "100%" },
@@ -185,7 +187,7 @@ export const ImageItem = (props: ImageItemProps) => {
           </Box>
         </Box>
         <Divider orientation="vertical" />
-        <Box style={{ display: "flex", alignItems: "center" }}>
+        <Box m="xs" style={{ display: "flex", alignItems: "center" }}>
           <Button
             size="xs"
             type="button"

@@ -1,5 +1,5 @@
 import { FieldValid } from "@/components"
-import { Box } from "@mantine/core"
+import { Box, BoxProps } from "@mantine/core"
 import React, { memo } from "react"
 import { Image } from "./Image"
 import { Label } from "./Label"
@@ -15,7 +15,7 @@ export type ThumbnailBoxUi = {
   valid?: FieldValid
 }
 
-export interface ThumbnailBoxProps {
+export interface ThumbnailBoxProps extends BoxProps {
   children: React.ReactNode
   onClick?: React.MouseEventHandler<HTMLDivElement>
   ui?: ThumbnailBoxUi

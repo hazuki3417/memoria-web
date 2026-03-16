@@ -4,6 +4,8 @@ export * from "./ButtonGroup"
 export * from "./CustomModal"
 export * from "./Image"
 export * from "./ImageLayout"
+export * from "./InputCounter"
+export * from "./TagsInput"
 export * from "./Toggle"
 
 export * from "./type"

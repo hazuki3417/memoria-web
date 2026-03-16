@@ -1,20 +1,12 @@
 "use client"
-import { ActionPanel, ButtonGroup, FieldValid } from "@/components"
+import { ButtonGroup, FieldValid, TagsInput } from "@/components"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { usePreference, useTaskManager } from "@/hooks"
 import { wait } from "@/lib/wait"
 import { useFeedbackContext, useUserContext } from "@/providers"
 import { Task, TaskValue } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Progress,
-  Stack,
-  TagsInput,
-} from "@mantine/core"
+import { Box, Button, Checkbox, Divider, Flex, Stack } from "@mantine/core"
 import { nanoid } from "nanoid"
 import React, { useCallback, useEffect, useMemo } from "react"
 import {
@@ -46,41 +38,6 @@ const imageInputFormSchema = (config: ImageInputFormSchemaConfig) => {
 
 type ImageInputFormValues = z.infer<ReturnType<typeof imageInputFormSchema>>
 
-/**
- * NOTE: 仕様
- *       - ドラッグ & ドロップ
- *         - 常に可能。下記のケースに一致するファイルも可能
- *           - サポートしていないファイルのドロップ
- *           - サイズ上限を超えている状態
- *       - ファイル選択
- *         - 対応しているファイル形式のみ可能。下記のケースに一致するファイルは選択可能
- *           - サイズ上限を超えるファイル
- *       - バリデーション
- *         - 全体
- *           - ファイルの登録上限を超えた場合
- *             - 追加ボタン非表示
- *             - ドラッグ & ドロップ可能
- *             - カーソル変更（no-drop）
- *             - 背景色変更（赤色）
- *           - ファイルの登録上限と一致した場合
- *             - 追加ボタン非表示
- *             - ドラッグ & ドロップ不可（イベント無効化）
- *             - カーソル変更（no-drop）
- *             - 背景色変更なし
- *         - ファイル単位
- *           - ファイルのサイズ上限を超えた場合
- *           - サポートしていないファイルのサイズ上限を超えた場合
- *
- * NOTE: ファイルの重複チェックはやらない（厳密性を求めることができないため）
- * NOTE: ファイルの破損チェックはやらない（厳密性を求めることができないため）
- *
- * ロジック
- * TODO: 一括の公開範囲、個別の公開範囲の優先度を検討
- *       - 公開で全適用ON > 個別の公開はそのまま、非公開は公開に変更?
- *       - 非公開で全適用ON > 個別の公開は非公開に変更、非公開はそのまま?
- * TODO: タグ情報の出し方を検討
- *       ユースケースを洗い出して検討した方が良さそう
- */
 const Page = () => {
   const user = useUserContext()
   const preference = usePreference()
@@ -121,6 +78,11 @@ const Page = () => {
     control: methods.control,
     name: "images",
   })
+
+  const count = {
+    selected: watchValueImages.filter((image) => image.selected).length,
+    total: watchValueImages.length,
+  }
 
   const { fields, append, remove, replace } = useFieldArray({
     control: methods.control,
@@ -283,28 +245,12 @@ const Page = () => {
     return false
   })()
 
-  const progres = useMemo(() => {
-    const { total, success, error, skip } = manager.value.meta.summary
-    return {
-      value: {
-        success: total === 0 ? 0 : (success / total) * 100,
-        error: total === 0 ? 0 : (error / total) * 100,
-        skip: total === 0 ? 0 : (skip / total) * 100,
-      },
-      count: {
-        success,
-        skip,
-        error,
-      },
-    }
-  }, [manager.value.tasks])
-
   return (
     <Box>
       <ImageDropForm
         disabled={imageDropFormDisabled}
         onFileDrop={handleFileDrop}
-        mb="xl"
+        mb="xs"
       >
         <ImageDropForm.AddImageBox
           prefix={preference.file.fileSizeUnit}
@@ -315,80 +261,96 @@ const Page = () => {
           onFileSelect={handleFileSelect}
         />
       </ImageDropForm>
-      <ActionPanel mb="sm">
-        <ActionPanel.Left>
-          <Flex align="center" gap="xs" w="100%">
-            <Controller
-              control={methods.control}
-              name={`bulk.tags`}
-              render={({ field }) => {
-                return (
-                  <TagsInput
-                    size="xs"
-                    flex="1"
-                    styles={{
-                      root: { height: "100%" },
-                      wrapper: { height: "100%" },
-                      input: { height: "100%" },
-                    }}
-                    {...field}
-                    placeholder="タグ"
-                    clearable
-                    disabled={allFormDisabled}
-                  />
-                )
+
+      <Divider />
+
+      <Box>
+        <Flex align="center" w="100%">
+          <Box w="160px" m="xs" pl="8px">
+            <Checkbox
+              size="xs"
+              variant="filled"
+              color="blue"
+              label={`選択：${count.selected} / ${count.total}`}
+              styles={{
+                label: {
+                  paddingLeft: "calc(.625rem * 0.5)",
+                },
               }}
             />
-            <ButtonGroup>
-              <Button
-                size="xs"
-                type="button"
-                disabled={allFormDisabled || bulkFormDisabled}
-                onClick={handleAddTags}
-              >
-                追加
-              </Button>
-              <Button
-                size="xs"
-                type="button"
-                disabled={allFormDisabled || bulkFormDisabled}
-                onClick={handleRemoveTags}
-              >
-                除去
-              </Button>
-              <Button
-                size="xs"
-                type="button"
-                disabled={allFormDisabled || bulkFormDisabled}
-                onClick={handleReplaceTags}
-              >
-                置換
-              </Button>
-            </ButtonGroup>
-          </Flex>
-        </ActionPanel.Left>
-        <ActionPanel.Right>
-          <ButtonGroup>
-            <Button
-              size="xs"
-              type="submit"
-              color="green"
-              form="new-image"
-              disabled={allFormDisabled || bulkFormDisabled}
-            >
-              登録
-            </Button>
+          </Box>
+          <Divider orientation="vertical" />
+          <Box flex="1" m="xs">
+            <Stack gap="calc(.625rem * 0.5)">
+              <Controller
+                control={methods.control}
+                name={`bulk.tags`}
+                render={({ field }) => {
+                  return (
+                    <TagsInput
+                      size="xs"
+                      label="タグ"
+                      clearable
+                      {...field}
+                      disabled={allFormDisabled}
+                    />
+                  )
+                }}
+              />
+              <Flex justify="space-between" gap="xs">
+                <Checkbox
+                  size="xs"
+                  color="blue"
+                  styles={{
+                    label: {
+                      paddingLeft: "calc(.625rem * 0.5)",
+                    },
+                  }}
+                  label="アップロード時に設定したタグを反映する"
+                />
+                <ButtonGroup>
+                  <Button
+                    size="xs"
+                    type="button"
+                    disabled={allFormDisabled || bulkFormDisabled}
+                    onClick={handleAddTags}
+                  >
+                    追加
+                  </Button>
+                  <Button
+                    size="xs"
+                    type="button"
+                    disabled={allFormDisabled || bulkFormDisabled}
+                    onClick={handleRemoveTags}
+                  >
+                    除去
+                  </Button>
+                  <Button
+                    size="xs"
+                    type="button"
+                    disabled={allFormDisabled || bulkFormDisabled}
+                    onClick={handleReplaceTags}
+                  >
+                    置換
+                  </Button>
+                </ButtonGroup>
+              </Flex>
+            </Stack>
+          </Box>
+          <Divider orientation="vertical" />
+          <Box m="xs" style={{ display: "flex", alignItems: "center" }}>
             <Button
               size="xs"
               type="button"
               disabled={allFormDisabled || bulkFormDisabled}
               onClick={handleRemoveFiles}
             >
-              すべて消去
+              消去
             </Button>
-          </ButtonGroup>
-        </ActionPanel.Right>
-      </ActionPanel>
+          </Box>
+        </Flex>
+      </Box>
+      <Divider />
 
       <ImageInputForm
         methods={methods}
@@ -396,39 +358,7 @@ const Page = () => {
         submitValid={inputValid}
         submitInvalid={inputInValid}
       >
-        <Box mb="xs">
-          <Progress.Root size="sm" radius="xs">
-            <Progress.Section
-              styles={{
-                section: {
-                  transition: "width 300ms ease",
-                },
-              }}
-              value={progres.value.success}
-              color="blue"
-            />
-            <Progress.Section
-              styles={{
-                section: {
-                  transition: "width 300ms ease",
-                },
-              }}
-              value={progres.value.skip}
-              color="yellow"
-            />
-            <Progress.Section
-              styles={{
-                section: {
-                  transition: "width 300ms ease",
-                },
-              }}
-              value={progres.value.error}
-              color="red"
-            />
-          </Progress.Root>
-        </Box>
-        <Divider />
-        <Stack mb="xs" gap={0}>
+        <Stack gap={0}>
           {fields.map((image, index) => {
             const task = manager.value.tasks.find(
               (task) => image.taskId === task.id,
