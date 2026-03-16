@@ -190,7 +190,7 @@ export const useTaskManager = <D = undefined>(
     const promises = tasks
       .filter((task) => task.status !== "success")
       .map((task, index) => {
-        runner(task, index, callback)
+        return runner(task, index, callback)
       })
     return await Promise.allSettled(promises)
   }
