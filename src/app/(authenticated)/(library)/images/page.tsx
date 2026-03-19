@@ -250,7 +250,15 @@ const Page = () => {
           </LinkButton>
         </ActionPanel.Right>
       </ActionPanel>
-      <Tabs.Panel value={TAB_FIELDS.list}>
+      <Tabs.Panel
+        value={TAB_FIELDS.list}
+        style={{
+          display: "flex",
+          flex: "1",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
         <ActionPanel mb="xs" mih="36px">
           <ActionPanel.Left>
             {mode === "filter" && (

@@ -17,7 +17,7 @@ const mapRouteTab: Record<string, string> = {
 export interface TabsProps extends BaseProps {}
 
 export const Tabs = (props: TabsProps) => {
-  const { children, ...rest } = props
+  const { style, ...rest } = props
   const router = useRouter()
   const handleChange = (value: string | null) => {
     switch (value) {
@@ -32,18 +32,17 @@ export const Tabs = (props: TabsProps) => {
 
   return (
     <Base
-      {...rest}
       color="gray"
       variant="pills"
       style={{
         display: "flex",
         flexDirection: "column",
         height: "100%",
+        ...style,
       }}
       onChange={handleChange}
-    >
-      {children}
-    </Base>
+      {...rest}
+    />
   )
 }
 Tabs.List = TabsList
