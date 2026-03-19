@@ -10,6 +10,7 @@ export const ja: TranslationSchema = {
   },
   placeholder: {
     tag: "タグ",
+    group: "グループ名",
   },
   label: {
     list: "リスト",

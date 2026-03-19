@@ -251,7 +251,7 @@ const Page = () => {
         </ActionPanel.Right>
       </ActionPanel>
       <Tabs.Panel value={TAB_FIELDS.list}>
-        <ActionPanel mb="xs">
+        <ActionPanel mb="xs" mih="36px">
           <ActionPanel.Left>
             {mode === "filter" && (
               <form

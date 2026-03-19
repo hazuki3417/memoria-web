@@ -13,7 +13,7 @@ export const ActionPanel = (props: ActionPanelProps) => {
 
   return (
     <Box {...rest}>
-      <Flex direction="row" align="center" w="100%">
+      <Flex direction="row" align="center" h="100%" w="100%">
         {children}
       </Flex>
     </Box>

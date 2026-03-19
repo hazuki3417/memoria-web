@@ -9,6 +9,7 @@ export type TranslationSchema = {
   }
   placeholder: {
     tag: string
+    group: string
   }
   label: {
     list: string

@@ -10,6 +10,7 @@ export const en: TranslationSchema = {
   },
   placeholder: {
     tag: "Tag",
+    group: "Group name",
   },
   label: {
     list: "List",
