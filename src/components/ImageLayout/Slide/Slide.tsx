@@ -8,19 +8,13 @@ export interface SlideProps {
 export const Slide = (props: SlideProps) => {
   const { children } = props
   return (
-    <ScrollArea
-      type="always"
-      scrollHideDelay={0}
-      offsetScrollbars
-      scrollbarSize={6}
-      style={{ width: "100%" }}
-    >
+    <ScrollArea scrollbarSize={6}>
       <Box
-        style={{
+        style={(theme) => ({
+          paddingBottom: theme.spacing.xs,
           display: "flex",
-          flexWrap: "nowrap",
-          gap: "8px",
-        }}
+          gap: theme.spacing.xs,
+        })}
       >
         {children}
       </Box>
