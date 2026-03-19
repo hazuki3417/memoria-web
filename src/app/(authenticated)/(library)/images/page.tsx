@@ -376,7 +376,7 @@ const Page = () => {
         </ActionPanel>
         <ImageLayout>
           <ScrollArea flex={1} scrollbarSize={6}>
-            <ImageLayout.Grid>
+            <ImageLayout.Grid style={{ justifyContent: "center" }}>
               <Image>
                 {items.map((item) => {
                   return (

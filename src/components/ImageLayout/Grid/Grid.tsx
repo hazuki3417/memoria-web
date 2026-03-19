@@ -12,10 +12,8 @@ export const Grid = (props: GridProps) => {
       {...rest}
       style={{
         ...style,
-        padding: "3px 0px", // NOTE: outline分の調整（0pxにするとoutlineが潰れる）
+        padding: "3px", // NOTE: outline分の調整（0pxにするとoutlineが潰れる）
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         flexWrap: "wrap",
         gap: "8px",
       }}
