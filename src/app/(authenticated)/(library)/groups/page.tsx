@@ -8,6 +8,7 @@ import { TAB_FIELDS, Tabs } from "../_components"
 const Page = () => {
   return (
     <Tabs value={TAB_FIELDS.group}>
+      {/* FIX: 仮実装 */}
       <ActionPanel mb="xs">
         <ActionPanel.Left>
           <Tabs.List />
@@ -17,19 +18,27 @@ const Page = () => {
       </ActionPanel>
       <Tabs.Panel value={TAB_FIELDS.group}>
         <ImageLayout>
-          <Box>
-            <Flex justify="space-between" mb="xs">
-              <Title order={4}>グループ1</Title>
-              <Link href="">もっと見る</Link>
-            </Flex>
-            <ImageLayout.Slide>
-              {Array.from({ length: 20 }).map((_, i) => (
-                <ThumbnailBox key={i} style={{ flex: "0 0 auto" }}>
-                  <ThumbnailBox.Image bdrs="sm" src={"sample/thumbnail.webp"} />
-                </ThumbnailBox>
-              ))}
-            </ImageLayout.Slide>
-          </Box>
+          {Array.from({ length: 8 }).map((_, groupIndex) => (
+            <Box key={groupIndex}>
+              <Flex justify="space-between" mb="xs">
+                <Title order={4}>グループ{groupIndex}</Title>
+                <Link href="">もっと見る</Link>
+              </Flex>
+              <ImageLayout.Slide>
+                {Array.from({ length: 20 }).map((_, itemIndex) => (
+                  <ThumbnailBox
+                    key={itemIndex}
+                    style={{ flex: "0 0 auto", scrollSnapAlign: "start" }}
+                  >
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"sample/thumbnail.webp"}
+                    />
+                  </ThumbnailBox>
+                ))}
+              </ImageLayout.Slide>
+            </Box>
+          ))}
         </ImageLayout>
       </Tabs.Panel>
     </Tabs>
