@@ -1,5 +1,5 @@
 import { RouteNodes } from "@/types/routes"
-import { images, settings } from "./routes/index"
+import { groups, images, settings } from "./routes/index"
 
 export const routes = {
   auth: {
@@ -29,5 +29,6 @@ export const routes = {
     tags: [],
   },
   ...images,
+  ...groups,
   ...settings,
 } as const satisfies RouteNodes

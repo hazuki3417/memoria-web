@@ -14,7 +14,6 @@ import {
 } from "@/graphql"
 import { useCollectionSelection, useIntersection, useUriQuery } from "@/hooks"
 import { action } from "@/lib/action"
-import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
 import {
@@ -31,7 +30,6 @@ import {
   Flex,
   ScrollArea,
   SegmentedControl,
-  Tabs,
   TagsInput,
   Text,
 } from "@mantine/core"
@@ -49,6 +47,7 @@ import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
+import { TAB_FIELDS, Tabs } from "../_components"
 
 const searchFormSchema = z.object({
   tags: z.array(z.string()),
@@ -59,9 +58,6 @@ type SearchFormValues = z.infer<typeof searchFormSchema>
 const searchFormDefaultValues = createFormDefaults<SearchFormValues>({
   tags: [],
 })
-
-const TAB_ID_LIST = ["list", "group"] as const
-const TAB_FIELDS = defineFieldObject(TAB_ID_LIST)
 
 const Page = () => {
   const query = useUriQuery<SearchFormValues>()
@@ -238,22 +234,10 @@ const Page = () => {
   }
 
   return (
-    <Tabs
-      color="gray"
-      variant="pills"
-      defaultValue={TAB_FIELDS.list}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-      }}
-    >
+    <Tabs value={TAB_FIELDS.list}>
       <ActionPanel mb="xs">
         <ActionPanel.Left>
-          <Tabs.List>
-            <Tabs.Tab value={TAB_FIELDS.list}>{t("label.list")}</Tabs.Tab>
-            <Tabs.Tab value={TAB_FIELDS.group}>{t("label.group")}</Tabs.Tab>
-          </Tabs.List>
+          <Tabs.List />
         </ActionPanel.Left>
         <ActionPanel.Center></ActionPanel.Center>
         <ActionPanel.Right>
@@ -266,15 +250,7 @@ const Page = () => {
           </LinkButton>
         </ActionPanel.Right>
       </ActionPanel>
-      <Tabs.Panel
-        value={TAB_FIELDS.list}
-        style={{
-          display: "flex",
-          flex: "1",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
+      <Tabs.Panel value={TAB_FIELDS.list}>
         <ActionPanel mb="xs">
           <ActionPanel.Left>
             {mode === "filter" && (
@@ -449,7 +425,7 @@ const Page = () => {
         {/* </Flex> */}
       </Tabs.Panel>
       <Tabs.Panel value={TAB_FIELDS.group} flex={1}>
-        group panel
+        group panelaa
       </Tabs.Panel>
     </Tabs>
   )
