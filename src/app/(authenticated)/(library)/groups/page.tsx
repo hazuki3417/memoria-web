@@ -2,7 +2,7 @@
 import {
   ActionPanel,
   ButtonGroup,
-  ImageLayout,
+  ContentLayout,
   ResizeSplitView,
 } from "@/components"
 import { ImageGroup } from "@/feature"
@@ -167,9 +167,9 @@ const Page = () => {
                 </Flex>
               </ActionPanel.Right>
             </ActionPanel>
-            <ImageLayout>
+            <ContentLayout>
               <ScrollArea flex={1} scrollbarSize={6}>
-                <ImageLayout.Grid>
+                <ContentLayout.Grid>
                   <ImageGroup
                     onClick={() => handleSelect("group1")}
                     ui={{ selected: selected === "group1" }}
@@ -324,9 +324,9 @@ const Page = () => {
                       <ImageGroup.Title>グループ6</ImageGroup.Title>
                     </ImageGroup.InfoContainer>
                   </ImageGroup>
-                </ImageLayout.Grid>
+                </ContentLayout.Grid>
               </ScrollArea>
-            </ImageLayout>
+            </ContentLayout>
           </ResizeSplitView.Panel>
           <ResizeSplitView.Separator visible={drawer === "opened"} />
           <ResizeSplitView.Panel

@@ -2,14 +2,14 @@ import React from "react"
 import { Grid } from "./Grid"
 import { Slide } from "./Slide"
 
-export interface ImageLayoutProps {
+export interface ContentLayoutProps {
   children: React.ReactNode
 }
 
-export const ImageLayout = (props: ImageLayoutProps) => {
+export const ContentLayout = (props: ContentLayoutProps) => {
   const { children } = props
   return <>{children}</>
 }
 
-ImageLayout.Grid = Grid
-ImageLayout.Slide = Slide
+ContentLayout.Grid = Grid
+ContentLayout.Slide = Slide

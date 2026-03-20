@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Slide } from "./Slide"
 import { Box } from "@mantine/core"
+import type { Meta, StoryObj } from "@storybook/react"
+import { Grid } from "./Grid"
 
 const meta = {
-  title: "ImageLayout/Slide",
-  component: Slide,
-} satisfies Meta<typeof Slide>
+  title: "ContentLayout/Grid",
+  component: Grid,
+} satisfies Meta<typeof Grid>
 
 export default meta
 type Story = StoryObj<typeof meta>

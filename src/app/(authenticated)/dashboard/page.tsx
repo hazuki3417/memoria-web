@@ -1,5 +1,5 @@
 "use client"
-import { ImageLayout } from "@/components"
+import { ContentLayout } from "@/components"
 import { ThumbnailBox } from "@/feature"
 import { Box, Flex, Title } from "@mantine/core"
 import Link from "next/link"
@@ -7,13 +7,13 @@ import Link from "next/link"
 const Page = () => {
   return (
     <Box>
-      <ImageLayout>
+      <ContentLayout>
         <Box>
           <Flex justify="space-between" mb="xs">
             <Title order={4}>最近追加された画像</Title>
             <Link href="">もっと見る</Link>
           </Flex>
-          <ImageLayout.Slide>
+          <ContentLayout.Slide>
             {Array.from({ length: 20 }).map((_, itemIndex) => (
               <ThumbnailBox
                 key={itemIndex}
@@ -22,14 +22,14 @@ const Page = () => {
                 <ThumbnailBox.Image bdrs="sm" src={"sample/thumbnail.webp"} />
               </ThumbnailBox>
             ))}
-          </ImageLayout.Slide>
+          </ContentLayout.Slide>
         </Box>
         <Box>
           <Flex justify="space-between" mb="xs">
             <Title order={4}>最近閲覧した画像</Title>
             <Link href="">もっと見る</Link>
           </Flex>
-          <ImageLayout.Slide>
+          <ContentLayout.Slide>
             {Array.from({ length: 20 }).map((_, itemIndex) => (
               <ThumbnailBox
                 key={itemIndex}
@@ -38,9 +38,9 @@ const Page = () => {
                 <ThumbnailBox.Image bdrs="sm" src={"sample/thumbnail.webp"} />
               </ThumbnailBox>
             ))}
-          </ImageLayout.Slide>
+          </ContentLayout.Slide>
         </Box>
-      </ImageLayout>
+      </ContentLayout>
     </Box>
   )
 }

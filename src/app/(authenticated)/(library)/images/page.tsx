@@ -2,8 +2,8 @@
 import {
   ActionPanel,
   ButtonGroup,
+  ContentLayout,
   Image,
-  ImageLayout,
   LinkButton,
 } from "@/components"
 import { ThumbnailBox } from "@/feature"
@@ -382,9 +382,9 @@ const Page = () => {
             </Flex>
           </ActionPanel.Right>
         </ActionPanel>
-        <ImageLayout>
+        <ContentLayout>
           <ScrollArea flex={1} scrollbarSize={6}>
-            <ImageLayout.Grid style={{ justifyContent: "center" }}>
+            <ContentLayout.Grid style={{ justifyContent: "center" }}>
               <Image>
                 {items.map((item) => {
                   return (
@@ -427,9 +427,9 @@ const Page = () => {
                   visible={data?.getImages.pageInfo.hasNextPage || false}
                 />
               </Image>
-            </ImageLayout.Grid>
+            </ContentLayout.Grid>
           </ScrollArea>
-        </ImageLayout>
+        </ContentLayout>
         {/* </Flex> */}
       </Tabs.Panel>
       <Tabs.Panel value={TAB_FIELDS.group} flex={1}>
