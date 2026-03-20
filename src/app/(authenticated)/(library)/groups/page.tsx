@@ -10,6 +10,7 @@ import { useLocalStorage, useUriQuery } from "@/hooks"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
 import { resolveUriQuery } from "@/lib/url"
+import { ImageDetailPayload, useImageDetailModalContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   ActionIcon,
@@ -122,8 +123,36 @@ const Page = () => {
     })
   }
 
-  const items = useMemo(() => {
+  const imageDetailModalContext = useImageDetailModalContext()
+
+
+  const groups = useMemo(() => {
     return []
+  }, [])
+
+  const images = useMemo(() => {
+
+    return [{
+      id: "edge.node.id",
+      info: {
+        file: {
+          name: "example",
+          size: 1000,
+          date: "",
+        },
+        image: {
+          width: 100,
+          height: 200,
+        },
+        tags: [],
+      },
+      image: {
+        preview: "sample/h.png",
+        thumbnail: "sample/thumbnail.webp",
+        alt: "",
+      },
+    } satisfies ImageDetailPayload
+    ]
   }, [])
 
   return (
@@ -193,7 +222,7 @@ const Page = () => {
                   </ActionPanel.Left>
                   <ActionPanel.Right>
                     <Flex align="center" gap="xs">
-                      <Text size="xs">{`${items.length} 件`}</Text>
+                      <Text size="xs">{`${groups.length} 件`}</Text>
                     </Flex>
                   </ActionPanel.Right>
                 </ActionPanel>
@@ -206,15 +235,15 @@ const Page = () => {
                       <ImageGroup.CountBadge value={42} />
                       <ImageGroup.ImageContainer>
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail1.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail2.webp"}
                         />
                       </ImageGroup.ImageContainer>
@@ -229,15 +258,15 @@ const Page = () => {
                       <ImageGroup.CountBadge value={20} />
                       <ImageGroup.ImageContainer>
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail1.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail2.webp"}
                         />
                       </ImageGroup.ImageContainer>
@@ -252,19 +281,19 @@ const Page = () => {
                       <ImageGroup.CountBadge value={15} />
                       <ImageGroup.ImageContainer>
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail1.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail2.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                       </ImageGroup.ImageContainer>
@@ -279,19 +308,19 @@ const Page = () => {
                       <ImageGroup.CountBadge value={15} />
                       <ImageGroup.ImageContainer>
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail1.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail2.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                       </ImageGroup.ImageContainer>
@@ -306,19 +335,19 @@ const Page = () => {
                       <ImageGroup.CountBadge value={15} />
                       <ImageGroup.ImageContainer>
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail1.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail2.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                       </ImageGroup.ImageContainer>
@@ -333,19 +362,19 @@ const Page = () => {
                       <ImageGroup.CountBadge value={15} />
                       <ImageGroup.ImageContainer>
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail1.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail2.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                         <ImageGroup.Image
-                          bdrs="xs"
+                          bdrs="sm"
                           src={"sample/thumbnail0.webp"}
                         />
                       </ImageGroup.ImageContainer>
@@ -397,89 +426,94 @@ const Page = () => {
                 </Flex>
                 <ContentLayout>
                   <ContentLayout.Grid style={{ justifyContent: "center" }}>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    <ThumbnailBox onClick={() => {
+                      imageDetailModalContext.control.open({
+                        id: images[0].id,
+                        getImages: () => images,
+                      })
+                    }}>
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
                     </ThumbnailBox>
                   </ContentLayout.Grid>
                 </ContentLayout>

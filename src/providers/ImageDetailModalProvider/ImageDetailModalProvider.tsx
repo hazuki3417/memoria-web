@@ -11,7 +11,7 @@ import {
 import { action } from "@/lib/action"
 import { useConfirmContext, useFeedbackContext } from "@/providers"
 import "client-only"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import {
   ImageDetail,
   ImageDetailModalContext,
@@ -121,7 +121,7 @@ export const ImageDetailModalProvider = (
     })
   }, [nav.current, downloadImage])
 
-  const handleEdit = () => {}
+  const handleEdit = () => { }
 
   const handleNext = () => {
     if (nav.next.exists) {
@@ -134,6 +134,21 @@ export const ImageDetailModalProvider = (
       handleOpen({ id: nav.prev.item.id, getImages: () => images })
     }
   }
+
+  const showLoopButton = useMemo(() => {
+    if (images.length === 1) {
+      // 1件のみ場合はページ送りのボタンを表示しない
+      return {
+        showPrev: false,
+        showNext: false,
+      }
+    }
+    // 1件より大きい場合は設定に従ってページ送りのボタンを表示する
+    return {
+      showPrev: nav.prev.exists,
+      showNext: nav.next.exists,
+    }
+  }, [images, nav])
 
   return (
     <ImageDetailModalContext.Provider
@@ -157,8 +172,7 @@ export const ImageDetailModalProvider = (
               showInfoByDefault: preference.preview.show,
             }}
             ui={{
-              showPrev: nav.prev.exists,
-              showNext: nav.next.exists,
+              ...showLoopButton
             }}
             payload={{
               slide: {
