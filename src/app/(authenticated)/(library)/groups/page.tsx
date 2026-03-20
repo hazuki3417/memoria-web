@@ -6,7 +6,7 @@ import {
   ResizeSplitView,
 } from "@/components"
 import { ImageGroup, ThumbnailBox } from "@/feature"
-import { useUriQuery } from "@/hooks"
+import { useLocalStorage, useUriQuery } from "@/hooks"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
 import { resolveUriQuery } from "@/lib/url"
@@ -26,12 +26,14 @@ import { t } from "i18next"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
-import { useGroupRef } from "react-resizable-panels"
+import { Layout, useGroupRef } from "react-resizable-panels"
 import z from "zod"
 import { TAB_FIELDS, Tabs } from "../_components"
 
 const PANEL_ID_LIST = ["left", "right"] as const
-export const PANEL_FIELDS = defineFieldObject(PANEL_ID_LIST)
+const PANEL_FIELDS = defineFieldObject(PANEL_ID_LIST)
+type PanelSize = Record<typeof PANEL_ID_LIST[number], number>
+
 
 const searchFormSchema = z.object({
   key: z.string(),
@@ -72,6 +74,22 @@ const Page = () => {
 
   const groupRef = useGroupRef()
 
+  const size = useLocalStorage<PanelSize>({
+    init: { left: 50, right: 50 },
+    key: "image-group-resize-split-view"
+  })
+
+  const handleLayoutChanged = (layout: Layout) => {
+    const ref = groupRef.current
+    if (ref === null) {
+      return
+    }
+    if (layout[PANEL_FIELDS.right] === 0) {
+      return // NOTE: 右側を閉じている状態なら何もしない
+    }
+    size.action.set({ left: layout[PANEL_FIELDS.left], right: layout[PANEL_FIELDS.right] })
+  }
+
   const handleSelect = (id: string) => {
     setSelected(id)
     const ref = groupRef.current
@@ -87,8 +105,8 @@ const Page = () => {
     // 右側が開いていない状態なら右側のパネルを表示
 
     ref.setLayout({
-      [PANEL_FIELDS.left]: 50,
-      [PANEL_FIELDS.right]: 50,
+      [PANEL_FIELDS.left]: size.value.left,
+      [PANEL_FIELDS.right]: size.value.right,
     })
   }
 
@@ -126,7 +144,7 @@ const Page = () => {
         }}
         value={TAB_FIELDS.group}
       >
-        <ResizeSplitView groupRef={groupRef}>
+        <ResizeSplitView groupRef={groupRef} onLayoutChanged={handleLayoutChanged}>
           <ResizeSplitView.Panel
             id={PANEL_FIELDS.left}
             defaultSize={100}
