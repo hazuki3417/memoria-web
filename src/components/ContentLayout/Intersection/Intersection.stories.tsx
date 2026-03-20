@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { IntersectionTile } from "./IntersectionTile"
+import { Intersection } from "./Intersection"
 
 const meta = {
-  title: "Image/IntersectionTile",
-  component: IntersectionTile,
-} satisfies Meta<typeof IntersectionTile>
+  title: "ContentLayout/Intersection",
+  component: Intersection,
+} satisfies Meta<typeof Intersection>
 
 export default meta
 type Story = StoryObj<typeof meta>

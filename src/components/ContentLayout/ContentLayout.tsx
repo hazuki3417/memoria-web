@@ -1,5 +1,6 @@
 import React from "react"
 import { Grid } from "./Grid"
+import { Intersection } from "./Intersection"
 import { Slide } from "./Slide"
 
 export interface ContentLayoutProps {
@@ -13,3 +14,4 @@ export const ContentLayout = (props: ContentLayoutProps) => {
 
 ContentLayout.Grid = Grid
 ContentLayout.Slide = Slide
+ContentLayout.Intersection = Intersection

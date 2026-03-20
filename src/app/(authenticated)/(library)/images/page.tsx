@@ -3,7 +3,6 @@ import {
   ActionPanel,
   ButtonGroup,
   ContentLayout,
-  Image,
   LinkButton,
 } from "@/components"
 import { ThumbnailBox } from "@/feature"
@@ -385,55 +384,49 @@ const Page = () => {
         <ContentLayout>
           <ScrollArea flex={1} scrollbarSize={6}>
             <ContentLayout.Grid style={{ justifyContent: "center" }}>
-              <Image>
-                {items.map((item) => {
-                  return (
-                    <ThumbnailBox
-                      key={item.id}
-                      ui={{
-                        selected: selection.value.ids.includes(item.id),
-                        selectable: mode === "bulk",
-                      }}
-                      onClick={() => {
-                        if (mode === "bulk") {
-                          const result = selection.action.toggle(item)
-                          if (result) {
-                            return
-                          }
-                          feedback.action.warning({
-                            title: "一括操作（選択）",
-                            body: `選択可能な数を超えています。`,
-                          })
-                        } else {
-                          // filter
-                          imageDetailModalContext.control.open({
-                            id: item.id,
-                            getImages: () => items,
-                          })
+              {items.map((item) => {
+                return (
+                  <ThumbnailBox
+                    key={item.id}
+                    ui={{
+                      selected: selection.value.ids.includes(item.id),
+                      selectable: mode === "bulk",
+                    }}
+                    onClick={() => {
+                      if (mode === "bulk") {
+                        const result = selection.action.toggle(item)
+                        if (result) {
+                          return
                         }
-                      }}
-                    >
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src={item.image.thumbnail}
-                        alt={item.image.alt}
-                      />
-                    </ThumbnailBox>
-                  )
-                })}
-                {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
-                <Image.Intersection
-                  ref={intersection.ref}
-                  visible={data?.getImages.pageInfo.hasNextPage || false}
-                />
-              </Image>
+                        feedback.action.warning({
+                          title: "一括操作（選択）",
+                          body: `選択可能な数を超えています。`,
+                        })
+                      } else {
+                        // filter
+                        imageDetailModalContext.control.open({
+                          id: item.id,
+                          getImages: () => items,
+                        })
+                      }
+                    }}
+                  >
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={item.image.thumbnail}
+                      alt={item.image.alt}
+                    />
+                  </ThumbnailBox>
+                )
+              })}
+              {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
+              <ContentLayout.Intersection
+                ref={intersection.ref}
+                visible={data?.getImages.pageInfo.hasNextPage || false}
+              />
             </ContentLayout.Grid>
           </ScrollArea>
         </ContentLayout>
-        {/* </Flex> */}
-      </Tabs.Panel>
-      <Tabs.Panel value={TAB_FIELDS.group} flex={1}>
-        group panelaa
       </Tabs.Panel>
     </Tabs>
   )
