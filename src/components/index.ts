@@ -5,6 +5,7 @@ export * from "./CustomModal"
 export * from "./Image"
 export * from "./ImageLayout"
 export * from "./InputCounter"
+export * from "./ResizeSplitView"
 export * from "./TagsInput"
 export * from "./Toggle"
 
