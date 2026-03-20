@@ -5,7 +5,7 @@ import {
   ContentLayout,
   ResizeSplitView,
 } from "@/components"
-import { ImageGroup } from "@/feature"
+import { ImageGroup, ThumbnailBox } from "@/feature"
 import { useUriQuery } from "@/hooks"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
@@ -15,9 +15,7 @@ import {
   ActionIcon,
   Box,
   Button,
-  Divider,
   Flex,
-  ScrollArea,
   Text,
   TextInput,
   Title,
@@ -134,199 +132,213 @@ const Page = () => {
             defaultSize={100}
             style={{ marginRight: "8px" }}
           >
-            <ActionPanel mb="xs" mih="36px">
-              <ActionPanel.Left>
-                <form
-                  onSubmit={handleSubmit(searchValid, searchInvalid)}
-                  style={{ flex: 1 }}
-                >
-                  <Flex align="center" gap="xs" w="100%">
-                    <Controller
-                      name="key"
-                      control={control}
-                      render={({ field }) => (
-                        <TextInput
-                          {...field}
-                          size="xs"
-                          placeholder={t("placeholder.group")}
-                          leftSection={<IconSearch size={16} />}
-                          flex="1"
+            {/* NOTE: right panelのmotion.div相当の要素 */}
+            <Box
+              style={(theme) => ({
+                height: "100%",
+              })}
+            >
+              <Box
+                style={(theme) => ({
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  borderRadius: theme.radius.xs,
+                })}
+              >
+                <ActionPanel mb="xs" mih="36px">
+                  <ActionPanel.Left>
+                    <form
+                      onSubmit={handleSubmit(searchValid, searchInvalid)}
+                      style={{ flex: 1 }}
+                    >
+                      <Flex align="center" gap="xs" w="100%">
+                        <Controller
+                          name="key"
+                          control={control}
+                          render={({ field }) => (
+                            <TextInput
+                              {...field}
+                              size="xs"
+                              placeholder={t("placeholder.group")}
+                              leftSection={<IconSearch size={16} />}
+                              flex="1"
+                            />
+                            // TODO: clearの実装
+                          )}
                         />
-                        // TODO: clearの実装
-                      )}
-                    />
-                    <Button size="xs" type="submit">
-                      {t("button.search")}
-                    </Button>
-                  </Flex>
-                </form>
-              </ActionPanel.Left>
-              <ActionPanel.Right>
-                <Flex align="center" gap="xs">
-                  <Text size="xs">{`${items.length} 件`}</Text>
-                </Flex>
-              </ActionPanel.Right>
-            </ActionPanel>
-            <ContentLayout>
-              <ScrollArea flex={1} scrollbarSize={6}>
-                <ContentLayout.Grid>
-                  <ImageGroup
-                    onClick={() => handleSelect("group1")}
-                    ui={{ selected: selected === "group1" }}
-                  >
-                    <ImageGroup.CountBadge value={42} />
-                    <ImageGroup.ImageContainer>
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail1.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail2.webp"}
-                      />
-                    </ImageGroup.ImageContainer>
-                    <ImageGroup.InfoContainer>
-                      <ImageGroup.Title>グループ1</ImageGroup.Title>
-                    </ImageGroup.InfoContainer>
-                  </ImageGroup>
-                  <ImageGroup
-                    onClick={() => handleSelect("group2")}
-                    ui={{ selected: selected === "group2" }}
-                  >
-                    <ImageGroup.CountBadge value={20} />
-                    <ImageGroup.ImageContainer>
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail1.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail2.webp"}
-                      />
-                    </ImageGroup.ImageContainer>
-                    <ImageGroup.InfoContainer>
-                      <ImageGroup.Title>グループ2</ImageGroup.Title>
-                    </ImageGroup.InfoContainer>
-                  </ImageGroup>
-                  <ImageGroup
-                    onClick={() => handleSelect("group3")}
-                    ui={{ selected: selected === "group3" }}
-                  >
-                    <ImageGroup.CountBadge value={15} />
-                    <ImageGroup.ImageContainer>
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail1.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail2.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                    </ImageGroup.ImageContainer>
-                    <ImageGroup.InfoContainer>
-                      <ImageGroup.Title>グループ3</ImageGroup.Title>
-                    </ImageGroup.InfoContainer>
-                  </ImageGroup>
-                  <ImageGroup
-                    onClick={() => handleSelect("group4")}
-                    ui={{ selected: selected === "group4" }}
-                  >
-                    <ImageGroup.CountBadge value={15} />
-                    <ImageGroup.ImageContainer>
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail1.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail2.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                    </ImageGroup.ImageContainer>
-                    <ImageGroup.InfoContainer>
-                      <ImageGroup.Title>グループ4</ImageGroup.Title>
-                    </ImageGroup.InfoContainer>
-                  </ImageGroup>
-                  <ImageGroup
-                    onClick={() => handleSelect("group5")}
-                    ui={{ selected: selected === "group5" }}
-                  >
-                    <ImageGroup.CountBadge value={15} />
-                    <ImageGroup.ImageContainer>
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail1.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail2.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                    </ImageGroup.ImageContainer>
-                    <ImageGroup.InfoContainer>
-                      <ImageGroup.Title>グループ5</ImageGroup.Title>
-                    </ImageGroup.InfoContainer>
-                  </ImageGroup>
-                  <ImageGroup
-                    onClick={() => handleSelect("group6")}
-                    ui={{ selected: selected === "group6" }}
-                  >
-                    <ImageGroup.CountBadge value={15} />
-                    <ImageGroup.ImageContainer>
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail1.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail2.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                      <ImageGroup.Image
-                        bdrs="xs"
-                        src={"sample/thumbnail0.webp"}
-                      />
-                    </ImageGroup.ImageContainer>
-                    <ImageGroup.InfoContainer>
-                      <ImageGroup.Title>グループ6</ImageGroup.Title>
-                    </ImageGroup.InfoContainer>
-                  </ImageGroup>
-                </ContentLayout.Grid>
-              </ScrollArea>
-            </ContentLayout>
+                        <Button size="xs" type="submit">
+                          {t("button.search")}
+                        </Button>
+                      </Flex>
+                    </form>
+                  </ActionPanel.Left>
+                  <ActionPanel.Right>
+                    <Flex align="center" gap="xs">
+                      <Text size="xs">{`${items.length} 件`}</Text>
+                    </Flex>
+                  </ActionPanel.Right>
+                </ActionPanel>
+                <ContentLayout>
+                  <ContentLayout.Grid>
+                    <ImageGroup
+                      onClick={() => handleSelect("group1")}
+                      ui={{ selected: selected === "group1" }}
+                    >
+                      <ImageGroup.CountBadge value={42} />
+                      <ImageGroup.ImageContainer>
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail1.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail2.webp"}
+                        />
+                      </ImageGroup.ImageContainer>
+                      <ImageGroup.InfoContainer>
+                        <ImageGroup.Title>グループ1</ImageGroup.Title>
+                      </ImageGroup.InfoContainer>
+                    </ImageGroup>
+                    <ImageGroup
+                      onClick={() => handleSelect("group2")}
+                      ui={{ selected: selected === "group2" }}
+                    >
+                      <ImageGroup.CountBadge value={20} />
+                      <ImageGroup.ImageContainer>
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail1.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail2.webp"}
+                        />
+                      </ImageGroup.ImageContainer>
+                      <ImageGroup.InfoContainer>
+                        <ImageGroup.Title>グループ2</ImageGroup.Title>
+                      </ImageGroup.InfoContainer>
+                    </ImageGroup>
+                    <ImageGroup
+                      onClick={() => handleSelect("group3")}
+                      ui={{ selected: selected === "group3" }}
+                    >
+                      <ImageGroup.CountBadge value={15} />
+                      <ImageGroup.ImageContainer>
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail1.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail2.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                      </ImageGroup.ImageContainer>
+                      <ImageGroup.InfoContainer>
+                        <ImageGroup.Title>グループ3</ImageGroup.Title>
+                      </ImageGroup.InfoContainer>
+                    </ImageGroup>
+                    <ImageGroup
+                      onClick={() => handleSelect("group4")}
+                      ui={{ selected: selected === "group4" }}
+                    >
+                      <ImageGroup.CountBadge value={15} />
+                      <ImageGroup.ImageContainer>
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail1.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail2.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                      </ImageGroup.ImageContainer>
+                      <ImageGroup.InfoContainer>
+                        <ImageGroup.Title>グループ4</ImageGroup.Title>
+                      </ImageGroup.InfoContainer>
+                    </ImageGroup>
+                    <ImageGroup
+                      onClick={() => handleSelect("group5")}
+                      ui={{ selected: selected === "group5" }}
+                    >
+                      <ImageGroup.CountBadge value={15} />
+                      <ImageGroup.ImageContainer>
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail1.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail2.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                      </ImageGroup.ImageContainer>
+                      <ImageGroup.InfoContainer>
+                        <ImageGroup.Title>グループ5</ImageGroup.Title>
+                      </ImageGroup.InfoContainer>
+                    </ImageGroup>
+                    <ImageGroup
+                      onClick={() => handleSelect("group6")}
+                      ui={{ selected: selected === "group6" }}
+                    >
+                      <ImageGroup.CountBadge value={15} />
+                      <ImageGroup.ImageContainer>
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail1.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail2.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                        <ImageGroup.Image
+                          bdrs="xs"
+                          src={"sample/thumbnail0.webp"}
+                        />
+                      </ImageGroup.ImageContainer>
+                      <ImageGroup.InfoContainer>
+                        <ImageGroup.Title>グループ6</ImageGroup.Title>
+                      </ImageGroup.InfoContainer>
+                    </ImageGroup>
+                  </ContentLayout.Grid>
+                </ContentLayout>
+              </Box>
+            </Box>
           </ResizeSplitView.Panel>
           <ResizeSplitView.Separator visible={drawer === "opened"} />
           <ResizeSplitView.Panel
@@ -336,40 +348,123 @@ const Page = () => {
             style={{ marginLeft: "8px" }}
           >
             <motion.div
+              style={{ height: "100%" }}
               animate={{
                 opacity: drawer === "opened" ? 1 : 0,
                 x: drawer === "opened" ? 0 : 100,
               }}
               transition={{ duration: 0.3 }}
             >
-              <Box>
-                <Box
-                  style={(theme) => ({
-                    height: "100%",
-                    backgroundColor: theme.colors.dark[7],
-                    borderRadius: theme.radius.xs,
-                  })}
-                >
-                  <Divider orientation="vertical" />
-                  <Box>
-                    <Flex p="xs" justify="space-between" align="center">
-                      <Title order={4}>グループ1</Title>
-                      <ButtonGroup>
-                        <ActionIcon
-                          color="gray"
-                          size="input-xs"
-                          variant="subtle"
-                          data-testid="edit-info"
-                          onClick={handleClose}
-                        >
-                          <IconX />
-                        </ActionIcon>
-                      </ButtonGroup>
-                    </Flex>
-                    <Divider />
-                    <Box></Box>
-                  </Box>
-                </Box>
+              <Box
+                style={(theme) => ({
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  borderRadius: theme.radius.xs,
+                })}
+              >
+                <Flex p="xs" justify="space-between" align="center">
+                  <Title order={4}>グループ1</Title>
+                  <ButtonGroup>
+                    <ActionIcon
+                      color="gray"
+                      size="input-xs"
+                      variant="subtle"
+                      data-testid="edit-info"
+                      onClick={handleClose}
+                    >
+                      <IconX />
+                    </ActionIcon>
+                  </ButtonGroup>
+                </Flex>
+                <ContentLayout>
+                  <ContentLayout.Grid style={{ justifyContent: "center" }}>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                    <ThumbnailBox>
+                      <ThumbnailBox.Image src="sample/thumbnail0.webp" />
+                    </ThumbnailBox>
+                  </ContentLayout.Grid>
+                </ContentLayout>
               </Box>
             </motion.div>
           </ResizeSplitView.Panel>

@@ -1,3 +1,4 @@
+"use client"
 import { Box, ScrollArea } from "@mantine/core"
 import React from "react"
 
