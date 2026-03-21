@@ -1,11 +1,18 @@
 // NOTE: 言語スキーマの型定義
 export type TranslationSchema = {
   button: {
+    group: string
     search: string
     new: string
     delete: string
     edit: string
     download: string
+    create: string
+    update: string
+    register: string
+    add: string
+    remove: string
+    replace: string
   }
   placeholder: {
     tag: string
