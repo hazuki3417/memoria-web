@@ -1,0 +1,18 @@
+mutation CreateImageGroup($input: CreateImageGroupInput!) {
+  createImageGroup(input: $input) {
+    id
+  }
+}
+
+mutation UpdateImageGroup($input: UpdateImageGroupInput!) {
+  updateImageGroup(input: $input) {
+    id
+  }
+}
+
+mutation DeleteImageGroup($input: DeleteImageGroupInput!) {
+  deleteImageGroup(input: $input) {
+    id
+  }
+}
+

@@ -14,11 +14,13 @@ input ImageGroupsFilterInput {
 }
 
 input ImageGroupInput {
-  ID: String!
+  id: String!
 }
 
 extend type Mutation {
   createImageGroup(input: CreateImageGroupInput!): CreateImageGroupPayload!
+  updateImageGroup(input: UpdateImageGroupInput!): UpdateImageGroupPayload!
+  deleteImageGroup(input: DeleteImageGroupInput!): DeleteImageGroupPayload!
 }
 
 input CreateImageGroupInput {
@@ -26,8 +28,26 @@ input CreateImageGroupInput {
   imageIds: [ID!]!
 }
 
+input UpdateImageGroupInput {
+  id: String!
+  name: String!
+  imageIds: [ID!]!
+}
+
+input DeleteImageGroupInput {
+  id: String!
+}
+
 type CreateImageGroupPayload {
-  group: ImageGroup!
+  id: String!
+}
+
+type UpdateImageGroupPayload {
+  id: String!
+}
+
+type DeleteImageGroupPayload {
+  id: String!
 }
 
 
