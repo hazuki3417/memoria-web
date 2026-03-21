@@ -1,0 +1,61 @@
+extend type Query {
+  imageGroups(
+    first: Int @tag(validate: "omitempty,min=1,max=100")
+    last: Int @tag(validate: "omitempty,min=1,max=100")
+    after: String @tag(validate: "omitempty,min=1")
+    before: String @tag(validate: "omitempty,min=1")
+    filter: ImageGroupsFilterInput
+  ): ImageGroupConnection!
+  imageGroup(input: ImageGroupInput!): ImageGroup!
+}
+
+input ImageGroupsFilterInput {
+  name: String
+}
+
+input ImageGroupInput {
+  ID: String!
+}
+
+extend type Mutation {
+  createImageGroup(input: CreateImageGroupInput!): CreateImageGroupPayload!
+}
+
+input CreateImageGroupInput {
+  name: String!
+  imageIds: [ID!]!
+}
+
+type CreateImageGroupPayload {
+  group: ImageGroup!
+}
+
+
+type ImageGroup {
+  id: ID!
+  name: String!
+  count: Int!
+  images(
+    first: Int
+    last: Int
+    after: String
+    before: String
+    filter: ImagesFilterInput
+  ): ImageConnection!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+
+
+# === relay model ===
+
+type ImageGroupEdge {
+  node: ImageGroup!
+  cursor: String!
+}
+
+type ImageGroupConnection {
+  edges: [ImageGroupEdge!]!
+  pageInfo: PageInfo!
+}

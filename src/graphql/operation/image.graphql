@@ -55,9 +55,9 @@ query GetImages(
   $last: Int
   $after: String
   $before: String
-  $filter: GetImagesFilterInput
+  $filter: ImagesFilterInput
 ) {
-  getImages(
+  images(
     first: $first
     last: $last
     after: $after

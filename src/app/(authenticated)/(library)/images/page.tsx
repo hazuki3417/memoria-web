@@ -3,7 +3,7 @@ import {
   ActionPanel,
   ButtonGroup,
   ContentLayout,
-  LinkButton,
+  LinkButton
 } from "@/components"
 import { ThumbnailBox } from "@/feature"
 import {
@@ -27,11 +27,14 @@ import {
   Center,
   Checkbox,
   Flex,
+  Modal,
   SegmentedControl,
   TagsInput,
-  Text,
+  Text
 } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import {
+  IconBoxMultiple,
   IconCheckbox,
   IconDownload,
   IconEdit,
@@ -46,6 +49,7 @@ import { useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 import { TAB_FIELDS, Tabs } from "../_components"
+import { CreateImageGroupForm } from "./new/_components"
 
 const searchFormSchema = z.object({
   tags: z.array(z.string()),
@@ -74,6 +78,9 @@ const Page = () => {
   const imageDetailModalContext = useImageDetailModalContext()
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
 
+  const [opened, { open, close }] = useDisclosure(false)
+
+
   const filter = {
     tags: query === undefined ? [] : query.tags,
   }
@@ -88,7 +95,7 @@ const Page = () => {
 
   const intersection = useIntersection({
     intersect: async () => {
-      const pageInfo = data?.getImages.pageInfo
+      const pageInfo = data?.images.pageInfo
       if (!pageInfo?.hasNextPage) return
       fetchMore({
         variables: {
@@ -105,7 +112,7 @@ const Page = () => {
       return []
     }
 
-    const edges = data.getImages.edges
+    const edges = data.images.edges
 
     return edges.map((edge) => {
       return {
@@ -147,6 +154,18 @@ const Page = () => {
   })
 
   const hasSelectable = selection.value.size > 0
+
+  const handleGroupImages = async () => {
+    if (selection.value.max < selection.value.size) {
+      feedback.action.warning({
+        title: "一括操作（グループ化）",
+        body: `${selection.value.max} 件以内に収まるよう選択してください。`,
+      })
+      return
+    }
+    open()
+
+  }
 
   const handleEditImages = async () => {
     if (selection.value.max < selection.value.size) {
@@ -230,6 +249,7 @@ const Page = () => {
     const downloadUrl = res.data.downloadImages
     action.download({ url: downloadUrl.url, fileName: downloadUrl.fileName })
   }
+
 
   return (
     <Tabs value={TAB_FIELDS.list}>
@@ -318,6 +338,14 @@ const Page = () => {
               )}
               {mode === "bulk" && (
                 <ButtonGroup>
+                  <Button
+                    size="xs"
+                    leftSection={<IconBoxMultiple size={16} />}
+                    disabled={!hasSelectable}
+                    onClick={handleGroupImages}
+                  >
+                    {t("button.group")}
+                  </Button>
                   <Button
                     size="xs"
                     leftSection={<IconEdit size={16} />}
@@ -420,12 +448,15 @@ const Page = () => {
             {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
             <ContentLayout.Intersection
               ref={intersection.ref}
-              visible={data?.getImages.pageInfo.hasNextPage || false}
+              visible={data?.images.pageInfo.hasNextPage || false}
             />
           </ContentLayout.Grid>
         </ContentLayout>
       </Tabs.Panel>
-    </Tabs>
+      <Modal opened={opened} onClose={close} title="新規グループ作成" size="xl" centered>
+        <CreateImageGroupForm items={selection.value.items} />
+      </Modal>
+    </Tabs >
   )
 }
 
