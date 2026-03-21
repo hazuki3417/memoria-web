@@ -9,7 +9,7 @@ import { ImageGroup, ThumbnailBox } from "@/feature"
 import { useLocalStorage, useUriQuery } from "@/hooks"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
-import { resolveUriQuery } from "@/lib/url"
+import { resolveUri, resolveUriQuery } from "@/lib/url"
 import { ImageDetailPayload, useImageDetailModalContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -21,7 +21,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core"
-import { IconSearch, IconX } from "@tabler/icons-react"
+import { IconEdit, IconSearch, IconX } from "@tabler/icons-react"
 import { motion } from "framer-motion"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
@@ -154,6 +154,16 @@ const Page = () => {
     } satisfies ImageDetailPayload
     ]
   }, [])
+
+  const handleEditGroup = async (id: string) => {
+    router.push(
+      resolveUri("/groups/:id/edit", {
+        path: {
+          id: id
+        }
+      }),
+    )
+  }
 
   return (
     <Tabs value={TAB_FIELDS.group}>
@@ -413,6 +423,13 @@ const Page = () => {
                 <Flex p="xs" justify="space-between" align="center">
                   <Title order={4}>グループ1</Title>
                   <ButtonGroup>
+                    <Button
+                      size="xs"
+                      leftSection={<IconEdit size={16} />}
+                      onClick={() => handleEditGroup("5678")}
+                    >
+                      {t("button.edit")}
+                    </Button>
                     <ActionIcon
                       color="gray"
                       size="input-xs"

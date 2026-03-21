@@ -13,11 +13,19 @@ export const groups = {
         breadcrumb: "グループ登録",
         tags: [],
       },
-      edit: {
-        segment: "edit",
-        title: "グループ編集",
-        breadcrumb: "グループ編集",
+      ":id": {
+        segment: ":id",
+        title: "グループ詳細",
+        breadcrumb: "グループ詳細",
         tags: [],
+        children: {
+          edit: {
+            segment: "edit",
+            title: "グループ編集",
+            breadcrumb: "グループ編集",
+            tags: [],
+          },
+        }
       },
     },
   },
