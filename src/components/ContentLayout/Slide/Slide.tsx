@@ -12,7 +12,7 @@ export const Slide = (props: SlideProps) => {
     <ScrollArea scrollbarSize={6}>
       <Box
         style={(theme) => ({
-          paddingBottom: theme.spacing.xs,
+          padding: "3px", // NOTE: outline分の調整（0pxにするとoutlineが潰れる）
           display: "flex",
           gap: theme.spacing.xs,
         })}
