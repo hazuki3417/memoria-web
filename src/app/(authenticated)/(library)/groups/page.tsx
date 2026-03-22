@@ -33,8 +33,7 @@ import { TAB_FIELDS, Tabs } from "../_components"
 
 const PANEL_ID_LIST = ["left", "right"] as const
 const PANEL_FIELDS = defineFieldObject(PANEL_ID_LIST)
-type PanelSize = Record<typeof PANEL_ID_LIST[number], number>
-
+type PanelSize = Record<(typeof PANEL_ID_LIST)[number], number>
 
 const searchFormSchema = z.object({
   key: z.string(),
@@ -77,7 +76,7 @@ const Page = () => {
 
   const size = useLocalStorage<PanelSize>({
     init: { left: 50, right: 50 },
-    key: "image-group-resize-split-view"
+    key: "image-group-resize-split-view",
   })
 
   const handleLayoutChanged = (layout: Layout) => {
@@ -88,7 +87,10 @@ const Page = () => {
     if (layout[PANEL_FIELDS.right] === 0) {
       return // NOTE: 右側を閉じている状態なら何もしない
     }
-    size.action.set({ left: layout[PANEL_FIELDS.left], right: layout[PANEL_FIELDS.right] })
+    size.action.set({
+      left: layout[PANEL_FIELDS.left],
+      right: layout[PANEL_FIELDS.right],
+    })
   }
 
   const handleSelect = (id: string) => {
@@ -125,33 +127,32 @@ const Page = () => {
 
   const imageDetailModalContext = useImageDetailModalContext()
 
-
   const groups = useMemo(() => {
     return []
   }, [])
 
   const images = useMemo(() => {
-
-    return [{
-      id: "edge.node.id",
-      info: {
-        file: {
-          name: "example",
-          size: 1000,
-          date: "",
+    return [
+      {
+        id: "edge.node.id",
+        info: {
+          file: {
+            name: "example",
+            size: 1000,
+            date: "",
+          },
+          image: {
+            width: 100,
+            height: 200,
+          },
+          tags: [],
         },
         image: {
-          width: 100,
-          height: 200,
+          preview: "sample/h.png",
+          thumbnail: "sample/thumbnail.webp",
+          alt: "",
         },
-        tags: [],
-      },
-      image: {
-        preview: "sample/h.png",
-        thumbnail: "sample/thumbnail.webp",
-        alt: "",
-      },
-    } satisfies ImageDetailPayload
+      } satisfies ImageDetailPayload,
     ]
   }, [])
 
@@ -159,8 +160,8 @@ const Page = () => {
     router.push(
       resolveUri("/groups/:id/edit", {
         path: {
-          id: id
-        }
+          id: id,
+        },
       }),
     )
   }
@@ -183,7 +184,10 @@ const Page = () => {
         }}
         value={TAB_FIELDS.group}
       >
-        <ResizeSplitView groupRef={groupRef} onLayoutChanged={handleLayoutChanged}>
+        <ResizeSplitView
+          groupRef={groupRef}
+          onLayoutChanged={handleLayoutChanged}
+        >
           <ResizeSplitView.Panel
             id={PANEL_FIELDS.left}
             defaultSize={100}
@@ -443,94 +447,180 @@ const Page = () => {
                 </Flex>
                 <ContentLayout>
                   <ContentLayout.Grid style={{ justifyContent: "center" }}>
-                    <ThumbnailBox onClick={() => {
-                      imageDetailModalContext.control.open({
-                        id: images[0].id,
-                        getImages: () => images,
-                      })
-                    }}>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                    <ThumbnailBox
+                      onClick={() => {
+                        imageDetailModalContext.control.open({
+                          id: images[0].id,
+                          getImages: () => images,
+                        })
+                      }}
+                    >
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                     <ThumbnailBox>
-                      <ThumbnailBox.Image bdrs="sm" src="sample/thumbnail0.webp" />
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src="sample/thumbnail0.webp"
+                      />
                     </ThumbnailBox>
                   </ContentLayout.Grid>
                 </ContentLayout>

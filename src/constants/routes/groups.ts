@@ -25,7 +25,7 @@ export const groups = {
             breadcrumb: "グループ編集",
             tags: [],
           },
-        }
+        },
       },
     },
   },

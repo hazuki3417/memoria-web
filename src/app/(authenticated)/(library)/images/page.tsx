@@ -3,10 +3,11 @@ import {
   ActionPanel,
   ButtonGroup,
   ContentLayout,
-  LinkButton
+  LinkButton,
 } from "@/components"
 import { ThumbnailBox } from "@/feature"
 import {
+  useCreateImageGroupMutation,
   useDeleteImagesMutation,
   useDownloadImagesMutation,
   useGetImagesQuery,
@@ -30,7 +31,7 @@ import {
   Modal,
   SegmentedControl,
   TagsInput,
-  Text
+  Text,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
@@ -49,7 +50,7 @@ import { useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 import { TAB_FIELDS, Tabs } from "../_components"
-import { CreateImageGroupForm } from "./new/_components"
+import { CreateImageGroupForm, ImageGroupInputFormValues } from "./_components"
 
 const searchFormSchema = z.object({
   tags: z.array(z.string()),
@@ -79,7 +80,6 @@ const Page = () => {
   const [mode, setMode] = useState<"filter" | "bulk">("filter")
 
   const [opened, { open, close }] = useDisclosure(false)
-
 
   const filter = {
     tags: query === undefined ? [] : query.tags,
@@ -164,7 +164,6 @@ const Page = () => {
       return
     }
     open()
-
   }
 
   const handleEditImages = async () => {
@@ -250,6 +249,35 @@ const Page = () => {
     action.download({ url: downloadUrl.url, fileName: downloadUrl.fileName })
   }
 
+  const [createImageGroup] = useCreateImageGroupMutation()
+
+  const createImageGroupValid = async (values: ImageGroupInputFormValues) => {
+    console.log("submit values:", values)
+
+    await createImageGroup({
+      variables: {
+        input: {
+          name: values.name,
+          imageIds: values.ids,
+        },
+      },
+    })
+    feedback.action.success({
+      title: "一括操作（グループ）",
+      body: `${values.name} グループを作成しました。`,
+    })
+    close()
+  }
+
+  const createImageGroupInvalid = async (
+    errors: FieldErrors<ImageGroupInputFormValues>,
+  ) => {
+    console.log("submit error:", errors)
+    feedback.action.error({
+      title: "一括操作（グループ）",
+      body: `作成に失敗しました。`,
+    })
+  }
 
   return (
     <Tabs value={TAB_FIELDS.list}>
@@ -453,10 +481,20 @@ const Page = () => {
           </ContentLayout.Grid>
         </ContentLayout>
       </Tabs.Panel>
-      <Modal opened={opened} onClose={close} title="新規グループ作成" size="xl" centered>
-        <CreateImageGroupForm items={selection.value.items} />
+      <Modal
+        opened={opened}
+        onClose={close}
+        title="新規グループ作成"
+        size="xl"
+        centered
+      >
+        <CreateImageGroupForm
+          items={selection.value.items}
+          submitValid={createImageGroupValid}
+          submitInvalid={createImageGroupInvalid}
+        />
       </Modal>
-    </Tabs >
+    </Tabs>
   )
 }
 
