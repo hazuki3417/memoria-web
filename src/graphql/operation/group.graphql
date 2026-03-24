@@ -1,3 +1,83 @@
+query GetImageGroups(
+  $first: Int
+  $last: Int
+  $after: String
+  $before: String
+  $filter: ImageGroupsFilterInput
+)  {
+  imageGroups(
+    first: $first
+    last: $last
+    after: $after
+    before: $before
+    filter: $filter
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        count
+        images(first: 4) {
+          edges {
+            node {
+              src {
+                thumbnail
+              }
+            }
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPrevPage
+      endCursor
+      startCursor
+    }
+  }
+}
+
+
+query GetImageGroup($input: ImageGroupInput!) {
+  imageGroup(input: $input) {
+      id
+      name
+      count
+    	images(first: 8) {
+      	edges {
+          cursor
+          node {
+            id
+            file {
+              size
+              name
+            }
+            size {
+              height
+              width
+            }
+            src {
+              thumbnail
+              preview
+            }
+            tags
+          }
+        }
+      	pageInfo {
+          hasNextPage
+          hasPrevPage
+          endCursor
+          startCursor
+        }
+    	}
+      createdAt
+      updatedAt
+  }
+}
+
+
+
 mutation CreateImageGroup($input: CreateImageGroupInput!) {
   createImageGroup(input: $input) {
     id

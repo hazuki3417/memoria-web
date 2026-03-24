@@ -67,17 +67,15 @@ query GetImages(
     edges {
       node {
         id
-        info {
-          file {
-            name
-            size
-          }
-          size {
-            width
-            height
-          }
-          tags
+        file {
+          name
+          size
         }
+        size {
+          width
+          height
+        }
+        tags
         src {
           thumbnail
           preview

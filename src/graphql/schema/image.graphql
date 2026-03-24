@@ -89,16 +89,12 @@ type DeleteImagesPayload {
 
 type Image {
   id: ID!
-  info: ImageInfo!
-  src: ImageSrc!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type ImageInfo {
   file: ImageFile!
   size: ImageSize!
+  src: ImageSrc!
   tags: [String!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type ImageFile {
