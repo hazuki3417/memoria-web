@@ -6,7 +6,8 @@ import {
   ResizeSplitView,
 } from "@/components"
 import { ImageGroup, ThumbnailBox } from "@/feature"
-import { useLocalStorage, useUriQuery } from "@/hooks"
+import { useGetImageGroupsQuery } from "@/graphql"
+import { useIntersection, useLocalStorage, useUriQuery } from "@/hooks"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
@@ -61,6 +62,32 @@ const Page = () => {
     console.log("submit values:", values)
     router.push(resolveUriQuery({ ...values }))
   }
+
+  const filter = {
+    name: query === undefined ? "" : query.key,
+  }
+
+  const { data, fetchMore } = useGetImageGroupsQuery({
+    variables: {
+      first: 80,
+      filter,
+    },
+    notifyOnNetworkStatusChange: true,
+  })
+
+  const imageGroupsIntersection = useIntersection({
+    intersect: async () => {
+      const pageInfo = data?.imageGroups.pageInfo
+      if (!pageInfo?.hasNextPage) return
+      fetchMore({
+        variables: {
+          first: 50,
+          after: pageInfo.endCursor,
+          filter,
+        },
+      })
+    },
+  })
 
   const searchInvalid = async (errors: FieldErrors<SearchFormValues>) => {
     console.log("submit error:", errors)
@@ -128,8 +155,24 @@ const Page = () => {
   const imageDetailModalContext = useImageDetailModalContext()
 
   const groups = useMemo(() => {
-    return []
-  }, [])
+    if (!data) {
+      return []
+    }
+    const edges = data.imageGroups.edges
+
+    return edges.map((groupEdge) => {
+      return {
+        id: groupEdge.node.id,
+        name: groupEdge.node.name,
+        count: groupEdge.node.count,
+        images: groupEdge.node.images.edges.map((imageEdge) => {
+          return {
+            thumbnail: imageEdge.node.src.thumbnail
+          }
+        })
+      }
+    })
+  }, [data])
 
   const images = useMemo(() => {
     return [
@@ -242,160 +285,35 @@ const Page = () => {
                 </ActionPanel>
                 <ContentLayout>
                   <ContentLayout.Grid>
-                    <ImageGroup
-                      onClick={() => handleSelect("group1")}
-                      ui={{ selected: selected === "group1" }}
-                    >
-                      <ImageGroup.CountBadge value={42} />
-                      <ImageGroup.ImageContainer>
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail1.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail2.webp"}
-                        />
-                      </ImageGroup.ImageContainer>
-                      <ImageGroup.InfoContainer>
-                        <ImageGroup.Title>グループ1</ImageGroup.Title>
-                      </ImageGroup.InfoContainer>
-                    </ImageGroup>
-                    <ImageGroup
-                      onClick={() => handleSelect("group2")}
-                      ui={{ selected: selected === "group2" }}
-                    >
-                      <ImageGroup.CountBadge value={20} />
-                      <ImageGroup.ImageContainer>
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail1.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail2.webp"}
-                        />
-                      </ImageGroup.ImageContainer>
-                      <ImageGroup.InfoContainer>
-                        <ImageGroup.Title>グループ2</ImageGroup.Title>
-                      </ImageGroup.InfoContainer>
-                    </ImageGroup>
-                    <ImageGroup
-                      onClick={() => handleSelect("group3")}
-                      ui={{ selected: selected === "group3" }}
-                    >
-                      <ImageGroup.CountBadge value={15} />
-                      <ImageGroup.ImageContainer>
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail1.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail2.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                      </ImageGroup.ImageContainer>
-                      <ImageGroup.InfoContainer>
-                        <ImageGroup.Title>グループ3</ImageGroup.Title>
-                      </ImageGroup.InfoContainer>
-                    </ImageGroup>
-                    <ImageGroup
-                      onClick={() => handleSelect("group4")}
-                      ui={{ selected: selected === "group4" }}
-                    >
-                      <ImageGroup.CountBadge value={15} />
-                      <ImageGroup.ImageContainer>
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail1.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail2.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                      </ImageGroup.ImageContainer>
-                      <ImageGroup.InfoContainer>
-                        <ImageGroup.Title>グループ4</ImageGroup.Title>
-                      </ImageGroup.InfoContainer>
-                    </ImageGroup>
-                    <ImageGroup
-                      onClick={() => handleSelect("group5")}
-                      ui={{ selected: selected === "group5" }}
-                    >
-                      <ImageGroup.CountBadge value={15} />
-                      <ImageGroup.ImageContainer>
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail1.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail2.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                      </ImageGroup.ImageContainer>
-                      <ImageGroup.InfoContainer>
-                        <ImageGroup.Title>グループ5</ImageGroup.Title>
-                      </ImageGroup.InfoContainer>
-                    </ImageGroup>
-                    <ImageGroup
-                      onClick={() => handleSelect("group6")}
-                      ui={{ selected: selected === "group6" }}
-                    >
-                      <ImageGroup.CountBadge value={15} />
-                      <ImageGroup.ImageContainer>
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail1.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail2.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                        <ImageGroup.Image
-                          bdrs="sm"
-                          src={"sample/thumbnail0.webp"}
-                        />
-                      </ImageGroup.ImageContainer>
-                      <ImageGroup.InfoContainer>
-                        <ImageGroup.Title>グループ6</ImageGroup.Title>
-                      </ImageGroup.InfoContainer>
-                    </ImageGroup>
+                    {groups.map((group) => {
+                      return (
+                        <ImageGroup
+                          key={group.id}
+                          onClick={() => handleSelect(group.id)}
+                          ui={{ selected: selected === group.id }}
+                        >
+                          <ImageGroup.CountBadge value={group.count} />
+                          <ImageGroup.ImageContainer>
+                            {group.images.map((image) => {
+                              return (
+                                <ImageGroup.Image
+                                  bdrs="sm"
+                                  src={image.thumbnail}
+                                />
+                              )
+                            })}
+                          </ImageGroup.ImageContainer>
+                          <ImageGroup.InfoContainer>
+                            <ImageGroup.Title>{group.name}</ImageGroup.Title>
+                          </ImageGroup.InfoContainer>
+                        </ImageGroup>
+
+                      )
+                    })}
+                    <ContentLayout.Intersection
+                      ref={imageGroupsIntersection.ref}
+                      visible={data?.imageGroups.pageInfo.hasNextPage || false}
+                    />
                   </ContentLayout.Grid>
                 </ContentLayout>
               </Box>
