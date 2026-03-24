@@ -119,20 +119,20 @@ const Page = () => {
         id: edge.node.id,
         info: {
           file: {
-            name: edge.node.info.file.name,
-            size: edge.node.info.file.size,
+            name: edge.node.file.name,
+            size: edge.node.file.size,
             date: "",
           },
           image: {
-            width: edge.node.info.size.width,
-            height: edge.node.info.size.height,
+            width: edge.node.size.width,
+            height: edge.node.size.height,
           },
-          tags: edge.node.info.tags,
+          tags: edge.node.tags,
         },
         image: {
           preview: edge.node.src.preview,
           thumbnail: edge.node.src.thumbnail,
-          alt: edge.node.info.file.name,
+          alt: edge.node.file.name,
         },
       } satisfies ImageDetailPayload
     })
