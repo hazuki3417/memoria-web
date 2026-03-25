@@ -167,9 +167,9 @@ const Page = () => {
         count: groupEdge.node.count,
         images: groupEdge.node.images.edges.map((imageEdge) => {
           return {
-            thumbnail: imageEdge.node.src.thumbnail
+            thumbnail: imageEdge.node.src.thumbnail,
           }
-        })
+        }),
       }
     })
   }, [data])
@@ -208,6 +208,8 @@ const Page = () => {
       }),
     )
   }
+
+  const intersectionVisible = data?.imageGroups.pageInfo.hasNextPage || false
 
   return (
     <Tabs value={TAB_FIELDS.group}>
@@ -297,6 +299,7 @@ const Page = () => {
                             {group.images.map((image) => {
                               return (
                                 <ImageGroup.Image
+                                  key={image.thumbnail}
                                   bdrs="sm"
                                   src={image.thumbnail}
                                 />
@@ -307,13 +310,13 @@ const Page = () => {
                             <ImageGroup.Title>{group.name}</ImageGroup.Title>
                           </ImageGroup.InfoContainer>
                         </ImageGroup>
-
                       )
                     })}
-                    <ContentLayout.Intersection
-                      ref={imageGroupsIntersection.ref}
-                      visible={data?.imageGroups.pageInfo.hasNextPage || false}
-                    />
+                    {intersectionVisible && (
+                      <ContentLayout.Intersection
+                        ref={imageGroupsIntersection.ref}
+                      />
+                    )}
                   </ContentLayout.Grid>
                 </ContentLayout>
               </Box>

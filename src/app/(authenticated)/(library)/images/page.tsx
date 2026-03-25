@@ -279,6 +279,8 @@ const Page = () => {
     })
   }
 
+  const intersectionVisible = data?.images.pageInfo.hasNextPage || false
+
   return (
     <Tabs value={TAB_FIELDS.list}>
       <ActionPanel mb="xs">
@@ -473,11 +475,9 @@ const Page = () => {
                 </ThumbnailBox>
               )
             })}
-            {/* NOTE: IntersectionObserverの監視対象は常に存在するようにする */}
-            <ContentLayout.Intersection
-              ref={intersection.ref}
-              visible={data?.images.pageInfo.hasNextPage || false}
-            />
+            {intersectionVisible && (
+              <ContentLayout.Intersection ref={intersection.ref} />
+            )}
           </ContentLayout.Grid>
         </ContentLayout>
       </Tabs.Panel>

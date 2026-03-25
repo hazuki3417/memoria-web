@@ -1,9 +1,3 @@
-import { getLang } from "@/lib/cookies/lang/getLang"
-import { theme } from "@/lib/theme"
-import "@/lib/ze"
-import type { Metadata } from "next"
-import { Head, Providers } from "./_components"
-
 /**
  * NOTE: 下記の順番でimportすること
  *       core, notifications, charts
@@ -15,6 +9,13 @@ import "@mantine/notifications/styles.css"
 import { preferenceConfig } from "@/config/preference"
 import { AppConfig } from "@/types/app-config"
 import "@mantine/charts/styles.css"
+import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core"
+
+import { getLang } from "@/lib/cookies/lang/getLang"
+import { theme } from "@/lib/theme"
+import "@/lib/ze"
+import type { Metadata } from "next"
+import { Providers } from "./_components"
 
 const metadata: Metadata = {
   title: "Memoria",
@@ -34,9 +35,14 @@ const RootLayout = async (props: RootLayoutProps) => {
   }
 
   return (
-    <html data-mantine-color-scheme="dark" lang={lang}>
-      {/* FIX: data-mantine-color-scheme="dark"の記述がない場合、ハイドレーションの差分が発生してエラーになる */}
-      <Head />
+    <html lang={lang} {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript defaultColorScheme="auto" />
+        <meta
+          name="viewport"
+          content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
+        />
+      </head>
       <body>
         <Providers
           theme={{
