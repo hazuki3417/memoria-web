@@ -6,6 +6,7 @@ export const cache = new InMemoryCache({
     Query: {
       fields: {
         images: relayStylePagination(["filter"]),
+        imageGroups: relayStylePagination(["filter"]),
       },
     },
   },
