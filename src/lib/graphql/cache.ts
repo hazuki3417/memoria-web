@@ -5,7 +5,7 @@ export const cache = new InMemoryCache({
   typePolicies: {
     Query: {
       fields: {
-        getImages: relayStylePagination(["filter"]),
+        images: relayStylePagination(["filter"]),
       },
     },
   },
