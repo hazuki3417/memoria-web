@@ -1,6 +1,5 @@
 import { Header } from "@/feature"
-import { LangSelect } from "@/feature/Header/LangSelect"
-import { UserMenu } from "@/feature/Header/UserMenu"
+import { LangSelect, UserMenu } from "@/feature/Header"
 import { GetMeDocument, GetMeQuery } from "@/graphql"
 import { auth } from "@/lib/auth"
 import { createGraphQL } from "@/lib/graphql/server"
