@@ -6,7 +6,7 @@ import {
   ResizeSplitView,
 } from "@/components"
 import { ImageGroup, ThumbnailBox } from "@/feature"
-import { useGetImageGroupsQuery } from "@/graphql"
+import { useGetImageGroupLazyQuery, useGetImageGroupsQuery } from "@/graphql"
 import { useIntersection, useLocalStorage, useUriQuery } from "@/hooks"
 import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
@@ -37,13 +37,13 @@ const PANEL_FIELDS = defineFieldObject(PANEL_ID_LIST)
 type PanelSize = Record<(typeof PANEL_ID_LIST)[number], number>
 
 const searchFormSchema = z.object({
-  key: z.string(),
+  name: z.string(),
 })
 
 type SearchFormValues = z.infer<typeof searchFormSchema>
 
 const searchFormDefaultValues = createFormDefaults<SearchFormValues>({
-  key: "",
+  name: "",
 })
 
 const Page = () => {
@@ -58,32 +58,53 @@ const Page = () => {
   })
   const { handleSubmit, control } = methods
 
+  const [selected, setSelected] = useState<string | null>(null)
   const searchValid = async (values: SearchFormValues) => {
     console.log("submit values:", values)
     router.push(resolveUriQuery({ ...values }))
   }
 
-  const filter = {
-    name: query === undefined ? "" : query.key,
+  const imageGroupsfilter = {
+    name: query === undefined ? "" : query.name,
   }
 
-  const { data, fetchMore } = useGetImageGroupsQuery({
+  const { data: imageGroupsData, fetchMore: fetchMoreImageGroups } = useGetImageGroupsQuery({
     variables: {
-      first: 80,
-      filter,
+      first: 10,
+      filter: imageGroupsfilter,
     },
     notifyOnNetworkStatusChange: true,
   })
 
   const imageGroupsIntersection = useIntersection({
     intersect: async () => {
-      const pageInfo = data?.imageGroups.pageInfo
+      const pageInfo = imageGroupsData?.imageGroups.pageInfo
       if (!pageInfo?.hasNextPage) return
-      fetchMore({
+      fetchMoreImageGroups({
         variables: {
           first: 50,
           after: pageInfo.endCursor,
-          filter,
+          filter: imageGroupsfilter,
+        },
+      })
+    },
+  })
+
+  const [getImageGroup, { data: imageGroupData, fetchMore: fetchMoreImageGroup }] = useGetImageGroupLazyQuery()
+
+  const imageGroupfilter = {
+    id: selected ?? "",
+  }
+
+  const imageGroupIntersection = useIntersection({
+    intersect: async () => {
+      const pageInfo = imageGroupData?.imageGroup.images.pageInfo
+      if (!pageInfo?.hasNextPage) return
+      fetchMoreImageGroup({
+        variables: {
+          first: 30,
+          after: pageInfo.endCursor,
+          filter: imageGroupfilter,
         },
       })
     },
@@ -92,8 +113,6 @@ const Page = () => {
   const searchInvalid = async (errors: FieldErrors<SearchFormValues>) => {
     console.log("submit error:", errors)
   }
-
-  const [selected, setSelected] = useState<string | null>(null)
 
   const drawer = useMemo(() => {
     return selected !== null ? "opened" : "closed"
@@ -120,8 +139,16 @@ const Page = () => {
     })
   }
 
-  const handleSelect = (id: string) => {
+  const handleSelect = async (id: string) => {
+    await getImageGroup({
+      variables: {
+        first: 30,
+        filter: { id },
+      },
+    })
+
     setSelected(id)
+
     const ref = groupRef.current
     if (ref === null) {
       return
@@ -138,6 +165,7 @@ const Page = () => {
       [PANEL_FIELDS.left]: size.value.left,
       [PANEL_FIELDS.right]: size.value.right,
     })
+
   }
 
   const handleClose = () => {
@@ -155,49 +183,58 @@ const Page = () => {
   const imageDetailModalContext = useImageDetailModalContext()
 
   const groups = useMemo(() => {
-    if (!data) {
+    if (!imageGroupsData) {
       return []
     }
-    const edges = data.imageGroups.edges
+    const edges = imageGroupsData.imageGroups.edges
 
     return edges.map((groupEdge) => {
+      const group = groupEdge.node
       return {
-        id: groupEdge.node.id,
-        name: groupEdge.node.name,
-        count: groupEdge.node.count,
-        images: groupEdge.node.images.edges.map((imageEdge) => {
+        id: group.id,
+        name: group.name,
+        count: group.count,
+        images: group.images.edges.map((imageEdge) => {
+          const image = imageEdge.node
           return {
-            thumbnail: imageEdge.node.src.thumbnail,
+            thumbnail: image.src.thumbnail,
           }
         }),
       }
     })
-  }, [data])
+  }, [imageGroupsData])
+
+  const imageGroup = imageGroupData?.imageGroup
 
   const images = useMemo(() => {
-    return [
-      {
-        id: "edge.node.id",
+    if (!imageGroupData) {
+      return []
+    }
+    const edges = imageGroupData.imageGroup.images.edges
+    return edges.map((imageEdge) => {
+      const image = imageEdge.node
+      return {
+        id: image.id,
         info: {
           file: {
-            name: "example",
-            size: 1000,
+            name: image.file.name,
+            size: image.file.size,
             date: "",
           },
           image: {
-            width: 100,
-            height: 200,
+            width: image.size.width,
+            height: image.size.height,
           },
           tags: [],
         },
         image: {
-          preview: "sample/h.png",
-          thumbnail: "sample/thumbnail.webp",
-          alt: "",
+          preview: image.src.preview,
+          thumbnail: image.src.thumbnail,
+          alt: image.file.name,
         },
-      } satisfies ImageDetailPayload,
-    ]
-  }, [])
+      } satisfies ImageDetailPayload
+    })
+  }, [imageGroupData])
 
   const handleEditGroup = async (id: string) => {
     router.push(
@@ -209,7 +246,7 @@ const Page = () => {
     )
   }
 
-  const intersectionVisible = data?.imageGroups.pageInfo.hasNextPage || false
+  const intersectionVisible = imageGroupsData?.imageGroups.pageInfo.hasNextPage || false
 
   return (
     <Tabs value={TAB_FIELDS.group}>
@@ -260,7 +297,7 @@ const Page = () => {
                     >
                       <Flex align="center" gap="xs" w="100%">
                         <Controller
-                          name="key"
+                          name="name"
                           control={control}
                           render={({ field }) => (
                             <TextInput
@@ -337,215 +374,60 @@ const Page = () => {
               }}
               transition={{ duration: 0.3 }}
             >
-              <Box
-                style={(theme) => ({
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  borderRadius: theme.radius.xs,
-                })}
-              >
-                <Flex p="xs" justify="space-between" align="center">
-                  <Title order={4}>グループ1</Title>
-                  <ButtonGroup>
-                    <Button
-                      size="xs"
-                      leftSection={<IconEdit size={16} />}
-                      onClick={() => handleEditGroup("5678")}
-                    >
-                      {t("button.edit")}
-                    </Button>
-                    <ActionIcon
-                      color="gray"
-                      size="input-xs"
-                      variant="subtle"
-                      data-testid="edit-info"
-                      onClick={handleClose}
-                    >
-                      <IconX />
-                    </ActionIcon>
-                  </ButtonGroup>
-                </Flex>
-                <ContentLayout>
-                  <ContentLayout.Grid style={{ justifyContent: "center" }}>
-                    <ThumbnailBox
-                      onClick={() => {
-                        imageDetailModalContext.control.open({
-                          id: images[0].id,
-                          getImages: () => images,
-                        })
-                      }}
-                    >
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                    <ThumbnailBox>
-                      <ThumbnailBox.Image
-                        bdrs="sm"
-                        src="sample/thumbnail0.webp"
-                      />
-                    </ThumbnailBox>
-                  </ContentLayout.Grid>
-                </ContentLayout>
-              </Box>
+              {imageGroup && (
+                <Box
+                  style={(theme) => ({
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    borderRadius: theme.radius.xs,
+                  })}
+                >
+                  <Flex p="xs" justify="space-between" align="center">
+                    <Title order={4}>{imageGroup.name}</Title>
+                    <ButtonGroup>
+                      <Button
+                        size="xs"
+                        leftSection={<IconEdit size={16} />}
+                        onClick={() => handleEditGroup(imageGroup.id)}
+                      >
+                        {t("button.edit")}
+                      </Button>
+                      <ActionIcon
+                        color="gray"
+                        size="input-xs"
+                        variant="subtle"
+                        data-testid="edit-info"
+                        onClick={handleClose}
+                      >
+                        <IconX />
+                      </ActionIcon>
+                    </ButtonGroup>
+                  </Flex>
+                  <ContentLayout>
+                    <ContentLayout.Grid style={{ justifyContent: "center" }}>
+                      {images.map((image) => {
+                        return (
+                          <ThumbnailBox
+                            key={image.id}
+                            onClick={() => {
+                              imageDetailModalContext.control.open({
+                                id: image.id,
+                                getImages: () => images,
+                              })
+                            }}
+                          >
+                            <ThumbnailBox.Image
+                              bdrs="sm"
+                              src={image.image.thumbnail}
+                            />
+                          </ThumbnailBox>
+                        )
+                      })}
+                    </ContentLayout.Grid>
+                  </ContentLayout>
+                </Box>
+              )}
             </motion.div>
           </ResizeSplitView.Panel>
         </ResizeSplitView>

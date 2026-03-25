@@ -39,12 +39,22 @@ query GetImageGroups(
 }
 
 
-query GetImageGroup($input: ImageGroupInput!) {
-  imageGroup(input: $input) {
+query GetImageGroup(
+  $first: Int
+  $last: Int
+  $after: String
+  $before: String
+  $filter: ImageGroupInput!) {
+  imageGroup(input: $filter) {
       id
       name
       count
-    	images(first: 8) {
+    	images(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
       	edges {
           cursor
           node {
@@ -75,8 +85,6 @@ query GetImageGroup($input: ImageGroupInput!) {
       updatedAt
   }
 }
-
-
 
 mutation CreateImageGroup($input: CreateImageGroupInput!) {
   createImageGroup(input: $input) {
