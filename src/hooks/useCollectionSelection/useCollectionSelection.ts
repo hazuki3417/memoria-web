@@ -71,6 +71,8 @@ export function useCollectionSelection<T, Id extends string | number>(
 
   const selectAll = useCallback(() => {
     for (let i = 0; i < max; i++) {
+      const id = ids[i]
+      if (id === undefined) return
       selection.action.select(ids[i])
     }
   }, [ids, selection, max])
