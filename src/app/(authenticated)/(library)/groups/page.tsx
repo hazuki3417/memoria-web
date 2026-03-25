@@ -68,16 +68,18 @@ const Page = () => {
     name: query === undefined ? "" : query.name,
   }
 
-  const { data: imageGroupsData, fetchMore: fetchMoreImageGroups } = useGetImageGroupsQuery({
-    variables: {
-      first: 10,
-      filter: imageGroupsfilter,
-    },
-    notifyOnNetworkStatusChange: true,
-  })
+  const { data: imageGroupsData, fetchMore: fetchMoreImageGroups } =
+    useGetImageGroupsQuery({
+      variables: {
+        first: 20,
+        filter: imageGroupsfilter,
+      },
+      notifyOnNetworkStatusChange: true,
+    })
 
   const imageGroupsIntersection = useIntersection({
     intersect: async () => {
+      console.debug("imageGroupsIntersection")
       const pageInfo = imageGroupsData?.imageGroups.pageInfo
       if (!pageInfo?.hasNextPage) return
       fetchMoreImageGroups({
@@ -90,7 +92,10 @@ const Page = () => {
     },
   })
 
-  const [getImageGroup, { data: imageGroupData, fetchMore: fetchMoreImageGroup }] = useGetImageGroupLazyQuery()
+  const [
+    getImageGroup,
+    { data: imageGroupData, fetchMore: fetchMoreImageGroup },
+  ] = useGetImageGroupLazyQuery()
 
   const imageGroupfilter = {
     id: selected ?? "",
@@ -98,6 +103,8 @@ const Page = () => {
 
   const imageGroupIntersection = useIntersection({
     intersect: async () => {
+      console.debug("imageGroupIntersection")
+
       const pageInfo = imageGroupData?.imageGroup.images.pageInfo
       if (!pageInfo?.hasNextPage) return
       fetchMoreImageGroup({
@@ -165,7 +172,6 @@ const Page = () => {
       [PANEL_FIELDS.left]: size.value.left,
       [PANEL_FIELDS.right]: size.value.right,
     })
-
   }
 
   const handleClose = () => {
@@ -245,8 +251,6 @@ const Page = () => {
       }),
     )
   }
-
-  const intersectionVisible = imageGroupsData?.imageGroups.pageInfo.hasNextPage || false
 
   return (
     <Tabs value={TAB_FIELDS.group}>
@@ -349,11 +353,10 @@ const Page = () => {
                         </ImageGroup>
                       )
                     })}
-                    {intersectionVisible && (
-                      <ContentLayout.Intersection
-                        ref={imageGroupsIntersection.ref}
-                      />
-                    )}
+                    <ContentLayout.Intersection
+                      h="360px" w="330px"
+                      ref={imageGroupsIntersection.ref}
+                    />
                   </ContentLayout.Grid>
                 </ContentLayout>
               </Box>
@@ -424,6 +427,10 @@ const Page = () => {
                           </ThumbnailBox>
                         )
                       })}
+                      <ContentLayout.Intersection
+                        h="160px" w="160px"
+                        ref={imageGroupIntersection.ref}
+                      />
                     </ContentLayout.Grid>
                   </ContentLayout>
                 </Box>

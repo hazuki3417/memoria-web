@@ -87,7 +87,7 @@ const Page = () => {
 
   const { data, fetchMore } = useGetImagesQuery({
     variables: {
-      first: 80,
+      first: 100,
       filter,
     },
     notifyOnNetworkStatusChange: true,
@@ -150,7 +150,7 @@ const Page = () => {
   const selection = useCollectionSelection({
     items,
     getKey: (item) => item.id,
-    max: 30,
+    max: 100,
   })
 
   const hasSelectable = selection.value.size > 0
@@ -475,9 +475,7 @@ const Page = () => {
                 </ThumbnailBox>
               )
             })}
-            {intersectionVisible && (
-              <ContentLayout.Intersection ref={intersection.ref} />
-            )}
+            <ContentLayout.Intersection h="160px" w="160px" ref={intersection.ref} />
           </ContentLayout.Grid>
         </ContentLayout>
       </Tabs.Panel>
