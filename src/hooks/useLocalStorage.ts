@@ -26,19 +26,17 @@ export interface UseLocalStorage<T> {
 export const useLocalStorage = <T>(
   option: UseLocalStorageOption<T>,
 ): UseLocalStorage<T> => {
-  if (typeof window === "undefined") {
-    throw new Error(
-      "useLocalStorage must be used in a client-side environment.",
-    )
-  }
-
   const { key, init } = option
+
   const [storage, setStorage] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return init
+    }
+
     try {
       const stored = localStorage.getItem(key)
       return stored ? JSON.parse(stored) : init
-    } catch (error) {
-      console.warn(`[useLocalStorage] failed to load key "${key}"`, error)
+    } catch {
       return init
     }
   })
@@ -47,7 +45,7 @@ export const useLocalStorage = <T>(
     try {
       localStorage.setItem(key, JSON.stringify(storage))
     } catch (err) {
-      console.error(`[useLocalStorage] Failed to save key "${key}"`, err)
+      console.error(`Failed to save key "${key}"`, err)
     }
   }, [key, storage])
 
