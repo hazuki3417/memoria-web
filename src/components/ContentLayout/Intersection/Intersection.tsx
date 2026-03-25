@@ -1,8 +1,8 @@
 "use client"
-import { Box } from "@mantine/core"
+import { Box, BoxProps } from "@mantine/core"
 import { forwardRef } from "react"
 
-export interface IntersectionProps {}
+export interface IntersectionProps extends BoxProps { }
 
 export const Intersection = forwardRef<HTMLDivElement, IntersectionProps>(
   (props, ref) => {
@@ -14,10 +14,9 @@ export const Intersection = forwardRef<HTMLDivElement, IntersectionProps>(
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          height: "160px",
-          width: "160px",
           userSelect: "none",
         }}
+        {...props}
       >
         {/* <LoadingOverlay
         visible={visible}
