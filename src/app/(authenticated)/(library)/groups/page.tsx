@@ -337,7 +337,12 @@ const Page = () => {
                         >
                           <ImageGroup.CountBadge value={group.count} />
                           <ImageGroup.ImageContainer>
-                            {group.images.map((image) => {
+                            {/*
+                              * NOTE: images側のrelay cursorが動作するとキャシュが更新される
+                                      その結果group側のimagesにも影響が出て想定以上の画像が表示されるため
+                                      表示件数を制限する
+                              */}
+                            {group.images.slice(0, 4).map((image) => {
                               return (
                                 <ImageGroup.Image
                                   key={image.thumbnail}
