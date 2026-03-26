@@ -18,15 +18,7 @@ query GetImageGroups(
         id
         name
         count
-        images(first: 4) {
-          edges {
-            node {
-              src {
-                thumbnail
-              }
-            }
-          }
-        }
+        thumbnails
       }
     }
     pageInfo {

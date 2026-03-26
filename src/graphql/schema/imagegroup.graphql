@@ -55,6 +55,7 @@ type ImageGroup {
   id: ID!
   name: String!
   count: Int!
+  thumbnails: [String!]!
   images(
     first: Int
     last: Int

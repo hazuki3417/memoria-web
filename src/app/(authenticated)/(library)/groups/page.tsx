@@ -200,12 +200,7 @@ const Page = () => {
         id: group.id,
         name: group.name,
         count: group.count,
-        images: group.images.edges.map((imageEdge) => {
-          const image = imageEdge.node
-          return {
-            thumbnail: image.src.thumbnail,
-          }
-        }),
+        thumbnails: group.thumbnails,
       }
     })
   }, [imageGroupsData])
@@ -344,12 +339,12 @@ const Page = () => {
                                 FIX: 制限はできたが詳細を開いたタイミングでキャッシュが更新される影響で画像のちらつきが発生する
                                      useMemoで依存配列を指定せずに作れば対応できそう
                               */}
-                            {group.images.slice(0, 4).map((image) => {
+                            {group.thumbnails.map((thumbnail) => {
                               return (
                                 <ImageGroup.Image
-                                  key={image.thumbnail}
+                                  key={thumbnail}
                                   bdrs="sm"
-                                  src={image.thumbnail}
+                                  src={thumbnail}
                                 />
                               )
                             })}
