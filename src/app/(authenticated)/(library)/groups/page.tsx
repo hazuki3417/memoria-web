@@ -22,7 +22,13 @@ import {
   TextInput,
   Title,
 } from "@mantine/core"
-import { IconEdit, IconSearch, IconX } from "@tabler/icons-react"
+import {
+  IconDownload,
+  IconEdit,
+  IconSearch,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react"
 import { motion } from "framer-motion"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
@@ -237,7 +243,7 @@ const Page = () => {
     })
   }, [imageGroupData])
 
-  const handleEditGroup = async (id: string) => {
+  const handleEditImageGroup = async (id: string) => {
     router.push(
       resolveUri("/groups/:id/edit", {
         path: {
@@ -245,6 +251,14 @@ const Page = () => {
         },
       }),
     )
+  }
+
+  const handleDeleteImageGroup = async (id: string) => {
+    // TODO: ロジックを実装
+  }
+
+  const handleDownloadImageGroup = async (id: string) => {
+    // TODO: ロジックを実装
   }
 
   return (
@@ -349,7 +363,8 @@ const Page = () => {
                       )
                     })}
                     <ContentLayout.Intersection
-                      h="360px" w="330px"
+                      h="360px"
+                      w="330px"
                       ref={imageGroupsIntersection.ref}
                     />
                   </ContentLayout.Grid>
@@ -383,24 +398,43 @@ const Page = () => {
                 >
                   <Flex p="xs" justify="space-between" align="center">
                     <Title order={4}>{imageGroup.name}</Title>
-                    <ButtonGroup>
-                      <Button
-                        size="xs"
-                        leftSection={<IconEdit size={16} />}
-                        onClick={() => handleEditGroup(imageGroup.id)}
-                      >
-                        {t("button.edit")}
-                      </Button>
-                      <ActionIcon
-                        color="gray"
-                        size="input-xs"
-                        variant="subtle"
-                        data-testid="edit-info"
-                        onClick={handleClose}
-                      >
-                        <IconX />
-                      </ActionIcon>
-                    </ButtonGroup>
+                    <Flex align="center" gap="xs">
+                      <Text size="xs">{`${imageGroup.count} 件`}</Text>
+                      <ButtonGroup>
+                        <Button
+                          size="xs"
+                          leftSection={<IconEdit size={16} />}
+                          onClick={() => handleEditImageGroup(imageGroup.id)}
+                        >
+                          {t("button.edit")}
+                        </Button>
+                        <Button
+                          size="xs"
+                          leftSection={<IconTrash size={16} />}
+                          onClick={() => handleDeleteImageGroup(imageGroup.id)}
+                        >
+                          {t("button.delete")}
+                        </Button>
+                        <Button
+                          size="xs"
+                          leftSection={<IconDownload size={16} />}
+                          onClick={() =>
+                            handleDownloadImageGroup(imageGroup.id)
+                          }
+                        >
+                          {t("button.download")}
+                        </Button>
+                        <ActionIcon
+                          color="gray"
+                          size="input-xs"
+                          variant="subtle"
+                          data-testid="edit-info"
+                          onClick={handleClose}
+                        >
+                          <IconX />
+                        </ActionIcon>
+                      </ButtonGroup>
+                    </Flex>
                   </Flex>
                   <ContentLayout>
                     <ContentLayout.Grid style={{ justifyContent: "center" }}>
@@ -423,7 +457,8 @@ const Page = () => {
                         )
                       })}
                       <ContentLayout.Intersection
-                        h="160px" w="160px"
+                        h="160px"
+                        w="160px"
                         ref={imageGroupIntersection.ref}
                       />
                     </ContentLayout.Grid>

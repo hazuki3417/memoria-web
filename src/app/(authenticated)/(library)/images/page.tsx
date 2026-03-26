@@ -475,7 +475,11 @@ const Page = () => {
                 </ThumbnailBox>
               )
             })}
-            <ContentLayout.Intersection h="160px" w="160px" ref={intersection.ref} />
+            <ContentLayout.Intersection
+              h="160px"
+              w="160px"
+              ref={intersection.ref}
+            />
           </ContentLayout.Grid>
         </ContentLayout>
       </Tabs.Panel>
