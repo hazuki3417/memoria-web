@@ -4,11 +4,12 @@ import {
   ButtonGroup,
   ContentLayout,
   ResizeSplitView,
+  ResizeSplitViewLayout,
+  useResizeSplitView,
 } from "@/components"
 import { ImageGroup, ThumbnailBox } from "@/feature"
 import { useGetImageGroupLazyQuery, useGetImageGroupsQuery } from "@/graphql"
 import { useIntersection, useLocalStorage, useUriQuery } from "@/hooks"
-import { defineFieldObject } from "@/lib/field"
 import { createFormDefaults } from "@/lib/form"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
 import { ImageDetailPayload, useImageDetailModalContext } from "@/providers"
@@ -34,13 +35,8 @@ import { t } from "i18next"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
-import { Layout, useGroupRef } from "react-resizable-panels"
 import z from "zod"
 import { TAB_FIELDS, Tabs } from "../_components"
-
-const PANEL_ID_LIST = ["left", "right"] as const
-const PANEL_FIELDS = defineFieldObject(PANEL_ID_LIST)
-type PanelSize = Record<(typeof PANEL_ID_LIST)[number], number>
 
 const searchFormSchema = z.object({
   name: z.string(),
@@ -131,25 +127,18 @@ const Page = () => {
     return selected !== null ? "opened" : "closed"
   }, [selected])
 
-  const groupRef = useGroupRef()
+  const { groupRef, getLayout, setLayout } = useResizeSplitView()
 
-  const size = useLocalStorage<PanelSize>({
+  const size = useLocalStorage<ResizeSplitViewLayout>({
     init: { left: 50, right: 50 },
     key: "image-group-resize-split-view",
   })
 
-  const handleLayoutChanged = (layout: Layout) => {
-    const ref = groupRef.current
-    if (ref === null) {
-      return
-    }
-    if (layout[PANEL_FIELDS.right] === 0) {
+  const handleLayoutChanged = (layout: ResizeSplitViewLayout) => {
+    if (layout.right === 0) {
       return // NOTE: 右側を閉じている状態なら何もしない
     }
-    size.action.set({
-      left: layout[PANEL_FIELDS.left],
-      right: layout[PANEL_FIELDS.right],
-    })
+    size.action.set({ ...layout })
   }
 
   const handleSelect = async (id: string) => {
@@ -162,33 +151,27 @@ const Page = () => {
 
     setSelected(id)
 
-    const ref = groupRef.current
-    if (ref === null) {
+    const layout = getLayout()
+    if (!layout) {
       return
     }
-    const layout = ref.getLayout()
-
-    if (layout[PANEL_FIELDS.right] !== 0) {
+    if (layout.right !== 0) {
       return // NOTE: 右側が開いている状態なら現状のレイアウトを維持
     }
 
     // 右側が開いていない状態なら右側のパネルを表示
 
-    ref.setLayout({
-      [PANEL_FIELDS.left]: size.value.left,
-      [PANEL_FIELDS.right]: size.value.right,
+    setLayout({
+      left: size.value.left,
+      right: size.value.right,
     })
   }
 
   const handleClose = () => {
     setSelected(null)
-    const ref = groupRef.current
-    if (ref === null) {
-      return
-    }
-    ref.setLayout({
-      [PANEL_FIELDS.left]: 100,
-      [PANEL_FIELDS.right]: 0,
+    setLayout({
+      left: 100,
+      right: 0,
     })
   }
 
@@ -281,13 +264,10 @@ const Page = () => {
       >
         <ResizeSplitView
           groupRef={groupRef}
+          defaultLayout={{ left: 100, right: 0 }}
           onLayoutChanged={handleLayoutChanged}
         >
-          <ResizeSplitView.Panel
-            id={PANEL_FIELDS.left}
-            defaultSize={100}
-            style={{ marginRight: "8px" }}
-          >
+          <ResizeSplitView.Left>
             {/* NOTE: right panelのmotion.div相当の要素 */}
             <Box
               style={(theme) => ({
@@ -371,14 +351,9 @@ const Page = () => {
                 </ContentLayout>
               </Box>
             </Box>
-          </ResizeSplitView.Panel>
+          </ResizeSplitView.Left>
           <ResizeSplitView.Separator visible={drawer === "opened"} />
-          <ResizeSplitView.Panel
-            id={PANEL_FIELDS.right}
-            defaultSize={0}
-            visible={drawer === "opened"}
-            style={{ marginLeft: "8px" }}
-          >
+          <ResizeSplitView.Right visible={drawer === "opened"}>
             <motion.div
               style={{ height: "100%" }}
               animate={{
@@ -466,7 +441,7 @@ const Page = () => {
                 </Box>
               )}
             </motion.div>
-          </ResizeSplitView.Panel>
+          </ResizeSplitView.Right>
         </ResizeSplitView>
       </Tabs.Panel>
     </Tabs>
