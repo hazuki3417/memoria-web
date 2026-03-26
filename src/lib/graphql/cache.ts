@@ -1,39 +1,39 @@
-import { FieldPolicy, InMemoryCache } from "@apollo/client";
-import { relayStylePagination } from "@apollo/client/utilities";
+import { FieldPolicy, InMemoryCache } from "@apollo/client"
+import { relayStylePagination } from "@apollo/client/utilities"
 
 const relayStylePaginationForImages = (): FieldPolicy<any> => {
   return {
     keyArgs: false,
 
     merge(existing, incoming, { args }) {
-      if (!existing) return incoming;
+      if (!existing) return incoming
 
-      const existingEdges = existing.edges ?? [];
-      const incomingEdges = incoming.edges ?? [];
+      const existingEdges = existing.edges ?? []
+      const incomingEdges = incoming.edges ?? []
 
-      let edges: any[];
+      let edges: any[]
 
       // forward pagination
       if (args?.after) {
-        edges = [...existingEdges, ...incomingEdges];
+        edges = [...existingEdges, ...incomingEdges]
       }
       // backward pagination
       else if (args?.before) {
-        edges = [...incomingEdges, ...existingEdges];
+        edges = [...incomingEdges, ...existingEdges]
       }
       // refetch or initial
       else {
-        edges = incomingEdges;
+        edges = incomingEdges
       }
 
       // cursorベースで重複排除（重要）
-      const seen = new Set<string>();
+      const seen = new Set<string>()
       edges = edges.filter((edge) => {
-        if (!edge?.cursor) return true;
-        if (seen.has(edge.cursor)) return false;
-        seen.add(edge.cursor);
-        return true;
-      });
+        if (!edge?.cursor) return true
+        if (seen.has(edge.cursor)) return false
+        seen.add(edge.cursor)
+        return true
+      })
 
       return {
         ...incoming,
@@ -43,15 +43,14 @@ const relayStylePaginationForImages = (): FieldPolicy<any> => {
           ...existing.pageInfo,
           ...incoming.pageInfo,
         },
-      };
+      }
     },
 
     read(existing) {
-      return existing;
+      return existing
     },
-  };
+  }
 }
-
 
 export const cache = new InMemoryCache({
   typePolicies: {
@@ -67,8 +66,7 @@ export const cache = new InMemoryCache({
     ImageGroup: {
       fields: {
         images: relayStylePaginationForImages(),
-      }
-    }
+      },
+    },
   },
 })
-

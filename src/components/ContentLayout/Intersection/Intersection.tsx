@@ -2,7 +2,7 @@
 import { Box, BoxProps } from "@mantine/core"
 import { forwardRef } from "react"
 
-export interface IntersectionProps extends BoxProps { }
+export interface IntersectionProps extends BoxProps {}
 
 export const Intersection = forwardRef<HTMLDivElement, IntersectionProps>(
   (props, ref) => {
