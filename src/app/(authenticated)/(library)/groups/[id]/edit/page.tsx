@@ -1,19 +1,63 @@
 "use client"
-import { ActionPanel, ButtonGroup } from "@/components"
+import {
+  ActionPanel,
+  ButtonGroup,
+  ContentLayout,
+  ResizeSplitView,
+} from "@/components"
+import { ThumbnailBox } from "@/feature"
 import { useGetImageGroupQuery } from "@/graphql"
 import { useIntersection, useUriParams } from "@/hooks"
+import { createFormDefaults } from "@/lib/form"
 import { ImageDetailPayload } from "@/providers"
-import { Box, Button, Flex, Text, Title } from "@mantine/core"
-import { IconTrash } from "@tabler/icons-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Box, Button, Flex, TextInput } from "@mantine/core"
+import { IconDeviceFloppy, IconTrash } from "@tabler/icons-react"
 import { t } from "i18next"
 import { useMemo } from "react"
+import { Controller, FieldErrors, useForm } from "react-hook-form"
+import z from "zod"
 
 type PathParam = {
   id: string
 }
 
+const inputFormSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  add: z.array(z.string()),
+  remove: z.array(z.string()),
+})
+
+type InputFormValues = z.infer<typeof inputFormSchema>
+
+const inputFormDefaultValues = createFormDefaults<InputFormValues>({
+  id: "",
+  name: "",
+  add: [],
+  remove: [],
+})
+
 const Page = () => {
   const uriParams = useUriParams<PathParam>()
+
+  const methods = useForm<InputFormValues>({
+    resolver: zodResolver(inputFormSchema),
+    defaultValues: {
+      ...inputFormDefaultValues({
+        id: uriParams.id,
+      }),
+    },
+  })
+  const { handleSubmit, control } = methods
+
+  const searchValid = async (values: InputFormValues) => {
+    console.log("submit values:", values)
+  }
+
+  const searchInvalid = async (errors: FieldErrors<InputFormValues>) => {
+    console.log("submit error:", errors)
+  }
 
   const filter = { id: uriParams.id }
 
@@ -71,37 +115,200 @@ const Page = () => {
   }, [data])
 
   const handleDeleteImageGroup = (id: string) => {}
-  const handleUpdateImageGroup = (id: string) => {}
 
   return (
-    <Box>
-      <Flex p="xs" justify="space-between" align="center">
-        <Title order={4}>{imageGroup?.name ?? ""}</Title>
-        <Text size="xs">{`${imageGroup?.count ?? 0} 件`}</Text>
-      </Flex>
-      <ActionPanel>
-        <ActionPanel.Left></ActionPanel.Left>
-        <ActionPanel.Center></ActionPanel.Center>
-        <ActionPanel.Right>
-          <ButtonGroup>
-            <Button
-              size="xs"
-              leftSection={<IconTrash size={16} />}
-              onClick={() => handleDeleteImageGroup("")}
+    <form
+      onSubmit={handleSubmit(searchValid, searchInvalid)}
+      style={{ height: "100%" }}
+    >
+      <Box
+        style={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <Flex justify="space-between" align="center" mb="xs">
+          <Controller
+            control={methods.control}
+            name={`name`}
+            render={({ field }) => (
+              <TextInput size="xs" placeholder="グループ名" {...field} />
+            )}
+          />
+          <Flex align="center" gap="xs">
+            {/* <Text size="xs">{`${imageGroup?.count ?? 0} 件`}</Text> */}
+            <ButtonGroup>
+              <Button
+                size="xs"
+                leftSection={<IconTrash size={16} />}
+                type="button"
+                onClick={() => handleDeleteImageGroup("")}
+              >
+                {t("button.delete")}
+              </Button>
+            </ButtonGroup>
+          </Flex>
+        </Flex>
+        <ResizeSplitView
+          defaultLayout={{ left: 50, right: 50 }}
+          style={{
+            flex: 1,
+            marginBottom: "var(--mantine-spacing-xs)",
+          }}
+        >
+          <ResizeSplitView.Left>
+            <Box
+              style={(theme) => ({
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              })}
             >
-              {t("button.delete")}
-            </Button>
-            <Button
-              size="xs"
-              leftSection={<IconTrash size={16} />}
-              onClick={() => handleUpdateImageGroup("imageGroup.id")}
+              <ContentLayout>
+                <ContentLayout.Grid>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                  <ThumbnailBox>
+                    <ThumbnailBox.Image
+                      bdrs="sm"
+                      src={"/sample/thumbnail0.webp"}
+                    />
+                  </ThumbnailBox>
+                </ContentLayout.Grid>
+              </ContentLayout>
+            </Box>
+          </ResizeSplitView.Left>
+          <ResizeSplitView.Separator />
+          <ResizeSplitView.Right>
+            <Box
+              style={(theme) => ({
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              })}
             >
-              {t("button.delete")}
-            </Button>
-          </ButtonGroup>
-        </ActionPanel.Right>
-      </ActionPanel>
-    </Box>
+              <ContentLayout.Grid>
+                {images.map((image) => {
+                  return (
+                    <ThumbnailBox key={image.id}>
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src={image.image.thumbnail}
+                      />
+                    </ThumbnailBox>
+                  )
+                })}
+              </ContentLayout.Grid>
+            </Box>
+          </ResizeSplitView.Right>
+        </ResizeSplitView>
+        <ActionPanel>
+          <ActionPanel.Left></ActionPanel.Left>
+          <ActionPanel.Center></ActionPanel.Center>
+          <ActionPanel.Right>
+            <ButtonGroup>
+              <Button
+                size="xs"
+                leftSection={<IconDeviceFloppy size={16} />}
+                type="submit"
+              >
+                {t("button.update")}
+              </Button>
+            </ButtonGroup>
+          </ActionPanel.Right>
+        </ActionPanel>
+      </Box>
+    </form>
   )
 }
 export default Page

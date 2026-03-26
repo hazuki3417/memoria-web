@@ -80,7 +80,7 @@ export const CreateImageGroupForm = (props: CreateImageGroupFormProps) => {
             control={methods.control}
             name={`name`}
             render={({ field }) => (
-              <TextInput size="xs" label="グループ名" {...field} />
+              <TextInput required size="xs" label="グループ名" {...field} />
             )}
           />
         </Box>

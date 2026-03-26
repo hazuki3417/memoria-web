@@ -61,9 +61,14 @@ const Page = () => {
   const { handleSubmit, control } = methods
 
   const [selected, setSelected] = useState<string | null>(null)
+
   const searchValid = async (values: SearchFormValues) => {
     console.log("submit values:", values)
     router.push(resolveUriQuery({ ...values }))
+  }
+
+  const searchInvalid = async (errors: FieldErrors<SearchFormValues>) => {
+    console.log("submit error:", errors)
   }
 
   const imageGroupsfilter = {
@@ -118,10 +123,6 @@ const Page = () => {
       })
     },
   })
-
-  const searchInvalid = async (errors: FieldErrors<SearchFormValues>) => {
-    console.log("submit error:", errors)
-  }
 
   const drawer = useMemo(() => {
     return selected !== null ? "opened" : "closed"
