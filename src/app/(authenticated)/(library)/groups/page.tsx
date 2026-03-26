@@ -332,13 +332,6 @@ const Page = () => {
                         >
                           <ImageGroup.CountBadge value={group.count} />
                           <ImageGroup.ImageContainer>
-                            {/*
-                              * NOTE: images側のrelay cursorが動作するとキャシュが更新される
-                                      その結果group側のimagesにも影響が出て想定以上の画像が表示されるため
-                                      表示件数を制限する。
-                                FIX: 制限はできたが詳細を開いたタイミングでキャッシュが更新される影響で画像のちらつきが発生する
-                                     useMemoで依存配列を指定せずに作れば対応できそう
-                              */}
                             {group.thumbnails.map((thumbnail) => {
                               return (
                                 <ImageGroup.Image
