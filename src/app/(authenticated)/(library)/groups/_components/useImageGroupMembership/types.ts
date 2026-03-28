@@ -25,6 +25,7 @@ export interface UseImageGroupMembershipControl {
 
 export interface UseImageGroupMembershipAction {
   reset: () => void
+  initialize: (imageIds: string[]) => void
 }
 
 export interface UseImageGroupMembership {

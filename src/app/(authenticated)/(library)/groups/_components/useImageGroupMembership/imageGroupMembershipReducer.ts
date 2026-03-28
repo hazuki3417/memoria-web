@@ -8,6 +8,7 @@ type ImageGroupMembershipAction =
   | { type: "ADD_IMAGE_TO_GROUP"; imageId: string }
   | { type: "REMOVE_IMAGE_FROM_GROUP"; imageId: string }
   | { type: "RESET_IMAGE_GROUP_MEMBERSHIP" }
+  | { type: "INITIALIZE_IMAGE_GROUP_MEMBERSHIP"; imageIds: string[] }
 
 export const createImageGroupMembershipState = (
   initialImageIds: string[],
@@ -82,6 +83,10 @@ export const imageGroupMembershipReducer = (
         addedImageIds: new Set(),
         removedImageIds: new Set(),
       }
+    }
+
+    case "INITIALIZE_IMAGE_GROUP_MEMBERSHIP": {
+      return createImageGroupMembershipState(action.imageIds)
     }
 
     default:

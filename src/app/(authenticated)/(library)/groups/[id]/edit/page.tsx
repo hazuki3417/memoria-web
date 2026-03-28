@@ -21,6 +21,7 @@ import { t } from "i18next"
 import { useEffect, useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import z from "zod"
+import { useImageGroupMembership } from "../../_components"
 
 type PathParam = {
   id: string
@@ -55,6 +56,8 @@ const inputFormDefaultValues = createFormDefaults<InputFormValues>({
 const Page = () => {
   const uriParams = useUriParams<PathParam>()
 
+  const membership = useImageGroupMembership({ initialImageIds: [] })
+
   const searchFormMethod = useForm<SearchFormValues>({
     resolver: zodResolver(searchFormSchema),
     defaultValues: {
@@ -76,11 +79,7 @@ const Page = () => {
   })
   const inputFormFilter = { id: uriParams.id }
 
-  const {
-    data: imagesData,
-    fetchMore: fetchMoreImages,
-    refetch,
-  } = useGetImagesQuery({
+  const { data: imagesData, fetchMore: fetchMoreImages } = useGetImagesQuery({
     variables: {
       first: 100,
       filter: searchFormFilter,
@@ -190,6 +189,9 @@ const Page = () => {
     if (!imageGroupData) {
       return []
     }
+
+    // FIX: 追加されたもの、除去されたものを反映するように実装を修正する
+
     const edges = imageGroupData.imageGroup.images.edges
     return edges.map((imageEdge) => {
       const image = imageEdge.node
@@ -227,6 +229,10 @@ const Page = () => {
       id: imageGroup.id,
       name: imageGroup.name,
     })
+
+    membership.action.initialize(
+      imageGroup.images.edges.map((edge) => edge.node.id),
+    )
   }, [imageGroupData])
 
   const handleDeleteImageGroup = (id: string) => {}
@@ -277,36 +283,39 @@ const Page = () => {
             </Flex>
             <ContentLayout>
               <ContentLayout.Grid>
-                <ThumbnailBox key={"selected"}>
-                  <ThumbnailBox.Overlay bdrs="sm">
-                    <ThumbnailBox.SelectedIcon />
-                  </ThumbnailBox.Overlay>
-                  <ThumbnailBox.Image
-                    bdrs="sm"
-                    src={"/sample/thumbnail2.webp"}
-                  />
-                </ThumbnailBox>
-                <ThumbnailBox key={"added"}>
-                  <ThumbnailBox.Overlay bdrs="sm">
-                    <ThumbnailBox.AddedIcon />
-                  </ThumbnailBox.Overlay>
-                  <ThumbnailBox.Image
-                    bdrs="sm"
-                    src={"/sample/thumbnail2.webp"}
-                  />
-                </ThumbnailBox>
-                <ThumbnailBox key={"removed"}>
-                  <ThumbnailBox.AddButton />
-                  <ThumbnailBox.RemovedIcon />
-                  <ThumbnailBox.Image
-                    bdrs="sm"
-                    src={"/sample/thumbnail2.webp"}
-                  />
-                </ThumbnailBox>
                 {searchFormImages.map((image) => {
+                  const status = membership.value.getStatus(image.id)
                   return (
                     <ThumbnailBox key={image.id}>
-                      {/* <ThumbnailBox.AddButton /> */}
+                      {status === "none" && (
+                        <>
+                          <ThumbnailBox.AddButton
+                            onClick={() =>
+                              membership.control.addImage(image.id)
+                            }
+                          />
+                        </>
+                      )}
+                      {status === "existing" && (
+                        <ThumbnailBox.Overlay bdrs="sm">
+                          <ThumbnailBox.SelectedIcon />
+                        </ThumbnailBox.Overlay>
+                      )}
+                      {status === "added" && (
+                        <ThumbnailBox.Overlay bdrs="sm">
+                          <ThumbnailBox.AddedIcon />
+                        </ThumbnailBox.Overlay>
+                      )}
+                      {status === "removed" && (
+                        <>
+                          <ThumbnailBox.AddButton
+                            onClick={() =>
+                              membership.control.addImage(image.id)
+                            }
+                          />
+                          <ThumbnailBox.RemovedIcon />
+                        </>
+                      )}
                       <ThumbnailBox.Image
                         bdrs="sm"
                         src={image.image.thumbnail}
@@ -351,35 +360,35 @@ const Page = () => {
             </Flex>
             <ContentLayout>
               <ContentLayout.Grid>
-                <ThumbnailBox key={"selected"}>
-                  <ThumbnailBox.RemoveButton />
-                  <ThumbnailBox.SelectedIcon />
-                  <ThumbnailBox.Image
-                    bdrs="sm"
-                    src={"/sample/thumbnail0.webp"}
-                  />
-                </ThumbnailBox>
-                <ThumbnailBox key={"added"}>
-                  <ThumbnailBox.AddedIcon />
-                  <ThumbnailBox.RemoveButton />
-                  <ThumbnailBox.Image
-                    bdrs="sm"
-                    src={"/sample/thumbnail1.webp"}
-                  />
-                </ThumbnailBox>
-                <ThumbnailBox key={"removed"}>
-                  <ThumbnailBox.Overlay bdrs="sm">
-                    <ThumbnailBox.RemovedIcon />
-                  </ThumbnailBox.Overlay>
-                  <ThumbnailBox.Image
-                    bdrs="sm"
-                    src={"/sample/thumbnail2.webp"}
-                  />
-                </ThumbnailBox>
                 {inputFormImages.map((image) => {
+                  const status = membership.value.getStatus(image.id)
                   return (
                     <ThumbnailBox key={image.id}>
-                      {/* <ThumbnailBox.Overlay bdrs="sm" /> */}
+                      {status === "existing" && (
+                        <>
+                          <ThumbnailBox.RemoveButton
+                            onClick={() =>
+                              membership.control.removeImage(image.id)
+                            }
+                          />
+                          <ThumbnailBox.SelectedIcon />
+                        </>
+                      )}
+                      {status === "added" && (
+                        <>
+                          <ThumbnailBox.RemoveButton
+                            onClick={() =>
+                              membership.control.removeImage(image.id)
+                            }
+                          />
+                          <ThumbnailBox.SelectedIcon />
+                        </>
+                      )}
+                      {status === "removed" && (
+                        <ThumbnailBox.Overlay bdrs="sm">
+                          <ThumbnailBox.RemovedIcon />
+                        </ThumbnailBox.Overlay>
+                      )}
                       <ThumbnailBox.Image
                         bdrs="sm"
                         src={image.image.thumbnail}

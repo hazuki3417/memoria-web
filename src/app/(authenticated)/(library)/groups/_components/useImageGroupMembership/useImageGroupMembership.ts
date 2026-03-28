@@ -51,6 +51,13 @@ export const useImageGroupMembership = (
     dispatch({ type: "RESET_IMAGE_GROUP_MEMBERSHIP" })
   }, [])
 
+  const initializeImageGroupMembership = useCallback((imageIds: string[]) => {
+    dispatch({
+      type: "INITIALIZE_IMAGE_GROUP_MEMBERSHIP",
+      imageIds,
+    })
+  }, [])
+
   return {
     value: {
       initialImageIds: Array.from(initialImageIds),
@@ -65,6 +72,7 @@ export const useImageGroupMembership = (
     },
     action: {
       reset: resetImageGroupMembership,
+      initialize: initializeImageGroupMembership,
     },
   }
 }
