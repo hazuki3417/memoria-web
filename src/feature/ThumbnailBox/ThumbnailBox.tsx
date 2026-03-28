@@ -2,11 +2,15 @@ import { FieldValid } from "@/components"
 import { Box, BoxProps } from "@mantine/core"
 import React, { memo } from "react"
 import { AddButton } from "./AddButton"
+import { AddedIcon } from "./AddedIcon"
 import { DeleteButton } from "./DeleteButton"
 import { Image } from "./Image"
 import { Label } from "./Label"
+import { Overlay } from "./Overlay"
 import { RemoveButton } from "./RemoveButton"
+import { RemovedIcon } from "./RemovedIcon"
 import { SelectableCheckbox } from "./SelectableCheckbox"
+import { SelectedIcon } from "./SelectedIcon"
 import classes from "./ThumbnailBox.module.css"
 
 export type ThumbnailBoxUi = {
@@ -54,4 +58,8 @@ ThumbnailBox.Label = memo(Label)
 ThumbnailBox.DeleteButton = memo(DeleteButton)
 ThumbnailBox.RemoveButton = memo(RemoveButton)
 ThumbnailBox.AddButton = memo(AddButton)
+ThumbnailBox.AddedIcon = memo(AddedIcon)
+ThumbnailBox.RemovedIcon = memo(RemovedIcon)
+ThumbnailBox.SelectedIcon = memo(SelectedIcon)
 ThumbnailBox.SelectableCheckbox = memo(SelectableCheckbox)
+ThumbnailBox.Overlay = memo(Overlay)

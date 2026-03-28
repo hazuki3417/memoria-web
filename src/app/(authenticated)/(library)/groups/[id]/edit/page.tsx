@@ -277,9 +277,36 @@ const Page = () => {
             </Flex>
             <ContentLayout>
               <ContentLayout.Grid>
+                <ThumbnailBox key={"selected"}>
+                  <ThumbnailBox.Overlay bdrs="sm">
+                    <ThumbnailBox.SelectedIcon />
+                  </ThumbnailBox.Overlay>
+                  <ThumbnailBox.Image
+                    bdrs="sm"
+                    src={"/sample/thumbnail2.webp"}
+                  />
+                </ThumbnailBox>
+                <ThumbnailBox key={"added"}>
+                  <ThumbnailBox.Overlay bdrs="sm">
+                    <ThumbnailBox.AddedIcon />
+                  </ThumbnailBox.Overlay>
+                  <ThumbnailBox.Image
+                    bdrs="sm"
+                    src={"/sample/thumbnail2.webp"}
+                  />
+                </ThumbnailBox>
+                <ThumbnailBox key={"removed"}>
+                  <ThumbnailBox.AddButton />
+                  <ThumbnailBox.RemovedIcon />
+                  <ThumbnailBox.Image
+                    bdrs="sm"
+                    src={"/sample/thumbnail2.webp"}
+                  />
+                </ThumbnailBox>
                 {searchFormImages.map((image) => {
                   return (
                     <ThumbnailBox key={image.id}>
+                      {/* <ThumbnailBox.AddButton /> */}
                       <ThumbnailBox.Image
                         bdrs="sm"
                         src={image.image.thumbnail}
@@ -324,22 +351,26 @@ const Page = () => {
             </Flex>
             <ContentLayout>
               <ContentLayout.Grid>
-                <ThumbnailBox key={"/sample/thumbnail0.webp"}>
+                <ThumbnailBox key={"selected"}>
                   <ThumbnailBox.RemoveButton />
+                  <ThumbnailBox.SelectedIcon />
                   <ThumbnailBox.Image
                     bdrs="sm"
                     src={"/sample/thumbnail0.webp"}
                   />
                 </ThumbnailBox>
-                <ThumbnailBox key={"/sample/thumbnail1.webp"}>
-                  <ThumbnailBox.AddButton />
+                <ThumbnailBox key={"added"}>
+                  <ThumbnailBox.AddedIcon />
+                  <ThumbnailBox.RemoveButton />
                   <ThumbnailBox.Image
                     bdrs="sm"
                     src={"/sample/thumbnail1.webp"}
                   />
                 </ThumbnailBox>
-                <ThumbnailBox key={"/sample/thumbnail2.webp"}>
-                  <ThumbnailBox.DeleteButton />
+                <ThumbnailBox key={"removed"}>
+                  <ThumbnailBox.Overlay bdrs="sm">
+                    <ThumbnailBox.RemovedIcon />
+                  </ThumbnailBox.Overlay>
                   <ThumbnailBox.Image
                     bdrs="sm"
                     src={"/sample/thumbnail2.webp"}
@@ -348,6 +379,7 @@ const Page = () => {
                 {inputFormImages.map((image) => {
                   return (
                     <ThumbnailBox key={image.id}>
+                      {/* <ThumbnailBox.Overlay bdrs="sm" /> */}
                       <ThumbnailBox.Image
                         bdrs="sm"
                         src={image.image.thumbnail}
