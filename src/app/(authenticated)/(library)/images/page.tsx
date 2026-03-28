@@ -279,8 +279,6 @@ const Page = () => {
     })
   }
 
-  const intersectionVisible = data?.images.pageInfo.hasNextPage || false
-
   return (
     <Tabs value={TAB_FIELDS.list}>
       <ActionPanel mb="xs">

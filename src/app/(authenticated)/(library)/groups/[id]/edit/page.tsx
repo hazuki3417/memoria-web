@@ -6,21 +6,35 @@ import {
   ResizeSplitView,
 } from "@/components"
 import { ThumbnailBox } from "@/feature"
-import { useGetImageGroupQuery } from "@/graphql"
+import {
+  useGetImageGroupQuery,
+  useGetImagesQuery,
+  useUpdateImageGroupMutation,
+} from "@/graphql"
 import { useIntersection, useUriParams } from "@/hooks"
 import { createFormDefaults } from "@/lib/form"
 import { ImageDetailPayload } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Box, Button, Flex, TextInput } from "@mantine/core"
-import { IconDeviceFloppy, IconTrash } from "@tabler/icons-react"
+import { Box, Button, Flex, TagsInput, TextInput } from "@mantine/core"
+import { IconSearch } from "@tabler/icons-react"
 import { t } from "i18next"
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import z from "zod"
 
 type PathParam = {
   id: string
 }
+
+const searchFormSchema = z.object({
+  tags: z.array(z.string()),
+})
+
+type SearchFormValues = z.infer<typeof searchFormSchema>
+
+const searchFormDefaultValues = createFormDefaults<SearchFormValues>({
+  tags: [],
+})
 
 const inputFormSchema = z.object({
   id: z.string(),
@@ -41,7 +55,14 @@ const inputFormDefaultValues = createFormDefaults<InputFormValues>({
 const Page = () => {
   const uriParams = useUriParams<PathParam>()
 
-  const methods = useForm<InputFormValues>({
+  const searchFormMethod = useForm<SearchFormValues>({
+    resolver: zodResolver(searchFormSchema),
+    defaultValues: {
+      ...searchFormDefaultValues(),
+    },
+  })
+
+  const inputFormMethod = useForm<InputFormValues>({
     resolver: zodResolver(inputFormSchema),
     defaultValues: {
       ...inputFormDefaultValues({
@@ -49,46 +70,97 @@ const Page = () => {
       }),
     },
   })
-  const { handleSubmit, control } = methods
 
-  const searchValid = async (values: InputFormValues) => {
-    console.log("submit values:", values)
-  }
+  const [searchFormFilter, setSearchFormFilter] = useState<SearchFormValues>({
+    ...searchFormDefaultValues(),
+  })
+  const inputFormFilter = { id: uriParams.id }
 
-  const searchInvalid = async (errors: FieldErrors<InputFormValues>) => {
-    console.log("submit error:", errors)
-  }
-
-  const filter = { id: uriParams.id }
-
-  const { data, fetchMore } = useGetImageGroupQuery({
+  const {
+    data: imagesData,
+    fetchMore: fetchMoreImages,
+    refetch,
+  } = useGetImagesQuery({
     variables: {
-      first: 50,
-      filter,
+      first: 100,
+      filter: searchFormFilter,
     },
+    notifyOnNetworkStatusChange: true,
   })
 
-  const intersection = useIntersection({
+  const { data: imageGroupData, fetchMore: fetchMoreImageGroup } =
+    useGetImageGroupQuery({
+      variables: {
+        first: 50,
+        filter: inputFormFilter,
+      },
+    })
+
+  const searchFormIntersection = useIntersection({
     intersect: async () => {
-      const pageInfo = data?.imageGroup.images.pageInfo
+      const pageInfo = imagesData?.images.pageInfo
       if (!pageInfo?.hasNextPage) return
-      fetchMore({
+      fetchMoreImages({
         variables: {
-          first: 30,
+          first: 50,
           after: pageInfo.endCursor,
-          filter,
+          filter: searchFormFilter,
         },
       })
     },
   })
 
-  const imageGroup = data?.imageGroup
+  const inputFormIntersection = useIntersection({
+    intersect: async () => {
+      const pageInfo = imageGroupData?.imageGroup.images.pageInfo
+      if (!pageInfo?.hasNextPage) return
+      fetchMoreImageGroup({
+        variables: {
+          first: 30,
+          after: pageInfo.endCursor,
+          filter: inputFormFilter,
+        },
+      })
+    },
+  })
 
-  const images = useMemo(() => {
-    if (!data) {
+  const [updateImageGroup, {}] = useUpdateImageGroupMutation()
+
+  const searchValid = async (values: SearchFormValues) => {
+    console.log("submit values:", values)
+    setSearchFormFilter({ ...values })
+  }
+
+  const searchInvalid = async (errors: FieldErrors<SearchFormValues>) => {
+    console.log("submit error:", errors)
+  }
+
+  const inputValid = async (values: InputFormValues) => {
+    console.log("submit values:", values)
+    try {
+      // await updateImageGroup({
+      //   variables: {
+      //     input: {
+      //       id: values.id,
+      //       name: values.name,
+      //       imageIds: []
+      //     }
+      //   }
+      // })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const inputInvalid = async (errors: FieldErrors<InputFormValues>) => {
+    console.log("submit error:", errors)
+  }
+
+  const searchFormImages = useMemo(() => {
+    if (!imagesData) {
       return []
     }
-    const edges = data.imageGroup.images.edges
+    const edges = imagesData.images.edges
     return edges.map((imageEdge) => {
       const image = imageEdge.node
       return {
@@ -112,173 +184,100 @@ const Page = () => {
         },
       } satisfies ImageDetailPayload
     })
-  }, [data])
+  }, [imagesData])
+
+  const inputFormImages = useMemo(() => {
+    if (!imageGroupData) {
+      return []
+    }
+    const edges = imageGroupData.imageGroup.images.edges
+    return edges.map((imageEdge) => {
+      const image = imageEdge.node
+      return {
+        id: image.id,
+        info: {
+          file: {
+            name: image.file.name,
+            size: image.file.size,
+            date: "",
+          },
+          image: {
+            width: image.size.width,
+            height: image.size.height,
+          },
+          tags: [],
+        },
+        image: {
+          preview: image.src.preview,
+          thumbnail: image.src.thumbnail,
+          alt: image.file.name,
+        },
+      } satisfies ImageDetailPayload
+    })
+  }, [imageGroupData])
+
+  useEffect(() => {
+    if (!imageGroupData) {
+      return
+    }
+
+    const imageGroup = imageGroupData.imageGroup
+
+    inputFormMethod.reset({
+      id: imageGroup.id,
+      name: imageGroup.name,
+    })
+  }, [imageGroupData])
 
   const handleDeleteImageGroup = (id: string) => {}
 
   return (
-    <form
-      onSubmit={handleSubmit(searchValid, searchInvalid)}
-      style={{ height: "100%" }}
+    <Box
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
     >
-      <Box
+      <ResizeSplitView
+        defaultLayout={{ left: 50, right: 50 }}
         style={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
+          flex: 1,
+          marginBottom: "var(--mantine-spacing-xs)",
         }}
       >
-        <Flex justify="space-between" align="center" mb="xs">
-          <Controller
-            control={methods.control}
-            name={`name`}
-            render={({ field }) => (
-              <TextInput size="xs" placeholder="グループ名" {...field} />
-            )}
-          />
-          <Flex align="center" gap="xs">
-            {/* <Text size="xs">{`${imageGroup?.count ?? 0} 件`}</Text> */}
-            <ButtonGroup>
-              <Button
-                size="xs"
-                leftSection={<IconTrash size={16} />}
-                type="button"
-                onClick={() => handleDeleteImageGroup("")}
-              >
-                {t("button.delete")}
+        <ResizeSplitView.Left>
+          <form
+            onSubmit={searchFormMethod.handleSubmit(searchValid, searchInvalid)}
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Flex justify="space-between" align="center" mb="xs" gap="xs">
+              <Controller
+                name="tags"
+                control={searchFormMethod.control}
+                render={({ field }) => (
+                  <TagsInput
+                    {...field}
+                    size="xs"
+                    placeholder={t("placeholder.tag")}
+                    leftSection={<IconSearch size={16} />}
+                    clearable
+                    flex="1"
+                  />
+                )}
+              />
+              <Button size="xs" type="submit">
+                {t("button.search")}
               </Button>
-            </ButtonGroup>
-          </Flex>
-        </Flex>
-        <ResizeSplitView
-          defaultLayout={{ left: 50, right: 50 }}
-          style={{
-            flex: 1,
-            marginBottom: "var(--mantine-spacing-xs)",
-          }}
-        >
-          <ResizeSplitView.Left>
-            <Box
-              style={(theme) => ({
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-              })}
-            >
-              <ContentLayout>
-                <ContentLayout.Grid>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                  <ThumbnailBox>
-                    <ThumbnailBox.Image
-                      bdrs="sm"
-                      src={"/sample/thumbnail0.webp"}
-                    />
-                  </ThumbnailBox>
-                </ContentLayout.Grid>
-              </ContentLayout>
-            </Box>
-          </ResizeSplitView.Left>
-          <ResizeSplitView.Separator />
-          <ResizeSplitView.Right>
-            <Box
-              style={(theme) => ({
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-              })}
-            >
+            </Flex>
+            <ContentLayout>
               <ContentLayout.Grid>
-                {images.map((image) => {
+                {searchFormImages.map((image) => {
                   return (
                     <ThumbnailBox key={image.id}>
                       <ThumbnailBox.Image
@@ -288,27 +287,71 @@ const Page = () => {
                     </ThumbnailBox>
                   )
                 })}
+                <ContentLayout.Intersection ref={searchFormIntersection.ref} />
               </ContentLayout.Grid>
-            </Box>
-          </ResizeSplitView.Right>
-        </ResizeSplitView>
-        <ActionPanel>
-          <ActionPanel.Left></ActionPanel.Left>
-          <ActionPanel.Center></ActionPanel.Center>
-          <ActionPanel.Right>
-            <ButtonGroup>
-              <Button
-                size="xs"
-                leftSection={<IconDeviceFloppy size={16} />}
-                type="submit"
-              >
-                {t("button.update")}
-              </Button>
-            </ButtonGroup>
-          </ActionPanel.Right>
-        </ActionPanel>
-      </Box>
-    </form>
+            </ContentLayout>
+          </form>
+        </ResizeSplitView.Left>
+        <ResizeSplitView.Separator />
+        <ResizeSplitView.Right>
+          <form
+            onSubmit={inputFormMethod.handleSubmit(inputValid, inputInvalid)}
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Flex justify="space-between" align="center" mb="xs">
+              <Controller
+                control={inputFormMethod.control}
+                name={`name`}
+                render={({ field }) => (
+                  <TextInput size="xs" placeholder="グループ名" {...field} />
+                )}
+              />
+              <Flex align="center" gap="xs">
+                <ButtonGroup>
+                  <Button
+                    size="xs"
+                    type="button"
+                    onClick={() => handleDeleteImageGroup("")}
+                  >
+                    {t("button.delete")}
+                  </Button>
+                </ButtonGroup>
+              </Flex>
+            </Flex>
+            <ContentLayout>
+              <ContentLayout.Grid>
+                {inputFormImages.map((image) => {
+                  return (
+                    <ThumbnailBox key={image.id}>
+                      <ThumbnailBox.Image
+                        bdrs="sm"
+                        src={image.image.thumbnail}
+                      />
+                    </ThumbnailBox>
+                  )
+                })}
+                <ContentLayout.Intersection ref={inputFormIntersection.ref} />
+              </ContentLayout.Grid>
+            </ContentLayout>
+            <ActionPanel mt="xs">
+              <ActionPanel.Left></ActionPanel.Left>
+              <ActionPanel.Center></ActionPanel.Center>
+              <ActionPanel.Right>
+                <ButtonGroup>
+                  <Button size="xs" type="submit">
+                    {t("button.update")}
+                  </Button>
+                </ButtonGroup>
+              </ActionPanel.Right>
+            </ActionPanel>
+          </form>
+        </ResizeSplitView.Right>
+      </ResizeSplitView>
+    </Box>
   )
 }
 export default Page
