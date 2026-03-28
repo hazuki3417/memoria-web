@@ -1,11 +1,11 @@
 import { ActionIcon } from "@mantine/core"
-import { IconMinus } from "@tabler/icons-react"
+import { IconPlus } from "@tabler/icons-react"
 
-export interface RemoveButtonProps {
+export interface AddButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>
 }
 
-export const RemoveButton = (props: RemoveButtonProps) => {
+export const AddButton = (props: AddButtonProps) => {
   const { ...rest } = props
   return (
     <ActionIcon
@@ -14,16 +14,16 @@ export const RemoveButton = (props: RemoveButtonProps) => {
           position: "absolute",
           top: 8,
           right: 8,
-          backgroundColor: theme.colors.orange[7],
+          backgroundColor: theme.colors.green[7],
           opacity: 0.8,
         },
       })}
       size={20}
       {...rest}
-      data-testid="preview-image-box-remove-button"
+      data-testid="preview-image-box-add-button"
     >
-      <IconMinus />
+      <IconPlus />
     </ActionIcon>
   )
 }
-RemoveButton.displayName = "ThumbnailBox.RemoveButton"
+AddButton.displayName = "ThumbnailBox.AddButton"

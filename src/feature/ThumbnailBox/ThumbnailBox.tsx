@@ -1,6 +1,8 @@
 import { FieldValid } from "@/components"
 import { Box, BoxProps } from "@mantine/core"
 import React, { memo } from "react"
+import { AddButton } from "./AddButton"
+import { DeleteButton } from "./DeleteButton"
 import { Image } from "./Image"
 import { Label } from "./Label"
 import { RemoveButton } from "./RemoveButton"
@@ -49,5 +51,7 @@ export const ThumbnailBox = (props: ThumbnailBoxProps) => {
 
 ThumbnailBox.Image = memo(Image)
 ThumbnailBox.Label = memo(Label)
+ThumbnailBox.DeleteButton = memo(DeleteButton)
 ThumbnailBox.RemoveButton = memo(RemoveButton)
+ThumbnailBox.AddButton = memo(AddButton)
 ThumbnailBox.SelectableCheckbox = memo(SelectableCheckbox)

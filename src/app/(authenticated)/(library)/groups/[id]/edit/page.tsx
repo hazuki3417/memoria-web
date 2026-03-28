@@ -324,6 +324,27 @@ const Page = () => {
             </Flex>
             <ContentLayout>
               <ContentLayout.Grid>
+                <ThumbnailBox key={"/sample/thumbnail0.webp"}>
+                  <ThumbnailBox.RemoveButton />
+                  <ThumbnailBox.Image
+                    bdrs="sm"
+                    src={"/sample/thumbnail0.webp"}
+                  />
+                </ThumbnailBox>
+                <ThumbnailBox key={"/sample/thumbnail1.webp"}>
+                  <ThumbnailBox.AddButton />
+                  <ThumbnailBox.Image
+                    bdrs="sm"
+                    src={"/sample/thumbnail1.webp"}
+                  />
+                </ThumbnailBox>
+                <ThumbnailBox key={"/sample/thumbnail2.webp"}>
+                  <ThumbnailBox.DeleteButton />
+                  <ThumbnailBox.Image
+                    bdrs="sm"
+                    src={"/sample/thumbnail2.webp"}
+                  />
+                </ThumbnailBox>
                 {inputFormImages.map((image) => {
                   return (
                     <ThumbnailBox key={image.id}>
