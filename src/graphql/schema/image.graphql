@@ -64,7 +64,7 @@ input DownloadImagesInput {
 
 
 # === payload ===
-
+# NOTE: 対象情報の他に付属する情報を返却したいケースに対応するためPayloadという層を用意している
 type UploadImagePayload {
   id: ID!
 }

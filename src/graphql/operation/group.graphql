@@ -19,6 +19,8 @@ query GetImageGroups(
         name
         count
         thumbnails
+        createdAt
+        updatedAt
       }
     }
     pageInfo {
@@ -80,13 +82,27 @@ query GetImageGroup(
 
 mutation CreateImageGroup($input: CreateImageGroupInput!) {
   createImageGroup(input: $input) {
-    id
+    node {
+      id
+      name
+      count
+      thumbnails
+      createdAt
+      updatedAt
+    }
   }
 }
 
 mutation UpdateImageGroup($input: UpdateImageGroupInput!) {
   updateImageGroup(input: $input) {
-    id
+    node {
+      id
+      name
+      count
+      thumbnails
+      createdAt
+      updatedAt
+    }
   }
 }
 
