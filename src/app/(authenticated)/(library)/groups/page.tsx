@@ -3,6 +3,7 @@ import {
   ActionPanel,
   ButtonGroup,
   ContentLayout,
+  LinkButton,
   ResizeSplitView,
   ResizeSplitViewLayout,
   useResizeSplitView,
@@ -35,6 +36,7 @@ import {
 import {
   IconDownload,
   IconEdit,
+  IconLibraryPlus,
   IconSearch,
   IconTrash,
   IconX,
@@ -303,7 +305,15 @@ const Page = () => {
           <Tabs.List />
         </ActionPanel.Left>
         <ActionPanel.Center></ActionPanel.Center>
-        <ActionPanel.Right></ActionPanel.Right>
+        <ActionPanel.Right>
+          <LinkButton
+            size="xs"
+            leftSection={<IconLibraryPlus size={16} />}
+            href={resolveUri("/groups/new")}
+          >
+            {t("button.new")}
+          </LinkButton>
+        </ActionPanel.Right>
       </ActionPanel>
       <Tabs.Panel
         style={{
