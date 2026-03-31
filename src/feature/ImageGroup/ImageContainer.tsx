@@ -15,7 +15,8 @@ export const ImageContainer = (props: ImageContainerProps) => {
       style={(theme) => ({
         ...style,
         display: "grid",
-        gridTemplateColumns: "auto auto",
+        gridTemplateColumns: "1fr 1fr",
+        gridTemplateRows: "1fr 1fr",
         gap: "calc(.3rem * var(--mantine-scale))",
       })}
     />

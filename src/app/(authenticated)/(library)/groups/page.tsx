@@ -397,6 +397,14 @@ const Page = () => {
                                 />
                               )
                             })}
+                            {[...Array(4 - group.thumbnails.length)].map(
+                              (_, i) => (
+                                <ImageGroup.ImageSkeleton
+                                  key={i}
+                                  animate={false}
+                                />
+                              ),
+                            )}
                           </ImageGroup.ImageContainer>
                           <ImageGroup.InfoContainer>
                             <ImageGroup.Title>{group.name}</ImageGroup.Title>

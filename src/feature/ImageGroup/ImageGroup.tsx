@@ -5,6 +5,7 @@ import { CountBadge } from "./CountBadge"
 import { Image } from "./Image"
 import { ImageContainer } from "./ImageContainer"
 import classes from "./ImageGroup.module.css"
+import { ImageSkeleton } from "./ImageSkeleton"
 import { InfoContainer } from "./InfoContainer"
 import { SelectableCheckbox } from "./SelectableCheckbox"
 import { Title } from "./Title"
@@ -50,6 +51,7 @@ export const ImageGroup = (props: ImageGroupProps) => {
 }
 
 ImageGroup.Image = memo(Image)
+ImageGroup.ImageSkeleton = memo(ImageSkeleton)
 ImageGroup.ImageContainer = memo(ImageContainer)
 ImageGroup.InfoContainer = memo(InfoContainer)
 ImageGroup.Title = memo(Title)
