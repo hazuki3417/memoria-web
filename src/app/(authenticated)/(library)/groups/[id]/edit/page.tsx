@@ -56,7 +56,7 @@ const inputFormDefaultValues = createFormDefaults<InputFormValues>({
 const Page = () => {
   const uriParams = useUriParams<PathParam>()
 
-  const membership = useImageGroupMembership({ initialImageIds: [] })
+  const membership = useImageGroupMembership<ImageDetailPayload>({ items: [] })
 
   const searchFormMethod = useForm<SearchFormValues>({
     resolver: zodResolver(searchFormSchema),
@@ -185,15 +185,13 @@ const Page = () => {
     })
   }, [imagesData])
 
-  const inputFormImages = useMemo(() => {
+  const baseFormImages = useMemo(() => {
     if (!imageGroupData) {
       return []
     }
 
-    // FIX: 追加されたもの、除去されたものを反映するように実装を修正する
-
     const edges = imageGroupData.imageGroup.images.edges
-    return edges.map((imageEdge) => {
+    const data = edges.map((imageEdge) => {
       const image = imageEdge.node
       return {
         id: image.id,
@@ -216,6 +214,8 @@ const Page = () => {
         },
       } satisfies ImageDetailPayload
     })
+    membership.action.initialize(data)
+    return data
   }, [imageGroupData])
 
   useEffect(() => {
@@ -224,15 +224,10 @@ const Page = () => {
     }
 
     const imageGroup = imageGroupData.imageGroup
-
     inputFormMethod.reset({
       id: imageGroup.id,
       name: imageGroup.name,
     })
-
-    membership.action.initialize(
-      imageGroup.images.edges.map((edge) => edge.node.id),
-    )
   }, [imageGroupData])
 
   const handleDeleteImageGroup = (id: string) => {}
@@ -290,9 +285,9 @@ const Page = () => {
                       {status === "none" && (
                         <>
                           <ThumbnailBox.AddButton
-                            onClick={() =>
-                              membership.control.addImage(image.id)
-                            }
+                            onClick={() => {
+                              membership.control.add(image)
+                            }}
                           />
                         </>
                       )}
@@ -309,9 +304,9 @@ const Page = () => {
                       {status === "removed" && (
                         <>
                           <ThumbnailBox.AddButton
-                            onClick={() =>
-                              membership.control.addImage(image.id)
-                            }
+                            onClick={() => {
+                              membership.control.add(image)
+                            }}
                           />
                           <ThumbnailBox.RemovedIcon />
                         </>
@@ -360,16 +355,14 @@ const Page = () => {
             </Flex>
             <ContentLayout>
               <ContentLayout.Grid>
-                {inputFormImages.map((image) => {
+                {membership.value.items.final.map((image) => {
                   const status = membership.value.getStatus(image.id)
                   return (
                     <ThumbnailBox key={image.id}>
                       {status === "existing" && (
                         <>
                           <ThumbnailBox.RemoveButton
-                            onClick={() =>
-                              membership.control.removeImage(image.id)
-                            }
+                            onClick={() => membership.control.remove(image.id)}
                           />
                           <ThumbnailBox.SelectedIcon />
                         </>
@@ -377,11 +370,9 @@ const Page = () => {
                       {status === "added" && (
                         <>
                           <ThumbnailBox.RemoveButton
-                            onClick={() =>
-                              membership.control.removeImage(image.id)
-                            }
+                            onClick={() => membership.control.remove(image.id)}
                           />
-                          <ThumbnailBox.SelectedIcon />
+                          <ThumbnailBox.AddedIcon />
                         </>
                       )}
                       {status === "removed" && (

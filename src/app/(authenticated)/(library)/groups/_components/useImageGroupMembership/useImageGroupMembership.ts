@@ -4,75 +4,115 @@ import {
   imageGroupMembershipReducer,
 } from "./imageGroupMembershipReducer"
 import {
+  ImageGroupMembershipItem,
   ImageGroupMembershipStatus,
   UseImageGroupMembership,
   UseImageGroupMembershipOption,
 } from "./types"
 
-export const useImageGroupMembership = (
-  option: UseImageGroupMembershipOption,
-): UseImageGroupMembership => {
-  const [membershipState, dispatch] = useReducer(
+export const useImageGroupMembership = <T extends ImageGroupMembershipItem>(
+  option: UseImageGroupMembershipOption<T>,
+): UseImageGroupMembership<T> => {
+  const [state, dispatch] = useReducer(
     imageGroupMembershipReducer,
-    option.initialImageIds,
+    option.items,
     createImageGroupMembershipState,
   )
 
-  const { initialImageIds, addedImageIds, removedImageIds } = membershipState
+  const { ids, entities } = state
 
-  const getImageMembershipStatus = useCallback(
+  const getStatus = useCallback(
     (imageId: string): ImageGroupMembershipStatus => {
-      if (removedImageIds.has(imageId)) return "removed"
-      if (addedImageIds.has(imageId)) return "added"
-      if (initialImageIds.has(imageId)) return "existing"
+      if (ids.removed.has(imageId)) return "removed"
+      if (ids.added.has(imageId)) return "added"
+      if (ids.initial.has(imageId)) return "existing"
       return "none"
     },
-    [initialImageIds, addedImageIds, removedImageIds],
+    [ids.initial, ids.added, ids.removed],
   )
 
-  const finalImageIds = useMemo(() => {
-    const result = new Set(initialImageIds)
-
-    addedImageIds.forEach((id) => result.add(id))
-    removedImageIds.forEach((id) => result.delete(id))
-
+  /**
+   * calculated ids
+   */
+  const initialIds = useMemo(() => Array.from(ids.initial), [ids.initial])
+  const addedIds = useMemo(() => Array.from(ids.added), [ids.added])
+  const removedIds = useMemo(() => Array.from(ids.removed), [ids.removed])
+  const finalIds = useMemo(() => {
+    const result = new Set(ids.initial)
+    ids.added.forEach((id) => result.add(id))
+    ids.removed.forEach((id) => result.delete(id))
     return Array.from(result)
-  }, [initialImageIds, addedImageIds, removedImageIds])
+  }, [ids.initial, ids.added, ids.removed])
 
-  const addImageToGroup = useCallback((imageId: string) => {
-    dispatch({ type: "ADD_IMAGE_TO_GROUP", imageId })
+  /**
+   * calculated items
+   */
+  const initialItems = useMemo(() => {
+    return Array.from(ids.initial)
+      .map((id) => entities.get(id))
+      .filter((item): item is T => item !== undefined)
+  }, [ids.initial, entities])
+  const addedItems = useMemo(() => {
+    return Array.from(ids.added)
+      .map((id) => entities.get(id))
+      .filter((item): item is T => item !== undefined)
+  }, [ids.added, entities])
+  const removedItems = useMemo(() => {
+    return Array.from(ids.removed)
+      .map((id) => entities.get(id))
+      .filter((item): item is T => item !== undefined)
+  }, [ids.removed, entities])
+  const finalItems = useMemo(() => {
+    return finalIds
+      .map((id) => entities.get(id))
+      .filter((item): item is T => item !== undefined)
+  }, [finalIds, entities])
+
+  /**
+   * handler functions
+   */
+  const addItem = useCallback((item: T) => {
+    dispatch({ type: "add", item })
   }, [])
 
-  const removeImageFromGroup = useCallback((imageId: string) => {
-    dispatch({ type: "REMOVE_IMAGE_FROM_GROUP", imageId })
+  const removeItem = useCallback((id: string) => {
+    dispatch({ type: "remove", id })
   }, [])
 
-  const resetImageGroupMembership = useCallback(() => {
-    dispatch({ type: "RESET_IMAGE_GROUP_MEMBERSHIP" })
+  const reset = useCallback(() => {
+    dispatch({ type: "reset" })
   }, [])
 
-  const initializeImageGroupMembership = useCallback((imageIds: string[]) => {
+  const initialize = useCallback((items: T[]) => {
     dispatch({
-      type: "INITIALIZE_IMAGE_GROUP_MEMBERSHIP",
-      imageIds,
+      type: "initialize",
+      items,
     })
   }, [])
 
   return {
     value: {
-      initialImageIds: Array.from(initialImageIds),
-      addedImageIds: Array.from(addedImageIds),
-      removedImageIds: Array.from(removedImageIds),
-      finalImageIds,
-      getStatus: getImageMembershipStatus,
+      ids: {
+        initial: initialIds,
+        added: addedIds,
+        removed: removedIds,
+        final: finalIds,
+      },
+      items: {
+        initial: initialItems,
+        added: addedItems,
+        removed: removedItems,
+        final: finalItems,
+      },
+      getStatus: getStatus,
     },
     control: {
-      addImage: addImageToGroup,
-      removeImage: removeImageFromGroup,
+      add: addItem,
+      remove: removeItem,
     },
     action: {
-      reset: resetImageGroupMembership,
-      initialize: initializeImageGroupMembership,
+      reset: reset,
+      initialize: initialize,
     },
   }
 }

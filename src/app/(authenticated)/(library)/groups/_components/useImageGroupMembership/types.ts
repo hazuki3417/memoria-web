@@ -1,35 +1,50 @@
+export type ImageGroupMembershipItem = {
+  id: string
+}
+
 export type ImageGroupMembershipStatus =
   | "none"
   | "existing"
   | "added"
   | "removed"
 
-export type UseImageGroupMembershipValue = {
-  initialImageIds: string[]
-  addedImageIds: string[]
-  removedImageIds: string[]
-
-  finalImageIds: string[]
-
-  getStatus: (imageId: string) => ImageGroupMembershipStatus
+export type UseImageGroupMembershipValue<T extends ImageGroupMembershipItem> = {
+  ids: {
+    initial: string[]
+    added: string[]
+    removed: string[]
+    final: string[]
+  }
+  items: {
+    initial: T[]
+    added: T[]
+    removed: T[]
+    final: T[]
+  }
+  getStatus: (id: string) => ImageGroupMembershipStatus
 }
 
-export type UseImageGroupMembershipOption = {
-  initialImageIds: string[]
+export type UseImageGroupMembershipOption<T extends ImageGroupMembershipItem> =
+  {
+    items: T[]
+  }
+
+export interface UseImageGroupMembershipControl<
+  T extends ImageGroupMembershipItem,
+> {
+  add: (item: T) => void
+  remove: (id: string) => void
 }
 
-export interface UseImageGroupMembershipControl {
-  addImage: (imageId: string) => void
-  removeImage: (imageId: string) => void
-}
-
-export interface UseImageGroupMembershipAction {
+export interface UseImageGroupMembershipAction<
+  T extends ImageGroupMembershipItem,
+> {
   reset: () => void
-  initialize: (imageIds: string[]) => void
+  initialize: (items: T[]) => void
 }
 
-export interface UseImageGroupMembership {
-  value: UseImageGroupMembershipValue
-  control: UseImageGroupMembershipControl
-  action: UseImageGroupMembershipAction
+export interface UseImageGroupMembership<T extends ImageGroupMembershipItem> {
+  value: UseImageGroupMembershipValue<T>
+  control: UseImageGroupMembershipControl<T>
+  action: UseImageGroupMembershipAction<T>
 }
