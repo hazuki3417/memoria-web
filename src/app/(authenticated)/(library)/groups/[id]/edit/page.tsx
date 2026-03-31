@@ -7,17 +7,24 @@ import {
 } from "@/components"
 import { ThumbnailBox } from "@/feature"
 import {
+  useDeleteImageGroupMutation,
   useGetImageGroupQuery,
   useGetImagesQuery,
   useUpdateImageGroupMutation,
 } from "@/graphql"
 import { useIntersection, useUriParams } from "@/hooks"
 import { createFormDefaults } from "@/lib/form"
-import { ImageDetailPayload } from "@/providers"
+import { resolveUri } from "@/lib/url"
+import {
+  ImageDetailPayload,
+  useConfirmContext,
+  useFeedbackContext,
+} from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Box, Button, Flex, TagsInput, TextInput } from "@mantine/core"
 import { IconSearch } from "@tabler/icons-react"
 import { t } from "i18next"
+import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 import { Controller, FieldErrors, useForm } from "react-hook-form"
 import z from "zod"
@@ -40,8 +47,7 @@ const searchFormDefaultValues = createFormDefaults<SearchFormValues>({
 const inputFormSchema = z.object({
   id: z.string(),
   name: z.string(),
-  add: z.array(z.string()),
-  remove: z.array(z.string()),
+  // NOTE: useImageGroupMembership で追加・削除する画像を管理しているためrhfでは管理しない
 })
 
 type InputFormValues = z.infer<typeof inputFormSchema>
@@ -49,14 +55,15 @@ type InputFormValues = z.infer<typeof inputFormSchema>
 const inputFormDefaultValues = createFormDefaults<InputFormValues>({
   id: "",
   name: "",
-  add: [],
-  remove: [],
 })
 
 const Page = () => {
   const uriParams = useUriParams<PathParam>()
+  const router = useRouter()
 
   const membership = useImageGroupMembership<ImageDetailPayload>({ items: [] })
+  const feedback = useFeedbackContext()
+  const confirm = useConfirmContext()
 
   const searchFormMethod = useForm<SearchFormValues>({
     resolver: zodResolver(searchFormSchema),
@@ -123,8 +130,6 @@ const Page = () => {
     },
   })
 
-  const [updateImageGroup, {}] = useUpdateImageGroupMutation()
-
   const searchValid = async (values: SearchFormValues) => {
     console.log("submit values:", values)
     setSearchFormFilter({ ...values })
@@ -134,20 +139,32 @@ const Page = () => {
     console.log("submit error:", errors)
   }
 
+  const [updateImageGroup] = useUpdateImageGroupMutation()
+
   const inputValid = async (values: InputFormValues) => {
     console.log("submit values:", values)
     try {
-      // await updateImageGroup({
-      //   variables: {
-      //     input: {
-      //       id: values.id,
-      //       name: values.name,
-      //       imageIds: []
-      //     }
-      //   }
-      // })
+      await updateImageGroup({
+        variables: {
+          input: {
+            id: values.id,
+            name: values.name,
+            addedImageIds: membership.value.ids.added,
+            removedImageIds: membership.value.ids.removed,
+          },
+        },
+      })
+      feedback.action.success({
+        title: "成功",
+        body: "更新しました。",
+      })
+      router.push(resolveUri("/groups"))
     } catch (error) {
       console.error(error)
+      feedback.action.error({
+        title: "エラー",
+        body: "更新に失敗しました。",
+      })
     }
   }
 
@@ -185,10 +202,16 @@ const Page = () => {
     })
   }, [imagesData])
 
-  const baseFormImages = useMemo(() => {
+  useEffect(() => {
     if (!imageGroupData) {
-      return []
+      return
     }
+
+    const imageGroup = imageGroupData.imageGroup
+    inputFormMethod.reset({
+      id: imageGroup.id,
+      name: imageGroup.name,
+    })
 
     const edges = imageGroupData.imageGroup.images.edges
     const data = edges.map((imageEdge) => {
@@ -215,22 +238,47 @@ const Page = () => {
       } satisfies ImageDetailPayload
     })
     membership.action.initialize(data)
-    return data
   }, [imageGroupData])
 
-  useEffect(() => {
-    if (!imageGroupData) {
+  const [deleteImageGroup] = useDeleteImageGroupMutation()
+
+  const handleDeleteImageGroup = async () => {
+    const result = await confirm.action.confirm({
+      body: "削除します。よろしいですか？",
+    })
+
+    if (result !== "confirmed") {
       return
     }
 
-    const imageGroup = imageGroupData.imageGroup
-    inputFormMethod.reset({
-      id: imageGroup.id,
-      name: imageGroup.name,
-    })
-  }, [imageGroupData])
+    try {
+      await deleteImageGroup({
+        variables: {
+          input: {
+            id: uriParams.id,
+          },
+        },
+        update(cache) {
+          cache.evict({
+            id: cache.identify({ __typename: "ImageGroup", id: uriParams.id }),
+          })
+          cache.gc()
+        },
+      })
 
-  const handleDeleteImageGroup = (id: string) => {}
+      feedback.action.success({
+        title: "成功",
+        body: "削除しました。",
+      })
+      router.push(resolveUri("/groups"))
+    } catch (error) {
+      console.error(error)
+      feedback.action.error({
+        title: "エラー",
+        body: "削除に失敗しました。",
+      })
+    }
+  }
 
   return (
     <Box
@@ -346,7 +394,7 @@ const Page = () => {
                   <Button
                     size="xs"
                     type="button"
-                    onClick={() => handleDeleteImageGroup("")}
+                    onClick={handleDeleteImageGroup}
                   >
                     {t("button.delete")}
                   </Button>

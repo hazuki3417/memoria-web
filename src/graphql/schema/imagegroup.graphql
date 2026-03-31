@@ -31,7 +31,8 @@ input CreateImageGroupInput {
 input UpdateImageGroupInput {
   id: String!
   name: String!
-  imageIds: [ID!]!
+  addedImageIds: [ID!]!
+  removedImageIds: [ID!]!
 }
 
 input DeleteImageGroupInput {

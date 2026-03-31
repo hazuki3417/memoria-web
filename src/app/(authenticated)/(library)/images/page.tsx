@@ -66,6 +66,14 @@ const Page = () => {
   const query = useUriQuery<SearchFormValues>()
   const router = useRouter()
 
+  const feedback = useFeedbackContext()
+  const confirm = useConfirmContext()
+
+  const imageDetailModalContext = useImageDetailModalContext()
+
+  const [mode, setMode] = useState<"filter" | "bulk">("filter")
+  const [opened, { open, close }] = useDisclosure(false)
+
   const methods = useForm<SearchFormValues>({
     resolver: zodResolver(searchFormSchema),
     defaultValues: {
@@ -73,13 +81,6 @@ const Page = () => {
     },
   })
   const { handleSubmit, control } = methods
-
-  const feedback = useFeedbackContext()
-  const confirm = useConfirmContext()
-  const imageDetailModalContext = useImageDetailModalContext()
-  const [mode, setMode] = useState<"filter" | "bulk">("filter")
-
-  const [opened, { open, close }] = useDisclosure(false)
 
   const filter = {
     tags: query === undefined ? [] : query.tags,
@@ -91,6 +92,7 @@ const Page = () => {
       filter,
     },
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: "network-only", // 一時的にキャッシュを無効化。API側で更新系のmutationで更新後の情報を返す実装に変更する必要あり（キャッシュ更新のため）
   })
 
   const intersection = useIntersection({

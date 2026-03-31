@@ -8,11 +8,20 @@ import {
   useResizeSplitView,
 } from "@/components"
 import { ImageGroup, ThumbnailBox } from "@/feature"
-import { useGetImageGroupLazyQuery, useGetImageGroupsQuery } from "@/graphql"
+import {
+  useDeleteImageGroupMutation,
+  useGetImageGroupLazyQuery,
+  useGetImageGroupsQuery,
+} from "@/graphql"
 import { useIntersection, useLocalStorage, useUriQuery } from "@/hooks"
 import { createFormDefaults } from "@/lib/form"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
-import { ImageDetailPayload, useImageDetailModalContext } from "@/providers"
+import {
+  ImageDetailPayload,
+  useConfirmContext,
+  useFeedbackContext,
+  useImageDetailModalContext,
+} from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   ActionIcon,
@@ -52,6 +61,11 @@ const Page = () => {
   const query = useUriQuery<SearchFormValues>()
   const router = useRouter()
 
+  const feedback = useFeedbackContext()
+  const confirm = useConfirmContext()
+
+  const [selected, setSelected] = useState<string | null>(null)
+
   const methods = useForm<SearchFormValues>({
     resolver: zodResolver(searchFormSchema),
     defaultValues: {
@@ -59,8 +73,6 @@ const Page = () => {
     },
   })
   const { handleSubmit, control } = methods
-
-  const [selected, setSelected] = useState<string | null>(null)
 
   const searchValid = async (values: SearchFormValues) => {
     console.log("submit values:", values)
@@ -82,6 +94,7 @@ const Page = () => {
         filter: imageGroupsfilter,
       },
       notifyOnNetworkStatusChange: true,
+      fetchPolicy: "network-only", // 一時的にキャッシュを無効化。API側で更新系のmutationで更新後の情報を返す実装に変更する必要あり（キャッシュ更新のため）
     })
 
   const imageGroupsIntersection = useIntersection({
@@ -237,8 +250,46 @@ const Page = () => {
     )
   }
 
+  const [deleteImageGroup] = useDeleteImageGroupMutation()
+
   const handleDeleteImageGroup = async (id: string) => {
-    // TODO: ロジックを実装
+    const result = await confirm.action.confirm({
+      body: "削除します。よろしいですか？",
+    })
+
+    if (result !== "confirmed") {
+      return
+    }
+
+    try {
+      await deleteImageGroup({
+        variables: {
+          input: {
+            id,
+          },
+        },
+        update(cache) {
+          cache.evict({
+            id: cache.identify({ __typename: "ImageGroup", id }),
+          })
+          cache.gc()
+        },
+      })
+
+      feedback.action.success({
+        title: "成功",
+        body: "削除しました。",
+      })
+      router.push(resolveUri("/groups"))
+    } catch (error) {
+      console.error(error)
+      feedback.action.error({
+        title: "エラー",
+        body: "削除に失敗しました。",
+      })
+    } finally {
+      handleClose()
+    }
   }
 
   const handleDownloadImageGroup = async (id: string) => {
