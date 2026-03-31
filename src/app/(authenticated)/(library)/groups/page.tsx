@@ -386,7 +386,6 @@ const Page = () => {
                           onClick={() => handleSelect(group.id)}
                           ui={{ selected: selected === group.id }}
                         >
-                          <ImageGroup.CountBadge value={group.count} />
                           <ImageGroup.ImageContainer>
                             {group.thumbnails.map((thumbnail) => {
                               return (
@@ -409,6 +408,7 @@ const Page = () => {
                           <ImageGroup.InfoContainer>
                             <ImageGroup.Title>{group.name}</ImageGroup.Title>
                           </ImageGroup.InfoContainer>
+                          <ImageGroup.CountBadge value={group.count} />
                         </ImageGroup>
                       )
                     })}
