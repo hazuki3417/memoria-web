@@ -381,7 +381,7 @@ const Page = () => {
               </Flex>
             </Flex>
             <ContentLayout>
-              <ContentLayout.Grid>
+              <ContentLayout.Grid styles={{ root: { height: "100%" } }}>
                 {membership.value.items.final.map((image) => {
                   const status = membership.value.getStatus(image.id)
                   return (

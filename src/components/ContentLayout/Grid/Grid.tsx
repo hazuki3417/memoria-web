@@ -1,15 +1,15 @@
 "use client"
-import { Box, BoxProps, ScrollArea } from "@mantine/core"
+import { Box, BoxProps, ScrollArea, ScrollAreaProps } from "@mantine/core"
 import React from "react"
 
-export interface GridProps extends BoxProps {
+export interface GridProps extends BoxProps, Pick<ScrollAreaProps, "styles"> {
   children: React.ReactNode
 }
 
 export const Grid = (props: GridProps) => {
-  const { children, style, ...rest } = props
+  const { children, style, styles, ...rest } = props
   return (
-    <ScrollArea scrollbarSize={6}>
+    <ScrollArea scrollbarSize={6} styles={styles}>
       <Box
         {...rest}
         style={{
