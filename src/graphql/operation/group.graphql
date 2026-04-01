@@ -66,6 +66,7 @@ query GetImageGroup(
               preview
             }
             tags
+            createdAt
           }
         }
       	pageInfo {

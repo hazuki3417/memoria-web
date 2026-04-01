@@ -1,0 +1,17 @@
+fragment ImageFields on Image {
+  id
+  file {
+    name
+    size
+  }
+  size {
+    width
+    height
+  }
+  tags
+  src {
+    thumbnail
+    preview
+  }
+  createdAt
+}

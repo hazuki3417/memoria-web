@@ -14,6 +14,7 @@ import {
 } from "@/graphql"
 import { useIntersection, useUriParams } from "@/hooks"
 import { createFormDefaults } from "@/lib/form"
+import { imageDetailPayloadMapper } from "@/lib/mapping"
 import { resolveUri } from "@/lib/url"
 import {
   ImageDetailPayload,
@@ -177,29 +178,7 @@ const Page = () => {
       return []
     }
     const edges = imagesData.images.edges
-    return edges.map((imageEdge) => {
-      const image = imageEdge.node
-      return {
-        id: image.id,
-        info: {
-          file: {
-            name: image.file.name,
-            size: image.file.size,
-            date: "",
-          },
-          image: {
-            width: image.size.width,
-            height: image.size.height,
-          },
-          tags: [],
-        },
-        image: {
-          preview: image.src.preview,
-          thumbnail: image.src.thumbnail,
-          alt: image.file.name,
-        },
-      } satisfies ImageDetailPayload
-    })
+    return edges.map((edge) => imageDetailPayloadMapper(edge.node))
   }, [imagesData])
 
   useEffect(() => {
@@ -222,7 +201,7 @@ const Page = () => {
           file: {
             name: image.file.name,
             size: image.file.size,
-            date: "",
+            date: image.createdAt,
           },
           image: {
             width: image.size.width,

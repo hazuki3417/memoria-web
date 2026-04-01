@@ -9,6 +9,7 @@ import {
   usePreference,
 } from "@/hooks"
 import { action } from "@/lib/action"
+import { transform } from "@/lib/transform"
 import { useConfirmContext, useFeedbackContext } from "@/providers"
 import "client-only"
 import React, { useCallback, useMemo, useState } from "react"
@@ -181,9 +182,14 @@ export const ImageDetailModalProvider = (
               },
               info: {
                 file: {
+                  // FIX: ファイルサイズの変換はコンポーネント内ではなくここで行うようにしたい
                   name: nav.current.item.info.file.name,
                   size: nav.current.item.info.file.size,
-                  date: nav.current.item.info.file.date,
+                  date: transform.date(
+                    nav.current.item.info.file.date,
+                    "Asia/Tokyo",
+                    "yyyy/MM/dd HH:mm:ss",
+                  ),
                 },
                 image: {
                   width: nav.current.item.info.image.width,

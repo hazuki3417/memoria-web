@@ -1,3 +1,4 @@
+import { formatInTimeZone } from "date-fns-tz"
 import { filesize } from "filesize"
 import { StorageUsage } from "./storage"
 
@@ -64,4 +65,5 @@ export const transform = {
   file: {
     size: transformFileSize,
   },
+  date: formatInTimeZone,
 }

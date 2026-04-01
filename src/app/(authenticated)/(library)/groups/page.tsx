@@ -16,9 +16,9 @@ import {
 } from "@/graphql"
 import { useIntersection, useLocalStorage, useUriQuery } from "@/hooks"
 import { createFormDefaults } from "@/lib/form"
+import { imageDetailPayloadMapper } from "@/lib/mapping"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
 import {
-  ImageDetailPayload,
   useConfirmContext,
   useFeedbackContext,
   useImageDetailModalContext,
@@ -217,29 +217,7 @@ const Page = () => {
       return []
     }
     const edges = imageGroupData.imageGroup.images.edges
-    return edges.map((imageEdge) => {
-      const image = imageEdge.node
-      return {
-        id: image.id,
-        info: {
-          file: {
-            name: image.file.name,
-            size: image.file.size,
-            date: "",
-          },
-          image: {
-            width: image.size.width,
-            height: image.size.height,
-          },
-          tags: [],
-        },
-        image: {
-          preview: image.src.preview,
-          thumbnail: image.src.thumbnail,
-          alt: image.file.name,
-        },
-      } satisfies ImageDetailPayload
-    })
+    return edges.map((edge) => imageDetailPayloadMapper(edge.node))
   }, [imageGroupData])
 
   const handleEditImageGroup = async (id: string) => {

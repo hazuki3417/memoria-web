@@ -2,7 +2,10 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   schema: "src/graphql/schema/**/*.graphql",
-  documents: "src/graphql/operation/**/*.graphql",
+  documents: [
+    "src/graphql/operation/**/*.graphql",
+    "src/graphql/fragment/**/*.graphql",
+  ],
   generates: {
     "./src/graphql/gql/index.ts": {
       plugins: [
@@ -16,7 +19,7 @@ const config: CodegenConfig = {
         withComponent: false,
         useTypeImports: true,
         scalars: {
-          DateTime: "Date",
+          DateTime: "string",
           Upload: "File",
         },
       },

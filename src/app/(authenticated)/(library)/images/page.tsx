@@ -15,9 +15,9 @@ import {
 import { useCollectionSelection, useIntersection, useUriQuery } from "@/hooks"
 import { action } from "@/lib/action"
 import { createFormDefaults } from "@/lib/form"
+import { imageDetailPayloadMapper } from "@/lib/mapping"
 import { resolveUri, resolveUriQuery } from "@/lib/url"
 import {
-  ImageDetailPayload,
   useConfirmContext,
   useFeedbackContext,
   useImageDetailModalContext,
@@ -44,7 +44,6 @@ import {
   IconSearch,
   IconTrash,
 } from "@tabler/icons-react"
-import { formatInTimeZone } from "date-fns-tz"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
@@ -116,32 +115,7 @@ const Page = () => {
 
     const edges = data.images.edges
 
-    return edges.map((edge) => {
-      return {
-        id: edge.node.id,
-        info: {
-          file: {
-            name: edge.node.file.name,
-            size: edge.node.file.size,
-            date: formatInTimeZone(
-              edge.node.createdAt,
-              "Asia/Tokyo",
-              "yyyy/MM/dd HH:mm:ss",
-            ),
-          },
-          image: {
-            width: edge.node.size.width,
-            height: edge.node.size.height,
-          },
-          tags: edge.node.tags,
-        },
-        image: {
-          preview: edge.node.src.preview,
-          thumbnail: edge.node.src.thumbnail,
-          alt: edge.node.file.name,
-        },
-      } satisfies ImageDetailPayload
-    })
+    return edges.map((edge) => imageDetailPayloadMapper(edge.node))
   }, [data])
 
   const searchValid = async (values: SearchFormValues) => {
