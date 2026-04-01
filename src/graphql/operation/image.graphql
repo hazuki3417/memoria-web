@@ -1,19 +1,25 @@
 mutation UploadImage($input: UploadImageInput!) {
   uploadImage(input: $input) {
-    id
+    node {
+      id
+    }
   }
 }
 
 mutation UpdateImage($input: UpdateImageInput!) {
   updateImage(input: $input) {
-    id
+    node {
+      id
+    }
   }
 }
 
 
 mutation UpdateImages($input: UpdateImagesInput!) {
   updateImages(input: $input) {
-    ids
+    nodes {
+      id
+    }
   }
 }
 
@@ -80,6 +86,7 @@ query GetImages(
           thumbnail
           preview
         }
+        createdAt
       }
       cursor
     }

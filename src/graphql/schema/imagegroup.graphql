@@ -1,20 +1,20 @@
 extend type Query {
   imageGroups(
-    first: Int @tag(validate: "omitempty,min=1,max=100")
-    last: Int @tag(validate: "omitempty,min=1,max=100")
-    after: String @tag(validate: "omitempty,min=1")
-    before: String @tag(validate: "omitempty,min=1")
+    first: Int
+    last: Int
+    after: String
+    before: String
     filter: ImageGroupsFilterInput
   ): ImageGroupConnection!
   imageGroup(input: ImageGroupInput!): ImageGroup!
 }
 
 input ImageGroupsFilterInput {
-  name: String
+  name: String @tag(validate: "search_image_group_name")
 }
 
 input ImageGroupInput {
-  id: String!
+  id: ID! @tag(validate: "ulid")
 }
 
 extend type Mutation {
@@ -24,19 +24,19 @@ extend type Mutation {
 }
 
 input CreateImageGroupInput {
-  name: String!
-  imageIds: [ID!]!
+  name: String! @tag(validate: "input_image_group_name")
+  imageIds: [ID!]! @tag(validate: "min=1,dive,ulid")
 }
 
 input UpdateImageGroupInput {
-  id: String!
-  name: String!
-  addedImageIds: [ID!]!
-  removedImageIds: [ID!]!
+  id: ID! @tag(validate: "ulid")
+  name: String! @tag(validate: "input_image_group_name")
+  addedImageIds: [ID!]! @tag(validate: "dive,ulid")
+  removedImageIds: [ID!]! @tag(validate: "dive,ulid")
 }
 
 input DeleteImageGroupInput {
-  id: String!
+  id: ID! @tag(validate: "ulid")
 }
 
 # === payload ===
@@ -50,7 +50,7 @@ type UpdateImageGroupPayload {
 }
 
 type DeleteImageGroupPayload {
-  id: String!
+  id: ID!
 }
 
 

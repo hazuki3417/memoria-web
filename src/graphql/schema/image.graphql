@@ -23,7 +23,7 @@ extend type Mutation {
 }
 
 input ImagesFilterInput {
-  tags: [String!]
+  tags: [String!] @tag(validate: "search_image_tags")
 }
 
 enum Visibility {
@@ -33,48 +33,48 @@ enum Visibility {
 
 input UploadImageInput {
   file: Upload!
-  tags: [String!]!
+  tags: [String!]! @tag(validate: "input_image_tags")
   visibility: Visibility!
 }
 
 input UpdateImageInput {
-  id: ID!
-  tags: [String!]!
+  id: ID! @tag(validate: "ulid")
+  tags: [String!]! @tag(validate: "input_image_tags")
 }
 
 input UpdateImagesInput {
-  targets: [UpdateImageInput!]!
+  targets: [UpdateImageInput!]! @tag(validate: "dive,min=1,max=100")
 }
 
 input DeleteImageInput {
-  id: ID!
+  id: ID! @tag(validate: "ulid")
 }
 
 input DeleteImagesInput {
-  ids: [ID!]!
+  ids: [ID!]! @tag(validate: "dive,ulid,min=1,max=100")
 }
 
 input DownloadImageInput {
-  id: ID!
+  id: ID! @tag(validate: "ulid")
 }
 
 input DownloadImagesInput {
-  ids: [ID!]!
+  ids: [ID!]! @tag(validate: "dive,ulid,min=1,max=100")
 }
 
 
 # === payload ===
 # NOTE: 対象情報の他に付属する情報を返却したいケースに対応するためPayloadという層を用意している
 type UploadImagePayload {
-  id: ID!
+  node: Image!
 }
 
 type UpdateImagePayload {
-  id: ID!
+  node: Image!
 }
 
 type UpdateImagesPayload {
-  ids: [ID!]!
+  nodes: [Image!]!
 }
 
 type DeleteImagePayload {
