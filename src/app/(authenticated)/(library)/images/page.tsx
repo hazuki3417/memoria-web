@@ -44,6 +44,7 @@ import {
   IconSearch,
   IconTrash,
 } from "@tabler/icons-react"
+import { formatInTimeZone } from "date-fns-tz"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
@@ -51,7 +52,6 @@ import { Controller, FieldErrors, useForm } from "react-hook-form"
 import { z } from "zod"
 import { TAB_FIELDS, Tabs } from "../_components"
 import { CreateImageGroupForm, ImageGroupInputFormValues } from "./_components"
-
 const searchFormSchema = z.object({
   tags: z.array(z.string()),
 })
@@ -123,7 +123,11 @@ const Page = () => {
           file: {
             name: edge.node.file.name,
             size: edge.node.file.size,
-            date: "",
+            date: formatInTimeZone(
+              edge.node.createdAt,
+              "Asia/Tokyo",
+              "yyyy/MM/dd HH:mm:ss",
+            ),
           },
           image: {
             width: edge.node.size.width,

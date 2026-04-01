@@ -11,7 +11,7 @@ import { AppConfig } from "@/types/app-config"
 import "@mantine/charts/styles.css"
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core"
 
-import { getLang } from "@/lib/cookies/lang/getLang"
+import { getLocale } from "@/lib/locale"
 import { theme } from "@/lib/theme"
 import "@/lib/ze"
 import type { Metadata } from "next"
@@ -28,14 +28,14 @@ type RootLayoutProps = {
 
 const RootLayout = async (props: RootLayoutProps) => {
   const { children } = props
-  const lang = await getLang()
+  const locale = await getLocale()
 
   const config: AppConfig = {
     preference: preferenceConfig,
   }
 
   return (
-    <html lang={lang} {...mantineHtmlProps}>
+    <html lang={locale.value} {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript defaultColorScheme="auto" />
         <meta

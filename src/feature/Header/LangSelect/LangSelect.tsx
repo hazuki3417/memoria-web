@@ -1,11 +1,10 @@
 "use client"
-import { useLang } from "@/lib/cookies/lang/useLang"
+import { Locale, SUPPORTED_LOCALES } from "@/constants/locale"
+import { useLocale } from "@/hooks"
 import { Combobox, InputBase, Text, useCombobox } from "@mantine/core"
 import { IconLanguage } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
 import { useCallback, useMemo } from "react"
-
-const langs = ["JA", "EN"]
 
 export interface LangSelectProps {}
 
@@ -17,23 +16,24 @@ export const LangSelect = (props: LangSelectProps) => {
     onDropdownClose: () => combobox.resetSelectedOption(),
   })
 
-  const lang = useLang()
+  const lang = useLocale()
 
   const options = useMemo(() => {
-    return langs.map((code) => (
+    return SUPPORTED_LOCALES.map((locale) => (
       <Combobox.Option
-        value={code}
-        key={code}
-        active={code.toLowerCase() === lang.state.value}
+        value={locale}
+        key={locale}
+        active={locale === lang.value}
       >
-        <Text size="xs">{code}</Text>
+        <Text size="xs">{locale.toLocaleUpperCase()}</Text>
       </Combobox.Option>
     ))
-  }, [langs])
+  }, [SUPPORTED_LOCALES])
 
   const onOptionSubmit = useCallback(
     (value: string) => {
-      lang.handler.set(value.toLowerCase())
+      const locale = value.toLocaleLowerCase() as Locale
+      lang.action.set(locale)
       combobox.closeDropdown()
       router.refresh()
     },
@@ -49,7 +49,7 @@ export const LangSelect = (props: LangSelectProps) => {
           pointer
           leftSection={<IconLanguage />}
           rightSectionPointerEvents="none"
-          value={lang.state.value.toUpperCase()}
+          value={lang.value.toLocaleUpperCase()}
           onClick={() => combobox.toggleDropdown()}
           readOnly
         />
