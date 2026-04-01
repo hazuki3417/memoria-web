@@ -22,8 +22,8 @@ export const ja: TranslationSchema = {
   label: {
     list: "リスト",
     group: "グループ",
-    filter: "絞り込み",
-    bulk: "一括操作",
+    view: "閲覧",
+    action: "操作",
   },
   auth: {
     signIn: "サインイン",

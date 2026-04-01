@@ -22,8 +22,8 @@ export const en: TranslationSchema = {
   label: {
     list: "List",
     group: "Group",
-    filter: "Filter",
-    bulk: "Bulk",
+    view: "View",
+    action: "Action",
   },
   auth: {
     signIn: "Sign in",

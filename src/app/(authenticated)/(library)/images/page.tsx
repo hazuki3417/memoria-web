@@ -39,8 +39,8 @@ import {
   IconCheckbox,
   IconDownload,
   IconEdit,
+  IconEye,
   IconLibraryPlus,
-  IconListSearch,
   IconSearch,
   IconTrash,
 } from "@tabler/icons-react"
@@ -70,7 +70,7 @@ const Page = () => {
 
   const imageDetailModalContext = useImageDetailModalContext()
 
-  const [mode, setMode] = useState<"filter" | "bulk">("filter")
+  const [mode, setMode] = useState<"view" | "bulk">("view")
   const [opened, { open, close }] = useDisclosure(false)
 
   const methods = useForm<SearchFormValues>({
@@ -287,7 +287,7 @@ const Page = () => {
       >
         <ActionPanel mb="xs" mih="36px">
           <ActionPanel.Left>
-            {mode === "filter" && (
+            {mode === "view" && (
               <form
                 onSubmit={handleSubmit(searchValid, searchInvalid)}
                 style={{ flex: 1 }}
@@ -341,9 +341,7 @@ const Page = () => {
           </ActionPanel.Left>
           <ActionPanel.Right>
             <Flex align="center" gap="xs">
-              {mode === "filter" && (
-                <Text size="xs">{`${items.length} 件`}</Text>
-              )}
+              {mode === "view" && <Text size="xs">{`${items.length} 件`}</Text>}
               {mode === "bulk" && (
                 <ButtonGroup>
                   <Button
@@ -383,8 +381,8 @@ const Page = () => {
               <SegmentedControl
                 value={mode}
                 onChange={(value) => {
-                  const mode = value as "filter" | "bulk"
-                  if (mode === "filter") {
+                  const mode = value as "view" | "bulk"
+                  if (mode === "view") {
                     // 一括選択 -> 絞り込みへの切り替えなので選択したアイテムをクリアする
                     selection.action.clear()
                   } else {
@@ -394,11 +392,11 @@ const Page = () => {
                 }}
                 data={[
                   {
-                    value: "filter",
+                    value: "view",
                     label: (
                       <Center style={{ gap: 10 }}>
-                        <IconListSearch size={16} />
-                        <span>{t("label.filter")}</span>
+                        <IconEye size={16} />
+                        <span>{t("label.view")}</span>
                       </Center>
                     ),
                   },
@@ -407,7 +405,7 @@ const Page = () => {
                     label: (
                       <Center style={{ gap: 10 }}>
                         <IconCheckbox size={16} />
-                        <span>{t("label.bulk")}</span>
+                        <span>{t("label.action")}</span>
                       </Center>
                     ),
                   },

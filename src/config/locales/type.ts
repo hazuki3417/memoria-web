@@ -21,8 +21,8 @@ export type TranslationSchema = {
   label: {
     list: string
     group: string
-    filter: string
-    bulk: string
+    view: string
+    action: string
   }
   auth: {
     signIn: string
