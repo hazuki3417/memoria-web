@@ -1,5 +1,5 @@
 "use client"
-import { FieldValid, TagsInput } from "@/components"
+import { FieldValid, FormModeSwitch, TagsInput } from "@/components"
 import { ThumbnailBox } from "@/feature"
 import {
   DEFAULT_FILE_SIZE_PREFIX,
@@ -131,14 +131,16 @@ export const ImageItem = (props: ImageItemProps) => {
           </Box>
         </Box>
         <Divider orientation="vertical" />
-        <Box m="xs" style={{ display: "flex", alignItems: "center" }}>
-          <Button
-            size="xs"
-            type="button"
-            onClick={() => onRemove?.(index, image.taskId)}
-          >
-            消去
-          </Button>
+        <Box w="54px" m="xs" style={{ display: "flex", alignItems: "center" }}>
+          <FormModeSwitch.New>
+            <Button
+              size="xs"
+              type="button"
+              onClick={() => onRemove?.(index, image.taskId)}
+            >
+              消去
+            </Button>
+          </FormModeSwitch.New>
         </Box>
       </Flex>
     </Box>

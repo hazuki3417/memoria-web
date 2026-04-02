@@ -1,9 +1,10 @@
 "use client"
-import { ButtonGroup, TagsInput } from "@/components"
+import { ButtonGroup, FormModeSwitch, TagsInput } from "@/components"
 import { useUserContext } from "@/providers"
 import { Box, Button, Checkbox, Divider, Flex, Stack } from "@mantine/core"
 import React, { useMemo } from "react"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
+import { Group } from "react-resizable-panels"
 import { ImageInputFormValues } from "./ImageInputFormSchema"
 import { useImageTagBulkAction } from "./useImageTagBulkAction"
 
@@ -116,27 +117,31 @@ export const BulkActionPanel = (props: BulkActionPanelProps) => {
               }}
             />
             <Flex justify="space-between" gap="xs">
-              <Controller
-                control={control}
-                name={`bulk.reflection`}
-                render={({ field }) => {
-                  const { value, ...rest } = field
-                  return (
-                    <Checkbox
-                      size="xs"
-                      color="blue"
-                      styles={{
-                        label: {
-                          paddingLeft: "calc(.625rem * 0.5)",
-                        },
-                      }}
-                      label="アップロード時に設定したタグを反映する"
-                      {...rest}
-                      checked={value}
-                    />
-                  )
-                }}
-              />
+              <Group>
+                <FormModeSwitch.New>
+                  <Controller
+                    control={control}
+                    name={`bulk.reflection`}
+                    render={({ field }) => {
+                      const { value, ...rest } = field
+                      return (
+                        <Checkbox
+                          size="xs"
+                          color="blue"
+                          styles={{
+                            label: {
+                              paddingLeft: "calc(.625rem * 0.5)",
+                            },
+                          }}
+                          label="アップロード時に設定したタグを反映する"
+                          {...rest}
+                          checked={value}
+                        />
+                      )
+                    }}
+                  />
+                </FormModeSwitch.New>
+              </Group>
               <ButtonGroup>
                 <Button size="xs" type="button" onClick={handleAdd}>
                   追加
@@ -152,10 +157,12 @@ export const BulkActionPanel = (props: BulkActionPanelProps) => {
           </Stack>
         </Box>
         <Divider orientation="vertical" />
-        <Box m="xs" style={{ display: "flex", alignItems: "center" }}>
-          <Button size="xs" type="button" onClick={onRemoveFiles}>
-            消去
-          </Button>
+        <Box w="54px" m="xs" style={{ display: "flex", alignItems: "center" }}>
+          <FormModeSwitch.New>
+            <Button size="xs" type="button" onClick={onRemoveFiles}>
+              消去
+            </Button>
+          </FormModeSwitch.New>
         </Box>
       </Flex>
       <Divider />

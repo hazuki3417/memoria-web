@@ -6,7 +6,7 @@ import { wait } from "@/lib/wait"
 import { useFeedbackContext, useUserContext } from "@/providers"
 import { Task, TaskValue } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Box, Button, Divider, ScrollArea } from "@mantine/core"
+import { Box, Button, Divider } from "@mantine/core"
 import { t } from "i18next"
 import { nanoid } from "nanoid"
 import React, { useCallback, useEffect, useMemo } from "react"
@@ -124,7 +124,14 @@ const Page = () => {
     const tasks: Task[] = []
     for (let i = 0; i < files.length; i++) {
       const id = nanoid()
-      images.push({ taskId: id, selected: true, file: files[i], tags: [] })
+      // NOTE: 新規登録時はidがないので適当な値を設定しておく（編集時に使用）
+      images.push({
+        entityId: id,
+        taskId: id,
+        selected: true,
+        file: files[i],
+        tags: [],
+      })
       tasks.push({ id, status: "idle" })
     }
     append(images)
@@ -198,6 +205,7 @@ const Page = () => {
       </ImageDropForm>
 
       <ImageInputForm
+        mode="new"
         methods={methods}
         submitValid={inputValid}
         submitInvalid={inputInValid}
@@ -209,14 +217,14 @@ const Page = () => {
         }}
       >
         <ImageInputForm.BulkActionPanel onRemoveFiles={handleRemoveFiles} />
-        <ScrollArea scrollbarSize={6}>
+        <ImageInputForm.Container>
           {fields.map((image, index) => {
             const task = manager.value.tasks.find(
               (task) => image.taskId === task.id,
             )
             const itemDisabled = task?.status === "success"
             return (
-              <React.Fragment key={image.id}>
+              <React.Fragment key={image.entityId}>
                 <ImageInputForm.ImageItem
                   index={index}
                   ui={{
@@ -234,7 +242,7 @@ const Page = () => {
               </React.Fragment>
             )
           })}
-        </ScrollArea>
+        </ImageInputForm.Container>
         <Divider />
         <ActionPanel mt="xs">
           <ActionPanel.Left />

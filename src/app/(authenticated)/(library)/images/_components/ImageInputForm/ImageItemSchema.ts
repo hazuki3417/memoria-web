@@ -35,6 +35,7 @@ export type ImageSchemaConfig = {
 }
 export const imageSchema = (config: ImageSchemaConfig) => {
   return z.object({
+    entityId: z.string(),
     taskId: z.string(),
     selected: z.boolean(),
     file: fileSchema(config.file),
