@@ -1,12 +1,21 @@
 "use client"
-import { ButtonGroup, FieldValid, TagsInput } from "@/components"
+import { ActionPanel, ButtonGroup, FieldValid, TagsInput } from "@/components"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { usePreference, useTaskManager } from "@/hooks"
 import { wait } from "@/lib/wait"
 import { useFeedbackContext, useUserContext } from "@/providers"
 import { Task, TaskValue } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Box, Button, Checkbox, Divider, Flex, Stack } from "@mantine/core"
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Flex,
+  ScrollArea,
+  Stack,
+} from "@mantine/core"
+import { t } from "i18next"
 import { nanoid } from "nanoid"
 import React, { useCallback, useEffect, useMemo } from "react"
 import {
@@ -255,7 +264,14 @@ const Page = () => {
   })()
 
   return (
-    <Box>
+    <Box
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       <ImageDropForm
         disabled={imageDropFormDisabled}
         onFileDrop={handleFileDrop}
@@ -387,11 +403,16 @@ const Page = () => {
 
       <ImageInputForm
         methods={methods}
-        id="new-image"
         submitValid={inputValid}
         submitInvalid={inputInValid}
+        style={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
       >
-        <Stack gap={0}>
+        <ScrollArea scrollbarSize={6}>
           {fields.map((image, index) => {
             const task = manager.value.tasks.find(
               (task) => image.taskId === task.id,
@@ -416,7 +437,17 @@ const Page = () => {
               </React.Fragment>
             )
           })}
-        </Stack>
+        </ScrollArea>
+        <Divider />
+        <ActionPanel mt="xs">
+          <ActionPanel.Left />
+          <ActionPanel.Center />
+          <ActionPanel.Right>
+            <Button type="submit" size="xs">
+              {t("button.register")}
+            </Button>
+          </ActionPanel.Right>
+        </ActionPanel>
       </ImageInputForm>
     </Box>
   )
