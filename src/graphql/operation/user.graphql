@@ -2,16 +2,7 @@ query GetMe {
   me {
     id
     limit {
-      upload {
-        file {
-          count
-          size
-          type
-        }
-        tag {
-          count
-        }
-      }
+      ...ImageUploadLimitFields
     }
     preference {
       file {

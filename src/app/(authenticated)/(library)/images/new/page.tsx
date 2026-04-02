@@ -1,81 +1,38 @@
 "use client"
-import { ActionPanel, ButtonGroup, FieldValid, TagsInput } from "@/components"
+import { ActionPanel, FieldValid } from "@/components"
 import { useUploadImageMutation, Visibility } from "@/graphql"
 import { usePreference, useTaskManager } from "@/hooks"
 import { wait } from "@/lib/wait"
 import { useFeedbackContext, useUserContext } from "@/providers"
 import { Task, TaskValue } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  Flex,
-  ScrollArea,
-  Stack,
-} from "@mantine/core"
+import { Box, Button, Divider, ScrollArea } from "@mantine/core"
 import { t } from "i18next"
 import { nanoid } from "nanoid"
 import React, { useCallback, useEffect, useMemo } from "react"
-import {
-  Controller,
-  FieldErrors,
-  useFieldArray,
-  useForm,
-  useWatch,
-} from "react-hook-form"
-import { z } from "zod"
+import { FieldErrors, useFieldArray, useForm, useWatch } from "react-hook-form"
 import {
   ImageInputForm,
-  imageItemSchema,
-  ImageItemSchemaConfig,
+  ImageInputFormValues,
   ImageValues,
-  tagsSchema,
+  useImageInputFormSchema,
 } from "../_components"
 import { ImageDropForm } from "./_components"
-
-type ImageInputFormSchemaConfig = ImageItemSchemaConfig
-const imageInputFormSchema = (config: ImageInputFormSchemaConfig) => {
-  return z.object({
-    bulk: z.object({
-      selected: z.boolean(),
-      reflection: z.boolean(),
-      tags: tagsSchema(config.image.tags),
-    }),
-    ...imageItemSchema(config).shape,
-  })
-}
-
-type ImageInputFormValues = z.infer<ReturnType<typeof imageInputFormSchema>>
 
 const Page = () => {
   const user = useUserContext()
   const preference = usePreference()
 
-  const inputSchema = useMemo(() => {
-    return imageInputFormSchema({
-      image: {
-        file: {
-          type: user.limit.upload.file.type,
-          size: {
-            max: user.limit.upload.file.size,
-          },
-        },
-        tags: { count: { max: user.limit.upload.tag.count } },
-      },
-      count: {
-        max: user.limit.upload.file.count,
-      },
-    })
-  }, [user])
+  const manager = useTaskManager({ mode: "parallel" })
+  const feedback = useFeedbackContext()
+
+  const inputSchema = useImageInputFormSchema(user.limit)
 
   const methods = useForm<ImageInputFormValues>({
     resolver: zodResolver(inputSchema),
     mode: "onChange",
     defaultValues: {
       bulk: {
-        selected: true,
         reflection: true,
         tags: [],
       },
@@ -83,24 +40,10 @@ const Page = () => {
     },
   })
 
-  const { getValues, setValue } = methods
-
-  const feedback = useFeedbackContext()
-
-  const watchValueBulkTags = useWatch({
-    control: methods.control,
-    name: "bulk.tags",
-  })
-
   const watchValueImages = useWatch({
     control: methods.control,
     name: "images",
   })
-
-  const count = {
-    selected: watchValueImages.filter((image) => image.selected).length,
-    total: watchValueImages.length,
-  }
 
   const { fields, append, remove, replace } = useFieldArray({
     control: methods.control,
@@ -108,7 +51,6 @@ const Page = () => {
   })
 
   const [uploadImage] = useUploadImageMutation()
-  const manager = useTaskManager({ mode: "parallel" })
 
   const inputValid = async (values: ImageInputFormValues) => {
     console.log("submit values:", values)
@@ -194,54 +136,22 @@ const Page = () => {
     manager.action.remove([id])
   }
 
-  const resetFiles = () => {
+  const handleRemoveFiles = useCallback(() => {
     replace([])
     manager.action.reset()
+  }, [manager.action.reset])
+
+  const handleFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    addFiles(event.dataTransfer.files)
   }
 
-  const handleAddTags = () => {
-    const images = getValues("images")
-    const tags = getValues("bulk.tags")
-    images.forEach((image, index) => {
-      setValue(`images.${index}.tags`, addTags(image.tags, tags))
-    })
-  }
-
-  const handleRemoveTags = () => {
-    const images = getValues("images")
-    const tags = getValues("bulk.tags")
-    images.forEach((image, index) => {
-      setValue(`images.${index}.tags`, removeTags(image.tags, tags))
-    })
-  }
-
-  const handleReplaceTags = () => {
-    const images = getValues("images")
-    const tags = getValues("bulk.tags")
-    images.forEach((_, index) => {
-      setValue(`images.${index}.tags`, tags)
-    })
-  }
-
-  const handleRemoveFiles = () => {
-    replace([])
-    manager.action.reset()
-  }
-
-  const handleFileDrop = useCallback(
-    (event: React.DragEvent<HTMLDivElement>) => {
-      event.preventDefault()
-      addFiles(event.dataTransfer.files)
-    },
-    [],
-  )
-
-  const handleFileSelect = useCallback((newFiles: FileList | null) => {
+  const handleFileSelect = (newFiles: FileList | null) => {
     if (newFiles === null) {
       return
     }
     addFiles(newFiles)
-  }, [])
+  }
 
   const imageDropFormDisabled = useMemo(() => {
     if (!user) {
@@ -287,120 +197,6 @@ const Page = () => {
         />
       </ImageDropForm>
 
-      <Divider />
-
-      <Box>
-        <Flex align="center" w="100%">
-          <Box w="160px" m="xs" pl="8px">
-            <Controller
-              control={methods.control}
-              name={`bulk.selected`}
-              render={({ field }) => {
-                const { value, ...rest } = field
-                return (
-                  <Checkbox
-                    size="xs"
-                    variant="filled"
-                    color="blue"
-                    label={`選択：${count.selected} / ${count.total}`}
-                    styles={{
-                      label: {
-                        paddingLeft: "calc(.625rem * 0.5)",
-                      },
-                    }}
-                    checked={value}
-                    {...rest}
-                  />
-                )
-              }}
-            />
-          </Box>
-          <Divider orientation="vertical" />
-          <Box flex="1" m="xs">
-            <Stack gap="calc(.625rem * 0.5)">
-              <Controller
-                control={methods.control}
-                name={`bulk.tags`}
-                render={({ field }) => {
-                  return (
-                    <TagsInput
-                      size="xs"
-                      label="タグ"
-                      current={watchValueBulkTags.length}
-                      limit={user.limit.upload.tag.count}
-                      clearable
-                      {...field}
-                      disabled={allFormDisabled}
-                    />
-                  )
-                }}
-              />
-              <Flex justify="space-between" gap="xs">
-                <Controller
-                  control={methods.control}
-                  name={`bulk.reflection`}
-                  render={({ field }) => {
-                    const { value, ...rest } = field
-                    return (
-                      <Checkbox
-                        size="xs"
-                        color="blue"
-                        styles={{
-                          label: {
-                            paddingLeft: "calc(.625rem * 0.5)",
-                          },
-                        }}
-                        label="アップロード時に設定したタグを反映する"
-                        {...rest}
-                        checked={value}
-                      />
-                    )
-                  }}
-                />
-                <ButtonGroup>
-                  <Button
-                    size="xs"
-                    type="button"
-                    disabled={allFormDisabled || bulkFormDisabled}
-                    onClick={handleAddTags}
-                  >
-                    追加
-                  </Button>
-                  <Button
-                    size="xs"
-                    type="button"
-                    disabled={allFormDisabled || bulkFormDisabled}
-                    onClick={handleRemoveTags}
-                  >
-                    除去
-                  </Button>
-                  <Button
-                    size="xs"
-                    type="button"
-                    disabled={allFormDisabled || bulkFormDisabled}
-                    onClick={handleReplaceTags}
-                  >
-                    置換
-                  </Button>
-                </ButtonGroup>
-              </Flex>
-            </Stack>
-          </Box>
-          <Divider orientation="vertical" />
-          <Box m="xs" style={{ display: "flex", alignItems: "center" }}>
-            <Button
-              size="xs"
-              type="button"
-              disabled={allFormDisabled || bulkFormDisabled}
-              onClick={handleRemoveFiles}
-            >
-              消去
-            </Button>
-          </Box>
-        </Flex>
-      </Box>
-      <Divider />
-
       <ImageInputForm
         methods={methods}
         submitValid={inputValid}
@@ -412,6 +208,7 @@ const Page = () => {
           overflow: "hidden",
         }}
       >
+        <ImageInputForm.BulkActionPanel onRemoveFiles={handleRemoveFiles} />
         <ScrollArea scrollbarSize={6}>
           {fields.map((image, index) => {
             const task = manager.value.tasks.find(
@@ -467,21 +264,4 @@ const calcTaskValid = (status: TaskValue | undefined): FieldValid => {
     default:
       return "idle"
   }
-}
-
-/**
- * 入力タグを元の配列に追加する（重複なし）
- */
-const addTags = (base: string[], add: string[]) => {
-  return [...new Set([...base, ...add])]
-}
-
-/**
- * 入力タグを元の配列から除去する
- * @param base
- * @param remove
- * @returns
- */
-const removeTags = (base: string[], remove: string[]) => {
-  return base.filter((tag) => !remove.includes(tag))
 }

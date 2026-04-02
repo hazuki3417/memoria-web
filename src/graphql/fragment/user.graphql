@@ -1,0 +1,12 @@
+fragment ImageUploadLimitFields on Limit {
+  upload {
+    file {
+      count
+      size
+      type
+    }
+    tag {
+      count
+    }
+  }
+}

@@ -1,10 +1,11 @@
-import React from "react"
+import React, { memo } from "react"
 import {
   FieldErrors,
   FieldValues,
   FormProvider,
   UseFormReturn,
 } from "react-hook-form"
+import { BulkActionPanel } from "./BulkActionPanel"
 import { ImageItem } from "./ImageItem"
 
 export interface ImageInputFormProps<T extends FieldValues>
@@ -34,4 +35,5 @@ export const ImageInputForm = <T extends FieldValues>(
 }
 
 ImageInputForm.displayName = "ImageInputForm"
-ImageInputForm.ImageItem = ImageItem
+ImageInputForm.ImageItem = memo(ImageItem)
+ImageInputForm.BulkActionPanel = memo(BulkActionPanel)
