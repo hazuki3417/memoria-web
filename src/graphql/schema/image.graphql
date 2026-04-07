@@ -18,8 +18,8 @@ extend type Mutation {
   deleteImage(input: DeleteImageInput!): DeleteImagePayload!
   deleteImages(input: DeleteImagesInput!): DeleteImagesPayload!
 
-  downloadImage(input: DownloadImageInput!): DownloadUrl!
-  downloadImages(input: DownloadImagesInput!): DownloadUrl!
+  downloadImage(input: DownloadImageInput!): FileObject!
+  downloadImages(input: DownloadImagesInput!): FileObject!
 }
 
 input ImagesFilterInput {
@@ -114,10 +114,10 @@ type ImageSrc {
 
 # === shared model ===
 
-type DownloadUrl {
+type FileObject {
   url: String!
+  name: String!
   expiresAt: DateTime!
-  fileName: String!
   contentType: String!
 }
 
