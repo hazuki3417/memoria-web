@@ -40,8 +40,8 @@ mutation DeleteImages($input: DeleteImagesInput!) {
 mutation DownloadImage($input: DownloadImageInput!) {
   downloadImage(input: $input) {
     url
+    name
     expiresAt
-    fileName
     contentType
   }
 }
@@ -50,8 +50,8 @@ mutation DownloadImage($input: DownloadImageInput!) {
 mutation DownloadImages($input: DownloadImagesInput!) {
   downloadImages(input: $input) {
     url
+    name
     expiresAt
-    fileName
     contentType
   }
 }
