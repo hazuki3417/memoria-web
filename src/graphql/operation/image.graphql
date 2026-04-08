@@ -56,6 +56,13 @@ mutation DownloadImages($input: DownloadImagesInput!) {
   }
 }
 
+
+query GetImage($id: ID!) {
+  image(id: $id) {
+    ...ImageFields
+  }
+}
+
 query GetImages(
   $first: Int
   $last: Int
@@ -85,3 +92,16 @@ query GetImages(
   }
 }
 
+query GetEditImages($ids: [ID!]!) {
+  imagesByIds(ids: $ids) {
+    id
+    file {
+      name
+      size
+    }
+    tags
+    src {
+      thumbnail
+    }
+  }
+}

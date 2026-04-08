@@ -1,5 +1,6 @@
 extend type Query {
   # NOTE: relay connection の引数はトップレベルに配置すること（apollo clientのキャッシュ設定が面倒になるため）
+  image(id: ID!): Image!
   images(
     first: Int @tag(validate: "omitempty,min=1,max=100")
     last: Int @tag(validate: "omitempty,min=1,max=100")
@@ -7,6 +8,7 @@ extend type Query {
     before: String @tag(validate: "omitempty,min=1")
     filter: ImagesFilterInput
   ): ImageConnection!
+  imagesByIds(ids: [ID!]!): [Image!]!
 }
 
 extend type Mutation {
