@@ -6,6 +6,7 @@ mutation UploadImage($input: UploadImageInput!) {
   }
 }
 
+
 mutation UpdateImage($input: UpdateImageInput!) {
   updateImage(input: $input) {
     node {
@@ -14,14 +15,6 @@ mutation UpdateImage($input: UpdateImageInput!) {
   }
 }
 
-
-mutation UpdateImages($input: UpdateImagesInput!) {
-  updateImages(input: $input) {
-    nodes {
-      id
-    }
-  }
-}
 
 mutation DeleteImage($input: DeleteImageInput!) {
   deleteImage(input: $input) {

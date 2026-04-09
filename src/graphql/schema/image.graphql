@@ -15,7 +15,6 @@ extend type Mutation {
   uploadImage(input: UploadImageInput!): UploadImagePayload!
 
   updateImage(input: UpdateImageInput!): UpdateImagePayload!
-  updateImages(input: UpdateImagesInput!): UpdateImagesPayload!
 
   deleteImage(input: DeleteImageInput!): DeleteImagePayload!
   deleteImages(input: DeleteImagesInput!): DeleteImagesPayload!
@@ -44,10 +43,6 @@ input UpdateImageInput {
   tags: [String!]! @tag(validate: "input_image_tags")
 }
 
-input UpdateImagesInput {
-  targets: [UpdateImageInput!]! @tag(validate: "dive,min=1,max=100")
-}
-
 input DeleteImageInput {
   id: ID! @tag(validate: "ulid")
 }
@@ -73,10 +68,6 @@ type UploadImagePayload {
 
 type UpdateImagePayload {
   node: Image!
-}
-
-type UpdateImagesPayload {
-  nodes: [Image!]!
 }
 
 type DeleteImagePayload {
