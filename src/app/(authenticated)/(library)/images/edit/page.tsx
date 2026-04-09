@@ -4,7 +4,7 @@ import { useGetEditImagesQuery, useUpdateImageMutation } from "@/graphql"
 import { usePreference, useTaskManager, useUriQuery } from "@/hooks"
 import { wait } from "@/lib/wait"
 import { useFeedbackContext, useUserContext } from "@/providers"
-import { TaskValue } from "@/reducers"
+import { Task, TaskValue } from "@/reducers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Box, Button, Divider } from "@mantine/core"
 import { t } from "i18next"
@@ -13,6 +13,7 @@ import { FieldErrors, useForm, useWatch } from "react-hook-form"
 import {
   ImageInputForm,
   ImageInputFormValues,
+  ImageValues,
   useImageInputFormSchema,
 } from "../_components"
 
@@ -56,6 +57,7 @@ const Page = () => {
   const inputValid = async (values: ImageInputFormValues) => {
     console.log("submit values:", values)
     await manager.action.submit(async (task) => {
+      console.debug("ugoita?")
       const image = values.images.find((image) => task.id === image.taskId)
 
       if (!image) {
@@ -130,24 +132,31 @@ const Page = () => {
     if (!data) {
       return
     }
-    const images = data.imagesByIds
+    const origin = data.imagesByIds
+
+    const images: ImageValues[] = []
+    const tasks: Task[] = []
+    for (let i = 0; i < origin.length; i++) {
+      const taskId = origin[i].id
+      images.push({
+        type: "existing",
+        taskId: taskId,
+        selected: true,
+        preview: {
+          src: origin[i].src.thumbnail,
+          name: origin[i].file.name,
+          size: origin[i].file.size,
+        },
+        tags: origin[i].tags,
+      })
+      tasks.push({ id: taskId, status: "idle" })
+    }
 
     reset((prev) => ({
       ...prev,
-      images: images.map((image) => {
-        return {
-          type: "existing",
-          taskId: image.id,
-          selected: true,
-          preview: {
-            src: image.src.thumbnail,
-            name: image.file.name,
-            size: image.file.size,
-          },
-          tags: image.tags,
-        }
-      }),
+      images: images,
     }))
+    manager.action.append(tasks)
   }, [data])
 
   return (
@@ -171,9 +180,7 @@ const Page = () => {
           overflow: "hidden",
         }}
       >
-        <ImageInputForm.BulkActionPanel
-        // onRemoveFiles={handleRemoveFiles}
-        />
+        <ImageInputForm.BulkActionPanel />
         <ImageInputForm.Container>
           {images.map((image, index) => {
             const task = manager.value.tasks.find(
@@ -193,7 +200,6 @@ const Page = () => {
                     limit: user.limit.upload.tag.count,
                   }}
                   disabled={allFormDisabled || itemDisabled}
-                  // onRemove={removeFile}
                 />
                 <Divider />
               </React.Fragment>
