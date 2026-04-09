@@ -118,11 +118,11 @@ export const ImageDetailModalProvider = (
     const downloadUrl = res.data.downloadImage
     action.download({
       url: downloadUrl.url,
-      fileName: downloadUrl.fileName,
+      fileName: downloadUrl.name,
     })
   }, [nav.current, downloadImage])
 
-  const handleEdit = () => {}
+  const handleEdit = () => { }
 
   const handleNext = () => {
     if (nav.next.exists) {

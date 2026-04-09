@@ -1,3 +1,4 @@
+"use client"
 import { SettingSectionDivider, SettingSectionTitle } from "../_components"
 
 const Page = () => {
