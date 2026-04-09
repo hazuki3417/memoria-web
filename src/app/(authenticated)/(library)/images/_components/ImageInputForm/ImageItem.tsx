@@ -39,7 +39,7 @@ export const ImageItem = (props: ImageItemProps) => {
     name: `images.${index}`,
   })
 
-  const size = transform.file.size({ bytes: image.file.size, prefix })
+  const size = transform.file.size({ bytes: image.preview.size, prefix })
 
   return (
     <Box
@@ -68,11 +68,11 @@ export const ImageItem = (props: ImageItemProps) => {
           />
           <Controller
             control={control}
-            name={`images.${index}.file`}
+            name={`images.${index}.preview`}
             render={({ field }) => {
               return (
                 <ThumbnailBox.Image
-                  src={URL.createObjectURL(field.value)}
+                  src={field.value.src}
                   alt={field.value.name}
                 />
               )
@@ -97,7 +97,7 @@ export const ImageItem = (props: ImageItemProps) => {
             <Text size="xs">ファイル名</Text>
           </Box>
           <Box>
-            <Text size="xs">{image.file.name}</Text>
+            <Text size="xs">{image.preview.name}</Text>
           </Box>
           <Box>
             <Text size="xs">ファイルサイズ</Text>

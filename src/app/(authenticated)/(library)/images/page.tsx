@@ -225,8 +225,8 @@ const Page = () => {
       return
     }
 
-    const downloadUrl = res.data.downloadImages
-    action.download({ url: downloadUrl.url, fileName: downloadUrl.fileName })
+    const file = res.data.downloadImages
+    action.download({ url: file.url, fileName: file.name })
   }
 
   const [createImageGroup] = useCreateImageGroupMutation()

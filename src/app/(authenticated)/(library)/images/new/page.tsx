@@ -65,6 +65,10 @@ const Page = () => {
         return { status: "skip" }
       }
 
+      if (!(image.type === "new")) {
+        return { status: "skip" }
+      }
+
       await wait(1)
 
       await uploadImage({
@@ -124,12 +128,17 @@ const Page = () => {
     const tasks: Task[] = []
     for (let i = 0; i < files.length; i++) {
       const id = nanoid()
-      // NOTE: 新規登録時はidがないので適当な値を設定しておく（編集時に使用）
+      const file = files[i]
       images.push({
-        entityId: id,
+        type: "new",
         taskId: id,
         selected: true,
-        file: files[i],
+        preview: {
+          src: URL.createObjectURL(file),
+          name: file.name,
+          size: file.size,
+        },
+        file: file,
         tags: [],
       })
       tasks.push({ id, status: "idle" })
@@ -220,11 +229,11 @@ const Page = () => {
         <ImageInputForm.Container>
           {fields.map((image, index) => {
             const task = manager.value.tasks.find(
-              (task) => image.taskId === task.id,
+              (task) => image.taskId === task.id && image.type === "new",
             )
             const itemDisabled = task?.status === "success"
             return (
-              <React.Fragment key={image.entityId}>
+              <React.Fragment key={image.taskId}>
                 <ImageInputForm.ImageItem
                   index={index}
                   ui={{

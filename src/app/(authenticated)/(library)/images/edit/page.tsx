@@ -1,6 +1,6 @@
 "use client"
 import { ActionPanel, FieldValid } from "@/components"
-import { useUpdateImageMutation } from "@/graphql"
+import { useGetEditImagesQuery, useUpdateImageMutation } from "@/graphql"
 import { usePreference, useTaskManager, useUriQuery } from "@/hooks"
 import { wait } from "@/lib/wait"
 import { useFeedbackContext, useUserContext } from "@/providers"
@@ -18,7 +18,6 @@ import {
 
 const Page = () => {
   const query = useUriQuery<{ targets: string[] }>()
-  console.debug("query", query)
 
   const user = useUserContext()
   const preference = usePreference()
@@ -39,10 +38,17 @@ const Page = () => {
       images: [],
     },
   })
+  const { reset } = methods
 
   const images = useWatch({
     control: methods.control,
     name: "images",
+  })
+
+  const { data } = useGetEditImagesQuery({
+    variables: {
+      ids: query?.targets || [],
+    },
   })
 
   const [updateImage] = useUpdateImageMutation()
@@ -65,7 +71,7 @@ const Page = () => {
       await updateImage({
         variables: {
           input: {
-            id: "",
+            id: image.taskId,
             tags: image.tags,
           },
         },
@@ -120,6 +126,30 @@ const Page = () => {
     return false
   })()
 
+  useEffect(() => {
+    if (!data) {
+      return
+    }
+    const images = data.imagesByIds
+
+    reset((prev) => ({
+      ...prev,
+      images: images.map((image) => {
+        return {
+          type: "existing",
+          taskId: image.id,
+          selected: true,
+          preview: {
+            src: image.src.thumbnail,
+            name: image.file.name,
+            size: image.file.size,
+          },
+          tags: image.tags,
+        }
+      }),
+    }))
+  }, [data])
+
   return (
     <Box
       style={{
@@ -151,7 +181,7 @@ const Page = () => {
             )
             const itemDisabled = task?.status === "success"
             return (
-              <React.Fragment key={image.entityId}>
+              <React.Fragment key={image.taskId}>
                 <ImageInputForm.ImageItem
                   index={index}
                   ui={{

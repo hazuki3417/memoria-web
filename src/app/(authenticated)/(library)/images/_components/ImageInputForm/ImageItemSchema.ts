@@ -33,14 +33,30 @@ export type ImageSchemaConfig = {
   file: FileSchemaConfig
   tags: TagsSchemaConfig
 }
-export const imageSchema = (config: ImageSchemaConfig) => {
+
+export const baseImageSchema = (config: ImageSchemaConfig) => {
   return z.object({
-    entityId: z.string(),
     taskId: z.string(),
     selected: z.boolean(),
-    file: fileSchema(config.file),
+    preview: z.object({
+      src: z.string(),
+      name: z.string(),
+      size: z.number(),
+    }),
     tags: tagsSchema(config.tags),
   })
+}
+
+export const imageSchema = (config: ImageSchemaConfig) => {
+  return z.discriminatedUnion("type", [
+    baseImageSchema(config).extend({
+      type: z.literal("new"),
+      file: fileSchema(config.file),
+    }),
+    baseImageSchema(config).extend({
+      type: z.literal("existing"),
+    }),
+  ])
 }
 
 export type ImageValues = z.infer<ReturnType<typeof imageSchema>>
