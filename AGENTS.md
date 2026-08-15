@@ -47,7 +47,12 @@
 
 ## ローカル開発環境
 
-Node.js 24を含むDevboxを使用します。
+標準環境はWindowsホスト、WSL2 Ubuntu、VS Code、Devboxです。Node.js 24を含むDevboxを使用します。共通方針は`memoria-design/pages/local-development.mdx`を参照します。
+
+- リポジトリはUbuntu側で開き、npm・Node.jsなどのプロジェクトコマンドはUbuntu上のDevbox内で実行します。
+- Windowsホストから直接プロジェクトコマンドを実行しません。
+- `node_modules`をOS間でコピーまたは共有せず、npmパッケージは`package.json`とlockfileへ記録します。
+- APIとの結合確認では、`memoria-api`を別のWSLターミナルとDevboxで起動し、Windowsのブラウザから`localhost`へアクセスします。
 
 ```sh
 devbox shell
@@ -106,4 +111,5 @@ npm run test:app
 - ファイルサイズ、Content-Type、認可、失敗処理が不足したupload・download処理を指摘します。
 - Memoriaのユビキタス言語と一致しないユーザー向け文言を指摘します。
 - Storybook・VRTへの対応方針が示されていない表示変更を指摘します。
+- Windowsホストからの直接実行、OS間の`node_modules`共有、依存関係の未記録など、標準ローカル環境の再現性を損なう手順を指摘します。
 - フォーマットなど機械的に判定できる項目はBiome、TypeScript、テスト、CIへ任せます。

@@ -14,9 +14,12 @@ UI・GraphQL開発の作業規則は[AGENTS.md](./AGENTS.md)を参照してく�
 
 前提:
 
-- Windows + WSL2
+- Windows + WSL2 Ubuntu
+- VS Code（WSLへ接続）
 - Devbox
 - Node.js 24
+
+リポジトリをUbuntu側で開き、次のコマンドはUbuntu上のDevbox内で実行します。
 
 ```sh
 devbox shell
@@ -29,6 +32,10 @@ Storybook:
 ```sh
 npm run dev:storybook
 ```
+
+WindowsのWebブラウザから、起動時に表示される`localhost` URLへアクセスします。APIと結合確認する場合は、`memoria-api`も別のWSLターミナルとDevboxで起動します。
+
+`node_modules`をWindows、macOS、他のLinux環境からコピーまたは共有せず、依存関係は`package.json`とlockfileへ記録します。共通の環境構成とトラブルシューティングは[memoria-designのローカル開発環境](https://github.com/hazuki3417/memoria-design/blob/develop/pages/local-development.mdx)を参照してください。
 
 Devbox shellを終了する場合は`exit`を実行します。
 
