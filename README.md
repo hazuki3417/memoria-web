@@ -35,7 +35,7 @@ npm run dev:storybook
 
 WindowsのWebブラウザから、起動時に表示される`localhost` URLへアクセスします。APIと結合確認する場合は、`memoria-api`も別のWSLターミナルとDevboxで起動します。
 
-`node_modules`をWindows、macOS、他のLinux環境からコピーまたは共有せず、npmのoptional dependencyを省略しません。共通の環境構成とトラブルシューティングは[memoria-designのローカル開発環境](https://github.com/hazuki3417/memoria-design/blob/develop/pages/local-development.mdx)を参照してください。
+`node_modules`をWindows、macOS、他のLinux環境からコピーまたは共有せず、依存関係は`package.json`とlockfileへ記録します。共通の環境構成とトラブルシューティングは[memoria-designのローカル開発環境](https://github.com/hazuki3417/memoria-design/blob/develop/pages/local-development.mdx)を参照してください。
 
 Devbox shellを終了する場合は`exit`を実行します。
 
