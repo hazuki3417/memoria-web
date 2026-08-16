@@ -13,10 +13,10 @@
 
 ## 開発プロセスとFeedback
 
-- MemoriaはSprintを単位とするアジャイル開発を採用します。正本は`memoria-design/pages/development-process.mdx`です。
-- 初期Cadenceは2週間とし、Sprintごとの親IssueへGoal、対象、対象外、Review、振り返りを記載します。3 Sprint後にCadenceを見直します。
+- MemoriaはGoalを単位とするイテレーション型のアジャイル開発を採用します。正本は`memoria-design/pages/development-process.mdx`です。
+- 開発頻度が不定期であるため固定期間を設けず、イテレーションIssueへGoal、対象、対象外、Checkpoint、Review、振り返りを記載します。3イテレーション完了後に運用を見直します。
 - 機能単位で要求を合意して設計・実装へ進み、すべての要求完了を待つ一括工程にはしません。
-- 大規模機能は利用者価値または独立して検証できる境界でPhaseへ分割し、工程別Phase、長期Feature branch、巨大PRを前提にしません。
+- 大規模機能は利用者価値または独立して検証できる境界でPhaseへ分割し、工程別Phase、長期Feature branch、巨大PRを前提にしません。中断時は再開に必要なCheckpointをIssueへ記録します。
 - AIは人間の提案へ受動的に同意せず、妥当性、前提、risk、既存設計との矛盾、過剰設計を評価します。
 - 懸念がある場合は変更前に指摘し、代替案、trade-off、推奨案を示します。詳細は`memoria-design/pages/ai-development.mdx`を参照します。
 - 複数の論点は番号を付けて一つずつ扱い、回答後に合意、前提、影響範囲、制限、未決定事項を整理します。
@@ -123,6 +123,6 @@ npm run test:app
 - ファイルサイズ、Content-Type、認可、失敗処理が不足したupload・download処理を指摘します。
 - Memoriaのユビキタス言語と一致しないユーザー向け文言を指摘します。
 - Storybook・VRTへの対応方針が示されていない表示変更を指摘します。
-- Sprint内に収まらない巨大Issue、工程別Phase、長期Feature branchを前提とする変更を指摘します。
+- Goalとして完了・検証できない巨大Issue、工程別Phase、長期Feature branchを前提とする変更を指摘します。
 - Windowsホストからの直接実行、OS間の`node_modules`共有、依存関係の未記録など、標準ローカル環境の再現性を損なう手順を指摘します。
 - フォーマットなど機械的に判定できる項目はBiome、TypeScript、テスト、CIへ任せます。
