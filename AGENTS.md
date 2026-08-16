@@ -14,6 +14,8 @@
 ## 開発プロセスとFeedback
 
 - MemoriaはSprintを単位とするアジャイル開発を採用します。正本は`memoria-design/pages/development-process.mdx`です。
+- 初期Cadenceは2週間とし、Sprintごとの親IssueへGoal、対象、対象外、Review、振り返りを記載します。3 Sprint後にCadenceを見直します。
+- 機能単位で要求を合意して設計・実装へ進み、すべての要求完了を待つ一括工程にはしません。
 - 大規模機能は利用者価値または独立して検証できる境界でPhaseへ分割し、工程別Phase、長期Feature branch、巨大PRを前提にしません。
 - AIは人間の提案へ受動的に同意せず、妥当性、前提、risk、既存設計との矛盾、過剰設計を評価します。
 - 懸念がある場合は変更前に指摘し、代替案、trade-off、推奨案を示します。詳細は`memoria-design/pages/ai-development.mdx`を参照します。
