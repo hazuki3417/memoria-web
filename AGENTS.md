@@ -11,6 +11,13 @@
 
 プロダクト全体の設計上の正本は`memoria-design`です。資料、リポジトリ内のGraphQLスキーマ、実際のAPI挙動が一致しない場合は差異を報告してください。
 
+## 開発プロセスとFeedback
+
+- MemoriaはSprintを単位とするアジャイル開発を採用します。正本は`memoria-design/pages/development-process.mdx`です。
+- 大規模機能は利用者価値または独立して検証できる境界でPhaseへ分割し、工程別Phase、長期Feature branch、巨大PRを前提にしません。
+- AIは人間の提案へ受動的に同意せず、妥当性、前提、risk、既存設計との矛盾、過剰設計を評価します。
+- 懸念がある場合は変更前に指摘し、代替案、trade-off、推奨案を示します。詳細は`memoria-design/pages/ai-development.mdx`を参照します。
+
 ## ブランチ運用
 
 - `main`は本番リリース可能な安定版を表します。通常の開発作業や直接pushは行いません。
@@ -111,5 +118,6 @@ npm run test:app
 - ファイルサイズ、Content-Type、認可、失敗処理が不足したupload・download処理を指摘します。
 - Memoriaのユビキタス言語と一致しないユーザー向け文言を指摘します。
 - Storybook・VRTへの対応方針が示されていない表示変更を指摘します。
+- Sprint内に収まらない巨大Issue、工程別Phase、長期Feature branchを前提とする変更を指摘します。
 - Windowsホストからの直接実行、OS間の`node_modules`共有、依存関係の未記録など、標準ローカル環境の再現性を損なう手順を指摘します。
 - フォーマットなど機械的に判定できる項目はBiome、TypeScript、テスト、CIへ任せます。
