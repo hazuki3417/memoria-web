@@ -76,14 +76,26 @@ Storybookは`npm run dev:storybook`で起動します。シークレット、ロ
 
 ## 検証
 
-変更に応じた検証を行い、完了前に次の基準を確認します。
+GitHub Actionsの`quality / web`はPull Requestと`develop`・`main`へのpushで、`npm ci`、GraphQL client生成、Biome、TypeScript、Vitest、Next.js buildを実行します。Node.jsのversionは`package.json`の`engines.node`を正本とします。
+
+人間がローカル開発環境で同じ検証を再現する場合:
 
 ```sh
-npx biome check src
-npx tsc --noEmit
-npm run test:unit
-npm run build:next
+npm ci
+npm run quality
 ```
+
+各検証を個別に確認する場合:
+
+```sh
+npm run gen:graphql
+npm run check
+npm run typecheck
+npm run test
+npm run build
+```
+
+GraphQL生成物はGit管理対象外のため、clean checkoutでは型検査とbuildの前に生成します。ChatGPTの実行環境ではbuild、test、静的解析、構文検証を実行せず、GitHub Actionsへ委譲します。
 
 表示や操作を変更する場合は、関連する検証も実行します。
 
