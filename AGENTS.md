@@ -78,6 +78,8 @@ Storybookは`npm run dev:storybook`で起動します。シークレット、ロ
 
 GitHub Actionsの`quality / web`はPull Requestと`develop`・`main`へのpushで、`npm ci`、GraphQL client生成、Biome、TypeScript、Vitest、Next.js buildを実行します。Node.jsのversionは`package.json`の`engines.node`を正本とします。
 
+Biomeは既存コード全体の違反によって新しい変更を停止させないため、比較元commitから変更されたTypeScript fileだけを段階的に検査します。TypeScript、Vitest、Next.js buildはプロジェクト全体を対象とします。
+
 人間がローカル開発環境で同じ検証を再現する場合:
 
 ```sh
@@ -91,7 +93,7 @@ npm run quality
 npm run gen:graphql
 npm run check
 npm run typecheck
-npm run test
+npm run test:unit
 npm run build
 ```
 
