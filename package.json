@@ -9,12 +9,16 @@
     "dev:next": "next dev",
     "dev:storybook": "storybook dev -p 6006",
     "format": "biome format --write",
+    "check": "biome check src",
+    "typecheck": "tsc --noEmit",
     "build:next": "next build",
     "build:storybook": "storybook build",
+    "build": "npm run build:next",
     "start": "next start",
     "lint": "next lint",
     "gen:graphql": "graphql-codegen",
     "test:unit": "vitest run",
+    "test": "npm run test:unit",
     "test:vrt": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts",
     "test:vrt:update": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts --update-snapshots",
     "test:vrt:report": "playwright show-report ./e2e/vrt/report",
@@ -22,7 +26,8 @@
     "test:app:update": "playwright test --config=playwright.app.config.ts --update-snapshots",
     "test:app:report": "playwright show-report ./e2e/app/report",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "quality": "npm run gen:graphql && npm run check && npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
