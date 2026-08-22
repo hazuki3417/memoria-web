@@ -21,6 +21,7 @@ jobs:
     timeout-minutes: 20
     env:
       NEXT_TELEMETRY_DISABLED: "1"
+      BIOME_BASE_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
       API_URI: http://localhost:8080/graphql
       APP_BASE_URL: http://localhost:3000
       AUTH0_DOMAIN: ci-example.auth0.com
@@ -31,6 +32,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -51,7 +54,7 @@ jobs:
         run: npm run typecheck
 
       - name: Run unit tests
-        run: npm run test
+        run: npm run test:unit
 
       - name: Build Next.js application
         run: npm run build
