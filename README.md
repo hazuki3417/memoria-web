@@ -62,6 +62,8 @@ GitHub ActionsではNext.js buildに必要な項目へCI専用の無効な仮値
 
 GitHub Actionsの`quality / web`は、Pull Requestと`develop`・`main`へのpushで、Node.js 24の依存関係導入、GraphQL client生成、Biome、TypeScript、Vitest、Next.js buildを実行します。Node.jsのversionは`package.json`の`engines.node`を正本とします。
 
+Biomeは既存コード全体の違反によって新しい変更を停止させないため、比較元commitから変更されたTypeScript fileだけを段階的に検査します。TypeScript、Vitest、Next.js buildはプロジェクト全体を対象とします。
+
 人間がローカル環境で同等のquality gateを再現する場合:
 
 ```sh
@@ -75,7 +77,7 @@ npm run quality
 npm run gen:graphql
 npm run check
 npm run typecheck
-npm run test
+npm run test:unit
 npm run build
 ```
 
