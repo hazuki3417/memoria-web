@@ -60,12 +60,26 @@ GitHub ActionsではNext.js buildに必要な項目へCI専用の無効な仮値
 
 ## 検証
 
+GitHub Actionsの`quality / web`は、Pull Requestと`develop`・`main`へのpushで、Node.js 24の依存関係導入、GraphQL client生成、Biome、TypeScript、Vitest、Next.js buildを実行します。Node.jsのversionは`package.json`の`engines.node`を正本とします。
+
+人間がローカル環境で同等のquality gateを再現する場合:
+
 ```sh
-npx biome check src
-npx tsc --noEmit
-npm run test:unit
-npm run build:next
+npm ci
+npm run quality
 ```
+
+各checkは個別にも実行できます。
+
+```sh
+npm run gen:graphql
+npm run check
+npm run typecheck
+npm run test
+npm run build
+```
+
+GraphQL生成物はGit管理対象外のため、clean checkoutでは型検査とbuildの前に生成します。Storybook build、Playwright、VRT、Application E2E、Auth0・APIを含む結合testは、実行時間と外部依存を確認するまで初期の必須quality gateに含めません。
 
 UI変更では必要に応じて次も実行します。
 
