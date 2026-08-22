@@ -1,0 +1,68 @@
+name: quality
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: web
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      API_URI: http://localhost:8080/graphql
+      APP_BASE_URL: http://localhost:3000
+      AUTH0_DOMAIN: ci-example.auth0.com
+      AUTH0_CLIENT_ID: ci-client-id
+      AUTH0_CLIENT_SECRET: ci-placeholder-client-secret
+      AUTH0_SECRET: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: package.json
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate GraphQL client
+        run: npm run gen:graphql
+
+      - name: Check source with Biome
+        run: npm run check
+
+      - name: Check TypeScript types
+        run: npm run typecheck
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Build Next.js application
+        run: npm run build
+
+      - name: Check client bundle for server secrets
+        shell: bash
+        run: |
+          for secret_name in AUTH0_SECRET AUTH0_CLIENT_SECRET; do
+            secret_value="${!secret_name}"
+            if grep -R -l -F -- "$secret_value" .next/static; then
+              echo "::error::$secret_name was found in the client bundle"
+              exit 1
+            fi
+          done
