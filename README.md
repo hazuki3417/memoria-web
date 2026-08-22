@@ -39,6 +39,25 @@ WindowsのWebブラウザから、起動時に表示される`localhost` URLへ�
 
 Devbox shellを終了する場合は`exit`を実行します。
 
+## 環境変数とSecret
+
+Server側の環境変数は`src/env/server.ts`で検証し、Server Component、Route Handler、middlewareからのみ参照します。必須値が不足している場合、URLが不正な場合、または`AUTH0_SECRET`が32文字未満の場合は安全に失敗します。
+
+| 変数 | 必須 | 用途 |
+| --- | --- | --- |
+| `APP_BASE_URL` | 必須 | Web applicationのURL |
+| `AUTH0_DOMAIN` | 必須 | Auth0 tenantのdomain |
+| `AUTH0_CLIENT_ID` | 必須 | Auth0 applicationのclient ID |
+| `AUTH0_CLIENT_SECRET` | 必須 | Auth0 applicationのclient secret |
+| `AUTH0_SECRET` | 必須 | Session暗号化用の32文字以上のsecret |
+| `API_URI` | 任意 | GraphQL APIのURL。未指定時は`http://localhost:8080/graphql` |
+| `AUTH0_SCOPE` | 任意 | 認可時に要求するscope |
+| `AUTH0_AUDIENCE` | 任意 | 認可時に要求するaudience |
+
+ローカル開発ではGit管理対象外の`.env`または実行環境の環境変数に設定します。Secretを`next.config.mjs`の`env`、`NEXT_PUBLIC_*`、Client Component、Git管理対象のfileへ記載しません。
+
+GitHub ActionsではNext.js buildに必要な項目へCI専用の無効な仮値を設定します。実際のAuth0 credentialや本番Secretは使用しません。
+
 ## 検証
 
 ```sh
