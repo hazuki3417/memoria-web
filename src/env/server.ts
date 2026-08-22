@@ -6,12 +6,12 @@ const ServerEnvSchema = z
   .object({
     //NOTE: サーバー固有の環境変数を定義
     NODE_ENV: z.enum(["development", "production", "test"]),
-    API_URI: z.string(),
-    APP_BASE_URL: z.string(),
-    AUTH0_DOMAIN: z.string(),
-    AUTH0_CLIENT_ID: z.string(),
-    AUTH0_CLIENT_SECRET: z.string(),
-    AUTH0_SECRET: z.string().optional(),
+    API_URI: z.string().url(),
+    APP_BASE_URL: z.string().url(),
+    AUTH0_DOMAIN: z.string().min(1),
+    AUTH0_CLIENT_ID: z.string().min(1),
+    AUTH0_CLIENT_SECRET: z.string().min(1),
+    AUTH0_SECRET: z.string().min(32),
     AUTH0_SCOPE: z.string().optional(),
     AUTH0_AUDIENCE: z.string().optional(),
   })
