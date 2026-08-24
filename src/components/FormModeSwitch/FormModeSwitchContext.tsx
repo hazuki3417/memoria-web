@@ -10,16 +10,14 @@ export type FormModeSwitchValue = {
   mode: FormMode
 }
 
-export interface FormModeSwitchControl {}
+export interface FormModeSwitchControl { }
 
-export interface FormModeSwitchAction {
-  switch: (mode: FormMode) => void
-}
+export interface FormModeSwitchAction { }
 
 export type FormModeSwitchContext = {
   value: FormModeSwitchValue
   // control: FormModeSwitchControl
-  action: FormModeSwitchAction
+  // action: FormModeSwitchAction
 }
 
 export const FormModeSwitchContext = createContext<

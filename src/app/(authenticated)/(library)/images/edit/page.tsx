@@ -57,7 +57,6 @@ const Page = () => {
   const inputValid = async (values: ImageInputFormValues) => {
     console.log("submit values:", values)
     await manager.action.submit(async (task) => {
-      console.debug("ugoita?")
       const image = values.images.find((image) => task.id === image.taskId)
 
       if (!image) {

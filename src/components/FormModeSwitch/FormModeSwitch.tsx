@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState } from "react"
+import React, { memo } from "react"
 import { Edit } from "./Edit"
 import { FormMode } from "./FormModeSwitchContext"
 import { FormModeSwitchProvider } from "./FormModeSwitchProvider"
@@ -13,19 +13,10 @@ export interface FormModeProps {
 export const FormModeSwitch = (props: FormModeProps) => {
   const { mode, children } = props
 
-  const [formMode, setFormMode] = useState<FormMode>(mode)
-
-  const handelSwitch = useCallback(
-    (mode: FormMode) => {
-      setFormMode(mode)
-    },
-    [setFormMode],
-  )
   return (
     <FormModeSwitchProvider
       value={{
-        value: { mode: formMode },
-        action: { switch: handelSwitch },
+        value: { mode },
       }}
     >
       {children}

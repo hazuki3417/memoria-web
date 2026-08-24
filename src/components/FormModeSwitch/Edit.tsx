@@ -1,5 +1,5 @@
 import React from "react"
-import { useFormModeSwitch } from "./useFormModeSwitch"
+import { useFormModeSwitchContext } from "./useFormModeSwitchContext"
 
 export interface EditProps {
   children?: React.ReactNode
@@ -7,6 +7,6 @@ export interface EditProps {
 
 export const Edit = (props: EditProps) => {
   const { children } = props
-  const { value } = useFormModeSwitch()
+  const { value } = useFormModeSwitchContext()
   return value.mode === "edit" ? <>{children}</> : null
 }

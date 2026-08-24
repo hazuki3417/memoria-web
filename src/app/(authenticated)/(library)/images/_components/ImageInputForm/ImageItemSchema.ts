@@ -2,14 +2,14 @@
 import { ze } from "@/lib"
 import z from "zod"
 
-export type FileSchemaConfig = {
+export type ImageFileSchemaConfig = {
   type: string[]
   size: {
     max: number
   }
 }
 
-export const fileSchema = (config: FileSchemaConfig) => {
+export const imageFileSchema = (config: ImageFileSchemaConfig) => {
   return ze.refine(
     z.custom<File>((file) => file instanceof File),
     [
@@ -19,19 +19,22 @@ export const fileSchema = (config: FileSchemaConfig) => {
   )
 }
 
-export type TagsSchemaConfig = {
+export type ImageTagsSchemaConfig = {
   count: {
     max: number
   }
 }
 
-export const tagsSchema = (config: TagsSchemaConfig) => {
+export const imageTagsSchema = (config: ImageTagsSchemaConfig) => {
   return z.array(z.string()).max(config.count.max)
 }
 
+export type ImageTagsValues = z.infer<ReturnType<typeof imageTagsSchema>>
+
+
 export type ImageSchemaConfig = {
-  file: FileSchemaConfig
-  tags: TagsSchemaConfig
+  file: ImageFileSchemaConfig
+  tags: ImageTagsSchemaConfig
 }
 
 export const baseImageSchema = (config: ImageSchemaConfig) => {
@@ -43,7 +46,7 @@ export const baseImageSchema = (config: ImageSchemaConfig) => {
       name: z.string(),
       size: z.number(),
     }),
-    tags: tagsSchema(config.tags),
+    tags: imageTagsSchema(config.tags),
   })
 }
 
@@ -51,7 +54,7 @@ export const imageSchema = (config: ImageSchemaConfig) => {
   return z.discriminatedUnion("type", [
     baseImageSchema(config).extend({
       type: z.literal("new"),
-      file: fileSchema(config.file),
+      file: imageFileSchema(config.file),
     }),
     baseImageSchema(config).extend({
       type: z.literal("existing"),

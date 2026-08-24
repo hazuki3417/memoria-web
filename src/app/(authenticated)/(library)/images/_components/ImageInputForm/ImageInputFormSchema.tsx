@@ -3,7 +3,7 @@ import { z } from "zod"
 import {
   imageItemSchema,
   ImageItemSchemaConfig,
-  tagsSchema,
+  imageTagsSchema,
 } from "./ImageItemSchema"
 
 export type ImageInputFormSchemaConfig = ImageItemSchemaConfig
@@ -11,7 +11,7 @@ export const imageInputFormSchema = (config: ImageInputFormSchemaConfig) => {
   return z.object({
     bulk: z.object({
       reflection: z.boolean(),
-      tags: tagsSchema(config.image.tags),
+      tags: imageTagsSchema(config.image.tags),
     }),
     ...imageItemSchema(config).shape,
   })
