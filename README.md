@@ -79,9 +79,12 @@ npm run check
 npm run typecheck
 npm run test:unit
 npm run build
+npm run build:storybook
+npx playwright install chromium
+npx playwright test --config=playwright.vrt.config.ts --grep 'Storybook smoke'
 ```
 
-GraphQL生成物はGit管理対象外のため、clean checkoutでは型検査とbuildの前に生成します。Storybook build、Playwright、VRT、Application E2E、Auth0・APIを含む結合testは、実行時間と外部依存を確認するまで初期の必須quality gateに含めません。
+GraphQL生成物はGit管理対象外のため、clean checkoutでは型検査とbuildの前に生成します。Storybook buildとPlaywright ChromiumによるStorybookのブラウザsmoke testを必須quality gateに含めます。VRTの画像比較はsnapshot baselineの整備と差分承認の運用が必要なため、現時点では必須gateに含めません。Application E2EとAuth0・APIを含む結合testも別途整備します。
 
 UI変更では必要に応じて次も実行します。
 
