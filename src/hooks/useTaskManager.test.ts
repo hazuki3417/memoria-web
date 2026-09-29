@@ -67,6 +67,7 @@ describe.skip("useTaskManager", () => {
 
     const mockProcess = vi.fn(async () => {
       await new Promise((res) => setTimeout(res, 5))
+      return { status: "success" as const }
     })
 
     await act(async () => {
@@ -93,6 +94,7 @@ describe.skip("useTaskManager", () => {
 
     const mockProcess = vi.fn(async () => {
       await new Promise((res) => setTimeout(res, 5))
+      return { status: "success" as const }
     })
 
     await act(async () => {
@@ -119,6 +121,7 @@ describe.skip("useTaskManager", () => {
       if (task.id === "2") {
         throw new Error("Failed at task 2")
       }
+      return { status: "success" as const }
     })
 
     await act(async () => {
