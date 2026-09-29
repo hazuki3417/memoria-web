@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   imageRotateReducer,
   ImageRotateAction,
-  ImageRotateState,
+  ImageRotateValue,
 } from "./imageRotateReducer"
 
 describe("imageRotateReducer", () => {
@@ -46,8 +46,7 @@ describe("imageRotateReducer", () => {
     expect(() =>
       imageRotateReducer(
         state,
-        // @ts-expect-error: intentionally testing invalid action
-        { type: "unknown" } as ImageRotateAction,
+        { type: "unknown" } as unknown as ImageRotateAction,
       ),
     ).toThrowError("Unhandled action type: unknown")
   })
