@@ -44,7 +44,9 @@ describe("imageRotateReducer", () => {
     }
 
     expect(() =>
-      imageRotateReducer(state, { type: "unknown" } as unknown as ImageRotateAction),
+      imageRotateReducer(state, {
+        type: "unknown",
+      } as unknown as ImageRotateAction),
     ).toThrowError("Unhandled action type: unknown")
   })
 })
