@@ -59,6 +59,23 @@ jobs:
       - name: Build Next.js application
         run: npm run build
 
+      - name: Build Storybook
+        run: npm run build:storybook
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke test Storybook in browser
+        run: npx playwright test --config=playwright.vrt.config.ts --grep 'Storybook smoke'
+
+      - name: Upload Storybook smoke test report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-smoke-report
+          path: e2e/vrt/report
+          if-no-files-found: ignore
+
       - name: Check client bundle for server secrets
         shell: bash
         run: |
