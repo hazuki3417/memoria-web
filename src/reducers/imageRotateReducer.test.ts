@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest"
 import {
+  type ImageRotateAction,
+  type ImageRotateValue,
   imageRotateReducer,
-  ImageRotateAction,
-  ImageRotateState,
 } from "./imageRotateReducer"
 
 describe("imageRotateReducer", () => {
   it("rotates left by 90 degrees", () => {
-    const state: ImageRotateState = {
+    const state: ImageRotateValue = {
       current: { angle: 0 },
       initial: { angle: 0 },
       meta: { action: "idle" },
@@ -17,7 +17,7 @@ describe("imageRotateReducer", () => {
   })
 
   it("rotates right by 90 degrees", () => {
-    const state: ImageRotateState = {
+    const state: ImageRotateValue = {
       current: { angle: 0 },
       initial: { angle: 0 },
       meta: { action: "idle" },
@@ -27,7 +27,7 @@ describe("imageRotateReducer", () => {
   })
 
   it("resets to initial value", () => {
-    const state: ImageRotateState = {
+    const state: ImageRotateValue = {
       current: { angle: 180 },
       initial: { angle: 0 },
       meta: { action: "idle" },
@@ -37,18 +37,16 @@ describe("imageRotateReducer", () => {
   })
 
   it("throws on unknown action type", () => {
-    const state: ImageRotateState = {
+    const state: ImageRotateValue = {
       current: { angle: 0 },
       initial: { angle: 0 },
       meta: { action: "idle" },
     }
 
     expect(() =>
-      imageRotateReducer(
-        state,
-        // @ts-expect-error: intentionally testing invalid action
-        { type: "unknown" } as ImageRotateAction,
-      ),
+      imageRotateReducer(state, {
+        type: "unknown",
+      } as unknown as ImageRotateAction),
     ).toThrowError("Unhandled action type: unknown")
   })
 })

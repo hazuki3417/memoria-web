@@ -1,7 +1,7 @@
-import { useTaskManager } from "@/hooks"
-import type { Task } from "@/reducers"
 import { act, renderHook } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
+import { useTaskManager } from "@/hooks"
+import type { Task } from "@/reducers"
 
 describe.skip("useTaskManager", () => {
   it("should append tasks", () => {
@@ -67,6 +67,7 @@ describe.skip("useTaskManager", () => {
 
     const mockProcess = vi.fn(async () => {
       await new Promise((res) => setTimeout(res, 5))
+      return { status: "success" as const }
     })
 
     await act(async () => {
@@ -93,6 +94,7 @@ describe.skip("useTaskManager", () => {
 
     const mockProcess = vi.fn(async () => {
       await new Promise((res) => setTimeout(res, 5))
+      return { status: "success" as const }
     })
 
     await act(async () => {
@@ -119,6 +121,7 @@ describe.skip("useTaskManager", () => {
       if (task.id === "2") {
         throw new Error("Failed at task 2")
       }
+      return { status: "success" as const }
     })
 
     await act(async () => {

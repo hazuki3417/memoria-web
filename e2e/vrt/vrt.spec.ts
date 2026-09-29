@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test";
-import data from "./../../storybook-static/index.json";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+const data = JSON.parse(
+  readFileSync(resolve(process.cwd(), "storybook-static/index.json"), "utf8"),
+) as { entries: Record<string, EntryType> };
 
 // storybookのindex.jsonに記述されているentries要素オブジェクトの型定義
 type EntryType = {
