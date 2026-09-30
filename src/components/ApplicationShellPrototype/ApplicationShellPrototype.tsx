@@ -151,12 +151,12 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
             <Divider mb="xs" />
             <NavLink
               label="サイドバーを閉じる"
-              leftSection={<IconChevronLeft size={17} stroke={1.6} aria-hidden="true" />}
+              leftSection={<IconChevronLeft size={14} stroke={1.6} aria-hidden="true" />}
               onClick={closeNavigation}
               styles={{
-                root: { borderRadius: "var(--mantine-radius-sm)", padding: "5px 8px", minHeight: 32 },
-                section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 8 },
-                label: { fontSize: "var(--mantine-font-size-sm)", lineHeight: 1.3 },
+                root: { borderRadius: "var(--mantine-radius-sm)", padding: "4px 8px", minHeight: 28 },
+                section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 6 },
+                label: { color: "var(--mantine-color-dimmed)", fontSize: "var(--mantine-font-size-xs)", lineHeight: 1.3 },
               }}
             />
           </Box>
