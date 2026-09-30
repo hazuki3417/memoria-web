@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  AppShell, Avatar, Box, Burger, Button, Group, Menu,
+  AppShell, Avatar, Box, Burger, Button, Drawer, Group, Menu,
   NavLink, Paper, Stack, Text, Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
@@ -24,8 +24,7 @@ const menuStyles = {
  * 具体的な色・寸法・配置はVisual Reviewで確定する。
  */
 export function ApplicationShellPrototype({ initialContext = "personal" }: { initialContext?: Context }) {
-  const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure(false)
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true)
+  const [navigationOpened, { toggle: toggleNavigation, close: closeNavigation }] = useDisclosure(false)
   const [context, setContext] = useState<Context>(initialContext)
   const [section, setSection] = useState<Section>("dashboard")
   const [accountOpened, setAccountOpened] = useState(false)
@@ -38,25 +37,23 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
   const selectContext = (next: Context) => {
     setContext(next)
     setSection("dashboard")
-    closeMobile()
+    closeNavigation()
   }
   const selectSection = (next: Section) => {
     setSection(next)
-    closeMobile()
+    closeNavigation()
   }
 
   return (
     <AppShell
       header={{ height: 40 }}
-      navbar={{ width: 248, breakpoint: "sm", collapsed: { mobile: !mobileOpened, desktop: !desktopOpened } }}
       padding="lg"
       styles={{ main: { minHeight: "100vh", background: "var(--mantine-color-body)" } }}
     >
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
-            <Box hiddenFrom="sm"><Burger opened={mobileOpened} onClick={toggleMobile} size="sm" aria-label="ナビゲーションを開閉" aria-controls="application-context-navigation" /></Box>
-            <Box visibleFrom="sm"><Burger opened={desktopOpened} onClick={toggleDesktop} size="sm" aria-label="ナビゲーションを開閉" aria-controls="application-context-navigation" /></Box>
+            <Burger opened={navigationOpened} onClick={toggleNavigation} size="sm" aria-label="ナビゲーションを開閉" aria-controls="application-context-navigation" aria-expanded={navigationOpened} />
             <Text fw={750} size="lg">Memoria</Text>
             <Box w={1} h={20} bg="var(--mantine-color-default-border)" aria-hidden="true" />
             <Menu withinPortal position="bottom-start" styles={menuStyles}>
@@ -90,9 +87,22 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar id="application-context-navigation" p="sm">
+      <Drawer
+        opened={navigationOpened}
+        onClose={closeNavigation}
+        position="left"
+        size={248}
+        withCloseButton={false}
+        padding="sm"
+        overlayProps={{ backgroundOpacity: 0 }}
+        styles={{
+          content: { marginTop: 40, height: "calc(100dvh - 40px)", boxShadow: "var(--mantine-shadow-md)" },
+          inner: { top: 0 },
+          body: { height: "100%" },
+        }}
+      >
         <Stack gap="md" h="100%">
-          <Box component="nav" aria-label="現在のコンテキスト内のナビゲーション">
+          <Box component="nav" id="application-context-navigation" aria-label="現在のコンテキスト内のナビゲーション">
             <Stack gap={2}>
               {sections.map((item) => (
                 <NavLink
@@ -119,7 +129,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
             <Text c="dimmed" size="xs">レイアウト検討用プロトタイプ</Text>
           </Box>
         </Stack>
-      </AppShell.Navbar>
+      </Drawer>
 
       <AppShell.Main>
         <Box maw={1120} mx="auto">
