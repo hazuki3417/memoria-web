@@ -6,16 +6,17 @@ import {
   Box,
   Button,
   Group,
-  Modal,
   Divider,
+  Modal,
   Stack,
   Text,
   TextInput,
   Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { Notifications, notifications } from "@mantine/notifications"
 import { IconAlertCircle, IconCheck } from "@tabler/icons-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type ReviewState = "default" | "invalid" | "saving" | "success" | "failure" | "blocking" | "unsaved"
 
@@ -30,15 +31,26 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
   const saving = status === "saving"
   const blocking = status === "blocking"
 
+  useEffect(() => {
+    if (reviewState === "success") {
+      notifications.show({ title: "保存しました", message: "プロフィールを更新しました。", color: "green", icon: <IconCheck size={18} /> })
+    } else if (reviewState === "failure") {
+      notifications.show({ title: "保存できませんでした", message: "変更内容は保持されています。再試行してください。", color: "red", icon: <IconAlertCircle size={18} /> })
+    }
+  }, [reviewState])
+
   const save = () => {
     if (!dirty || invalid || saving || blocking) return
     setSavedName(normalized)
     setNickname(normalized)
     setStatus("success")
+    notifications.show({ title: "保存しました", message: "プロフィールを更新しました。", color: "green", icon: <IconCheck size={18} /> })
   }
 
   return (
-    <AppShell header={{ height: 40 }} padding="lg">
+    <>
+      <Notifications position="top-right" />
+      <AppShell header={{ height: 40 }} padding="lg">
       <AppShell.Header>
         <Group h="100%" px="md" gap="sm">
           <Text fw={750} size="lg">Memoria</Text>
@@ -76,23 +88,13 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
                     required
                   />
                 </Box>
-                {status === "failure" && (
-                  <Alert color="red" title="保存できませんでした" icon={<IconAlertCircle size={18} />}>
-                    変更内容は保持されています。時間をおいて再試行してください。
-                  </Alert>
-                )}
-                {status === "success" && (
-                  <Alert color="green" title="プロフィールを更新しました" icon={<IconCheck size={18} />}>
-                    新しいニックネームを保存しました。
-                  </Alert>
-                )}
                 <Group gap="sm">
                   <Button size="sm" onClick={save} disabled={!dirty || invalid || saving || blocking} loading={saving}>
-                    変更を保存
+                    保存
                   </Button>
                   {dirty && (
                     <Button size="sm" variant="default" onClick={openDiscard} disabled={saving || blocking}>
-                      変更を破棄
+                      キャンセル
                     </Button>
                   )}
                 </Group>
@@ -101,6 +103,7 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
           </Stack>
         </Box>
       </AppShell.Main>
+      </AppShell>
       <Modal opened={discardOpened} onClose={closeDiscard} title="変更を破棄しますか？" centered>
         <Stack>
           <Text size="sm">保存していない変更は失われます。</Text>
@@ -112,6 +115,6 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
           </Group>
         </Stack>
       </Modal>
-    </AppShell>
+    </>
   )
 }
