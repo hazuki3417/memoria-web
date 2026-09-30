@@ -94,7 +94,9 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
         size={248}
         withCloseButton={false}
         padding="sm"
-        overlayProps={{ backgroundOpacity: 0 }}
+        closeOnClickOutside
+        closeOnEscape
+        overlayProps={{ backgroundOpacity: 0.35, blur: 0 }}
         styles={{
           content: { marginTop: 40, height: "calc(100dvh - 40px)", boxShadow: "var(--mantine-shadow-md)" },
           inner: { top: 0 },
