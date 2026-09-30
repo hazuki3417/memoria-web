@@ -39,13 +39,14 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
           color={success ? "green" : "red"}
           title={success ? "保存しました" : "保存できませんでした"}
           icon={success ? <IconCheck size={18} /> : <IconAlertCircle size={18} />}
+          styles={{ root: { backgroundColor: `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`, paddingRight: 40 } }}
         >
           {success ? "プロフィールを更新しました。" : "変更内容は保持されています。再試行してください。"}
         </Alert>
       ),
       withCloseButton: true,
       styles: {
-        root: { padding: 0, border: 0, background: "transparent", boxShadow: "none" },
+        root: { padding: 0, border: 0, background: "var(--mantine-color-body)", boxShadow: "none" },
         body: { margin: 0 },
         description: { margin: 0 },
         closeButton: { position: "absolute", top: 8, right: 8, zIndex: 1 },
@@ -121,7 +122,7 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
                 </Group>
                 <Box mih={92} aria-live="polite">
                   {blocking && (
-                    <Alert color="red" title="プロフィールを変更できません" icon={<IconAlertCircle size={18} />}>
+                    <Alert color="red" title="プロフィールを変更できません" icon={<IconAlertCircle size={18} />} styles={{ root: { backgroundColor: "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))" } }}>
                       現在のアカウント状態では編集を続けられません。アカウントの状態を確認してください。
                     </Alert>
                   )}
