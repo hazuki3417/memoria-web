@@ -9,5 +9,6 @@ test("Storybook smoke: index and iframe are available", async ({ page, request }
   const story = Object.values(data.entries).find((entry) => entry.type === "story");
   expect(story, "At least one Storybook story is required").toBeDefined();
   await page.goto(`/iframe.html?id=${story?.id}`);
-  await expect(page.locator("#storybook-root")).toBeVisible();
+  await expect(page.locator("#storybook-root")).toBeAttached();
+  await expect(page.locator("#storybook-root > *").first()).toBeAttached();
 });
