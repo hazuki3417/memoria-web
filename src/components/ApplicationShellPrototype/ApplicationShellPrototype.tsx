@@ -70,9 +70,15 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Label>切り替え先</Menu.Label>
-                <Menu.Item leftSection={<IconUser size={16} stroke={1.6} aria-hidden="true" />} onClick={() => selectContext("personal")}>Personal</Menu.Item>
-                <Menu.Item leftSection={<IconUsers size={16} stroke={1.6} aria-hidden="true" />} onClick={() => selectContext("community")}>{communityName}</Menu.Item>
+                <Menu.Label>
+                  <Group gap={6} wrap="nowrap">
+                    <IconUsers size={14} stroke={1.6} aria-hidden="true" />
+                    <Text size="xs">切り替え先</Text>
+                  </Group>
+                </Menu.Label>
+                <Menu.Item onClick={() => selectContext("personal")}>Personal</Menu.Item>
+                <Menu.Divider />
+                <Menu.Item onClick={() => selectContext("community")}>{communityName}</Menu.Item>
                 <Menu.Divider />
                 <Menu.Item disabled leftSection={<IconPlus size={16} stroke={1.6} aria-hidden="true" />}>Communityを作成</Menu.Item>
               </Menu.Dropdown>
