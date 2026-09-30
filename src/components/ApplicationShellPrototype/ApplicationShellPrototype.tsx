@@ -110,26 +110,38 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
           <Box component="nav" id="application-context-navigation" aria-label="現在のコンテキスト内のナビゲーション">
             <Stack gap={2}>
               {sections.map((item) => (
-                <NavLink
-                  key={item.id}
-                  label={item.label}
-                  leftSection={<item.icon size={17} stroke={1.6} aria-hidden="true" />}
-                  active={section === item.id}
-                  onClick={() => selectSection(item.id)}
-                  variant="subtle"
-                  color="gray"
-                  styles={{
-                    root: {
-                      borderRadius: "var(--mantine-radius-sm)",
-                      borderLeft: section === item.id ? "3px solid var(--mantine-primary-color-filled)" : "3px solid transparent",
-                      background: section === item.id ? "var(--mantine-color-default-hover)" : undefined,
-                      padding: "7px 10px",
-                      minHeight: 36,
-                      fontWeight: section === item.id ? 600 : 400,
-                    },
-                    section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 10 },
-                  }}
-                />
+                <Box key={item.id} pos="relative" pl={8}>
+                  {section === item.id && (
+                    <Box
+                      pos="absolute"
+                      top={4}
+                      bottom={4}
+                      left={0}
+                      w={3}
+                      bg="var(--mantine-primary-color-filled)"
+                      style={{ borderRadius: "var(--mantine-radius-xl)", pointerEvents: "none" }}
+                      aria-hidden="true"
+                    />
+                  )}
+                  <NavLink
+                    label={item.label}
+                    leftSection={<item.icon size={17} stroke={1.6} aria-hidden="true" />}
+                    active={section === item.id}
+                    onClick={() => selectSection(item.id)}
+                    variant="subtle"
+                    color="gray"
+                    styles={{
+                      root: {
+                        borderRadius: "var(--mantine-radius-sm)",
+                        background: section === item.id ? "var(--mantine-color-default-hover)" : undefined,
+                        padding: "7px 10px",
+                        minHeight: 36,
+                        fontWeight: section === item.id ? 600 : 400,
+                      },
+                      section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 10 },
+                    }}
+                  />
+                </Box>
               ))}
             </Stack>
           </Box>
