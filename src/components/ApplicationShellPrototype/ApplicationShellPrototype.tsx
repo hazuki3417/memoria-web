@@ -190,7 +190,6 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
         <Box maw={1120} mx="auto">
           <Stack gap="lg">
             <Box>
-              <Text size="sm" c="dimmed">{context === "personal" ? "Personal" : communityName}</Text>
               <Title order={1} size="h2">{sections.find((item) => item.id === section)?.label}</Title>
             </Box>
             <Paper withBorder radius="md" p="xl" mih={320}>
