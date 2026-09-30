@@ -39,7 +39,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
 
   return (
     <AppShell
-      header={{ height: 64 }}
+      header={{ height: 48 }}
       navbar={{ width: 248, breakpoint: "sm", collapsed: { mobile: !opened } }}
       padding="lg"
       styles={{ main: { minHeight: "100vh", background: "var(--mantine-color-body)" } }}
