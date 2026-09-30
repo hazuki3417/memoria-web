@@ -67,8 +67,8 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
             <Menu withinPortal position="bottom-start" styles={menuStyles}>
               <Menu.Target>
                 <Button variant="subtle" color="gray" size="compact-sm" px="xs" aria-label="コンテキストを切り替える" maw={{ base: 144, sm: 240 }}>
+                  <Text size="xs" mr={6} aria-hidden="true">▾</Text>
                   <Text size="sm" truncate>{contextLabels[context]}</Text>
-                  <Text size="xs" ml={6} aria-hidden="true">▾</Text>
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
