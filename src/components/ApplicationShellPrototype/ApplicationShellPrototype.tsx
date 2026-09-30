@@ -29,7 +29,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
   const [context, setContext] = useState<Context>(initialContext)
   const [section, setSection] = useState<Section>("dashboard")
   const [accountOpened, setAccountOpened] = useState(false)
-  const sections = [
+  const sections: { id: Section; label: string; icon: typeof IconLayoutDashboard }[] = [
     { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
     { id: "media", label: "メディア", icon: IconPhoto },
     { id: "groups", label: "グループ", icon: IconUsers },
