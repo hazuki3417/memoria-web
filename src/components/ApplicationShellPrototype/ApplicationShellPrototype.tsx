@@ -2,9 +2,10 @@
 
 import {
   AppShell, Avatar, Box, Burger, Button, Drawer, Group, Menu,
-  NavLink, Paper, Stack, Text, Title,
+  Divider, NavLink, Paper, Stack, Text, Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { IconChevronLeft, IconLayoutDashboard, IconPhoto, IconUsers, IconUserCircle } from "@tabler/icons-react"
 import { useState } from "react"
 
 type Context = "personal" | "community"
@@ -28,11 +29,11 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
   const [context, setContext] = useState<Context>(initialContext)
   const [section, setSection] = useState<Section>("dashboard")
   const [accountOpened, setAccountOpened] = useState(false)
-  const sections: { id: Section; label: string }[] = [
-    { id: "dashboard", label: "ダッシュボード" },
-    { id: "media", label: "メディア" },
-    { id: "groups", label: "グループ" },
-    ...(context === "community" ? [{ id: "members" as const, label: "メンバー" }] : []),
+  const sections = [
+    { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
+    { id: "media", label: "メディア", icon: IconPhoto },
+    { id: "groups", label: "グループ", icon: IconUsers },
+    ...(context === "community" ? [{ id: "members" as const, label: "メンバー", icon: IconUserCircle }] : []),
   ]
   const selectContext = (next: Context) => {
     setContext(next)
@@ -94,7 +95,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
         zIndex={200}
         size={248}
         withCloseButton={false}
-        padding="sm"
+        padding={0}
         closeOnClickOutside
         closeOnEscape
         overlayProps={{ backgroundOpacity: 0.35, blur: 0 }}
@@ -105,13 +106,14 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
           body: { height: "100%" },
         }}
       >
-        <Stack gap="md" h="100%">
+        <Stack gap={0} h="100%" p="xs">
           <Box component="nav" id="application-context-navigation" aria-label="現在のコンテキスト内のナビゲーション">
             <Stack gap={2}>
               {sections.map((item) => (
                 <NavLink
                   key={item.id}
                   label={item.label}
+                  leftSection={<item.icon size={17} stroke={1.6} aria-hidden="true" />}
                   active={section === item.id}
                   onClick={() => selectSection(item.id)}
                   variant="subtle"
@@ -119,18 +121,30 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                   styles={{
                     root: {
                       borderRadius: "var(--mantine-radius-sm)",
-                      borderLeft: section === item.id ? "2px solid var(--mantine-color-text)" : "2px solid transparent",
+                      borderLeft: section === item.id ? "3px solid var(--mantine-primary-color-filled)" : "3px solid transparent",
                       background: section === item.id ? "var(--mantine-color-default-hover)" : undefined,
                       padding: "7px 10px",
+                      minHeight: 36,
                       fontWeight: section === item.id ? 600 : 400,
                     },
+                    section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 10 },
                   }}
                 />
               ))}
             </Stack>
           </Box>
+          <Divider my="md" />
           <Box mt="auto">
-            <Text c="dimmed" size="xs">レイアウト検討用プロトタイプ</Text>
+            <Divider mb="xs" />
+            <NavLink
+              label="サイドバーを閉じる"
+              leftSection={<IconChevronLeft size={17} stroke={1.6} aria-hidden="true" />}
+              onClick={closeNavigation}
+              styles={{
+                root: { borderRadius: "var(--mantine-radius-sm)", padding: "7px 10px", minHeight: 36 },
+                section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 10 },
+              }}
+            />
           </Box>
         </Stack>
       </Drawer>
