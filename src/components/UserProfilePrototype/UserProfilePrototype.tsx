@@ -39,7 +39,11 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
           color={success ? "green" : "red"}
           title={success ? "保存しました" : "保存できませんでした"}
           icon={success ? <IconCheck size={18} /> : <IconAlertCircle size={18} />}
-          styles={{ root: { backgroundColor: `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`, paddingRight: 40 } }}
+          styles={{
+            root: { backgroundColor: `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`, paddingRight: 40 },
+            title: { fontSize: 14 },
+            message: { fontSize: 12 },
+          }}
         >
           {success ? "プロフィールを更新しました。" : "変更内容は保持されています。再試行してください。"}
         </Alert>
