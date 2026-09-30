@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  AppShell, Avatar, Box, Burger, Button, Divider, Group, Menu,
+  AppShell, Avatar, Box, Burger, Button, Group, Menu,
   NavLink, Paper, Stack, Text, Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
@@ -56,6 +56,22 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
           <Group gap="sm" wrap="nowrap">
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" aria-label="ナビゲーションを開閉" />
             <Text fw={750} size="lg">Memoria</Text>
+            <Box w={1} h={20} bg="var(--mantine-color-default-border)" aria-hidden="true" />
+          <Menu withinPortal position="bottom-start" styles={menuStyles}>
+            <Menu.Target>
+              <Button variant="subtle" color="gray" size="compact-sm" px="xs" aria-label="コンテキストを切り替える" maw={{ base: 144, sm: 240 }}>
+                <Text size="sm" truncate>{context === "personal" ? "Personal" : communityName}</Text>
+                <Text size="xs" ml={6} aria-hidden="true">▾</Text>
+              </Button>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Label>切り替え先</Menu.Label>
+              <Menu.Item onClick={() => selectContext("personal")}>Personal</Menu.Item>
+              <Menu.Item onClick={() => selectContext("community")}>{communityName}</Menu.Item>
+              <Menu.Divider />
+              <Menu.Item disabled>Communityを作成（表示例）</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
           </Group>
           <Menu opened={accountOpened} onChange={setAccountOpened} position="bottom-end" withinPortal styles={menuStyles}>
             <Menu.Target>
@@ -74,21 +90,6 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
 
       <AppShell.Navbar p="md">
         <Stack gap="md" h="100%">
-          <Menu withinPortal position="bottom-start" styles={menuStyles}>
-            <Menu.Target>
-              <Button variant="light" color="gray" fullWidth justify="space-between" aria-label="コンテキストを切り替える">
-                {context === "personal" ? "Personal" : communityName} ▾
-              </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Label>切り替え先</Menu.Label>
-              <Menu.Item onClick={() => selectContext("personal")}>Personal</Menu.Item>
-              <Menu.Item onClick={() => selectContext("community")}>{communityName}</Menu.Item>
-              <Menu.Divider />
-              <Menu.Item disabled>Communityを作成（表示例）</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-          <Divider />
           <Box component="nav" aria-label="現在のコンテキスト内のナビゲーション">
             <Stack gap={4}>
               {sections.map((item) => (
