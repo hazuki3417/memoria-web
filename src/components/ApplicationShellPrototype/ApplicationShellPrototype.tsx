@@ -84,7 +84,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 <Avatar size={32} radius="xl">U</Avatar>
                 <Box>
                   <Text size="sm" fw={600} lh={1.2}>ユーザー</Text>
-                  <Text size="xs" c="dimmed" lh={1.2}>Personal</Text>
+                  <Text size="xs" c="dimmed" lh={1.2}>{context === "personal" ? "Personal" : communityName}</Text>
                 </Box>
               </Group>
               <Menu.Divider />
