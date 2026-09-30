@@ -33,9 +33,9 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
 
   useEffect(() => {
     if (reviewState === "success") {
-      notifications.show({ title: "保存しました", message: "プロフィールを更新しました。", color: "green", icon: <IconCheck size={18} /> })
+      notifications.show({ title: "保存しました", message: "プロフィールを更新しました。", color: "green", icon: <IconCheck size={18} />, withBorder: true, radius: "sm", styles: { root: { boxShadow: "none" } } })
     } else if (reviewState === "failure") {
-      notifications.show({ title: "保存できませんでした", message: "変更内容は保持されています。再試行してください。", color: "red", icon: <IconAlertCircle size={18} /> })
+      notifications.show({ title: "保存できませんでした", message: "変更内容は保持されています。再試行してください。", color: "red", icon: <IconAlertCircle size={18} />, withBorder: true, radius: "sm", styles: { root: { boxShadow: "none" } } })
     }
   }, [reviewState])
 
