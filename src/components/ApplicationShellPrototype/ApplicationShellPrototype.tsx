@@ -171,7 +171,6 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
           </Box>
           <Divider my="md" />
           <Box mt="auto">
-            <Divider mb="xs" />
             <NavLink
               label="サイドバーを閉じる"
               leftSection={<IconChevronLeft size={14} stroke={1.6} aria-hidden="true" />}
@@ -182,7 +181,8 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 label: { color: "var(--mantine-color-dimmed)", fontSize: "var(--mantine-font-size-xs)", lineHeight: 1.3 },
               }}
             />
-            <Text size="10px" c="dimmed" px="sm" pt="sm" pb={4}>© 2026 Memoria</Text>
+            <Divider mt="xs" mb="xs" />
+            <Text size="10px" c="dimmed" px="sm" pb={4}>© 2026 Memoria</Text>
           </Box>
         </Stack>
       </Drawer>
