@@ -182,12 +182,13 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 label: { color: "var(--mantine-color-dimmed)", fontSize: "var(--mantine-font-size-xs)", lineHeight: 1.3 },
               }}
             />
+            <Text size="xs" c="dimmed" px="sm" pt="sm" pb={4}>© 2026 Memoria</Text>
           </Box>
         </Stack>
       </Drawer>
 
-      <AppShell.Main style={{ display: "flex", flexDirection: "column" }}>
-        <Box maw={1120} mx="auto" w="100%" style={{ flex: 1 }}>
+      <AppShell.Main>
+        <Box maw={1120} mx="auto" w="100%">
           <h1 style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }}>
             {sections.find((item) => item.id === section)?.label}
           </h1>
@@ -199,9 +200,6 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
               </Text>
             </Stack>
           </Paper>
-        </Box>
-        <Box component="footer" maw={1120} mx="auto" w="100%" pt="xl" pb="xs">
-          <Text size="xs" c="dimmed" ta="center">© 2026 Memoria</Text>
         </Box>
       </AppShell.Main>
     </AppShell>
