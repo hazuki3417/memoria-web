@@ -79,7 +79,6 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 <Menu.Item onClick={() => selectContext("personal")}>Personal</Menu.Item>
                 <Menu.Divider />
                 <Menu.Item onClick={() => selectContext("community")}>{communityName}</Menu.Item>
-                <Menu.Divider />
                 <Menu.Item disabled leftSection={<IconPlus size={16} stroke={1.6} aria-hidden="true" />}>Communityを作成</Menu.Item>
               </Menu.Dropdown>
             </Menu>
