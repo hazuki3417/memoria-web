@@ -8,13 +8,15 @@ import { useDisclosure } from "@mantine/hooks"
 import { IconCheck, IconChevronLeft, IconDeviceDesktop, IconLayoutDashboard, IconLogout, IconMoon, IconPhoto, IconPlus, IconSun, IconUser, IconUsers, IconUserCircle } from "@tabler/icons-react"
 import { useState } from "react"
 
-type Context = "personal" | "community"
+type Context = "personal" | "community" | "communityTravel"
 type Section = "dashboard" | "media" | "groups" | "members"
 
 const communityName = "家族のアルバム"
+const secondCommunityName = "旅行の思い出"
+const contextLabels: Record<Context, string> = { personal: "Personal", community: communityName, communityTravel: secondCommunityName }
 
 // Visual Review用の仮色。正式なコンテキスト設定値との接続は行わない。
-const contextColors: Record<Context, string> = { personal: "var(--mantine-color-blue-6)", community: "var(--mantine-color-teal-6)" }
+const contextColors: Record<Context, string> = { personal: "var(--mantine-color-blue-6)", community: "var(--mantine-color-teal-6)", communityTravel: "var(--mantine-color-violet-6)" }
 
 // GitHub風の共通メニュー試作。承認後に共通コンポーネントへ移す。
 const menuStyles = {
@@ -38,7 +40,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
     { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
     { id: "media", label: "メディア", icon: IconPhoto },
     { id: "groups", label: "グループ", icon: IconUsers },
-    ...(context === "community" ? [{ id: "members" as const, label: "メンバー", icon: IconUserCircle }] : []),
+    ...(context !== "personal" ? [{ id: "members" as const, label: "メンバー", icon: IconUserCircle }] : []),
   ]
   const selectContext = (next: Context) => {
     setContext(next)
@@ -65,7 +67,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
             <Menu withinPortal position="bottom-start" styles={menuStyles}>
               <Menu.Target>
                 <Button variant="subtle" color="gray" size="compact-sm" px="xs" aria-label="コンテキストを切り替える" maw={{ base: 144, sm: 240 }}>
-                  <Text size="sm" truncate>{context === "personal" ? "Personal" : communityName}</Text>
+                  <Text size="sm" truncate>{contextLabels[context]}</Text>
                   <Text size="xs" ml={6} aria-hidden="true">▾</Text>
                 </Button>
               </Menu.Target>
@@ -79,6 +81,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 <Menu.Item onClick={() => selectContext("personal")}>Personal</Menu.Item>
                 <Menu.Divider />
                 <Menu.Item onClick={() => selectContext("community")}>{communityName}</Menu.Item>
+                <Menu.Item onClick={() => selectContext("communityTravel")}>{secondCommunityName}</Menu.Item>
                 <Menu.Item disabled leftSection={<IconPlus size={16} stroke={1.6} aria-hidden="true" />}>Communityを作成</Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -94,7 +97,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 <Avatar size={32} radius="xl">U</Avatar>
                 <Box>
                   <Text size="sm" fw={600} lh={1.2}>ユーザー</Text>
-                  <Text size="xs" c="dimmed" lh={1.2}>{context === "personal" ? "Personal" : communityName}</Text>
+                  <Text size="xs" c="dimmed" lh={1.2}>{contextLabels[context]}</Text>
                 </Box>
               </Group>
               <Menu.Divider />
