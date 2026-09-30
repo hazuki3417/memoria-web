@@ -12,6 +12,13 @@ type Section = "dashboard" | "media" | "groups" | "members"
 
 const communityName = "家族のアルバム"
 
+// GitHub風の共通メニュー試作。承認後に共通コンポーネントへ移す。
+const menuStyles = {
+  dropdown: { border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)", boxShadow: "var(--mantine-shadow-md)", padding: 4, minWidth: 200 },
+  item: { borderRadius: "var(--mantine-radius-sm)", fontSize: "var(--mantine-font-size-sm)", minHeight: 32, padding: "6px 8px" },
+  label: { padding: "8px 8px 4px", fontSize: "var(--mantine-font-size-xs)" },
+} as const
+
 /**
  * 画面レイアウトの検討専用。認証、Routing、API、既存AppShellには接続しない。
  * 具体的な色・寸法・配置はVisual Reviewで確定する。
@@ -50,13 +57,10 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" aria-label="ナビゲーションを開閉" />
             <Text fw={750} size="lg">Memoria</Text>
           </Group>
-          <Menu opened={accountOpened} onChange={setAccountOpened} position="bottom-end" withinPortal>
+          <Menu opened={accountOpened} onChange={setAccountOpened} position="bottom-end" withinPortal styles={menuStyles}>
             <Menu.Target>
-              <Button variant="subtle" color="gray" aria-label="アカウントメニュー">
-                <Group gap="xs" wrap="nowrap">
-                  <Avatar size="sm" radius="xl">U</Avatar>
-                  <Text visibleFrom="sm">アカウント</Text>
-                </Group>
+              <Button variant="subtle" color="gray" size="compact-sm" px={4} aria-label="アカウントメニュー" title="アカウントメニュー">
+                <Avatar size={24} radius="xl">U</Avatar>
               </Button>
             </Menu.Target>
             <Menu.Dropdown>
@@ -70,7 +74,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
 
       <AppShell.Navbar p="md">
         <Stack gap="md" h="100%">
-          <Menu withinPortal position="bottom-start">
+          <Menu withinPortal position="bottom-start" styles={menuStyles}>
             <Menu.Target>
               <Button variant="light" color="gray" fullWidth justify="space-between" aria-label="コンテキストを切り替える">
                 {context === "personal" ? "Personal" : communityName} ▾
