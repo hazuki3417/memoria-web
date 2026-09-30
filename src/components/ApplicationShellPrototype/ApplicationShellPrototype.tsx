@@ -2,7 +2,7 @@
 
 import {
   AppShell, Avatar, Box, Burger, Button, Drawer, Group, Menu,
-  Divider, NavLink, Paper, Stack, Text, Title, useMantineColorScheme,
+  Divider, NavLink, Paper, Stack, Text, useMantineColorScheme,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { IconCheck, IconChevronLeft, IconDeviceDesktop, IconLayoutDashboard, IconLogout, IconMoon, IconPhoto, IconPlus, IconSun, IconUser, IconUsers, IconUserCircle } from "@tabler/icons-react"
@@ -186,21 +186,22 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
         </Stack>
       </Drawer>
 
-      <AppShell.Main>
-        <Box maw={1120} mx="auto">
-          <Stack gap="lg">
-            <Box>
-              <Title order={1} size="h2">{sections.find((item) => item.id === section)?.label}</Title>
-            </Box>
-            <Paper withBorder radius="md" p="xl" mih={320}>
-              <Stack align="center" justify="center" mih={260} gap="xs">
-                <Text fw={600}>コンテンツ領域</Text>
-                <Text c="dimmed" ta="center" size="sm">
-                  このStoryでは共通Shellのみを検討します。画面固有のデータや操作は接続していません。
-                </Text>
-              </Stack>
-            </Paper>
-          </Stack>
+      <AppShell.Main style={{ display: "flex", flexDirection: "column" }}>
+        <Box maw={1120} mx="auto" w="100%" style={{ flex: 1 }}>
+          <h1 style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }}>
+            {sections.find((item) => item.id === section)?.label}
+          </h1>
+          <Paper withBorder radius="md" p="xl" mih={320}>
+            <Stack align="center" justify="center" mih={260} gap="xs">
+              <Text fw={600}>コンテンツ領域</Text>
+              <Text c="dimmed" ta="center" size="sm">
+                このStoryでは共通Shellのみを検討します。画面固有のデータや操作は接続していません。
+              </Text>
+            </Stack>
+          </Paper>
+        </Box>
+        <Box component="footer" maw={1120} mx="auto" w="100%" pt="xl" pb="xs">
+          <Text size="xs" c="dimmed" ta="center">© 2026 Memoria</Text>
         </Box>
       </AppShell.Main>
     </AppShell>
