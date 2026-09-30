@@ -5,8 +5,8 @@ import {
   AppShell,
   Box,
   Button,
-  Group,
   Divider,
+  Group,
   Modal,
   Stack,
   Text,
@@ -65,11 +65,6 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
               <Title order={1} size="h2">プロフィール</Title>
               <Text c="dimmed" size="sm" mt={4}>Memoriaで使用するプロフィール情報を管理します。</Text>
             </Box>
-            {blocking && (
-              <Alert color="red" title="プロフィールを変更できません" icon={<IconAlertCircle size={18} />}>
-                現在のアカウント状態では編集を続けられません。
-              </Alert>
-            )}
             <Box>
               <Title order={2} size="h4">基本情報</Title>
               <Divider my="md" />
@@ -83,10 +78,14 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
                       setNickname(event.currentTarget.value)
                       setStatus("default")
                     }}
-                    error={invalid ? "ニックネームを入力してください。" : undefined}
+                    error={invalid}
+                    aria-describedby="nickname-error"
                     disabled={saving || blocking}
                     required
                   />
+                  <Box mih={22} mt={4} id="nickname-error" aria-live="polite">
+                    {invalid && <Text size="xs" c="red">ニックネームを入力してください。</Text>}
+                  </Box>
                 </Box>
                 <Group gap="sm">
                   <Button size="sm" onClick={save} disabled={!dirty || invalid || saving || blocking} loading={saving}>
@@ -98,6 +97,13 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
                     </Button>
                   )}
                 </Group>
+                <Box mih={92} aria-live="polite">
+                  {blocking && (
+                    <Alert color="red" title="プロフィールを変更できません" icon={<IconAlertCircle size={18} />}>
+                      現在のアカウント状態では編集を続けられません。アカウントの状態を確認してください。
+                    </Alert>
+                  )}
+                </Box>
               </Stack>
             </Box>
           </Stack>
