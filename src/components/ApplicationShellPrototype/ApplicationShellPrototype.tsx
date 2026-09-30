@@ -182,7 +182,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 label: { color: "var(--mantine-color-dimmed)", fontSize: "var(--mantine-font-size-xs)", lineHeight: 1.3 },
               }}
             />
-            <Text size="xs" c="dimmed" px="sm" pt="sm" pb={4}>© 2026 Memoria</Text>
+            <Text size="10px" c="dimmed" px="sm" pt="sm" pb={4}>© 2026 Memoria</Text>
           </Box>
         </Stack>
       </Drawer>
