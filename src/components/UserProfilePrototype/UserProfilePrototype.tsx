@@ -7,7 +7,7 @@ import {
   Button,
   Group,
   Modal,
-  Paper,
+  Divider,
   Stack,
   Text,
   TextInput,
@@ -47,8 +47,8 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
         </Group>
       </AppShell.Header>
       <AppShell.Main>
-        <Box maw={760} mx="auto" w="100%">
-          <Stack gap="lg">
+        <Box maw={880} mx="auto" w="100%">
+          <Stack gap="xl">
             <Box>
               <Title order={1} size="h2">プロフィール</Title>
               <Text c="dimmed" size="sm" mt={4}>Memoriaで使用するプロフィール情報を管理します。</Text>
@@ -58,9 +58,10 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
                 現在のアカウント状態では編集を続けられません。
               </Alert>
             )}
-            <Paper withBorder radius="md" p="lg">
-              <Stack gap="lg">
-                <Title order={2} size="h4">基本情報</Title>
+            <Box>
+              <Title order={2} size="h4">基本情報</Title>
+              <Divider my="md" />
+              <Stack gap="md" maw={540}>
                 <Box maw={440}>
                   <TextInput
                     label="ニックネーム"
@@ -85,16 +86,18 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
                     新しいニックネームを保存しました。
                   </Alert>
                 )}
-                <Group justify="flex-end">
-                  <Button variant="subtle" color="gray" onClick={openDiscard} disabled={!dirty || saving || blocking}>
-                    変更を破棄
-                  </Button>
-                  <Button onClick={save} disabled={!dirty || invalid || saving || blocking} loading={saving}>
+                <Group gap="sm">
+                  <Button size="sm" onClick={save} disabled={!dirty || invalid || saving || blocking} loading={saving}>
                     変更を保存
                   </Button>
+                  {dirty && (
+                    <Button size="sm" variant="default" onClick={openDiscard} disabled={saving || blocking}>
+                      変更を破棄
+                    </Button>
+                  )}
                 </Group>
               </Stack>
-            </Paper>
+            </Box>
           </Stack>
         </Box>
       </AppShell.Main>
