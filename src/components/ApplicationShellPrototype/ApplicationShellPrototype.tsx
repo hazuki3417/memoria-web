@@ -5,7 +5,7 @@ import {
   Divider, NavLink, Paper, Stack, Text, Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconChevronLeft, IconLayoutDashboard, IconPhoto, IconUsers, IconUserCircle } from "@tabler/icons-react"
+import { IconChevronLeft, IconLayoutDashboard, IconLogout, IconPhoto, IconUser, IconUsers, IconUserCircle } from "@tabler/icons-react"
 import { useState } from "react"
 
 type Context = "personal" | "community"
@@ -16,7 +16,7 @@ const communityName = "家族のアルバム"
 // GitHub風の共通メニュー試作。承認後に共通コンポーネントへ移す。
 const menuStyles = {
   dropdown: { border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)", boxShadow: "var(--mantine-shadow-md)", padding: 4, minWidth: 200 },
-  item: { borderRadius: "var(--mantine-radius-sm)", fontSize: "var(--mantine-font-size-sm)", minHeight: 32, padding: "6px 8px" },
+  item: { borderRadius: "var(--mantine-radius-sm)", fontSize: "var(--mantine-font-size-sm)", minHeight: 32, padding: "5px 8px" },
   label: { padding: "8px 8px 4px", fontSize: "var(--mantine-font-size-xs)" },
 } as const
 
@@ -69,7 +69,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                 <Menu.Item onClick={() => selectContext("personal")}>Personal</Menu.Item>
                 <Menu.Item onClick={() => selectContext("community")}>{communityName}</Menu.Item>
                 <Menu.Divider />
-                <Menu.Item disabled>Communityを作成（表示例）</Menu.Item>
+                <Menu.Item disabled>Communityを作成</Menu.Item>
               </Menu.Dropdown>
             </Menu>
           </Group>
@@ -80,9 +80,17 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
               </Button>
             </Menu.Target>
             <Menu.Dropdown>
-              <Menu.Label>アカウント</Menu.Label>
-              <Menu.Item>プロフィール（表示例）</Menu.Item>
-              <Menu.Item>ログアウト（表示例）</Menu.Item>
+              <Group gap="sm" px="xs" py="xs" wrap="nowrap">
+                <Avatar size={32} radius="xl">U</Avatar>
+                <Box>
+                  <Text size="sm" fw={600} lh={1.2}>ユーザー</Text>
+                  <Text size="xs" c="dimmed" lh={1.2}>Personal</Text>
+                </Box>
+              </Group>
+              <Menu.Divider />
+              <Menu.Item leftSection={<IconUser size={16} stroke={1.6} aria-hidden="true" />}>プロフィール</Menu.Item>
+              <Menu.Divider />
+              <Menu.Item leftSection={<IconLogout size={16} stroke={1.6} aria-hidden="true" />}>ログアウト</Menu.Item>
             </Menu.Dropdown>
           </Menu>
         </Group>
