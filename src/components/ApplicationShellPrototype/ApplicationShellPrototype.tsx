@@ -108,14 +108,14 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
       >
         <Stack gap={0} h="100%" p="xs">
           <Box component="nav" id="application-context-navigation" aria-label="現在のコンテキスト内のナビゲーション">
-            <Stack gap={2}>
+            <Stack gap={0}>
               {sections.map((item) => (
                 <Box key={item.id} pos="relative" pl={8}>
                   {section === item.id && (
                     <Box
                       pos="absolute"
-                      top={4}
-                      bottom={4}
+                      top={3}
+                      bottom={3}
                       left={0}
                       w={3}
                       bg="var(--mantine-primary-color-filled)"
@@ -125,7 +125,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                   )}
                   <NavLink
                     label={item.label}
-                    leftSection={<item.icon size={17} stroke={1.6} aria-hidden="true" />}
+                    leftSection={<item.icon size={16} stroke={1.6} aria-hidden="true" />}
                     active={section === item.id}
                     onClick={() => selectSection(item.id)}
                     variant="subtle"
@@ -134,11 +134,12 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                       root: {
                         borderRadius: "var(--mantine-radius-sm)",
                         background: section === item.id ? "var(--mantine-color-default-hover)" : undefined,
-                        padding: "7px 10px",
-                        minHeight: 36,
+                        padding: "5px 8px",
+                        minHeight: 32,
                         fontWeight: section === item.id ? 600 : 400,
                       },
-                      section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 10 },
+                      section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 8 },
+                      label: { fontSize: "var(--mantine-font-size-sm)", lineHeight: 1.3 },
                     }}
                   />
                 </Box>
@@ -153,8 +154,9 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
               leftSection={<IconChevronLeft size={17} stroke={1.6} aria-hidden="true" />}
               onClick={closeNavigation}
               styles={{
-                root: { borderRadius: "var(--mantine-radius-sm)", padding: "7px 10px", minHeight: 36 },
-                section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 10 },
+                root: { borderRadius: "var(--mantine-radius-sm)", padding: "5px 8px", minHeight: 32 },
+                section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 8 },
+                label: { fontSize: "var(--mantine-font-size-sm)", lineHeight: 1.3 },
               }}
             />
           </Box>
