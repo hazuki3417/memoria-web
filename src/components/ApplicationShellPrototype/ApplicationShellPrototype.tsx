@@ -2,16 +2,19 @@
 
 import {
   AppShell, Avatar, Box, Burger, Button, Drawer, Group, Menu,
-  Divider, NavLink, Paper, Stack, Text, Title,
+  Divider, NavLink, Paper, Stack, Text, Title, useMantineColorScheme,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconChevronLeft, IconLayoutDashboard, IconLogout, IconPhoto, IconUser, IconUsers, IconUserCircle } from "@tabler/icons-react"
+import { IconCheck, IconChevronLeft, IconDeviceDesktop, IconLayoutDashboard, IconLogout, IconMoon, IconPhoto, IconSun, IconUser, IconUsers, IconUserCircle } from "@tabler/icons-react"
 import { useState } from "react"
 
 type Context = "personal" | "community"
 type Section = "dashboard" | "media" | "groups" | "members"
 
 const communityName = "家族のアルバム"
+
+// Visual Review用の仮色。正式なコンテキスト設定値との接続は行わない。
+const contextColors: Record<Context, string> = { personal: "var(--mantine-color-blue-6)", community: "var(--mantine-color-teal-6)" }
 
 // GitHub風の共通メニュー試作。承認後に共通コンポーネントへ移す。
 const menuStyles = {
@@ -29,6 +32,8 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
   const [context, setContext] = useState<Context>(initialContext)
   const [section, setSection] = useState<Section>("dashboard")
   const [accountOpened, setAccountOpened] = useState(false)
+  const { colorScheme, setColorScheme } = useMantineColorScheme()
+  const accentColor = contextColors[context]
   const sections: { id: Section; label: string; icon: typeof IconLayoutDashboard }[] = [
     { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
     { id: "media", label: "メディア", icon: IconPhoto },
@@ -51,7 +56,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
       padding="lg"
       styles={{ main: { minHeight: "100vh", background: "var(--mantine-color-body)" } }}
     >
-      <AppShell.Header style={{ zIndex: 300 }}>
+      <AppShell.Header style={{ zIndex: 300, borderTop: `2px solid ${accentColor}` }}>
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
             <Burger opened={navigationOpened} onClick={toggleNavigation} size="sm" aria-label="ナビゲーションを開閉" aria-controls="application-context-navigation" aria-expanded={navigationOpened} />
@@ -60,6 +65,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
             <Menu withinPortal position="bottom-start" styles={menuStyles}>
               <Menu.Target>
                 <Button variant="subtle" color="gray" size="compact-sm" px="xs" aria-label="コンテキストを切り替える" maw={{ base: 144, sm: 240 }}>
+                  <Box w={8} h={8} bg={accentColor} style={{ borderRadius: "50%", flexShrink: 0 }} aria-hidden="true" />
                   <Text size="sm" truncate>{context === "personal" ? "Personal" : communityName}</Text>
                   <Text size="xs" ml={6} aria-hidden="true">▾</Text>
                 </Button>
@@ -89,6 +95,11 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
               </Group>
               <Menu.Divider />
               <Menu.Item leftSection={<IconUser size={16} stroke={1.6} aria-hidden="true" />}>プロフィール</Menu.Item>
+              <Menu.Divider />
+              <Menu.Label>表示テーマ</Menu.Label>
+              <Menu.Item leftSection={<IconDeviceDesktop size={16} stroke={1.6} />} rightSection={colorScheme === "auto" ? <IconCheck size={14} /> : null} onClick={() => setColorScheme("auto")}>システム</Menu.Item>
+              <Menu.Item leftSection={<IconSun size={16} stroke={1.6} />} rightSection={colorScheme === "light" ? <IconCheck size={14} /> : null} onClick={() => setColorScheme("light")}>ライト</Menu.Item>
+              <Menu.Item leftSection={<IconMoon size={16} stroke={1.6} />} rightSection={colorScheme === "dark" ? <IconCheck size={14} /> : null} onClick={() => setColorScheme("dark")}>ダーク</Menu.Item>
               <Menu.Divider />
               <Menu.Item leftSection={<IconLogout size={16} stroke={1.6} aria-hidden="true" />}>ログアウト</Menu.Item>
             </Menu.Dropdown>
@@ -126,7 +137,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
                       bottom={3}
                       left={0}
                       w={3}
-                      bg="var(--mantine-primary-color-filled)"
+                      bg={accentColor}
                       style={{ borderRadius: "var(--mantine-radius-xl)", pointerEvents: "none" }}
                       aria-hidden="true"
                     />
