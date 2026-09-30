@@ -50,7 +50,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
       padding="lg"
       styles={{ main: { minHeight: "100vh", background: "var(--mantine-color-body)" } }}
     >
-      <AppShell.Header>
+      <AppShell.Header style={{ zIndex: 300 }}>
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
             <Burger opened={navigationOpened} onClick={toggleNavigation} size="sm" aria-label="ナビゲーションを開閉" aria-controls="application-context-navigation" aria-expanded={navigationOpened} />
@@ -91,6 +91,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
         opened={navigationOpened}
         onClose={closeNavigation}
         position="left"
+        zIndex={200}
         size={248}
         withCloseButton={false}
         padding="sm"
@@ -100,6 +101,7 @@ export function ApplicationShellPrototype({ initialContext = "personal" }: { ini
         styles={{
           content: { marginTop: 40, height: "calc(100dvh - 40px)", boxShadow: "var(--mantine-shadow-md)" },
           inner: { top: 0 },
+          overlay: { top: 40, height: "calc(100dvh - 40px)" },
           body: { height: "100%" },
         }}
       >
