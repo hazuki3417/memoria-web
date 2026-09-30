@@ -31,11 +31,33 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
   const saving = status === "saving"
   const blocking = status === "blocking"
 
+  const showFeedback = (kind: "success" | "failure") => {
+    const success = kind === "success"
+    notifications.show({
+      message: (
+        <Alert
+          color={success ? "green" : "red"}
+          title={success ? "保存しました" : "保存できませんでした"}
+          icon={success ? <IconCheck size={18} /> : <IconAlertCircle size={18} />}
+        >
+          {success ? "プロフィールを更新しました。" : "変更内容は保持されています。再試行してください。"}
+        </Alert>
+      ),
+      withCloseButton: true,
+      styles: {
+        root: { padding: 0, border: 0, background: "transparent", boxShadow: "none" },
+        body: { margin: 0 },
+        description: { margin: 0 },
+        closeButton: { position: "absolute", top: 8, right: 8, zIndex: 1 },
+      },
+    })
+  }
+
   useEffect(() => {
     if (reviewState === "success") {
-      notifications.show({ title: "保存しました", message: "プロフィールを更新しました。", color: "green", icon: <IconCheck size={18} />, withBorder: true, radius: "sm", styles: { root: { boxShadow: "none" } } })
+      showFeedback("success")
     } else if (reviewState === "failure") {
-      notifications.show({ title: "保存できませんでした", message: "変更内容は保持されています。再試行してください。", color: "red", icon: <IconAlertCircle size={18} />, withBorder: true, radius: "sm", styles: { root: { boxShadow: "none" } } })
+      showFeedback("failure")
     }
   }, [reviewState])
 
@@ -44,7 +66,7 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
     setSavedName(normalized)
     setNickname(normalized)
     setStatus("success")
-    notifications.show({ title: "保存しました", message: "プロフィールを更新しました。", color: "green", icon: <IconCheck size={18} /> })
+    showFeedback("success")
   }
 
   return (
