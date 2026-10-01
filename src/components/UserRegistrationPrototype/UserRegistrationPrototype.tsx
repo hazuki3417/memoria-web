@@ -186,7 +186,7 @@ export function UserRegistrationPrototype({
                     {blocking && (
                       <Alert
                         color="red"
-                        title="登録を続けられません"
+                        title="認証情報を確認できませんでした"
                         icon={<IconAlertCircle size={18} />}
                         styles={{
                           root: {
@@ -195,7 +195,7 @@ export function UserRegistrationPrototype({
                           },
                         }}
                       >
-                        認証情報を確認できませんでした。登録せずに終了し、もう一度ログインしてください。
+                        もう一度ログインしてください。
                       </Alert>
                     )}
                     {exited && (
