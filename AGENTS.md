@@ -40,12 +40,18 @@
 
 ## アプリケーション境界
 
-- ルートとレイアウトは`src/app`へ置きます。
-- 再利用可能なUI部品は`src/components`へ置きます。
-- プロダクト機能として構成されたUIは`src/feature`へ置きます。
-- 横断的なProviderは`src/providers`へ置きます。
-- GraphQLのoperationとfragmentは`src/graphql/operation`と`src/graphql/fragment`へ置きます。
-- GraphQLクライアントの生成コードは`src/graphql/gql`へ出力します。
+Application Architectureの正本は `memoria-design/content/system/web/implementation-conventions.mdx` です。目標構成は `src/app`、`src/features`、`src/ui`、`src/infrastructure` をownership boundaryとして使用します。
+
+既存の `src/components`、`src/feature`、`src/providers`、`src/graphql`、`src/lib` 等は旧構成を含みます。存在していることだけを理由に新規実装の配置規則とはみなしません。一括移行は行わず、変更対象ごとに正本Architectureへ適合させる範囲を判断します。
+
+- `src/app` はNext.jsのentry、routing、layout等を担当し、Product/Application Logicを蓄積しません。
+- Product Capabilityは `src/features` をownerとし、Feature間の直接依存を原則として避けます。
+- Feature非依存のMemoria UI / Pattern実装は `src/ui` が所有します。再利用されるだけではFeature Componentを移動しません。
+- GraphQL Client等の外部Integrationは `src/infrastructure` が所有します。
+- Product FeatureのGraphQL Remote StateはClient Apolloをdefaultとし、Server QueryはServer固有の明確な責務がある場合に利用します。
+- ComponentとPure Product/Application LogicへApolloやGenerated GraphQL Typeを漏らしません。
+- Reactを必要としない判断、変換、Validation、State Transition、Derived StateはPure TypeScriptを優先します。
+- `shared` / `common` や、Code形態だけを表すTop-level `utils` / `hooks` / `types` 等を新しい標準境界として追加しません。
 - サーバー専用の環境変数や認証情報を、Client Componentやブラウザ向けbundleへ含めません。
 - 認証済みルートと公開ルートの境界を維持します。
 
@@ -112,9 +118,9 @@ npm run test:app
 ## GraphQL開発手順
 
 - `src/graphql/schema`のクライアントスキーマは、`memoria-api/schemas/graphql`が所有するAPI契約を反映します。
-- operationまたはfragmentを先に変更し、`npm run gen:graphql`を実行します。
-- GraphQL文書と生成されたクライアントコードを同じ変更に含めます。
-- `src/graphql/gql`を直接編集しません。
+- 現行構成ではoperation / fragmentを変更してから`npm run gen:graphql`を実行します。Feature近接配置への移行はArchitecture正本と実装Issueに従います。
+- GraphQL生成物はGit管理対象外です。clean checkoutでも生成可能な状態を維持し、生成物を直接編集しません。
+- 目標構成ではAPI schema mirrorを`src/infrastructure/graphql/schema`、生成物を`src/infrastructure/graphql/generated`で扱います。実装移行前にREADME・Codegen設定・importを同じ変更で整合させます。
 - APIスキーマ変更時は、その契約を提供するAPI側のPRまたはcommitを示し、null許容性、scalar、upload、paginationの意味を確認します。
 - 判断を記録せず、API契約の不一致を推測によるクライアント側回避策で隠しません。
 
