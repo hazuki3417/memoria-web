@@ -218,7 +218,7 @@ export function UserRegistrationPrototype({
       >
         <Stack>
           <Text size="sm">
-            Memoriaへの登録は行われません。MemoriaとAuth0からログアウトし、公開画面へ戻ります。
+            登録せずに終了すると、ログアウトしてトップページに戻ります。
           </Text>
           <Group justify="flex-end">
             <Button variant="default" onClick={closeExit}>
