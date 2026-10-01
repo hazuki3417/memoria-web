@@ -157,17 +157,7 @@ export function UserRegistrationPrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <Alert
-                        color="red"
-                        title="登録できませんでした"
-                        icon={<IconAlertCircle size={18} />}
-                        styles={{
-                          root: {
-                            backgroundColor:
-                              "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
-                          },
-                        }}
-                      >
+                      <PrototypeFormAlert kind="error" title="登録できませんでした">
                         認証情報を確認できませんでした。もう一度ログインしてください。
                       </PrototypeFormAlert>
                     )}
