@@ -84,10 +84,14 @@ export function AccountDeletionImpactPrototype({
                     )}
                   </Box>
                 )}
-                {failed && (
+                {(failed || retrying) && (
                   <Alert
                     color="red"
-                    title="削除の影響を確認できませんでした"
+                    title={
+                      retrying
+                        ? "削除対象のMediaを確認しています"
+                        : "削除の影響を確認できませんでした"
+                    }
                     icon={<IconAlertCircle size={18} />}
                     styles={{
                       root: {
@@ -96,7 +100,9 @@ export function AccountDeletionImpactPrototype({
                       },
                     }}
                   >
-                    Mediaの件数を取得できませんでした。もう一度お試しください。
+                    {retrying
+                      ? "Mediaの件数を再取得しています。"
+                      : "Mediaの件数を取得できませんでした。もう一度お試しください。"}
                   </Alert>
                 )}
                 <Alert
