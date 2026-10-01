@@ -216,7 +216,10 @@ export function AccountDeletionImpactPrototype({
                               label="確認のためCommunity名を入力"
                               description={`「${community.name}」と入力してください。`}
                               value={confirmations[community.id] ?? ""}
-                              onChange={(event) => setConfirmations((previous) => ({ ...previous, [community.id]: event.currentTarget.value }))}
+                              onChange={(event) => {
+                                const value = event.currentTarget.value
+                                setConfirmations((previous) => ({ ...previous, [community.id]: value }))
+                              }}
                               error={confirmations[community.id] && confirmations[community.id] !== community.name ? "Community名が一致しません" : undefined}
                             />
                           </Stack>
