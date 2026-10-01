@@ -2,6 +2,7 @@
 
 import { AppShell, Badge, Box, Button, Divider, Group, Radio, Select, Stack, Stepper, Text, TextInput, Title } from "@mantine/core"
 import { useState } from "react"
+import { useMediaQuery } from "@mantine/hooks"
 import { PrototypeFormAlert } from "../PrototypeFeedback/PrototypeFeedback"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
@@ -24,6 +25,7 @@ export function AccountDeletionImpactPrototype({
   retryOutcome?: RetryOutcome
 }) {
   const [step, setStep] = useState(0)
+  const compactStepper = useMediaQuery("(max-width: 48em)")
   const [loadState, setLoadState] = useState<"ready" | "failed" | "retrying">(
     reviewState === "failure" ? "failed" : reviewState === "retrying" ? "retrying" : "ready",
   )
@@ -84,17 +86,39 @@ export function AccountDeletionImpactPrototype({
               </Stack>
             ) : (
               <>
-                <Stepper active={step} allowNextStepsSelect={false} size="sm" orientation="horizontal">
-                  {labels.map((label, index) => (
-                    <Stepper.Step
-                      key={label}
-                      label={label}
-                      description={skipped(index) && step > index ? "対象なし" : index === step ? "確認中" : undefined}
-                      completedIcon={skipped(index) ? <Text size="xs">—</Text> : undefined}
-                      color={skipped(index) && step > index ? "gray" : undefined}
-                    />
-                  ))}
-                </Stepper>
+                <Box
+                  style={{
+                    position: "sticky",
+                    top: 40,
+                    zIndex: 10,
+                    background: "var(--mantine-color-body)",
+                    borderBottom: "1px solid var(--mantine-color-default-border)",
+                    paddingTop: 12,
+                    paddingBottom: 12,
+                  }}
+                >
+                  {compactStepper ? (
+                    <Stack gap={4}>
+                      <Text size="xs" c="dimmed">ステップ {step + 1}/4</Text>
+                      <Text fw={600}>{labels[step]}</Text>
+                      <Text size="xs" c="dimmed">
+                        {labels.map((label, index) => skipped(index) && step > index ? `${label}：対象なし` : null).filter(Boolean).join(" / ")}
+                      </Text>
+                    </Stack>
+                  ) : (
+                    <Stepper active={step} allowNextStepsSelect={false} size="sm" orientation="horizontal">
+                      {labels.map((label, index) => (
+                        <Stepper.Step
+                          key={label}
+                          label={label}
+                          description={skipped(index) && step > index ? "対象なし" : index === step ? "確認中" : undefined}
+                          completedIcon={skipped(index) ? <Text size="xs">—</Text> : undefined}
+                          color={skipped(index) && step > index ? "gray" : undefined}
+                        />
+                      ))}
+                    </Stepper>
+                  )}
+                </Box>
                 {step === 0 && (
                   <Box w="100%">
                     <Title order={2} size="h4">削除されるデータ</Title>
