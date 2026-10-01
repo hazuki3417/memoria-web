@@ -8,7 +8,7 @@ MemoriaのWebアプリケーションです。Next.js、React、Mantine、Apollo
 - [memoria-design](https://github.com/hazuki3417/memoria-design): プロダクト設計とアーキテクチャの正本
 - [memoria-IaC](https://github.com/hazuki3417/memoria-IaC): AWS CDKによる実行環境
 
-UI・GraphQL開発の作業規則は[AGENTS.md](./AGENTS.md)を参照してください。
+UI・GraphQL開発の作業規則は[AGENTS.md](./AGENTS.md)を参照してください。Application Architectureの正本は[memoria-designのFrontend実装規約](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/web/implementation-conventions.mdx)です。
 
 ## ローカル開発
 
@@ -97,6 +97,8 @@ npm run test:app
 snapshotは表示差分を確認してから更新します。
 
 ## GraphQL
+
+以下は現在の実装上の配置です。目標Architectureではoperation / fragmentをFeatureへ近接配置し、schema mirrorと生成物を`src/infrastructure/graphql/`配下へ移します。移行は一括ではなく、Codegen設定・import・文書を整合させる実装変更として行います。
 
 - operation: `src/graphql/operation/`
 - fragment: `src/graphql/fragment/`
