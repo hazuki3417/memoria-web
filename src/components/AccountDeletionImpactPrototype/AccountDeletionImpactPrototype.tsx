@@ -84,6 +84,21 @@ export function AccountDeletionImpactPrototype({
                     )}
                   </Box>
                 )}
+                {failed && (
+                  <Alert
+                    color="red"
+                    title="削除の影響を確認できませんでした"
+                    icon={<IconAlertCircle size={18} />}
+                    styles={{
+                      root: {
+                        backgroundColor:
+                          "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
+                      },
+                    }}
+                  >
+                    Mediaの件数を取得できませんでした。もう一度お試しください。
+                  </Alert>
+                )}
                 <Alert
                   color="red"
                   title="削除したデータは復元できません"
@@ -100,21 +115,6 @@ export function AccountDeletionImpactPrototype({
                 <Text size="sm" c="dimmed">
                   Communityへの影響は、次の画面以降で確認します。
                 </Text>
-                {failed && (
-                  <Alert
-                    color="red"
-                    title="削除の影響を確認できませんでした"
-                    icon={<IconAlertCircle size={18} />}
-                    styles={{
-                      root: {
-                        backgroundColor:
-                          "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
-                      },
-                    }}
-                  >
-                    Mediaの件数を取得できませんでした。もう一度お試しください。
-                  </Alert>
-                )}
                 <Group gap="sm">
                   {failed || retrying ? (
                     <Button
