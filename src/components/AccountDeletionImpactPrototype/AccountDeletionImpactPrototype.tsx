@@ -116,11 +116,11 @@ export function AccountDeletionImpactPrototype({
                         <PrototypeFormAlert kind="error" title="削除したデータは復元できません">アカウントと、あなたが管理するMediaが削除されます。</PrototypeFormAlert>
                       </Box>
                       {loadState === "ready" && <Text c="dimmed" size="sm">Communityへの影響は、後続のステップで確認します。対応が不要なステップは自動的に省略します。</Text>}
-                      <Group gap="sm">
+                      <Group gap="sm" justify="space-between">
+                        <Button size="sm" variant="default" onClick={() => setCancelled(true)}>キャンセル</Button>
                         {loadState !== "ready" ? (
                           <Button size="sm" loading={loadState === "retrying"} disabled={loadState === "retrying"} onClick={() => setLoadState("retrying")}>再試行</Button>
                         ) : <Button size="sm" onClick={next}>次へ</Button>}
-                        <Button size="sm" variant="default" onClick={() => setCancelled(true)}>キャンセル</Button>
                       </Group>
                       {loadState === "retrying" && <Button size="xs" variant="light" onClick={() => setLoadState(retryOutcome === "success" ? "ready" : "failed")}>再取得を完了</Button>}
                     </Stack>
@@ -160,10 +160,12 @@ export function AccountDeletionImpactPrototype({
                           </Box>
                         )
                       })}
-                      <Group gap="sm">
+                      <Group gap="sm" justify="space-between">
+                        <Group gap="sm">
+                          <Button size="sm" variant="subtle" color="gray" onClick={() => setCancelled(true)}>キャンセル</Button>
+                          <Button size="sm" variant="default" onClick={back}>戻る</Button>
+                        </Group>
                         <Button size="sm" disabled={!allResolved} onClick={next}>次へ</Button>
-                        <Button size="sm" variant="default" onClick={back}>戻る</Button>
-                        <Button size="sm" variant="subtle" color="gray" onClick={() => setCancelled(true)}>キャンセル</Button>
                       </Group>
                     </Stack>
                   </Box>
@@ -191,10 +193,12 @@ export function AccountDeletionImpactPrototype({
                           </Stack>
                         </Box>
                       ))}
-                      <Group gap="sm">
+                      <Group gap="sm" justify="space-between">
+                        <Group gap="sm">
+                          <Button size="sm" variant="subtle" color="gray" onClick={() => setCancelled(true)}>キャンセル</Button>
+                          <Button size="sm" variant="default" onClick={back}>戻る</Button>
+                        </Group>
                         <Button size="sm" disabled={!allConfirmed} onClick={next}>次へ</Button>
-                        <Button size="sm" variant="default" onClick={back}>戻る</Button>
-                        <Button size="sm" variant="subtle" color="gray" onClick={() => setCancelled(true)}>キャンセル</Button>
                       </Group>
                     </Stack>
                   </Box>
@@ -224,10 +228,12 @@ export function AccountDeletionImpactPrototype({
                       )}
                       <PrototypeFormAlert kind="error" title="削除は取り消せません">内容を確認した後、再認証と最終確定が必要です。</PrototypeFormAlert>
                       {reauth && <PrototypeFormAlert kind="info" title="再認証（プロトタイプ）">実際のAuth0認証は行いません。削除処理も実行されません。</PrototypeFormAlert>}
-                      <Group gap="sm">
+                      <Group gap="sm" justify="space-between">
+                        <Group gap="sm">
+                          <Button size="sm" variant="subtle" color="gray" onClick={() => setCancelled(true)}>キャンセル</Button>
+                          <Button size="sm" variant="default" onClick={() => { setReauth(false); back() }}>戻る</Button>
+                        </Group>
                         <Button size="sm" color={reauth ? "red" : undefined} onClick={() => reauth ? setConfirmed(true) : next()}>{reauth ? "削除を確定（デモ）" : "再認証へ（デモ）"}</Button>
-                        <Button size="sm" variant="default" onClick={() => { setReauth(false); back() }}>戻る</Button>
-                        <Button size="sm" variant="subtle" color="gray" onClick={() => setCancelled(true)}>キャンセル</Button>
                       </Group>
                     </Stack>
                   </Box>
