@@ -60,8 +60,7 @@ export function UserRegistrationPrototype({
           }
           styles={{
             root: {
-              backgroundColor:
-                `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`,
+              backgroundColor: `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`,
               paddingRight: 40,
             },
             title: { fontSize: 14 },
