@@ -70,14 +70,14 @@ export function AccountDeletionImpactPrototype({
         </Group>
       </AppShell.Header>
       <AppShell.Main>
-        <Box maw={960} mx="auto" w="100%">
+        <Box maw={600} mx="auto" w="100%">
           <Stack gap="xl">
             <Box>
               <Title order={1} size="h2">アカウント削除</Title>
               <Text c="dimmed" size="sm" mt={4}>削除による影響と必要な対応を順番に確認してください。</Text>
             </Box>
             {cancelled || confirmed ? (
-              <Stack gap="md" maw={600}>
+              <Stack gap="md">
                 <Title order={2} size="h4">{confirmed ? "削除手続きの確認（プロトタイプ）" : "削除手続きを中止しました"}</Title>
                 <Text c="dimmed">{confirmed ? "実際の再認証や削除処理は行っていません。" : "削除は開始されていません。"}</Text>
                 <Button variant="default" size="sm" onClick={() => { setCancelled(false); setConfirmed(false); setReauth(false); setStep(0) }}>最初に戻る</Button>
@@ -96,7 +96,7 @@ export function AccountDeletionImpactPrototype({
                   ))}
                 </Stepper>
                 {step === 0 && (
-                  <Box maw={600}>
+                  <Box w="100%">
                     <Title order={2} size="h4">削除されるデータ</Title>
                     <Divider my="md" />
                     <Stack gap="lg">
@@ -132,7 +132,7 @@ export function AccountDeletionImpactPrototype({
                   </Box>
                 )}
                 {step === 1 && (
-                  <Box maw={600}>
+                  <Box w="100%">
                     <Title order={2} size="h4">管理状態の解消</Title>
                     <Divider my="md" />
                     <Stack gap="lg">
@@ -176,7 +176,7 @@ export function AccountDeletionImpactPrototype({
                   </Box>
                 )}
                 {step === 2 && (
-                  <Box maw={600}>
+                  <Box w="100%">
                     <Title order={2} size="h4">削除対象の確認</Title>
                     <Divider my="md" />
                     <Stack gap="lg">
@@ -209,7 +209,7 @@ export function AccountDeletionImpactPrototype({
                   </Box>
                 )}
                 {step === 3 && (
-                  <Box maw={600}>
+                  <Box w="100%">
                     <Title order={2} size="h4">最終確認</Title>
                     <Divider my="md" />
                     <Stack gap="lg">
