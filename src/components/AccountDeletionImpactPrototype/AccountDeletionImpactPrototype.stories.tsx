@@ -18,6 +18,13 @@ export const Compact: Story = {
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
+export const FourSteps: Story = { args: { reviewState: "default", communityScenario: "requires-resolution" } }
+export const SkipsCommunitySteps: Story = { args: { reviewState: "default", communityScenario: "no-resolution" } }
+export const SkipsCommunityStepsCompact: Story = {
+  args: { reviewState: "default", communityScenario: "no-resolution" },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+
 export const CommunityResolutionRequired: Story = {
   args: {
     reviewState: "default",
