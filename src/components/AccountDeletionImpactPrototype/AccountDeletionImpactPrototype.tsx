@@ -11,7 +11,11 @@ import {
   Text,
   Title,
 } from "@mantine/core"
-import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react"
+import {
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconInfoCircle,
+} from "@tabler/icons-react"
 import { useState } from "react"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
@@ -96,7 +100,13 @@ export function AccountDeletionImpactPrototype({
                             ? "削除対象のMediaを確認しています"
                             : "削除の影響を確認できませんでした"
                         }
-                        icon={retrying ? undefined : <IconAlertCircle size={18} />}
+                        icon={
+                          retrying ? (
+                            <IconInfoCircle size={18} />
+                          ) : (
+                            <IconAlertCircle size={18} />
+                          )
+                        }
                         styles={{
                           root: {
                             backgroundColor: `color-mix(in srgb, var(--mantine-color-${retrying ? "blue" : "red"}-6) 7%, var(--mantine-color-body))`,
