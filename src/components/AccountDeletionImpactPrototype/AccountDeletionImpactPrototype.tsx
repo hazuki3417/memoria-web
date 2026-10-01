@@ -15,14 +15,27 @@ import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react"
 import { useState } from "react"
 
 type ReviewState = "default" | "empty" | "failure"
+type CommunityScenario = "requires-resolution" | "no-resolution"
+type RetryOutcome = "success" | "failure"
 
 export function AccountDeletionImpactPrototype({
   reviewState = "default",
+  communityScenario = "requires-resolution",
+  retryOutcome = "success",
 }: {
   reviewState?: ReviewState
+  communityScenario?: CommunityScenario
+  retryOutcome?: RetryOutcome
 }) {
-  const [failed, setFailed] = useState(reviewState === "failure")
-  const [completed, setCompleted] = useState<"next" | "cancel" | null>(null)
+  const [loadState, setLoadState] = useState<"ready" | "failed" | "retrying">(
+    reviewState === "failure" ? "failed" : "ready",
+  )
+  const [destination, setDestination] = useState<
+    "community-resolution" | "final-review" | "cancelled" | null
+  >(null)
+  const failed = loadState === "failed"
+  const retrying = loadState === "retrying"
+  const showImpact = destination === null
   const mediaCount = reviewState === "empty" ? 0 : 24
 
   return (
@@ -41,6 +54,8 @@ export function AccountDeletionImpactPrototype({
       <AppShell.Main>
         <Box maw={880} mx="auto" w="100%">
           <Stack gap="xl">
+            {showImpact ? (
+              <>
             <Box>
               <Title order={1} size="h2">
                 アカウント削除
@@ -55,7 +70,7 @@ export function AccountDeletionImpactPrototype({
               </Title>
               <Divider my="md" />
               <Stack gap="lg" maw={540}>
-                {!failed && (
+                {!failed && !retrying && (
                   <Box>
                     <Text size="sm" c="dimmed">
                       削除対象のMedia
@@ -101,32 +116,85 @@ export function AccountDeletionImpactPrototype({
                   </Alert>
                 )}
                 <Group gap="sm">
-                  {failed ? (
-                    <Button size="sm" onClick={() => setFailed(false)}>
+                  {failed || retrying ? (
+                    <Button
+                      size="sm"
+                      loading={retrying}
+                      disabled={retrying}
+                      onClick={() => setLoadState("retrying")}
+                    >
                       再試行
                     </Button>
                   ) : (
-                    <Button size="sm" onClick={() => setCompleted("next")}>
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        setDestination(
+                          communityScenario === "requires-resolution"
+                            ? "community-resolution"
+                            : "final-review",
+                        )
+                      }
+                    >
                       次へ
                     </Button>
                   )}
                   <Button
                     size="sm"
                     variant="default"
-                    onClick={() => setCompleted("cancel")}
+                    onClick={() => setDestination("cancelled")}
                   >
                     キャンセル
                   </Button>
                 </Group>
-                {completed && (
-                  <Text size="sm" c="dimmed" aria-live="polite">
-                    {completed === "next"
-                      ? "次の画面へ進みます（画面試作）。"
-                      : "削除手続きを中止しました（画面試作）。"}
-                  </Text>
+                {retrying && (
+                  <Box>
+                    <Text size="sm" c="dimmed" mb="xs">
+                      影響情報を再取得しています（画面試作）。
+                    </Text>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      onClick={() =>
+                        setLoadState(
+                          retryOutcome === "success" ? "ready" : "failed",
+                        )
+                      }
+                    >
+                      再取得を完了
+                    </Button>
+                  </Box>
                 )}
               </Stack>
             </Box>
+              </>
+            ) : (
+              <Stack gap="md" maw={540}>
+                <Title order={1} size="h2">
+                  {destination === "community-resolution"
+                    ? "Communityの対応"
+                    : destination === "final-review"
+                      ? "削除内容の最終確認"
+                      : "削除手続きを中止しました"}
+                </Title>
+                <Text c="dimmed">
+                  {destination === "community-resolution"
+                    ? "最後のAdministratorであるCommunityがあるため、各Communityの対応を選択します。後続画面の試作は別途行います。"
+                    : destination === "final-review"
+                      ? "対応が必要なCommunityはありません。不要な中間画面を省略して最終確認へ進みます。後続画面の試作は別途行います。"
+                      : "削除は開始されていません。削除開始前の画面へ戻る想定です。"}
+                </Text>
+                <Group gap="sm">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => setDestination(null)}
+                  >
+                    戻る
+                  </Button>
+                </Group>
+              </Stack>
+            )}
           </Stack>
         </Box>
       </AppShell.Main>
