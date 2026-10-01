@@ -17,3 +17,19 @@ export const Compact: Story = {
   args: { reviewState: "default" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
+
+export const CommunityResolutionRequired: Story = {
+  args: {
+    reviewState: "default",
+    communityScenario: "requires-resolution",
+  },
+}
+export const CommunityResolutionSkipped: Story = {
+  args: { reviewState: "default", communityScenario: "no-resolution" },
+}
+export const RetrySucceeds: Story = {
+  args: { reviewState: "failure", retryOutcome: "success" },
+}
+export const RetryFails: Story = {
+  args: { reviewState: "failure", retryOutcome: "failure" },
+}
