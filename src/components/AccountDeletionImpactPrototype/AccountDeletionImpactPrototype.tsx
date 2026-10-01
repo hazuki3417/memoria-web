@@ -57,7 +57,19 @@ export function AccountDeletionImpactPrototype({
               <Stack gap="lg" maw={540}>
                 {!failed && (
                   <Box>
-                    <Alert
+                    <Text size="sm" c="dimmed">
+                      削除対象のMedia
+                    </Text>
+                    {mediaCount === 0 ? (
+                      <Text mt={4}>削除対象のMediaはありません</Text>
+                    ) : (
+                      <Title order={3} size="h2" mt={4}>
+                        {mediaCount}件
+                      </Title>
+                    )}
+                  </Box>
+                )}
+                <Alert
                   color="red"
                   title="削除したデータは復元できません"
                   icon={<IconAlertTriangle size={18} />}
@@ -70,18 +82,6 @@ export function AccountDeletionImpactPrototype({
                 >
                   アカウントと、あなたが管理するMediaが削除されます。
                 </Alert>
-                <Text size="sm" c="dimmed">
-                      削除対象のMedia
-                    </Text>
-                    {mediaCount === 0 ? (
-                      <Text mt={4}>削除対象のMediaはありません</Text>
-                    ) : (
-                      <Title order={3} size="h2" mt={4}>
-                        {mediaCount}件
-                      </Title>
-                    )}
-                  </Box>
-                )}
                 <Text size="sm" c="dimmed">
                   Communityへの影響は、次の画面以降で確認します。
                 </Text>
