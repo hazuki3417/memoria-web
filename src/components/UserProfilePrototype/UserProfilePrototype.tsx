@@ -154,17 +154,7 @@ export function UserProfilePrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <Alert
-                        color="red"
-                        title="プロフィールを更新できませんでした"
-                        icon={<IconAlertCircle size={18} />}
-                        styles={{
-                          root: {
-                            backgroundColor:
-                              "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
-                          },
-                        }}
-                      >
+                      <PrototypeFormAlert kind="error" title="プロフィールを更新できませんでした">
                         現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
                       </PrototypeFormAlert>
                     )}
