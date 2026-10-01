@@ -14,7 +14,7 @@ import {
 import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react"
 import { useState } from "react"
 
-type ReviewState = "default" | "empty" | "failure"
+type ReviewState = "default" | "empty" | "failure" | "retrying"
 type CommunityScenario = "requires-resolution" | "no-resolution"
 type RetryOutcome = "success" | "failure"
 
@@ -28,7 +28,11 @@ export function AccountDeletionImpactPrototype({
   retryOutcome?: RetryOutcome
 }) {
   const [loadState, setLoadState] = useState<"ready" | "failed" | "retrying">(
-    reviewState === "failure" ? "failed" : "ready",
+    reviewState === "failure"
+      ? "failed"
+      : reviewState === "retrying"
+        ? "retrying"
+        : "ready",
   )
   const [destination, setDestination] = useState<
     "community-resolution" | "final-review" | "cancelled" | null
@@ -95,8 +99,7 @@ export function AccountDeletionImpactPrototype({
                         icon={retrying ? undefined : <IconAlertCircle size={18} />}
                         styles={{
                           root: {
-                            backgroundColor:
-                              `color-mix(in srgb, var(--mantine-color-${retrying ? "blue" : "red"}-6) 7%, var(--mantine-color-body))`,
+                            backgroundColor: `color-mix(in srgb, var(--mantine-color-${retrying ? "blue" : "red"}-6) 7%, var(--mantine-color-body))`,
                           },
                         }}
                       >
