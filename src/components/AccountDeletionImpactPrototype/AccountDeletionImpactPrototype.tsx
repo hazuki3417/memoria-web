@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  Alert,
   AppShell,
   Box,
   Button,
@@ -11,11 +10,7 @@ import {
   Text,
   Title,
 } from "@mantine/core"
-import {
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconInfoCircle,
-} from "@tabler/icons-react"
+import { PrototypeFormAlert } from "../PrototypeFeedback/PrototypeFeedback"
 import { useState } from "react"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
@@ -93,44 +88,31 @@ export function AccountDeletionImpactPrototype({
                       </Box>
                     )}
                     {(failed || retrying) && (
-                      <Alert
-                        color={retrying ? "blue" : "red"}
+                      <PrototypeFormAlert
+                        kind={retrying ? "info" : "error"}
                         title={
                           retrying
                             ? "削除対象のMediaを確認しています"
                             : "削除の影響を確認できませんでした"
                         }
-                        icon={
-                          retrying ? (
-                            <IconInfoCircle size={18} />
-                          ) : (
-                            <IconAlertCircle size={18} />
-                          )
-                        }
-                        styles={{
-                          root: {
-                            backgroundColor: `color-mix(in srgb, var(--mantine-color-${retrying ? "blue" : "red"}-6) 7%, var(--mantine-color-body))`,
-                          },
-                        }}
                       >
                         {retrying
                           ? "Mediaの件数を再取得しています。"
                           : "Mediaの件数を取得できませんでした。もう一度お試しください。"}
-                      </Alert>
+                      </PrototypeFormAlert>
                     )}
-                    <Alert
-                      color="red"
-                      title="削除したデータは復元できません"
-                      icon={<IconAlertTriangle size={18} />}
-                      styles={{
-                        root: {
-                          backgroundColor:
-                            "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
-                        },
-                      }}
-                    >
-                      アカウントと、あなたが管理するMediaが削除されます。
-                    </Alert>
+                    <Box>
+                      <Title order={2} size="h4">
+                        注意事項
+                      </Title>
+                      <Divider my="md" />
+                      <PrototypeFormAlert
+                        kind="error"
+                        title="削除したデータは復元できません"
+                      >
+                        アカウントと、あなたが管理するMediaが削除されます。
+                      </PrototypeFormAlert>
+                    </Box>
                     <Text size="sm" c="dimmed">
                       Communityへの影響は、次の画面以降で確認します。
                     </Text>
