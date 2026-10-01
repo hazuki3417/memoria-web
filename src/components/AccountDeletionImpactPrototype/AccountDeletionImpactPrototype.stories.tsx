@@ -27,6 +27,9 @@ export const CommunityResolutionRequired: Story = {
 export const CommunityResolutionSkipped: Story = {
   args: { reviewState: "default", communityScenario: "no-resolution" },
 }
+export const RetryLoading: Story = {
+  args: { reviewState: "retrying", retryOutcome: "success" },
+}
 export const RetrySucceeds: Story = {
   args: { reviewState: "failure", retryOutcome: "success" },
 }
