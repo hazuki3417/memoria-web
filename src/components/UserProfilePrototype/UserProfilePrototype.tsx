@@ -153,11 +153,11 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
                   </Box>
                   <Group gap="sm">
                     <Button
-                    size="sm"
-                    onClick={save}
-                    disabled={!dirty || invalid || saving || blocking}
-                    loading={saving}
-                  >
+                      size="sm"
+                      onClick={save}
+                      disabled={!dirty || invalid || saving || blocking}
+                      loading={saving}
+                    >
                       保存
                     </Button>
                     {dirty && (
