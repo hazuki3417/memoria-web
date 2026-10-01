@@ -16,7 +16,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications, notifications } from "@mantine/notifications"
 import { IconAlertCircle, IconCheck } from "@tabler/icons-react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 type ReviewState =
   | "default"
@@ -27,7 +27,11 @@ type ReviewState =
   | "blocking"
   | "unsaved"
 
-export function UserProfilePrototype({ reviewState = "default" }: { reviewState?: ReviewState }) {
+export function UserProfilePrototype({
+  reviewState = "default",
+}: {
+  reviewState?: ReviewState
+}) {
   const [savedName, setSavedName] = useState("ユーザー")
   const [nickname, setNickname] = useState(
     reviewState === "invalid"
@@ -37,21 +41,24 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
         : "ユーザー",
   )
   const [status, setStatus] = useState<ReviewState>(reviewState)
-  const [discardOpened, { open: openDiscard, close: closeDiscard }] = useDisclosure(false)
+  const [discardOpened, { open: openDiscard, close: closeDiscard }] =
+    useDisclosure(false)
   const normalized = nickname.trim()
   const invalid = normalized.length === 0
   const dirty = normalized !== savedName
   const saving = status === "saving"
   const blocking = status === "blocking"
 
-  const showFeedback = (kind: "success" | "failure") => {
+  const showFeedback = useCallback((kind: "success" | "failure") => {
     const success = kind === "success"
     notifications.show({
       message: (
         <Alert
           color={success ? "green" : "red"}
           title={success ? "保存しました" : "保存できませんでした"}
-          icon={success ? <IconCheck size={18} /> : <IconAlertCircle size={18} />}
+          icon={
+            success ? <IconCheck size={18} /> : <IconAlertCircle size={18} />
+          }
           styles={{
             root: {
               backgroundColor: `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`,
@@ -79,7 +86,7 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
         closeButton: { position: "absolute", top: 8, right: 8, zIndex: 1 },
       },
     })
-  }
+  }, [])
 
   useEffect(() => {
     if (reviewState === "success") {
@@ -87,7 +94,7 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
     } else if (reviewState === "failure") {
       showFeedback("failure")
     }
-  }, [reviewState])
+  }, [reviewState, showFeedback])
 
   const save = () => {
     if (!dirty || invalid || saving || blocking) return
@@ -194,7 +201,12 @@ export function UserProfilePrototype({ reviewState = "default" }: { reviewState?
           </Box>
         </AppShell.Main>
       </AppShell>
-      <Modal opened={discardOpened} onClose={closeDiscard} title="変更を破棄しますか？" centered>
+      <Modal
+        opened={discardOpened}
+        onClose={closeDiscard}
+        title="変更を破棄しますか？"
+        centered
+      >
         <Stack>
           <Text size="sm">保存していない変更は失われます。</Text>
           <Group justify="flex-end">
