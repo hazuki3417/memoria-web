@@ -70,7 +70,7 @@ export function AccountDeletionImpactPrototype({
         </Group>
       </AppShell.Header>
       <AppShell.Main>
-        <Box maw={600} mx="auto" w="100%">
+        <Box maw={960} mx="auto" w="100%">
           <Stack gap="xl">
             <Box>
               <Title order={1} size="h2">アカウント削除</Title>
