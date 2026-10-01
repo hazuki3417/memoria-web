@@ -56,123 +56,120 @@ export function AccountDeletionImpactPrototype({
           <Stack gap="xl">
             {showImpact ? (
               <>
-            <Box>
-              <Title order={1} size="h2">
-                アカウント削除
-              </Title>
-              <Text c="dimmed" size="sm" mt={4}>
-                アカウント削除による影響を確認してください。
-              </Text>
-            </Box>
-            <Box>
-              <Title order={2} size="h4">
-                削除されるデータ
-              </Title>
-              <Divider my="md" />
-              <Stack gap="lg" maw={540}>
-                {!failed && !retrying && (
-                  <Box>
-                    <Text size="sm" c="dimmed">
-                      削除対象のMedia
-                    </Text>
-                    {mediaCount === 0 ? (
-                      <Text mt={4}>削除対象のMediaはありません</Text>
-                    ) : (
-                      <Title order={3} size="h2" mt={4}>
-                        {mediaCount}件
-                      </Title>
+                <Box>
+                  <Title order={1} size="h2">
+                    アカウント削除
+                  </Title>
+                  <Text c="dimmed" size="sm" mt={4}>
+                    アカウント削除による影響を確認してください。
+                  </Text>
+                </Box>
+                <Box>
+                  <Title order={2} size="h4">
+                    削除されるデータ
+                  </Title>
+                  <Divider my="md" />
+                  <Stack gap="lg" maw={540}>
+                    {!failed && !retrying && (
+                      <Box>
+                        <Text size="sm" c="dimmed">
+                          削除対象のMedia
+                        </Text>
+                        {mediaCount === 0 ? (
+                          <Text mt={4}>削除対象のMediaはありません</Text>
+                        ) : (
+                          <Title order={3} size="h2" mt={4}>
+                            {mediaCount}件
+                          </Title>
+                        )}
+                      </Box>
                     )}
-                  </Box>
-                )}
-                {(failed || retrying) && (
-                  <Alert
-                    color="red"
-                    title={
-                      retrying
-                        ? "削除対象のMediaを確認しています"
-                        : "削除の影響を確認できませんでした"
-                    }
-                    icon={<IconAlertCircle size={18} />}
-                    styles={{
-                      root: {
-                        backgroundColor:
-                          "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
-                      },
-                    }}
-                  >
-                    {retrying
-                      ? "Mediaの件数を再取得しています。"
-                      : "Mediaの件数を取得できませんでした。もう一度お試しください。"}
-                  </Alert>
-                )}
-                <Alert
-                  color="red"
-                  title="削除したデータは復元できません"
-                  icon={<IconAlertTriangle size={18} />}
-                  styles={{
-                    root: {
-                      backgroundColor:
-                        "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
-                    },
-                  }}
-                >
-                  アカウントと、あなたが管理するMediaが削除されます。
-                </Alert>
-                <Text size="sm" c="dimmed">
-                  Communityへの影響は、次の画面以降で確認します。
-                </Text>
-                <Group gap="sm">
-                  {failed || retrying ? (
-                    <Button
-                      size="sm"
-                      loading={retrying}
-                      disabled={retrying}
-                      onClick={() => setLoadState("retrying")}
+                    {(failed || retrying) && (
+                      <Alert
+                        color={retrying ? "blue" : "red"}
+                        title={
+                          retrying
+                            ? "削除対象のMediaを確認しています"
+                            : "削除の影響を確認できませんでした"
+                        }
+                        icon={retrying ? undefined : <IconAlertCircle size={18} />}
+                        styles={{
+                          root: {
+                            backgroundColor:
+                              `color-mix(in srgb, var(--mantine-color-${retrying ? "blue" : "red"}-6) 7%, var(--mantine-color-body))`,
+                          },
+                        }}
+                      >
+                        {retrying
+                          ? "Mediaの件数を再取得しています。"
+                          : "Mediaの件数を取得できませんでした。もう一度お試しください。"}
+                      </Alert>
+                    )}
+                    <Alert
+                      color="red"
+                      title="削除したデータは復元できません"
+                      icon={<IconAlertTriangle size={18} />}
+                      styles={{
+                        root: {
+                          backgroundColor:
+                            "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
+                        },
+                      }}
                     >
-                      再試行
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      onClick={() =>
-                        setDestination(
-                          communityScenario === "requires-resolution"
-                            ? "community-resolution"
-                            : "final-review",
-                        )
-                      }
-                    >
-                      次へ
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() => setDestination("cancelled")}
-                  >
-                    キャンセル
-                  </Button>
-                </Group>
-                {retrying && (
-                  <Box>
-                    <Text size="sm" c="dimmed" mb="xs">
-                      影響情報を再取得しています（画面試作）。
+                      アカウントと、あなたが管理するMediaが削除されます。
+                    </Alert>
+                    <Text size="sm" c="dimmed">
+                      Communityへの影響は、次の画面以降で確認します。
                     </Text>
-                    <Button
-                      size="xs"
-                      variant="light"
-                      onClick={() =>
-                        setLoadState(
-                          retryOutcome === "success" ? "ready" : "failed",
-                        )
-                      }
-                    >
-                      再取得を完了
-                    </Button>
-                  </Box>
-                )}
-              </Stack>
-            </Box>
+                    <Group gap="sm">
+                      {failed || retrying ? (
+                        <Button
+                          size="sm"
+                          loading={retrying}
+                          disabled={retrying}
+                          onClick={() => setLoadState("retrying")}
+                        >
+                          再試行
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            setDestination(
+                              communityScenario === "requires-resolution"
+                                ? "community-resolution"
+                                : "final-review",
+                            )
+                          }
+                        >
+                          次へ
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => setDestination("cancelled")}
+                      >
+                        キャンセル
+                      </Button>
+                    </Group>
+                    {retrying && (
+                      <Box>
+                        <Button
+                          size="xs"
+                          variant="light"
+                          onClick={() =>
+                            setLoadState(
+                              retryOutcome === "success" ? "ready" : "failed",
+                            )
+                          }
+                        >
+                          再取得を完了
+                        </Button>
+                      </Box>
+                    )}
+                  </Stack>
+                </Box>
               </>
             ) : (
               <Stack gap="md" maw={540}>
