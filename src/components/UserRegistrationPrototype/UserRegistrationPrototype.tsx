@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  Alert,
   AppShell,
   Box,
   Button,
@@ -14,8 +13,11 @@ import {
   Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { Notifications, notifications } from "@mantine/notifications"
-import { IconAlertCircle, IconCheck } from "@tabler/icons-react"
+import { Notifications } from "@mantine/notifications"
+import {
+  PrototypeFormAlert,
+  showPrototypeNotification,
+} from "../PrototypeFeedback/PrototypeFeedback"
 import { useCallback, useEffect, useState } from "react"
 
 type ReviewState =
@@ -50,40 +52,12 @@ export function UserRegistrationPrototype({
 
   const showFeedback = useCallback((kind: "success" | "failure") => {
     const success = kind === "success"
-    notifications.show({
-      message: (
-        <Alert
-          color={success ? "green" : "red"}
-          title={success ? "登録しました" : "登録できませんでした"}
-          icon={
-            success ? <IconCheck size={18} /> : <IconAlertCircle size={18} />
-          }
-          styles={{
-            root: {
-              backgroundColor: `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`,
-              paddingRight: 40,
-            },
-            title: { fontSize: 14 },
-            message: { fontSize: 12 },
-          }}
-        >
-          {success
-            ? "登録が完了しました。"
-            : "入力内容は保持されています。再試行してください。"}
-        </Alert>
-      ),
-      withCloseButton: true,
-      styles: {
-        root: {
-          padding: 0,
-          border: 0,
-          background: "var(--mantine-color-body)",
-          boxShadow: "none",
-        },
-        body: { margin: 0 },
-        description: { margin: 0 },
-        closeButton: { position: "absolute", top: 8, right: 8, zIndex: 1 },
-      },
+    showPrototypeNotification({
+      kind: success ? "success" : "error",
+      title: success ? "登録しました" : "登録できませんでした",
+      message: success
+        ? "登録が完了しました。"
+        : "入力内容は保持されています。再試行してください。",
     })
   }, [])
 
@@ -195,12 +169,12 @@ export function UserRegistrationPrototype({
                         }}
                       >
                         認証情報を確認できませんでした。もう一度ログインしてください。
-                      </Alert>
+                      </PrototypeFormAlert>
                     )}
                     {exited && (
-                      <Alert title="登録せずに終了しました">
+                      <PrototypeFormAlert kind="info" title="登録せずに終了しました">
                         実際の画面ではログアウトして公開画面へ戻ります。
-                      </Alert>
+                      </PrototypeFormAlert>
                     )}
                   </Box>
                 </Stack>
