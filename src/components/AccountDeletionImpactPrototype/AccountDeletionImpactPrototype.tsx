@@ -55,7 +55,9 @@ export function AccountDeletionImpactPrototype({
               </Title>
               <Divider my="md" />
               <Stack gap="lg" maw={540}>
-                <Alert
+                {!failed && (
+                  <Box>
+                    <Alert
                   color="red"
                   title="削除したデータは復元できません"
                   icon={<IconAlertTriangle size={18} />}
@@ -68,9 +70,7 @@ export function AccountDeletionImpactPrototype({
                 >
                   アカウントと、あなたが管理するMediaが削除されます。
                 </Alert>
-                {!failed && (
-                  <Box>
-                    <Text size="sm" c="dimmed">
+                <Text size="sm" c="dimmed">
                       削除対象のMedia
                     </Text>
                     {mediaCount === 0 ? (
