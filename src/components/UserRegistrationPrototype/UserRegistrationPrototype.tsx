@@ -15,7 +15,7 @@ import {
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications, notifications } from "@mantine/notifications"
-import { IconAlertCircle } from "@tabler/icons-react"
+import { IconAlertCircle, IconCheck } from "@tabler/icons-react"
 import { useCallback, useEffect, useState } from "react"
 
 type ReviewState =
@@ -48,24 +48,29 @@ export function UserRegistrationPrototype({
   const blocking = status === "blocking"
   const registered = status === "registered"
 
-  const showFailure = useCallback(() => {
+  const showFeedback = useCallback((kind: "success" | "failure") => {
+    const success = kind === "success"
     notifications.show({
       message: (
         <Alert
-          color="red"
-          title="登録できませんでした"
-          icon={<IconAlertCircle size={18} />}
+          color={success ? "green" : "red"}
+          title={success ? "登録しました" : "登録できませんでした"}
+          icon={
+            success ? <IconCheck size={18} /> : <IconAlertCircle size={18} />
+          }
           styles={{
             root: {
               backgroundColor:
-                "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
+                `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`,
               paddingRight: 40,
             },
             title: { fontSize: 14 },
             message: { fontSize: 12 },
           }}
         >
-          入力内容は保持されています。再試行してください。
+          {success
+            ? "登録が完了しました。"
+            : "入力内容は保持されています。再試行してください。"}
         </Alert>
       ),
       withCloseButton: true,
@@ -85,14 +90,17 @@ export function UserRegistrationPrototype({
 
   useEffect(() => {
     if (reviewState === "failure") {
-      showFailure()
+      showFeedback("failure")
+    } else if (reviewState === "registered") {
+      showFeedback("success")
     }
-  }, [reviewState, showFailure])
+  }, [reviewState, showFeedback])
 
   const register = () => {
     if (invalid || registering || blocking || registered) return
     // Visual prototype only: actual registration and navigation are not connected.
     setStatus("registered")
+    showFeedback("success")
   }
 
   return (
@@ -188,11 +196,6 @@ export function UserRegistrationPrototype({
                         }}
                       >
                         認証情報を確認できませんでした。登録せずに終了し、もう一度ログインしてください。
-                      </Alert>
-                    )}
-                    {registered && (
-                      <Alert color="green" title="登録が完了しました">
-                        実際の画面では、保持された復帰先またはMemoriaの標準入口へ移動します。
                       </Alert>
                     )}
                     {exited && (
