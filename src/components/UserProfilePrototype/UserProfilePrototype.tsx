@@ -70,7 +70,7 @@ export function UserProfilePrototype({
         >
           {success
             ? "プロフィールを更新しました。"
-            : "変更内容は保持されています。再試行してください。"}
+            : "保存処理中に問題が発生しました。変更内容は保持されています。もう一度お試しください。"}
         </Alert>
       ),
       withCloseButton: true,
@@ -182,7 +182,7 @@ export function UserProfilePrototype({
                     {blocking && (
                       <Alert
                         color="red"
-                        title="プロフィールを変更できません"
+                        title="プロフィールを更新できませんでした"
                         icon={<IconAlertCircle size={18} />}
                         styles={{
                           root: {
@@ -191,7 +191,7 @@ export function UserProfilePrototype({
                           },
                         }}
                       >
-                        現在のアカウント状態では編集を続けられません。アカウントの状態を確認してください。
+                        現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
                       </Alert>
                     )}
                   </Box>
