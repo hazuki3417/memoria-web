@@ -154,7 +154,13 @@ export function UserRegistrationPrototype({
                     <Button
                       size="sm"
                       onClick={register}
-                      disabled={invalid || registering || blocking || registered || exited}
+                      disabled={
+                        invalid ||
+                        registering ||
+                        blocking ||
+                        registered ||
+                        exited
+                      }
                       loading={registering}
                     >
                       登録する
