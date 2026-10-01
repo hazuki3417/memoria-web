@@ -163,7 +163,7 @@ export function UserRegistrationPrototype({
                       }
                       loading={registering}
                     >
-                      登録する
+                      登録
                     </Button>
                     <Button
                       size="sm"
@@ -171,7 +171,7 @@ export function UserRegistrationPrototype({
                       onClick={openExit}
                       disabled={registering || registered || exited}
                     >
-                      登録せずに終了
+                      終了
                     </Button>
                   </Group>
                   <Box mih={92} aria-live="polite">
@@ -219,7 +219,7 @@ export function UserRegistrationPrototype({
           </Text>
           <Group justify="flex-end">
             <Button variant="default" onClick={closeExit}>
-              登録画面に戻る
+              戻る
             </Button>
             <Button
               color="red"
@@ -228,7 +228,7 @@ export function UserRegistrationPrototype({
                 setExited(true)
               }}
             >
-              登録せずに終了
+              終了
             </Button>
           </Group>
         </Stack>
