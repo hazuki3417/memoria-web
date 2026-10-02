@@ -309,7 +309,7 @@ export function AccountDeletionImpactPrototype({
                       </Box>
                       {loadState === "ready" && (
                         <Text c="dimmed" size="sm">
-                          Communityへの影響は次のステップで確認します。対応するCommunityがないステップは省略します。
+                          Communityに参加している場合は、次のステップで各Communityへの対応と影響を確認します。
                         </Text>
                       )}
                       <Group gap="sm" justify="space-between">
@@ -390,6 +390,7 @@ export function AccountDeletionImpactPrototype({
                       </Badge>
                       {communities.map((community) => {
                         const decision = decisions[community.id]
+                        const requiresDecision = community.relation === "last-administrator"
                         return (
                           <Box
                             key={community.id}
@@ -502,7 +503,7 @@ export function AccountDeletionImpactPrototype({
                                     />
                                   </Box>
                                 </Group>
-                              </Radio.Group>
+                              </Radio.Group>}
                             </Stack>
                           </Box>
                         )
