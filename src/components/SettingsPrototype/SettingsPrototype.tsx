@@ -2,10 +2,13 @@
 
 import {
   AppShell,
+  Avatar,
   Box,
+  Burger,
   Button,
   Divider,
   Group,
+  Menu,
   NavLink,
   Progress,
   Select,
@@ -20,6 +23,23 @@ import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
 
 type Section = "profile" | "preferences" | "usage" | "account"
+
+const menuStyles = {
+  dropdown: {
+    border: "1px solid var(--mantine-color-default-border)",
+    borderRadius: "var(--mantine-radius-md)",
+    boxShadow: "var(--mantine-shadow-md)",
+    padding: 4,
+    minWidth: 200,
+  },
+  item: {
+    borderRadius: "var(--mantine-radius-sm)",
+    fontSize: "var(--mantine-font-size-sm)",
+    minHeight: 32,
+    padding: "5px 8px",
+  },
+  label: { padding: "8px 8px 4px", fontSize: "var(--mantine-font-size-xs)" },
+} as const
 
 const sections: { id: Section; label: string }[] = [
   { id: "profile", label: "プロフィール" },
@@ -322,16 +342,71 @@ export function SettingsPrototype({
 
   return (
     <AppShell header={{ height: 40 }} padding="lg">
-      <AppShell.Header>
-        <Group h="100%" px="md" justify="space-between">
-          <Group gap="sm">
+      <AppShell.Header style={{ zIndex: 300, borderTop: "2px solid var(--mantine-color-blue-6)" }}>
+        <Group h="100%" px="md" justify="space-between" wrap="nowrap">
+          <Group gap="sm" wrap="nowrap">
+            <Burger
+              opened={false}
+              size="sm"
+              aria-label="ナビゲーションを開閉"
+            />
             <Text fw={750} size="lg">Memoria</Text>
-            <Text c="dimmed" size="sm">/</Text>
-            <Text size="sm">設定</Text>
+            <Box
+              w={1}
+              h={20}
+              bg="var(--mantine-color-default-border)"
+              aria-hidden="true"
+            />
+            <Menu withinPortal position="bottom-start" styles={menuStyles}>
+              <Menu.Target>
+                <Button
+                  variant="subtle"
+                  color="gray"
+                  size="compact-sm"
+                  px="xs"
+                  aria-label="コンテキストを切り替える"
+                  maw={{ base: 144, sm: 240 }}
+                >
+                  <Text size="xs" mr={6} aria-hidden="true">▾</Text>
+                  <Text size="sm" truncate>Personal</Text>
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>切り替え先</Menu.Label>
+                <Menu.Item>Personal</Menu.Item>
+                <Menu.Divider />
+                <Menu.Item>家族のアルバム</Menu.Item>
+                <Menu.Item>旅行の思い出</Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           </Group>
-          <Button variant="subtle" color="gray" size="compact-sm">
-            ユーザー
-          </Button>
+          <Menu position="bottom-end" withinPortal styles={menuStyles}>
+            <Menu.Target>
+              <Button
+                variant="subtle"
+                color="gray"
+                size="compact-sm"
+                px={4}
+                aria-label="アカウントメニュー"
+                title="アカウントメニュー"
+              >
+                <Avatar size={24} radius="xl">U</Avatar>
+              </Button>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Group gap="sm" px="xs" py="xs" wrap="nowrap">
+                <Avatar size={32} radius="xl">U</Avatar>
+                <Box>
+                  <Text size="sm" fw={600} lh={1.2}>ユーザー</Text>
+                  <Text size="xs" c="dimmed" lh={1.2}>Personal</Text>
+                </Box>
+              </Group>
+              <Menu.Divider />
+              <Menu.Item>設定</Menu.Item>
+              <Menu.Divider />
+              <Menu.Item>ログアウト</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </Group>
       </AppShell.Header>
       <AppShell.Main>
