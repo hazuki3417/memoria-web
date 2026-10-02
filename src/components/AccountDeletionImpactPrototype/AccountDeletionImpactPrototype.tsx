@@ -52,7 +52,14 @@ const resolutionCommunities: CommunityFixture[] = [
       { value: "b", label: "山田 太郎" },
     ],
   },
-  { id: "travel", name: "旅行の思い出", members: 1, media: 42, relation: "last-administrator", candidates: [] },
+  {
+    id: "travel",
+    name: "旅行の思い出",
+    members: 1,
+    media: 42,
+    relation: "last-administrator",
+    candidates: [],
+  },
   {
     id: "friends",
     name: "友人との記録",
@@ -64,16 +71,34 @@ const resolutionCommunities: CommunityFixture[] = [
 ]
 
 const withdrawalCommunities: CommunityFixture[] = [
-  { id: "club", name: "写真クラブ", members: 8, media: 64, relation: "member", candidates: [] },
-  { id: "school", name: "同窓会", members: 12, media: 91, relation: "administrator-with-others", candidates: [] },
+  {
+    id: "club",
+    name: "写真クラブ",
+    members: 8,
+    media: 64,
+    relation: "member",
+    candidates: [],
+  },
+  {
+    id: "school",
+    name: "同窓会",
+    members: 12,
+    media: 91,
+    relation: "administrator-with-others",
+    candidates: [],
+  },
 ]
-const communitiesForScenario = (scenario: CommunityScenario): CommunityFixture[] => {
+const communitiesForScenario = (
+  scenario: CommunityScenario,
+): CommunityFixture[] => {
   if (scenario === "no-communities") return []
   if (scenario === "member-only") return [withdrawalCommunities[0]]
-  if (scenario === "administrator-with-others-only") return [withdrawalCommunities[1]]
+  if (scenario === "administrator-with-others-only")
+    return [withdrawalCommunities[1]]
   if (scenario === "withdrawal-mixed") return withdrawalCommunities
   if (scenario === "last-administrator") return [resolutionCommunities[0]]
-  if (scenario === "last-administrator-no-candidate") return [resolutionCommunities[1]]
+  if (scenario === "last-administrator-no-candidate")
+    return [resolutionCommunities[1]]
   if (scenario === "multiple-last-administrators") return resolutionCommunities
   return [resolutionCommunities[0], ...withdrawalCommunities]
 }
@@ -104,7 +129,8 @@ export function AccountDeletionImpactPrototype({
   const [decisions, setDecisions] = useState<Record<string, Decision>>({})
   const [confirmations, setConfirmations] = useState<Record<string, string>>({})
   const [cancelled, setCancelled] = useState(false)
-  const [cancelConfirmationOpened, setCancelConfirmationOpened] = useState(false)
+  const [cancelConfirmationOpened, setCancelConfirmationOpened] =
+    useState(false)
   const [reauth, setReauth] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const mediaCount = reviewState === "empty" ? 0 : 24
@@ -125,7 +151,9 @@ export function AccountDeletionImpactPrototype({
       (decision?.choice === "keep" &&
         decision.successors.length > 0 &&
         decision.successors.every((successor) =>
-          community?.candidates.some((candidate) => candidate.value === successor),
+          community?.candidates.some(
+            (candidate) => candidate.value === successor,
+          ),
         ))
     )
   }
@@ -194,238 +222,442 @@ export function AccountDeletionImpactPrototype({
         </Stack>
       </Modal>
       <AppShell header={{ height: 40 }} padding="lg">
-      <AppShell.Header>
-        <Group h="100%" px="md" gap="sm">
-          <Text fw={750} size="lg">
-            Memoria
-          </Text>
-          <Text c="dimmed" size="sm">
-            /
-          </Text>
-          <Text size="sm">Personal</Text>
-        </Group>
-      </AppShell.Header>
-      <AppShell.Main>
-        <Box maw={960} mx="auto" w="100%">
-          <Stack gap="xl">
-            <Box>
-              <Title order={1} size="h2">
-                アカウント削除
-              </Title>
-              <Text c="dimmed" size="sm" mt={4}>
-                アカウントを削除した場合の影響と、削除前に必要な対応を確認します。
-              </Text>
-            </Box>
-            {cancelled || confirmed ? (
-              <Stack gap="md">
-                <Title order={2} size="h4">
-                  {confirmed
-                    ? "削除を確認しました（プロトタイプ）"
-                    : "削除手続きを中止しました"}
+        <AppShell.Header>
+          <Group h="100%" px="md" gap="sm">
+            <Text fw={750} size="lg">
+              Memoria
+            </Text>
+            <Text c="dimmed" size="sm">
+              /
+            </Text>
+            <Text size="sm">Personal</Text>
+          </Group>
+        </AppShell.Header>
+        <AppShell.Main>
+          <Box maw={960} mx="auto" w="100%">
+            <Stack gap="xl">
+              <Box>
+                <Title order={1} size="h2">
+                  アカウント削除
                 </Title>
-                <Text c="dimmed">
-                  {confirmed
-                    ? "このプロトタイプではアカウントとデータは削除されません。"
-                    : "削除は開始されていません。"}
+                <Text c="dimmed" size="sm" mt={4}>
+                  アカウントを削除した場合の影響と、削除前に必要な対応を確認します。
                 </Text>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => {
-                    setCancelled(false)
-                    setConfirmed(false)
-                    setReauth(false)
-                    setStep(0)
-                  }}
-                >
-                  最初に戻る
-                </Button>
-              </Stack>
-            ) : (
-              <>
-                <Box
-                  style={{
-                    position: "sticky",
-                    top: 40,
-                    zIndex: 10,
-                    background: "var(--mantine-color-body)",
-                    borderBottom:
-                      "1px solid var(--mantine-color-default-border)",
-                    paddingTop: 12,
-                    paddingBottom: 12,
-                  }}
-                >
-                  {compactStepper ? (
-                    <Stack gap={4}>
-                      <Text size="xs" c="dimmed">
-                        ステップ {step + 1}/4
-                      </Text>
-                      <Text fw={600}>{labels[step]}</Text>
-                      <Text size="xs" c="dimmed">
-                        {labels
-                          .map((label, index) =>
-                            skipped(index) && step > index
-                              ? `${label}：対象なし`
-                              : null,
-                          )
-                          .filter(Boolean)
-                          .join(" / ")}
-                      </Text>
-                    </Stack>
-                  ) : (
-                    <Stepper
-                      active={step}
-                      allowNextStepsSelect={false}
-                      size="sm"
-                      orientation="horizontal"
-                    >
-                      {labels.map((label, index) => (
-                        <Stepper.Step
-                          key={label}
-                          label={label}
-                          description={
-                            skipped(index) && step > index
-                              ? "対象なし"
-                              : index === step
-                                ? "確認中"
-                                : undefined
-                          }
-                          completedIcon={
-                            skipped(index) ? (
-                              <Text size="xs">—</Text>
-                            ) : undefined
-                          }
-                          color={
-                            skipped(index) && step > index ? "gray" : undefined
-                          }
-                        />
-                      ))}
-                    </Stepper>
-                  )}
-                </Box>
-                {step === 0 && (
-                  <Box w="100%">
-                    {!compactStepper && (
-                      <>
-                        <Title order={2} size="h4">
-                          個人データへの影響
-                        </Title>
-                        <Divider my="md" />
-                      </>
-                    )}
-                    <Stack gap="lg">
-                      {loadState === "ready" ? (
-                        <Box>
-                          <Text c="dimmed" size="sm">
-                            削除されるMedia
-                          </Text>
-                          {mediaCount === 0 ? (
-                            <Text mt={4}>削除されるMediaはありません</Text>
-                          ) : (
-                            <Title order={3} size="h2" mt={4}>
-                              {mediaCount}件
-                            </Title>
-                          )}
-                        </Box>
-                      ) : (
-                        <PrototypeFormAlert
-                          kind={loadState === "retrying" ? "info" : "error"}
-                          title={
-                            loadState === "retrying"
-                              ? "削除されるMediaを確認しています"
-                              : "削除されるMediaを確認できませんでした"
-                          }
-                        >
-                          {loadState === "retrying"
-                            ? "Mediaの件数を再取得しています。"
-                            : "削除されるMediaの件数を確認できませんでした。再試行してください。"}
-                        </PrototypeFormAlert>
-                      )}
-                      <Box>
-                        <Title order={2} size="h4">
-                          注意事項
-                        </Title>
-                        <Divider my="md" />
-                        <PrototypeFormAlert
-                          kind="error"
-                          title="削除したデータは復元できません"
-                        >
-                          アカウントとあなたが管理するMediaが削除されます。
-                        </PrototypeFormAlert>
-                      </Box>
-                      {loadState === "ready" && (
-                        <Text c="dimmed" size="sm">
-                          Communityに参加している場合は、次のステップで各Communityへの対応と影響を確認します。
+              </Box>
+              {cancelled || confirmed ? (
+                <Stack gap="md">
+                  <Title order={2} size="h4">
+                    {confirmed
+                      ? "削除を確認しました（プロトタイプ）"
+                      : "削除手続きを中止しました"}
+                  </Title>
+                  <Text c="dimmed">
+                    {confirmed
+                      ? "このプロトタイプではアカウントとデータは削除されません。"
+                      : "削除は開始されていません。"}
+                  </Text>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => {
+                      setCancelled(false)
+                      setConfirmed(false)
+                      setReauth(false)
+                      setStep(0)
+                    }}
+                  >
+                    最初に戻る
+                  </Button>
+                </Stack>
+              ) : (
+                <>
+                  <Box
+                    style={{
+                      position: "sticky",
+                      top: 40,
+                      zIndex: 10,
+                      background: "var(--mantine-color-body)",
+                      borderBottom:
+                        "1px solid var(--mantine-color-default-border)",
+                      paddingTop: 12,
+                      paddingBottom: 12,
+                    }}
+                  >
+                    {compactStepper ? (
+                      <Stack gap={4}>
+                        <Text size="xs" c="dimmed">
+                          ステップ {step + 1}/4
                         </Text>
+                        <Text fw={600}>{labels[step]}</Text>
+                        <Text size="xs" c="dimmed">
+                          {labels
+                            .map((label, index) =>
+                              skipped(index) && step > index
+                                ? `${label}：対象なし`
+                                : null,
+                            )
+                            .filter(Boolean)
+                            .join(" / ")}
+                        </Text>
+                      </Stack>
+                    ) : (
+                      <Stepper
+                        active={step}
+                        allowNextStepsSelect={false}
+                        size="sm"
+                        orientation="horizontal"
+                      >
+                        {labels.map((label, index) => (
+                          <Stepper.Step
+                            key={label}
+                            label={label}
+                            description={
+                              skipped(index) && step > index
+                                ? "対象なし"
+                                : index === step
+                                  ? "確認中"
+                                  : undefined
+                            }
+                            completedIcon={
+                              skipped(index) ? (
+                                <Text size="xs">—</Text>
+                              ) : undefined
+                            }
+                            color={
+                              skipped(index) && step > index
+                                ? "gray"
+                                : undefined
+                            }
+                          />
+                        ))}
+                      </Stepper>
+                    )}
+                  </Box>
+                  {step === 0 && (
+                    <Box w="100%">
+                      {!compactStepper && (
+                        <>
+                          <Title order={2} size="h4">
+                            個人データへの影響
+                          </Title>
+                          <Divider my="md" />
+                        </>
                       )}
-                      <Group gap="sm" justify="flex-end">
-                        <Box
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          {loadState !== "ready" ? (
+                      <Stack gap="lg">
+                        {loadState === "ready" ? (
+                          <Box>
+                            <Text c="dimmed" size="sm">
+                              削除されるMedia
+                            </Text>
+                            {mediaCount === 0 ? (
+                              <Text mt={4}>削除されるMediaはありません</Text>
+                            ) : (
+                              <Title order={3} size="h2" mt={4}>
+                                {mediaCount}件
+                              </Title>
+                            )}
+                          </Box>
+                        ) : (
+                          <PrototypeFormAlert
+                            kind={loadState === "retrying" ? "info" : "error"}
+                            title={
+                              loadState === "retrying"
+                                ? "削除されるMediaを確認しています"
+                                : "削除されるMediaを確認できませんでした"
+                            }
+                          >
+                            {loadState === "retrying"
+                              ? "Mediaの件数を再取得しています。"
+                              : "削除されるMediaの件数を確認できませんでした。再試行してください。"}
+                          </PrototypeFormAlert>
+                        )}
+                        <Box>
+                          <Title order={2} size="h4">
+                            注意事項
+                          </Title>
+                          <Divider my="md" />
+                          <PrototypeFormAlert
+                            kind="error"
+                            title="削除したデータは復元できません"
+                          >
+                            アカウントとあなたが管理するMediaが削除されます。
+                          </PrototypeFormAlert>
+                        </Box>
+                        {loadState === "ready" && (
+                          <Text c="dimmed" size="sm">
+                            Communityに参加している場合は、次のステップで各Communityへの対応と影響を確認します。
+                          </Text>
+                        )}
+                        <Group gap="sm" justify="flex-end">
+                          <Box
+                            style={{
+                              display: "flex",
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            {loadState !== "ready" ? (
+                              <Button
+                                size="sm"
+                                loading={loadState === "retrying"}
+                                disabled={loadState === "retrying"}
+                                onClick={() => setLoadState("retrying")}
+                              >
+                                再試行
+                              </Button>
+                            ) : (
+                              <Button size="sm" onClick={next}>
+                                次へ
+                              </Button>
+                            )}
+                          </Box>
+                        </Group>
+                        {loadState === "retrying" && (
+                          <Button
+                            size="xs"
+                            variant="light"
+                            onClick={() =>
+                              setLoadState(
+                                retryOutcome === "success" ? "ready" : "failed",
+                              )
+                            }
+                          >
+                            再取得を完了
+                          </Button>
+                        )}
+                      </Stack>
+                    </Box>
+                  )}
+                  {step === 1 && (
+                    <Box w="100%">
+                      {!compactStepper && (
+                        <>
+                          <Title order={2} size="h4">
+                            Communityへの対応
+                          </Title>
+                          <Divider my="md" />
+                        </>
+                      )}
+                      <Stack gap="lg">
+                        <Text size="sm" c="dimmed">
+                          参加中のCommunityごとに、アカウント削除時の対応を確認してください。必要なCommunityではAdministratorの指定または削除を選択します。
+                        </Text>
+                        {needsResolution && (
+                          <Badge
+                            color={allResolved ? "green" : "yellow"}
+                            variant="light"
+                            w="fit-content"
+                          >
+                            {allResolved
+                              ? "すべて解決済み"
+                              : `未解決 ${communitiesToResolve.filter((item) => !resolved(item.id)).length}件`}
+                          </Badge>
+                        )}
+                        {communities.map((community) => {
+                          const decision = decisions[community.id]
+                          const requiresDecision =
+                            community.relation === "last-administrator"
+                          return (
+                            <Box
+                              key={community.id}
+                              p="md"
+                              style={{
+                                border:
+                                  "1px solid var(--mantine-color-default-border)",
+                                borderRadius: "var(--mantine-radius-md)",
+                              }}
+                            >
+                              <Stack gap="md">
+                                <Group justify="space-between">
+                                  <Title order={3} size="h5">
+                                    {community.name}
+                                  </Title>
+                                  {requiresDecision && (
+                                    <Badge
+                                      color={
+                                        resolved(community.id)
+                                          ? "green"
+                                          : "yellow"
+                                      }
+                                      variant="light"
+                                    >
+                                      {resolved(community.id)
+                                        ? "解決済み"
+                                        : "未解決"}
+                                    </Badge>
+                                  )}
+                                </Group>
+                                {!requiresDecision ? (
+                                  <PrototypeFormAlert kind="info" title="退会">
+                                    {community.relation === "member"
+                                      ? "このCommunityにはMemberとして参加しています。アカウントを削除すると、このCommunityから退会します。"
+                                      : "あなた以外にもAdministratorがいるため、Communityはそのまま残ります。アカウントを削除すると、このCommunityから退会します。"}
+                                  </PrototypeFormAlert>
+                                ) : (
+                                  <Text size="sm" c="dimmed">
+                                    あなた以外にAdministratorがいません。
+                                  </Text>
+                                )}
+                                {requiresDecision && (
+                                  <Radio.Group
+                                    label="このCommunityの対応"
+                                    value={decision?.choice ?? ""}
+                                    onChange={(value) =>
+                                      changeDecision(community.id, {
+                                        choice: value as Decision["choice"],
+                                        successors:
+                                          value === "keep"
+                                            ? (decision?.successors ?? [])
+                                            : [],
+                                      })
+                                    }
+                                  >
+                                    <Group align="stretch" grow mt="sm">
+                                      <Box
+                                        p="sm"
+                                        style={{
+                                          border: `1px solid ${
+                                            decision?.choice === "keep"
+                                              ? "var(--mantine-color-green-filled)"
+                                              : "var(--mantine-color-default-border)"
+                                          }`,
+                                          borderRadius:
+                                            "var(--mantine-radius-md)",
+                                          background:
+                                            decision?.choice === "keep"
+                                              ? "var(--mantine-color-green-light)"
+                                              : undefined,
+                                        }}
+                                      >
+                                        <Radio
+                                          value="keep"
+                                          label="Communityを残す"
+                                          description={
+                                            community.candidates.length > 0
+                                              ? "別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。"
+                                              : "Administratorに指定できるMemberがいないため、このCommunityを残すことはできません。"
+                                          }
+                                          disabled={
+                                            community.candidates.length === 0
+                                          }
+                                        />
+                                        <MultiSelect
+                                          mt="md"
+                                          label="後任のAdministrator"
+                                          placeholder={
+                                            community.candidates.length > 0
+                                              ? "Memberを検索して選択"
+                                              : "選択できるMemberがいません"
+                                          }
+                                          data={community.candidates}
+                                          value={decision?.successors ?? []}
+                                          onChange={(values) =>
+                                            changeDecision(community.id, {
+                                              choice: "keep",
+                                              successors: values,
+                                            })
+                                          }
+                                          searchable
+                                          clearable
+                                          disabled={
+                                            decision?.choice !== "keep" ||
+                                            community.candidates.length === 0
+                                          }
+                                        />
+                                      </Box>
+                                      <Box
+                                        p="sm"
+                                        style={{
+                                          border: `1px solid ${
+                                            decision?.choice === "delete"
+                                              ? "var(--mantine-color-red-filled)"
+                                              : "var(--mantine-color-default-border)"
+                                          }`,
+                                          borderRadius:
+                                            "var(--mantine-radius-md)",
+                                          background:
+                                            decision?.choice === "delete"
+                                              ? "var(--mantine-color-red-light)"
+                                              : undefined,
+                                        }}
+                                      >
+                                        <Radio
+                                          value="delete"
+                                          label="Communityを削除する"
+                                          description="個人データへの影響は次のステップで確認します。"
+                                        />
+                                      </Box>
+                                    </Group>
+                                  </Radio.Group>
+                                )}
+                              </Stack>
+                            </Box>
+                          )
+                        })}
+                        <Group gap="sm" justify="space-between">
+                          <Box style={{ flex: 1 }}>
+                            <Button size="sm" variant="default" onClick={back}>
+                              戻る
+                            </Button>
+                          </Box>
+                          <Box
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              justifyContent: "center",
+                            }}
+                          >
                             <Button
                               size="sm"
-                              loading={loadState === "retrying"}
-                              disabled={loadState === "retrying"}
-                              onClick={() => setLoadState("retrying")}
+                              variant="subtle"
+                              color="gray"
+                              onClick={cancel}
                             >
-                              再試行
+                              キャンセル
                             </Button>
-                          ) : (
-                            <Button size="sm" onClick={next}>
+                          </Box>
+                          <Box
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <Button
+                              size="sm"
+                              disabled={!allResolved}
+                              onClick={next}
+                            >
                               次へ
                             </Button>
-                          )}
-                        </Box>
-                      </Group>
-                      {loadState === "retrying" && (
-                        <Button
-                          size="xs"
-                          variant="light"
-                          onClick={() =>
-                            setLoadState(
-                              retryOutcome === "success" ? "ready" : "failed",
-                            )
-                          }
-                        >
-                          再取得を完了
-                        </Button>
+                          </Box>
+                        </Group>
+                      </Stack>
+                    </Box>
+                  )}
+                  {step === 2 && (
+                    <Box w="100%">
+                      {!compactStepper && (
+                        <>
+                          <Title order={2} size="h4">
+                            Communityへの影響
+                          </Title>
+                          <Divider my="md" />
+                        </>
                       )}
-                    </Stack>
-                  </Box>
-                )}
-                {step === 1 && (
-                  <Box w="100%">
-                    {!compactStepper && (
-                      <>
-                        <Title order={2} size="h4">
-                          Communityへの対応
-                        </Title>
-                        <Divider my="md" />
-                      </>
-                    )}
-                    <Stack gap="lg">
-                      <Text size="sm" c="dimmed">
-                        参加中のCommunityごとに、アカウント削除時の対応を確認してください。必要なCommunityではAdministratorの指定または削除を選択します。
-                      </Text>
-                      {needsResolution && (
+                      <Stack gap="lg">
+                        <Text size="sm" c="dimmed">
+                          参加中のCommunityごとに、アカウント削除後の状態を確認してください。削除するCommunityでは確認のためCommunity名を入力します。
+                        </Text>
                         <Badge
-                          color={allResolved ? "green" : "yellow"}
+                          color={allConfirmed ? "green" : "yellow"}
                           variant="light"
                           w="fit-content"
                         >
-                          {allResolved
-                            ? "すべて解決済み"
-                            : `未解決 ${communitiesToResolve.filter((item) => !resolved(item.id)).length}件`}
+                          {allConfirmed
+                            ? "すべて確認済み"
+                            : `未確認 ${toDelete.filter((item) => confirmations[item.id] !== item.name).length}件`}
                         </Badge>
-                      )}
-                      {communities.map((community) => {
-                        const decision = decisions[community.id]
-                        const requiresDecision = community.relation === "last-administrator"
-                        return (
+                        {communities.map((community) => (
                           <Box
                             key={community.id}
                             p="md"
@@ -440,483 +672,297 @@ export function AccountDeletionImpactPrototype({
                                 <Title order={3} size="h5">
                                   {community.name}
                                 </Title>
-                                {requiresDecision && (
-                                  <Badge
-                                    color={
-                                      resolved(community.id) ? "green" : "yellow"
-                                    }
-                                    variant="light"
-                                  >
-                                    {resolved(community.id)
-                                      ? "解決済み"
-                                      : "未解決"}
-                                  </Badge>
-                                )}
+                                <Badge variant="light">
+                                  {community.relation !== "last-administrator"
+                                    ? "退会"
+                                    : decisions[community.id]?.choice ===
+                                        "delete"
+                                      ? "削除"
+                                      : "保持"}
+                                </Badge>
                               </Group>
-                              {!requiresDecision ? (
-                                <PrototypeFormAlert kind="info" title="退会">
-                                  {community.relation === "member"
-                                    ? "このCommunityにはMemberとして参加しています。アカウントを削除すると、このCommunityから退会します。"
-                                    : "あなた以外にもAdministratorがいるため、Communityはそのまま残ります。アカウントを削除すると、このCommunityから退会します。"}
-                                </PrototypeFormAlert>
-                              ) : (
+                              {decisions[community.id]?.choice === "delete" && (
+                                <>
+                                  <Text size="sm">
+                                    参加者：{community.members}人 /
+                                    Community管理Media：{community.media}件
+                                  </Text>
+                                  <PrototypeFormAlert
+                                    kind="error"
+                                    title="このCommunityは復元できません"
+                                  >
+                                    このCommunityと管理Mediaが削除されます。他のUserがアップロードしたMediaも削除されます。
+                                  </PrototypeFormAlert>
+                                  <TextInput
+                                    label="確認のためCommunity名を入力"
+                                    description={`「${community.name}」と入力してください。`}
+                                    value={confirmations[community.id] ?? ""}
+                                    onChange={(event) => {
+                                      const value = event.currentTarget.value
+                                      setConfirmations((previous) => ({
+                                        ...previous,
+                                        [community.id]: value,
+                                      }))
+                                    }}
+                                    error={
+                                      confirmations[community.id] &&
+                                      confirmations[community.id] !==
+                                        community.name
+                                        ? "入力内容とCommunity名が一致していません"
+                                        : undefined
+                                    }
+                                  />
+                                </>
+                              )}
+                              {community.relation !== "last-administrator" && (
                                 <Text size="sm" c="dimmed">
-                                  あなた以外にAdministratorがいません。
+                                  アカウントを削除すると、このCommunityから退会します。Communityはそのまま残ります。
                                 </Text>
                               )}
-                              {requiresDecision && (
-                                <Radio.Group
-                                label="このCommunityの対応"
-                                value={decision?.choice ?? ""}
-                                onChange={(value) =>
-                                  changeDecision(community.id, {
-                                    choice: value as Decision["choice"],
-                                    successors:
-                                      value === "keep"
-                                        ? (decision?.successors ?? [])
-                                        : [],
-                                  })
-                                }
-                              >
-                                <Group align="stretch" grow mt="sm">
-                                  <Box
-                                    p="sm"
-                                    style={{
-                                      border: `1px solid ${
-                                        decision?.choice === "keep"
-                                          ? "var(--mantine-color-green-filled)"
-                                          : "var(--mantine-color-default-border)"
-                                      }`,
-                                      borderRadius: "var(--mantine-radius-md)",
-                                      background:
-                                        decision?.choice === "keep"
-                                          ? "var(--mantine-color-green-light)"
-                                          : undefined,
-                                    }}
-                                  >
-                                    <Radio
-                                      value="keep"
-                                      label="Communityを残す"
-                                      description={
-                                        community.candidates.length > 0
-                                          ? "別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。"
-                                          : "Administratorに指定できるMemberがいないため、このCommunityを残すことはできません。"
-                                      }
-                                      disabled={community.candidates.length === 0}
-                                    />
-                                    <MultiSelect
-                                      mt="md"
-                                      label="後任のAdministrator"
-                                      placeholder={
-                                        community.candidates.length > 0
-                                          ? "Memberを検索して選択"
-                                          : "選択できるMemberがいません"
-                                      }
-                                      data={community.candidates}
-                                      value={decision?.successors ?? []}
-                                      onChange={(values) =>
-                                        changeDecision(community.id, {
-                                          choice: "keep",
-                                          successors: values,
-                                        })
-                                      }
-                                      searchable
-                                      clearable
-                                      disabled={
-                                        decision?.choice !== "keep" ||
-                                        community.candidates.length === 0
-                                      }
-                                    />
-                                  </Box>
-                                  <Box
-                                    p="sm"
-                                    style={{
-                                      border: `1px solid ${
-                                        decision?.choice === "delete"
-                                          ? "var(--mantine-color-red-filled)"
-                                          : "var(--mantine-color-default-border)"
-                                      }`,
-                                      borderRadius: "var(--mantine-radius-md)",
-                                      background:
-                                        decision?.choice === "delete"
-                                          ? "var(--mantine-color-red-light)"
-                                          : undefined,
-                                    }}
-                                  >
-                                    <Radio
-                                      value="delete"
-                                      label="Communityを削除する"
-                                      description="個人データへの影響は次のステップで確認します。"
-                                    />
-                                  </Box>
-                                </Group>
-                              </Radio.Group>
-                              )}
+                              {community.relation === "last-administrator" &&
+                                decisions[community.id]?.choice === "keep" && (
+                                  <Text size="sm" c="dimmed">
+                                    Communityはそのまま残り、指定したAdministratorが管理を引き継ぎます。
+                                  </Text>
+                                )}
                             </Stack>
                           </Box>
-                        )
-                      })}
-                      <Group gap="sm" justify="space-between">
-                        <Box style={{ flex: 1 }}>
-                          <Button size="sm" variant="default" onClick={back}>
-                            戻る
-                          </Button>
-                        </Box>
-                        <Box
-                          style={{
-                            flex: 1,
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Button
-                            size="sm"
-                            variant="subtle"
-                            color="gray"
-                            onClick={cancel}
-                          >
-                            キャンセル
-                          </Button>
-                        </Box>
-                        <Box
-                          style={{
-                            flex: 1,
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Button
-                            size="sm"
-                            disabled={!allResolved}
-                            onClick={next}
-                          >
-                            次へ
-                          </Button>
-                        </Box>
-                      </Group>
-                    </Stack>
-                  </Box>
-                )}
-                {step === 2 && (
-                  <Box w="100%">
-                    {!compactStepper && (
-                      <>
-                        <Title order={2} size="h4">
-                          Communityへの影響
-                        </Title>
-                        <Divider my="md" />
-                      </>
-                    )}
-                    <Stack gap="lg">
-                      <Text size="sm" c="dimmed">
-                        参加中のCommunityごとに、アカウント削除後の状態を確認してください。削除するCommunityでは確認のためCommunity名を入力します。
-                      </Text>
-                      <Badge
-                        color={allConfirmed ? "green" : "yellow"}
-                        variant="light"
-                        w="fit-content"
-                      >
-                        {allConfirmed
-                          ? "すべて確認済み"
-                          : `未確認 ${toDelete.filter((item) => confirmations[item.id] !== item.name).length}件`}
-                      </Badge>
-                      {communities.map((community) => (
-                        <Box
-                          key={community.id}
-                          p="md"
-                          style={{
-                            border:
-                              "1px solid var(--mantine-color-default-border)",
-                            borderRadius: "var(--mantine-radius-md)",
-                          }}
-                        >
-                          <Stack gap="md">
-                            <Group justify="space-between">
-                              <Title order={3} size="h5">
-                                {community.name}
-                              </Title>
-                              <Badge variant="light">
-                                {community.relation !== "last-administrator"
-                                  ? "退会"
-                                  : decisions[community.id]?.choice === "delete"
-                                    ? "削除"
-                                    : "保持"}
-                              </Badge>
-                            </Group>
-                            {decisions[community.id]?.choice === "delete" && (
-                              <>
-                            <Text size="sm">
-                              参加者：{community.members}人 /
-                              Community管理Media：{community.media}件
-                            </Text>
-                            <PrototypeFormAlert
-                              kind="error"
-                              title="このCommunityは復元できません"
-                            >
-                              このCommunityと管理Mediaが削除されます。他のUserがアップロードしたMediaも削除されます。
-                            </PrototypeFormAlert>
-                            <TextInput
-                              label="確認のためCommunity名を入力"
-                              description={`「${community.name}」と入力してください。`}
-                              value={confirmations[community.id] ?? ""}
-                              onChange={(event) => {
-                                const value = event.currentTarget.value
-                                setConfirmations((previous) => ({
-                                  ...previous,
-                                  [community.id]: value,
-                                }))
-                              }}
-                              error={
-                                confirmations[community.id] &&
-                                confirmations[community.id] !== community.name
-                                  ? "入力内容とCommunity名が一致していません"
-                                  : undefined
-                              }
-                            />
-                            </>
-                            )}
-                            {community.relation !== "last-administrator" && (
-                              <Text size="sm" c="dimmed">アカウントを削除すると、このCommunityから退会します。Communityはそのまま残ります。</Text>
-                            )}
-                            {community.relation === "last-administrator" && decisions[community.id]?.choice === "keep" && (
-                              <Text size="sm" c="dimmed">Communityはそのまま残り、指定したAdministratorが管理を引き継ぎます。</Text>
-                            )}
-                          </Stack>
-                        </Box>
-                      ))}
-                      <Group gap="sm" justify="space-between">
-                        <Box style={{ flex: 1 }}>
-                          <Button size="sm" variant="default" onClick={back}>
-                            戻る
-                          </Button>
-                        </Box>
-                        <Box
-                          style={{
-                            flex: 1,
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Button
-                            size="sm"
-                            variant="subtle"
-                            color="gray"
-                            onClick={cancel}
-                          >
-                            キャンセル
-                          </Button>
-                        </Box>
-                        <Box
-                          style={{
-                            flex: 1,
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Button
-                            size="sm"
-                            disabled={!allConfirmed}
-                            onClick={next}
-                          >
-                            次へ
-                          </Button>
-                        </Box>
-                      </Group>
-                    </Stack>
-                  </Box>
-                )}
-                {step === 3 && (
-                  <Box w="100%">
-                    {!compactStepper && (
-                      <>
-                        <Title order={2} size="h4">
-                          最終確認
-                        </Title>
-                        <Divider my="md" />
-                      </>
-                    )}
-                    <Stack gap="lg">
-                      <Box>
-                        <Title order={3} size="h5">
-                          アカウントとMedia
-                        </Title>
-                        <Text size="sm">
-                          アカウントおよび管理Media {mediaCount}件を削除します。
-                        </Text>
-                      </Box>
-                      <Box>
-                        <Title order={3} size="h5">
-                          Communityへの対応
-                        </Title>
-                        {!needsResolution && (
-                          <PrototypeFormAlert
-                            kind="info"
-                            title="Communityの管理状態を変更する必要はありません"
-                          >
-                            {communities.length === 0
-                              ? "参加中のCommunityはありません。管理状態の解消と削除対象の確認は省略しました。"
-                              : "最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。"}
-                          </PrototypeFormAlert>
-                        )}
-                        {needsResolution && toDelete.length === 0 && (
-                          <PrototypeFormAlert
-                            kind="info"
-                            title="削除するCommunityはありません"
-                          >
-                            削除対象の確認は、対象がないため省略しました。
-                          </PrototypeFormAlert>
-                        )}
-                        {communities.length > 0 && (
-                          <Stack
-                            gap={0}
-                            mt="sm"
+                        ))}
+                        <Group gap="sm" justify="space-between">
+                          <Box style={{ flex: 1 }}>
+                            <Button size="sm" variant="default" onClick={back}>
+                              戻る
+                            </Button>
+                          </Box>
+                          <Box
                             style={{
-                              border:
-                                "1px solid var(--mantine-color-default-border)",
-                              borderRadius: "var(--mantine-radius-md)",
-                              overflow: "hidden",
+                              flex: 1,
+                              display: "flex",
+                              justifyContent: "center",
                             }}
                           >
-                            {communities.map((community, index) => {
-                              const action =
-                                community.relation !== "last-administrator"
-                                  ? "leave"
-                                  : decisions[community.id]?.choice === "delete"
-                                    ? "delete"
-                                    : "keep"
-                              const successors = (
-                                decisions[community.id]?.successors ?? []
-                              )
-                                .map(
-                                  (successor) =>
-                                    community.candidates.find(
-                                      (candidate) =>
-                                        candidate.value === successor,
-                                    )?.label,
-                                )
-                                .filter(Boolean)
-                                .join("、")
-
-                              return (
-                                <Group
-                                  key={community.id}
-                                  gap="md"
-                                  px="sm"
-                                  py="xs"
-                                  wrap="nowrap"
-                                  style={{
-                                    borderTop:
-                                      index > 0
-                                        ? "1px solid var(--mantine-color-default-border)"
-                                        : undefined,
-                                  }}
-                                >
-                                  <Box style={{ flex: 1, minWidth: 0 }}>
-                                    <Text size="sm" fw={500} truncate>
-                                      {community.name}
-                                    </Text>
-                                    <Text size="xs" c="dimmed" truncate>
-                                      {action === "delete"
-                                        ? "Communityと管理Mediaを削除"
-                                        : action === "keep"
-                                          ? `Administrator → ${successors || "未指定"}`
-                                          : "Communityから退会・Communityは保持"}
-                                    </Text>
-                                  </Box>
-                                  <Badge
-                                    size="sm"
-                                    variant="light"
-                                    color={
-                                      action === "delete"
-                                        ? "red"
-                                        : action === "keep"
-                                          ? "green"
-                                          : "gray"
-                                    }
-                                  >
-                                    {action === "delete"
-                                      ? "削除"
-                                      : action === "keep"
-                                        ? "保持"
-                                        : "退会"}
-                                  </Badge>
-                                </Group>
-                              )
-                            })}
-                          </Stack>
-                        )}
-                      </Box>
-                      <PrototypeFormAlert
-                        kind="error"
-                        title="アカウントと削除対象のデータは復元できません"
-                      >
-                        削除を続けるには再認証が必要です。
-                      </PrototypeFormAlert>
-                      {reauth && (
-                        <PrototypeFormAlert
-                          kind="info"
-                          title="再認証（プロトタイプ）"
-                        >
-                          実際のAuth0認証は行いません。削除処理も実行されません。
-                        </PrototypeFormAlert>
+                            <Button
+                              size="sm"
+                              variant="subtle"
+                              color="gray"
+                              onClick={cancel}
+                            >
+                              キャンセル
+                            </Button>
+                          </Box>
+                          <Box
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <Button
+                              size="sm"
+                              disabled={!allConfirmed}
+                              onClick={next}
+                            >
+                              次へ
+                            </Button>
+                          </Box>
+                        </Group>
+                      </Stack>
+                    </Box>
+                  )}
+                  {step === 3 && (
+                    <Box w="100%">
+                      {!compactStepper && (
+                        <>
+                          <Title order={2} size="h4">
+                            最終確認
+                          </Title>
+                          <Divider my="md" />
+                        </>
                       )}
-                      <Group gap="sm" justify="space-between">
-                        <Box style={{ flex: 1 }}>
-                          <Button
-                            size="sm"
-                            variant="default"
-                            onClick={() => {
-                              setReauth(false)
-                              back()
+                      <Stack gap="lg">
+                        <Box>
+                          <Title order={3} size="h5">
+                            アカウントとMedia
+                          </Title>
+                          <Text size="sm">
+                            アカウントおよび管理Media {mediaCount}
+                            件を削除します。
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Title order={3} size="h5">
+                            Communityへの対応
+                          </Title>
+                          {!needsResolution && (
+                            <PrototypeFormAlert
+                              kind="info"
+                              title="Communityの管理状態を変更する必要はありません"
+                            >
+                              {communities.length === 0
+                                ? "参加中のCommunityはありません。管理状態の解消と削除対象の確認は省略しました。"
+                                : "最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。"}
+                            </PrototypeFormAlert>
+                          )}
+                          {needsResolution && toDelete.length === 0 && (
+                            <PrototypeFormAlert
+                              kind="info"
+                              title="削除するCommunityはありません"
+                            >
+                              削除対象の確認は、対象がないため省略しました。
+                            </PrototypeFormAlert>
+                          )}
+                          {communities.length > 0 && (
+                            <Stack
+                              gap={0}
+                              mt="sm"
+                              style={{
+                                border:
+                                  "1px solid var(--mantine-color-default-border)",
+                                borderRadius: "var(--mantine-radius-md)",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {communities.map((community, index) => {
+                                const action =
+                                  community.relation !== "last-administrator"
+                                    ? "leave"
+                                    : decisions[community.id]?.choice ===
+                                        "delete"
+                                      ? "delete"
+                                      : "keep"
+                                const successors = (
+                                  decisions[community.id]?.successors ?? []
+                                )
+                                  .map(
+                                    (successor) =>
+                                      community.candidates.find(
+                                        (candidate) =>
+                                          candidate.value === successor,
+                                      )?.label,
+                                  )
+                                  .filter(Boolean)
+                                  .join("、")
+
+                                return (
+                                  <Group
+                                    key={community.id}
+                                    gap="md"
+                                    px="sm"
+                                    py="xs"
+                                    wrap="nowrap"
+                                    style={{
+                                      borderTop:
+                                        index > 0
+                                          ? "1px solid var(--mantine-color-default-border)"
+                                          : undefined,
+                                    }}
+                                  >
+                                    <Box style={{ flex: 1, minWidth: 0 }}>
+                                      <Text size="sm" fw={500} truncate>
+                                        {community.name}
+                                      </Text>
+                                      <Text size="xs" c="dimmed" truncate>
+                                        {action === "delete"
+                                          ? "Communityと管理Mediaを削除"
+                                          : action === "keep"
+                                            ? `Administrator → ${successors || "未指定"}`
+                                            : "Communityから退会・Communityは保持"}
+                                      </Text>
+                                    </Box>
+                                    <Badge
+                                      size="sm"
+                                      variant="light"
+                                      color={
+                                        action === "delete"
+                                          ? "red"
+                                          : action === "keep"
+                                            ? "green"
+                                            : "gray"
+                                      }
+                                    >
+                                      {action === "delete"
+                                        ? "削除"
+                                        : action === "keep"
+                                          ? "保持"
+                                          : "退会"}
+                                    </Badge>
+                                  </Group>
+                                )
+                              })}
+                            </Stack>
+                          )}
+                        </Box>
+                        <PrototypeFormAlert
+                          kind="error"
+                          title="アカウントと削除対象のデータは復元できません"
+                        >
+                          削除を続けるには再認証が必要です。
+                        </PrototypeFormAlert>
+                        {reauth && (
+                          <PrototypeFormAlert
+                            kind="info"
+                            title="再認証（プロトタイプ）"
+                          >
+                            実際のAuth0認証は行いません。削除処理も実行されません。
+                          </PrototypeFormAlert>
+                        )}
+                        <Group gap="sm" justify="space-between">
+                          <Box style={{ flex: 1 }}>
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => {
+                                setReauth(false)
+                                back()
+                              }}
+                            >
+                              戻る
+                            </Button>
+                          </Box>
+                          <Box
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              justifyContent: "center",
                             }}
                           >
-                            戻る
-                          </Button>
-                        </Box>
-                        <Box
-                          style={{
-                            flex: 1,
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Button
-                            size="sm"
-                            variant="subtle"
-                            color="gray"
-                            onClick={cancel}
+                            <Button
+                              size="sm"
+                              variant="subtle"
+                              color="gray"
+                              onClick={cancel}
+                            >
+                              キャンセル
+                            </Button>
+                          </Box>
+                          <Box
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              justifyContent: "flex-end",
+                            }}
                           >
-                            キャンセル
-                          </Button>
-                        </Box>
-                        <Box
-                          style={{
-                            flex: 1,
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Button
-                            size="sm"
-                            color={reauth ? "red" : undefined}
-                            onClick={() =>
-                              reauth ? setConfirmed(true) : next()
-                            }
-                          >
-                            {reauth
-                              ? "アカウントを削除する（デモ）"
-                              : "再認証する（デモ）"}
-                          </Button>
-                        </Box>
-                      </Group>
-                    </Stack>
-                  </Box>
-                )}
-              </>
-            )}
-          </Stack>
-        </Box>
-      </AppShell.Main>
+                            <Button
+                              size="sm"
+                              color={reauth ? "red" : undefined}
+                              onClick={() =>
+                                reauth ? setConfirmed(true) : next()
+                              }
+                            >
+                              {reauth
+                                ? "アカウントを削除する（デモ）"
+                                : "再認証する（デモ）"}
+                            </Button>
+                          </Box>
+                        </Group>
+                      </Stack>
+                    </Box>
+                  )}
+                </>
+              )}
+            </Stack>
+          </Box>
+        </AppShell.Main>
       </AppShell>
     </>
   )

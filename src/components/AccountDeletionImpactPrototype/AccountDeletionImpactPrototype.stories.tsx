@@ -20,7 +20,10 @@ export const MemberOnly: Story = {
   args: { reviewState: "default", communityScenario: "member-only" },
 }
 export const AdministratorWithOthersOnly: Story = {
-  args: { reviewState: "default", communityScenario: "administrator-with-others-only" },
+  args: {
+    reviewState: "default",
+    communityScenario: "administrator-with-others-only",
+  },
 }
 export const WithdrawalMixed: Story = {
   args: { reviewState: "default", communityScenario: "withdrawal-mixed" },
@@ -29,10 +32,16 @@ export const LastAdministrator: Story = {
   args: { reviewState: "default", communityScenario: "last-administrator" },
 }
 export const LastAdministratorNoCandidate: Story = {
-  args: { reviewState: "default", communityScenario: "last-administrator-no-candidate" },
+  args: {
+    reviewState: "default",
+    communityScenario: "last-administrator-no-candidate",
+  },
 }
 export const MultipleLastAdministrators: Story = {
-  args: { reviewState: "default", communityScenario: "multiple-last-administrators" },
+  args: {
+    reviewState: "default",
+    communityScenario: "multiple-last-administrators",
+  },
 }
 export const NoMedia: Story = {
   args: { reviewState: "empty", communityScenario: "mixed-memberships" },
@@ -41,13 +50,25 @@ export const LoadFailed: Story = {
   args: { reviewState: "failure", communityScenario: "mixed-memberships" },
 }
 export const RetryLoading: Story = {
-  args: { reviewState: "retrying", retryOutcome: "success", communityScenario: "mixed-memberships" },
+  args: {
+    reviewState: "retrying",
+    retryOutcome: "success",
+    communityScenario: "mixed-memberships",
+  },
 }
 export const RetrySucceeds: Story = {
-  args: { reviewState: "failure", retryOutcome: "success", communityScenario: "mixed-memberships" },
+  args: {
+    reviewState: "failure",
+    retryOutcome: "success",
+    communityScenario: "mixed-memberships",
+  },
 }
 export const RetryFails: Story = {
-  args: { reviewState: "failure", retryOutcome: "failure", communityScenario: "mixed-memberships" },
+  args: {
+    reviewState: "failure",
+    retryOutcome: "failure",
+    communityScenario: "mixed-memberships",
+  },
 }
 export const Compact: Story = {
   args: { reviewState: "default", communityScenario: "mixed-memberships" },
