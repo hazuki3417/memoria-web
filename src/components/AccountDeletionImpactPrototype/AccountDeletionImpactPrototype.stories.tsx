@@ -16,6 +16,9 @@ export const Default: Story = {
 export const NoCommunityResolution: Story = {
   args: { reviewState: "default", communityScenario: "no-resolution" },
 }
+export const OtherAdministrator: Story = {
+  args: { reviewState: "default", communityScenario: "other-administrator" },
+}
 export const NoMedia: Story = { args: { reviewState: "empty" } }
 export const LoadFailed: Story = { args: { reviewState: "failure" } }
 export const RetryLoading: Story = {
