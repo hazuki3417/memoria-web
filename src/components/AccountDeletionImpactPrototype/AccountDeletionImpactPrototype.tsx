@@ -137,7 +137,7 @@ export function AccountDeletionImpactPrototype({
                       <Box>
                         <Title order={2} size="h4">注意事項</Title>
                         <Divider my="md" />
-                        <PrototypeFormAlert kind="error" title="削除したデータは復元できません">アカウントと、あなたが管理するMediaが削除されます。</PrototypeFormAlert>
+                        <PrototypeFormAlert kind="error" title="削除したデータは復元できません">アカウントとあなたが管理するMediaが削除されます。</PrototypeFormAlert>
                       </Box>
                       {loadState === "ready" && <Text c="dimmed" size="sm">Communityへの影響は次のステップで確認します。対応するCommunityがないステップは省略します。</Text>}
                       <Group gap="sm" justify="space-between">
