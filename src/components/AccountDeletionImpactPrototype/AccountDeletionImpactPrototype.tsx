@@ -22,7 +22,6 @@ import { PrototypeFormAlert } from "../PrototypeFeedback/PrototypeFeedback"
 type ReviewState = "default" | "empty" | "failure" | "retrying"
 type CommunityScenario =
   | "requires-resolution"
-  | "other-administrator"
   | "no-resolution"
 type RetryOutcome = "success" | "failure"
 type Decision = { choice: "keep" | "delete" | null; successors: string[] }
@@ -76,8 +75,7 @@ export function AccountDeletionImpactPrototype({
   const [reauth, setReauth] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const mediaCount = reviewState === "empty" ? 0 : 24
-  const needsResolution = communityScenario !== "no-resolution"
-  const hasOtherAdministrator = communityScenario === "other-administrator"
+  const needsResolution = communityScenario === "requires-resolution"
   const resolved = (id: string) => {
     const decision = decisions[id]
     const community = communities.find((item) => item.id === id)
@@ -383,9 +381,7 @@ export function AccountDeletionImpactPrototype({
                                 </Badge>
                               </Group>
                               <Text size="sm" c="dimmed">
-                                {hasOtherAdministrator
-                                  ? "あなた以外にもAdministratorがいます。"
-                                  : "あなた以外にAdministratorがいません。"}
+                                あなた以外にAdministratorがいません。
                               </Text>
                               <Radio.Group
                                 label="このCommunityの対応"
@@ -625,7 +621,7 @@ export function AccountDeletionImpactPrototype({
                           kind="info"
                           title="Communityへの対応は不要です"
                         >
-                          管理状態の解消と削除対象の確認は、対象がないため省略しました。
+                          最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。
                         </PrototypeFormAlert>
                       )}
                       {needsResolution && toDelete.length === 0 && (
