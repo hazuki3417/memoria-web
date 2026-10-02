@@ -693,24 +693,6 @@ export function AccountDeletionImpactPrototype({
                     </Title>
                     <Divider my="md" />
                     <Stack gap="lg">
-                      {!needsResolution && (
-                        <PrototypeFormAlert
-                          kind="info"
-                          title="Communityの管理状態を変更する必要はありません"
-                        >
-                          {communities.length === 0
-                            ? "参加中のCommunityはありません。管理状態の解消と削除対象の確認は省略しました。"
-                            : "最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。"}
-                        </PrototypeFormAlert>
-                      )}
-                      {needsResolution && toDelete.length === 0 && (
-                        <PrototypeFormAlert
-                          kind="info"
-                          title="削除するCommunityはありません"
-                        >
-                          削除対象の確認は、対象がないため省略しました。
-                        </PrototypeFormAlert>
-                      )}
                       <Box>
                         <Title order={3} size="h5">
                           アカウントとMedia
@@ -719,13 +701,40 @@ export function AccountDeletionImpactPrototype({
                           アカウントおよび管理Media {mediaCount}件を削除します。
                         </Text>
                       </Box>
-                      {communities.length > 0 && (
-                        <Box>
-                          <Title order={3} size="h5">
-                            Communityへの対応
-                          </Title>
-                          <Stack gap="xs" mt="sm">
-                            {communities.map((community) => {
+                      <Box>
+                        <Title order={3} size="h5">
+                          Communityへの対応
+                        </Title>
+                        {!needsResolution && (
+                          <PrototypeFormAlert
+                            kind="info"
+                            title="Communityの管理状態を変更する必要はありません"
+                          >
+                            {communities.length === 0
+                              ? "参加中のCommunityはありません。管理状態の解消と削除対象の確認は省略しました。"
+                              : "最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。"}
+                          </PrototypeFormAlert>
+                        )}
+                        {needsResolution && toDelete.length === 0 && (
+                          <PrototypeFormAlert
+                            kind="info"
+                            title="削除するCommunityはありません"
+                          >
+                            削除対象の確認は、対象がないため省略しました。
+                          </PrototypeFormAlert>
+                        )}
+                        {communities.length > 0 && (
+                          <Stack
+                            gap={0}
+                            mt="sm"
+                            style={{
+                              border:
+                                "1px solid var(--mantine-color-default-border)",
+                              borderRadius: "var(--mantine-radius-md)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {communities.map((community, index) => {
                               const action =
                                 community.relation !== "last-administrator"
                                   ? "leave"
@@ -746,55 +755,54 @@ export function AccountDeletionImpactPrototype({
                                 .join("、")
 
                               return (
-                                <Box
+                                <Group
                                   key={community.id}
-                                  p="sm"
+                                  gap="md"
+                                  px="sm"
+                                  py="xs"
+                                  wrap="nowrap"
                                   style={{
-                                    border:
-                                      "1px solid var(--mantine-color-default-border)",
-                                    borderRadius:
-                                      "var(--mantine-radius-md)",
+                                    borderTop:
+                                      index > 0
+                                        ? "1px solid var(--mantine-color-default-border)"
+                                        : undefined,
                                   }}
                                 >
-                                  <Group
-                                    justify="space-between"
-                                    align="flex-start"
-                                    wrap="nowrap"
-                                  >
-                                    <Text size="sm" fw={500}>
+                                  <Box style={{ flex: 1, minWidth: 0 }}>
+                                    <Text size="sm" fw={500} truncate>
                                       {community.name}
                                     </Text>
-                                    <Badge
-                                      size="sm"
-                                      variant="light"
-                                      color={
-                                        action === "delete"
-                                          ? "red"
-                                          : action === "keep"
-                                            ? "green"
-                                            : "gray"
-                                      }
-                                    >
+                                    <Text size="xs" c="dimmed" truncate>
                                       {action === "delete"
-                                        ? "削除"
+                                        ? "Communityと管理Mediaを削除"
                                         : action === "keep"
-                                          ? "保持"
-                                          : "退会"}
-                                    </Badge>
-                                  </Group>
-                                  <Text size="xs" c="dimmed" mt={4}>
+                                          ? `Administrator → ${successors || "未指定"}`
+                                          : "Communityから退会・Communityは保持"}
+                                    </Text>
+                                  </Box>
+                                  <Badge
+                                    size="sm"
+                                    variant="light"
+                                    color={
+                                      action === "delete"
+                                        ? "red"
+                                        : action === "keep"
+                                          ? "green"
+                                          : "gray"
+                                    }
+                                  >
                                     {action === "delete"
-                                      ? "Communityと管理Mediaを削除します。"
+                                      ? "削除"
                                       : action === "keep"
-                                        ? `Administrator → ${successors || "未指定"}`
-                                        : "Communityから退会します。Communityはそのまま残ります。"}
-                                  </Text>
-                                </Box>
+                                        ? "保持"
+                                        : "退会"}
+                                  </Badge>
+                                </Group>
                               )
                             })}
                           </Stack>
-                        </Box>
-                      )}
+                        )}
+                      </Box>
                       <PrototypeFormAlert
                         kind="error"
                         title="アカウントと削除対象のデータは復元できません"
