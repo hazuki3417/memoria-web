@@ -444,27 +444,30 @@ export function AccountDeletionImpactPrototype({
                                 }
                               >
                                 <Group align="stretch" grow mt="sm">
-                                  <Box
+                                  <Radio.Card
+                                    value="keep"
                                     p="sm"
+                                    disabled={community.candidates.length === 0}
                                     style={{
-                                      border:
-                                        "1px solid var(--mantine-color-default-border)",
-                                      borderRadius:
-                                        "var(--mantine-radius-md)",
+                                      borderColor:
+                                        decision?.choice === "keep"
+                                          ? "var(--mantine-color-green-5)"
+                                          : undefined,
+                                      background:
+                                        decision?.choice === "keep"
+                                          ? "var(--mantine-color-green-light)"
+                                          : undefined,
                                     }}
                                   >
-                                    <Radio
-                                      value="keep"
-                                      label="Communityを残す"
-                                      description={
-                                        community.candidates.length > 0
-                                          ? "別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。"
-                                          : "Administratorに指定できるMemberがいないため、このCommunityを残すことはできません。"
-                                      }
-                                      disabled={
-                                        community.candidates.length === 0
-                                      }
-                                    />
+                                    <Radio.Indicator />
+                                    <Text fw={500} size="sm" mt="xs">
+                                      Communityを残す
+                                    </Text>
+                                    <Text c="dimmed" size="xs" mt={2}>
+                                      {community.candidates.length > 0
+                                        ? "別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。"
+                                        : "Administratorに指定できるMemberがいないため、このCommunityを残すことはできません。"}
+                                    </Text>
                                     <MultiSelect
                                       mt="md"
                                       label="後任のAdministrator"
@@ -487,23 +490,31 @@ export function AccountDeletionImpactPrototype({
                                         decision?.choice !== "keep" ||
                                         community.candidates.length === 0
                                       }
+                                      onClick={(event) => event.stopPropagation()}
                                     />
-                                  </Box>
-                                  <Box
+                                  </Radio.Card>
+                                  <Radio.Card
+                                    value="delete"
                                     p="sm"
                                     style={{
-                                      border:
-                                        "1px solid var(--mantine-color-default-border)",
-                                      borderRadius:
-                                        "var(--mantine-radius-md)",
+                                      borderColor:
+                                        decision?.choice === "delete"
+                                          ? "var(--mantine-color-red-5)"
+                                          : undefined,
+                                      background:
+                                        decision?.choice === "delete"
+                                          ? "var(--mantine-color-red-light)"
+                                          : undefined,
                                     }}
                                   >
-                                    <Radio
-                                      value="delete"
-                                      label="Communityを削除する"
-                                      description="削除されるデータは次のステップで確認します。"
-                                    />
-                                  </Box>
+                                    <Radio.Indicator />
+                                    <Text fw={500} size="sm" mt="xs">
+                                      Communityを削除する
+                                    </Text>
+                                    <Text c="dimmed" size="xs" mt={2}>
+                                      削除されるデータは次のステップで確認します。
+                                    </Text>
+                                  </Radio.Card>
                                 </Group>
                               </Radio.Group>
                               )}
