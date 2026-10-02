@@ -7,6 +7,7 @@ import {
   Burger,
   Button,
   Divider,
+  Drawer,
   Group,
   Menu,
   NavLink,
@@ -412,6 +413,78 @@ export function SettingsPrototype({
           </Menu>
         </Group>
       </AppShell.Header>
+      <Drawer
+        opened={applicationNavigationOpened}
+        onClose={() => setApplicationNavigationOpened(false)}
+        position="left"
+        zIndex={200}
+        size={248}
+        withCloseButton={false}
+        padding={0}
+        closeOnClickOutside
+        closeOnEscape
+        overlayProps={{ backgroundOpacity: 0.35, blur: 0 }}
+        styles={{
+          content: {
+            marginTop: 40,
+            height: "calc(100dvh - 40px)",
+            boxShadow: "var(--mantine-shadow-md)",
+          },
+          inner: { top: 0 },
+          overlay: { top: 40, height: "calc(100dvh - 40px)" },
+          body: { height: "100%" },
+        }}
+      >
+        <Stack gap={0} h="100%" p="xs">
+          <Box component="nav" aria-label="現在のコンテキスト内のナビゲーション">
+            <Stack gap={0}>
+              {["ダッシュボード", "メディア", "グループ"].map((label) => (
+                <Box key={label} pos="relative" pl={8}>
+                  <NavLink
+                    label={label}
+                    onClick={() => setApplicationNavigationOpened(false)}
+                    variant="subtle"
+                    color="gray"
+                    styles={{
+                      root: {
+                        borderRadius: "var(--mantine-radius-sm)",
+                        padding: "5px 8px",
+                        minHeight: 32,
+                      },
+                      label: {
+                        fontSize: "var(--mantine-font-size-sm)",
+                        lineHeight: 1.3,
+                      },
+                    }}
+                  />
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+          <Divider my="md" />
+          <Box mt="auto">
+            <NavLink
+              label="サイドバーを閉じる"
+              onClick={() => setApplicationNavigationOpened(false)}
+              styles={{
+                root: {
+                  borderRadius: "var(--mantine-radius-sm)",
+                  padding: "4px 8px",
+                  minHeight: 28,
+                },
+                label: {
+                  color: "var(--mantine-color-dimmed)",
+                  fontSize: "var(--mantine-font-size-xs)",
+                  lineHeight: 1.3,
+                },
+              }}
+            />
+            <Divider mt="xs" mb="xs" />
+            <Text size="10px" c="dimmed" px="sm" pb={4}>© 2026 Memoria</Text>
+          </Box>
+        </Stack>
+      </Drawer>
+
       <AppShell.Main>
         <Box maw={1120} mx="auto" w="100%">
           {compact ? (
@@ -433,101 +506,52 @@ export function SettingsPrototype({
             </Stack>
           ) : (
             <Group align="flex-start" gap={56} wrap="nowrap">
-              <Box w={200} style={{ flexShrink: 0 }}>
-                {applicationNavigationOpened ? (
-                  <Box component="nav" aria-label="Application Navigation">
-                    <Text size="xs" fw={700} c="dimmed" mb="xs">Personal</Text>
-                    <Stack gap={0}>
-                      {["ダッシュボード", "メディア", "グループ"].map((label) => (
-                        <Box key={label} pos="relative" pl={8}>
-                          <NavLink
-                            label={label}
-                            onClick={() => setApplicationNavigationOpened(false)}
-                            variant="subtle"
-                            color="gray"
-                            styles={{
-                              root: {
-                                borderRadius: "var(--mantine-radius-sm)",
-                                padding: "5px 8px",
-                                minHeight: 32,
-                              },
-                              label: {
-                                fontSize: "var(--mantine-font-size-sm)",
-                                lineHeight: 1.3,
-                              },
-                            }}
-                          />
-                        </Box>
-                      ))}
-                    </Stack>
-                    <Divider my="md" />
-                    <NavLink
-                      label="設定に戻る"
-                      onClick={() => setApplicationNavigationOpened(false)}
-                      variant="subtle"
-                      color="gray"
-                      styles={{
-                        root: {
-                          borderRadius: "var(--mantine-radius-sm)",
-                          padding: "5px 8px",
-                          minHeight: 32,
-                        },
-                        label: {
-                          color: "var(--mantine-color-dimmed)",
-                          fontSize: "var(--mantine-font-size-xs)",
-                        },
-                      }}
-                    />
-                  </Box>
-                ) : (
-                  <Box component="nav" aria-label="設定">
-                    <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
-                    <Stack gap={0}>
-                      {sections.map((item) => (
-                        <Box key={item.id} pos="relative" pl={8}>
-                          {section === item.id && (
-                            <Box
-                              pos="absolute"
-                              top={3}
-                              bottom={3}
-                              left={0}
-                              w={3}
-                              bg="var(--mantine-color-blue-6)"
-                              style={{
-                                borderRadius: "var(--mantine-radius-xl)",
-                                pointerEvents: "none",
-                              }}
-                              aria-hidden="true"
-                            />
-                          )}
-                          <NavLink
-                            label={item.label}
-                            active={section === item.id}
-                            onClick={() => setSection(item.id)}
-                            variant="subtle"
-                            color="gray"
-                            styles={{
-                              root: {
-                                borderRadius: "var(--mantine-radius-sm)",
-                                background:
-                                  section === item.id
-                                    ? "var(--mantine-color-default-hover)"
-                                    : undefined,
-                                padding: "5px 8px",
-                                minHeight: 32,
-                                fontWeight: section === item.id ? 600 : 400,
-                              },
-                              label: {
-                                fontSize: "var(--mantine-font-size-sm)",
-                                lineHeight: 1.3,
-                              },
-                            }}
-                          />
-                        </Box>
-                      ))}
-                    </Stack>
-                  </Box>
-                )}
+              <Box component="nav" aria-label="設定" w={200} style={{ flexShrink: 0 }}>
+                <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
+                <Stack gap={0}>
+                  {sections.map((item) => (
+                    <Box key={item.id} pos="relative" pl={8}>
+                      {section === item.id && (
+                        <Box
+                          pos="absolute"
+                          top={3}
+                          bottom={3}
+                          left={0}
+                          w={3}
+                          bg="var(--mantine-color-blue-6)"
+                          style={{
+                            borderRadius: "var(--mantine-radius-xl)",
+                            pointerEvents: "none",
+                          }}
+                          aria-hidden="true"
+                        />
+                      )}
+                      <NavLink
+                        label={item.label}
+                        active={section === item.id}
+                        onClick={() => setSection(item.id)}
+                        variant="subtle"
+                        color="gray"
+                        styles={{
+                          root: {
+                            borderRadius: "var(--mantine-radius-sm)",
+                            background:
+                              section === item.id
+                                ? "var(--mantine-color-default-hover)"
+                                : undefined,
+                            padding: "5px 8px",
+                            minHeight: 32,
+                            fontWeight: section === item.id ? 600 : 400,
+                          },
+                          label: {
+                            fontSize: "var(--mantine-font-size-sm)",
+                            lineHeight: 1.3,
+                          },
+                        }}
+                      />
+                    </Box>
+                  ))}
+                </Stack>
               </Box>
               <Box style={{ flex: 1 }} maw={760} miw={0}>
                 {content}
