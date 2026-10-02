@@ -21,6 +21,12 @@ import {
   Title,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
+import {
+  IconChartBar,
+  IconSettings,
+  IconUser,
+  IconUserCircle,
+} from "@tabler/icons-react"
 import { useState } from "react"
 
 type Section = "profile" | "preferences" | "usage" | "account"
@@ -42,12 +48,12 @@ const menuStyles = {
   label: { padding: "8px 8px 4px", fontSize: "var(--mantine-font-size-xs)" },
 } as const
 
-const sections: { id: Section; label: string }[] = [
-  { id: "profile", label: "プロフィール" },
-  { id: "preferences", label: "環境設定" },
-  { id: "usage", label: "利用状況" },
-  { id: "account", label: "アカウント" },
-]
+const sections = [
+  { id: "profile", label: "プロフィール", icon: IconUser },
+  { id: "preferences", label: "環境設定", icon: IconSettings },
+  { id: "usage", label: "利用状況", icon: IconChartBar },
+  { id: "account", label: "アカウント", icon: IconUserCircle },
+] satisfies { id: Section; label: string; icon: typeof IconUser }[]
 
 function PageHeader({
   title,
@@ -525,6 +531,9 @@ export function SettingsPrototype({
                       )}
                       <NavLink
                         label={item.label}
+                        leftSection={
+                          <item.icon size={16} stroke={1.6} aria-hidden="true" />
+                        }
                         active={section === item.id}
                         onClick={() => setSection(item.id)}
                         variant="subtle"
@@ -539,6 +548,10 @@ export function SettingsPrototype({
                             padding: "5px 8px",
                             minHeight: 32,
                             fontWeight: section === item.id ? 600 : 400,
+                          },
+                          section: {
+                            color: "var(--mantine-color-dimmed)",
+                            marginInlineEnd: 8,
                           },
                           label: {
                             fontSize: "var(--mantine-font-size-sm)",
