@@ -76,12 +76,12 @@ export function AccountDeletionImpactPrototype({
           <Stack gap="xl">
             <Box>
               <Title order={1} size="h2">アカウント削除</Title>
-              <Text c="dimmed" size="sm" mt={4}>削除による影響と必要な対応を順番に確認してください。</Text>
+              <Text c="dimmed" size="sm" mt={4}>アカウントを削除すると失われるデータと、削除前に必要な対応を確認します。</Text>
             </Box>
             {cancelled || confirmed ? (
               <Stack gap="md">
-                <Title order={2} size="h4">{confirmed ? "削除手続きの確認（プロトタイプ）" : "削除手続きを中止しました"}</Title>
-                <Text c="dimmed">{confirmed ? "実際の再認証や削除処理は行っていません。" : "削除は開始されていません。"}</Text>
+                <Title order={2} size="h4">{confirmed ? "削除を確認しました（プロトタイプ）" : "削除手続きを中止しました"}</Title>
+                <Text c="dimmed">{confirmed ? "このプロトタイプではアカウントとデータは削除されません。" : "削除は開始されていません。"}</Text>
                 <Button variant="default" size="sm" onClick={() => { setCancelled(false); setConfirmed(false); setReauth(false); setStep(0) }}>最初に戻る</Button>
               </Stack>
             ) : (
@@ -126,12 +126,12 @@ export function AccountDeletionImpactPrototype({
                     <Stack gap="lg">
                       {loadState === "ready" ? (
                         <Box>
-                          <Text c="dimmed" size="sm">削除対象のMedia</Text>
-                          {mediaCount === 0 ? <Text mt={4}>削除対象のMediaはありません</Text> : <Title order={3} size="h2" mt={4}>{mediaCount}件</Title>}
+                          <Text c="dimmed" size="sm">削除されるMedia</Text>
+                          {mediaCount === 0 ? <Text mt={4}>削除されるMediaはありません</Text> : <Title order={3} size="h2" mt={4}>{mediaCount}件</Title>}
                         </Box>
                       ) : (
-                        <PrototypeFormAlert kind={loadState === "retrying" ? "info" : "error"} title={loadState === "retrying" ? "削除対象のMediaを確認しています" : "削除の影響を確認できませんでした"}>
-                          {loadState === "retrying" ? "Mediaの件数を再取得しています。" : "Mediaの件数を取得できませんでした。もう一度お試しください。"}
+                        <PrototypeFormAlert kind={loadState === "retrying" ? "info" : "error"} title={loadState === "retrying" ? "削除されるMediaを確認しています" : "削除されるMediaを確認できませんでした"}>
+                          {loadState === "retrying" ? "Mediaの件数を再取得しています。" : "削除されるMediaの件数を確認できませんでした。再試行してください。"}
                         </PrototypeFormAlert>
                       )}
                       <Box>
@@ -139,7 +139,7 @@ export function AccountDeletionImpactPrototype({
                         <Divider my="md" />
                         <PrototypeFormAlert kind="error" title="削除したデータは復元できません">アカウントと、あなたが管理するMediaが削除されます。</PrototypeFormAlert>
                       </Box>
-                      {loadState === "ready" && <Text c="dimmed" size="sm">Communityへの影響は、後続のステップで確認します。対応が不要なステップは自動的に省略します。</Text>}
+                      {loadState === "ready" && <Text c="dimmed" size="sm">Communityへの影響は次のステップで確認します。対応するCommunityがないステップは省略します。</Text>}
                       <Group gap="sm" justify="space-between">
                         <Box style={{ flex: 1 }} />
                         <Box style={{ flex: 1, display: "flex", justifyContent: "center" }}>
@@ -171,17 +171,17 @@ export function AccountDeletionImpactPrototype({
                                 <Title order={3} size="h5">{community.name}</Title>
                                 <Badge color={resolved(community.id) ? "green" : "yellow"} variant="light">{resolved(community.id) ? "解決済み" : "未解決"}</Badge>
                               </Group>
-                              <Text size="sm" c="dimmed">あなたが最後のAdministratorです。</Text>
+                              <Text size="sm" c="dimmed">あなた以外にAdministratorがいません。</Text>
                               <Radio.Group label="このCommunityの対応" value={decision?.choice ?? ""} onChange={(value) => changeDecision(community.id, { choice: value as Decision["choice"], successor: value === "keep" ? decision?.successor ?? null : null })}>
                                 <Stack gap="md" mt="sm">
                                   {community.candidates.length > 0 ? (
                                     <Box p="sm" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
-                                      <Radio value="keep" label="Communityを保持する" description="別のMemberをAdministratorに指定します。" />
+                                      <Radio value="keep" label="Communityを残す" description="別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。" />
                                       {decision?.choice === "keep" && <Select mt="md" label="後任のAdministrator" placeholder="Memberを選択" data={community.candidates} value={decision.successor} onChange={(value) => changeDecision(community.id, { choice: "keep", successor: value })} clearable />}
                                     </Box>
-                                  ) : <PrototypeFormAlert kind="info" title="後任にできるMemberがいません">このCommunityは保持できません。削除を選択してください。</PrototypeFormAlert>}
+                                  ) : <PrototypeFormAlert kind="info" title="Administratorに指定できるMemberがいません">このCommunityを残すことはできません。アカウントを削除するには、このCommunityも削除する必要があります。</PrototypeFormAlert>}
                                   <Box p="sm" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
-                                    <Radio value="delete" label="Communityを削除する" description="削除による影響は次のステップで確認します。" />
+                                    <Radio value="delete" label="Communityを削除する" description="削除されるデータは次のステップで確認します。" />
                                   </Box>
                                 </Stack>
                               </Radio.Group>
@@ -204,14 +204,14 @@ export function AccountDeletionImpactPrototype({
                     <Title order={2} size="h4">削除対象の確認</Title>
                     <Divider my="md" />
                     <Stack gap="lg">
-                      <Text size="sm" c="dimmed">削除するCommunityの影響を確認し、各Community名を入力してください。</Text>
+                      <Text size="sm" c="dimmed">削除されるデータを確認し、削除する各Communityの名前を入力してください。</Text>
                       <Badge color={allConfirmed ? "green" : "yellow"} variant="light" w="fit-content">{allConfirmed ? "すべて確認済み" : `未確認 ${toDelete.filter((item) => confirmations[item.id] !== item.name).length}件`}</Badge>
                       {toDelete.map((community) => (
                         <Box key={community.id} p="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
                           <Stack gap="md">
                             <Title order={3} size="h5">{community.name}</Title>
                             <Text size="sm">参加者：{community.members}人 / Community管理Media：{community.media}件</Text>
-                            <PrototypeFormAlert kind="error" title="削除したCommunityは復元できません">他のUserがアップロードしたMediaも含め、このCommunityと管理Mediaが削除されます。</PrototypeFormAlert>
+                            <PrototypeFormAlert kind="error" title="このCommunityは復元できません">このCommunityと管理Mediaが削除されます。他のUserがアップロードしたMediaも削除されます。</PrototypeFormAlert>
                             <TextInput
                               label="確認のためCommunity名を入力"
                               description={`「${community.name}」と入力してください。`}
@@ -220,7 +220,7 @@ export function AccountDeletionImpactPrototype({
                                 const value = event.currentTarget.value
                                 setConfirmations((previous) => ({ ...previous, [community.id]: value }))
                               }}
-                              error={confirmations[community.id] && confirmations[community.id] !== community.name ? "Community名が一致しません" : undefined}
+                              error={confirmations[community.id] && confirmations[community.id] !== community.name ? "入力内容とCommunity名が一致していません" : undefined}
                             />
                           </Stack>
                         </Box>
@@ -258,14 +258,14 @@ export function AccountDeletionImpactPrototype({
                           </Stack>
                         </Box>
                       )}
-                      <PrototypeFormAlert kind="error" title="削除は取り消せません">内容を確認した後、再認証と最終確定が必要です。</PrototypeFormAlert>
+                      <PrototypeFormAlert kind="error" title="アカウントと削除対象のデータは復元できません">削除を続けるには再認証が必要です。</PrototypeFormAlert>
                       {reauth && <PrototypeFormAlert kind="info" title="再認証（プロトタイプ）">実際のAuth0認証は行いません。削除処理も実行されません。</PrototypeFormAlert>}
                       <Group gap="sm" justify="space-between">
                         <Box style={{ flex: 1 }}><Button size="sm" variant="default" onClick={() => { setReauth(false); back() }}>戻る</Button></Box>
                         <Box style={{ flex: 1, display: "flex", justifyContent: "center" }}>
                           <Button size="sm" variant="subtle" color="gray" onClick={() => setCancelled(true)}>キャンセル</Button>
                         </Box>
-                        <Box style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}><Button size="sm" color={reauth ? "red" : undefined} onClick={() => reauth ? setConfirmed(true) : next()}>{reauth ? "削除を確定（デモ）" : "再認証へ（デモ）"}</Button></Box>
+                        <Box style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}><Button size="sm" color={reauth ? "red" : undefined} onClick={() => reauth ? setConfirmed(true) : next()}>{reauth ? "アカウントを削除する（デモ）" : "再認証する（デモ）"}</Button></Box>
                       </Group>
                     </Stack>
                   </Box>
