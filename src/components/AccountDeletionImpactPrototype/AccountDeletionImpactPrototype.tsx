@@ -78,8 +78,8 @@ const communitiesForScenario = (scenario: CommunityScenario): CommunityFixture[]
 }
 const labels = [
   "削除されるデータ",
-  "管理状態の解消",
-  "削除対象の確認",
+  "Communityへの対応",
+  "Communityへの影響",
   "最終確認",
 ]
 export function AccountDeletionImpactPrototype({
@@ -113,7 +113,7 @@ export function AccountDeletionImpactPrototype({
   const communitiesToWithdraw = communities.filter(
     (community) => community.relation !== "last-administrator",
   )
-  const needsResolution = communitiesToResolve.length > 0
+  const hasCommunities = communities.length > 0\n  const needsResolution = communitiesToResolve.length > 0
   const resolved = (id: string) => {
     const decision = decisions[id]
     const community = communities.find((item) => item.id === id)
@@ -134,17 +134,15 @@ export function AccountDeletionImpactPrototype({
     (item) => confirmations[item.id] === item.name,
   )
   const skipped = (index: number) =>
-    (index === 1 && !needsResolution) ||
-    (index === 2 &&
-      (!needsResolution || (allResolved && toDelete.length === 0)))
+    (index === 1 && !hasCommunities) || (index === 2 && !hasCommunities)
   const next = () => {
-    if (step === 0) setStep(needsResolution ? 1 : 3)
-    if (step === 1 && allResolved) setStep(toDelete.length > 0 ? 2 : 3)
+    if (step === 0) setStep(hasCommunities ? 1 : 3)
+    if (step === 1 && allResolved) setStep(2)
     if (step === 2 && allConfirmed) setStep(3)
     if (step === 3) setReauth(true)
   }
   const back = () => {
-    if (step === 3) setStep(!needsResolution ? 0 : toDelete.length > 0 ? 2 : 1)
+    if (step === 3) setStep(hasCommunities ? 2 : 0)
     if (step === 2) setStep(1)
     if (step === 1) setStep(0)
   }
@@ -374,12 +372,12 @@ export function AccountDeletionImpactPrototype({
                 {step === 1 && (
                   <Box w="100%">
                     <Title order={2} size="h4">
-                      管理状態の解消
+                      Communityへの対応
                     </Title>
                     <Divider my="md" />
                     <Stack gap="lg">
                       <Text size="sm" c="dimmed">
-                        最後のAdministratorであるCommunityごとに、後任の指定または削除を選択してください。
+                        参加中のCommunityごとに、アカウント削除時の対応を確認してください。必要なCommunityではAdministratorの指定または削除を選択します。
                       </Text>
                       <Badge
                         color={allResolved ? "green" : "yellow"}
@@ -390,7 +388,7 @@ export function AccountDeletionImpactPrototype({
                           ? "すべて解決済み"
                           : `未解決 ${communitiesToResolve.filter((item) => !resolved(item.id)).length}件`}
                       </Badge>
-                      {communitiesToResolve.map((community) => {
+                      {communities.map((community) => {
                         const decision = decisions[community.id]
                         return (
                           <Box
@@ -418,10 +416,18 @@ export function AccountDeletionImpactPrototype({
                                     : "未解決"}
                                 </Badge>
                               </Group>
-                              <Text size="sm" c="dimmed">
-                                あなた以外にAdministratorがいません。
-                              </Text>
-                              <Radio.Group
+                              {!requiresDecision ? (
+                                <PrototypeFormAlert kind="info" title="退会">
+                                  {community.relation === "member"
+                                    ? "このCommunityにはMemberとして参加しています。アカウントを削除すると、このCommunityから退会します。"
+                                    : "あなた以外にもAdministratorがいるため、Communityはそのまま残ります。アカウントを削除すると、このCommunityから退会します。"}
+                                </PrototypeFormAlert>
+                              ) : (
+                                <Text size="sm" c="dimmed">
+                                  あなた以外にAdministratorがいません。
+                                </Text>
+                              )}
+                              {requiresDecision && <Radio.Group
                                 label="このCommunityの対応"
                                 value={decision?.choice ?? ""}
                                 onChange={(value) =>
@@ -545,12 +551,12 @@ export function AccountDeletionImpactPrototype({
                 {step === 2 && (
                   <Box w="100%">
                     <Title order={2} size="h4">
-                      削除対象の確認
+                      Communityへの影響
                     </Title>
                     <Divider my="md" />
                     <Stack gap="lg">
                       <Text size="sm" c="dimmed">
-                        削除されるデータを確認し、削除する各Communityの名前を入力してください。
+                        参加中のCommunityごとに、アカウント削除後の状態を確認してください。削除するCommunityでは確認のためCommunity名を入力します。
                       </Text>
                       <Badge
                         color={allConfirmed ? "green" : "yellow"}
@@ -561,7 +567,7 @@ export function AccountDeletionImpactPrototype({
                           ? "すべて確認済み"
                           : `未確認 ${toDelete.filter((item) => confirmations[item.id] !== item.name).length}件`}
                       </Badge>
-                      {toDelete.map((community) => (
+                      {communities.map((community) => (
                         <Box
                           key={community.id}
                           p="md"
@@ -572,9 +578,19 @@ export function AccountDeletionImpactPrototype({
                           }}
                         >
                           <Stack gap="md">
-                            <Title order={3} size="h5">
-                              {community.name}
-                            </Title>
+                            <Group justify="space-between">
+                              <Title order={3} size="h5">
+                                {community.name}
+                              </Title>
+                              <Badge variant="light">
+                                {community.relation !== "last-administrator"
+                                  ? "退会"
+                                  : decisions[community.id]?.choice === "delete"
+                                    ? "削除"
+                                    : "保持"}
+                              </Badge>
+                            </Group>
+                            {decisions[community.id]?.choice === "delete" && <>
                             <Text size="sm">
                               参加者：{community.members}人 /
                               Community管理Media：{community.media}件
@@ -603,6 +619,13 @@ export function AccountDeletionImpactPrototype({
                                   : undefined
                               }
                             />
+                            </>}
+                            {community.relation !== "last-administrator" && (
+                              <Text size="sm" c="dimmed">アカウントを削除すると、このCommunityから退会します。Communityはそのまま残ります。</Text>
+                            )}
+                            {community.relation === "last-administrator" && decisions[community.id]?.choice === "keep" && (
+                              <Text size="sm" c="dimmed">Communityはそのまま残り、指定したAdministratorが管理を引き継ぎます。</Text>
+                            )}
                           </Stack>
                         </Box>
                       ))}
