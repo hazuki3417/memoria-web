@@ -8,7 +8,7 @@ import {
   Divider,
   Group,
   Radio,
-  Select,
+  MultiSelect,
   Stack,
   Stepper,
   Text,
@@ -22,7 +22,7 @@ import { PrototypeFormAlert } from "../PrototypeFeedback/PrototypeFeedback"
 type ReviewState = "default" | "empty" | "failure" | "retrying"
 type CommunityScenario = "requires-resolution" | "no-resolution"
 type RetryOutcome = "success" | "failure"
-type Decision = { choice: "keep" | "delete" | null; successor: string | null }
+type Decision = { choice: "keep" | "delete" | null; successors: string[] }
 const communities = [
   {
     id: "family",
@@ -80,8 +80,9 @@ export function AccountDeletionImpactPrototype({
     return (
       decision?.choice === "delete" ||
       (decision?.choice === "keep" &&
-        community?.candidates.some(
-          (candidate) => candidate.value === decision.successor,
+        decision.successors.length > 0 &&
+        decision.successors.every((successor) =>
+          community?.candidates.some((candidate) => candidate.value === successor),
         ))
     )
   }
@@ -386,10 +387,10 @@ export function AccountDeletionImpactPrototype({
                                 onChange={(value) =>
                                   changeDecision(community.id, {
                                     choice: value as Decision["choice"],
-                                    successor:
+                                    successors:
                                       value === "keep"
-                                        ? (decision?.successor ?? null)
-                                        : null,
+                                        ? (decision?.successors ?? [])
+                                        : [],
                                   })
                                 }
                               >
@@ -415,23 +416,29 @@ export function AccountDeletionImpactPrototype({
                                         community.candidates.length === 0
                                       }
                                     />
-                                    {decision?.choice === "keep" &&
-                                      community.candidates.length > 0 && (
-                                        <Select
-                                          mt="md"
-                                          label="後任のAdministrator"
-                                          placeholder="Memberを選択"
-                                          data={community.candidates}
-                                          value={decision.successor}
-                                          onChange={(value) =>
-                                            changeDecision(community.id, {
-                                              choice: "keep",
-                                              successor: value,
-                                            })
-                                          }
-                                          clearable
-                                        />
-                                      )}
+                                    <MultiSelect
+                                      mt="md"
+                                      label="後任のAdministrator"
+                                      placeholder={
+                                        community.candidates.length > 0
+                                          ? "Memberを検索して選択"
+                                          : "選択できるMemberがいません"
+                                      }
+                                      data={community.candidates}
+                                      value={decision?.successors ?? []}
+                                      onChange={(values) =>
+                                        changeDecision(community.id, {
+                                          choice: "keep",
+                                          successors: values,
+                                        })
+                                      }
+                                      searchable
+                                      clearable
+                                      disabled={
+                                        decision?.choice !== "keep" ||
+                                        community.candidates.length === 0
+                                      }
+                                    />
                                   </Box>
                                   <Box
                                     p="sm"
@@ -642,7 +649,7 @@ export function AccountDeletionImpactPrototype({
                                 {community.name}：
                                 {decisions[community.id]?.choice === "delete"
                                   ? "削除"
-                                  : `保持（後任：${community.candidates.find((candidate) => candidate.value === decisions[community.id]?.successor)?.label ?? "未指定"}）`}
+                                  : `保持（後任：${(decisions[community.id]?.successors ?? []).map((successor) => community.candidates.find((candidate) => candidate.value === successor)?.label).filter(Boolean).join("、") || "未指定"}）`}
                               </Text>
                             ))}
                           </Stack>
