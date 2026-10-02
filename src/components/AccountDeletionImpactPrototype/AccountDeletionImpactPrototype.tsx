@@ -172,7 +172,7 @@ export function AccountDeletionImpactPrototype({
                 アカウント削除
               </Title>
               <Text c="dimmed" size="sm" mt={4}>
-                アカウントを削除すると失われるデータと、削除前に必要な対応を確認します。
+                アカウントを削除した場合の影響と、削除前に必要な対応を確認します。
               </Text>
             </Box>
             {cancelled || confirmed ? (
