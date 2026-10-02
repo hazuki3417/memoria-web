@@ -134,7 +134,7 @@ function ProfileContent() {
         <Stack gap="md" maw={540}>
           <TextInput
             label="ニックネーム"
-            description="Memoriaで表示する名前です."
+            description="Memoriaで表示する名前です。"
             value={name}
             onChange={(event) => setName(event.currentTarget.value)}
             error={invalid ? "ニックネームを入力してください。" : undefined}
@@ -191,7 +191,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               aria-label="日付形式"
               value={dateFormat}
               onChange={(value) => value && setDateFormat(value)}
-              data={["YYYY-MM-DD", "YYYY/MM/DD", "MM/DD/YYYY", "DD/MM/YYYY"]}
+              data={["YYYY-MM-DD"]}
               allowDeselect={false}
             />
           </SettingRow>
