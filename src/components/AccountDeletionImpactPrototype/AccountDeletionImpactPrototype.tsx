@@ -449,13 +449,13 @@ export function AccountDeletionImpactPrototype({
                                     style={{
                                       border: `1px solid ${
                                         decision?.choice === "keep"
-                                          ? "var(--mantine-color-green-6)"
+                                          ? "var(--mantine-color-green-filled)"
                                           : "var(--mantine-color-default-border)"
                                       }`,
                                       borderRadius: "var(--mantine-radius-md)",
                                       background:
                                         decision?.choice === "keep"
-                                          ? "color-mix(in srgb, var(--mantine-color-green-6) 3%, var(--mantine-color-body))"
+                                          ? "var(--mantine-color-green-light)"
                                           : undefined,
                                     }}
                                   >
@@ -498,13 +498,13 @@ export function AccountDeletionImpactPrototype({
                                     style={{
                                       border: `1px solid ${
                                         decision?.choice === "delete"
-                                          ? "var(--mantine-color-red-6)"
+                                          ? "var(--mantine-color-red-filled)"
                                           : "var(--mantine-color-default-border)"
                                       }`,
                                       borderRadius: "var(--mantine-radius-md)",
                                       background:
                                         decision?.choice === "delete"
-                                          ? "color-mix(in srgb, var(--mantine-color-red-6) 3%, var(--mantine-color-body))"
+                                          ? "var(--mantine-color-red-light)"
                                           : undefined,
                                     }}
                                   >
