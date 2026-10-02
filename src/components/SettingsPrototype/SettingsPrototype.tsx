@@ -327,6 +327,7 @@ export function SettingsPrototype({
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>(initialSection)
+  const [applicationNavigationOpened, setApplicationNavigationOpened] = useState(false)
   const currentLabel = sections.find((item) => item.id === section)?.label
 
   const content =
@@ -346,9 +347,11 @@ export function SettingsPrototype({
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
             <Burger
-              opened={false}
+              opened={applicationNavigationOpened}
+              onClick={() => setApplicationNavigationOpened((opened) => !opened)}
               size="sm"
               aria-label="ナビゲーションを開閉"
+              aria-expanded={applicationNavigationOpened}
             />
             <Text fw={750} size="lg">Memoria</Text>
             <Box
@@ -430,52 +433,101 @@ export function SettingsPrototype({
             </Stack>
           ) : (
             <Group align="flex-start" gap={56} wrap="nowrap">
-              <Box component="nav" aria-label="設定" w={200} style={{ flexShrink: 0 }}>
-                <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
-                <Stack gap={0}>
-                  {sections.map((item) => (
-                    <Box key={item.id} pos="relative" pl={8}>
-                      {section === item.id && (
-                        <Box
-                          pos="absolute"
-                          top={3}
-                          bottom={3}
-                          left={0}
-                          w={3}
-                          bg="var(--mantine-color-blue-6)"
-                          style={{
-                            borderRadius: "var(--mantine-radius-xl)",
-                            pointerEvents: "none",
-                          }}
-                          aria-hidden="true"
-                        />
-                      )}
-                      <NavLink
-                        label={item.label}
-                        active={section === item.id}
-                        onClick={() => setSection(item.id)}
-                        variant="subtle"
-                        color="gray"
-                        styles={{
-                          root: {
-                            borderRadius: "var(--mantine-radius-sm)",
-                            background:
-                              section === item.id
-                                ? "var(--mantine-color-default-hover)"
-                                : undefined,
-                            padding: "5px 8px",
-                            minHeight: 32,
-                            fontWeight: section === item.id ? 600 : 400,
-                          },
-                          label: {
-                            fontSize: "var(--mantine-font-size-sm)",
-                            lineHeight: 1.3,
-                          },
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Stack>
+              <Box w={200} style={{ flexShrink: 0 }}>
+                {applicationNavigationOpened ? (
+                  <Box component="nav" aria-label="Application Navigation">
+                    <Text size="xs" fw={700} c="dimmed" mb="xs">Personal</Text>
+                    <Stack gap={0}>
+                      {["ダッシュボード", "メディア", "グループ"].map((label) => (
+                        <Box key={label} pos="relative" pl={8}>
+                          <NavLink
+                            label={label}
+                            onClick={() => setApplicationNavigationOpened(false)}
+                            variant="subtle"
+                            color="gray"
+                            styles={{
+                              root: {
+                                borderRadius: "var(--mantine-radius-sm)",
+                                padding: "5px 8px",
+                                minHeight: 32,
+                              },
+                              label: {
+                                fontSize: "var(--mantine-font-size-sm)",
+                                lineHeight: 1.3,
+                              },
+                            }}
+                          />
+                        </Box>
+                      ))}
+                    </Stack>
+                    <Divider my="md" />
+                    <NavLink
+                      label="設定に戻る"
+                      onClick={() => setApplicationNavigationOpened(false)}
+                      variant="subtle"
+                      color="gray"
+                      styles={{
+                        root: {
+                          borderRadius: "var(--mantine-radius-sm)",
+                          padding: "5px 8px",
+                          minHeight: 32,
+                        },
+                        label: {
+                          color: "var(--mantine-color-dimmed)",
+                          fontSize: "var(--mantine-font-size-xs)",
+                        },
+                      }}
+                    />
+                  </Box>
+                ) : (
+                  <Box component="nav" aria-label="設定">
+                    <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
+                    <Stack gap={0}>
+                      {sections.map((item) => (
+                        <Box key={item.id} pos="relative" pl={8}>
+                          {section === item.id && (
+                            <Box
+                              pos="absolute"
+                              top={3}
+                              bottom={3}
+                              left={0}
+                              w={3}
+                              bg="var(--mantine-color-blue-6)"
+                              style={{
+                                borderRadius: "var(--mantine-radius-xl)",
+                                pointerEvents: "none",
+                              }}
+                              aria-hidden="true"
+                            />
+                          )}
+                          <NavLink
+                            label={item.label}
+                            active={section === item.id}
+                            onClick={() => setSection(item.id)}
+                            variant="subtle"
+                            color="gray"
+                            styles={{
+                              root: {
+                                borderRadius: "var(--mantine-radius-sm)",
+                                background:
+                                  section === item.id
+                                    ? "var(--mantine-color-default-hover)"
+                                    : undefined,
+                                padding: "5px 8px",
+                                minHeight: 32,
+                                fontWeight: section === item.id ? 600 : 400,
+                              },
+                              label: {
+                                fontSize: "var(--mantine-font-size-sm)",
+                                lineHeight: 1.3,
+                              },
+                            }}
+                          />
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
               </Box>
               <Box style={{ flex: 1 }} maw={760} miw={0}>
                 {content}
