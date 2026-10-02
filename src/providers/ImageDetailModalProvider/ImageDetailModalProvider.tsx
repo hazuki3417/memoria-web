@@ -122,7 +122,7 @@ export const ImageDetailModalProvider = (
     })
   }, [nav.current, downloadImage])
 
-  const handleEdit = () => { }
+  const handleEdit = () => {}
 
   const handleNext = () => {
     if (nav.next.exists) {

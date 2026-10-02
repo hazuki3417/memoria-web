@@ -10,9 +10,9 @@ export type FormModeSwitchValue = {
   mode: FormMode
 }
 
-export interface FormModeSwitchControl { }
+export interface FormModeSwitchControl {}
 
-export interface FormModeSwitchAction { }
+export interface FormModeSwitchAction {}
 
 export type FormModeSwitchContext = {
   value: FormModeSwitchValue

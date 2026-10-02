@@ -157,12 +157,18 @@ export function UserRegistrationPrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <PrototypeFormAlert kind="error" title="登録できませんでした">
+                      <PrototypeFormAlert
+                        kind="error"
+                        title="登録できませんでした"
+                      >
                         認証情報を確認できませんでした。もう一度ログインしてください。
                       </PrototypeFormAlert>
                     )}
                     {exited && (
-                      <PrototypeFormAlert kind="info" title="登録せずに終了しました">
+                      <PrototypeFormAlert
+                        kind="info"
+                        title="登録せずに終了しました"
+                      >
                         実際の画面ではログアウトして公開画面へ戻ります。
                       </PrototypeFormAlert>
                     )}

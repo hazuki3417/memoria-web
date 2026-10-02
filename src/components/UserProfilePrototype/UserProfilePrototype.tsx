@@ -154,7 +154,10 @@ export function UserProfilePrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <PrototypeFormAlert kind="error" title="プロフィールを更新できませんでした">
+                      <PrototypeFormAlert
+                        kind="error"
+                        title="プロフィールを更新できませんでした"
+                      >
                         現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
                       </PrototypeFormAlert>
                     )}

@@ -31,7 +31,6 @@ export const imageTagsSchema = (config: ImageTagsSchemaConfig) => {
 
 export type ImageTagsValues = z.infer<ReturnType<typeof imageTagsSchema>>
 
-
 export type ImageSchemaConfig = {
   file: ImageFileSchemaConfig
   tags: ImageTagsSchemaConfig

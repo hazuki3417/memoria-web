@@ -1,4 +1,7 @@
-import { imageTagsSchema, ImageTagsSchemaConfig } from "@/app/(authenticated)/(library)/images/_components"
+import {
+  imageTagsSchema,
+  ImageTagsSchemaConfig,
+} from "@/app/(authenticated)/(library)/images/_components"
 import { ButtonGroup, FormModeSwitch, useUseFormModeSwitch } from "@/components"
 import { useUpdateImageMutation } from "@/graphql"
 import {
@@ -18,7 +21,7 @@ import {
   Paper,
   type PaperProps,
   TagsInput,
-  Text
+  Text,
 } from "@mantine/core"
 import { IconCheck, IconEdit, IconTrash, IconX } from "@tabler/icons-react"
 import type React from "react"
@@ -57,13 +60,11 @@ export interface InfoProps extends PaperProps {
 const imageInputFormSchema = (config: ImageTagsSchemaConfig) => {
   return z.object({
     id: z.string(),
-    tags: imageTagsSchema(config)
+    tags: imageTagsSchema(config),
   })
 }
 
-type ImageInputFormValues = z.infer<
-  ReturnType<typeof imageInputFormSchema>
->
+type ImageInputFormValues = z.infer<ReturnType<typeof imageInputFormSchema>>
 
 export const Info = (props: InfoProps) => {
   const { payload, prefix = DEFAULT_FILE_SIZE_PREFIX, handler } = props
@@ -73,7 +74,9 @@ export const Info = (props: InfoProps) => {
 
   const feedback = useFeedbackContext()
 
-  const inputSchema = imageInputFormSchema({ count: { max: user.limit.upload.tag.count } })
+  const inputSchema = imageInputFormSchema({
+    count: { max: user.limit.upload.tag.count },
+  })
 
   const methods = useForm<ImageInputFormValues>({
     resolver: zodResolver(inputSchema),
@@ -103,7 +106,6 @@ export const Info = (props: InfoProps) => {
     console.log("submit error:", errors)
   }
 
-
   const formModeSwitch = useUseFormModeSwitch("view")
 
   const handleEdit = () => {
@@ -118,7 +120,6 @@ export const Info = (props: InfoProps) => {
   useEffect(() => {
     reset({ tags: payload.tags })
   }, [payload])
-
 
   useEffect(() => {
     const { data, error } = result
@@ -282,13 +283,7 @@ export const Info = (props: InfoProps) => {
                     name="tags"
                     render={({ field }) => {
                       return (
-                        <TagsInput
-                          size="xs"
-                          w="100%"
-
-                          {...field}
-                          clearable
-                        />
+                        <TagsInput size="xs" w="100%" {...field} clearable />
                       )
                     }}
                   />
@@ -315,8 +310,7 @@ export const Info = (props: InfoProps) => {
             alignItems: "center",
             justifyContent: "center",
           })}
-        >
-        </Box>
+        ></Box>
         <Box
           style={(theme) => ({
             display: "flex",
