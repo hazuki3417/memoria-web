@@ -113,7 +113,8 @@ export function AccountDeletionImpactPrototype({
   const communitiesToWithdraw = communities.filter(
     (community) => community.relation !== "last-administrator",
   )
-  const hasCommunities = communities.length > 0\n  const needsResolution = communitiesToResolve.length > 0
+  const hasCommunities = communities.length > 0
+  const needsResolution = communitiesToResolve.length > 0
   const resolved = (id: string) => {
     const decision = decisions[id]
     const community = communities.find((item) => item.id === id)
@@ -428,7 +429,8 @@ export function AccountDeletionImpactPrototype({
                                   あなた以外にAdministratorがいません。
                                 </Text>
                               )}
-                              {requiresDecision && (\n                                <Radio.Group
+                              {requiresDecision && (
+                                <Radio.Group
                                 label="このCommunityの対応"
                                 value={decision?.choice ?? ""}
                                 onChange={(value) =>
@@ -591,7 +593,8 @@ export function AccountDeletionImpactPrototype({
                                     : "保持"}
                               </Badge>
                             </Group>
-                            {decisions[community.id]?.choice === "delete" && (\n                              <>
+                            {decisions[community.id]?.choice === "delete" && (
+                              <>
                             <Text size="sm">
                               参加者：{community.members}人 /
                               Community管理Media：{community.media}件
