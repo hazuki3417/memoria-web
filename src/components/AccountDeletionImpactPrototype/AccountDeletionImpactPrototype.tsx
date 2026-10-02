@@ -428,7 +428,7 @@ export function AccountDeletionImpactPrototype({
                                   あなた以外にAdministratorがいません。
                                 </Text>
                               )}
-                              {requiresDecision && <Radio.Group
+                              {requiresDecision && (\n                                <Radio.Group
                                 label="このCommunityの対応"
                                 value={decision?.choice ?? ""}
                                 onChange={(value) =>
@@ -591,7 +591,7 @@ export function AccountDeletionImpactPrototype({
                                     : "保持"}
                               </Badge>
                             </Group>
-                            {decisions[community.id]?.choice === "delete" && <>
+                            {decisions[community.id]?.choice === "delete" && (\n                              <>
                             <Text size="sm">
                               参加者：{community.members}人 /
                               Community管理Media：{community.media}件
