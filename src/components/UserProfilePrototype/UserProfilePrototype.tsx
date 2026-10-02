@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  Alert,
   AppShell,
   Box,
   Button,
@@ -14,9 +13,12 @@ import {
   Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { Notifications, notifications } from "@mantine/notifications"
-import { IconAlertCircle, IconCheck } from "@tabler/icons-react"
+import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
+import {
+  PrototypeFormAlert,
+  showPrototypeNotification,
+} from "../PrototypeFeedback/PrototypeFeedback"
 
 type ReviewState =
   | "default"
@@ -51,40 +53,12 @@ export function UserProfilePrototype({
 
   const showFeedback = useCallback((kind: "success" | "failure") => {
     const success = kind === "success"
-    notifications.show({
-      message: (
-        <Alert
-          color={success ? "green" : "red"}
-          title={success ? "保存しました" : "保存できませんでした"}
-          icon={
-            success ? <IconCheck size={18} /> : <IconAlertCircle size={18} />
-          }
-          styles={{
-            root: {
-              backgroundColor: `color-mix(in srgb, var(--mantine-color-${success ? "green" : "red"}-6) 7%, var(--mantine-color-body))`,
-              paddingRight: 40,
-            },
-            title: { fontSize: 14 },
-            message: { fontSize: 12 },
-          }}
-        >
-          {success
-            ? "プロフィールを更新しました。"
-            : "保存処理中に問題が発生しました。変更内容は保持されています。もう一度お試しください。"}
-        </Alert>
-      ),
-      withCloseButton: true,
-      styles: {
-        root: {
-          padding: 0,
-          border: 0,
-          background: "var(--mantine-color-body)",
-          boxShadow: "none",
-        },
-        body: { margin: 0 },
-        description: { margin: 0 },
-        closeButton: { position: "absolute", top: 8, right: 8, zIndex: 1 },
-      },
+    showPrototypeNotification({
+      kind: success ? "success" : "error",
+      title: success ? "保存しました" : "保存できませんでした",
+      message: success
+        ? "プロフィールを更新しました。"
+        : "保存処理中に問題が発生しました。変更内容は保持されています。もう一度お試しください。",
     })
   }, [])
 
@@ -180,19 +154,12 @@ export function UserProfilePrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <Alert
-                        color="red"
+                      <PrototypeFormAlert
+                        kind="error"
                         title="プロフィールを更新できませんでした"
-                        icon={<IconAlertCircle size={18} />}
-                        styles={{
-                          root: {
-                            backgroundColor:
-                              "color-mix(in srgb, var(--mantine-color-red-6) 7%, var(--mantine-color-body))",
-                          },
-                        }}
                       >
                         現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
-                      </Alert>
+                      </PrototypeFormAlert>
                     )}
                   </Box>
                 </Stack>

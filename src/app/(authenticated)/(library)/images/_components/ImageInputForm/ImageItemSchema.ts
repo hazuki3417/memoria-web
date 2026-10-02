@@ -1,6 +1,6 @@
 "use client"
-import { ze } from "@/lib"
 import z from "zod"
+import { ze } from "@/lib"
 
 export type ImageFileSchemaConfig = {
   type: string[]
@@ -30,7 +30,6 @@ export const imageTagsSchema = (config: ImageTagsSchemaConfig) => {
 }
 
 export type ImageTagsValues = z.infer<ReturnType<typeof imageTagsSchema>>
-
 
 export type ImageSchemaConfig = {
   file: ImageFileSchemaConfig

@@ -128,7 +128,7 @@ npm run test:app
 
 1. 編集前に対象のroute、component・feature、provider、GraphQL operation、テストを確認します。
 2. 別のUIシステムを追加する前に、既存のMantine部品とMemoriaの実装パターンを優先します。
-3. ユーザー向け文言には`memoria-design/content/ubiquitous.mdx`のユビキタス言語と`memoria-design/content/design-system/content-design.mdx`のContent Designを適用します。
+3. ユーザー向け文言には`memoria-design/pages/ubiquitous.mdx`のユビキタス言語を使用します。
 4. 横断変更が明示されていない限り、変更範囲をこのリポジトリ内に限定します。
 5. 横断変更ではリポジトリごとにブランチとPRを分け、契約上の依存関係を相互リンクします。
 6. ロジックには単体テスト、重要なUI挙動にはStorybookまたはPlaywrightの検証を追加します。
@@ -141,7 +141,7 @@ npm run test:app
 - 生成コードが古いGraphQL変更や、API契約への依存が示されていない変更を指摘します。
 - ユーザー、画像グループ、pagination connection間でデータが混ざる可能性のあるcache更新を指摘します。
 - ファイルサイズ、Content-Type、認可、失敗処理が不足したupload・download処理を指摘します。
-- Memoriaのユビキタス言語またはContent Designと一致しないユーザー向け文言を指摘します。
+- Memoriaのユビキタス言語と一致しないユーザー向け文言を指摘します。
 - Storybook・VRTへの対応方針が示されていない表示変更を指摘します。
 - Goalとして完了・検証できない巨大Issue、工程別Phase、長期Feature branchを前提とする変更を指摘します。
 - Windowsホストからの直接実行、OS間の`node_modules`共有、依存関係の未記録など、標準ローカル環境の再現性を損なう手順を指摘します。

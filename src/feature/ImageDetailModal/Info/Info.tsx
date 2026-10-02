@@ -1,12 +1,3 @@
-import { imageTagsSchema, ImageTagsSchemaConfig } from "@/app/(authenticated)/(library)/images/_components"
-import { ButtonGroup, FormModeSwitch, useUseFormModeSwitch } from "@/components"
-import { useUpdateImageMutation } from "@/graphql"
-import {
-  DEFAULT_FILE_SIZE_PREFIX,
-  FileSizePrefix,
-  transform,
-} from "@/lib/transform"
-import { useFeedbackContext, useUserContext } from "@/providers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   ActionIcon,
@@ -18,13 +9,25 @@ import {
   Paper,
   type PaperProps,
   TagsInput,
-  Text
+  Text,
 } from "@mantine/core"
 import { IconCheck, IconEdit, IconTrash, IconX } from "@tabler/icons-react"
 import type React from "react"
 import { useEffect } from "react"
-import { Controller, FieldErrors, useForm } from "react-hook-form"
+import { Controller, type FieldErrors, useForm } from "react-hook-form"
 import z from "zod"
+import {
+  type ImageTagsSchemaConfig,
+  imageTagsSchema,
+} from "@/app/(authenticated)/(library)/images/_components"
+import { ButtonGroup, FormModeSwitch, useUseFormModeSwitch } from "@/components"
+import { useUpdateImageMutation } from "@/graphql"
+import {
+  DEFAULT_FILE_SIZE_PREFIX,
+  type FileSizePrefix,
+  transform,
+} from "@/lib/transform"
+import { useFeedbackContext, useUserContext } from "@/providers"
 import { Body } from "./Body"
 import { Footer } from "./Footer"
 import { Header } from "./Header"
@@ -57,13 +60,11 @@ export interface InfoProps extends PaperProps {
 const imageInputFormSchema = (config: ImageTagsSchemaConfig) => {
   return z.object({
     id: z.string(),
-    tags: imageTagsSchema(config)
+    tags: imageTagsSchema(config),
   })
 }
 
-type ImageInputFormValues = z.infer<
-  ReturnType<typeof imageInputFormSchema>
->
+type ImageInputFormValues = z.infer<ReturnType<typeof imageInputFormSchema>>
 
 export const Info = (props: InfoProps) => {
   const { payload, prefix = DEFAULT_FILE_SIZE_PREFIX, handler } = props
@@ -73,7 +74,9 @@ export const Info = (props: InfoProps) => {
 
   const feedback = useFeedbackContext()
 
-  const inputSchema = imageInputFormSchema({ count: { max: user.limit.upload.tag.count } })
+  const inputSchema = imageInputFormSchema({
+    count: { max: user.limit.upload.tag.count },
+  })
 
   const methods = useForm<ImageInputFormValues>({
     resolver: zodResolver(inputSchema),
@@ -103,7 +106,6 @@ export const Info = (props: InfoProps) => {
     console.log("submit error:", errors)
   }
 
-
   const formModeSwitch = useUseFormModeSwitch("view")
 
   const handleEdit = () => {
@@ -117,8 +119,7 @@ export const Info = (props: InfoProps) => {
 
   useEffect(() => {
     reset({ tags: payload.tags })
-  }, [payload])
-
+  }, [payload, reset])
 
   useEffect(() => {
     const { data, error } = result
@@ -136,14 +137,14 @@ export const Info = (props: InfoProps) => {
         body: "正常に終了しました。",
       })
     }
-  }, [result])
+  }, [result, feedback.action.warning, feedback.action.success])
 
   return (
     <Paper
       data-testid="info"
       p={0}
       radius={0}
-      style={(theme) => ({
+      style={(_theme) => ({
         display: "flex",
         flexDirection: "column",
         width: "340px",
@@ -151,7 +152,7 @@ export const Info = (props: InfoProps) => {
       })}
     >
       <Header
-        style={(theme) => ({
+        style={(_theme) => ({
           display: "flex",
           height: "40px",
           flexShrink: 0,
@@ -160,7 +161,7 @@ export const Info = (props: InfoProps) => {
         })}
       >
         <Box
-          style={(theme) => ({
+          style={(_theme) => ({
             display: "flex",
             alignItems: "center",
           })}
@@ -168,7 +169,7 @@ export const Info = (props: InfoProps) => {
           <Text>情報</Text>
         </Box>
         <Box
-          style={(theme) => ({
+          style={(_theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -187,7 +188,7 @@ export const Info = (props: InfoProps) => {
       </Header>
       <Divider />
       <Body
-        style={(theme) => ({
+        style={(_theme) => ({
           flexGrow: 1,
           padding: "8px 8px",
         })}
@@ -282,13 +283,7 @@ export const Info = (props: InfoProps) => {
                     name="tags"
                     render={({ field }) => {
                       return (
-                        <TagsInput
-                          size="xs"
-                          w="100%"
-
-                          {...field}
-                          clearable
-                        />
+                        <TagsInput size="xs" w="100%" {...field} clearable />
                       )
                     }}
                   />
@@ -300,7 +295,7 @@ export const Info = (props: InfoProps) => {
       </Body>
       <Divider />
       <Footer
-        style={(theme) => ({
+        style={(_theme) => ({
           height: "40px",
           flexShrink: 0,
           padding: "0px 8px",
@@ -310,15 +305,14 @@ export const Info = (props: InfoProps) => {
         })}
       >
         <Box
-          style={(theme) => ({
+          style={(_theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           })}
-        >
-        </Box>
+        ></Box>
         <Box
-          style={(theme) => ({
+          style={(_theme) => ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
