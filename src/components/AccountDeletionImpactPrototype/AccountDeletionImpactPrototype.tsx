@@ -393,23 +393,30 @@ export function AccountDeletionImpactPrototype({
                                   })
                                 }
                               >
-                                <Stack gap="md" mt="sm">
-                                  {community.candidates.length > 0 ? (
-                                    <Box
-                                      p="sm"
-                                      style={{
-                                        border:
-                                          "1px solid var(--mantine-color-default-border)",
-                                        borderRadius:
-                                          "var(--mantine-radius-md)",
-                                      }}
-                                    >
-                                      <Radio
-                                        value="keep"
-                                        label="Communityを残す"
-                                        description="別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。"
-                                      />
-                                      {decision?.choice === "keep" && (
+                                <Group align="stretch" grow mt="sm">
+                                  <Box
+                                    p="sm"
+                                    style={{
+                                      border:
+                                        "1px solid var(--mantine-color-default-border)",
+                                      borderRadius:
+                                        "var(--mantine-radius-md)",
+                                    }}
+                                  >
+                                    <Radio
+                                      value="keep"
+                                      label="Communityを残す"
+                                      description={
+                                        community.candidates.length > 0
+                                          ? "別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。"
+                                          : "Administratorに指定できるMemberがいないため、このCommunityを残すことはできません。"
+                                      }
+                                      disabled={
+                                        community.candidates.length === 0
+                                      }
+                                    />
+                                    {decision?.choice === "keep" &&
+                                      community.candidates.length > 0 && (
                                         <Select
                                           mt="md"
                                           label="後任のAdministrator"
@@ -425,21 +432,14 @@ export function AccountDeletionImpactPrototype({
                                           clearable
                                         />
                                       )}
-                                    </Box>
-                                  ) : (
-                                    <PrototypeFormAlert
-                                      kind="info"
-                                      title="Administratorに指定できるMemberがいません"
-                                    >
-                                      このCommunityを残すことはできません。アカウントを削除するには、このCommunityも削除する必要があります。
-                                    </PrototypeFormAlert>
-                                  )}
+                                  </Box>
                                   <Box
                                     p="sm"
                                     style={{
                                       border:
                                         "1px solid var(--mantine-color-default-border)",
-                                      borderRadius: "var(--mantine-radius-md)",
+                                      borderRadius:
+                                        "var(--mantine-radius-md)",
                                     }}
                                   >
                                     <Radio
@@ -448,7 +448,7 @@ export function AccountDeletionImpactPrototype({
                                       description="削除されるデータは次のステップで確認します。"
                                     />
                                   </Box>
-                                </Stack>
+                                </Group>
                               </Radio.Group>
                             </Stack>
                           </Box>
