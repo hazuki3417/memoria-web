@@ -429,15 +429,17 @@ export function AccountDeletionImpactPrototype({
                       <Text size="sm" c="dimmed">
                         参加中のCommunityごとに、アカウント削除時の対応を確認してください。必要なCommunityではAdministratorの指定または削除を選択します。
                       </Text>
-                      <Badge
-                        color={allResolved ? "green" : "yellow"}
-                        variant="light"
-                        w="fit-content"
-                      >
-                        {allResolved
-                          ? "すべて解決済み"
-                          : `未解決 ${communitiesToResolve.filter((item) => !resolved(item.id)).length}件`}
-                      </Badge>
+                      {needsResolution && (
+                        <Badge
+                          color={allResolved ? "green" : "yellow"}
+                          variant="light"
+                          w="fit-content"
+                        >
+                          {allResolved
+                            ? "すべて解決済み"
+                            : `未解決 ${communitiesToResolve.filter((item) => !resolved(item.id)).length}件`}
+                        </Badge>
+                      )}
                       {communities.map((community) => {
                         const decision = decisions[community.id]
                         const requiresDecision = community.relation === "last-administrator"
@@ -456,16 +458,18 @@ export function AccountDeletionImpactPrototype({
                                 <Title order={3} size="h5">
                                   {community.name}
                                 </Title>
-                                <Badge
-                                  color={
-                                    resolved(community.id) ? "green" : "yellow"
-                                  }
-                                  variant="light"
-                                >
-                                  {resolved(community.id)
-                                    ? "解決済み"
-                                    : "未解決"}
-                                </Badge>
+                                {requiresDecision && (
+                                  <Badge
+                                    color={
+                                      resolved(community.id) ? "green" : "yellow"
+                                    }
+                                    variant="light"
+                                  >
+                                    {resolved(community.id)
+                                      ? "解決済み"
+                                      : "未解決"}
+                                  </Badge>
+                                )}
                               </Group>
                               {!requiresDecision ? (
                                 <PrototypeFormAlert kind="info" title="退会">
