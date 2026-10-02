@@ -358,27 +358,9 @@ export function AccountDeletionImpactPrototype({
                           Communityに参加している場合は、次のステップで各Communityへの対応と影響を確認します。
                         </Text>
                       )}
-                      <Group gap="sm" justify="space-between">
-                        <Box style={{ flex: 1 }} />
+                      <Group gap="sm" justify="flex-end">
                         <Box
                           style={{
-                            flex: 1,
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Button
-                            size="sm"
-                            variant="subtle"
-                            color="gray"
-                            onClick={cancel}
-                          >
-                            キャンセル
-                          </Button>
-                        </Box>
-                        <Box
-                          style={{
-                            flex: 1,
                             display: "flex",
                             justifyContent: "flex-end",
                           }}
