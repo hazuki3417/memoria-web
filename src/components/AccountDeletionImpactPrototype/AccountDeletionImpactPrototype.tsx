@@ -505,7 +505,8 @@ export function AccountDeletionImpactPrototype({
                                     />
                                   </Box>
                                 </Group>
-                              </Radio.Group>}
+                              </Radio.Group>
+                              )}
                             </Stack>
                           </Box>
                         )
@@ -623,7 +624,8 @@ export function AccountDeletionImpactPrototype({
                                   : undefined
                               }
                             />
-                            </>}
+                            </>
+                            )}
                             {community.relation !== "last-administrator" && (
                               <Text size="sm" c="dimmed">アカウントを削除すると、このCommunityから退会します。Communityはそのまま残ります。</Text>
                             )}
