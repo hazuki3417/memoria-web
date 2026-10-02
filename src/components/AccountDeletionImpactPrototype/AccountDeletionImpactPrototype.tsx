@@ -9,6 +9,7 @@ import {
   Group,
   Radio,
   MultiSelect,
+  Modal,
   Stack,
   Stepper,
   Text,
@@ -103,6 +104,7 @@ export function AccountDeletionImpactPrototype({
   const [decisions, setDecisions] = useState<Record<string, Decision>>({})
   const [confirmations, setConfirmations] = useState<Record<string, string>>({})
   const [cancelled, setCancelled] = useState(false)
+  const [cancelConfirmationOpened, setCancelConfirmationOpened] = useState(false)
   const [reauth, setReauth] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const mediaCount = reviewState === "empty" ? 0 : 24
@@ -134,6 +136,16 @@ export function AccountDeletionImpactPrototype({
   const allConfirmed = toDelete.every(
     (item) => confirmations[item.id] === item.name,
   )
+  const hasPendingChanges =
+    Object.keys(decisions).length > 0 ||
+    Object.values(confirmations).some((value) => value.length > 0)
+  const cancel = () => {
+    if (hasPendingChanges) {
+      setCancelConfirmationOpened(true)
+      return
+    }
+    setCancelled(true)
+  }
   const skipped = (index: number) =>
     (index === 1 && !hasCommunities) || (index === 2 && !hasCommunities)
   const next = () => {
@@ -152,7 +164,36 @@ export function AccountDeletionImpactPrototype({
     setConfirmations((previous) => ({ ...previous, [id]: "" }))
   }
   return (
-    <AppShell header={{ height: 40 }} padding="lg">
+    <>
+      <Modal
+        opened={cancelConfirmationOpened}
+        onClose={() => setCancelConfirmationOpened(false)}
+        title="アカウント削除を中止しますか？"
+        centered
+      >
+        <Stack gap="lg">
+          <Text size="sm">
+            Communityへの対応など、この画面で行った変更は保存されません。
+          </Text>
+          <Group justify="flex-end">
+            <Button
+              variant="default"
+              onClick={() => setCancelConfirmationOpened(false)}
+            >
+              確認を続ける
+            </Button>
+            <Button
+              onClick={() => {
+                setCancelConfirmationOpened(false)
+                setCancelled(true)
+              }}
+            >
+              中止する
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+      <AppShell header={{ height: 40 }} padding="lg">
       <AppShell.Header>
         <Group h="100%" px="md" gap="sm">
           <Text fw={750} size="lg">
@@ -330,7 +371,7 @@ export function AccountDeletionImpactPrototype({
                             size="sm"
                             variant="subtle"
                             color="gray"
-                            onClick={() => setCancelled(true)}
+                            onClick={cancel}
                           >
                             キャンセル
                           </Button>
@@ -546,7 +587,7 @@ export function AccountDeletionImpactPrototype({
                             size="sm"
                             variant="subtle"
                             color="gray"
-                            onClick={() => setCancelled(true)}
+                            onClick={cancel}
                           >
                             キャンセル
                           </Button>
@@ -674,7 +715,7 @@ export function AccountDeletionImpactPrototype({
                             size="sm"
                             variant="subtle"
                             color="gray"
-                            onClick={() => setCancelled(true)}
+                            onClick={cancel}
                           >
                             キャンセル
                           </Button>
@@ -857,7 +898,7 @@ export function AccountDeletionImpactPrototype({
                             size="sm"
                             variant="subtle"
                             color="gray"
-                            onClick={() => setCancelled(true)}
+                            onClick={cancel}
                           >
                             キャンセル
                           </Button>
@@ -890,6 +931,7 @@ export function AccountDeletionImpactPrototype({
           </Stack>
         </Box>
       </AppShell.Main>
-    </AppShell>
+      </AppShell>
+    </>
   )
 }
