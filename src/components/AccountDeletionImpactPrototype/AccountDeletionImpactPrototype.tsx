@@ -21,30 +21,61 @@ import { PrototypeFormAlert } from "../PrototypeFeedback/PrototypeFeedback"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
 type CommunityScenario =
-  | "requires-resolution"
-  | "no-resolution"
+  | "mixed-memberships"
+  | "no-communities"
+  | "member-only"
+  | "administrator-with-others-only"
+  | "withdrawal-mixed"
+  | "last-administrator"
+  | "last-administrator-no-candidate"
+  | "multiple-last-administrators"
 type RetryOutcome = "success" | "failure"
 type Decision = { choice: "keep" | "delete" | null; successors: string[] }
-const communities = [
+type CommunityFixture = {
+  id: string
+  name: string
+  members: number
+  media: number
+  relation: "member" | "administrator-with-others" | "last-administrator"
+  candidates: { value: string; label: string }[]
+}
+const resolutionCommunities: CommunityFixture[] = [
   {
     id: "family",
     name: "家族のアルバム",
     members: 5,
     media: 128,
+    relation: "last-administrator",
     candidates: [
       { value: "a", label: "山田 花子" },
       { value: "b", label: "山田 太郎" },
     ],
   },
-  { id: "travel", name: "旅行の思い出", members: 1, media: 42, candidates: [] },
+  { id: "travel", name: "旅行の思い出", members: 1, media: 42, relation: "last-administrator", candidates: [] },
   {
     id: "friends",
     name: "友人との記録",
     members: 4,
     media: 36,
+    relation: "last-administrator",
     candidates: [{ value: "c", label: "佐藤 葵" }],
   },
 ]
+
+const withdrawalCommunities: CommunityFixture[] = [
+  { id: "club", name: "写真クラブ", members: 8, media: 64, relation: "member", candidates: [] },
+  { id: "school", name: "同窓会", members: 12, media: 91, relation: "administrator-with-others", candidates: [] },
+]
+const communitiesForScenario = (scenario: CommunityScenario): CommunityFixture[] => {
+  if (scenario === "no-communities") return []
+  if (scenario === "member-only") return [withdrawalCommunities[0]]
+  if (scenario === "administrator-with-others-only") return [withdrawalCommunities[1]]
+  if (scenario === "withdrawal-mixed") return withdrawalCommunities
+  if (scenario === "last-administrator") return [resolutionCommunities[0]]
+  if (scenario === "last-administrator-no-candidate") return [resolutionCommunities[1]]
+  if (scenario === "multiple-last-administrators") return resolutionCommunities
+  return [resolutionCommunities[0], ...withdrawalCommunities]
+}
 const labels = [
   "削除されるデータ",
   "管理状態の解消",
@@ -53,7 +84,7 @@ const labels = [
 ]
 export function AccountDeletionImpactPrototype({
   reviewState = "default",
-  communityScenario = "requires-resolution",
+  communityScenario = "mixed-memberships",
   retryOutcome = "success",
 }: {
   reviewState?: ReviewState
@@ -75,7 +106,14 @@ export function AccountDeletionImpactPrototype({
   const [reauth, setReauth] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const mediaCount = reviewState === "empty" ? 0 : 24
-  const needsResolution = communityScenario === "requires-resolution"
+  const communities = communitiesForScenario(communityScenario)
+  const communitiesToResolve = communities.filter(
+    (community) => community.relation === "last-administrator",
+  )
+  const communitiesToWithdraw = communities.filter(
+    (community) => community.relation !== "last-administrator",
+  )
+  const needsResolution = communitiesToResolve.length > 0
   const resolved = (id: string) => {
     const decision = decisions[id]
     const community = communities.find((item) => item.id === id)
@@ -88,8 +126,8 @@ export function AccountDeletionImpactPrototype({
         ))
     )
   }
-  const allResolved = communities.every((item) => resolved(item.id))
-  const toDelete = communities.filter(
+  const allResolved = communitiesToResolve.every((item) => resolved(item.id))
+  const toDelete = communitiesToResolve.filter(
     (item) => decisions[item.id]?.choice === "delete",
   )
   const allConfirmed = toDelete.every(
@@ -350,9 +388,9 @@ export function AccountDeletionImpactPrototype({
                       >
                         {allResolved
                           ? "すべて解決済み"
-                          : `未解決 ${communities.filter((item) => !resolved(item.id)).length}件`}
+                          : `未解決 ${communitiesToResolve.filter((item) => !resolved(item.id)).length}件`}
                       </Badge>
-                      {communities.map((community) => {
+                      {communitiesToResolve.map((community) => {
                         const decision = decisions[community.id]
                         return (
                           <Box
@@ -619,9 +657,11 @@ export function AccountDeletionImpactPrototype({
                       {!needsResolution && (
                         <PrototypeFormAlert
                           kind="info"
-                          title="Communityへの対応は不要です"
+                          title="Communityの管理状態を変更する必要はありません"
                         >
-                          最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。
+                          {communities.length === 0
+                            ? "参加中のCommunityはありません。管理状態の解消と削除対象の確認は省略しました。"
+                            : "最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。"}
                         </PrototypeFormAlert>
                       )}
                       {needsResolution && toDelete.length === 0 && (
@@ -640,7 +680,7 @@ export function AccountDeletionImpactPrototype({
                           アカウントおよび管理Media {mediaCount}件を削除します。
                         </Text>
                       </Box>
-                      {needsResolution && (
+                      {communities.length > 0 && (
                         <Box>
                           <Title order={3} size="h5">
                             Communityへの対応
@@ -649,9 +689,11 @@ export function AccountDeletionImpactPrototype({
                             {communities.map((community) => (
                               <Text key={community.id} size="sm">
                                 {community.name}：
-                                {decisions[community.id]?.choice === "delete"
-                                  ? "削除"
-                                  : `保持（後任：${(decisions[community.id]?.successors ?? []).map((successor) => community.candidates.find((candidate) => candidate.value === successor)?.label).filter(Boolean).join("、") || "未指定"}）`}
+                                {community.relation !== "last-administrator"
+                                  ? "退会"
+                                  : decisions[community.id]?.choice === "delete"
+                                    ? "削除"
+                                    : `保持（Administrator：${(decisions[community.id]?.successors ?? []).map((successor) => community.candidates.find((candidate) => candidate.value === successor)?.label).filter(Boolean).join("、") || "未指定"}）`}
                               </Text>
                             ))}
                           </Stack>
