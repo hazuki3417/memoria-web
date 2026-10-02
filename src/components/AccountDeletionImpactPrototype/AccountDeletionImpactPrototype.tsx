@@ -451,23 +451,25 @@ export function AccountDeletionImpactPrototype({
                                     style={{
                                       borderColor:
                                         decision?.choice === "keep"
-                                          ? "var(--mantine-color-green-5)"
+                                          ? "var(--mantine-color-green-3)"
                                           : undefined,
                                       background:
                                         decision?.choice === "keep"
-                                          ? "var(--mantine-color-green-light)"
+                                          ? "color-mix(in srgb, var(--mantine-color-green-6) 3%, var(--mantine-color-body))"
                                           : undefined,
                                     }}
                                   >
-                                    <Radio.Indicator />
-                                    <Text fw={500} size="sm" mt="xs">
-                                      Communityを残す
-                                    </Text>
-                                    <Text c="dimmed" size="xs" mt={2}>
-                                      {community.candidates.length > 0
-                                        ? "別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。"
-                                        : "Administratorに指定できるMemberがいないため、このCommunityを残すことはできません。"}
-                                    </Text>
+                                    <Radio
+                                      value="keep"
+                                      label="Communityを残す"
+                                      description={
+                                        community.candidates.length > 0
+                                          ? "別のMemberをAdministratorにすると、アカウント削除後もCommunityが残ります。"
+                                          : "Administratorに指定できるMemberがいないため、このCommunityを残すことはできません。"
+                                      }
+                                      disabled={community.candidates.length === 0}
+                                      styles={{ root: { pointerEvents: "none" } }}
+                                    />
                                     <MultiSelect
                                       mt="md"
                                       label="後任のAdministrator"
@@ -499,21 +501,20 @@ export function AccountDeletionImpactPrototype({
                                     style={{
                                       borderColor:
                                         decision?.choice === "delete"
-                                          ? "var(--mantine-color-red-5)"
+                                          ? "var(--mantine-color-red-3)"
                                           : undefined,
                                       background:
                                         decision?.choice === "delete"
-                                          ? "var(--mantine-color-red-light)"
+                                          ? "color-mix(in srgb, var(--mantine-color-red-6) 3%, var(--mantine-color-body))"
                                           : undefined,
                                     }}
                                   >
-                                    <Radio.Indicator />
-                                    <Text fw={500} size="sm" mt="xs">
-                                      Communityを削除する
-                                    </Text>
-                                    <Text c="dimmed" size="xs" mt={2}>
-                                      削除されるデータは次のステップで確認します。
-                                    </Text>
+                                    <Radio
+                                      value="delete"
+                                      label="Communityを削除する"
+                                      description="削除されるデータは次のステップで確認します。"
+                                      styles={{ root: { pointerEvents: "none" } }}
+                                    />
                                   </Radio.Card>
                                 </Group>
                               </Radio.Group>
