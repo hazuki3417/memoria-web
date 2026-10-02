@@ -444,15 +444,15 @@ export function AccountDeletionImpactPrototype({
                                 }
                               >
                                 <Group align="stretch" grow mt="sm">
-                                  <Radio.Card
-                                    value="keep"
+                                  <Box
                                     p="sm"
-                                    disabled={community.candidates.length === 0}
                                     style={{
-                                      borderColor:
+                                      border: `1px solid ${
                                         decision?.choice === "keep"
-                                          ? "var(--mantine-color-green-3)"
-                                          : undefined,
+                                          ? "var(--mantine-color-green-4)"
+                                          : "var(--mantine-color-default-border)"
+                                      }`,
+                                      borderRadius: "var(--mantine-radius-md)",
                                       background:
                                         decision?.choice === "keep"
                                           ? "color-mix(in srgb, var(--mantine-color-green-6) 3%, var(--mantine-color-body))"
@@ -468,7 +468,6 @@ export function AccountDeletionImpactPrototype({
                                           : "Administratorに指定できるMemberがいないため、このCommunityを残すことはできません。"
                                       }
                                       disabled={community.candidates.length === 0}
-                                      styles={{ root: { pointerEvents: "none" } }}
                                     />
                                     <MultiSelect
                                       mt="md"
@@ -492,17 +491,17 @@ export function AccountDeletionImpactPrototype({
                                         decision?.choice !== "keep" ||
                                         community.candidates.length === 0
                                       }
-                                      onClick={(event) => event.stopPropagation()}
                                     />
-                                  </Radio.Card>
-                                  <Radio.Card
-                                    value="delete"
+                                  </Box>
+                                  <Box
                                     p="sm"
                                     style={{
-                                      borderColor:
+                                      border: `1px solid ${
                                         decision?.choice === "delete"
-                                          ? "var(--mantine-color-red-3)"
-                                          : undefined,
+                                          ? "var(--mantine-color-red-4)"
+                                          : "var(--mantine-color-default-border)"
+                                      }`,
+                                      borderRadius: "var(--mantine-radius-md)",
                                       background:
                                         decision?.choice === "delete"
                                           ? "color-mix(in srgb, var(--mantine-color-red-6) 3%, var(--mantine-color-body))"
@@ -513,9 +512,8 @@ export function AccountDeletionImpactPrototype({
                                       value="delete"
                                       label="Communityを削除する"
                                       description="削除されるデータは次のステップで確認します。"
-                                      styles={{ root: { pointerEvents: "none" } }}
                                     />
-                                  </Radio.Card>
+                                  </Box>
                                 </Group>
                               </Radio.Group>
                               )}
