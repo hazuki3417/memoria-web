@@ -264,10 +264,14 @@ export function AccountDeletionImpactPrototype({
                 </Box>
                 {step === 0 && (
                   <Box w="100%">
-                    <Title order={2} size="h4">
-                      削除されるデータ
-                    </Title>
-                    <Divider my="md" />
+                    {!compactStepper && (
+                      <>
+                        <Title order={2} size="h4">
+                          削除されるデータ
+                        </Title>
+                        <Divider my="md" />
+                      </>
+                    )}
                     <Stack gap="lg">
                       {loadState === "ready" ? (
                         <Box>
@@ -372,10 +376,14 @@ export function AccountDeletionImpactPrototype({
                 )}
                 {step === 1 && (
                   <Box w="100%">
-                    <Title order={2} size="h4">
-                      Communityへの対応
-                    </Title>
-                    <Divider my="md" />
+                    {!compactStepper && (
+                      <>
+                        <Title order={2} size="h4">
+                          Communityへの対応
+                        </Title>
+                        <Divider my="md" />
+                      </>
+                    )}
                     <Stack gap="lg">
                       <Text size="sm" c="dimmed">
                         参加中のCommunityごとに、アカウント削除時の対応を確認してください。必要なCommunityではAdministratorの指定または削除を選択します。
@@ -564,10 +572,14 @@ export function AccountDeletionImpactPrototype({
                 )}
                 {step === 2 && (
                   <Box w="100%">
-                    <Title order={2} size="h4">
-                      Communityへの影響
-                    </Title>
-                    <Divider my="md" />
+                    {!compactStepper && (
+                      <>
+                        <Title order={2} size="h4">
+                          Communityへの影響
+                        </Title>
+                        <Divider my="md" />
+                      </>
+                    )}
                     <Stack gap="lg">
                       <Text size="sm" c="dimmed">
                         参加中のCommunityごとに、アカウント削除後の状態を確認してください。削除するCommunityでは確認のためCommunity名を入力します。
@@ -688,10 +700,14 @@ export function AccountDeletionImpactPrototype({
                 )}
                 {step === 3 && (
                   <Box w="100%">
-                    <Title order={2} size="h4">
-                      最終確認
-                    </Title>
-                    <Divider my="md" />
+                    {!compactStepper && (
+                      <>
+                        <Title order={2} size="h4">
+                          最終確認
+                        </Title>
+                        <Divider my="md" />
+                      </>
+                    )}
                     <Stack gap="lg">
                       <Box>
                         <Title order={3} size="h5">
