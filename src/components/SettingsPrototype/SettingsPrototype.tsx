@@ -64,8 +64,12 @@ function PageHeader({
 }) {
   return (
     <Box>
-      <Title order={1} size="h2">{title}</Title>
-      <Text c="dimmed" size="sm" mt={4}>{description}</Text>
+      <Title order={1} size="h2">
+        {title}
+      </Title>
+      <Text c="dimmed" size="sm" mt={4}>
+        {description}
+      </Text>
     </Box>
   )
 }
@@ -73,7 +77,9 @@ function PageHeader({
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <Box>
-      <Title order={2} size="h4">{children}</Title>
+      <Title order={2} size="h4">
+        {children}
+      </Title>
       <Divider mt="sm" mb="lg" />
     </Box>
   )
@@ -98,8 +104,12 @@ function SettingRow({
       gap="md"
     >
       <Box style={{ flex: 1 }} miw={0}>
-        <Text fw={600} size="sm">{label}</Text>
-        <Text c="dimmed" size="sm" mt={2}>{description}</Text>
+        <Text fw={600} size="sm">
+          {label}
+        </Text>
+        <Text c="dimmed" size="sm" mt={2}>
+          {description}
+        </Text>
       </Box>
       <Box w={compact ? "100%" : 180}>{children}</Box>
     </Group>
@@ -142,7 +152,11 @@ function ProfileContent() {
               保存
             </Button>
             {dirty && (
-              <Button size="sm" variant="default" onClick={() => setName(saved)}>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => setName(saved)}
+              >
                 キャンセル
               </Button>
             )}
@@ -242,10 +256,16 @@ function UsageContent() {
         <Stack gap="sm">
           <Group justify="space-between" align="end">
             <Box>
-              <Text fw={700} size="xl">12.4 GB 使用中</Text>
-              <Text size="sm" c="dimmed">50 GB 中</Text>
+              <Text fw={700} size="xl">
+                12.4 GB 使用中
+              </Text>
+              <Text size="sm" c="dimmed">
+                50 GB 中
+              </Text>
             </Box>
-            <Text size="sm" fw={600}>25%</Text>
+            <Text size="sm" fw={600}>
+              25%
+            </Text>
           </Group>
           <Progress value={25} size="md" aria-label="ストレージ使用率 25%" />
         </Stack>
@@ -290,8 +310,12 @@ function UsageContent() {
             ["対応形式", "JPEG, PNG"],
           ].map(([label, value]) => (
             <Group key={label} justify="space-between" gap="xl" wrap="nowrap">
-              <Text size="sm" c="dimmed">{label}</Text>
-              <Text size="sm" fw={600} ta="right">{value}</Text>
+              <Text size="sm" c="dimmed">
+                {label}
+              </Text>
+              <Text size="sm" fw={600} ta="right">
+                {value}
+              </Text>
             </Group>
           ))}
         </Stack>
@@ -303,10 +327,7 @@ function UsageContent() {
 function AccountContent() {
   return (
     <Stack gap="xl">
-      <PageHeader
-        title="アカウント"
-        description="アカウントを管理します。"
-      />
+      <PageHeader title="アカウント" description="アカウントを管理します。" />
       <Box>
         <SectionTitle>アカウント削除</SectionTitle>
         <Stack gap="md" maw={620}>
@@ -331,7 +352,8 @@ export function SettingsPrototype({
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>(initialSection)
-  const [applicationNavigationOpened, setApplicationNavigationOpened] = useState(false)
+  const [applicationNavigationOpened, setApplicationNavigationOpened] =
+    useState(false)
   const currentLabel = sections.find((item) => item.id === section)?.label
 
   const content =
@@ -347,17 +369,26 @@ export function SettingsPrototype({
 
   return (
     <AppShell header={{ height: 40 }} padding="lg">
-      <AppShell.Header style={{ zIndex: 300, borderTop: "2px solid var(--mantine-color-blue-6)" }}>
+      <AppShell.Header
+        style={{
+          zIndex: 300,
+          borderTop: "2px solid var(--mantine-color-blue-6)",
+        }}
+      >
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
             <Burger
               opened={applicationNavigationOpened}
-              onClick={() => setApplicationNavigationOpened((opened) => !opened)}
+              onClick={() =>
+                setApplicationNavigationOpened((opened) => !opened)
+              }
               size="sm"
               aria-label="ナビゲーションを開閉"
               aria-expanded={applicationNavigationOpened}
             />
-            <Text fw={750} size="lg">Memoria</Text>
+            <Text fw={750} size="lg">
+              Memoria
+            </Text>
             <Box
               w={1}
               h={20}
@@ -374,8 +405,12 @@ export function SettingsPrototype({
                   aria-label="コンテキストを切り替える"
                   maw={{ base: 144, sm: 240 }}
                 >
-                  <Text size="xs" mr={6} aria-hidden="true">▾</Text>
-                  <Text size="sm" truncate>Personal</Text>
+                  <Text size="xs" mr={6} aria-hidden="true">
+                    ▾
+                  </Text>
+                  <Text size="sm" truncate>
+                    Personal
+                  </Text>
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
@@ -397,15 +432,23 @@ export function SettingsPrototype({
                 aria-label="アカウントメニュー"
                 title="アカウントメニュー"
               >
-                <Avatar size={24} radius="xl">U</Avatar>
+                <Avatar size={24} radius="xl">
+                  U
+                </Avatar>
               </Button>
             </Menu.Target>
             <Menu.Dropdown>
               <Group gap="sm" px="xs" py="xs" wrap="nowrap">
-                <Avatar size={32} radius="xl">U</Avatar>
+                <Avatar size={32} radius="xl">
+                  U
+                </Avatar>
                 <Box>
-                  <Text size="sm" fw={600} lh={1.2}>ユーザー</Text>
-                  <Text size="xs" c="dimmed" lh={1.2}>Personal</Text>
+                  <Text size="sm" fw={600} lh={1.2}>
+                    ユーザー
+                  </Text>
+                  <Text size="xs" c="dimmed" lh={1.2}>
+                    Personal
+                  </Text>
                 </Box>
               </Group>
               <Menu.Divider />
@@ -439,7 +482,10 @@ export function SettingsPrototype({
         }}
       >
         <Stack gap={0} h="100%" p="xs">
-          <Box component="nav" aria-label="現在のコンテキスト内のナビゲーション">
+          <Box
+            component="nav"
+            aria-label="現在のコンテキスト内のナビゲーション"
+          >
             <Stack gap={0}>
               {["ダッシュボード", "メディア", "グループ"].map((label) => (
                 <Box key={label} pos="relative" pl={8}>
@@ -483,7 +529,9 @@ export function SettingsPrototype({
               }}
             />
             <Divider mt="xs" mb="xs" />
-            <Text size="10px" c="dimmed" px="sm" pb={4}>© 2026 Memoria</Text>
+            <Text size="10px" c="dimmed" px="sm" pb={4}>
+              © 2026 Memoria
+            </Text>
           </Box>
         </Stack>
       </Drawer>
@@ -493,7 +541,9 @@ export function SettingsPrototype({
           {compact ? (
             <Stack gap="xl">
               <Box>
-                <Text size="xs" c="dimmed" mb={6}>設定</Text>
+                <Text size="xs" c="dimmed" mb={6}>
+                  設定
+                </Text>
                 <Select
                   aria-label="設定画面"
                   value={section}
@@ -509,8 +559,15 @@ export function SettingsPrototype({
             </Stack>
           ) : (
             <Group align="flex-start" gap={56} wrap="nowrap">
-              <Box component="nav" aria-label="設定" w={200} style={{ flexShrink: 0 }}>
-                <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
+              <Box
+                component="nav"
+                aria-label="設定"
+                w={200}
+                style={{ flexShrink: 0 }}
+              >
+                <Text size="xs" fw={700} c="dimmed" mb="xs">
+                  設定
+                </Text>
                 <Stack gap={0}>
                   {sections.map((item) => (
                     <Box key={item.id} pos="relative" pl={8}>
@@ -532,7 +589,11 @@ export function SettingsPrototype({
                       <NavLink
                         label={item.label}
                         leftSection={
-                          <item.icon size={16} stroke={1.6} aria-hidden="true" />
+                          <item.icon
+                            size={16}
+                            stroke={1.6}
+                            aria-hidden="true"
+                          />
                         }
                         active={section === item.id}
                         onClick={() => setSection(item.id)}
@@ -570,7 +631,12 @@ export function SettingsPrototype({
           )}
           <Text
             pos="absolute"
-            style={{ width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}
+            style={{
+              width: 1,
+              height: 1,
+              overflow: "hidden",
+              clip: "rect(0 0 0 0)",
+            }}
           >
             現在の設定: {currentLabel}
           </Text>
