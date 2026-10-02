@@ -449,7 +449,7 @@ export function AccountDeletionImpactPrototype({
                                     style={{
                                       border: `1px solid ${
                                         decision?.choice === "keep"
-                                          ? "var(--mantine-color-green-4)"
+                                          ? "var(--mantine-color-green-6)"
                                           : "var(--mantine-color-default-border)"
                                       }`,
                                       borderRadius: "var(--mantine-radius-md)",
@@ -498,7 +498,7 @@ export function AccountDeletionImpactPrototype({
                                     style={{
                                       border: `1px solid ${
                                         decision?.choice === "delete"
-                                          ? "var(--mantine-color-red-4)"
+                                          ? "var(--mantine-color-red-6)"
                                           : "var(--mantine-color-default-border)"
                                       }`,
                                       borderRadius: "var(--mantine-radius-md)",
