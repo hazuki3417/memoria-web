@@ -111,14 +111,14 @@ function ProfileContent() {
     <Stack gap="xl">
       <PageHeader
         title="プロフィール"
-        description="Memoriaで使用するプロフィール情報を管理します。"
+        description="プロフィール情報を変更します。"
       />
       <Box>
         <SectionTitle>基本情報</SectionTitle>
         <Stack gap="md" maw={540}>
           <TextInput
             label="ニックネーム"
-            description="Memoria内で表示される名前です。"
+            description="Memoriaで表示する名前です."
             value={name}
             onChange={(event) => setName(event.currentTarget.value)}
             error={invalid ? "ニックネームを入力してください。" : undefined}
@@ -157,7 +157,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
     <Stack gap="xl">
       <PageHeader
         title="環境設定"
-        description="Memoriaの表示や操作方法を設定します。"
+        description="表示とプレビューの動作を設定します。"
       />
       <Box>
         <SectionTitle>表示</SectionTitle>
@@ -165,7 +165,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
           <SettingRow
             compact={compact}
             label="日付形式"
-            description="日付を表示するときの形式です。"
+            description="日付の表示形式を選びます。"
           >
             <Select
               aria-label="日付形式"
@@ -178,7 +178,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
           <SettingRow
             compact={compact}
             label="ファイルサイズの単位"
-            description="Mediaのサイズを表示するときの単位です。"
+            description="Mediaサイズの表示単位を選びます。"
           >
             <Select
               aria-label="ファイルサイズの単位"
@@ -199,7 +199,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
           <SettingRow
             compact={compact}
             label="繰り返し表示"
-            description="最後のMediaの次に最初のMediaへ戻ります。"
+            description="最後まで進んだら最初のMediaに戻ります。"
           >
             <Switch
               checked={loop}
@@ -210,7 +210,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
           <SettingRow
             compact={compact}
             label="詳細情報を表示"
-            description="プレビューを開いたときから詳細情報を表示します。"
+            description="プレビューを開いたときに詳細情報を表示します。"
           >
             <Switch
               checked={showDetails}
@@ -220,9 +220,6 @@ function PreferencesContent({ compact }: { compact: boolean }) {
           </SettingRow>
         </Stack>
       </Box>
-      <Text size="xs" c="dimmed">
-        このプロトタイプでは変更を即時反映します。APIへの保存は行いません。
-      </Text>
     </Stack>
   )
 }
@@ -232,7 +229,7 @@ function UsageContent() {
     <Stack gap="xl">
       <PageHeader
         title="利用状況"
-        description="Mediaの使用量とアップロードの制限を確認できます。"
+        description="ストレージの使用量とアップロード上限を確認します。"
       />
       <Box>
         <SectionTitle>ストレージ</SectionTitle>
@@ -282,8 +279,8 @@ function UsageContent() {
         <SectionTitle>アップロード</SectionTitle>
         <Stack gap="md">
           {[
-            ["1回のアップロード", "最大100 Media"],
-            ["1 Mediaのサイズ", "最大50 MB"],
+            ["1回のアップロード", "100 Media"],
+            ["1 Mediaのサイズ", "50 MB"],
             ["対応形式", "JPEG, PNG"],
           ].map(([label, value]) => (
             <Group key={label} justify="space-between" gap="xl" wrap="nowrap">
@@ -302,17 +299,17 @@ function AccountContent() {
     <Stack gap="xl">
       <PageHeader
         title="アカウント"
-        description="Memoriaアカウントに関する操作を行います。"
+        description="アカウントを管理します。"
       />
       <Box>
         <SectionTitle>アカウント削除</SectionTitle>
         <Stack gap="md" maw={620}>
           <Text size="sm">
-            Memoriaのアカウントと関連するデータを削除します。削除する前に、削除されるデータとCommunityへの影響を確認します。
+            アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。
           </Text>
           <Box>
             <Button variant="default" size="sm">
-              アカウント削除について確認
+              アカウントを削除する
             </Button>
           </Box>
         </Stack>
