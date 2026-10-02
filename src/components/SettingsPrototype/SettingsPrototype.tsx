@@ -357,27 +357,48 @@ export function SettingsPrototype({
             <Group align="flex-start" gap={56} wrap="nowrap">
               <Box component="nav" aria-label="設定" w={200} style={{ flexShrink: 0 }}>
                 <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
-                <Stack gap={2}>
+                <Stack gap={0}>
                   {sections.map((item) => (
-                    <NavLink
-                      key={item.id}
-                      label={item.label}
-                      active={section === item.id}
-                      onClick={() => setSection(item.id)}
-                      variant="subtle"
-                      color="gray"
-                      styles={{
-                        root: {
-                          borderRadius: "var(--mantine-radius-sm)",
-                          minHeight: 34,
-                          background:
-                            section === item.id
-                              ? "var(--mantine-color-default-hover)"
-                              : undefined,
-                          fontWeight: section === item.id ? 600 : 400,
-                        },
-                      }}
-                    />
+                    <Box key={item.id} pos="relative" pl={8}>
+                      {section === item.id && (
+                        <Box
+                          pos="absolute"
+                          top={3}
+                          bottom={3}
+                          left={0}
+                          w={3}
+                          bg="var(--mantine-color-blue-6)"
+                          style={{
+                            borderRadius: "var(--mantine-radius-xl)",
+                            pointerEvents: "none",
+                          }}
+                          aria-hidden="true"
+                        />
+                      )}
+                      <NavLink
+                        label={item.label}
+                        active={section === item.id}
+                        onClick={() => setSection(item.id)}
+                        variant="subtle"
+                        color="gray"
+                        styles={{
+                          root: {
+                            borderRadius: "var(--mantine-radius-sm)",
+                            background:
+                              section === item.id
+                                ? "var(--mantine-color-default-hover)"
+                                : undefined,
+                            padding: "5px 8px",
+                            minHeight: 32,
+                            fontWeight: section === item.id ? 600 : 400,
+                          },
+                          label: {
+                            fontSize: "var(--mantine-font-size-sm)",
+                            lineHeight: 1.3,
+                          },
+                        }}
+                      />
+                    </Box>
                   ))}
                 </Stack>
               </Box>
