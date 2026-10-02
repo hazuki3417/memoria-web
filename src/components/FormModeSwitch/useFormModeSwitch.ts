@@ -1,7 +1,7 @@
 "use client"
 import "client-only"
 import { useCallback, useState } from "react"
-import { FormMode } from "./FormModeSwitchContext"
+import type { FormMode } from "./FormModeSwitchContext"
 
 export type UseFormModeSwitchOption = FormMode
 
@@ -16,7 +16,7 @@ export interface UseFormModeSwitchControl {
   switch: (mode: FormMode) => void
 }
 
-export interface UseFormModeSwitchAction {}
+// export type UseFormModeSwitchAction = {}
 
 export type UseFormModeSwitch = {
   value: UseFormModeSwitchValue
@@ -29,9 +29,9 @@ export const useUseFormModeSwitch = (
 ): UseFormModeSwitch => {
   const [mode, setMode] = useState<FormMode>(option)
 
-  const viewhandle = useCallback(() => setMode("view"), [setMode])
-  const newhandle = useCallback(() => setMode("new"), [setMode])
-  const edithandle = useCallback(() => setMode("edit"), [setMode])
+  const viewhandle = useCallback(() => setMode("view"), [])
+  const newhandle = useCallback(() => setMode("new"), [])
+  const edithandle = useCallback(() => setMode("edit"), [])
 
   return {
     value: { mode },

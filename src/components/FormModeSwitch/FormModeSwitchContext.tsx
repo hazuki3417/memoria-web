@@ -1,6 +1,6 @@
 "use client"
-import { defineFieldObject } from "@/lib/field"
 import { createContext } from "react"
+import { defineFieldObject } from "@/lib/field"
 
 const FORM_MODE = ["new", "edit", "view"] as const
 export type FormMode = (typeof FORM_MODE)[number]
@@ -10,9 +10,9 @@ export type FormModeSwitchValue = {
   mode: FormMode
 }
 
-export interface FormModeSwitchControl {}
+// export type FormModeSwitchControl = {}
 
-export interface FormModeSwitchAction {}
+// export type FormModeSwitchAction = {}
 
 export type FormModeSwitchContext = {
   value: FormModeSwitchValue

@@ -1,6 +1,6 @@
 "use client"
-import { ze } from "@/lib"
 import z from "zod"
+import { ze } from "@/lib"
 
 export type ImageFileSchemaConfig = {
   type: string[]

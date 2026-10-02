@@ -12,11 +12,12 @@ import { action } from "@/lib/action"
 import { transform } from "@/lib/transform"
 import { useConfirmContext, useFeedbackContext } from "@/providers"
 import "client-only"
-import React, { useCallback, useMemo, useState } from "react"
+import type React from "react"
+import { useCallback, useMemo, useState } from "react"
 import {
-  ImageDetail,
+  type ImageDetail,
   ImageDetailModalContext,
-  ImageDetailPayload,
+  type ImageDetailPayload,
 } from "./ImageDetailModalContext"
 
 export interface ImageDetailModalProviderProps {
@@ -98,7 +99,7 @@ export const ImageDetailModalProvider = (
       body: "削除しました。",
     })
     handleClose()
-  }, [nav.current, confirm, deleteImage, feedback])
+  }, [nav.current, confirm, deleteImage, feedback, handleClose])
 
   const [downloadImage] = useDownloadImageMutation()
   const handleDownload = useCallback(async () => {

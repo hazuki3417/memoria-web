@@ -7,17 +7,17 @@ import {
   Button,
   Divider,
   Group,
-  Radio,
-  MultiSelect,
   Modal,
+  MultiSelect,
+  Radio,
   Stack,
   Stepper,
   Text,
   TextInput,
   Title,
 } from "@mantine/core"
-import { useState } from "react"
 import { useMediaQuery } from "@mantine/hooks"
+import { useState } from "react"
 import { PrototypeFormAlert } from "../PrototypeFeedback/PrototypeFeedback"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
@@ -138,7 +138,7 @@ export function AccountDeletionImpactPrototype({
   const communitiesToResolve = communities.filter(
     (community) => community.relation === "last-administrator",
   )
-  const communitiesToWithdraw = communities.filter(
+  const _communitiesToWithdraw = communities.filter(
     (community) => community.relation !== "last-administrator",
   )
   const hasCommunities = communities.length > 0
