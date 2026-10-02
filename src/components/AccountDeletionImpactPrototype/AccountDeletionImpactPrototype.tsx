@@ -77,7 +77,7 @@ const communitiesForScenario = (scenario: CommunityScenario): CommunityFixture[]
   return [resolutionCommunities[0], ...withdrawalCommunities]
 }
 const labels = [
-  "削除されるデータ",
+  "個人データへの影響",
   "Communityへの対応",
   "Communityへの影響",
   "最終確認",
@@ -267,7 +267,7 @@ export function AccountDeletionImpactPrototype({
                     {!compactStepper && (
                       <>
                         <Title order={2} size="h4">
-                          削除されるデータ
+                          個人データへの影響
                         </Title>
                         <Divider my="md" />
                       </>
@@ -519,7 +519,7 @@ export function AccountDeletionImpactPrototype({
                                     <Radio
                                       value="delete"
                                       label="Communityを削除する"
-                                      description="削除されるデータは次のステップで確認します。"
+                                      description="個人データへの影響は次のステップで確認します。"
                                     />
                                   </Box>
                                 </Group>
