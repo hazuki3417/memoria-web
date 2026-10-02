@@ -725,16 +725,73 @@ export function AccountDeletionImpactPrototype({
                             Communityへの対応
                           </Title>
                           <Stack gap="xs" mt="sm">
-                            {communities.map((community) => (
-                              <Text key={community.id} size="sm">
-                                {community.name}：
-                                {community.relation !== "last-administrator"
-                                  ? "退会"
+                            {communities.map((community) => {
+                              const action =
+                                community.relation !== "last-administrator"
+                                  ? "leave"
                                   : decisions[community.id]?.choice === "delete"
-                                    ? "削除"
-                                    : `保持（Administrator：${(decisions[community.id]?.successors ?? []).map((successor) => community.candidates.find((candidate) => candidate.value === successor)?.label).filter(Boolean).join("、") || "未指定"}）`}
-                              </Text>
-                            ))}
+                                    ? "delete"
+                                    : "keep"
+                              const successors = (
+                                decisions[community.id]?.successors ?? []
+                              )
+                                .map(
+                                  (successor) =>
+                                    community.candidates.find(
+                                      (candidate) =>
+                                        candidate.value === successor,
+                                    )?.label,
+                                )
+                                .filter(Boolean)
+                                .join("、")
+
+                              return (
+                                <Box
+                                  key={community.id}
+                                  p="sm"
+                                  style={{
+                                    border:
+                                      "1px solid var(--mantine-color-default-border)",
+                                    borderRadius:
+                                      "var(--mantine-radius-md)",
+                                  }}
+                                >
+                                  <Group
+                                    justify="space-between"
+                                    align="flex-start"
+                                    wrap="nowrap"
+                                  >
+                                    <Text size="sm" fw={500}>
+                                      {community.name}
+                                    </Text>
+                                    <Badge
+                                      size="sm"
+                                      variant="light"
+                                      color={
+                                        action === "delete"
+                                          ? "red"
+                                          : action === "keep"
+                                            ? "green"
+                                            : "gray"
+                                      }
+                                    >
+                                      {action === "delete"
+                                        ? "削除"
+                                        : action === "keep"
+                                          ? "保持"
+                                          : "退会"}
+                                    </Badge>
+                                  </Group>
+                                  <Text size="xs" c="dimmed" mt={4}>
+                                    {action === "delete"
+                                      ? "Communityと管理Mediaを削除します。"
+                                      : action === "keep"
+                                        ? `Administrator → ${successors || "未指定"}`
+                                        : "Communityから退会します。Communityはそのまま残ります。"}
+                                  </Text>
+                                </Box>
+                              )
+                            })}
                           </Stack>
                         </Box>
                       )}
