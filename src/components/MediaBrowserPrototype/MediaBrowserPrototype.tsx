@@ -2,7 +2,7 @@
 
 import {
   Alert, AspectRatio, Badge, Box, Button, Center, Checkbox, Group, Image,
-  Loader, Menu, Modal, Paper, SegmentedControl, Stack, TagsInput, Text, ThemeIcon,
+  Loader, Menu, Modal, Paper, SegmentedControl, Select, Stack, TagsInput, Text, ThemeIcon,
 } from "@mantine/core"
 import {
   IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
@@ -12,11 +12,13 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
 import { ApplicationShell } from "@/components/ApplicationShell"
+import { Dialog } from "@/components/Dialog"
 
 type PrototypeState =
   | "default" | "tag-filtered" | "true-empty" | "filtered-empty" | "loading"
   | "error" | "loading-more" | "load-more-error" | "processing-failure" | "selection"
 type ContextKind = "personal" | "community"
+type SelectionDialog = "group" | "tag" | "share" | "delete" | null
 type MediaItem = { id: string; label: string; src: string; failed?: boolean }
 
 const media: MediaItem[] = Array.from({ length: 8 }, (_, index) => ({
@@ -130,6 +132,10 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
   const [selecting, setSelecting] = useState(initialState === "selection")
   const [selected, setSelected] = useState<Set<string>>(initialState === "selection" ? new Set(["2", "5", "7"]) : new Set())
   const [detail, setDetail] = useState<MediaItem | null>(null)
+  const [selectionDialog, setSelectionDialog] = useState<SelectionDialog>(null)
+  const [groupTarget, setGroupTarget] = useState<string | null>(null)
+  const [tagTarget, setTagTarget] = useState<string | null>(null)
+  const [communityTarget, setCommunityTarget] = useState<string | null>(null)
   const [tags, setTags] = useState<string[]>(initialState === "tag-filtered" || initialState === "filtered-empty" ? ["旅行"] : [])
   const currentContext = contexts.find((item) => item.kind === context) ?? contexts[0]
   const stateItems =
@@ -185,12 +191,12 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
           <Group gap="xs" justify="flex-end" wrap="nowrap" style={{ gridColumn: compact ? "1" : undefined }}>
             {selecting && (
               <>
-                <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />}>Group</Button>
-                <Button size="xs" variant="default" leftSection={<IconTags size={15} />}>Tag</Button>
+                <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />} disabled={selected.size === 0} onClick={() => setSelectionDialog("group")}>Group</Button>
+                <Button size="xs" variant="default" leftSection={<IconTags size={15} />} disabled={selected.size === 0} onClick={() => setSelectionDialog("tag")}>Tag</Button>
                 {context === "personal" && (
-                  <Button size="xs" variant="default" leftSection={<IconShare size={15} />}>共有</Button>
+                  <Button size="xs" variant="default" leftSection={<IconShare size={15} />} disabled={selected.size === 0} onClick={() => setSelectionDialog("share")}>共有</Button>
                 )}
-                <Button size="xs" variant="default" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
+                <Button size="xs" variant="default" color="red" leftSection={<IconTrash size={15} />} disabled={selected.size === 0} onClick={() => setSelectionDialog("delete")}>削除</Button>
               </>
             )}
             {!selecting && (context === "personal" ? (
@@ -289,6 +295,97 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
           </Group></Paper>
         )}
       </Stack>
+
+      <Dialog
+        opened={selectionDialog === "group"}
+        onClose={() => setSelectionDialog(null)}
+        title="Groupに追加"
+        size="md"
+        footer={
+          <Dialog.Footer
+            secondary={<Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>}
+            primary={<Button disabled={!groupTarget} onClick={() => setSelectionDialog(null)}>追加</Button>}
+          />
+        }
+      >
+        <Stack gap="xs">
+          <Text size="sm">{selected.size}件のMediaを既存のGroupに追加します。</Text>
+          <Select
+            label="Group"
+            placeholder="Groupを選択"
+            searchable
+            data={["旅行", "家族", "風景写真", "お気に入り"]}
+            value={groupTarget}
+            onChange={setGroupTarget}
+          />
+        </Stack>
+      </Dialog>
+
+      <Dialog
+        opened={selectionDialog === "tag"}
+        onClose={() => setSelectionDialog(null)}
+        title="Tagを追加"
+        size="md"
+        footer={
+          <Dialog.Footer
+            secondary={<Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>}
+            primary={<Button disabled={!tagTarget} onClick={() => setSelectionDialog(null)}>追加</Button>}
+          />
+        }
+      >
+        <Stack gap="xs">
+          <Text size="sm">{selected.size}件のMediaにTagを追加します。</Text>
+          <Select
+            label="Tag"
+            placeholder="Tagを選択"
+            searchable
+            data={["家族", "旅行", "風景", "イベント"]}
+            value={tagTarget}
+            onChange={setTagTarget}
+          />
+        </Stack>
+      </Dialog>
+
+      <Dialog
+        opened={selectionDialog === "share"}
+        onClose={() => setSelectionDialog(null)}
+        title="Communityへ共有"
+        size="md"
+        footer={
+          <Dialog.Footer
+            secondary={<Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>}
+            primary={<Button disabled={!communityTarget} onClick={() => setSelectionDialog(null)}>共有</Button>}
+          />
+        }
+      >
+        <Stack gap="xs">
+          <Text size="sm">{selected.size}件のPersonal MediaをCommunityへ共有します。</Text>
+          <Select
+            label="Community"
+            placeholder="Communityを選択"
+            data={["Photo Club", "Family Archive", "Travel Team"]}
+            value={communityTarget}
+            onChange={setCommunityTarget}
+          />
+        </Stack>
+      </Dialog>
+
+      <Dialog
+        opened={selectionDialog === "delete"}
+        onClose={() => setSelectionDialog(null)}
+        title="Mediaを削除"
+        size="md"
+        footer={
+          <Dialog.Footer
+            secondary={<Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>}
+            primary={<Button color="red" onClick={() => setSelectionDialog(null)}>削除</Button>}
+          />
+        }
+      >
+        <Text size="sm">
+          選択した{selected.size}件のMediaを削除します。この操作は元に戻せません。
+        </Text>
+      </Dialog>
 
       <Modal opened={detail !== null} onClose={() => setDetail(null)} title="Media Detail" size="xl" centered>
         {detail && <Stack>
