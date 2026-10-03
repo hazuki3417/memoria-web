@@ -335,7 +335,7 @@ export function GroupBrowserPrototype() {
         <Divider />
         <Box pos="relative">
           <Button variant="subtle" color="red" onClick={deletion.open}>
-            Groupを削除
+            削除
           </Button>
           <Button
             variant="default"
