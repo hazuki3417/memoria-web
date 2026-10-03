@@ -191,7 +191,7 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
           {!compact && <Box />}
 
           <Group gap="xs" justify="flex-end" wrap="nowrap" style={{ gridColumn: compact ? "1" : undefined }}>
-            {context === "personal" ? (
+            {!selecting && (context === "personal" ? (
               <Button size="xs" leftSection={<IconCloudUpload size={16} />}>アップロード</Button>
             ) : (
               <Menu position="bottom-end">
@@ -205,7 +205,7 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
                   <Menu.Item leftSection={<IconShare size={16} />}>Personal Mediaから共有</Menu.Item>
                 </Menu.Dropdown>
               </Menu>
-            )}
+            ))}
             <SegmentedControl
               size="xs"
               value={selecting ? "select" : "view"}
