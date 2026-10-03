@@ -1,16 +1,17 @@
-"use client"\n\nimport { PageHeader } from "@/components/PageHeader"\nimport { SectionHeader } from "@/components/SectionHeader"
+"use client"
+
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
 
 import {
   AppShell,
   Box,
   Button,
-  Divider,
   Group,
   Modal,
   Stack,
   Text,
   TextInput,
-  Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
@@ -97,7 +98,8 @@ export function UserProfilePrototype({
           <Box maw={880} mx="auto" w="100%">
             <Stack gap="xl">
               <PageHeader title="プロフィール" description="Memoriaで使用するプロフィール情報を管理します。" />
-              <Box>\n                <SectionHeader>基本情報</SectionHeader>
+              <Box>
+                <SectionHeader>基本情報</SectionHeader>
                 <Stack gap="md" maw={540}>
                   <Box maw={440}>
                     <TextInput
