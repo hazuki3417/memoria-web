@@ -103,17 +103,18 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
 }
 
 function PreviewGrid({ count }: { count: number }) {
+  const previewCellIds = ["preview-1", "preview-2", "preview-3", "preview-4"]
   let groupVisualIndex = 0
   return (
     <SimpleGrid cols={2} spacing={4}>
-      {Array.from({ length: 4 }, (_, index) => {
+      {previewCellIds.map((cellId, index) => {
         const media = index < Math.min(count, 4)
         const continuation = count > 4 && index === 3
         const groupVisualStart = groupVisualIndex * 3
         if (!media) groupVisualIndex += 1
         return (
           <Box
-            key={index}
+            key={cellId}
             bdrs="sm"
             style={{
               position: "relative",
@@ -221,11 +222,12 @@ function RelationEditor({ label, names, oppositeNames, onChange, currentGroupNam
 }
 function MediaGrid() {
   const tones = ["blue", "grape", "teal", "orange", "cyan"]
+  const mediaItems = Array.from({ length: 24 }, (_, index) => ({ id: `media-${index + 1}`, index }))
   return (
     <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
-      {Array.from({ length: 24 }, (_, index) => (
+      {mediaItems.map(({ id, index }) => (
         <Box
-          key={index}
+          key={id}
           bg={"var(--mantine-color-" + tones[index % tones.length] + "-1)"}
           bdrs="sm"
           style={{
