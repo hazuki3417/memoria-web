@@ -240,7 +240,7 @@ export function GroupBrowserPrototype() {
           {compactView === "groups" ? (
             <Box h="100%" style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
               <Stack p="sm" gap="xs">
-                <Group justify="space-between"><Text fw={700}>グループ</Text><ActionIcon variant="subtle" aria-label="Groupを作成"><IconPlus size={18} /></ActionIcon></Group>
+                <Group justify="flex-end"><ActionIcon variant="subtle" aria-label="Groupを作成"><IconPlus size={18} /></ActionIcon></Group>
                 <TextInput value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Groupを検索" leftSection={<IconSearch size={16} />} />
                 <Text size="xs" c="dimmed">{visibleGroups.length}件</Text>
               </Stack>
@@ -272,9 +272,7 @@ export function GroupBrowserPrototype() {
         <SplitView.Pane id="groups" minWidth={264}>
           <Box style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
             <Stack p="sm" gap="xs">
-              <Group justify="space-between">
-                <Text fw={700}>グループ</Text>
-                <ActionIcon variant="subtle" aria-label="Groupを作成">
+              <Group justify="flex-end">\n                <ActionIcon variant="subtle" aria-label="Groupを作成">
                   <IconPlus size={18} />
                 </ActionIcon>
               </Group>
