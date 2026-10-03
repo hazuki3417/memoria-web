@@ -229,9 +229,11 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                             />
                             <Box>
                               <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
-                              <Text size="xs" c="dimmed">
-                                Media登録済み {registeredCount}件 ・ 画像処理中 {processingCount}件 ・ 完了 {completedCount}件
-                              </Text>
+                              <Stack gap={0}>
+                                <Text size="xs" c="dimmed">Media登録済み {registeredCount}件</Text>
+                                <Text size="xs" c="dimmed">画像処理中 {processingCount}件</Text>
+                                <Text size="xs" c="dimmed">完了 {completedCount}件</Text>
+                              </Stack>
                             </Box>
                           </Group>
                           <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除">
@@ -257,13 +259,15 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                           onChange={toggleAll}
                           aria-label="アップロード可能なMediaをすべて選択"
                         />
-                        <Box style={{ flex: "0 0 42%", minWidth: 0 }}>
+                        <Box style={{ flex: "0 0 28%", minWidth: 0 }}>
                           <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
-                          <Text size="xs" c="dimmed" mt={2}>
-                            Media登録済み {registeredCount}件 ・ 画像処理中 {processingCount}件 ・ 完了 {completedCount}件
-                          </Text>
+                          <Stack gap={0} mt={2}>
+                            <Text size="xs" c="dimmed">Media登録済み {registeredCount}件</Text>
+                            <Text size="xs" c="dimmed">画像処理中 {processingCount}件</Text>
+                            <Text size="xs" c="dimmed">完了 {completedCount}件</Text>
+                          </Stack>
                         </Box>
-                        <Stack gap={4} style={{ flex: "1 1 48%", minWidth: 360 }}>
+                        <Stack gap={4} style={{ flex: "1 1 62%", minWidth: 420 }}>
                           <TextInput
                             value={bulkTag}
                             onChange={(event) => setBulkTag(event.currentTarget.value)}
@@ -389,7 +393,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
               styles={{
               root: { height: "100%" },
               wrapper: { height: "100%" },
-              input: { minHeight: "72px", height: "72px", alignContent: "center" },
+              input: { minHeight: "72px", height: "72px", alignContent: "flex-start", paddingTop: "8px", paddingBottom: "8px" },
             }}
             />
           </Box>
@@ -405,7 +409,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
     <Box p="sm">
       <Group align="center" wrap="nowrap" gap="md" h={72}>
         <Checkbox checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
-        <Group align="center" wrap="nowrap" gap="sm" h={72} style={{ flex: "0 0 42%", minWidth: 0, overflow: "hidden" }}>
+        <Group align="center" wrap="nowrap" gap="sm" h={72} style={{ flex: "0 0 36%", minWidth: 0, overflow: "hidden" }}>
           <Box w={72} h={72} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
             <IconPhoto size={28} stroke={1.4} />
           </Box>
@@ -417,7 +421,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
             <StatusBadge file={file} presentation={presentation} StatusIcon={StatusIcon} />
           </Stack>
         </Group>
-        <Box h={72} style={{ flex: "1 1 48%", minWidth: 360 }}>
+        <Box h={72} style={{ flex: "1 1 54%", minWidth: 420 }}>
           <TagsInput
             value={file.tags}
             onChange={onTagsChange}
@@ -427,7 +431,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
             styles={{
               root: { height: "100%" },
               wrapper: { height: "100%" },
-              input: { minHeight: "72px", height: "72px", alignContent: "center" },
+              input: { minHeight: "72px", height: "72px", alignContent: "flex-start", paddingTop: "8px", paddingBottom: "8px" },
             }}
           />
         </Box>
