@@ -248,7 +248,7 @@ export function GroupBrowserPrototype() {
           style={{ visibility: selectedId ? "visible" : "hidden" }}
         />
 
-        <SplitView.Pane id="detail" minWidth={360}>
+        <SplitView.Pane id="detail" minWidth={360} collapsible collapsedSize={0}>
           <Box style={{
             display: selectedId ? "flex" : "none", flexDirection: "column", minWidth: 0, minHeight: 0, height: "100%",
           }}>
