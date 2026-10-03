@@ -184,8 +184,13 @@ function RelationEditor({ label, names, oppositeNames, onChange, currentGroupNam
         hidePickedOptions={false}
         nothingFoundMessage="候補がありません"
         styles={{
+          input: {
+            height: 76,
+            overflow: "hidden",
+            alignItems: "flex-start",
+          },
           pillsList: {
-            maxHeight: 76,
+            height: "100%",
             overflowY: "auto",
             alignContent: "flex-start",
           },
