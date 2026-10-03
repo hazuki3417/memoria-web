@@ -209,7 +209,7 @@ export function GroupBrowserPrototype() {
   }
 
   const handleDetailExitComplete = () => {
-    if (compact) return
+    if (compact || selectedId) return
     splitViewRef.current?.setLayout({ groups: 100, detail: 0 })
   }
 
