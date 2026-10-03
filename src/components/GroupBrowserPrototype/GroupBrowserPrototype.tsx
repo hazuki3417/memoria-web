@@ -9,7 +9,8 @@ import {
   IconChevronDown, IconChevronRight, IconDots, IconEdit, IconPlus,
   IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconUsers, IconX,
 } from "@tabler/icons-react"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useGroupRef } from "react-resizable-panels"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
 
@@ -88,7 +89,9 @@ function MediaGrid() {
 
 export function GroupBrowserPrototype() {
   const [query, setQuery] = useState("")
-  const [selectedId, setSelectedId] = useState("travel")
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const splitViewRef = useGroupRef()
+  const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
   const [relationsOpened, relations] = useDisclosure(false)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [compactView, setCompactView] = useState<"groups" | "detail">("groups")
@@ -101,7 +104,52 @@ export function GroupBrowserPrototype() {
     )
   }, [query])
 
-  const selected = groups.find((group) => group.id === selectedId) ?? groups[0]
+  const selected = groups.find((group) => group.id === selectedId) ?? null
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("memoria-group-browser-layout")
+    if (!stored) return
+    try {
+      const layout = JSON.parse(stored) as { groups?: number; detail?: number }
+      if (typeof layout.groups === "number" && typeof layout.detail === "number") {
+        setSavedLayout({ groups: layout.groups, detail: layout.detail })
+      }
+    } catch {
+      window.localStorage.removeItem("memoria-group-browser-layout")
+    }
+  }, [])
+
+  const openDetail = (id: string) => {
+    setSelectedId(id)
+    if (compact) {
+      setCompactView("detail")
+      return
+    }
+    const layout = splitViewRef.current?.getLayout()
+    if (layout?.detail === 0) {
+      splitViewRef.current?.setLayout(savedLayout)
+    }
+  }
+
+  const closeDetail = () => {
+    setSelectedId(null)
+    if (compact) {
+      setCompactView("groups")
+      return
+    }
+    splitViewRef.current?.setLayout({ groups: 100, detail: 0 })
+  }
+
+  const handleLayoutChanged = (
+    layout: Record<string, number>,
+    meta: { requestedLayout?: Record<string, number> },
+  ) => {
+    const requested = meta.requestedLayout ?? layout
+    if (!selectedId || requested.detail === 0) return
+    const next = { groups: requested.groups, detail: requested.detail }
+    setSavedLayout(next)
+    window.localStorage.setItem("memoria-group-browser-layout", JSON.stringify(next))
+  }
 
   return (
     <ApplicationShell
@@ -125,7 +173,7 @@ export function GroupBrowserPrototype() {
               </Stack>
               <Divider />
               <ScrollArea flex={1}><SimpleGrid p="sm" cols={{ base: 1, xs: 2 }} spacing="sm">{visibleGroups.map((group) => (
-                <UnstyledButton key={group.id} onClick={() => { setSelectedId(group.id); setCompactView("detail") }} p="xs" bdrs="sm">
+                <UnstyledButton key={group.id} onClick={() => openDetail(group.id)} p="xs" bdrs="sm">
                   <Stack gap={6}><Text fw={600} size="sm" truncate="end">{group.name}</Text><PreviewStrip count={group.previewCount} /></Stack>
                 </UnstyledButton>
               ))}</SimpleGrid></ScrollArea>
@@ -133,17 +181,19 @@ export function GroupBrowserPrototype() {
           ) : (
             <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
               <Group p="sm" justify="space-between" wrap="nowrap">
-                <Box miw={0}><Text fw={700} truncate="end">{selected.name}</Text><Text size="xs" c="dimmed">{selected.mediaCount} Media</Text></Box>
-                <ActionIcon variant="subtle" aria-label="Group一覧へ戻る" onClick={() => setCompactView("groups")}><IconX size={18} /></ActionIcon>
+                <Box miw={0}><Text fw={700} truncate="end">{selected?.name ?? ""}</Text><Text size="xs" c="dimmed">{selected?.mediaCount ?? 0} Media</Text></Box>
+                <ActionIcon variant="subtle" aria-label="Group一覧へ戻る" onClick={closeDetail}><IconX size={18} /></ActionIcon>
               </Group>
               <Divider />
-              <ScrollArea flex={1}><Box p="sm">{selected.mediaCount === 0 ? <Paper withBorder p="xl" ta="center"><Text fw={600}>表示するMediaがありません</Text></Paper> : <MediaGrid />}</Box></ScrollArea>
+              <ScrollArea flex={1}><Box p="sm">{(selected?.mediaCount ?? 0) === 0 ? <Paper withBorder p="xl" ta="center"><Text fw={600}>表示するMediaがありません</Text></Paper> : <MediaGrid />}</Box></ScrollArea>
             </Box>
           )}
         </Box>
       ) : (
       <SplitView.Root
-        defaultLayout={{ groups: 32, detail: 68 }}
+        groupRef={splitViewRef}
+        defaultLayout={{ groups: 100, detail: 0 }}
+        onLayoutChanged={handleLayoutChanged}
         style={{ height: "calc(100vh - 88px)" }}
       >
         <SplitView.Pane id="groups" minWidth={320}>
@@ -171,7 +221,7 @@ export function GroupBrowserPrototype() {
                   return (
                     <UnstyledButton
                       key={group.id}
-                      onClick={() => { setSelectedId(group.id); if (compact) setCompactView("detail") }}
+                      onClick={() => openDetail(group.id)}
                       aria-pressed={selectedItem}
                       p="xs"
                       bdrs="sm"
@@ -194,11 +244,13 @@ export function GroupBrowserPrototype() {
           </Box>
         </SplitView.Pane>
 
-        <SplitView.Separator />
+        <SplitView.Separator
+          style={{ visibility: selectedId ? "visible" : "hidden" }}
+        />
 
-        <SplitView.Pane id="detail" minSize={40}>
+        <SplitView.Pane id="detail" minWidth={360}>
           <Box style={{
-            display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0, height: "100%",
+            display: selectedId ? "flex" : "none", flexDirection: "column", minWidth: 0, minHeight: 0, height: "100%",
           }}>
             <Box p="sm">
               <Group justify="space-between" wrap="nowrap">
@@ -219,7 +271,7 @@ export function GroupBrowserPrototype() {
                       <Menu.Item color="red" leftSection={<IconTrash size={15} />}>Delete</Menu.Item>
                     </Menu.Dropdown>
                   </Menu>
-                  <ActionIcon variant="subtle" aria-label="Group選択を閉じる" onClick={() => setCompactView("groups")}>
+                  <ActionIcon variant="subtle" aria-label="Group選択を閉じる" onClick={closeDetail}>
                     <IconX size={18} />
                   </ActionIcon>
                 </Group>
