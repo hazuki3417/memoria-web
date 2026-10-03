@@ -179,6 +179,7 @@ export function MediaBrowserPrototype({
   const [detailInfoOpened, setDetailInfoOpened] = useState(true)
   const [detailZoom, setDetailZoom] = useState(100)
   const [detailRotate, setDetailRotate] = useState(0)
+  const [detailRotateAnimated, setDetailRotateAnimated] = useState(true)
   const [selectionDialog, setSelectionDialog] = useState<SelectionDialog>(initialDialog)
   const [groupTarget, setGroupTarget] = useState<string | null>(null)
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
@@ -453,7 +454,7 @@ export function MediaBrowserPrototype({
                     {detail.failed ? (
                       <Stack align="center" c="dimmed"><IconPhotoOff size={48} /><Text size="sm">画像を表示できません</Text></Stack>
                     ) : (
-                      <Image src={detail.src} alt={detail.label} maw="100%" mah="100%" w="auto" h="auto" fit="contain" style={{ transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`, transition: "transform 180ms ease" }} />
+                      <Image src={detail.src} alt={detail.label} maw="100%" mah="100%" w="auto" h="auto" fit="contain" style={{ transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`, transition: detailRotateAnimated ? "transform 180ms ease" : "none" }} />
                     )}
                   </Center>
                   <Center>
@@ -464,9 +465,9 @@ export function MediaBrowserPrototype({
                   <Group gap={4} wrap="nowrap">
                     <ActionIcon variant="subtle" aria-label="Originalをダウンロード"><IconDownload size={18} /></ActionIcon>
                     {!compact && <>
-                      <ActionIcon variant="subtle" aria-label="左へ回転" onClick={() => setDetailRotate((value) => value - 90)}><IconRotate size={18} /></ActionIcon>
-                      <ActionIcon variant="subtle" aria-label="回転をリセット" onClick={() => setDetailRotate(0)}><IconRotate2 size={18} /></ActionIcon>
-                      <ActionIcon variant="subtle" aria-label="右へ回転" onClick={() => setDetailRotate((value) => value + 90)}><IconRotate2 size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="左へ回転" onClick={() => { setDetailRotateAnimated(true); setDetailRotate((value) => value - 90) }}><IconRotate size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="回転をリセット" onClick={() => { setDetailRotateAnimated(false); setDetailRotate(0) }}><IconRotate2 size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="右へ回転" onClick={() => { setDetailRotateAnimated(true); setDetailRotate((value) => value + 90) }}><IconRotate2 size={18} /></ActionIcon>
                     </>}
                   </Group>
                   <Text size="xs" c="dimmed">{detailIndex + 1} / {stateItems.length}</Text>
