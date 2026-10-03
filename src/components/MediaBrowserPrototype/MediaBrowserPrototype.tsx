@@ -513,16 +513,17 @@ export function MediaBrowserPrototype({
                     style={{ overflow: "hidden", minWidth: 0 }}
                   >
                 <Box
-                  p="md"
                   h="100%"
                   bg="var(--mantine-color-body)"
                   style={{
                     borderLeft: compact ? undefined : "1px solid var(--mantine-color-default-border)",
                     borderTop: compact ? "1px solid var(--mantine-color-default-border)" : undefined,
-                    overflowY: "auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
                   }}
                 >
-                  <Stack gap="md">
+                  <Stack gap="md" p="md" style={{ flex: 1, overflowY: "auto" }}>
                     <Box>
                       <Text fw={650}>{detail.label}</Text>
                       <Text size="xs" c="dimmed">IMG_20261003_0842.jpg</Text>
@@ -543,12 +544,13 @@ export function MediaBrowserPrototype({
                       <Text size="xs" c="dimmed" mb={6}>Groups</Text>
                       <Group gap={6}><Badge variant="outline">旅行</Badge><Badge variant="outline">お気に入り</Badge></Group>
                     </Box>
-                    <Divider />
+                  </Stack>
+                  <Box p="md" style={{ borderTop: "1px solid var(--mantine-color-default-border)", flexShrink: 0 }}>
                     <Group justify="space-between">
                       <Button size="xs" variant="default" leftSection={<IconEdit size={15} />}>編集</Button>
                       <Button size="xs" variant="subtle" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
                     </Group>
-                  </Stack>
+                  </Box>
                 </Box>
                   </motion.div>
                 )}
