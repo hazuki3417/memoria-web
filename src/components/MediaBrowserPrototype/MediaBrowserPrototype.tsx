@@ -180,6 +180,7 @@ export function MediaBrowserPrototype({
   const [detailZoom, setDetailZoom] = useState(100)
   const [detailRotate, setDetailRotate] = useState(0)
   const [detailRotateAnimated, setDetailRotateAnimated] = useState(true)
+  const [detailDirection, setDetailDirection] = useState<-1 | 1>(1)
   const [selectionDialog, setSelectionDialog] = useState<SelectionDialog>(initialDialog)
   const [groupTarget, setGroupTarget] = useState<string | null>(null)
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
@@ -448,17 +449,29 @@ export function MediaBrowserPrototype({
                 </Group>
                 <Box style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "44px minmax(0, 1fr) 44px", alignItems: "center" }}>
                   <Center>
-                    {prev && <ActionIcon variant="subtle" color="gray" size="lg" aria-label="前のMedia" onClick={() => setDetail(prev)}><IconChevronLeft /></ActionIcon>}
+                    {prev && <ActionIcon variant="subtle" color="gray" size="lg" aria-label="前のMedia" onClick={() => { setDetailDirection(-1); setDetailZoom(100); setDetailRotateAnimated(false); setDetailRotate(0); setDetail(prev) }}><IconChevronLeft /></ActionIcon>}
                   </Center>
                   <Center h="100%" style={{ minWidth: 0, overflow: "hidden" }}>
-                    {detail.failed ? (
-                      <Stack align="center" c="dimmed"><IconPhotoOff size={48} /><Text size="sm">画像を表示できません</Text></Stack>
-                    ) : (
-                      <Image src={detail.src} alt={detail.label} maw="100%" mah="100%" w="auto" h="auto" fit="contain" style={{ transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`, transition: detailRotateAnimated ? "transform 180ms ease" : "none" }} />
-                    )}
+                    <AnimatePresence mode="wait" initial={false} custom={detailDirection}>
+                      <motion.div
+                        key={detail.id}
+                        custom={detailDirection}
+                        initial={(direction) => ({ x: direction > 0 ? 32 : -32, opacity: 0 })}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={(direction) => ({ x: direction > 0 ? -32 : 32, opacity: 0 })}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      >
+                        {detail.failed ? (
+                          <Stack align="center" c="dimmed"><IconPhotoOff size={48} /><Text size="sm">画像を表示できません</Text></Stack>
+                        ) : (
+                          <Image src={detail.src} alt={detail.label} maw="100%" mah="100%" w="auto" h="auto" fit="contain" style={{ transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`, transition: detailRotateAnimated ? "transform 180ms ease" : "none" }} />
+                        )}
+                      </motion.div>
+                    </AnimatePresence>
                   </Center>
                   <Center>
-                    {next && <ActionIcon variant="subtle" color="gray" size="lg" aria-label="次のMedia" onClick={() => setDetail(next)}><IconChevronRight /></ActionIcon>}
+                    {next && <ActionIcon variant="subtle" color="gray" size="lg" aria-label="次のMedia" onClick={() => { setDetailDirection(1); setDetailZoom(100); setDetailRotateAnimated(false); setDetailRotate(0); setDetail(next) }}><IconChevronRight /></ActionIcon>}
                   </Center>
                 </Box>
                 <Group h={48} px="sm" justify="space-between" wrap="nowrap" style={{ flexShrink: 0 }}>
