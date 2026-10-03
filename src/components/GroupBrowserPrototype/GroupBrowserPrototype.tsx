@@ -159,16 +159,11 @@ function RelationItems({ names }: { names: string[] }) {
 }
 
 function RelationEditor({ label, names, onChange, currentGroupName }: { label: string; names: string[]; onChange: (names: string[]) => void; currentGroupName: string }) {
-  const data = relationCandidateNames.map((name) => {
-    const isSelf = name === currentGroupName
-    const isExisting = names.includes(name)
-    return {
-      value: name,
-      label: name,
-      disabled: isSelf,
-      disabledReason: isSelf ? "現在のGroup" : isExisting ? "選択済み" : undefined,
-    }
-  })
+  const data = relationCandidateNames.map((name) => ({
+    value: name,
+    label: name,
+    disabled: name === currentGroupName,
+  }))
 
   return (
     <Stack gap="xs">
@@ -187,13 +182,16 @@ function RelationEditor({ label, names, onChange, currentGroupName }: { label: s
         hidePickedOptions={false}
         nothingFoundMessage="候補がありません"
         renderOption={({ option, checked }) => {
-          const item = data.find((candidate) => candidate.value === option.value)
+          const reason =
+            option.value === currentGroupName
+              ? "現在のGroup"
+              : checked
+                ? "選択済み"
+                : ""
           return (
             <Group justify="space-between" wrap="nowrap" w="100%">
               <Text size="sm">{option.label}</Text>
-              <Text size="xs" c="dimmed">
-                {item?.disabledReason ?? (checked ? "選択済み" : "")}
-              </Text>
+              <Text size="xs" c="dimmed">{reason}</Text>
             </Group>
           )
         }}
