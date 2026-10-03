@@ -9,7 +9,8 @@ import {
   IconChevronDown, IconChevronRight, IconDots, IconEdit, IconPlus,
   IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconUsers, IconX,
 } from "@tabler/icons-react"
-import { motion } from "framer-motion"\nimport { useEffect, useMemo, useState } from "react"
+import { motion } from "framer-motion"
+import { useEffect, useMemo, useState } from "react"
 import { useGroupRef } from "react-resizable-panels"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
