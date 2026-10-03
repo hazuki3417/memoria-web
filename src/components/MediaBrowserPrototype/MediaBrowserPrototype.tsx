@@ -9,6 +9,7 @@ import {
   IconEye, IconFolderPlus, IconPhoto, IconPhotoOff, IconPlus, IconSearch,
   IconShare, IconTags, IconTrash,
 } from "@tabler/icons-react"
+import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
 import { ApplicationShell } from "@/components/ApplicationShell"
 
@@ -117,6 +118,7 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
   initialState?: PrototypeState; contextKind?: ContextKind
 }) {
   const [context, setContext] = useState(contextKind)
+  const compact = useMediaQuery("(max-width: 47.99em)")
   const [selecting, setSelecting] = useState(initialState === "selection")
   const [selected, setSelected] = useState<Set<string>>(initialState === "selection" ? new Set(["2", "5", "7"]) : new Set())
   const [detail, setDetail] = useState<MediaItem | null>(null)
@@ -143,7 +145,7 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
         <Box
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
+            gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto minmax(0, 1fr)",
             alignItems: "center",
             gap: "var(--mantine-spacing-xs)",
           }}
@@ -159,8 +161,9 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
                   clearable
                   leftSection={<IconSearch size={16} />}
                   size="xs"
-                  w={280}
+                  w={compact ? "100%" : 280}
                   maw="100%"
+                  style={{ flex: compact ? "1 1 auto" : undefined }}
                 />
                 <Button size="xs" style={{ flexShrink: 0 }}>検索</Button>
               </Group>
@@ -177,9 +180,9 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
             )}
           </Box>
 
-          <Box />
+          {!compact && <Box />}
 
-          <Group gap="xs" justify="flex-end" wrap="nowrap">
+          <Group gap="xs" justify="flex-end" wrap="nowrap" style={{ gridColumn: compact ? "1" : undefined }}>
             {context === "personal" ? (
               <Button size="xs" leftSection={<IconCloudUpload size={16} />}>アップロード</Button>
             ) : (
