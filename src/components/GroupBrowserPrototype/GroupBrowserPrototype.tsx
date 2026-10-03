@@ -240,9 +240,9 @@ export function GroupBrowserPrototype() {
           {compactView === "groups" ? (
             <Box h="100%" style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
               <Stack p="sm" gap="xs">
-                <Group justify="space-between"><Text fw={700}>Groups</Text><ActionIcon variant="subtle" aria-label="Groupを作成"><IconPlus size={18} /></ActionIcon></Group>
+                <Group justify="space-between"><Text fw={700}>グループ</Text><ActionIcon variant="subtle" aria-label="Groupを作成"><IconPlus size={18} /></ActionIcon></Group>
                 <TextInput value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Groupを検索" leftSection={<IconSearch size={16} />} />
-                <Text size="xs" c="dimmed">{visibleGroups.length} Groups</Text>
+                <Text size="xs" c="dimmed">{visibleGroups.length}件</Text>
               </Stack>
               <Divider />
               <ScrollArea flex={1}><Box p="sm" style={{ display: "flex", flexWrap: "wrap", gap: "var(--mantine-spacing-sm)" }}>{visibleGroups.map((group) => (
@@ -254,11 +254,11 @@ export function GroupBrowserPrototype() {
           ) : (
             <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
               <Group p="sm" justify="space-between" wrap="nowrap">
-                <Box miw={0}><Text fw={700} truncate="end">{selected?.name ?? ""}</Text><Text size="xs" c="dimmed">{selected?.mediaCount ?? 0} Media</Text></Box>
-                <ActionIcon variant="subtle" aria-label="Group一覧へ戻る" onClick={closeDetail}><IconX size={18} /></ActionIcon>
+                <Box miw={0}><Text fw={700} truncate="end">{selected?.name ?? ""}</Text><Text size="xs" c="dimmed">{selected?.mediaCount ?? 0}件のMedia</Text></Box>
+                <ActionIcon variant="subtle" aria-label="Group一覧に戻る" onClick={closeDetail}><IconX size={18} /></ActionIcon>
               </Group>
               <Divider />
-              <ScrollArea flex={1}><Box p="sm">{(selected?.mediaCount ?? 0) === 0 ? <Paper withBorder p="xl" ta="center"><Text fw={600}>表示するMediaがありません</Text></Paper> : <MediaGrid />}</Box></ScrollArea>
+              <ScrollArea flex={1}><Box p="sm">{(selected?.mediaCount ?? 0) === 0 ? <Paper withBorder p="xl" ta="center"><Text fw={600}>Mediaがありません</Text></Paper> : <MediaGrid />}</Box></ScrollArea>
             </Box>
           )}
         </Box>
@@ -273,7 +273,7 @@ export function GroupBrowserPrototype() {
           <Box style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
             <Stack p="sm" gap="xs">
               <Group justify="space-between">
-                <Text fw={700}>Groups</Text>
+                <Text fw={700}>グループ</Text>
                 <ActionIcon variant="subtle" aria-label="Groupを作成">
                   <IconPlus size={18} />
                 </ActionIcon>
@@ -284,7 +284,7 @@ export function GroupBrowserPrototype() {
                 placeholder="Groupを検索"
                 leftSection={<IconSearch size={16} />}
               />
-              <Text size="xs" c="dimmed">{visibleGroups.length} Groups</Text>
+              <Text size="xs" c="dimmed">{visibleGroups.length}件</Text>
             </Stack>
             <Divider />
             <ScrollArea flex={1}>
@@ -339,10 +339,10 @@ export function GroupBrowserPrototype() {
               <Group justify="space-between" wrap="nowrap">
                 <Box miw={0}>
                   <Text fw={700} truncate="end">{selected?.name ?? ""}</Text>
-                  <Text size="xs" c="dimmed">{selected?.mediaCount ?? 0} Media</Text>
+                  <Text size="xs" c="dimmed">{selected?.mediaCount ?? 0}件のMedia</Text>
                 </Box>
                 <Group gap="xs" wrap="nowrap">
-                  <Button size="xs" variant="default">Relations</Button>
+                  <Button size="xs" variant="default">所属関係</Button>
                   <Menu position="bottom-end">
                     <Menu.Target>
                       <ActionIcon variant="subtle" aria-label="Groupの操作">
@@ -350,11 +350,11 @@ export function GroupBrowserPrototype() {
                       </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown>
-                      <Menu.Item leftSection={<IconEdit size={15} />}>Rename</Menu.Item>
-                      <Menu.Item color="red" leftSection={<IconTrash size={15} />}>Delete</Menu.Item>
+                      <Menu.Item leftSection={<IconEdit size={15} />}>名前を変更</Menu.Item>
+                      <Menu.Item color="red" leftSection={<IconTrash size={15} />}>削除</Menu.Item>
                     </Menu.Dropdown>
                   </Menu>
-                  <ActionIcon variant="subtle" aria-label="Group選択を閉じる" onClick={closeDetail}>
+                  <ActionIcon variant="subtle" aria-label="Groupの選択を解除" onClick={closeDetail}>
                     <IconX size={18} />
                   </ActionIcon>
                 </Group>
@@ -365,18 +365,18 @@ export function GroupBrowserPrototype() {
             <UnstyledButton onClick={relations.toggle} px="sm" py="xs">
               <Group gap="xs">
                 {relationsOpened ? <IconChevronDown size={16} /> : <IconChevronRight size={16} />}
-                <Text size="sm" fw={600}>Related groups</Text>
+                <Text size="sm" fw={600}>所属関係</Text>
               </Group>
             </UnstyledButton>
             {relationsOpened && (
               <Box px="lg" pb="sm">
                 <SimpleGrid cols={2} spacing="lg">
                   <Stack gap={4}>
-                    <Text size="xs" c="dimmed">Parents</Text>
+                    <Text size="xs" c="dimmed">所属先</Text>
                     <RelationItems names={selected?.parentNames ?? []} />
                   </Stack>
                   <Stack gap={4}>
-                    <Text size="xs" c="dimmed">Children</Text>
+                    <Text size="xs" c="dimmed">所属Group</Text>
                     <RelationItems names={selected?.childNames ?? []} />
                   </Stack>
                 </SimpleGrid>
@@ -388,7 +388,7 @@ export function GroupBrowserPrototype() {
               <Box p="sm">
                 {(selected?.mediaCount ?? 0) === 0 ? (
                   <Paper withBorder p="xl" ta="center">
-                    <Text fw={600}>表示するMediaがありません</Text>
+                    <Text fw={600}>Mediaがありません</Text>
                     <Text size="sm" c="dimmed" mt={4}>
                       このGroupまたはその下位Groupに分類されたMediaはありません。
                     </Text>
