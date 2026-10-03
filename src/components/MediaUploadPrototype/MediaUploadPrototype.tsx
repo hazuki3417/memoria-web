@@ -385,7 +385,11 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
               disabled={!tagEditable}
               size="xs"
               placeholder="Tagを追加"
-              styles={{ root: { height: "100%" }, input: { minHeight: "100%", height: "100%" } }}
+              styles={{
+              root: { height: "100%" },
+              wrapper: { height: "100%" },
+              input: { minHeight: "72px", height: "72px", alignContent: "center" },
+            }}
             />
           </Box>
           <Box w={28} style={{ flex: "0 0 28px" }}>
@@ -419,7 +423,11 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
             disabled={!tagEditable}
             size="sm"
             placeholder="Tagを追加"
-            styles={{ root: { height: "100%" }, input: { minHeight: "100%", height: "100%" } }}
+            styles={{
+              root: { height: "100%" },
+              wrapper: { height: "100%" },
+              input: { minHeight: "72px", height: "72px", alignContent: "center" },
+            }}
           />
         </Box>
         <Box w={36} style={{ flex: "0 0 36px" }}>
@@ -436,14 +444,31 @@ function Status({ file, presentation, StatusIcon }: {
   StatusIcon: typeof IconCheck
 }) {
   return (
-    <Stack gap={2} style={{ minWidth: 0, overflow: "hidden" }}>
-      <Group gap={6} wrap="nowrap">
-        <Badge variant="light" color={presentation.color} leftSection={<StatusIcon size={12} />}>{presentation.label}</Badge>
-        {file.status === "upload-failed" && <Badge variant="outline" color="gray" leftSection={<IconRefresh size={12} />}>再試行可能</Badge>}
-      </Group>
-      <Text size="xs" c={file.reason ? "red" : "dimmed"} truncate style={{ maxWidth: "100%" }}>
-        {file.reason ?? (file.status === "uploading" ? "送信しています" : "\u00a0")}
-      </Text>
-    </Stack>
+    <Group gap={8} wrap="nowrap" style={{ minWidth: 0, overflow: "hidden" }}>
+      <Badge
+        variant="light"
+        color={presentation.color}
+        leftSection={<StatusIcon size={12} />}
+        style={{ flex: "0 0 auto" }}
+      >
+        {presentation.label}
+      </Badge>
+      {file.status === "upload-failed" && (
+        <Badge variant="outline" color="gray" leftSection={<IconRefresh size={12} />} style={{ flex: "0 0 auto" }}>
+          再試行可能
+        </Badge>
+      )}
+      {(file.reason || file.status === "uploading") && (
+        <Text
+          size="xs"
+          c={file.reason ? "red" : "dimmed"}
+          truncate
+          title={file.reason ?? "送信しています"}
+          style={{ minWidth: 0, flex: 1 }}
+        >
+          {file.reason ?? "送信しています"}
+        </Text>
+      )}
+    </Group>
   )
 }
