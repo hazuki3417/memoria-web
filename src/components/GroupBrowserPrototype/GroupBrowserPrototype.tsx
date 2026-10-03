@@ -7,7 +7,7 @@ import {
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
   IconChevronDown, IconChevronRight, IconDots, IconEdit, IconPlus,
-  IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconUsers, IconX,
+  IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
@@ -53,27 +53,58 @@ const previewTones = [
   "var(--mantine-color-orange-1)",
 ]
 
+function GroupVisual({ startIndex }: { startIndex: number }) {
+  const layers = Array.from({ length: 3 }, (_, layer) => startIndex + layer)
+  return (
+    <Box
+      w="100%"
+      h="100%"
+      pos="relative"
+      bg="var(--mantine-color-default-hover)"
+      style={{ overflow: "hidden" }}
+    >
+      {layers.map((mediaIndex, layer) => (
+        <Box
+          key={mediaIndex}
+          pos="absolute"
+          w="58%"
+          h="58%"
+          bdrs="sm"
+          bg={previewTones[mediaIndex % previewTones.length]}
+          style={{
+            left: `${18 + layer * 8}%`,
+            top: `${14 + layer * 8}%`,
+            border: "1px solid var(--mantine-color-default-border)",
+            boxShadow: "var(--mantine-shadow-xs)",
+          }}
+        />
+      ))}
+    </Box>
+  )
+}
+
 function PreviewGrid({ count }: { count: number }) {
+  let groupVisualIndex = 0
   return (
     <SimpleGrid cols={2} spacing={4}>
       {Array.from({ length: 4 }, (_, index) => {
         const media = index < Math.min(count, 4)
         const continuation = count > 4 && index === 3
+        const groupVisualStart = groupVisualIndex * 3
+        if (!media) groupVisualIndex += 1
         return (
           <Box
             key={index}
             bdrs="sm"
-            bg={media ? previewTones[index] : "var(--mantine-color-default-hover)"}
+            bg={media ? previewTones[index] : undefined}
             style={{
               position: "relative",
               aspectRatio: "1 / 1",
               border: "1px solid var(--mantine-color-default-border)",
-              display: "grid",
-              placeItems: "center",
               overflow: "hidden",
             }}
           >
-            {!media && <IconUsers size={22} stroke={1.5} aria-hidden />}
+            {!media && <GroupVisual startIndex={groupVisualStart} />}
             {continuation && (
               <Box
                 pos="absolute"
