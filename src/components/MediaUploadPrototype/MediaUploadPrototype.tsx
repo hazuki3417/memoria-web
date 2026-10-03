@@ -371,12 +371,15 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
           <Box w={72} h={72} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
             <IconPhoto size={22} stroke={1.4} />
           </Box>
-          <Stack gap={4} justify="center" h={72} style={{ flex: "0 0 34%", minWidth: 0, overflow: "hidden" }}>
-            <Box style={{ minWidth: 0 }}>
-              <Text size="sm" fw={600} truncate>{file.name}</Text>
-              <Text size="xs" c="dimmed">{file.size}</Text>
-            </Box>
-            <Status file={file} presentation={presentation} StatusIcon={StatusIcon} />
+          <Stack gap={5} justify="center" h={72} style={{ flex: "0 0 34%", minWidth: 0, overflow: "hidden" }}>
+            <Group gap="xs" wrap="nowrap" align="center">
+              <Box style={{ minWidth: 0, flex: 1 }}>
+                <Text size="sm" fw={600} truncate>{file.name}</Text>
+                <Text size="xs" c="dimmed">{file.size}</Text>
+              </Box>
+              <StatusBadge file={file} presentation={presentation} StatusIcon={StatusIcon} />
+            </Group>
+            <StatusMessage file={file} />
           </Stack>
           <Box h={72} style={{ flex: 1, minWidth: 0 }}>
             <TagsInput
@@ -408,12 +411,15 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
           <Box w={72} h={72} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
             <IconPhoto size={28} stroke={1.4} />
           </Box>
-          <Stack gap={4} justify="center" h={72} style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-            <Box>
-              <Text size="sm" fw={600} truncate>{file.name}</Text>
-              <Text size="xs" c="dimmed">{file.size}</Text>
-            </Box>
-            <Status file={file} presentation={presentation} StatusIcon={StatusIcon} />
+          <Stack gap={5} justify="center" h={72} style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+            <Group gap="sm" wrap="nowrap" align="center">
+              <Box style={{ minWidth: 0, flex: 1 }}>
+                <Text size="sm" fw={600} truncate>{file.name}</Text>
+                <Text size="xs" c="dimmed">{file.size}</Text>
+              </Box>
+              <StatusBadge file={file} presentation={presentation} StatusIcon={StatusIcon} />
+            </Group>
+            <StatusMessage file={file} />
           </Stack>
         </Group>
         <Box h={72} style={{ flex: "1 1 48%", minWidth: 360 }}>
@@ -438,37 +444,37 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
   )
 }
 
-function Status({ file, presentation, StatusIcon }: {
+function StatusBadge({ file, presentation, StatusIcon }: {
   file: UploadFile
   presentation: { label: string; color: string }
   StatusIcon: typeof IconCheck
 }) {
   return (
-    <Group gap={8} wrap="nowrap" style={{ minWidth: 0, overflow: "hidden" }}>
-      <Badge
-        variant="light"
-        color={presentation.color}
-        leftSection={<StatusIcon size={12} />}
-        style={{ flex: "0 0 auto" }}
-      >
+    <Group gap={4} wrap="nowrap" style={{ flex: "0 0 auto" }}>
+      <Badge variant="light" color={presentation.color} leftSection={<StatusIcon size={12} />}>
         {presentation.label}
       </Badge>
       {file.status === "upload-failed" && (
-        <Badge variant="outline" color="gray" leftSection={<IconRefresh size={12} />} style={{ flex: "0 0 auto" }}>
+        <Badge variant="outline" color="gray" leftSection={<IconRefresh size={12} />}>
           再試行可能
         </Badge>
       )}
-      {(file.reason || file.status === "uploading") && (
-        <Text
-          size="xs"
-          c={file.reason ? "red" : "dimmed"}
-          truncate
-          title={file.reason ?? "送信しています"}
-          style={{ minWidth: 0, flex: 1 }}
-        >
-          {file.reason ?? "送信しています"}
-        </Text>
-      )}
     </Group>
+  )
+}
+
+function StatusMessage({ file }: { file: UploadFile }) {
+  const message = file.reason ?? (file.status === "uploading" ? "送信しています" : "\u00a0")
+
+  return (
+    <Text
+      size="xs"
+      c={file.reason ? "red" : "dimmed"}
+      truncate
+      title={message.trim() ? message : undefined}
+      style={{ minWidth: 0, width: "100%" }}
+    >
+      {message}
+    </Text>
   )
 }
