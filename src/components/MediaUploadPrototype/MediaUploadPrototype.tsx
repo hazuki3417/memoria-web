@@ -368,7 +368,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
       <Box p="sm">
         <Group align="flex-start" wrap="nowrap">
           <Checkbox mt={18} checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
-          <Box w={56} h={56} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center" }}>
+          <Box w={56} h={56} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
             <IconPhoto size={22} stroke={1.4} />
           </Box>
           <Stack gap={8} style={{ flex: 1, minWidth: 0 }}>
@@ -392,7 +392,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
       <Group align="stretch" wrap="nowrap" gap="md" mih={80}>
         <Checkbox mt={26} checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
         <Group align="flex-start" wrap="nowrap" gap="sm" style={{ flex: "0 0 42%", minWidth: 0 }}>
-          <Box w={76} h={64} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center" }}>
+          <Box w={72} h={72} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
             <IconPhoto size={28} stroke={1.4} />
           </Box>
           <Stack gap={7} style={{ flex: 1, minWidth: 0 }}>
