@@ -1,12 +1,11 @@
 "use client"
 
-import { ApplicationShell } from "@/components/ApplicationShell"
+import { ApplicationShell } from "@/components/ApplicationShell"\nimport { NavigationItem } from "@/components/NavigationItem"
 import {
   Box,
   Button,
   Divider,
   Group,
-  NavLink,
   Progress,
   Select,
   Stack,
@@ -420,55 +419,15 @@ export function SettingsPrototype({
               </Text>
               <Stack gap={0}>
                 {sections.map((item) => (
-                  <Box key={item.id} pos="relative" pl={8}>
-                    {section === item.id && (
-                      <Box
-                        pos="absolute"
-                        top={3}
-                        bottom={3}
-                        left={0}
-                        w={3}
-                        bg="var(--mantine-color-blue-6)"
-                        style={{
-                          borderRadius: "var(--mantine-radius-xl)",
-                          pointerEvents: "none",
-                        }}
-                        aria-hidden="true"
-                      />
-                    )}
-                    <NavLink
-                      label={item.label}
-                      leftSection={
-                        <item.icon size={16} stroke={1.6} aria-hidden="true" />
-                      }
-                      active={section === item.id}
-                      onClick={() => setSection(item.id)}
-                      variant="subtle"
-                      color="gray"
-                      styles={{
-                        root: {
-                          borderRadius: "var(--mantine-radius-sm)",
-                          background:
-                            section === item.id
-                              ? "var(--mantine-color-default-hover)"
-                              : undefined,
-                          padding: "5px 8px",
-                          minHeight: 32,
-                          fontWeight: section === item.id ? 600 : 400,
-                        },
-                        section: {
-                          color: "var(--mantine-color-dimmed)",
-                          marginInlineEnd: 8,
-                        },
-                        label: {
-                          fontSize: "var(--mantine-font-size-sm)",
-                          lineHeight: 1.3,
-                        },
-                      }}
-                    />
-                  </Box>
-                ))}
-              </Stack>
+                  <NavigationItem
+                    key={item.id}
+                    label={item.label}
+                    icon={item.icon}
+                    active={section === item.id}
+                    accentColor="var(--mantine-color-blue-6)"
+                    onClick={() => setSection(item.id)}
+                  />
+                ))}              </Stack>
             </Box>
             <Box style={{ flex: 1 }} maw={760} miw={0}>
               {content}
