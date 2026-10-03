@@ -19,9 +19,12 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconChartBar,
+  IconLayoutDashboard,
+  IconPhoto,
   IconSettings,
   IconUser,
   IconUserCircle,
+  IconUsers,
 } from "@tabler/icons-react"
 import { useState } from "react"
 
@@ -373,9 +376,9 @@ export function SettingsPrototype({
         },
       ]}
       navigationItems={[
-        { id: "dashboard", label: "ダッシュボード", icon: IconChartBar },
-        { id: "media", label: "メディア", icon: IconUser },
-        { id: "groups", label: "グループ", icon: IconUserCircle },
+        { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
+        { id: "media", label: "メディア", icon: IconPhoto },
+        { id: "groups", label: "グループ", icon: IconUsers },
       ]}
       user={{ displayName: "ユーザー" }}
       onSelectContext={() => undefined}
