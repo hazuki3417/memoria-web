@@ -9,6 +9,7 @@ import {
   Group,
   Modal,
   MultiSelect,
+  Paper,
   ScrollArea,
   SimpleGrid,
   Stack,
@@ -31,6 +32,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import { useGroupRef } from "react-resizable-panels"
+import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
 
@@ -412,8 +414,8 @@ export function GroupBrowserPrototype() {
   }
 
   const handleLayoutChanged = (
-    layout: Record<string, number>,
-    meta: { requestedLayout?: Record<string, number> },
+    layout: Layout,
+    meta: LayoutChangedMeta,
   ) => {
     const requested = meta.requestedLayout ?? layout
     if (!selectedId || requested.detail === 0) return
