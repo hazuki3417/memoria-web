@@ -377,14 +377,12 @@ export function MediaBrowserPrototype({
       <Modal
         opened={detail !== null}
         onClose={() => setDetail(null)}
-        fullScreen={compact}
-        size="calc(100vw - 48px)"
+        fullScreen
         padding={0}
         withCloseButton={false}
-        centered
         styles={{
-          content: { height: compact ? "100dvh" : "min(860px, calc(100dvh - 48px))" },
-          body: { height: "100%", padding: 0 },
+          content: { background: "transparent" },
+          body: { height: "100dvh", padding: 0, background: "transparent" },
         }}
       >
         {detail && (() => {
@@ -398,7 +396,7 @@ export function MediaBrowserPrototype({
                 display: "grid",
                 gridTemplateColumns: compact || !detailInfoOpened ? "minmax(0, 1fr)" : "minmax(0, 1fr) 340px",
                 gridTemplateRows: compact && detailInfoOpened ? "minmax(0, 1fr) auto" : "minmax(0, 1fr)",
-                background: "var(--mantine-color-body)",
+                background: "transparent",
               }}
             >
               <Box style={{ minWidth: 0, minHeight: 0, display: "flex", flexDirection: "column" }}>
@@ -447,6 +445,7 @@ export function MediaBrowserPrototype({
               {detailInfoOpened && (
                 <Box
                   p="md"
+                  bg="var(--mantine-color-body)"
                   style={{
                     borderLeft: compact ? undefined : "1px solid var(--mantine-color-default-border)",
                     borderTop: compact ? "1px solid var(--mantine-color-default-border)" : undefined,
