@@ -10,7 +10,7 @@ import {
   IconShare, IconTags, IconTrash,
 } from "@tabler/icons-react"
 import { useMediaQuery } from "@mantine/hooks"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
 
@@ -134,6 +134,7 @@ export function MediaBrowserPrototype({
   initialDialog?: SelectionDialog
 }) {
   const [context, setContext] = useState(contextKind)
+  const groupSearchRef = useRef<HTMLInputElement>(null)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [selecting, setSelecting] = useState(initialState === "selection")
   const [selected, setSelected] = useState<Set<string>>(initialState === "selection" ? new Set(["2", "5", "7"]) : new Set())
@@ -185,7 +186,6 @@ export function MediaBrowserPrototype({
                   maw="100%"
                   style={{ flex: compact ? "1 1 auto" : undefined }}
                   comboboxProps={{ withinPortal: true }}
-                  onDropdownOpen={() => undefined}
                 />
                 <Button size="xs" type="submit" style={{ flexShrink: 0 }}>検索</Button>
               </Group>
@@ -308,6 +308,7 @@ export function MediaBrowserPrototype({
       <Dialog
         opened={selectionDialog === "group"}
         onClose={() => setSelectionDialog(null)}
+        onEnterTransitionEnd={() => groupSearchRef.current?.blur()}
         title="Groupに追加"
         size="md"
         footer={
@@ -320,10 +321,12 @@ export function MediaBrowserPrototype({
         <Stack gap="xs">
           <Text size="sm">{selected.size}件のMediaを既存のGroupに追加します。</Text>
           <Select
+            ref={groupSearchRef}
             label="Group"
             placeholder="Groupを選択"
             searchable
-            comboboxProps={{ keepMounted: false }}
+            searchValue=""
+            onSearchChange={() => undefined}
             data={["旅行", "家族", "風景写真", "お気に入り"]}
             value={groupTarget}
             onChange={setGroupTarget}
