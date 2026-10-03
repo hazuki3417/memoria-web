@@ -140,9 +140,8 @@ export function ApplicationShell({
                     <Text size="xs">切り替え先</Text>
                   </Group>
                 </Menu.Label>
-                {contexts.map((context, index) => (
+                {contexts.map((context) => (
                   <Box key={context.id}>
-                    {index === 1 && <Menu.Divider />}
                     <Menu.Item
                       onClick={() => selectContext(context.id)}
                       rightSection={context.id === currentContext.id ? <IconCheck size={14} /> : null}
