@@ -124,15 +124,21 @@ function MediaTile({ item, selecting, selected, onClick }: {
   )
 }
 
-export function MediaBrowserPrototype({ initialState = "default", contextKind = "personal" }: {
-  initialState?: PrototypeState; contextKind?: ContextKind
+export function MediaBrowserPrototype({
+  initialState = "default",
+  contextKind = "personal",
+  initialDialog = null,
+}: {
+  initialState?: PrototypeState
+  contextKind?: ContextKind
+  initialDialog?: SelectionDialog
 }) {
   const [context, setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [selecting, setSelecting] = useState(initialState === "selection")
   const [selected, setSelected] = useState<Set<string>>(initialState === "selection" ? new Set(["2", "5", "7"]) : new Set())
   const [detail, setDetail] = useState<MediaItem | null>(null)
-  const [selectionDialog, setSelectionDialog] = useState<SelectionDialog>(null)
+  const [selectionDialog, setSelectionDialog] = useState<SelectionDialog>(initialDialog)
   const [groupTarget, setGroupTarget] = useState<string | null>(null)
   const [tagTarget, setTagTarget] = useState<string | null>(null)
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
@@ -166,7 +172,8 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
         >
           <Box style={{ minWidth: 0 }}>
             {!selecting ? (
-              <Group gap="xs" wrap="nowrap">
+              <Box component="form" onSubmit={(event) => event.preventDefault()}>
+                <Group gap="xs" wrap="nowrap">
                 <TagsInput
                   placeholder="Tag"
                   data={["家族", "旅行", "風景", "イベント"]}
@@ -179,8 +186,9 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
                   maw="100%"
                   style={{ flex: compact ? "1 1 auto" : undefined }}
                 />
-                <Button size="xs" style={{ flexShrink: 0 }}>検索</Button>
+                <Button size="xs" type="submit" style={{ flexShrink: 0 }}>検索</Button>
               </Group>
+              </Box>
             ) : (
               <Badge size="lg" variant="light">{selected.size}件選択</Badge>
             )}
