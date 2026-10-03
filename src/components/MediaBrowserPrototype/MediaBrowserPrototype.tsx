@@ -465,7 +465,7 @@ export function MediaBrowserPrototype({
                         {detail.failed ? (
                           <Stack align="center" c="dimmed"><IconPhotoOff size={48} /><Text size="sm">画像を表示できません</Text></Stack>
                         ) : (
-                          <Image src={detail.src} alt={detail.label} maw="100%" mah="100%" w="auto" h="auto" fit="contain" style={{ transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`, transition: detailRotateAnimated ? "transform 180ms ease" : "none" }} />
+                          <Image src={detail.src} alt={detail.label} w="100%" h="100%" fit="contain" style={{ objectFit: "contain", transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`, transition: detailRotateAnimated ? "transform 180ms ease" : "none" }} />
                         )}
                       </motion.div>
                     </AnimatePresence>
