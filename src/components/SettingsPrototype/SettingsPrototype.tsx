@@ -1,15 +1,11 @@
 "use client"
 
+import { ApplicationShell } from "@/components/ApplicationShell"
 import {
-  AppShell,
-  Avatar,
   Box,
-  Burger,
   Button,
   Divider,
-  Drawer,
   Group,
-  Menu,
   NavLink,
   Progress,
   Select,
@@ -20,7 +16,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core"
-import { useMediaQuery } from "@mantine/hooks"\nimport { ApplicationShell } from "@/components/ApplicationShell"
+import { useMediaQuery } from "@mantine/hooks"
 import {
   IconChartBar,
   IconSettings,
@@ -30,23 +26,6 @@ import {
 import { useState } from "react"
 
 type Section = "profile" | "preferences" | "usage" | "account"
-
-const menuStyles = {
-  dropdown: {
-    border: "1px solid var(--mantine-color-default-border)",
-    borderRadius: "var(--mantine-radius-md)",
-    boxShadow: "var(--mantine-shadow-md)",
-    padding: 4,
-    minWidth: 200,
-  },
-  item: {
-    borderRadius: "var(--mantine-radius-sm)",
-    fontSize: "var(--mantine-font-size-sm)",
-    minHeight: 32,
-    padding: "5px 8px",
-  },
-  label: { padding: "8px 8px 4px", fontSize: "var(--mantine-font-size-xs)" },
-} as const
 
 const sections = [
   { id: "profile", label: "プロフィール", icon: IconUser },
