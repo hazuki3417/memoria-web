@@ -153,15 +153,13 @@ function RelationItems({ names }: { names: string[] }) {
   }
   return (
     <Group gap={6}>
-      {names.map((name) => <Badge key={name} variant="light">{name}</Badge>)}
+      {[...names].sort().map((name) => <Badge key={name} variant="light">{name}</Badge>)}
     </Group>
   )
 }
 
 function RelationEditor({ label, names, oppositeNames, onChange, currentGroupName }: { label: string; names: string[]; oppositeNames: string[]; onChange: (names: string[]) => void; currentGroupName: string }) {
-  const order = new Map(relationCandidateNames.map((name, index) => [name, index]))
-  const sortByDefaultOrder = (values: string[]) =>
-    [...values].sort((a, b) => (order.get(a) ?? Number.MAX_SAFE_INTEGER) - (order.get(b) ?? Number.MAX_SAFE_INTEGER))
+  const sortTags = (values: string[]) => [...values].sort()
   const data = relationCandidateNames.map((name) => ({
     value: name,
     label: name,
@@ -177,7 +175,7 @@ function RelationEditor({ label, names, oppositeNames, onChange, currentGroupNam
       <MultiSelect
         data={data}
         value={names}
-        onChange={(values) => onChange(sortByDefaultOrder(values))}
+        onChange={(values) => onChange(sortTags(values))}
         searchable
         placeholder="Groupを検索"
         rightSection={null}
