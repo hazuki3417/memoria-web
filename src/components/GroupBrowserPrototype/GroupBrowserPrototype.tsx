@@ -335,15 +335,6 @@ export function GroupBrowserPrototype() {
           </Button>
         </Box>
       </Stack>
-        <Stack>
-          <Text size="sm">
-            「{selected?.name ?? ""}」を削除します。このGroupによるMedia分類とGroup間の関係は削除されますが、Media本体と他のGroupは削除されません。
-          </Text>
-          <Group justify="flex-end">
-            <Button variant="default" onClick={deletion.close}>キャンセル</Button>
-            <Button color="red" onClick={() => { deletion.close(); edit.close() }}>削除</Button>
-          </Group>
-        </Stack>
     </Modal>
   )
 
