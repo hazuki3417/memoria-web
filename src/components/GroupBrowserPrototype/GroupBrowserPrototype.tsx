@@ -184,8 +184,11 @@ function RelationEditor({ label, names, oppositeNames, onChange, currentGroupNam
         hidePickedOptions={false}
         nothingFoundMessage="候補がありません"
         styles={{
-          input: { height: 88, overflowY: "auto", alignItems: "flex-start" },
-          pillsList: { alignContent: "flex-start" },
+          pillsList: {
+            maxHeight: 76,
+            overflowY: "auto",
+            alignContent: "flex-start",
+          },
         }}
         renderOption={({ option, checked }) => {
           const reason =
