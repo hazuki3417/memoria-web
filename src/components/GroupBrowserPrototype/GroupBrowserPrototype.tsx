@@ -52,37 +52,32 @@ const previewImages = Array.from(
 )
 
 function GroupVisual({ startIndex }: { startIndex: number }) {
-  const layers = Array.from({ length: 3 }, (_, layer) => startIndex + layer)
-  const placements = [
-    { left: "8%", top: "7%", width: "76%", height: "76%" },
-    { left: "13%", top: "11%", width: "78%", height: "78%" },
-    { left: "8%", top: "20%", width: "86%", height: "74%" },
-  ]
+  const mediaIndexes = Array.from({ length: 3 }, (_, index) => startIndex + index)
 
   return (
     <Box
       w="100%"
       h="100%"
-      pos="relative"
       bg="var(--mantine-color-default-hover)"
-      style={{ overflow: "hidden" }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "2fr 1fr",
+        gridTemplateRows: "1fr 1fr",
+        gap: 2,
+        overflow: "hidden",
+      }}
     >
-      {layers.map((mediaIndex, layer) => {
-        const placement = placements[layer]
-        return (
-          <Box
-            key={mediaIndex}
-            pos="absolute"
-            bdrs={2}
-            style={{
-              ...placement,
-              backgroundImage: `url("${previewImages[mediaIndex % previewImages.length]}")`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
-            }}
-          />
-        )
-      })}
+      {mediaIndexes.map((mediaIndex, index) => (
+        <Box
+          key={mediaIndex}
+          style={{
+            gridRow: index === 0 ? "1 / 3" : undefined,
+            backgroundImage: `url("${previewImages[mediaIndex % previewImages.length]}")`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        />
+      ))}
     </Box>
   )
 }
