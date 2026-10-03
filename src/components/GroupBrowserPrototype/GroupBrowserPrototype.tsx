@@ -255,8 +255,8 @@ export function GroupBrowserPrototype() {
             <Box p="sm">
               <Group justify="space-between" wrap="nowrap">
                 <Box miw={0}>
-                  <Text fw={700} truncate="end">{selected.name}</Text>
-                  <Text size="xs" c="dimmed">{selected.mediaCount} Media</Text>
+                  <Text fw={700} truncate="end">{selected?.name ?? ""}</Text>
+                  <Text size="xs" c="dimmed">{selected?.mediaCount ?? 0} Media</Text>
                 </Box>
                 <Group gap="xs" wrap="nowrap">
                   <Button size="xs" variant="default">Relations</Button>
@@ -310,7 +310,7 @@ export function GroupBrowserPrototype() {
 
             <ScrollArea flex={1}>
               <Box p="sm">
-                {selected.mediaCount === 0 ? (
+                {(selected?.mediaCount ?? 0) === 0 ? (
                   <Paper withBorder p="xl" ta="center">
                     <Text fw={600}>表示するMediaがありません</Text>
                     <Text size="sm" c="dimmed" mt={4}>
