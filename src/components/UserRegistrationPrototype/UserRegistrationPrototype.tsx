@@ -4,21 +4,18 @@ import {
   AppShell,
   Box,
   Button,
-  Divider,
   Group,
   Modal,
   Stack,
   Text,
   TextInput,
-  Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
-import {
-  PrototypeFormAlert,
-  showPrototypeNotification,
-} from "../PrototypeFeedback/PrototypeFeedback"
+import { FeedbackAlert, showNotification } from "@/components/Feedback"
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
 
 type ReviewState =
   | "default"
@@ -52,7 +49,7 @@ export function UserRegistrationPrototype({
 
   const showFeedback = useCallback((kind: "success" | "failure") => {
     const success = kind === "success"
-    showPrototypeNotification({
+    showNotification({
       kind: success ? "success" : "error",
       title: success ? "登録しました" : "登録できませんでした",
       message: success
@@ -90,19 +87,12 @@ export function UserRegistrationPrototype({
         <AppShell.Main>
           <Box maw={880} mx="auto" w="100%">
             <Stack gap="xl">
+              <PageHeader
+                title="Memoriaへようこそ"
+                description="Memoriaで使用するプロフィールを設定して、登録を完了してください。"
+              />
               <Box>
-                <Title order={1} size="h2">
-                  Memoriaへようこそ
-                </Title>
-                <Text c="dimmed" size="sm" mt={4}>
-                  Memoriaで使用するプロフィールを設定して、登録を完了してください。
-                </Text>
-              </Box>
-              <Box>
-                <Title order={2} size="h4">
-                  基本情報
-                </Title>
-                <Divider my="md" />
+                <SectionHeader>基本情報</SectionHeader>
                 <Stack gap="md" maw={540}>
                   <Box maw={440}>
                     <TextInput
@@ -157,20 +147,14 @@ export function UserRegistrationPrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <PrototypeFormAlert
-                        kind="error"
-                        title="登録できませんでした"
-                      >
+                      <FeedbackAlert kind="error" title="登録できませんでした">
                         認証情報を確認できませんでした。もう一度ログインしてください。
-                      </PrototypeFormAlert>
+                      </FeedbackAlert>
                     )}
                     {exited && (
-                      <PrototypeFormAlert
-                        kind="info"
-                        title="登録せずに終了しました"
-                      >
+                      <FeedbackAlert kind="info" title="登録せずに終了しました">
                         実際の画面ではログアウトして公開画面へ戻ります。
-                      </PrototypeFormAlert>
+                      </FeedbackAlert>
                     )}
                   </Box>
                 </Stack>

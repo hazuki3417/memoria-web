@@ -1,16 +1,9 @@
 "use client"
 
 import {
-  AppShell,
-  Avatar,
   Box,
-  Burger,
   Button,
-  Divider,
-  Drawer,
   Group,
-  Menu,
-  NavLink,
   Progress,
   Select,
   Stack,
@@ -18,35 +11,26 @@ import {
   Table,
   Text,
   TextInput,
-  Title,
+  useMantineColorScheme,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconChartBar,
+  IconLayoutDashboard,
+  IconPhoto,
   IconSettings,
   IconUser,
   IconUserCircle,
+  IconUsers,
 } from "@tabler/icons-react"
 import { useState } from "react"
+import { ApplicationShell } from "@/components/ApplicationShell"
+import { NavigationItem } from "@/components/NavigationItem"
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
+import { SettingRow } from "@/components/SettingRow"
 
 type Section = "profile" | "preferences" | "usage" | "account"
-
-const menuStyles = {
-  dropdown: {
-    border: "1px solid var(--mantine-color-default-border)",
-    borderRadius: "var(--mantine-radius-md)",
-    boxShadow: "var(--mantine-shadow-md)",
-    padding: 4,
-    minWidth: 200,
-  },
-  item: {
-    borderRadius: "var(--mantine-radius-sm)",
-    fontSize: "var(--mantine-font-size-sm)",
-    minHeight: 32,
-    padding: "5px 8px",
-  },
-  label: { padding: "8px 8px 4px", fontSize: "var(--mantine-font-size-xs)" },
-} as const
 
 const sections = [
   { id: "profile", label: "プロフィール", icon: IconUser },
@@ -54,67 +38,6 @@ const sections = [
   { id: "usage", label: "利用状況", icon: IconChartBar },
   { id: "account", label: "アカウント", icon: IconUserCircle },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
-
-function PageHeader({
-  title,
-  description,
-}: {
-  title: string
-  description: string
-}) {
-  return (
-    <Box>
-      <Title order={1} size="h2">
-        {title}
-      </Title>
-      <Text c="dimmed" size="sm" mt={4}>
-        {description}
-      </Text>
-    </Box>
-  )
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <Box>
-      <Title order={2} size="h4">
-        {children}
-      </Title>
-      <Divider mt="sm" mb="lg" />
-    </Box>
-  )
-}
-
-function SettingRow({
-  label,
-  description,
-  children,
-  compact,
-}: {
-  label: string
-  description: string
-  children: React.ReactNode
-  compact: boolean
-}) {
-  return (
-    <Group
-      justify="space-between"
-      align={compact ? "stretch" : "center"}
-      wrap={compact ? "wrap" : "nowrap"}
-      gap="md"
-    >
-      <Box style={{ flex: 1 }} miw={0}>
-        <Text fw={600} size="sm">
-          {label}
-        </Text>
-        <Text c="dimmed" size="sm" mt={2}>
-          {description}
-        </Text>
-      </Box>
-      <Box w={compact ? "100%" : 180}>{children}</Box>
-    </Group>
-  )
-}
 
 function ProfileContent() {
   const [name, setName] = useState("ユーザー")
@@ -130,7 +53,7 @@ function ProfileContent() {
         description="プロフィール情報を変更します。"
       />
       <Box>
-        <SectionTitle>基本情報</SectionTitle>
+        <SectionHeader>基本情報</SectionHeader>
         <Stack gap="md" maw={540}>
           <TextInput
             label="ニックネーム"
@@ -168,6 +91,7 @@ function ProfileContent() {
 }
 
 function PreferencesContent({ compact }: { compact: boolean }) {
+  const { colorScheme, setColorScheme } = useMantineColorScheme()
   const [dateFormat, setDateFormat] = useState("YYYY-MM-DD")
   const [fileSizeUnit, setFileSizeUnit] = useState("SI")
   const [loop, setLoop] = useState(true)
@@ -180,8 +104,27 @@ function PreferencesContent({ compact }: { compact: boolean }) {
         description="表示とプレビューの動作を設定します。"
       />
       <Box>
-        <SectionTitle>表示</SectionTitle>
+        <SectionHeader>表示</SectionHeader>
         <Stack gap="xl">
+          <SettingRow
+            compact={compact}
+            label="表示テーマ"
+            description="画面の表示テーマを選びます。"
+          >
+            <Select
+              aria-label="表示テーマ"
+              value={colorScheme}
+              onChange={(value) =>
+                value && setColorScheme(value as "auto" | "light" | "dark")
+              }
+              data={[
+                { value: "auto", label: "システム" },
+                { value: "light", label: "ライト" },
+                { value: "dark", label: "ダーク" },
+              ]}
+              allowDeselect={false}
+            />
+          </SettingRow>
           <SettingRow
             compact={compact}
             label="日付形式"
@@ -214,7 +157,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
         </Stack>
       </Box>
       <Box>
-        <SectionTitle>プレビュー</SectionTitle>
+        <SectionHeader>プレビュー</SectionHeader>
         <Stack gap="xl">
           <SettingRow
             compact={compact}
@@ -252,7 +195,7 @@ function UsageContent() {
         description="ストレージの使用量とアップロード上限を確認します。"
       />
       <Box>
-        <SectionTitle>ストレージ</SectionTitle>
+        <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
           <Group justify="space-between" align="end">
             <Box>
@@ -271,7 +214,7 @@ function UsageContent() {
         </Stack>
       </Box>
       <Box>
-        <SectionTitle>Media</SectionTitle>
+        <SectionHeader>Media</SectionHeader>
         <Table.ScrollContainer minWidth={420}>
           <Table verticalSpacing="sm">
             <Table.Thead>
@@ -302,7 +245,7 @@ function UsageContent() {
         </Table.ScrollContainer>
       </Box>
       <Box>
-        <SectionTitle>アップロード</SectionTitle>
+        <SectionHeader>アップロード</SectionHeader>
         <Stack gap="md">
           {[
             ["1回のアップロード", "100 Media"],
@@ -329,7 +272,7 @@ function AccountContent() {
     <Stack gap="xl">
       <PageHeader title="アカウント" description="アカウントを管理します。" />
       <Box>
-        <SectionTitle>アカウント削除</SectionTitle>
+        <SectionHeader>アカウント削除</SectionHeader>
         <Stack gap="md" maw={620}>
           <Text size="sm">
             アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。
@@ -352,8 +295,6 @@ export function SettingsPrototype({
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>(initialSection)
-  const [applicationNavigationOpened, setApplicationNavigationOpened] =
-    useState(false)
   const currentLabel = sections.find((item) => item.id === section)?.label
 
   const content =
@@ -368,280 +309,106 @@ export function SettingsPrototype({
     )
 
   return (
-    <AppShell header={{ height: 40 }} padding="lg">
-      <AppShell.Header
-        style={{
-          zIndex: 300,
-          borderTop: "2px solid var(--mantine-color-blue-6)",
-        }}
-      >
-        <Group h="100%" px="md" justify="space-between" wrap="nowrap">
-          <Group gap="sm" wrap="nowrap">
-            <Burger
-              opened={applicationNavigationOpened}
-              onClick={() =>
-                setApplicationNavigationOpened((opened) => !opened)
-              }
-              size="sm"
-              aria-label="ナビゲーションを開閉"
-              aria-expanded={applicationNavigationOpened}
-            />
-            <Text fw={750} size="lg">
-              Memoria
-            </Text>
+    <ApplicationShell
+      currentContext={{
+        id: "personal",
+        kind: "personal",
+        label: "Personal",
+        accentColor: "var(--mantine-color-blue-6)",
+      }}
+      contexts={[
+        {
+          id: "personal",
+          kind: "personal",
+          label: "Personal",
+          accentColor: "var(--mantine-color-blue-6)",
+        },
+        {
+          id: "family",
+          kind: "community",
+          label: "家族のアルバム",
+          accentColor: "var(--mantine-color-teal-6)",
+        },
+        {
+          id: "travel",
+          kind: "community",
+          label: "旅行の思い出",
+          accentColor: "var(--mantine-color-violet-6)",
+        },
+      ]}
+      navigationItems={[
+        { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
+        { id: "media", label: "メディア", icon: IconPhoto },
+        { id: "groups", label: "グループ", icon: IconUsers },
+      ]}
+      user={{ displayName: "ユーザー" }}
+      onSelectContext={() => undefined}
+      onSelectNavigation={() => undefined}
+      onCreateCommunity={() => undefined}
+      onOpenSettings={() => undefined}
+      onLogout={() => undefined}
+    >
+      <Box maw={1120} mx="auto" w="100%">
+        {compact ? (
+          <Stack gap="xl">
+            <Box>
+              <Text size="xs" c="dimmed" mb={6}>
+                設定
+              </Text>
+              <Select
+                aria-label="設定画面"
+                value={section}
+                onChange={(value) => value && setSection(value as Section)}
+                data={sections.map((item) => ({
+                  value: item.id,
+                  label: item.label,
+                }))}
+                allowDeselect={false}
+              />
+            </Box>
+            <Box>{content}</Box>
+          </Stack>
+        ) : (
+          <Group align="flex-start" gap={56} wrap="nowrap">
             <Box
-              w={1}
-              h={20}
-              bg="var(--mantine-color-default-border)"
-              aria-hidden="true"
-            />
-            <Menu withinPortal position="bottom-start" styles={menuStyles}>
-              <Menu.Target>
-                <Button
-                  variant="subtle"
-                  color="gray"
-                  size="compact-sm"
-                  px="xs"
-                  aria-label="コンテキストを切り替える"
-                  maw={{ base: 144, sm: 240 }}
-                >
-                  <Text size="xs" mr={6} aria-hidden="true">
-                    ▾
-                  </Text>
-                  <Text size="sm" truncate>
-                    Personal
-                  </Text>
-                </Button>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Label>切り替え先</Menu.Label>
-                <Menu.Item>Personal</Menu.Item>
-                <Menu.Divider />
-                <Menu.Item>家族のアルバム</Menu.Item>
-                <Menu.Item>旅行の思い出</Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </Group>
-          <Menu position="bottom-end" withinPortal styles={menuStyles}>
-            <Menu.Target>
-              <Button
-                variant="subtle"
-                color="gray"
-                size="compact-sm"
-                px={4}
-                aria-label="アカウントメニュー"
-                title="アカウントメニュー"
-              >
-                <Avatar size={24} radius="xl">
-                  U
-                </Avatar>
-              </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Group gap="sm" px="xs" py="xs" wrap="nowrap">
-                <Avatar size={32} radius="xl">
-                  U
-                </Avatar>
-                <Box>
-                  <Text size="sm" fw={600} lh={1.2}>
-                    ユーザー
-                  </Text>
-                  <Text size="xs" c="dimmed" lh={1.2}>
-                    Personal
-                  </Text>
-                </Box>
-              </Group>
-              <Menu.Divider />
-              <Menu.Item>設定</Menu.Item>
-              <Menu.Divider />
-              <Menu.Item>ログアウト</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Group>
-      </AppShell.Header>
-      <Drawer
-        opened={applicationNavigationOpened}
-        onClose={() => setApplicationNavigationOpened(false)}
-        position="left"
-        zIndex={200}
-        size={248}
-        withCloseButton={false}
-        padding={0}
-        closeOnClickOutside
-        closeOnEscape
-        overlayProps={{ backgroundOpacity: 0.35, blur: 0 }}
-        styles={{
-          content: {
-            marginTop: 40,
-            height: "calc(100dvh - 40px)",
-            boxShadow: "var(--mantine-shadow-md)",
-          },
-          inner: { top: 0 },
-          overlay: { top: 40, height: "calc(100dvh - 40px)" },
-          body: { height: "100%" },
-        }}
-      >
-        <Stack gap={0} h="100%" p="xs">
-          <Box
-            component="nav"
-            aria-label="現在のコンテキスト内のナビゲーション"
-          >
-            <Stack gap={0}>
-              {["ダッシュボード", "メディア", "グループ"].map((label) => (
-                <Box key={label} pos="relative" pl={8}>
-                  <NavLink
-                    label={label}
-                    onClick={() => setApplicationNavigationOpened(false)}
-                    variant="subtle"
-                    color="gray"
-                    styles={{
-                      root: {
-                        borderRadius: "var(--mantine-radius-sm)",
-                        padding: "5px 8px",
-                        minHeight: 32,
-                      },
-                      label: {
-                        fontSize: "var(--mantine-font-size-sm)",
-                        lineHeight: 1.3,
-                      },
-                    }}
+              component="nav"
+              aria-label="設定"
+              w={200}
+              style={{ flexShrink: 0 }}
+            >
+              <Text size="xs" fw={700} c="dimmed" mb="xs">
+                設定
+              </Text>
+              <Stack gap={0}>
+                {sections.map((item) => (
+                  <NavigationItem
+                    key={item.id}
+                    label={item.label}
+                    icon={item.icon}
+                    active={section === item.id}
+                    accentColor="var(--mantine-color-blue-6)"
+                    onClick={() => setSection(item.id)}
                   />
-                </Box>
-              ))}
-            </Stack>
-          </Box>
-          <Divider my="md" />
-          <Box mt="auto">
-            <NavLink
-              label="サイドバーを閉じる"
-              onClick={() => setApplicationNavigationOpened(false)}
-              styles={{
-                root: {
-                  borderRadius: "var(--mantine-radius-sm)",
-                  padding: "4px 8px",
-                  minHeight: 28,
-                },
-                label: {
-                  color: "var(--mantine-color-dimmed)",
-                  fontSize: "var(--mantine-font-size-xs)",
-                  lineHeight: 1.3,
-                },
-              }}
-            />
-            <Divider mt="xs" mb="xs" />
-            <Text size="10px" c="dimmed" px="sm" pb={4}>
-              © 2026 Memoria
-            </Text>
-          </Box>
-        </Stack>
-      </Drawer>
-
-      <AppShell.Main>
-        <Box maw={1120} mx="auto" w="100%">
-          {compact ? (
-            <Stack gap="xl">
-              <Box>
-                <Text size="xs" c="dimmed" mb={6}>
-                  設定
-                </Text>
-                <Select
-                  aria-label="設定画面"
-                  value={section}
-                  onChange={(value) => value && setSection(value as Section)}
-                  data={sections.map((item) => ({
-                    value: item.id,
-                    label: item.label,
-                  }))}
-                  allowDeselect={false}
-                />
-              </Box>
-              <Box>{content}</Box>
-            </Stack>
-          ) : (
-            <Group align="flex-start" gap={56} wrap="nowrap">
-              <Box
-                component="nav"
-                aria-label="設定"
-                w={200}
-                style={{ flexShrink: 0 }}
-              >
-                <Text size="xs" fw={700} c="dimmed" mb="xs">
-                  設定
-                </Text>
-                <Stack gap={0}>
-                  {sections.map((item) => (
-                    <Box key={item.id} pos="relative" pl={8}>
-                      {section === item.id && (
-                        <Box
-                          pos="absolute"
-                          top={3}
-                          bottom={3}
-                          left={0}
-                          w={3}
-                          bg="var(--mantine-color-blue-6)"
-                          style={{
-                            borderRadius: "var(--mantine-radius-xl)",
-                            pointerEvents: "none",
-                          }}
-                          aria-hidden="true"
-                        />
-                      )}
-                      <NavLink
-                        label={item.label}
-                        leftSection={
-                          <item.icon
-                            size={16}
-                            stroke={1.6}
-                            aria-hidden="true"
-                          />
-                        }
-                        active={section === item.id}
-                        onClick={() => setSection(item.id)}
-                        variant="subtle"
-                        color="gray"
-                        styles={{
-                          root: {
-                            borderRadius: "var(--mantine-radius-sm)",
-                            background:
-                              section === item.id
-                                ? "var(--mantine-color-default-hover)"
-                                : undefined,
-                            padding: "5px 8px",
-                            minHeight: 32,
-                            fontWeight: section === item.id ? 600 : 400,
-                          },
-                          section: {
-                            color: "var(--mantine-color-dimmed)",
-                            marginInlineEnd: 8,
-                          },
-                          label: {
-                            fontSize: "var(--mantine-font-size-sm)",
-                            lineHeight: 1.3,
-                          },
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Stack>
-              </Box>
-              <Box style={{ flex: 1 }} maw={760} miw={0}>
-                {content}
-              </Box>
-            </Group>
-          )}
-          <Text
-            pos="absolute"
-            style={{
-              width: 1,
-              height: 1,
-              overflow: "hidden",
-              clip: "rect(0 0 0 0)",
-            }}
-          >
-            現在の設定: {currentLabel}
-          </Text>
-        </Box>
-      </AppShell.Main>
-    </AppShell>
+                ))}
+              </Stack>
+            </Box>
+            <Box style={{ flex: 1 }} maw={760} miw={0}>
+              {content}
+            </Box>
+          </Group>
+        )}
+        <Text
+          pos="absolute"
+          style={{
+            width: 1,
+            height: 1,
+            overflow: "hidden",
+            clip: "rect(0 0 0 0)",
+          }}
+        >
+          現在の設定: {currentLabel}
+        </Text>
+      </Box>
+    </ApplicationShell>
   )
 }

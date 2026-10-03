@@ -4,21 +4,18 @@ import {
   AppShell,
   Box,
   Button,
-  Divider,
   Group,
   Modal,
   Stack,
   Text,
   TextInput,
-  Title,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
-import {
-  PrototypeFormAlert,
-  showPrototypeNotification,
-} from "../PrototypeFeedback/PrototypeFeedback"
+import { FeedbackAlert, showNotification } from "@/components/Feedback"
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
 
 type ReviewState =
   | "default"
@@ -53,7 +50,7 @@ export function UserProfilePrototype({
 
   const showFeedback = useCallback((kind: "success" | "failure") => {
     const success = kind === "success"
-    showPrototypeNotification({
+    showNotification({
       kind: success ? "success" : "error",
       title: success ? "保存しました" : "保存できませんでした",
       message: success
@@ -96,19 +93,12 @@ export function UserProfilePrototype({
         <AppShell.Main>
           <Box maw={880} mx="auto" w="100%">
             <Stack gap="xl">
+              <PageHeader
+                title="プロフィール"
+                description="Memoriaで使用するプロフィール情報を管理します。"
+              />
               <Box>
-                <Title order={1} size="h2">
-                  プロフィール
-                </Title>
-                <Text c="dimmed" size="sm" mt={4}>
-                  Memoriaで使用するプロフィール情報を管理します。
-                </Text>
-              </Box>
-              <Box>
-                <Title order={2} size="h4">
-                  基本情報
-                </Title>
-                <Divider my="md" />
+                <SectionHeader>基本情報</SectionHeader>
                 <Stack gap="md" maw={540}>
                   <Box maw={440}>
                     <TextInput
@@ -154,12 +144,12 @@ export function UserProfilePrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <PrototypeFormAlert
+                      <FeedbackAlert
                         kind="error"
                         title="プロフィールを更新できませんでした"
                       >
                         現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
-                      </PrototypeFormAlert>
+                      </FeedbackAlert>
                     )}
                   </Box>
                 </Stack>

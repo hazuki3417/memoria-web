@@ -10,9 +10,9 @@ import {
 } from "@tabler/icons-react"
 import type { ReactNode } from "react"
 
-export type PrototypeFeedbackKind = "success" | "info" | "warning" | "error"
+export type FeedbackKind = "success" | "info" | "warning" | "error"
 
-const colors: Record<PrototypeFeedbackKind, string> = {
+const colors: Record<FeedbackKind, string> = {
   success: "green",
   info: "blue",
   warning: "yellow",
@@ -26,7 +26,7 @@ const icons = {
   error: IconAlertCircle,
 }
 
-function feedbackAppearance(kind: PrototypeFeedbackKind) {
+function feedbackAppearance(kind: FeedbackKind) {
   const color = colors[kind]
   return {
     color,
@@ -34,18 +34,19 @@ function feedbackAppearance(kind: PrototypeFeedbackKind) {
   }
 }
 
-export function PrototypeFormAlert({
+export function FeedbackAlert({
   kind,
   title,
   children,
   ...props
 }: Omit<AlertProps, "color" | "icon" | "title"> & {
-  kind: PrototypeFeedbackKind
+  kind: FeedbackKind
   title: string
   children: ReactNode
 }) {
   const Icon = icons[kind]
   const appearance = feedbackAppearance(kind)
+
   return (
     <Alert
       {...props}
@@ -61,17 +62,18 @@ export function PrototypeFormAlert({
   )
 }
 
-export function showPrototypeNotification({
+export function showNotification({
   kind,
   title,
   message,
 }: {
-  kind: PrototypeFeedbackKind
+  kind: FeedbackKind
   title: string
   message: string
 }) {
   const appearance = feedbackAppearance(kind)
   const Icon = icons[kind]
+
   notifications.show({
     message: (
       <Alert
