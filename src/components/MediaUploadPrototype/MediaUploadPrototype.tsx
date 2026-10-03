@@ -4,9 +4,10 @@ import {
   Badge,
   Box,
   Button,
+  Checkbox,
   Group,
+  Modal,
   Paper,
-  Progress,
   Stack,
   Text,
   TextInput,
@@ -19,6 +20,7 @@ import {
   IconCheck,
   IconClock,
   IconCloudUpload,
+  IconHelpCircle,
   IconPhoto,
   IconPhotoPlus,
   IconRefresh,
@@ -35,15 +37,21 @@ export type UploadScenario =
   | "validation-errors"
   | "uploading"
   | "partial-failure"
+  | "all-failed"
+  | "non-retryable-failure"
+  | "result-unknown"
   | "processing"
   | "completed"
   | "processing-failure"
+  | "leave-confirmation"
 
 type FileStatus =
   | "ready"
   | "validation-error"
   | "uploading"
   | "upload-failed"
+  | "upload-rejected"
+  | "result-unknown"
   | "processing"
   | "completed"
   | "processing-failed"
@@ -57,7 +65,7 @@ type UploadFile = {
   tags: string[]
 }
 
-const fixtures: Record<Exclude<UploadScenario, "empty">, UploadFile[]> = {
+const fixtures: Record<Exclude<UploadScenario, "empty" | "leave-confirmation">, UploadFile[]> = {
   ready: [
     { id: "1", name: "IMG_1842.HEIC", size: "8.4 MB", status: "ready", tags: ["旅行"] },
     { id: "2", name: "IMG_1843.HEIC", size: "7.9 MB", status: "ready", tags: ["旅行"] },
@@ -71,13 +79,25 @@ const fixtures: Record<Exclude<UploadScenario, "empty">, UploadFile[]> = {
   ],
   uploading: [
     { id: "1", name: "IMG_1842.HEIC", size: "8.4 MB", status: "uploading", tags: ["旅行"] },
-    { id: "2", name: "IMG_1843.HEIC", size: "7.9 MB", status: "uploading", tags: ["旅行"] },
+    { id: "2", name: "IMG_1843.HEIC", size: "7.9 MB", status: "processing", tags: ["旅行"] },
     { id: "3", name: "sunset.webp", size: "3.1 MB", status: "ready", tags: [] },
   ],
   "partial-failure": [
     { id: "1", name: "IMG_1842.HEIC", size: "8.4 MB", status: "completed", tags: ["旅行"] },
-    { id: "2", name: "IMG_1843.HEIC", size: "7.9 MB", status: "upload-failed", reason: "アップロードできませんでした。通信状態を確認して再試行してください", tags: ["旅行"] },
+    { id: "2", name: "IMG_1843.HEIC", size: "7.9 MB", status: "upload-failed", reason: "通信状態を確認して再試行してください", tags: ["旅行"] },
     { id: "3", name: "sunset.webp", size: "3.1 MB", status: "processing", tags: [] },
+  ],
+  "all-failed": [
+    { id: "1", name: "IMG_1842.HEIC", size: "8.4 MB", status: "upload-failed", reason: "通信状態を確認して再試行してください", tags: ["旅行"] },
+    { id: "2", name: "IMG_1843.HEIC", size: "7.9 MB", status: "upload-failed", reason: "通信状態を確認して再試行してください", tags: ["旅行"] },
+  ],
+  "non-retryable-failure": [
+    { id: "1", name: "IMG_1842.HEIC", size: "8.4 MB", status: "upload-rejected", reason: "このMediaをアップロードする権限がありません", tags: ["旅行"] },
+    { id: "2", name: "sunset.webp", size: "3.1 MB", status: "ready", tags: [] },
+  ],
+  "result-unknown": [
+    { id: "1", name: "IMG_1842.HEIC", size: "8.4 MB", status: "result-unknown", reason: "送信結果を確認しています。確認が終わるまで再送信しません", tags: ["旅行"] },
+    { id: "2", name: "sunset.webp", size: "3.1 MB", status: "ready", tags: [] },
   ],
   processing: [
     { id: "1", name: "IMG_1842.HEIC", size: "8.4 MB", status: "completed", tags: ["旅行"] },
@@ -101,6 +121,8 @@ const statusPresentation: Record<FileStatus, { label: string; color: string; ico
   "validation-error": { label: "アップロードできません", color: "red", icon: IconAlertCircle },
   uploading: { label: "アップロード中", color: "blue", icon: IconCloudUpload },
   "upload-failed": { label: "アップロード失敗", color: "red", icon: IconAlertCircle },
+  "upload-rejected": { label: "アップロード不可", color: "red", icon: IconAlertCircle },
+  "result-unknown": { label: "結果を確認中", color: "yellow", icon: IconHelpCircle },
   processing: { label: "画像処理中", color: "blue", icon: IconClock },
   completed: { label: "完了", color: "green", icon: IconCheck },
   "processing-failed": { label: "画像処理失敗", color: "red", icon: IconAlertCircle },
@@ -111,6 +133,9 @@ const contexts = {
   community: { id: "community", kind: "community" as const, label: "家族のアルバム", accentColor: "var(--mantine-color-teal-6)" },
 }
 
+const selectableStatuses: FileStatus[] = ["ready", "upload-failed"]
+const uploadStartedStatuses: FileStatus[] = ["uploading", "processing", "completed", "processing-failed", "result-unknown"]
+
 export function MediaUploadPrototype({
   scenario = "ready",
   context = "personal",
@@ -119,74 +144,81 @@ export function MediaUploadPrototype({
   context?: "personal" | "community"
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
-  const [files, setFiles] = useState<UploadFile[]>(scenario === "empty" ? [] : fixtures[scenario])
-  const [commonTag, setCommonTag] = useState("")
+  const initialFiles = scenario === "empty"
+    ? []
+    : scenario === "leave-confirmation"
+      ? fixtures.ready
+      : fixtures[scenario]
+  const [files, setFiles] = useState<UploadFile[]>(initialFiles)
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    initialFiles.filter((file) => selectableStatuses.includes(file.status)).map((file) => file.id),
+  )
+  const [bulkTag, setBulkTag] = useState("")
   const currentContext = contexts[context]
 
-  const counts = useMemo(() => ({
-    total: files.length,
-    ready: files.filter((file) => file.status === "ready").length,
-    invalid: files.filter((file) => file.status === "validation-error").length,
-    failed: files.filter((file) => file.status === "upload-failed").length,
-    processing: files.filter((file) => file.status === "processing").length,
-    completed: files.filter((file) => file.status === "completed").length,
-  }), [files])
-
+  const selectableFiles = files.filter((file) => selectableStatuses.includes(file.status))
+  const selectedFiles = selectableFiles.filter((file) => selectedIds.includes(file.id))
   const activeUpload = files.some((file) => file.status === "uploading")
-  const allRequestsSettled = files.length > 0 && files.every((file) =>
-    ["completed", "processing", "upload-failed", "processing-failed"].includes(file.status),
-  )
+  const registeredCount = files.filter((file) => ["processing", "completed", "processing-failed"].includes(file.status)).length
+  const completedCount = files.filter((file) => file.status === "completed").length
+  const processingCount = files.filter((file) => file.status === "processing").length
+  const failedCount = files.filter((file) => file.status === "upload-failed").length
+  const invalidCount = files.filter((file) => file.status === "validation-error").length
+  const unknownCount = files.filter((file) => file.status === "result-unknown").length
+  const hasUnsent = files.some((file) => ["ready", "validation-error", "upload-failed", "upload-rejected"].includes(file.status))
 
-  const removeFile = (id: string) => setFiles((current) => current.filter((file) => file.id !== id))
-  const retryFile = (id: string) => setFiles((current) => current.map((file) =>
-    file.id === id ? { ...file, status: "uploading", reason: undefined } : file,
-  ))
-  const applyCommonTag = () => {
-    const tag = commonTag.trim()
-    if (!tag) return
-    setFiles((current) => current.map((file) => ({
-      ...file,
-      tags: file.tags.includes(tag) ? file.tags : [...file.tags, tag],
-    })))
-    setCommonTag("")
+  const allSelectableChecked = selectableFiles.length > 0 && selectedFiles.length === selectableFiles.length
+  const toggleAll = () => setSelectedIds(allSelectableChecked ? [] : selectableFiles.map((file) => file.id))
+  const toggleFile = (id: string, checked: boolean) =>
+    setSelectedIds((current) => checked ? [...new Set([...current, id])] : current.filter((item) => item !== id))
+
+  const applyTagAction = (action: "add" | "remove" | "replace") => {
+    const tag = bulkTag.trim()
+    if (!tag || selectedIds.length === 0) return
+    setFiles((current) => current.map((file) => {
+      if (!selectedIds.includes(file.id)) return file
+      if (action === "replace") return { ...file, tags: [tag] }
+      if (action === "remove") return { ...file, tags: file.tags.filter((item) => item !== tag) }
+      return { ...file, tags: file.tags.includes(tag) ? file.tags : [...file.tags, tag] }
+    }))
+    setBulkTag("")
+  }
+
+  const removeFile = (id: string) => {
+    setFiles((current) => current.filter((file) => file.id !== id))
+    setSelectedIds((current) => current.filter((item) => item !== id))
   }
 
   return (
     <ApplicationShell
       currentContext={currentContext}
       contexts={Object.values(contexts)}
-      navigationItems={[
-        { id: "media", label: "メディア", icon: IconPhoto, active: true },
-      ]}
+      navigationItems={[{ id: "media", label: "メディア", icon: IconPhoto, active: true }]}
       user={{ displayName: "ユーザー" }}
       onSelectContext={() => undefined}
       onSelectNavigation={() => undefined}
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <Box maw={1120} mx="auto" w="100%" pb={96}>
+      <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="xl">
-          <PageHeader
-            title="メディアをアップロード"
-            description={context === "community"
-              ? "このCommunityが管理するMediaとして画像を追加します。"
-              : "Personalで管理するMediaとして画像を追加します。"}
-          />
+          <Box>
+            <Button variant="subtle" px={0} mb="xs">Mediaへ戻る</Button>
+            <PageHeader
+              title="メディアをアップロード"
+              description={context === "community"
+                ? "このCommunityが管理するMediaとして画像を追加します。"
+                : "Personalで管理するMediaとして画像を追加します。"}
+            />
+          </Box>
 
-          <Paper
-            withBorder
-            radius="md"
-            p={files.length === 0 ? "xl" : "md"}
-            style={{ borderStyle: "dashed" }}
-          >
+          <Paper withBorder radius="md" p={files.length === 0 ? "xl" : "md"} style={{ borderStyle: "dashed" }}>
             <Stack align="center" gap="sm" py={files.length === 0 ? 36 : 4}>
               <ThemeIcon variant="light" size={files.length === 0 ? 52 : 36} radius="xl">
                 <IconPhotoPlus size={files.length === 0 ? 28 : 20} />
               </ThemeIcon>
               <Box ta="center">
-                <Text fw={600}>
-                  {files.length === 0 ? "画像をここにドロップ" : "画像をさらに追加"}
-                </Text>
+                <Text fw={600}>{files.length === 0 ? "画像をここにドロップ" : "画像をさらに追加"}</Text>
                 <Text size="sm" c="dimmed" mt={2}>
                   JPEG / PNG / WebP / HEIC・HEIF ・ 最大100件 ・ 1件128 MiBまで
                 </Text>
@@ -201,32 +233,37 @@ export function MediaUploadPrototype({
                 <Box>
                   <Title order={2} size="h4">アップロードする画像</Title>
                   <Group gap="xs" mt={8}>
-                    <Badge variant="light" color="gray">{counts.total}件</Badge>
-                    {counts.invalid > 0 && <Badge variant="light" color="red">問題 {counts.invalid}件</Badge>}
-                    {counts.processing > 0 && <Badge variant="light" color="blue">画像処理中 {counts.processing}件</Badge>}
-                    {counts.completed > 0 && <Badge variant="light" color="green">完了 {counts.completed}件</Badge>}
+                    <Badge variant="light" color="gray">{files.length}件</Badge>
+                    {invalidCount > 0 && <Badge variant="light" color="red">問題 {invalidCount}件</Badge>}
+                    {processingCount > 0 && <Badge variant="light" color="blue">画像処理中 {processingCount}件</Badge>}
+                    {completedCount > 0 && <Badge variant="light" color="green">完了 {completedCount}件</Badge>}
                   </Group>
                 </Box>
-                {!activeUpload && !allRequestsSettled && (
-                  <Button variant="subtle" color="gray" size="sm" onClick={() => setFiles([])}>
+                {!activeUpload && hasUnsent && (
+                  <Button variant="subtle" color="gray" size="sm" onClick={() => { setFiles([]); setSelectedIds([]) }}>
                     すべて削除
                   </Button>
                 )}
               </Group>
 
-              {counts.invalid > 0 && (
+              {invalidCount > 0 && (
                 <FeedbackAlert kind="warning" title="アップロードできないファイルがあります">
-                  問題のあるファイルを除いて、アップロード可能な画像だけを送信できます。
+                  問題のあるファイルは選択できません。修正または削除してからアップロードしてください。
                 </FeedbackAlert>
               )}
-              {counts.failed > 0 && (
-                <FeedbackAlert kind="warning" title="一部のアップロードに失敗しました">
-                  成功済みのMediaは保持されています。失敗したファイルだけ再試行できます。
+              {failedCount > 0 && (
+                <FeedbackAlert kind="warning" title={failedCount === files.length ? "アップロードに失敗しました" : "一部のアップロードに失敗しました"}>
+                  成功済みのMediaは保持されています。再試行できるファイルだけを選択して送信できます。
+                </FeedbackAlert>
+              )}
+              {unknownCount > 0 && (
+                <FeedbackAlert kind="warning" title="送信結果を確認しているMediaがあります">
+                  結果が確定するまで再送信しません。重複登録を防ぐため、このMediaは選択できません。
                 </FeedbackAlert>
               )}
               {scenario === "processing-failure" && (
                 <FeedbackAlert kind="error" title="画像処理に失敗したMediaがあります">
-                  Media登録は完了しています。画像処理失敗は再アップロードせず、Media Browserで確認できます。
+                  Media登録は完了しています。再アップロードせず、Media Browserで状態を確認できます。
                 </FeedbackAlert>
               )}
               {scenario === "completed" && (
@@ -235,25 +272,43 @@ export function MediaUploadPrototype({
                 </FeedbackAlert>
               )}
 
-              {!allRequestsSettled && !activeUpload && (
+              {selectableFiles.length > 0 && !activeUpload && (
                 <Paper withBorder radius="md" p="md">
                   <Stack gap="sm">
-                    <Box>
-                      <Text fw={600} size="sm">共通Tag</Text>
-                      <Text c="dimmed" size="xs">
-                        入力したTagを現在の画像へ共通で追加する案を検証します。個別Tag編集との関係はVisual Reviewで判断します。
-                      </Text>
-                    </Box>
+                    <Group justify="space-between">
+                      <Box>
+                        <Text fw={600} size="sm">選択したMediaのTagを一括編集</Text>
+                        <Text c="dimmed" size="xs">{selectedFiles.length}件を選択中</Text>
+                      </Box>
+                      <Button variant="subtle" size="compact-sm" onClick={toggleAll}>
+                        {allSelectableChecked ? "選択を解除" : "すべて選択"}
+                      </Button>
+                    </Group>
                     <Group align="flex-end" wrap={compact ? "wrap" : "nowrap"}>
                       <TextInput
-                        value={commonTag}
-                        onChange={(event) => setCommonTag(event.currentTarget.value)}
+                        value={bulkTag}
+                        onChange={(event) => setBulkTag(event.currentTarget.value)}
                         placeholder="Tagを入力"
-                        style={{ flex: 1 }}
+                        style={{ flex: 1, minWidth: compact ? "100%" : 240 }}
                       />
-                      <Button variant="default" onClick={applyCommonTag}>すべてに追加</Button>
+                      <Group gap="xs">
+                        <Button variant="default" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("add")}>追加</Button>
+                        <Button variant="default" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("remove")}>除去</Button>
+                        <Button variant="default" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
+                      </Group>
                     </Group>
                   </Stack>
+                </Paper>
+              )}
+
+              {uploadStartedStatuses.some((status) => files.some((file) => file.status === status)) && (
+                <Paper withBorder radius="md" p="md">
+                  <Text fw={600} size="sm">今回の進行状況</Text>
+                  <Text size="sm" c="dimmed" mt={4}>
+                    Media登録済み {registeredCount}件
+                    {processingCount > 0 ? ` ・ 画像処理中 ${processingCount}件` : ""}
+                    {completedCount > 0 ? ` ・ 完了 ${completedCount}件` : ""}
+                  </Text>
                 </Paper>
               )}
 
@@ -263,9 +318,10 @@ export function MediaUploadPrototype({
                     key={file.id}
                     file={file}
                     compact={compact}
-                    locked={activeUpload || ["completed", "processing", "processing-failed"].includes(file.status)}
+                    selected={selectedIds.includes(file.id)}
+                    selectable={selectableStatuses.includes(file.status) && !activeUpload}
+                    onSelect={(checked) => toggleFile(file.id, checked)}
                     onRemove={() => removeFile(file.id)}
-                    onRetry={() => retryFile(file.id)}
                   />
                 ))}
               </Stack>
@@ -275,39 +331,43 @@ export function MediaUploadPrototype({
       </Box>
 
       {files.length > 0 && (
-        <Box
-          style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 100,
-            borderTop: "1px solid var(--mantine-color-default-border)",
-            background: "var(--mantine-color-body)",
-          }}
-        >
+        <Box style={{
+          position: "fixed",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 100,
+          borderTop: "1px solid var(--mantine-color-default-border)",
+          background: "var(--mantine-color-body)",
+        }}>
           <Box maw={1120} mx="auto" px="lg" py="sm">
-            <Group justify="space-between" wrap="nowrap">
-              <Button variant="default">Mediaへ戻る</Button>
+            <Group justify="flex-end" wrap="nowrap">
               {activeUpload ? (
-                <Box style={{ flex: 1, maxWidth: 360 }}>
-                  <Group justify="space-between" mb={4}>
-                    <Text size="xs" fw={600}>アップロード中</Text>
-                    <Text size="xs" c="dimmed">ファイル単位で送信しています</Text>
-                  </Group>
-                  <Progress value={58} animated />
-                </Box>
-              ) : allRequestsSettled ? (
-                <Button>Mediaを確認</Button>
+                <Text size="sm" fw={600}>アップロード中 ・ Media登録済み {registeredCount}件</Text>
               ) : (
-                <Button disabled={counts.ready === 0}>
-                  {counts.ready}件をアップロード
-                </Button>
+                <>
+                  <Text size="sm" c="dimmed">{selectedFiles.length}件選択中</Text>
+                  <Button disabled={selectedFiles.length === 0}>
+                    選択した{selectedFiles.length}件をアップロード
+                  </Button>
+                </>
               )}
             </Group>
           </Box>
         </Box>
       )}
+
+      <Modal opened={scenario === "leave-confirmation"} onClose={() => undefined} title="アップロード画面を離れますか？" centered>
+        <Stack>
+          <Text size="sm">
+            まだアップロードしていない画像があります。この画面を離れると、未送信の画像と編集内容は失われます。
+          </Text>
+          <Group justify="flex-end">
+            <Button variant="default">この画面に残る</Button>
+            <Button color="red">Mediaへ戻る</Button>
+          </Group>
+        </Stack>
+      </Modal>
     </ApplicationShell>
   )
 }
@@ -315,25 +375,35 @@ export function MediaUploadPrototype({
 function FileRow({
   file,
   compact,
-  locked,
+  selected,
+  selectable,
+  onSelect,
   onRemove,
-  onRetry,
 }: {
   file: UploadFile
   compact: boolean
-  locked: boolean
+  selected: boolean
+  selectable: boolean
+  onSelect: (checked: boolean) => void
   onRemove: () => void
-  onRetry: () => void
 }) {
   const presentation = statusPresentation[file.status]
   const StatusIcon = presentation.icon
+  const removable = ["ready", "validation-error", "upload-failed", "upload-rejected"].includes(file.status)
 
   return (
     <Paper withBorder radius="md" p="sm">
       <Group align="flex-start" wrap="nowrap">
+        <Checkbox
+          mt={compact ? 20 : 24}
+          checked={selected}
+          disabled={!selectable}
+          onChange={(event) => onSelect(event.currentTarget.checked)}
+          aria-label={`${file.name}を選択`}
+        />
         <Box
-          w={compact ? 64 : 88}
-          h={compact ? 64 : 72}
+          w={compact ? 56 : 76}
+          h={compact ? 56 : 64}
           style={{
             flex: "0 0 auto",
             borderRadius: "var(--mantine-radius-sm)",
@@ -342,7 +412,7 @@ function FileRow({
             placeItems: "center",
           }}
         >
-          <IconPhoto size={compact ? 24 : 30} stroke={1.4} />
+          <IconPhoto size={compact ? 22 : 28} stroke={1.4} />
         </Box>
         <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
           <Group justify="space-between" gap="xs" wrap="nowrap">
@@ -350,7 +420,7 @@ function FileRow({
               <Text size="sm" fw={600} truncate>{file.name}</Text>
               <Text size="xs" c="dimmed">{file.size}</Text>
             </Box>
-            {!locked && (
+            {removable && (
               <Button variant="subtle" color="gray" size="compact-sm" onClick={onRemove} aria-label={`${file.name}を削除`}>
                 <IconTrash size={16} />
               </Button>
@@ -361,12 +431,10 @@ function FileRow({
               {presentation.label}
             </Badge>
             {file.status === "upload-failed" && (
-              <Button variant="light" size="compact-xs" leftSection={<IconRefresh size={13} />} onClick={onRetry}>
-                再試行
-              </Button>
+              <Badge variant="outline" color="gray" leftSection={<IconRefresh size={12} />}>再試行可能</Badge>
             )}
           </Group>
-          {file.status === "uploading" && <Progress value={42} size="xs" animated />}
+          {file.status === "uploading" && <Text size="xs" c="dimmed">送信しています。正確な進捗率は表示しません。</Text>}
           {file.reason && <Text size="xs" c="red">{file.reason}</Text>}
           {file.tags.length > 0 && (
             <Group gap={4}>
