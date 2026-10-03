@@ -31,8 +31,8 @@ import {
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
-import { useGroupRef } from "react-resizable-panels"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
+import { useGroupRef } from "react-resizable-panels"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
 
@@ -413,10 +413,7 @@ export function GroupBrowserPrototype() {
     splitViewRef.current?.setLayout({ groups: 100, detail: 0 })
   }
 
-  const handleLayoutChanged = (
-    layout: Layout,
-    meta: LayoutChangedMeta,
-  ) => {
+  const handleLayoutChanged = (layout: Layout, meta: LayoutChangedMeta) => {
     const requested = meta.requestedLayout ?? layout
     if (!selectedId || requested.detail === 0) return
     const next = { groups: requested.groups, detail: requested.detail }
