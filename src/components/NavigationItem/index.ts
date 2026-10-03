@@ -1,1 +1,1 @@
-export * from "./NavigationItem"\n
+export * from "./NavigationItem"
