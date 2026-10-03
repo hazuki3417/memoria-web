@@ -2,7 +2,7 @@
 
 import {
   Alert, AspectRatio, Badge, Box, Button, Center, Checkbox, Group, Image,
-  Loader, Menu, Modal, SegmentedControl, Stack, TagsInput, Text,
+  Loader, Menu, Modal, Paper, SegmentedControl, Stack, TagsInput, Text, ThemeIcon,
 } from "@mantine/core"
 import {
   IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
