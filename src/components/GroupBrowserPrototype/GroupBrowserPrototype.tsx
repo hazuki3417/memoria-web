@@ -323,9 +323,9 @@ export function GroupBrowserPrototype() {
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
           <RelationEditor label="Parents" names={draftParents} onChange={setDraftParents} 
-                currentGroupName={selected.name}/>
+                currentGroupName={selected?.name ?? ""}/>
           <RelationEditor label="Children" names={draftChildren} onChange={setDraftChildren} 
-                currentGroupName={selected.name}/>
+                currentGroupName={selected?.name ?? ""}/>
         </SimpleGrid>
         <Divider />
         <Box pos="relative">
