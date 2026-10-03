@@ -240,7 +240,7 @@ export function GroupBrowserPrototype() {
           {compactView === "groups" ? (
             <Box h="100%" style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
               <Stack p="sm" gap="xs">
-                <Group gap="xs" wrap="nowrap"><TextInput flex={1} value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Groupを検索" leftSection={<IconSearch size={16} />} /><ActionIcon variant="subtle" aria-label="Groupを作成"><IconPlus size={18} /></ActionIcon></Group>
+                <Group gap="xs" wrap="nowrap"><TextInput flex={1} size="sm" value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Groupを検索" leftSection={<IconSearch size={16} />} /><ActionIcon size="input-sm" variant="subtle" aria-label="Groupを作成"><IconPlus size={18} /></ActionIcon></Group>
                 <Text size="xs" c="dimmed">{visibleGroups.length}件</Text>
               </Stack>
               <Divider />
@@ -274,12 +274,13 @@ export function GroupBrowserPrototype() {
               <Group gap="xs" wrap="nowrap">
                 <TextInput
                   flex={1}
+                  size="sm"
                   value={query}
                   onChange={(event) => setQuery(event.currentTarget.value)}
                   placeholder="Groupを検索"
                   leftSection={<IconSearch size={16} />}
                 />
-                <ActionIcon variant="subtle" aria-label="Groupを作成">
+                <ActionIcon size="input-sm" variant="subtle" aria-label="Groupを作成">
                   <IconPlus size={18} />
                 </ActionIcon>
               </Group>
@@ -348,8 +349,7 @@ export function GroupBrowserPrototype() {
                       </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown>
-                      <Menu.Item leftSection={<IconEdit size={15} />}>名前を変更</Menu.Item>
-                      <Menu.Item>関係を編集</Menu.Item>
+                      <Menu.Item leftSection={<IconEdit size={15} />}>編集</Menu.Item>
                       <Menu.Item color="red" leftSection={<IconTrash size={15} />}>削除</Menu.Item>
                     </Menu.Dropdown>
                   </Menu>
