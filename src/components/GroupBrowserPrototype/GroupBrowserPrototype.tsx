@@ -7,7 +7,7 @@ import {
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
   IconChevronDown, IconChevronRight, IconEdit, IconPlus,
-  IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconUsers, IconX,
+  IconLayoutDashboard, IconPhoto, IconSearch, IconUsers, IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
@@ -302,7 +302,7 @@ export function GroupBrowserPrototype() {
   }
 
   const editDialog = (
-    <Modal opened={editOpened} onClose={edit.close} title="Groupを編集" size="lg" centered>
+    <Modal opened={editOpened} onClose={edit.close} title="Groupを編集" size="lg" centered withCloseButton={false}>
       <Stack gap="lg">
         <TextInput
           label="名前"
@@ -315,23 +315,25 @@ export function GroupBrowserPrototype() {
           <RelationEditor label="Children" names={draftChildren} onChange={setDraftChildren} />
         </SimpleGrid>
         <Divider />
-        <Group justify="space-between">
-          <Button
-            variant="subtle"
-            color="red"
-            leftSection={<IconTrash size={15} />}
-            onClick={() => {
-              edit.close()
-              deletion.open()
-            }}
-          >
+        <Box pos="relative">
+          <Button variant="subtle" color="red" onClick={deletion.open}>
             Groupを削除
           </Button>
-          <Group>
-            <Button variant="default" onClick={edit.close}>キャンセル</Button>
-            <Button onClick={edit.close} disabled={!draftName.trim()}>保存</Button>
-          </Group>
-        </Group>
+          <Button
+            variant="default"
+            onClick={edit.close}
+            style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
+          >
+            キャンセル
+          </Button>
+          <Button
+            onClick={edit.close}
+            disabled={!draftName.trim()}
+            style={{ position: "absolute", right: 0 }}
+          >
+            保存
+          </Button>
+        </Box>
       </Stack>
         <Stack>
           <Text size="sm">
@@ -346,7 +348,7 @@ export function GroupBrowserPrototype() {
   )
 
   const deleteDialog = (
-    <Modal opened={deleteOpened} onClose={deletion.close} title="Groupを削除" centered>
+    <Modal opened={deleteOpened} onClose={deletion.close} title="Groupを削除" centered withCloseButton={false}>
       <Stack>
         <Text size="sm">
           「{selected?.name ?? ""}」を削除します。このGroupによるMedia分類とGroup間の関係は削除されますが、Media本体と他のGroupは削除されません。
