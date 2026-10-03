@@ -9,7 +9,12 @@ import {
 } from "react-resizable-panels"
 
 export type SplitViewRootProps = ComponentProps<typeof ResizableGroup>
-export type SplitViewPaneProps = Omit<\n  ComponentProps<typeof ResizablePanel>,\n  "minSize"\n> & {\n  minWidth?: number\n}
+export type SplitViewPaneProps = Omit<
+  ComponentProps<typeof ResizablePanel>,
+  "minSize"
+> & {
+  minWidth?: number
+}
 export type SplitViewSeparatorProps = ComponentProps<typeof ResizableSeparator>
 
 function Root({ style, ...props }: SplitViewRootProps) {
@@ -25,6 +30,7 @@ function Root({ style, ...props }: SplitViewRootProps) {
 function Pane({ minWidth, style, ...props }: SplitViewPaneProps) {
   return (
     <ResizablePanel
+      minSize={minWidth}
       style={{ minWidth: 0, minHeight: 0, overflow: "hidden", ...style }}
       {...props}
     />
