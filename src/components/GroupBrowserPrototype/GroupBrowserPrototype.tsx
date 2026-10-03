@@ -335,10 +335,21 @@ export function GroupBrowserPrototype() {
     <Modal opened={editOpened} onClose={edit.close} title="Groupを編集" size="lg" centered withCloseButton={false}>
       <Stack gap="lg">
         <TextInput
-          label="名前"
+          label={
+            <Group justify="space-between" wrap="nowrap">
+              <Text component="span" size="sm" fw={500}>名前</Text>
+              <Text component="span" size="xs" c="dimmed">
+                {Array.from(draftName).length} / 100
+              </Text>
+            </Group>
+          }
           value={draftName}
-          onChange={(event) => setDraftName(event.currentTarget.value)}
+          onChange={(event) => {
+            const value = event.currentTarget.value
+            if (Array.from(value).length <= 100) setDraftName(value)
+          }}
           placeholder="Group名"
+          styles={{ label: { display: "block", width: "100%" } }}
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
           <RelationEditor label="Parents" names={draftParents} onChange={setDraftParents} />
