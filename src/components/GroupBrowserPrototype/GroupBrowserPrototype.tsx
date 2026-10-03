@@ -272,7 +272,8 @@ export function GroupBrowserPrototype() {
         <SplitView.Pane id="groups" minWidth={264}>
           <Box style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
             <Stack p="sm" gap="xs">
-              <Group justify="flex-end">\n                <ActionIcon variant="subtle" aria-label="Groupを作成">
+              <Group justify="flex-end">
+                <ActionIcon variant="subtle" aria-label="Groupを作成">
                   <IconPlus size={18} />
                 </ActionIcon>
               </Group>
