@@ -6,7 +6,7 @@ import {
 } from "@mantine/core"
 import {
   IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
-  IconEye, IconFolderPlus, IconPhoto, IconPhotoOff, IconPlus, IconSearch,
+  IconEdit, IconEye, IconFolderPlus, IconPhoto, IconPhotoOff, IconPlus, IconSearch,
   IconShare, IconTags, IconTrash,
 } from "@tabler/icons-react"
 import { useMediaQuery } from "@mantine/hooks"
@@ -18,7 +18,7 @@ type PrototypeState =
   | "default" | "tag-filtered" | "true-empty" | "filtered-empty" | "loading"
   | "error" | "loading-more" | "load-more-error" | "processing-failure" | "selection"
 type ContextKind = "personal" | "community"
-type SelectionDialog = "group" | "tag" | "share" | "delete" | null
+type SelectionDialog = "group" | "share" | "delete" | null
 type MediaItem = { id: string; label: string; src: string; failed?: boolean }
 
 const media: MediaItem[] = Array.from({ length: 8 }, (_, index) => ({
@@ -140,7 +140,6 @@ export function MediaBrowserPrototype({
   const [detail, setDetail] = useState<MediaItem | null>(null)
   const [selectionDialog, setSelectionDialog] = useState<SelectionDialog>(initialDialog)
   const [groupTarget, setGroupTarget] = useState<string | null>(null)
-  const [tagTarget, setTagTarget] = useState<string | null>(null)
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
   const [tags, setTags] = useState<string[]>(initialState === "tag-filtered" || initialState === "filtered-empty" ? ["旅行"] : [])
   const currentContext = contexts.find((item) => item.kind === context) ?? contexts[0]
@@ -185,6 +184,8 @@ export function MediaBrowserPrototype({
                   w={compact ? "100%" : 280}
                   maw="100%"
                   style={{ flex: compact ? "1 1 auto" : undefined }}
+                  comboboxProps={{ withinPortal: true }}
+                  onDropdownOpen={() => undefined}
                 />
                 <Button size="xs" type="submit" style={{ flexShrink: 0 }}>検索</Button>
               </Group>
@@ -200,7 +201,7 @@ export function MediaBrowserPrototype({
             {selecting && (
               <>
                 <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />} disabled={selected.size === 0} onClick={() => setSelectionDialog("group")}>Group</Button>
-                <Button size="xs" variant="default" leftSection={<IconTags size={15} />} disabled={selected.size === 0} onClick={() => setSelectionDialog("tag")}>Tag</Button>
+                <Button size="xs" variant="default" leftSection={<IconEdit size={15} />} disabled={selected.size === 0}>編集</Button>
                 {context === "personal" && (
                   <Button size="xs" variant="default" leftSection={<IconShare size={15} />} disabled={selected.size === 0} onClick={() => setSelectionDialog("share")}>共有</Button>
                 )}
@@ -322,34 +323,10 @@ export function MediaBrowserPrototype({
             label="Group"
             placeholder="Groupを選択"
             searchable
+            comboboxProps={{ keepMounted: false }}
             data={["旅行", "家族", "風景写真", "お気に入り"]}
             value={groupTarget}
             onChange={setGroupTarget}
-          />
-        </Stack>
-      </Dialog>
-
-      <Dialog
-        opened={selectionDialog === "tag"}
-        onClose={() => setSelectionDialog(null)}
-        title="Tagを追加"
-        size="md"
-        footer={
-          <Dialog.Footer
-            secondary={<Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>}
-            primary={<Button disabled={!tagTarget} onClick={() => setSelectionDialog(null)}>追加</Button>}
-          />
-        }
-      >
-        <Stack gap="xs">
-          <Text size="sm">{selected.size}件のMediaにTagを追加します。</Text>
-          <Select
-            label="Tag"
-            placeholder="Tagを選択"
-            searchable
-            data={["家族", "旅行", "風景", "イベント"]}
-            value={tagTarget}
-            onChange={setTagTarget}
           />
         </Stack>
       </Dialog>
