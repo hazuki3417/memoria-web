@@ -158,7 +158,15 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
     setFiles((current) => current.filter((file) => file.id !== id))
     setSelectedIds((current) => current.filter((item) => item !== id))
   }
-  const removeAll = () => { setFiles([]); setSelectedIds([]) }
+  const removeAll = () => {
+    setFiles((current) => current.filter((file) => !removableStatuses.includes(file.status)))
+    setSelectedIds((current) =>
+      current.filter((id) => {
+        const file = files.find((item) => item.id === id)
+        return file ? !removableStatuses.includes(file.status) : false
+      }),
+    )
+  }
   const updateTags = (id: string, tags: string[]) =>
     setFiles((current) => current.map((file) => file.id === id ? { ...file, tags } : file))
 
