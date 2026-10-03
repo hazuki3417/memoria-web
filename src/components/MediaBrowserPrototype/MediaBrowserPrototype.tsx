@@ -176,21 +176,23 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
                 <Button size="xs" style={{ flexShrink: 0 }}>検索</Button>
               </Group>
             ) : (
-              <Group gap="xs">
-                <Badge size="lg" variant="light">{selected.size}件選択</Badge>
-                <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />}>Group</Button>
-                <Button size="xs" variant="default" leftSection={<IconTags size={15} />}>Tag</Button>
-                {context === "personal" && (
-                  <Button size="xs" variant="default" leftSection={<IconShare size={15} />}>共有</Button>
-                )}
-                <Button size="xs" variant="default" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
-              </Group>
+              <Badge size="lg" variant="light">{selected.size}件選択</Badge>
             )}
           </Box>
 
           {!compact && <Box />}
 
           <Group gap="xs" justify="flex-end" wrap="nowrap" style={{ gridColumn: compact ? "1" : undefined }}>
+            {selecting && (
+              <>
+                <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />}>Group</Button>
+                <Button size="xs" variant="default" leftSection={<IconTags size={15} />}>Tag</Button>
+                {context === "personal" && (
+                  <Button size="xs" variant="default" leftSection={<IconShare size={15} />}>共有</Button>
+                )}
+                <Button size="xs" variant="default" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
+              </>
+            )}
             {!selecting && (context === "personal" ? (
               <Button size="xs" leftSection={<IconCloudUpload size={16} />}>アップロード</Button>
             ) : (
