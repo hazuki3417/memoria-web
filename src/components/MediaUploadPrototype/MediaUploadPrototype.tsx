@@ -376,7 +376,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
           <Box w={72} h={72} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
             <IconPhoto size={22} stroke={1.4} />
           </Box>
-          <Stack gap={4} justify="center" h={72} style={{ flex: "0 0 34%", minWidth: 0, overflow: "hidden" }}>
+          <Stack gap={4} justify="center" h={72} style={{ flex: "0 0 28%", minWidth: 0, overflow: "hidden" }}>
             <Box style={{ minWidth: 0 }}>
               <Text size="sm" fw={600} truncate>{file.name}</Text>
               <Text size="xs" c="dimmed">{file.size}</Text>
