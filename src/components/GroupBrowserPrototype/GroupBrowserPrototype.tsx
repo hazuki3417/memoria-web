@@ -33,6 +33,25 @@ const groups: PrototypeGroup[] = [
   { id: "empty", name: "新しいGroup", mediaCount: 3, previewCount: 0, parentNames: [], childNames: [] },
 ]
 
+const relationCandidateNames = [
+  ...groups.map((group) => group.name),
+  "北海道",
+  "東北",
+  "関東",
+  "関西",
+  "九州",
+  "イベント",
+  "日常",
+  "お気に入り",
+  "山",
+  "海",
+  "夕景",
+  "夜景",
+  "ポートレート",
+  "アーカイブ",
+  "未整理",
+]
+
 const personalContext = {
   id: "personal",
   kind: "personal" as const,
@@ -140,8 +159,7 @@ function RelationItems({ names }: { names: string[] }) {
 
 function RelationEditor({ label, names, onChange }: { label: string; names: string[]; onChange: (names: string[]) => void }) {
   const [query, setQuery] = useState("")
-  const candidates = groups
-    .map((group) => group.name)
+  const candidates = relationCandidateNames
     .filter((name) => !names.includes(name) && name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
 
   return (
