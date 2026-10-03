@@ -1,5 +1,6 @@
 "use client"
 
+import { NavigationItem } from "@/components/NavigationItem"
 import {
   AppShell,
   Avatar,
@@ -10,7 +11,6 @@ import {
   Drawer,
   Group,
   Menu,
-  NavLink,
   Stack,
   Text,
   useMantineColorScheme,
@@ -229,40 +229,15 @@ export function ApplicationShell({
           <Box component="nav" id="application-context-navigation" aria-label="現在のコンテキスト内のナビゲーション">
             <Stack gap={0}>
               {navigationItems.map((item) => (
-                <Box key={item.id} pos="relative" pl={8}>
-                  {item.active && (
-                    <Box
-                      pos="absolute"
-                      top={3}
-                      bottom={3}
-                      left={0}
-                      w={3}
-                      bg={currentContext.accentColor}
-                      style={{ borderRadius: "var(--mantine-radius-xl)", pointerEvents: "none" }}
-                      aria-hidden="true"
-                    />
-                  )}
-                  <NavLink
-                    label={item.label}
-                    leftSection={<item.icon size={16} stroke={1.6} aria-hidden="true" />}
-                    active={item.active}
-                    disabled={item.disabled}
-                    onClick={() => selectNavigation(item.id)}
-                    variant="subtle"
-                    color="gray"
-                    styles={{
-                      root: {
-                        borderRadius: "var(--mantine-radius-sm)",
-                        background: item.active ? "var(--mantine-color-default-hover)" : undefined,
-                        padding: "5px 8px",
-                        minHeight: 32,
-                        fontWeight: item.active ? 600 : 400,
-                      },
-                      section: { color: "var(--mantine-color-dimmed)", marginInlineEnd: 8 },
-                      label: { fontSize: "var(--mantine-font-size-sm)", lineHeight: 1.3 },
-                    }}
-                  />
-                </Box>
+                <NavigationItem
+                  key={item.id}
+                  label={item.label}
+                  icon={item.icon}
+                  active={item.active}
+                  disabled={item.disabled}
+                  accentColor={currentContext.accentColor}
+                  onClick={() => selectNavigation(item.id)}
+                />
               ))}
             </Stack>
           </Box>
