@@ -185,7 +185,7 @@ function RelationEditor({ label, names, oppositeNames, onChange, currentGroupNam
         nothingFoundMessage="候補がありません"
         styles={{
           input: {
-            height: 76,
+            height: 104,
             overflow: "hidden",
             alignItems: "flex-start",
           },
