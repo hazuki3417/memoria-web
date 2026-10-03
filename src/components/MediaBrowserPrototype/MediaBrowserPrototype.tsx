@@ -378,6 +378,7 @@ export function MediaBrowserPrototype({
         opened={detail !== null}
         onClose={() => setDetail(null)}
         fullScreen
+        zIndex={400}
         padding={0}
         withCloseButton={false}
         styles={{
