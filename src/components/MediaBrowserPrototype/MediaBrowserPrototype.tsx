@@ -2,7 +2,7 @@
 
 import {
   Alert, AspectRatio, Badge, Box, Button, Center, Group, Loader, Menu, Modal,
-  Paper, SimpleGrid, Stack, TagsInput, Text, ThemeIcon,
+  Image, Paper, Stack, TagsInput, Text, ThemeIcon,
 } from "@mantine/core"
 import {
   IconAlertCircle, IconCheck, IconChevronDown, IconCloudUpload, IconFolderPlus,
@@ -16,19 +16,14 @@ type PrototypeState =
   | "default" | "tag-filtered" | "true-empty" | "filtered-empty" | "loading"
   | "error" | "loading-more" | "load-more-error" | "processing-failure" | "selection"
 type ContextKind = "personal" | "community"
-type MediaItem = { id: string; label: string; background: string; failed?: boolean }
+type MediaItem = { id: string; label: string; src: string; failed?: boolean }
 
-const media: MediaItem[] = [
-  { id: "1", label: "海辺の夕暮れ", background: "linear-gradient(145deg, #f2b880 0%, #d56d63 45%, #48506f 100%)" },
-  { id: "2", label: "森の小径", background: "linear-gradient(145deg, #a9c49b 0%, #52745d 52%, #263e3a 100%)" },
-  { id: "3", label: "青空と雲", background: "linear-gradient(145deg, #c9e6f5 0%, #76b6db 55%, #e8edf0 56%, #9fb8c5 100%)" },
-  { id: "4", label: "夜の街", background: "linear-gradient(145deg, #34364f 0%, #171827 55%, #b46a72 100%)" },
-  { id: "5", label: "花畑", background: "linear-gradient(145deg, #f2d8dd 0%, #d99fae 48%, #77946b 100%)" },
-  { id: "6", label: "雪山", background: "linear-gradient(145deg, #dfe8ef 0%, #a8bac8 48%, #637789 100%)" },
-  { id: "7", label: "湖", background: "linear-gradient(145deg, #b9d7d5 0%, #669a9a 55%, #395b60 100%)" },
-  { id: "8", label: "夕方の草原", background: "linear-gradient(145deg, #e9c889 0%, #b9985d 45%, #667451 100%)" },
-  { id: "9", label: "画像処理失敗", background: "", failed: true },
-]
+const media: MediaItem[] = Array.from({ length: 8 }, (_, index) => ({
+  id: String(index + 1),
+  label: `Media ${index + 1}`,
+  src: `/group-browser/group-media-${String((index % 9) + 1).padStart(2, "0")}.jpg`,
+}))
+media.push({ id: "9", label: "画像処理失敗", src: "", failed: true })
 const contexts = [
   { id: "personal", kind: "personal" as const, label: "Personal", accentColor: "var(--mantine-color-blue-6)" },
   { id: "community", kind: "community" as const, label: "Photo Club", accentColor: "var(--mantine-color-violet-6)" },
@@ -42,27 +37,57 @@ function MediaTile({ item, selecting, selected, onClick }: {
   item: MediaItem; selecting: boolean; selected: boolean; onClick: () => void
 }) {
   return (
-    <Box component="button" type="button" onClick={onClick}
+    <Box
+      component="button"
+      type="button"
+      onClick={onClick}
       aria-label={selecting ? `${item.label}を${selected ? "選択解除" : "選択"}` : `${item.label}を開く`}
       aria-pressed={selecting ? selected : undefined}
-      style={{ border: 0, padding: 0, background: "transparent", cursor: "pointer", position: "relative", borderRadius: "var(--mantine-radius-md)" }}>
-      <AspectRatio ratio={1} style={{
-        borderRadius: "var(--mantine-radius-md)", overflow: "hidden",
-        boxShadow: selected ? "0 0 0 3px var(--mantine-color-blue-6)" : undefined,
-        background: item.failed ? "var(--mantine-color-gray-1)" : item.background,
-      }}>
-        {item.failed ? (
-          <Stack align="center" justify="center" gap={6} p="sm">
-            <IconPhotoOff size={28} stroke={1.5} aria-hidden="true" />
-            <Text size="xs" fw={600} ta="center">画像を表示できません</Text>
-            <Text size="10px" c="dimmed" ta="center">処理に失敗しました</Text>
-          </Stack>
-        ) : <Box aria-hidden="true" />}
-      </AspectRatio>
-      {selecting && (
-        <ThemeIcon radius="xl" variant={selected ? "filled" : "white"} color={selected ? "blue" : "gray"} size={24}
-          style={{ position: "absolute", top: 8, right: 8, border: "1px solid var(--mantine-color-default-border)" }} aria-hidden="true">
-          {selected ? <IconCheck size={15} /> : null}
+      w={160}
+      h={160}
+      p={0}
+      bdrs="sm"
+      style={{
+        position: "relative",
+        flex: "0 0 160px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        border: 0,
+        background: selected ? "var(--mantine-color-blue-light)" : "transparent",
+        outline: selected ? "1px solid var(--mantine-color-blue-filled)" : undefined,
+        filter: selecting ? (selected ? "brightness(1.1)" : "brightness(0.9)") : undefined,
+        cursor: "pointer",
+        transition: "filter 0.2s ease",
+        userSelect: "none",
+      }}
+    >
+      {item.failed ? (
+        <Stack align="center" justify="center" gap={6} p="sm">
+          <IconPhotoOff size={28} stroke={1.5} aria-hidden="true" />
+          <Text size="xs" fw={600} ta="center">画像を表示できません</Text>
+          <Text size="10px" c="dimmed" ta="center">処理に失敗しました</Text>
+        </Stack>
+      ) : (
+        <Image
+          src={item.src}
+          alt={item.label}
+          bdrs="sm"
+          w="auto"
+          h="auto"
+          mah="100%"
+          maw="100%"
+          draggable={false}
+        />
+      )}
+      {selecting && selected && (
+        <ThemeIcon
+          radius="xl"
+          size={24}
+          style={{ position: "absolute", top: 6, right: 6 }}
+          aria-hidden="true"
+        >
+          <IconCheck size={15} />
         </ThemeIcon>
       )}
     </Box>
@@ -166,12 +191,25 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
         )}
 
         {stateItems.length > 0 && (
-          <SimpleGrid cols={{ base: 2, xs: 3, sm: 4, md: 5, lg: 6 }} spacing="sm">
+          <Box
+            p={3}
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              justifyContent: "center",
+            }}
+          >
             {stateItems.map((item) => (
-              <MediaTile key={item.id} item={item} selecting={selecting} selected={selected.has(item.id)}
-                onClick={() => selecting ? toggle(item.id) : setDetail(item)} />
+              <MediaTile
+                key={item.id}
+                item={item}
+                selecting={selecting}
+                selected={selected.has(item.id)}
+                onClick={() => selecting ? toggle(item.id) : setDetail(item)}
+              />
             ))}
-          </SimpleGrid>
+          </Box>
         )}
         {initialState === "loading-more" && (
           <Center py="md"><Group gap="xs"><Loader size="sm" /><Text size="sm" c="dimmed">さらに読み込んでいます</Text></Group></Center>
@@ -186,8 +224,8 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
 
       <Modal opened={detail !== null} onClose={() => setDetail(null)} title="Media Detail" size="xl" centered>
         {detail && <Stack>
-          <AspectRatio ratio={16 / 10} style={{ borderRadius: "var(--mantine-radius-md)", overflow: "hidden", background: detail.background }}>
-            <Box aria-label={detail.label} />
+          <AspectRatio ratio={16 / 10} style={{ borderRadius: "var(--mantine-radius-md)", overflow: "hidden" }}>
+            <Image src={detail.src} alt={detail.label} fit="contain" />
           </AspectRatio>
           <Box>
             <Text fw={650}>{detail.label}</Text>
