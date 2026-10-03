@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core"
+import { useMantineColorScheme } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconChartBar,
@@ -90,6 +91,7 @@ function ProfileContent() {
 }
 
 function PreferencesContent({ compact }: { compact: boolean }) {
+  const { colorScheme, setColorScheme } = useMantineColorScheme()
   const [dateFormat, setDateFormat] = useState("YYYY-MM-DD")
   const [fileSizeUnit, setFileSizeUnit] = useState("SI")
   const [loop, setLoop] = useState(true)
@@ -104,6 +106,26 @@ function PreferencesContent({ compact }: { compact: boolean }) {
       <Box>
         <SectionHeader>表示</SectionHeader>
         <Stack gap="xl">
+          <SettingRow
+            compact={compact}
+            label="表示テーマ"
+            description="画面の表示テーマを選びます。"
+          >
+            <Select
+              aria-label="表示テーマ"
+              value={colorScheme}
+              onChange={(value) =>
+                value &&
+                setColorScheme(value as "auto" | "light" | "dark")
+              }
+              data={[
+                { value: "auto", label: "システム" },
+                { value: "light", label: "ライト" },
+                { value: "dark", label: "ダーク" },
+              ]}
+              allowDeselect={false}
+            />
+          </SettingRow>
           <SettingRow
             compact={compact}
             label="日付形式"
