@@ -54,13 +54,13 @@ function MediaTile({ item, selecting, selected, onClick }: {
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        border: selected
-          ? "2px solid var(--mantine-color-blue-6)"
-          : "1px solid var(--mantine-color-default-border)",
+        border: "1px solid var(--mantine-color-default-border)",
+        outline: selected ? "2px solid var(--mantine-color-blue-6)" : undefined,
+        outlineOffset: selected ? "-2px" : undefined,
         background: "var(--mantine-color-gray-0)",
         boxShadow: selected ? "0 0 0 2px var(--mantine-color-blue-light)" : undefined,
         cursor: "pointer",
-        transition: "border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease",
+        transition: "outline-color 120ms ease, box-shadow 120ms ease, transform 120ms ease",
         userSelect: "none",
       }}
     >
