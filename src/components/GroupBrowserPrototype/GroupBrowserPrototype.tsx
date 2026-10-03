@@ -21,10 +21,10 @@ type PrototypeGroup = {
 }
 
 const groups: PrototypeGroup[] = [
-  { id: "travel", name: "旅行", mediaCount: 128, previewCount: 4 },
-  { id: "family", name: "家族", mediaCount: 84, previewCount: 4 },
-  { id: "food", name: "料理", mediaCount: 42, previewCount: 3 },
-  { id: "landscape", name: "風景写真", mediaCount: 31, previewCount: 4 },
+  { id: "travel", name: "旅行", mediaCount: 128, previewCount: 8 },
+  { id: "family", name: "家族", mediaCount: 84, previewCount: 8 },
+  { id: "food", name: "料理", mediaCount: 42, previewCount: 6 },
+  { id: "landscape", name: "風景写真", mediaCount: 31, previewCount: 7 },
   { id: "archive", name: "あとで整理する写真", mediaCount: 18, previewCount: 2 },
   { id: "empty", name: "新しいGroup", mediaCount: 0, previewCount: 0 },
 ]
@@ -47,21 +47,36 @@ const previewTones = [
   "var(--mantine-color-grape-1)",
   "var(--mantine-color-teal-1)",
   "var(--mantine-color-orange-1)",
+  "var(--mantine-color-cyan-1)",
+  "var(--mantine-color-indigo-1)",
+  "var(--mantine-color-lime-1)",
+  "var(--mantine-color-pink-1)",
 ]
 
 function PreviewStrip({ count }: { count: number }) {
   return (
-    <SimpleGrid cols={4} spacing={4}>
-      {Array.from({ length: 4 }, (_, index) => (
+    <Box
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(44px, 1fr))",
+        gridAutoRows: "1fr",
+        gap: 4,
+        maxHeight: 96,
+        overflow: "hidden",
+      }}
+    >
+      {Array.from({ length: Math.min(count, 8) }, (_, index) => (
         <Box
           key={index}
-          h={44}
           bdrs="sm"
-          bg={index < count ? previewTones[index] : "var(--mantine-color-default-hover)"}
-          style={{ border: "1px solid var(--mantine-color-default-border)" }}
+          bg={previewTones[index]}
+          style={{
+            aspectRatio: "1 / 1",
+            border: "1px solid var(--mantine-color-default-border)",
+          }}
         />
       ))}
-    </SimpleGrid>
+    </Box>
   )
 }
 
