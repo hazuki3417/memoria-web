@@ -240,8 +240,7 @@ export function GroupBrowserPrototype() {
           {compactView === "groups" ? (
             <Box h="100%" style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
               <Stack p="sm" gap="xs">
-                <Group justify="flex-end"><ActionIcon variant="subtle" aria-label="Groupを作成"><IconPlus size={18} /></ActionIcon></Group>
-                <TextInput value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Groupを検索" leftSection={<IconSearch size={16} />} />
+                <Group gap="xs" wrap="nowrap"><TextInput flex={1} value={query} onChange={(event) => setQuery(event.currentTarget.value)} placeholder="Groupを検索" leftSection={<IconSearch size={16} />} /><ActionIcon variant="subtle" aria-label="Groupを作成"><IconPlus size={18} /></ActionIcon></Group>
                 <Text size="xs" c="dimmed">{visibleGroups.length}件</Text>
               </Stack>
               <Divider />
@@ -272,17 +271,18 @@ export function GroupBrowserPrototype() {
         <SplitView.Pane id="groups" minWidth={264}>
           <Box style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
             <Stack p="sm" gap="xs">
-              <Group justify="flex-end">
+              <Group gap="xs" wrap="nowrap">
+                <TextInput
+                  flex={1}
+                  value={query}
+                  onChange={(event) => setQuery(event.currentTarget.value)}
+                  placeholder="Groupを検索"
+                  leftSection={<IconSearch size={16} />}
+                />
                 <ActionIcon variant="subtle" aria-label="Groupを作成">
                   <IconPlus size={18} />
                 </ActionIcon>
               </Group>
-              <TextInput
-                value={query}
-                onChange={(event) => setQuery(event.currentTarget.value)}
-                placeholder="Groupを検索"
-                leftSection={<IconSearch size={16} />}
-              />
               <Text size="xs" c="dimmed">{visibleGroups.length}件</Text>
             </Stack>
             <Divider />
