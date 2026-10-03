@@ -11,6 +11,7 @@ export * from "./NavigationItem"
 export * from "./PageHeader"
 export * from "./ResizeSplitView"
 export * from "./SectionHeader"
+export * from "./SettingRow"
 export * from "./TagsInput"
 export * from "./Toggle"
 
