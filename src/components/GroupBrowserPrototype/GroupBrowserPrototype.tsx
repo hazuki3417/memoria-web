@@ -67,7 +67,7 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
           pos="absolute"
           w="78%"
           h="78%"
-          bdrs="sm"
+          bdrs={2}
           style={{
             left: `${5 + layer * 6}%`,
             top: `${5 + layer * 6}%`,
