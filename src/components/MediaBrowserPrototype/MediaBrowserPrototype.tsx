@@ -524,11 +524,6 @@ export function MediaBrowserPrototype({
                   }}
                 >
                   <Stack gap="md" p="md" style={{ flex: 1, overflowY: "auto" }}>
-                    <Box>
-                      <Text fw={650}>{detail.label}</Text>
-                      <Text size="xs" c="dimmed">IMG_20261003_0842.jpg</Text>
-                    </Box>
-                    <Divider />
                     <Stack gap="xs">
                       <Group justify="space-between"><Text size="xs" c="dimmed">ファイルサイズ</Text><Text size="xs">8.4 MB</Text></Group>
                       <Group justify="space-between"><Text size="xs" c="dimmed">サイズ</Text><Text size="xs">4032 × 3024</Text></Group>
