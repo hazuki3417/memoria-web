@@ -1,6 +1,5 @@
 "use client"
 
-import { ApplicationShell, type ApplicationContextOption } from "@/components/ApplicationShell"
 import { Box, Paper, Stack, Text } from "@mantine/core"
 import {
   IconLayoutDashboard,
@@ -9,6 +8,10 @@ import {
   IconUsers,
 } from "@tabler/icons-react"
 import { useState } from "react"
+import {
+  type ApplicationContextOption,
+  ApplicationShell,
+} from "@/components/ApplicationShell"
 
 type Context = "personal" | "community" | "communityTravel"
 type Section = "dashboard" | "media" | "groups" | "members"
@@ -93,7 +96,8 @@ export function ApplicationShellPrototype({
           <Stack align="center" justify="center" mih={260} gap="xs">
             <Text fw={600}>コンテンツ領域</Text>
             <Text c="dimmed" ta="center" size="sm">
-              このStoryでは共通Application Shellのみを検討します。画面固有のデータや操作は接続していません。
+              このStoryでは共通Application
+              Shellのみを検討します。画面固有のデータや操作は接続していません。
             </Text>
           </Stack>
         </Paper>

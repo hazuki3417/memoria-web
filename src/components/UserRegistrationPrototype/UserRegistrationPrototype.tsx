@@ -1,8 +1,5 @@
 "use client"
 
-import { PageHeader } from "@/components/PageHeader"
-import { SectionHeader } from "@/components/SectionHeader"
-
 import {
   AppShell,
   Box,
@@ -17,6 +14,8 @@ import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
 
 type ReviewState =
   | "default"
@@ -88,7 +87,10 @@ export function UserRegistrationPrototype({
         <AppShell.Main>
           <Box maw={880} mx="auto" w="100%">
             <Stack gap="xl">
-              <PageHeader title="Memoriaへようこそ" description="Memoriaで使用するプロフィールを設定して、登録を完了してください。" />
+              <PageHeader
+                title="Memoriaへようこそ"
+                description="Memoriaで使用するプロフィールを設定して、登録を完了してください。"
+              />
               <Box>
                 <SectionHeader>基本情報</SectionHeader>
                 <Stack gap="md" maw={540}>
@@ -145,18 +147,12 @@ export function UserRegistrationPrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <FeedbackAlert
-                        kind="error"
-                        title="登録できませんでした"
-                      >
+                      <FeedbackAlert kind="error" title="登録できませんでした">
                         認証情報を確認できませんでした。もう一度ログインしてください。
                       </FeedbackAlert>
                     )}
                     {exited && (
-                      <FeedbackAlert
-                        kind="info"
-                        title="登録せずに終了しました"
-                      >
+                      <FeedbackAlert kind="info" title="登録せずに終了しました">
                         実際の画面ではログアウトして公開画面へ戻ります。
                       </FeedbackAlert>
                     )}

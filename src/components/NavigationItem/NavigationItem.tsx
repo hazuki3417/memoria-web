@@ -5,7 +5,11 @@ import type { ComponentType } from "react"
 
 export type NavigationItemProps = {
   label: string
-  icon: ComponentType<{ size?: number; stroke?: number; "aria-hidden"?: boolean }>
+  icon: ComponentType<{
+    size?: number
+    stroke?: number
+    "aria-hidden"?: boolean
+  }>
   active?: boolean
   disabled?: boolean
   accentColor?: string
@@ -48,7 +52,9 @@ export function NavigationItem({
         styles={{
           root: {
             borderRadius: "var(--mantine-radius-sm)",
-            background: active ? "var(--mantine-color-default-hover)" : undefined,
+            background: active
+              ? "var(--mantine-color-default-hover)"
+              : undefined,
             padding: "5px 8px",
             minHeight: 32,
             fontWeight: active ? 600 : 400,

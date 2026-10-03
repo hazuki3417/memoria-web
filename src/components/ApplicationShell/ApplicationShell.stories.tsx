@@ -1,15 +1,40 @@
 import { Box, NavLink, Paper, Stack, Text } from "@mantine/core"
-import { IconLayoutDashboard, IconPhoto, IconUsers, IconUserCircle } from "@tabler/icons-react"
 import type { Meta, StoryObj } from "@storybook/react"
+import {
+  IconLayoutDashboard,
+  IconPhoto,
+  IconUserCircle,
+  IconUsers,
+} from "@tabler/icons-react"
 import { ApplicationShell } from "./ApplicationShell"
 
-const personal = { id: "personal", kind: "personal" as const, label: "Personal", accentColor: "var(--mantine-color-blue-6)" }
-const family = { id: "family", kind: "community" as const, label: "家族のアルバム", accentColor: "var(--mantine-color-teal-6)" }
-const travel = { id: "travel", kind: "community" as const, label: "旅行の思い出", accentColor: "var(--mantine-color-violet-6)" }
+const personal = {
+  id: "personal",
+  kind: "personal" as const,
+  label: "Personal",
+  accentColor: "var(--mantine-color-blue-6)",
+}
+const family = {
+  id: "family",
+  kind: "community" as const,
+  label: "家族のアルバム",
+  accentColor: "var(--mantine-color-teal-6)",
+}
+const travel = {
+  id: "travel",
+  kind: "community" as const,
+  label: "旅行の思い出",
+  accentColor: "var(--mantine-color-violet-6)",
+}
 const contexts = [personal, family, travel]
 
 const personalNavigation = [
-  { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard, active: true },
+  {
+    id: "dashboard",
+    label: "ダッシュボード",
+    icon: IconLayoutDashboard,
+    active: true,
+  },
   { id: "media", label: "メディア", icon: IconPhoto },
   { id: "groups", label: "グループ", icon: IconUsers },
 ]
@@ -71,18 +96,28 @@ export const WithLocalNavigation: Story = {
     children: (
       <Box maw={1120} mx="auto" w="100%">
         <Box style={{ display: "flex", gap: 56, alignItems: "flex-start" }}>
-          <Box component="nav" aria-label="設定" w={200} style={{ flexShrink: 0 }}>
-            <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
+          <Box
+            component="nav"
+            aria-label="設定"
+            w={200}
+            style={{ flexShrink: 0 }}
+          >
+            <Text size="xs" fw={700} c="dimmed" mb="xs">
+              設定
+            </Text>
             <Stack gap={0}>
-              {["プロフィール", "環境設定", "利用状況", "アカウント"].map((label, index) => (
-                <NavLink key={label} label={label} active={index === 0} />
-              ))}
+              {["プロフィール", "環境設定", "利用状況", "アカウント"].map(
+                (label, index) => (
+                  <NavLink key={label} label={label} active={index === 0} />
+                ),
+              )}
             </Stack>
           </Box>
           <Paper withBorder radius="md" p="xl" style={{ flex: 1 }}>
             <Text fw={600}>Settings content</Text>
             <Text c="dimmed" size="sm" mt="xs">
-              Local NavigationはScreen側が所有し、Application Drawerはその前面へ表示されます。
+              Local NavigationはScreen側が所有し、Application
+              Drawerはその前面へ表示されます。
             </Text>
           </Paper>
         </Box>

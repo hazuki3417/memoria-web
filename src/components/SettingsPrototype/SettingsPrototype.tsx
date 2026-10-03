@@ -1,10 +1,5 @@
 "use client"
 
-import { ApplicationShell } from "@/components/ApplicationShell"
-import { NavigationItem } from "@/components/NavigationItem"
-import { PageHeader } from "@/components/PageHeader"
-import { SectionHeader } from "@/components/SectionHeader"
-import { SettingRow } from "@/components/SettingRow"
 import {
   Box,
   Button,
@@ -28,6 +23,11 @@ import {
   IconUsers,
 } from "@tabler/icons-react"
 import { useState } from "react"
+import { ApplicationShell } from "@/components/ApplicationShell"
+import { NavigationItem } from "@/components/NavigationItem"
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
+import { SettingRow } from "@/components/SettingRow"
 
 type Section = "profile" | "preferences" | "usage" | "account"
 

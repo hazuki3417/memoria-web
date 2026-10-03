@@ -1,6 +1,5 @@
 "use client"
 
-import { NavigationItem } from "@/components/NavigationItem"
 import {
   AppShell,
   Avatar,
@@ -27,6 +26,7 @@ import {
 } from "@tabler/icons-react"
 import type { ComponentType, ReactNode } from "react"
 import { useState } from "react"
+import { NavigationItem } from "@/components/NavigationItem"
 
 export type ApplicationContextOption = {
   id: string
@@ -38,7 +38,11 @@ export type ApplicationContextOption = {
 export type ApplicationNavigationItem = {
   id: string
   label: string
-  icon: ComponentType<{ size?: number; stroke?: number; "aria-hidden"?: boolean }>
+  icon: ComponentType<{
+    size?: number
+    stroke?: number
+    "aria-hidden"?: boolean
+  }>
   active?: boolean
   disabled?: boolean
 }
@@ -102,10 +106,15 @@ export function ApplicationShell({
     <AppShell
       header={{ height: 40 }}
       padding="lg"
-      styles={{ main: { minHeight: "100vh", background: "var(--mantine-color-body)" } }}
+      styles={{
+        main: { minHeight: "100vh", background: "var(--mantine-color-body)" },
+      }}
     >
       <AppShell.Header
-        style={{ zIndex: 300, borderTop: `2px solid ${currentContext.accentColor}` }}
+        style={{
+          zIndex: 300,
+          borderTop: `2px solid ${currentContext.accentColor}`,
+        }}
       >
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
@@ -117,8 +126,15 @@ export function ApplicationShell({
               aria-controls="application-context-navigation"
               aria-expanded={navigationOpened}
             />
-            <Text fw={750} size="lg">Memoria</Text>
-            <Box w={1} h={20} bg="var(--mantine-color-default-border)" aria-hidden="true" />
+            <Text fw={750} size="lg">
+              Memoria
+            </Text>
+            <Box
+              w={1}
+              h={20}
+              bg="var(--mantine-color-default-border)"
+              aria-hidden="true"
+            />
             <Menu withinPortal position="bottom-start" styles={menuStyles}>
               <Menu.Target>
                 <Button
@@ -129,8 +145,12 @@ export function ApplicationShell({
                   aria-label="コンテキストを切り替える"
                   maw={{ base: 144, sm: 240 }}
                 >
-                  <Text size="xs" mr={6} aria-hidden="true">▾</Text>
-                  <Text size="sm" truncate>{currentContext.label}</Text>
+                  <Text size="xs" mr={6} aria-hidden="true">
+                    ▾
+                  </Text>
+                  <Text size="sm" truncate>
+                    {currentContext.label}
+                  </Text>
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
@@ -144,7 +164,11 @@ export function ApplicationShell({
                   <Box key={context.id}>
                     <Menu.Item
                       onClick={() => selectContext(context.id)}
-                      rightSection={context.id === currentContext.id ? <IconCheck size={14} /> : null}
+                      rightSection={
+                        context.id === currentContext.id ? (
+                          <IconCheck size={14} />
+                        ) : null
+                      }
                     >
                       {context.label}
                     </Menu.Item>
@@ -152,7 +176,9 @@ export function ApplicationShell({
                 ))}
                 {onCreateCommunity && (
                   <Menu.Item
-                    leftSection={<IconPlus size={16} stroke={1.6} aria-hidden="true" />}
+                    leftSection={
+                      <IconPlus size={16} stroke={1.6} aria-hidden="true" />
+                    }
                     onClick={onCreateCommunity}
                   >
                     Communityを作成
@@ -172,34 +198,66 @@ export function ApplicationShell({
                 aria-label="アカウントメニュー"
                 title="アカウントメニュー"
               >
-                <Avatar size={24} radius="xl">{user.avatarLabel ?? user.displayName.slice(0, 1)}</Avatar>
+                <Avatar size={24} radius="xl">
+                  {user.avatarLabel ?? user.displayName.slice(0, 1)}
+                </Avatar>
               </Button>
             </Menu.Target>
             <Menu.Dropdown>
               <Group gap="sm" px="xs" py="xs" wrap="nowrap">
-                <Avatar size={32} radius="xl">{user.avatarLabel ?? user.displayName.slice(0, 1)}</Avatar>
+                <Avatar size={32} radius="xl">
+                  {user.avatarLabel ?? user.displayName.slice(0, 1)}
+                </Avatar>
                 <Box>
-                  <Text size="sm" fw={600} lh={1.2}>{user.displayName}</Text>
-                  <Text size="xs" c="dimmed" lh={1.2}>{currentContext.label}</Text>
+                  <Text size="sm" fw={600} lh={1.2}>
+                    {user.displayName}
+                  </Text>
+                  <Text size="xs" c="dimmed" lh={1.2}>
+                    {currentContext.label}
+                  </Text>
                 </Box>
               </Group>
               <Menu.Divider />
-              <Menu.Item leftSection={<IconSettings size={16} stroke={1.6} />} onClick={onOpenSettings}>
+              <Menu.Item
+                leftSection={<IconSettings size={16} stroke={1.6} />}
+                onClick={onOpenSettings}
+              >
                 設定
               </Menu.Item>
               <Menu.Divider />
               <Menu.Label>表示テーマ</Menu.Label>
-              <Menu.Item leftSection={<IconDeviceDesktop size={16} stroke={1.6} />} rightSection={colorScheme === "auto" ? <IconCheck size={14} /> : null} onClick={() => setColorScheme("auto")}>
+              <Menu.Item
+                leftSection={<IconDeviceDesktop size={16} stroke={1.6} />}
+                rightSection={
+                  colorScheme === "auto" ? <IconCheck size={14} /> : null
+                }
+                onClick={() => setColorScheme("auto")}
+              >
                 システム
               </Menu.Item>
-              <Menu.Item leftSection={<IconSun size={16} stroke={1.6} />} rightSection={colorScheme === "light" ? <IconCheck size={14} /> : null} onClick={() => setColorScheme("light")}>
+              <Menu.Item
+                leftSection={<IconSun size={16} stroke={1.6} />}
+                rightSection={
+                  colorScheme === "light" ? <IconCheck size={14} /> : null
+                }
+                onClick={() => setColorScheme("light")}
+              >
                 ライト
               </Menu.Item>
-              <Menu.Item leftSection={<IconMoon size={16} stroke={1.6} />} rightSection={colorScheme === "dark" ? <IconCheck size={14} /> : null} onClick={() => setColorScheme("dark")}>
+              <Menu.Item
+                leftSection={<IconMoon size={16} stroke={1.6} />}
+                rightSection={
+                  colorScheme === "dark" ? <IconCheck size={14} /> : null
+                }
+                onClick={() => setColorScheme("dark")}
+              >
                 ダーク
               </Menu.Item>
               <Menu.Divider />
-              <Menu.Item leftSection={<IconLogout size={16} stroke={1.6} />} onClick={onLogout}>
+              <Menu.Item
+                leftSection={<IconLogout size={16} stroke={1.6} />}
+                onClick={onLogout}
+              >
                 ログアウト
               </Menu.Item>
             </Menu.Dropdown>
@@ -219,14 +277,22 @@ export function ApplicationShell({
         closeOnEscape
         overlayProps={{ backgroundOpacity: 0.35, blur: 0 }}
         styles={{
-          content: { marginTop: 40, height: "calc(100dvh - 40px)", boxShadow: "var(--mantine-shadow-md)" },
+          content: {
+            marginTop: 40,
+            height: "calc(100dvh - 40px)",
+            boxShadow: "var(--mantine-shadow-md)",
+          },
           inner: { top: 0 },
           overlay: { top: 40, height: "calc(100dvh - 40px)" },
           body: { height: "100%" },
         }}
       >
         <Stack gap={0} h="100%" p="xs">
-          <Box component="nav" id="application-context-navigation" aria-label="現在のコンテキスト内のナビゲーション">
+          <Box
+            component="nav"
+            id="application-context-navigation"
+            aria-label="現在のコンテキスト内のナビゲーション"
+          >
             <Stack gap={0}>
               {navigationItems.map((item) => (
                 <NavigationItem
@@ -243,7 +309,9 @@ export function ApplicationShell({
           </Box>
           <Box mt="auto">
             <Divider mb="xs" />
-            <Text size="10px" c="dimmed" px="sm" pb={4}>© 2026 Memoria</Text>
+            <Text size="10px" c="dimmed" px="sm" pb={4}>
+              © 2026 Memoria
+            </Text>
           </Box>
         </Stack>
       </Drawer>

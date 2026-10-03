@@ -1,8 +1,5 @@
 "use client"
 
-import { PageHeader } from "@/components/PageHeader"
-import { SectionHeader } from "@/components/SectionHeader"
-
 import {
   AppShell,
   Box,
@@ -17,6 +14,8 @@ import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
 
 type ReviewState =
   | "default"
@@ -94,7 +93,10 @@ export function UserProfilePrototype({
         <AppShell.Main>
           <Box maw={880} mx="auto" w="100%">
             <Stack gap="xl">
-              <PageHeader title="プロフィール" description="Memoriaで使用するプロフィール情報を管理します。" />
+              <PageHeader
+                title="プロフィール"
+                description="Memoriaで使用するプロフィール情報を管理します。"
+              />
               <Box>
                 <SectionHeader>基本情報</SectionHeader>
                 <Stack gap="md" maw={540}>
