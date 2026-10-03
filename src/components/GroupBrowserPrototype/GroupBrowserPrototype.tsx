@@ -239,7 +239,7 @@ export function GroupBrowserPrototype() {
                     </UnstyledButton>
                   )
                 })}
-              </SimpleGrid>
+              </Box>
             </ScrollArea>
           </Box>
         </SplitView.Pane>
