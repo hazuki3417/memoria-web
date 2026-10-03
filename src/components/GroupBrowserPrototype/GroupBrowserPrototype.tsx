@@ -58,7 +58,6 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
       w="100%"
       h="100%"
       pos="relative"
-      bg="var(--mantine-color-default-hover)"
       style={{ overflow: "hidden" }}
     >
       {layers.map((mediaIndex, layer) => (
@@ -74,7 +73,6 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
             backgroundImage: `url("${previewImages[mediaIndex % previewImages.length]}")`,
             backgroundPosition: "center",
             backgroundSize: "cover",
-            boxShadow: "var(--mantine-shadow-xs)",
           }}
         />
       ))}
@@ -98,7 +96,7 @@ function PreviewGrid({ count }: { count: number }) {
             style={{
               position: "relative",
               aspectRatio: "1 / 1",
-              border: "1px solid var(--mantine-color-default-border)",
+              border: media ? "1px solid var(--mantine-color-default-border)" : undefined,
               overflow: "hidden",
               ...(media
                 ? {
