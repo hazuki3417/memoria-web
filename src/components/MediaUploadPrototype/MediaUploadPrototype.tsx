@@ -366,36 +366,45 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
   if (compact) {
     return (
       <Box p="sm">
-        <Group align="flex-start" wrap="nowrap">
-          <Checkbox mt={18} checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
-          <Box w={56} h={56} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
+        <Group align="center" wrap="nowrap" h={72}>
+          <Checkbox checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
+          <Box w={72} h={72} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
             <IconPhoto size={22} stroke={1.4} />
           </Box>
-          <Stack gap={8} style={{ flex: 1, minWidth: 0 }}>
-            <Group justify="space-between" wrap="nowrap">
-              <Box style={{ minWidth: 0 }}>
-                <Text size="sm" fw={600} truncate>{file.name}</Text>
-                <Text size="xs" c="dimmed">{file.size}</Text>
-              </Box>
-              {removable && <Button variant="subtle" color="gray" size="compact-sm" onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>}
-            </Group>
+          <Stack gap={4} justify="center" h={72} style={{ flex: "0 0 34%", minWidth: 0, overflow: "hidden" }}>
+            <Box style={{ minWidth: 0 }}>
+              <Text size="sm" fw={600} truncate>{file.name}</Text>
+              <Text size="xs" c="dimmed">{file.size}</Text>
+            </Box>
             <Status file={file} presentation={presentation} StatusIcon={StatusIcon} />
-            <TagsInput value={file.tags} onChange={onTagsChange} disabled={!tagEditable} size="xs" placeholder="Tagを追加" />
           </Stack>
+          <Box h={72} style={{ flex: 1, minWidth: 0 }}>
+            <TagsInput
+              value={file.tags}
+              onChange={onTagsChange}
+              disabled={!tagEditable}
+              size="xs"
+              placeholder="Tagを追加"
+              styles={{ root: { height: "100%" }, input: { minHeight: "100%", height: "100%" } }}
+            />
+          </Box>
+          <Box w={28} style={{ flex: "0 0 28px" }}>
+            {removable && <Button variant="subtle" color="gray" size="compact-sm" onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>}
+          </Box>
         </Group>
       </Box>
     )
   }
 
   return (
-    <Box p="sm" mih={104}>
-      <Group align="stretch" wrap="nowrap" gap="md" mih={80}>
-        <Checkbox mt={26} checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
-        <Group align="flex-start" wrap="nowrap" gap="sm" style={{ flex: "0 0 42%", minWidth: 0 }}>
+    <Box p="sm">
+      <Group align="center" wrap="nowrap" gap="md" h={72}>
+        <Checkbox checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
+        <Group align="center" wrap="nowrap" gap="sm" h={72} style={{ flex: "0 0 42%", minWidth: 0, overflow: "hidden" }}>
           <Box w={72} h={72} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center", overflow: "hidden" }}>
             <IconPhoto size={28} stroke={1.4} />
           </Box>
-          <Stack gap={7} style={{ flex: 1, minWidth: 0 }}>
+          <Stack gap={4} justify="center" h={72} style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
             <Box>
               <Text size="sm" fw={600} truncate>{file.name}</Text>
               <Text size="xs" c="dimmed">{file.size}</Text>
@@ -403,17 +412,17 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
             <Status file={file} presentation={presentation} StatusIcon={StatusIcon} />
           </Stack>
         </Group>
-        <Box style={{ flex: "1 1 48%", minWidth: 360, alignSelf: "stretch" }}>
+        <Box h={72} style={{ flex: "1 1 48%", minWidth: 360 }}>
           <TagsInput
             value={file.tags}
             onChange={onTagsChange}
             disabled={!tagEditable}
             size="sm"
             placeholder="Tagを追加"
-            styles={{ root: { height: "100%" }, input: { minHeight: "100%" } }}
+            styles={{ root: { height: "100%" }, input: { minHeight: "100%", height: "100%" } }}
           />
         </Box>
-        <Box w={36} style={{ flex: "0 0 36px", paddingTop: 18 }}>
+        <Box w={36} style={{ flex: "0 0 36px" }}>
           {removable && <Button variant="subtle" color="gray" size="compact-sm" onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>}
         </Box>
       </Group>
@@ -427,12 +436,12 @@ function Status({ file, presentation, StatusIcon }: {
   StatusIcon: typeof IconCheck
 }) {
   return (
-    <Stack gap={5} mih={42}>
+    <Stack gap={2} style={{ minWidth: 0, overflow: "hidden" }}>
       <Group gap={6} wrap="nowrap">
         <Badge variant="light" color={presentation.color} leftSection={<StatusIcon size={12} />}>{presentation.label}</Badge>
         {file.status === "upload-failed" && <Badge variant="outline" color="gray" leftSection={<IconRefresh size={12} />}>再試行可能</Badge>}
       </Group>
-      <Text size="xs" c={file.reason ? "red" : "dimmed"} truncate>
+      <Text size="xs" c={file.reason ? "red" : "dimmed"} truncate style={{ maxWidth: "100%" }}>
         {file.reason ?? (file.status === "uploading" ? "送信しています" : "\u00a0")}
       </Text>
     </Stack>
