@@ -283,7 +283,13 @@ export function ApplicationShell({
       </Drawer>
 
       <AppShell.Main>{children}</AppShell.Main>
-      <Box id="application-modal-root" />
+      <Box
+        id="application-modal-root"
+        style={{
+          position: "relative",
+          zIndex: 400,
+        }}
+      />
     </AppShell>
   )
 }
