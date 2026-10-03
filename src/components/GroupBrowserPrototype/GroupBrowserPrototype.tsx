@@ -52,7 +52,6 @@ const relationCandidateNames = [
   "未整理",
 ]
 
-let draftSelectedGroupName = ""
 
 const personalContext = {
   id: "personal",
@@ -159,10 +158,9 @@ function RelationItems({ names }: { names: string[] }) {
   )
 }
 
-function RelationEditor({ label, names, onChange }: { label: string; names: string[]; onChange: (names: string[]) => void }) {
-  const selected = groups.find((group) => group.name === draftSelectedGroupName)
+function RelationEditor({ label, names, onChange, currentGroupName }: { label: string; names: string[]; onChange: (names: string[]) => void; currentGroupName: string }) {
   const data = relationCandidateNames.map((name) => {
-    const isSelf = name === selected?.name
+    const isSelf = name === currentGroupName
     const isExisting = names.includes(name)
     return {
       value: name,
@@ -251,7 +249,6 @@ export function GroupBrowserPrototype() {
 
   const openEdit = () => {
     if (!selected) return
-    draftSelectedGroupName = selected.name
     setDraftName(selected.name)
     setDraftParents(selected.parentNames)
     setDraftChildren(selected.childNames)
@@ -327,8 +324,10 @@ export function GroupBrowserPrototype() {
           styles={{ label: { display: "block", width: "100%" } }}
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-          <RelationEditor label="Parents" names={draftParents} onChange={setDraftParents} />
-          <RelationEditor label="Children" names={draftChildren} onChange={setDraftChildren} />
+          <RelationEditor label="Parents" names={draftParents} onChange={setDraftParents} 
+                currentGroupName={selected.name}/>
+          <RelationEditor label="Children" names={draftChildren} onChange={setDraftChildren} 
+                currentGroupName={selected.name}/>
         </SimpleGrid>
         <Divider />
         <Box pos="relative">
