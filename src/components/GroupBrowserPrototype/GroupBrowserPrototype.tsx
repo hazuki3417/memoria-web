@@ -91,6 +91,7 @@ function MediaGrid() {
 export function GroupBrowserPrototype() {
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [detailVisible, setDetailVisible] = useState(false)
   const splitViewRef = useGroupRef()
   const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
   const [relationsOpened, relations] = useDisclosure(false)
@@ -122,6 +123,7 @@ export function GroupBrowserPrototype() {
 
   const openDetail = (id: string) => {
     setSelectedId(id)
+    setDetailVisible(true)
     if (compact) {
       setCompactView("detail")
       return
@@ -133,11 +135,18 @@ export function GroupBrowserPrototype() {
   }
 
   const closeDetail = () => {
-    setSelectedId(null)
     if (compact) {
+      setSelectedId(null)
+      setDetailVisible(false)
       setCompactView("groups")
       return
     }
+    setDetailVisible(false)
+  }
+
+  const handleDetailAnimationComplete = () => {
+    if (detailVisible || compact) return
+    setSelectedId(null)
     splitViewRef.current?.setLayout({ groups: 100, detail: 0 })
   }
 
@@ -257,7 +266,7 @@ export function GroupBrowserPrototype() {
               opacity: selectedId ? 1 : 0,
               x: selectedId ? 0 : 100,
             }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.3 }}\n            onAnimationComplete={handleDetailAnimationComplete}
           >
           <Box style={{
             display: selectedId ? "flex" : "none", flexDirection: "column", minWidth: 0, minHeight: 0, height: "100%",
