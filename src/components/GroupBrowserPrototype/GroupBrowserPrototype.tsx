@@ -341,7 +341,6 @@ export function GroupBrowserPrototype() {
                   <Text size="xs" c="dimmed">{selected?.mediaCount ?? 0}件のMedia</Text>
                 </Box>
                 <Group gap="xs" wrap="nowrap">
-                  <Button size="xs" variant="default">所属関係</Button>
                   <Menu position="bottom-end">
                     <Menu.Target>
                       <ActionIcon variant="subtle" aria-label="Groupの操作">
@@ -350,6 +349,7 @@ export function GroupBrowserPrototype() {
                     </Menu.Target>
                     <Menu.Dropdown>
                       <Menu.Item leftSection={<IconEdit size={15} />}>名前を変更</Menu.Item>
+                      <Menu.Item>関係を編集</Menu.Item>
                       <Menu.Item color="red" leftSection={<IconTrash size={15} />}>削除</Menu.Item>
                     </Menu.Dropdown>
                   </Menu>
@@ -361,10 +361,10 @@ export function GroupBrowserPrototype() {
             </Box>
             <Divider />
 
-            <UnstyledButton onClick={relations.toggle} px="sm" py="xs">
+            <UnstyledButton onClick={relations.toggle} px="sm" py={6}>
               <Group gap="xs">
                 {relationsOpened ? <IconChevronDown size={16} /> : <IconChevronRight size={16} />}
-                <Text size="sm" fw={600}>このGroupとの関係</Text>
+                <Text size="xs" c="dimmed">このGroupとの関係</Text>
               </Group>
             </UnstyledButton>
             {relationsOpened && (
