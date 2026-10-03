@@ -16,10 +16,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
-import {
-  PrototypeFormAlert,
-  showPrototypeNotification,
-} from "../PrototypeFeedback/PrototypeFeedback"
+import { FeedbackAlert, showNotification } from "@/components/Feedback"
 
 type ReviewState =
   | "default"
@@ -53,7 +50,7 @@ export function UserRegistrationPrototype({
 
   const showFeedback = useCallback((kind: "success" | "failure") => {
     const success = kind === "success"
-    showPrototypeNotification({
+    showNotification({
       kind: success ? "success" : "error",
       title: success ? "登録しました" : "登録できませんでした",
       message: success
@@ -148,20 +145,20 @@ export function UserRegistrationPrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <PrototypeFormAlert
+                      <FeedbackAlert
                         kind="error"
                         title="登録できませんでした"
                       >
                         認証情報を確認できませんでした。もう一度ログインしてください。
-                      </PrototypeFormAlert>
+                      </FeedbackAlert>
                     )}
                     {exited && (
-                      <PrototypeFormAlert
+                      <FeedbackAlert
                         kind="info"
                         title="登録せずに終了しました"
                       >
                         実際の画面ではログアウトして公開画面へ戻ります。
-                      </PrototypeFormAlert>
+                      </FeedbackAlert>
                     )}
                   </Box>
                 </Stack>
