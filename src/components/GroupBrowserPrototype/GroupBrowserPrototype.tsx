@@ -263,10 +263,11 @@ export function GroupBrowserPrototype() {
           <motion.div
             style={{ height: "100%" }}
             animate={{
-              opacity: selectedId ? 1 : 0,
-              x: selectedId ? 0 : 100,
+              opacity: detailVisible ? 1 : 0,
+              x: detailVisible ? 0 : 100,
             }}
-            transition={{ duration: 0.3 }}\n            onAnimationComplete={handleDetailAnimationComplete}
+            transition={{ duration: 0.3 }}
+            onAnimationComplete={handleDetailAnimationComplete}
           >
           <Box style={{
             display: selectedId ? "flex" : "none", flexDirection: "column", minWidth: 0, minHeight: 0, height: "100%",
