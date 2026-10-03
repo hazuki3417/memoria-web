@@ -180,6 +180,7 @@ function RelationEditor({ label, names, oppositeNames, onChange, currentGroupNam
         onChange={(values) => onChange(sortByDefaultOrder(values))}
         searchable
         placeholder="Groupを検索"
+        rightSection={null}
         maxValues={10}
         hidePickedOptions={false}
         nothingFoundMessage="候補がありません"
