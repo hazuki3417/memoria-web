@@ -100,6 +100,13 @@ function MediaTile({ item, selecting, selected, onClick }: {
           color="blue"
           aria-hidden="true"
           tabIndex={-1}
+          styles={{
+            input: {
+              backgroundColor: selected ? undefined : "transparent",
+              borderColor: selected ? undefined : "rgba(255, 255, 255, 0.92)",
+              boxShadow: selected ? undefined : "0 1px 3px rgba(0, 0, 0, 0.45)",
+            },
+          }}
           style={{
             position: "absolute",
             top: 8,
