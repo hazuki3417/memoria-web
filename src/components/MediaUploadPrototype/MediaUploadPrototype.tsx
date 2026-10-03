@@ -188,7 +188,7 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
             </Stack>
           </Paper>
 
-          {files.length > 0 && (
+          {(
             <>
               {invalidCount > 0 && (
                 <FeedbackAlert kind="warning" title="アップロードできないファイルがあります">
@@ -215,7 +215,7 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
               )}
 
               <Stack gap="sm">
-                {!activeUpload && selectableFiles.length > 0 && (
+                {!activeUpload && (
                   <>
                     <Paper withBorder radius="md" p="sm">
                       {compact ? (
@@ -244,7 +244,7 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                               <Text size="xs" c="dimmed">{completedCount}件</Text>
                             </Stack>
                           </Group>
-                          <TextInput value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} placeholder="選択したMediaのTag" />
+                          <TextInput value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} placeholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"} />
                         </Stack>
                       ) : (
                         <Group align="center" wrap="nowrap" gap="md">
@@ -257,19 +257,20 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                             <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>完了</Text><Text size="xs" c="dimmed">{completedCount}件</Text></Group>
                           </Stack>
                           <Divider orientation="vertical" />
-                          <TextInput style={{ flex: 1 }} value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} placeholder="選択したMediaのTag" />
+                          <TextInput style={{ flex: 1 }} value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} placeholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"} />
                           <Box w={36} style={{ flex: "0 0 36px" }}><Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除"><IconTrash size={16} /></Button></Box>
                         </Group>
                       )}
                     </Paper>
                     <Group justify="center" gap="xs">
-                      <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("add")}>追加</Button>
-                      <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("remove")}>除去</Button>
-                      <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
+                      <Button variant="default" size="sm" disabled={files.length === 0 || !bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("add")}>追加</Button>
+                      <Button variant="default" size="sm" disabled={files.length === 0 || !bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("remove")}>除去</Button>
+                      <Button variant="default" size="sm" disabled={files.length === 0 || !bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
                     </Group>
                   </>
                 )}
 
+                {files.length > 0 && (
                 <Paper withBorder radius="md" style={{ overflow: "hidden" }}>
                 {activeUpload && (
                   <Box p="sm">
@@ -296,6 +297,7 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                   ))}
                 </Box>
               </Paper>
+                )}
               </Stack>
 
             </>
