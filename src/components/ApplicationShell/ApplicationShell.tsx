@@ -12,16 +12,12 @@ import {
   Menu,
   Stack,
   Text,
-  useMantineColorScheme,
 } from "@mantine/core"
 import {
   IconCheck,
-  IconDeviceDesktop,
   IconLogout,
-  IconMoon,
   IconPlus,
   IconSettings,
-  IconSun,
   IconUsers,
 } from "@tabler/icons-react"
 import type { ComponentType, ReactNode } from "react"
@@ -90,7 +86,6 @@ export function ApplicationShell({
   onLogout,
 }: ApplicationShellProps) {
   const [navigationOpened, setNavigationOpened] = useState(false)
-  const { colorScheme, setColorScheme } = useMantineColorScheme()
 
   const closeNavigation = () => setNavigationOpened(false)
   const selectContext = (id: string) => {
@@ -223,35 +218,6 @@ export function ApplicationShell({
                 onClick={onOpenSettings}
               >
                 設定
-              </Menu.Item>
-              <Menu.Divider />
-              <Menu.Label>表示テーマ</Menu.Label>
-              <Menu.Item
-                leftSection={<IconDeviceDesktop size={16} stroke={1.6} />}
-                rightSection={
-                  colorScheme === "auto" ? <IconCheck size={14} /> : null
-                }
-                onClick={() => setColorScheme("auto")}
-              >
-                システム
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconSun size={16} stroke={1.6} />}
-                rightSection={
-                  colorScheme === "light" ? <IconCheck size={14} /> : null
-                }
-                onClick={() => setColorScheme("light")}
-              >
-                ライト
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconMoon size={16} stroke={1.6} />}
-                rightSection={
-                  colorScheme === "dark" ? <IconCheck size={14} /> : null
-                }
-                onClick={() => setColorScheme("dark")}
-              >
-                ダーク
               </Menu.Item>
               <Menu.Divider />
               <Menu.Item
