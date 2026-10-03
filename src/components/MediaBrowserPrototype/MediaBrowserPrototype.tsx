@@ -7,7 +7,7 @@ import {
 import {
   IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
   IconChevronLeft, IconChevronRight, IconDownload, IconEdit, IconEye, IconFolderPlus,
-  IconInfoCircle, IconPhoto, IconPhotoOff, IconPlus, IconRotate, IconRotateClockwise, IconSearch, IconShare,
+  IconInfoCircle, IconPhoto, IconPhotoOff, IconPlus, IconRotate, IconRotate2, IconSearch, IconShare,
   IconTags, IconTrash, IconX, IconZoomIn, IconZoomOut, IconZoomReset,
 } from "@tabler/icons-react"
 import { useMediaQuery } from "@mantine/hooks"
@@ -429,16 +429,16 @@ export function MediaBrowserPrototype({
                     <ActionIcon variant="subtle" aria-label="Originalをダウンロード"><IconDownload size={18} /></ActionIcon>
                     {!compact && <>
                       <ActionIcon variant="subtle" aria-label="左へ回転" onClick={() => setDetailRotate((value) => value - 90)}><IconRotate size={18} /></ActionIcon>
-                      <ActionIcon variant="subtle" aria-label="回転をリセット" onClick={() => setDetailRotate(0)}><IconRotateClockwise size={18} /></ActionIcon>
-                      <ActionIcon variant="subtle" aria-label="右へ回転" onClick={() => setDetailRotate((value) => value + 90)}><IconRotateClockwise size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="回転をリセット" onClick={() => setDetailRotate(0)}><IconRotate2 size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="右へ回転" onClick={() => setDetailRotate((value) => value + 90)}><IconRotate2 size={18} /></ActionIcon>
                     </>}
                   </Group>
                   <Text size="xs" c="dimmed">{detailIndex + 1} / {stateItems.length}</Text>
                   <Group gap={4} wrap="nowrap">
                     {!compact && <>
                       <ActionIcon variant="subtle" aria-label="拡大率をリセット" onClick={() => setDetailZoom(100)}><IconZoomReset size={18} /></ActionIcon>
-                      <ActionIcon variant="subtle" aria-label="縮小" disabled={detailZoom <= 100} onClick={() => setDetailZoom((value) => Math.max(100, value - 10))}><IconZoomOut size={18} /></ActionIcon>
-                      <Slider w={100} size="xs" min={100} max={300} step={10} value={detailZoom} onChange={setDetailZoom} label={null} />
+                      <ActionIcon variant="subtle" aria-label="縮小" disabled={detailZoom <= 50} onClick={() => setDetailZoom((value) => Math.max(50, value - 10))}><IconZoomOut size={18} /></ActionIcon>
+                      <Slider w={100} size="xs" min={50} max={300} step={10} value={detailZoom} onChange={setDetailZoom} label={null} />
                       <ActionIcon variant="subtle" aria-label="拡大" disabled={detailZoom >= 300} onClick={() => setDetailZoom((value) => Math.min(300, value + 10))}><IconZoomIn size={18} /></ActionIcon>
                       <Text size="xs" w={36} ta="right">{detailZoom}%</Text>
                     </>}
