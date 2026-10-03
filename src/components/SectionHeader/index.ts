@@ -1,1 +1,1 @@
-export * from "./SectionHeader"\n
+export * from "./SectionHeader"
