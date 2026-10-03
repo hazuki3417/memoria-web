@@ -1,1 +1,1 @@
-export * from "./PageHeader"\n
+export * from "./PageHeader"
