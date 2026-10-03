@@ -215,8 +215,7 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
               )}
 
               <Stack gap="sm">
-                {!activeUpload && (
-                  <>
+                <>
                     <Paper withBorder radius="md" p="sm">
                       {compact ? (
                         <Stack gap="sm">
@@ -226,11 +225,12 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                                 checked={allSelectableChecked}
                                 indeterminate={selectedFiles.length > 0 && !allSelectableChecked}
                                 onChange={toggleAll}
+                                disabled={selectableFiles.length === 0}
                                 aria-label="アップロード可能なMediaをすべて選択"
                               />
                               <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
                             </Group>
-                            <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除"><IconTrash size={16} /></Button>
+                            <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} disabled={!files.some((file) => removableStatuses.includes(file.status))} aria-label="すべて削除"><IconTrash size={16} /></Button>
                           </Group>
                           <Group gap="lg">
                             <Stack gap={0}>
@@ -244,11 +244,11 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                               <Text size="xs" c="dimmed">{completedCount}件</Text>
                             </Stack>
                           </Group>
-                          <TextInput value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} placeholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"} />
+                          <TextInput value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} disabled={files.length > 0 && selectableFiles.length === 0} placeholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"} />
                         </Stack>
                       ) : (
                         <Group align="center" wrap="nowrap" gap="md">
-                          <Checkbox checked={allSelectableChecked} indeterminate={selectedFiles.length > 0 && !allSelectableChecked} onChange={toggleAll} aria-label="アップロード可能なMediaをすべて選択" />
+                          <Checkbox checked={allSelectableChecked} indeterminate={selectedFiles.length > 0 && !allSelectableChecked} onChange={toggleAll} disabled={selectableFiles.length === 0} aria-label="アップロード可能なMediaをすべて選択" />
                           <Box w={72} style={{ flex: "0 0 72px" }}><Text size="sm" fw={600}>{selectedFiles.length}件選択</Text></Box>
                           <Divider orientation="vertical" />
                           <Stack gap={0} style={{ flex: "0 0 22%", minWidth: 180 }}>
@@ -257,8 +257,8 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                             <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>完了</Text><Text size="xs" c="dimmed">{completedCount}件</Text></Group>
                           </Stack>
                           <Divider orientation="vertical" />
-                          <TextInput style={{ flex: 1 }} value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} placeholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"} />
-                          <Box w={36} style={{ flex: "0 0 36px" }}><Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除"><IconTrash size={16} /></Button></Box>
+                          <TextInput style={{ flex: 1 }} value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} disabled={files.length > 0 && selectableFiles.length === 0} placeholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"} />
+                          <Box w={36} style={{ flex: "0 0 36px" }}><Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} disabled={!files.some((file) => removableStatuses.includes(file.status))} aria-label="すべて削除"><IconTrash size={16} /></Button></Box>
                         </Group>
                       )}
                     </Paper>
@@ -268,18 +268,9 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                       <Button variant="default" size="sm" disabled={files.length === 0 || !bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
                     </Group>
                   </>
-                )}
 
                 {files.length > 0 && (
                 <Paper withBorder radius="md" style={{ overflow: "hidden" }}>
-                {activeUpload && (
-                  <Box p="sm">
-                    <Text size="sm" fw={600}>アップロード中 ・ Media登録済み {registeredCount}件</Text>
-                  </Box>
-                )}
-
-                <Divider />
-
                 <Box>
                   {files.map((file, index) => (
                     <Box key={file.id}>
@@ -288,7 +279,7 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                         file={file}
                         compact={compact}
                         selected={selectedIds.includes(file.id)}
-                        selectable={selectableStatuses.includes(file.status) && !activeUpload}
+                        selectable={selectableStatuses.includes(file.status)}
                         onSelect={(checked) => toggleFile(file.id, checked)}
                         onRemove={() => removeFile(file.id)}
                         onTagsChange={(tags) => updateTags(file.id, tags)}
@@ -305,26 +296,20 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
         </Stack>
       </Box>
 
-      {files.length > 0 && (
-        <Box style={{
-          position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 100,
-          borderTop: "1px solid var(--mantine-color-default-border)",
-          background: "var(--mantine-color-body)",
-        }}>
-          <Box maw={1120} mx="auto" px="lg" py="sm">
-            <Group justify="flex-end" wrap="nowrap">
-              {activeUpload ? (
-                <Text size="sm" fw={600}>アップロード中 ・ Media登録済み {registeredCount}件</Text>
-              ) : (
-                <>
-                  <Text size="sm" c="dimmed">{selectedFiles.length}件選択中</Text>
-                  <Button disabled={selectedFiles.length === 0}>選択した{selectedFiles.length}件をアップロード</Button>
-                </>
-              )}
-            </Group>
-          </Box>
+      <Box style={{
+        position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 100,
+        borderTop: "1px solid var(--mantine-color-default-border)",
+        background: "var(--mantine-color-body)",
+      }}>
+        <Box maw={1120} mx="auto" px="lg" py="sm">
+          <Group justify="flex-end" wrap="nowrap">
+            <Text size="sm" c="dimmed">{selectedFiles.length}件選択中</Text>
+            <Button disabled={activeUpload || selectedFiles.length === 0}>
+              {activeUpload ? "アップロード中" : `選択した${selectedFiles.length}件をアップロード`}
+            </Button>
+          </Group>
         </Box>
-      )}
+      </Box>
 
       <Modal opened={scenario === "leave-confirmation"} onClose={() => undefined} title="アップロード画面を離れますか？" centered>
         <Stack>
@@ -383,7 +368,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
             />
           </Box>
           <Box w={28} style={{ flex: "0 0 28px" }}>
-            {removable && <Button variant="subtle" color="gray" size="compact-sm" onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>}
+            <Button variant="subtle" color="gray" size="compact-sm" disabled={!removable} onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>
           </Box>
         </Group>
       </Box>
@@ -421,7 +406,7 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
           />
         </Box>
         <Box w={36} style={{ flex: "0 0 36px" }}>
-          {removable && <Button variant="subtle" color="gray" size="compact-sm" onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>}
+          <Button variant="subtle" color="gray" size="compact-sm" disabled={!removable} onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>
         </Box>
       </Group>
     </Box>
