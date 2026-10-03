@@ -18,7 +18,7 @@ import {
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
-import { PrototypeFormAlert } from "../PrototypeFeedback/PrototypeFeedback"
+import { FeedbackAlert } from "@/components/Feedback"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
 type CommunityScenario =
@@ -358,7 +358,7 @@ export function AccountDeletionImpactPrototype({
                             )}
                           </Box>
                         ) : (
-                          <PrototypeFormAlert
+                          <FeedbackAlert
                             kind={loadState === "retrying" ? "info" : "error"}
                             title={
                               loadState === "retrying"
@@ -369,19 +369,19 @@ export function AccountDeletionImpactPrototype({
                             {loadState === "retrying"
                               ? "Mediaの件数を再取得しています。"
                               : "削除されるMediaの件数を確認できませんでした。再試行してください。"}
-                          </PrototypeFormAlert>
+                          </FeedbackAlert>
                         )}
                         <Box>
                           <Title order={2} size="h4">
                             注意事項
                           </Title>
                           <Divider my="md" />
-                          <PrototypeFormAlert
+                          <FeedbackAlert
                             kind="error"
                             title="削除したデータは復元できません"
                           >
                             アカウントとあなたが管理するMediaが削除されます。
-                          </PrototypeFormAlert>
+                          </FeedbackAlert>
                         </Box>
                         {loadState === "ready" && (
                           <Text c="dimmed" size="sm">
@@ -487,11 +487,11 @@ export function AccountDeletionImpactPrototype({
                                   )}
                                 </Group>
                                 {!requiresDecision ? (
-                                  <PrototypeFormAlert kind="info" title="退会">
+                                  <FeedbackAlert kind="info" title="退会">
                                     {community.relation === "member"
                                       ? "このCommunityにはMemberとして参加しています。アカウントを削除すると、このCommunityから退会します。"
                                       : "あなた以外にもAdministratorがいるため、Communityはそのまま残ります。アカウントを削除すると、このCommunityから退会します。"}
-                                  </PrototypeFormAlert>
+                                  </FeedbackAlert>
                                 ) : (
                                   <Text size="sm" c="dimmed">
                                     あなた以外にAdministratorがいません。
@@ -687,12 +687,12 @@ export function AccountDeletionImpactPrototype({
                                     参加者：{community.members}人 /
                                     Community管理Media：{community.media}件
                                   </Text>
-                                  <PrototypeFormAlert
+                                  <FeedbackAlert
                                     kind="error"
                                     title="このCommunityは復元できません"
                                   >
                                     このCommunityと管理Mediaが削除されます。他のUserがアップロードしたMediaも削除されます。
-                                  </PrototypeFormAlert>
+                                  </FeedbackAlert>
                                   <TextInput
                                     label="確認のためCommunity名を入力"
                                     description={`「${community.name}」と入力してください。`}
@@ -794,22 +794,22 @@ export function AccountDeletionImpactPrototype({
                             Communityへの対応
                           </Title>
                           {!needsResolution && (
-                            <PrototypeFormAlert
+                            <FeedbackAlert
                               kind="info"
                               title="Communityの管理状態を変更する必要はありません"
                             >
                               {communities.length === 0
                                 ? "参加中のCommunityはありません。管理状態の解消と削除対象の確認は省略しました。"
                                 : "最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。"}
-                            </PrototypeFormAlert>
+                            </FeedbackAlert>
                           )}
                           {needsResolution && toDelete.length === 0 && (
-                            <PrototypeFormAlert
+                            <FeedbackAlert
                               kind="info"
                               title="削除するCommunityはありません"
                             >
                               削除対象の確認は、対象がないため省略しました。
-                            </PrototypeFormAlert>
+                            </FeedbackAlert>
                           )}
                           {communities.length > 0 && (
                             <Stack
@@ -892,19 +892,19 @@ export function AccountDeletionImpactPrototype({
                             </Stack>
                           )}
                         </Box>
-                        <PrototypeFormAlert
+                        <FeedbackAlert
                           kind="error"
                           title="アカウントと削除対象のデータは復元できません"
                         >
                           削除を続けるには再認証が必要です。
-                        </PrototypeFormAlert>
+                        </FeedbackAlert>
                         {reauth && (
-                          <PrototypeFormAlert
+                          <FeedbackAlert
                             kind="info"
                             title="再認証（プロトタイプ）"
                           >
                             実際のAuth0認証は行いません。削除処理も実行されません。
-                          </PrototypeFormAlert>
+                          </FeedbackAlert>
                         )}
                         <Group gap="sm" justify="space-between">
                           <Box style={{ flex: 1 }}>
