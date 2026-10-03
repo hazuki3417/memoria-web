@@ -1,11 +1,11 @@
 "use client"
 
 import {
-  Alert, AspectRatio, Badge, Box, Button, Center, Group, Image, Loader, Menu,
-  Modal, SegmentedControl, Stack, TagsInput, Text, ThemeIcon,
+  ActionIcon, Alert, AspectRatio, Badge, Box, Button, Center, Checkbox, Group,
+  Image, Loader, Menu, Modal, SegmentedControl, Stack, TagsInput, Text,
 } from "@mantine/core"
 import {
-  IconAlertCircle, IconCheck, IconCheckbox, IconChevronDown, IconCloudUpload,
+  IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
   IconEye, IconFolderPlus, IconPhoto, IconPhotoOff, IconPlus, IconSearch,
   IconShare, IconTags, IconTrash,
 } from "@tabler/icons-react"
@@ -93,22 +93,40 @@ function MediaTile({ item, selecting, selected, onClick }: {
       )}
 
       {selecting && (
-        <ThemeIcon
-          radius="xl"
+        <Checkbox
+          checked={selected}
+          readOnly
+          size="sm"
+          color="blue"
+          aria-hidden="true"
+          tabIndex={-1}
+          style={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {selecting && (
+        <ActionIcon
           size={26}
-          variant={selected ? "filled" : "white"}
-          color={selected ? "blue" : "gray"}
+          color="red"
+          variant="filled"
+          aria-label={`${item.label}を削除`}
           style={{
             position: "absolute",
             top: 8,
             right: 8,
-            border: selected ? undefined : "1px solid var(--mantine-color-gray-4)",
-            boxShadow: "var(--mantine-shadow-xs)",
+            opacity: 0.9,
           }}
-          aria-hidden="true"
+          onClick={(event) => {
+            event.stopPropagation()
+          }}
         >
-          {selected && <IconCheck size={16} />}
-        </ThemeIcon>
+          <IconTrash size={15} />
+        </ActionIcon>
       )}
     </Box>
   )
