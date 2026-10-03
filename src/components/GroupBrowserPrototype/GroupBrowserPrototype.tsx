@@ -158,11 +158,11 @@ function RelationItems({ names }: { names: string[] }) {
   )
 }
 
-function RelationEditor({ label, names, onChange, currentGroupName }: { label: string; names: string[]; onChange: (names: string[]) => void; currentGroupName: string }) {
+function RelationEditor({ label, names, oppositeNames, onChange, currentGroupName }: { label: string; names: string[]; oppositeNames: string[]; onChange: (names: string[]) => void; currentGroupName: string }) {
   const data = relationCandidateNames.map((name) => ({
     value: name,
     label: name,
-    disabled: name === currentGroupName,
+    disabled: name === currentGroupName || oppositeNames.includes(name),
   }))
 
   return (
@@ -176,7 +176,6 @@ function RelationEditor({ label, names, onChange, currentGroupName }: { label: s
         value={names}
         onChange={onChange}
         searchable
-        clearable
         placeholder="Groupを検索"
         maxValues={10}
         hidePickedOptions={false}
@@ -185,9 +184,13 @@ function RelationEditor({ label, names, onChange, currentGroupName }: { label: s
           const reason =
             option.value === currentGroupName
               ? "現在のGroup"
-              : checked
-                ? "選択済み"
-                : ""
+              : oppositeNames.includes(option.value)
+                ? label === "Parents"
+                  ? "Childに指定されています"
+                  : "Parentに指定されています"
+                : checked
+                  ? "選択済み"
+                  : ""
           return (
             <Group justify="space-between" wrap="nowrap" w="100%">
               <Text size="sm">{option.label}</Text>
@@ -322,9 +325,9 @@ export function GroupBrowserPrototype() {
           styles={{ label: { display: "block", width: "100%" } }}
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-          <RelationEditor label="Parents" names={draftParents} onChange={setDraftParents} 
+          <RelationEditor label="Parents" names={draftParents} oppositeNames={draftChildren} onChange={setDraftParents} 
                 currentGroupName={selected?.name ?? ""}/>
-          <RelationEditor label="Children" names={draftChildren} onChange={setDraftChildren} 
+          <RelationEditor label="Children" names={draftChildren} oppositeNames={draftParents} onChange={setDraftChildren} 
                 currentGroupName={selected?.name ?? ""}/>
         </SimpleGrid>
         <Divider />
