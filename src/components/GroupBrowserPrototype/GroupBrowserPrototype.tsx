@@ -365,7 +365,7 @@ export function GroupBrowserPrototype() {
             <UnstyledButton onClick={relations.toggle} px="sm" py="xs">
               <Group gap="xs">
                 {relationsOpened ? <IconChevronDown size={16} /> : <IconChevronRight size={16} />}
-                <Text size="sm" fw={600}>所属関係</Text>
+                <Text size="sm" fw={600}>このGroupとの関係</Text>
               </Group>
             </UnstyledButton>
             {relationsOpened && (
