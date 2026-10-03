@@ -43,13 +43,12 @@ function MediaTile({ item, selecting, selected, onClick }: {
       onClick={onClick}
       aria-label={selecting ? `${item.label}を${selected ? "選択解除" : "選択"}` : `${item.label}を開く`}
       aria-pressed={selecting ? selected : undefined}
-      w={160}
-      h={160}
+      w="100%"
       p={0}
       bdrs="sm"
       style={{
         position: "relative",
-        flex: "0 0 160px",
+        aspectRatio: "1 / 1",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -194,10 +193,9 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
           <Box
             p={3}
             style={{
-              display: "flex",
-              flexWrap: "wrap",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(160px, 100%), 1fr))",
               gap: 8,
-              justifyContent: "center",
             }}
           >
             {stateItems.map((item) => (
