@@ -1,13 +1,14 @@
 "use client"
 
 import {
-  Alert, AspectRatio, Badge, Box, Button, Center, Checkbox, Group, Image,
+  ActionIcon, Alert, Badge, Box, Button, Center, Checkbox, Divider, Group, Image,
   Loader, Menu, Modal, Paper, SegmentedControl, Select, Stack, TagsInput, Text, ThemeIcon,
 } from "@mantine/core"
 import {
   IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
-  IconEdit, IconEye, IconFolderPlus, IconPhoto, IconPhotoOff, IconPlus, IconSearch,
-  IconShare, IconTags, IconTrash,
+  IconChevronLeft, IconChevronRight, IconDownload, IconEdit, IconEye, IconFolderPlus,
+  IconInfoCircle, IconPhoto, IconPhotoOff, IconPlus, IconRotate, IconSearch, IconShare,
+  IconTags, IconTrash, IconX, IconZoomIn, IconZoomOut,
 } from "@tabler/icons-react"
 import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
@@ -138,6 +139,7 @@ export function MediaBrowserPrototype({
   const [selecting, setSelecting] = useState(initialState === "selection")
   const [selected, setSelected] = useState<Set<string>>(initialState === "selection" ? new Set(["2", "5", "7"]) : new Set())
   const [detail, setDetail] = useState<MediaItem | null>(null)
+  const [detailInfoOpened, setDetailInfoOpened] = useState(true)
   const [selectionDialog, setSelectionDialog] = useState<SelectionDialog>(initialDialog)
   const [groupTarget, setGroupTarget] = useState<string | null>(null)
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
@@ -372,16 +374,117 @@ export function MediaBrowserPrototype({
         </Text>
       </Dialog>
 
-      <Modal opened={detail !== null} onClose={() => setDetail(null)} title="Media Detail" size="xl" centered>
-        {detail && <Stack>
-          <AspectRatio ratio={16 / 10} style={{ borderRadius: "var(--mantine-radius-md)", overflow: "hidden" }}>
-            <Image src={detail.src} alt={detail.label} fit="contain" />
-          </AspectRatio>
-          <Box>
-            <Text fw={650}>{detail.label}</Text>
-            <Text size="xs" c="dimmed">IMG_20261003_0842.jpg · 4032 × 3024</Text>
-          </Box>
-        </Stack>}
+      <Modal
+        opened={detail !== null}
+        onClose={() => setDetail(null)}
+        fullScreen={compact}
+        size="calc(100vw - 48px)"
+        padding={0}
+        withCloseButton={false}
+        centered
+        styles={{
+          content: { height: compact ? "100dvh" : "min(860px, calc(100dvh - 48px))" },
+          body: { height: "100%", padding: 0 },
+        }}
+      >
+        {detail && (() => {
+          const detailIndex = stateItems.findIndex((item) => item.id === detail.id)
+          const prev = detailIndex > 0 ? stateItems[detailIndex - 1] : null
+          const next = detailIndex >= 0 && detailIndex < stateItems.length - 1 ? stateItems[detailIndex + 1] : null
+          return (
+            <Box
+              h="100%"
+              style={{
+                display: "grid",
+                gridTemplateColumns: compact || !detailInfoOpened ? "minmax(0, 1fr)" : "minmax(0, 1fr) 340px",
+                gridTemplateRows: compact && detailInfoOpened ? "minmax(0, 1fr) auto" : "minmax(0, 1fr)",
+                background: "var(--mantine-color-body)",
+              }}
+            >
+              <Box style={{ minWidth: 0, minHeight: 0, display: "flex", flexDirection: "column" }}>
+                <Group h={44} px="xs" justify="flex-end" style={{ flexShrink: 0 }}>
+                  <ActionIcon variant="subtle" color="gray" aria-label="閉じる" onClick={() => setDetail(null)}>
+                    <IconX size={18} />
+                  </ActionIcon>
+                </Group>
+                <Box style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "44px minmax(0, 1fr) 44px", alignItems: "center" }}>
+                  <Center>
+                    {prev && <ActionIcon variant="subtle" color="gray" size="lg" aria-label="前のMedia" onClick={() => setDetail(prev)}><IconChevronLeft /></ActionIcon>}
+                  </Center>
+                  <Center h="100%" style={{ minWidth: 0, overflow: "hidden" }}>
+                    {detail.failed ? (
+                      <Stack align="center" c="dimmed"><IconPhotoOff size={48} /><Text size="sm">画像を表示できません</Text></Stack>
+                    ) : (
+                      <Image src={detail.src} alt={detail.label} maw="100%" mah="100%" w="auto" h="auto" fit="contain" />
+                    )}
+                  </Center>
+                  <Center>
+                    {next && <ActionIcon variant="subtle" color="gray" size="lg" aria-label="次のMedia" onClick={() => setDetail(next)}><IconChevronRight /></ActionIcon>}
+                  </Center>
+                </Box>
+                <Group h={48} px="sm" justify="space-between" wrap="nowrap" style={{ flexShrink: 0 }}>
+                  <Group gap={4} wrap="nowrap">
+                    <ActionIcon variant="subtle" aria-label="Originalをダウンロード"><IconDownload size={18} /></ActionIcon>
+                    {!compact && <ActionIcon variant="subtle" aria-label="左へ回転"><IconRotate size={18} /></ActionIcon>}
+                  </Group>
+                  <Text size="xs" c="dimmed">{detailIndex + 1} / {stateItems.length}</Text>
+                  <Group gap={4} wrap="nowrap">
+                    {!compact && <>
+                      <ActionIcon variant="subtle" aria-label="縮小"><IconZoomOut size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="拡大"><IconZoomIn size={18} /></ActionIcon>
+                    </>}
+                    <ActionIcon
+                      variant={detailInfoOpened ? "light" : "subtle"}
+                      aria-label={detailInfoOpened ? "情報を閉じる" : "情報を開く"}
+                      onClick={() => setDetailInfoOpened((value) => !value)}
+                    >
+                      <IconInfoCircle size={18} />
+                    </ActionIcon>
+                  </Group>
+                </Group>
+              </Box>
+
+              {detailInfoOpened && (
+                <Box
+                  p="md"
+                  style={{
+                    borderLeft: compact ? undefined : "1px solid var(--mantine-color-default-border)",
+                    borderTop: compact ? "1px solid var(--mantine-color-default-border)" : undefined,
+                    overflowY: "auto",
+                  }}
+                >
+                  <Stack gap="md">
+                    <Box>
+                      <Text fw={650}>{detail.label}</Text>
+                      <Text size="xs" c="dimmed">IMG_20261003_0842.jpg</Text>
+                    </Box>
+                    <Divider />
+                    <Stack gap="xs">
+                      <Group justify="space-between"><Text size="xs" c="dimmed">ファイルサイズ</Text><Text size="xs">8.4 MB</Text></Group>
+                      <Group justify="space-between"><Text size="xs" c="dimmed">サイズ</Text><Text size="xs">4032 × 3024</Text></Group>
+                      <Group justify="space-between"><Text size="xs" c="dimmed">アップロード</Text><Text size="xs">2026/10/03 08:42</Text></Group>
+                      <Group justify="space-between"><Text size="xs" c="dimmed">Uploader</Text><Text size="xs">Hazuki</Text></Group>
+                    </Stack>
+                    <Divider />
+                    <Box>
+                      <Text size="xs" c="dimmed" mb={6}>Tags</Text>
+                      <Group gap={6}><Badge variant="light">旅行</Badge><Badge variant="light">風景</Badge></Group>
+                    </Box>
+                    <Box>
+                      <Text size="xs" c="dimmed" mb={6}>Groups</Text>
+                      <Group gap={6}><Badge variant="outline">旅行</Badge><Badge variant="outline">お気に入り</Badge></Group>
+                    </Box>
+                    <Divider />
+                    <Group justify="space-between">
+                      <Button size="xs" variant="default" leftSection={<IconEdit size={15} />}>編集</Button>
+                      <Button size="xs" variant="subtle" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
+                    </Group>
+                  </Stack>
+                </Box>
+              )}
+            </Box>
+          )
+        })()}
       </Modal>
     </ApplicationShell>
   )
