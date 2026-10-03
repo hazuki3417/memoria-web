@@ -13,6 +13,7 @@ export * from "./PageHeader"
 export * from "./ResizeSplitView"
 export * from "./SectionHeader"
 export * from "./SettingRow"
+export * from "./SplitView"
 export * from "./TagsInput"
 export * from "./Toggle"
 
