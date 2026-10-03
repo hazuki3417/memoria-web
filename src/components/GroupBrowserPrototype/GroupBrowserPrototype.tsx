@@ -11,7 +11,7 @@ import {
 } from "@tabler/icons-react"
 import { useMemo, useState } from "react"
 import { ApplicationShell } from "@/components/ApplicationShell"
-import { PageHeader } from "@/components/PageHeader"
+import { SplitView } from "@/components/SplitView"
 
 type PrototypeGroup = {
   id: string
@@ -110,27 +110,12 @@ export function GroupBrowserPrototype() {
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <Stack h="calc(100vh - 88px)" gap="lg">
-        <PageHeader
-          title="Groups"
-          description="MediaをGroupに整理し、関連するGroupとあわせて閲覧します。"
-        />
-
-        <Box
-          style={{
-            display: "grid",
-            gridTemplateColumns: "300px minmax(0, 1fr)",
-            minHeight: 0,
-            flex: 1,
-            border: "1px solid var(--mantine-color-default-border)",
-            borderRadius: "var(--mantine-radius-md)",
-            overflow: "hidden",
-          }}
-        >
-          <Box style={{
-            display: "flex", flexDirection: "column", minHeight: 0,
-            borderRight: "1px solid var(--mantine-color-default-border)",
-          }}>
+      <SplitView.Root
+        defaultLayout={{ groups: 32, detail: 68 }}
+        style={{ height: "calc(100vh - 88px)" }}
+      >
+        <SplitView.Pane id="groups" minSize={24}>
+          <Box style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
             <Stack p="sm" gap="xs">
               <Group justify="space-between">
                 <Text fw={700}>Groups</Text>
@@ -166,8 +151,8 @@ export function GroupBrowserPrototype() {
                       }}
                     >
                       <Stack gap={6}>
-                        <PreviewStrip count={group.previewCount} />
                         <Text fw={600} size="sm" truncate="end">{group.name}</Text>
+                        <PreviewStrip count={group.previewCount} />
                       </Stack>
                     </UnstyledButton>
                   )
@@ -175,9 +160,13 @@ export function GroupBrowserPrototype() {
               </Stack>
             </ScrollArea>
           </Box>
+        </SplitView.Pane>
 
+        <SplitView.Separator />
+
+        <SplitView.Pane id="detail" minSize={40}>
           <Box style={{
-            display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0,
+            display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0, height: "100%",
           }}>
             <Box p="sm">
               <Group justify="space-between" wrap="nowrap">
@@ -250,8 +239,8 @@ export function GroupBrowserPrototype() {
               </Box>
             </ScrollArea>
           </Box>
-        </Box>
-      </Stack>
+        </SplitView.Pane>
+      </SplitView.Root>
     </ApplicationShell>
   )
 }
