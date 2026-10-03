@@ -7,7 +7,7 @@ import {
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
   IconChevronDown, IconChevronRight, IconDots, IconEdit, IconPlus,
-  IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconX,
+  IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconUsers, IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
