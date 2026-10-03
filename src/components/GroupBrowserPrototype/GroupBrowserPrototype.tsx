@@ -315,20 +315,18 @@ export function GroupBrowserPrototype() {
           <RelationEditor label="Children" names={draftChildren} onChange={setDraftChildren} />
         </SimpleGrid>
         <Divider />
-        <Group justify="space-between" align="flex-end">
-          <Stack gap={2}>
-            <Text fw={600} size="sm">Groupを削除</Text>
-            <Text size="xs" c="dimmed">Media本体は削除されません。</Text>
-            <Button
-              mt="xs"
-              variant="light"
-              color="red"
-              leftSection={<IconTrash size={15} />}
-              onClick={deletion.open}
-            >
-              Groupを削除
-            </Button>
-          </Stack>
+        <Group justify="space-between">
+          <Button
+            variant="subtle"
+            color="red"
+            leftSection={<IconTrash size={15} />}
+            onClick={() => {
+              edit.close()
+              deletion.open()
+            }}
+          >
+            Groupを削除
+          </Button>
           <Group>
             <Button variant="default" onClick={edit.close}>キャンセル</Button>
             <Button onClick={edit.close} disabled={!draftName.trim()}>保存</Button>
