@@ -45,48 +45,68 @@ function MediaTile({ item, selecting, selected, onClick }: {
       aria-pressed={selecting ? selected : undefined}
       w="100%"
       p={0}
-      bdrs="sm"
+      bdrs="md"
       style={{
         position: "relative",
         aspectRatio: "1 / 1",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        border: 0,
-        background: selected ? "var(--mantine-color-blue-light)" : "transparent",
-        outline: selected ? "1px solid var(--mantine-color-blue-filled)" : undefined,
-        filter: selecting ? (selected ? "brightness(1.1)" : "brightness(0.9)") : undefined,
+        overflow: "hidden",
+        border: selected
+          ? "2px solid var(--mantine-color-blue-6)"
+          : "1px solid var(--mantine-color-default-border)",
+        background: "var(--mantine-color-gray-0)",
+        boxShadow: selected ? "0 0 0 2px var(--mantine-color-blue-light)" : undefined,
         cursor: "pointer",
-        transition: "filter 0.2s ease",
+        transition: "border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease",
         userSelect: "none",
       }}
     >
       {item.failed ? (
-        <Stack align="center" justify="center" gap={6} p="sm">
-          <IconPhotoOff size={28} stroke={1.5} aria-hidden="true" />
+        <Stack align="center" justify="center" gap={6} p="sm" c="dimmed">
+          <IconPhotoOff size={30} stroke={1.5} aria-hidden="true" />
           <Text size="xs" fw={600} ta="center">画像を表示できません</Text>
-          <Text size="10px" c="dimmed" ta="center">処理に失敗しました</Text>
+          <Text size="10px" ta="center">処理に失敗しました</Text>
         </Stack>
       ) : (
         <Image
           src={item.src}
           alt={item.label}
-          bdrs="sm"
-          w="auto"
-          h="auto"
-          mah="100%"
-          maw="100%"
+          w="100%"
+          h="100%"
+          fit="cover"
           draggable={false}
         />
       )}
-      {selecting && selected && (
+
+      {selecting && (
+        <Box
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: selected ? "rgba(34, 139, 230, 0.08)" : "transparent",
+          }}
+        />
+      )}
+
+      {selecting && (
         <ThemeIcon
           radius="xl"
-          size={24}
-          style={{ position: "absolute", top: 6, right: 6 }}
+          size={26}
+          variant={selected ? "filled" : "white"}
+          color={selected ? "blue" : "gray"}
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            border: selected ? undefined : "1px solid var(--mantine-color-gray-4)",
+            boxShadow: "var(--mantine-shadow-xs)",
+          }}
           aria-hidden="true"
         >
-          <IconCheck size={15} />
+          {selected && <IconCheck size={16} />}
         </ThemeIcon>
       )}
     </Box>
@@ -194,8 +214,8 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
             p={3}
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(min(160px, 100%), 1fr))",
-              gap: 8,
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(168px, 100%), 1fr))",
+              gap: "var(--mantine-spacing-xs)",
             }}
           >
             {stateItems.map((item) => (
