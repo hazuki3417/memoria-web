@@ -11,8 +11,8 @@ import {
   Table,
   Text,
   TextInput,
+  useMantineColorScheme,
 } from "@mantine/core"
-import { useMantineColorScheme } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconChartBar,
@@ -115,8 +115,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               aria-label="表示テーマ"
               value={colorScheme}
               onChange={(value) =>
-                value &&
-                setColorScheme(value as "auto" | "light" | "dark")
+                value && setColorScheme(value as "auto" | "light" | "dark")
               }
               data={[
                 { value: "auto", label: "システム" },
