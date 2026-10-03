@@ -32,7 +32,7 @@ export const Warning: Story = {
   },
 }
 
-export const Error: Story = {
+export const ErrorState: Story = {
   args: {
     kind: "error",
     title: "処理を続けられません",
