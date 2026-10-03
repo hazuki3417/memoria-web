@@ -194,28 +194,40 @@ function RelationEditor({ label, names, onChange }: { label: string; names: stri
         onChange={(event) => setQuery(event.currentTarget.value)}
         placeholder="Groupを検索"
         leftSection={<IconSearch size={16} />}
+        rightSection={query ? (
+          <ActionIcon
+            variant="transparent"
+            aria-label="検索文字列をクリア"
+            onClick={() => setQuery("")}
+          >
+            <IconX size={16} />
+          </ActionIcon>
+        ) : null}
       />
-      {query && (
-        <Paper withBorder p={4}>
-          <Stack gap={2}>
-            {candidates.slice(0, 4).map((name) => (
-              <UnstyledButton
-                key={name}
-                p="xs"
-                bdrs="sm"
-                disabled={names.length >= 10}
-                onClick={() => {
-                  onChange([...names, name])
-                  setQuery("")
-                }}
-              >
-                <Text size="sm">{name}</Text>
-              </UnstyledButton>
-            ))}
-            {candidates.length === 0 && <Text size="sm" c="dimmed" p="xs">候補がありません</Text>}
-          </Stack>
-        </Paper>
-      )}
+      <Paper
+        withBorder={Boolean(query)}
+        p={query ? 4 : 0}
+        h={156}
+        style={{ overflowY: "auto", visibility: query ? "visible" : "hidden" }}
+      >
+        <Stack gap={2}>
+          {candidates.slice(0, 4).map((name) => (
+            <UnstyledButton
+              key={name}
+              p="xs"
+              bdrs="sm"
+              disabled={names.length >= 10}
+              onClick={() => {
+                onChange([...names, name])
+                setQuery("")
+              }}
+            >
+              <Text size="sm">{name}</Text>
+            </UnstyledButton>
+          ))}
+          {candidates.length === 0 && <Text size="sm" c="dimmed" p="xs">候補がありません</Text>}
+        </Stack>
+      </Paper>
     </Stack>
   )
 }
