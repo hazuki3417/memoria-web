@@ -1,12 +1,12 @@
 "use client"
 
 import {
-  ActionIcon, Badge, Box, Button, Divider, Group, Menu, Modal, Paper, ScrollArea,
+  ActionIcon, Badge, Box, Button, Divider, Group, Modal, Paper, ScrollArea,
   SimpleGrid, Stack, Text, TextInput, UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
-  IconChevronDown, IconChevronRight, IconDots, IconEdit, IconPlus,
+  IconChevronDown, IconChevronRight, IconEdit, IconPlus,
   IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconUsers, IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
@@ -230,6 +230,7 @@ export function GroupBrowserPrototype() {
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [compactView, setCompactView] = useState<"groups" | "detail">("groups")
   const [editOpened, edit] = useDisclosure(false)
+  const [deleteOpened, deletion] = useDisclosure(false)
   const [draftName, setDraftName] = useState("")
   const [draftParents, setDraftParents] = useState<string[]>([])
   const [draftChildren, setDraftChildren] = useState<string[]>([])
@@ -313,11 +314,38 @@ export function GroupBrowserPrototype() {
           <RelationEditor label="Parents" names={draftParents} onChange={setDraftParents} />
           <RelationEditor label="Children" names={draftChildren} onChange={setDraftChildren} />
         </SimpleGrid>
-        <Group justify="flex-end">
-          <Button variant="default" onClick={edit.close}>キャンセル</Button>
-          <Button onClick={edit.close} disabled={!draftName.trim()}>保存</Button>
+        <Divider />
+        <Group justify="space-between" align="flex-end">
+          <Stack gap={2}>
+            <Text fw={600} size="sm">Groupを削除</Text>
+            <Text size="xs" c="dimmed">Media本体は削除されません。</Text>
+            <Button
+              mt="xs"
+              variant="light"
+              color="red"
+              leftSection={<IconTrash size={15} />}
+              onClick={deletion.open}
+            >
+              Groupを削除
+            </Button>
+          </Stack>
+          <Group>
+            <Button variant="default" onClick={edit.close}>キャンセル</Button>
+            <Button onClick={edit.close} disabled={!draftName.trim()}>保存</Button>
+          </Group>
         </Group>
       </Stack>
+      <Modal opened={deleteOpened} onClose={deletion.close} title="Groupを削除" centered>
+        <Stack>
+          <Text size="sm">
+            「{selected?.name ?? ""}」を削除します。このGroupによるMedia分類とGroup間の関係は削除されますが、Media本体と他のGroupは削除されません。
+          </Text>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={deletion.close}>キャンセル</Button>
+            <Button color="red" onClick={() => { deletion.close(); edit.close() }}>削除</Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Modal>
   )
 
@@ -440,17 +468,9 @@ export function GroupBrowserPrototype() {
                   <Text size="xs" c="dimmed">{selected?.mediaCount ?? 0}件のMedia</Text>
                 </Box>
                 <Group gap="xs" wrap="nowrap">
-                  <Menu position="bottom-end">
-                    <Menu.Target>
-                      <ActionIcon variant="subtle" aria-label="Groupの操作">
-                        <IconDots size={18} />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item leftSection={<IconEdit size={15} />} onClick={openEdit}>編集</Menu.Item>
-                      <Menu.Item color="red" leftSection={<IconTrash size={15} />}>削除</Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
+                  <ActionIcon variant="subtle" aria-label="Groupを編集" onClick={openEdit}>
+                    <IconEdit size={18} />
+                  </ActionIcon>
                   <ActionIcon variant="subtle" aria-label="Groupの選択を解除" onClick={closeDetail}>
                     <IconX size={18} />
                   </ActionIcon>
