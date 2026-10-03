@@ -49,9 +49,9 @@ const previewTones = [
   "var(--mantine-color-orange-1)",
 ]
 
-function PreviewGrid({ count }: { count: number }) {
+function PreviewStrip({ count }: { count: number }) {
   return (
-    <SimpleGrid cols={2} spacing={4}>
+    <SimpleGrid cols={4} spacing={4}>
       {Array.from({ length: 4 }, (_, index) => (
         <Box
           key={index}
@@ -124,9 +124,9 @@ export function GroupBrowserPrototype() {
                 <Text size="xs" c="dimmed">{visibleGroups.length} Groups</Text>
               </Stack>
               <Divider />
-              <ScrollArea flex={1}><SimpleGrid p="sm" cols={{ base: 2, xs: 3 }} spacing="sm">{visibleGroups.map((group) => (
+              <ScrollArea flex={1}><SimpleGrid p="sm" cols={{ base: 1, xs: 2 }} spacing="sm">{visibleGroups.map((group) => (
                 <UnstyledButton key={group.id} onClick={() => { setSelectedId(group.id); setCompactView("detail") }} p="xs" bdrs="sm">
-                  <Stack gap={6}><Text fw={600} size="sm" truncate="end">{group.name}</Text><PreviewGrid count={group.previewCount} /></Stack>
+                  <Stack gap={6}><Text fw={600} size="sm" truncate="end">{group.name}</Text><PreviewStrip count={group.previewCount} /></Stack>
                 </UnstyledButton>
               ))}</SimpleGrid></ScrollArea>
             </Box>
@@ -146,7 +146,7 @@ export function GroupBrowserPrototype() {
         defaultLayout={{ groups: 32, detail: 68 }}
         style={{ height: "calc(100vh - 88px)" }}
       >
-        <SplitView.Pane id="groups" minSize={24}>
+        <SplitView.Pane id="groups" minSize={32}>
           <Box style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
             <Stack p="sm" gap="xs">
               <Group justify="space-between">
@@ -165,7 +165,7 @@ export function GroupBrowserPrototype() {
             </Stack>
             <Divider />
             <ScrollArea flex={1}>
-              <SimpleGrid p="sm" cols={{ base: 1, lg: 2 }} spacing="sm">
+              <SimpleGrid p="sm" cols={{ base: 1, xl: 2 }} spacing="sm">
                 {visibleGroups.map((group) => {
                   const selectedItem = group.id === selectedId
                   return (
@@ -184,7 +184,7 @@ export function GroupBrowserPrototype() {
                     >
                       <Stack gap={6}>
                         <Text fw={600} size="sm" truncate="end">{group.name}</Text>
-                        <PreviewGrid count={group.previewCount} />
+                        <PreviewStrip count={group.previewCount} />
                       </Stack>
                     </UnstyledButton>
                   )
