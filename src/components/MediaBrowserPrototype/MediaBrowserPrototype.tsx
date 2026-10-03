@@ -341,7 +341,10 @@ export function MediaBrowserPrototype({
         }
       >
         <Stack gap="xs">
-          <Text size="sm">{selected.size}件のPersonal MediaをCommunityへ共有します。</Text>
+          <Stack gap={4}>
+          <Text size="sm">{selected.size}件の選択Mediaから、共有可能なUser管理Mediaを1つのCommunityへ共有します。</Text>
+          <Text size="xs" c="dimmed">Community管理Mediaや、選択した共有先へすでに共有済みのMediaには新しい共有関係を作成しません。</Text>
+        </Stack>
           <Select
             label="Community"
             placeholder="Communityを選択"
@@ -365,7 +368,7 @@ export function MediaBrowserPrototype({
         }
       >
         <Text size="sm">
-          選択した{selected.size}件のMediaを削除します。この操作は元に戻せません。
+          選択した{selected.size}件のMediaを削除します。削除したMediaは復元できません。
         </Text>
       </Dialog>
 
