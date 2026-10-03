@@ -26,9 +26,6 @@ export const CommunitySelection: Story = { args: { initialState: "selection", co
 export const GroupDialog: Story = {
   args: { initialState: "selection", contextKind: "personal", initialDialog: "group" },
 }
-export const TagDialog: Story = {
-  args: { initialState: "selection", contextKind: "personal", initialDialog: "tag" },
-}
 export const ShareDialog: Story = {
   args: { initialState: "selection", contextKind: "personal", initialDialog: "share" },
 }
