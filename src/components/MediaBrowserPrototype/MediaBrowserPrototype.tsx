@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  ActionIcon, Alert, Badge, Box, Button, Center, Checkbox, Divider, Group, Image,
+  ActionIcon, Alert, Badge, Box, Button, Center, Checkbox, Combobox, Divider, Group, Image,
   Loader, Menu, Modal, Paper, SegmentedControl, Select, Slider, Stack, TagsInput, Text, ThemeIcon,
 } from "@mantine/core"
 import {
@@ -10,8 +10,8 @@ import {
   IconInfoCircle, IconPhoto, IconPhotoOff, IconPlus, IconRotate, IconRotate2, IconSearch, IconShare,
   IconTags, IconTrash, IconX, IconZoomIn, IconZoomOut, IconZoomReset,
 } from "@tabler/icons-react"
-import { useMediaQuery } from "@mantine/hooks"
-import { useState } from "react"
+import { useCombobox, useMediaQuery } from "@mantine/hooks"
+import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
@@ -123,6 +123,41 @@ function MediaTile({ item, selecting, selected, onClick }: {
       )}
 
     </Box>
+  )
+}
+
+function ZoomInput({ value, onChange }: { value: number; onChange: (value: number) => void }) {
+  const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() })
+  const [input, setInput] = useState(`${value}%`)
+  useEffect(() => setInput(`${value}%`), [value])
+  const commit = () => {
+    const parsed = Number(input.replace(/[^0-9]/g, ""))
+    const next = Math.min(300, Math.max(50, Number.isFinite(parsed) ? parsed : 100))
+    onChange(next)
+    setInput(`${next}%`)
+  }
+  return (
+    <Combobox store={combobox} onOptionSubmit={(option) => { onChange(Number(option)); combobox.closeDropdown() }}>
+      <Combobox.Target>
+        <Combobox.EventsTarget>
+          <Box
+            component="input"
+            aria-label="拡大率"
+            value={input}
+            onChange={(event) => { setInput(event.currentTarget.value.replace(/[^0-9%]/g, "").slice(0, 4)); combobox.openDropdown() }}
+            onFocus={() => combobox.openDropdown()}
+            onBlur={commit}
+            onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur() }}
+            style={{ width: 68, height: 30, paddingInline: 8, border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-body)", color: "inherit", fontSize: "var(--mantine-font-size-xs)" }}
+          />
+        </Combobox.EventsTarget>
+      </Combobox.Target>
+      <Combobox.Dropdown>
+        <Combobox.Options mah={200} style={{ overflowY: "auto" }}>
+          {Array.from({ length: 26 }, (_, index) => 50 + index * 10).map((level) => <Combobox.Option key={level} value={String(level)}>{level}%</Combobox.Option>)}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
   )
 }
 
@@ -440,7 +475,7 @@ export function MediaBrowserPrototype({
                       <ActionIcon variant="subtle" aria-label="縮小" disabled={detailZoom <= 50} onClick={() => setDetailZoom((value) => Math.max(50, value - 10))}><IconZoomOut size={18} /></ActionIcon>
                       <Slider w={100} size="xs" min={50} max={300} step={10} value={detailZoom} onChange={setDetailZoom} label={null} />
                       <ActionIcon variant="subtle" aria-label="拡大" disabled={detailZoom >= 300} onClick={() => setDetailZoom((value) => Math.min(300, value + 10))}><IconZoomIn size={18} /></ActionIcon>
-                      <Text size="xs" w={36} ta="right">{detailZoom}%</Text>
+                      <ZoomInput value={detailZoom} onChange={setDetailZoom} />
                     </>}
                     <ActionIcon
                       variant={detailInfoOpened ? "light" : "subtle"}
