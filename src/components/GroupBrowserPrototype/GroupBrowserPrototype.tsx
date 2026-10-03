@@ -53,6 +53,12 @@ const previewImages = Array.from(
 
 function GroupVisual({ startIndex }: { startIndex: number }) {
   const layers = Array.from({ length: 3 }, (_, layer) => startIndex + layer)
+  const placements = [
+    { left: "8%", top: "7%", width: "76%", height: "76%" },
+    { left: "13%", top: "11%", width: "78%", height: "78%" },
+    { left: "8%", top: "20%", width: "86%", height: "74%" },
+  ]
+
   return (
     <Box
       w="100%"
@@ -61,22 +67,22 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
       bg="var(--mantine-color-default-hover)"
       style={{ overflow: "hidden" }}
     >
-      {layers.map((mediaIndex, layer) => (
-        <Box
-          key={mediaIndex}
-          pos="absolute"
-          w="78%"
-          h="78%"
-          bdrs={2}
-          style={{
-            left: `${5 + layer * 6}%`,
-            top: `${5 + layer * 6}%`,
-            backgroundImage: `url("${previewImages[mediaIndex % previewImages.length]}")`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        />
-      ))}
+      {layers.map((mediaIndex, layer) => {
+        const placement = placements[layer]
+        return (
+          <Box
+            key={mediaIndex}
+            pos="absolute"
+            bdrs={2}
+            style={{
+              ...placement,
+              backgroundImage: `url("${previewImages[mediaIndex % previewImages.length]}")`,
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+            }}
+          />
+        )
+      })}
     </Box>
   )
 }
