@@ -1,6 +1,6 @@
 "use client"
 
-import { ApplicationShell } from "@/components/ApplicationShell"\nimport { NavigationItem } from "@/components/NavigationItem"
+import { ApplicationShell } from "@/components/ApplicationShell"\nimport { NavigationItem } from "@/components/NavigationItem"\nimport { PageHeader } from "@/components/PageHeader"\nimport { SectionHeader } from "@/components/SectionHeader"
 import {
   Box,
   Button,
@@ -35,36 +35,6 @@ const sections = [
   { id: "usage", label: "利用状況", icon: IconChartBar },
   { id: "account", label: "アカウント", icon: IconUserCircle },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
-
-function PageHeader({
-  title,
-  description,
-}: {
-  title: string
-  description: string
-}) {
-  return (
-    <Box>
-      <Title order={1} size="h2">
-        {title}
-      </Title>
-      <Text c="dimmed" size="sm" mt={4}>
-        {description}
-      </Text>
-    </Box>
-  )
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <Box>
-      <Title order={2} size="h4">
-        {children}
-      </Title>
-      <Divider mt="sm" mb="lg" />
-    </Box>
-  )
-}
 
 function SettingRow({
   label,
@@ -111,7 +81,7 @@ function ProfileContent() {
         description="プロフィール情報を変更します。"
       />
       <Box>
-        <SectionTitle>基本情報</SectionTitle>
+        <SectionHeader>基本情報</SectionHeader>
         <Stack gap="md" maw={540}>
           <TextInput
             label="ニックネーム"
@@ -161,7 +131,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
         description="表示とプレビューの動作を設定します。"
       />
       <Box>
-        <SectionTitle>表示</SectionTitle>
+        <SectionHeader>表示</SectionHeader>
         <Stack gap="xl">
           <SettingRow
             compact={compact}
@@ -195,7 +165,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
         </Stack>
       </Box>
       <Box>
-        <SectionTitle>プレビュー</SectionTitle>
+        <SectionHeader>プレビュー</SectionHeader>
         <Stack gap="xl">
           <SettingRow
             compact={compact}
@@ -233,7 +203,7 @@ function UsageContent() {
         description="ストレージの使用量とアップロード上限を確認します。"
       />
       <Box>
-        <SectionTitle>ストレージ</SectionTitle>
+        <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
           <Group justify="space-between" align="end">
             <Box>
@@ -252,7 +222,7 @@ function UsageContent() {
         </Stack>
       </Box>
       <Box>
-        <SectionTitle>Media</SectionTitle>
+        <SectionHeader>Media</SectionHeader>
         <Table.ScrollContainer minWidth={420}>
           <Table verticalSpacing="sm">
             <Table.Thead>
@@ -283,7 +253,7 @@ function UsageContent() {
         </Table.ScrollContainer>
       </Box>
       <Box>
-        <SectionTitle>アップロード</SectionTitle>
+        <SectionHeader>アップロード</SectionHeader>
         <Stack gap="md">
           {[
             ["1回のアップロード", "100 Media"],
@@ -310,7 +280,7 @@ function AccountContent() {
     <Stack gap="xl">
       <PageHeader title="アカウント" description="アカウントを管理します。" />
       <Box>
-        <SectionTitle>アカウント削除</SectionTitle>
+        <SectionHeader>アカウント削除</SectionHeader>
         <Stack gap="md" maw={620}>
           <Text size="sm">
             アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。
