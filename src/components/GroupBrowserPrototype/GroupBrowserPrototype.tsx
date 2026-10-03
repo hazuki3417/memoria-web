@@ -146,7 +146,7 @@ export function GroupBrowserPrototype() {
         defaultLayout={{ groups: 32, detail: 68 }}
         style={{ height: "calc(100vh - 88px)" }}
       >
-        <SplitView.Pane id="groups" minSize={32}>
+        <SplitView.Pane id="groups" minWidth={320}>
           <Box style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
             <Stack p="sm" gap="xs">
               <Group justify="space-between">
