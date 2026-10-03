@@ -67,13 +67,13 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
         <Box
           key={mediaIndex}
           pos="absolute"
-          w="58%"
-          h="58%"
+          w="78%"
+          h="78%"
           bdrs="sm"
           bg={previewTones[mediaIndex % previewTones.length]}
           style={{
-            left: `${18 + layer * 8}%`,
-            top: `${14 + layer * 8}%`,
+            left: `${5 + layer * 6}%`,
+            top: `${5 + layer * 6}%`,
             border: "1px solid var(--mantine-color-default-border)",
             boxShadow: "var(--mantine-shadow-xs)",
           }}
