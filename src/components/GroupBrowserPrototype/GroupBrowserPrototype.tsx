@@ -1,8 +1,8 @@
 "use client"
 
 import {
-  ActionIcon, Badge, Box, Button, Divider, Group, Modal, Paper, ScrollArea,
-  SimpleGrid, Stack, Text, TextInput, UnstyledButton,
+  ActionIcon, Badge, Box, Button, Divider, Group, Modal, MultiSelect, ScrollArea,
+  SimpleGrid, Stack, Text, TextInput,
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
@@ -51,6 +51,8 @@ const relationCandidateNames = [
   "アーカイブ",
   "未整理",
 ]
+
+let draftSelectedGroupName = ""
 
 const personalContext = {
   id: "personal",
@@ -158,9 +160,17 @@ function RelationItems({ names }: { names: string[] }) {
 }
 
 function RelationEditor({ label, names, onChange }: { label: string; names: string[]; onChange: (names: string[]) => void }) {
-  const [query, setQuery] = useState("")
-  const candidates = relationCandidateNames
-    .filter((name) => !names.includes(name) && name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
+  const selected = groups.find((group) => group.name === draftSelectedGroupName)
+  const data = relationCandidateNames.map((name) => {
+    const isSelf = name === selected?.name
+    const isExisting = names.includes(name)
+    return {
+      value: name,
+      label: name,
+      disabled: isSelf,
+      disabledReason: isSelf ? "現在のGroup" : isExisting ? "選択済み" : undefined,
+    }
+  })
 
   return (
     <Stack gap="xs">
@@ -168,70 +178,34 @@ function RelationEditor({ label, names, onChange }: { label: string; names: stri
         <Text fw={600} size="sm">{label}</Text>
         <Text size="xs" c="dimmed">{names.length} / 10</Text>
       </Group>
-      <Group gap={6}>
-        {names.length === 0 && <Text size="sm" c="dimmed">なし</Text>}
-        {names.map((name) => (
-          <Badge
-            key={name}
-            variant="light"
-            rightSection={
-              <ActionIcon
-                size="xs"
-                variant="transparent"
-                aria-label={`${name}を解除`}
-                onClick={() => onChange(names.filter((item) => item !== name))}
-              >
-                <IconX size={12} />
-              </ActionIcon>
-            }
-          >
-            {name}
-          </Badge>
-        ))}
-      </Group>
-      <TextInput
-        value={query}
-        onChange={(event) => setQuery(event.currentTarget.value)}
+      <MultiSelect
+        data={data}
+        value={names}
+        onChange={onChange}
+        searchable
+        clearable
         placeholder="Groupを検索"
-        leftSection={<IconSearch size={16} />}
-        rightSection={query ? (
-          <ActionIcon
-            variant="transparent"
-            aria-label="検索文字列をクリア"
-            onClick={() => setQuery("")}
-          >
-            <IconX size={16} />
-          </ActionIcon>
-        ) : null}
+        maxValues={10}
+        hidePickedOptions={false}
+        nothingFoundMessage="候補がありません"
+        renderOption={({ option, checked }) => {
+          const item = data.find((candidate) => candidate.value === option.value)
+          return (
+            <Group justify="space-between" wrap="nowrap" w="100%">
+              <Text size="sm">{option.label}</Text>
+              <Text size="xs" c="dimmed">
+                {item?.disabledReason ?? (checked ? "選択済み" : "")}
+              </Text>
+            </Group>
+          )
+        }}
       />
-      <Paper
-        withBorder={Boolean(query)}
-        p={query ? 4 : 0}
-        h={156}
-        style={{ overflowY: "auto", visibility: query ? "visible" : "hidden" }}
-      >
-        <Stack gap={2}>
-          {candidates.slice(0, 4).map((name) => (
-            <UnstyledButton
-              key={name}
-              p="xs"
-              bdrs="sm"
-              disabled={names.length >= 10}
-              onClick={() => {
-                onChange([...names, name])
-                setQuery("")
-              }}
-            >
-              <Text size="sm">{name}</Text>
-            </UnstyledButton>
-          ))}
-          {candidates.length === 0 && <Text size="sm" c="dimmed" p="xs">候補がありません</Text>}
-        </Stack>
-      </Paper>
+      {names.length >= 10 && (
+        <Text size="xs" c="dimmed">追加できるGroupは10件までです</Text>
+      )}
     </Stack>
   )
 }
-
 function MediaGrid() {
   const tones = ["blue", "grape", "teal", "orange", "cyan"]
   return (
@@ -277,6 +251,7 @@ export function GroupBrowserPrototype() {
 
   const openEdit = () => {
     if (!selected) return
+    draftSelectedGroupName = selected.name
     setDraftName(selected.name)
     setDraftParents(selected.parentNames)
     setDraftChildren(selected.childNames)
