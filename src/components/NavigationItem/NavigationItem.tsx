@@ -43,7 +43,7 @@ export function NavigationItem({
       )}
       <NavLink
         label={label}
-        leftSection={<Icon size={16} stroke={1.6} aria-hidden="true" />}
+        leftSection={<Icon size={16} stroke={1.6} aria-hidden />}
         active={active}
         disabled={disabled}
         onClick={onClick}
