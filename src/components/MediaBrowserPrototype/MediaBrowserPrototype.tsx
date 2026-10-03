@@ -10,7 +10,7 @@ import {
   IconShare, IconTags, IconTrash,
 } from "@tabler/icons-react"
 import { useMediaQuery } from "@mantine/hooks"
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
 
@@ -134,7 +134,6 @@ export function MediaBrowserPrototype({
   initialDialog?: SelectionDialog
 }) {
   const [context, setContext] = useState(contextKind)
-  const groupSearchRef = useRef<HTMLInputElement>(null)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [selecting, setSelecting] = useState(initialState === "selection")
   const [selected, setSelected] = useState<Set<string>>(initialState === "selection" ? new Set(["2", "5", "7"]) : new Set())
@@ -176,7 +175,6 @@ export function MediaBrowserPrototype({
                 <Group gap="xs" wrap="nowrap">
                 <TagsInput
                   placeholder="Tag"
-                  data={["家族", "旅行", "風景", "イベント"]}
                   value={tags}
                   onChange={setTags}
                   clearable
@@ -308,7 +306,6 @@ export function MediaBrowserPrototype({
       <Dialog
         opened={selectionDialog === "group"}
         onClose={() => setSelectionDialog(null)}
-        onEnterTransitionEnd={() => groupSearchRef.current?.blur()}
         title="Groupに追加"
         size="md"
         footer={
@@ -321,12 +318,9 @@ export function MediaBrowserPrototype({
         <Stack gap="xs">
           <Text size="sm">{selected.size}件のMediaを既存のGroupに追加します。</Text>
           <Select
-            ref={groupSearchRef}
             label="Group"
             placeholder="Groupを選択"
             searchable
-            searchValue=""
-            onSearchChange={() => undefined}
             data={["旅行", "家族", "風景写真", "お気に入り"]}
             value={groupTarget}
             onChange={setGroupTarget}
