@@ -1,16 +1,16 @@
 "use client"
 
 import {
-  Alert, AspectRatio, Badge, Box, Button, Center, Group, Loader, Menu, Modal,
-  Image, Paper, Stack, TagsInput, Text, ThemeIcon,
+  Alert, AspectRatio, Badge, Box, Button, Center, Group, Image, Loader, Menu,
+  Modal, SegmentedControl, Stack, TagsInput, Text, ThemeIcon,
 } from "@mantine/core"
 import {
-  IconAlertCircle, IconCheck, IconChevronDown, IconCloudUpload, IconFolderPlus,
-  IconPhoto, IconPhotoOff, IconPlus, IconShare, IconTags, IconTrash, IconX,
+  IconAlertCircle, IconCheck, IconCheckbox, IconChevronDown, IconCloudUpload,
+  IconEye, IconFolderPlus, IconPhoto, IconPhotoOff, IconPlus, IconSearch,
+  IconShare, IconTags, IconTrash,
 } from "@tabler/icons-react"
 import { useState } from "react"
 import { ApplicationShell } from "@/components/ApplicationShell"
-import { PageHeader } from "@/components/PageHeader"
 
 type PrototypeState =
   | "default" | "tag-filtered" | "true-empty" | "filtered-empty" | "loading"
@@ -139,48 +139,73 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
       user={{ displayName: "Hazuki" }}
       onSelectContext={(id) => setContext(id === "community" ? "community" : "personal")}
       onSelectNavigation={() => {}} onCreateCommunity={() => {}} onOpenSettings={() => {}} onLogout={() => {}}>
-      <Stack gap="lg" maw={1440} mx="auto">
-        <PageHeader title="Media"
-          description={context === "personal" ? "あなたのMediaを閲覧・整理します。" : "Photo Clubで共有されているMediaを閲覧・整理します。"} />
-
-        <Paper withBorder radius="md" p="sm">
-          {selecting ? (
-            <Group justify="space-between" gap="sm">
-              <Group gap="xs">
-                <Badge size="lg" variant="light">{selected.size}件選択</Badge>
-                <Text size="xs" c="dimmed" visibleFrom="sm">選択中はTag filterを変更できません</Text>
-              </Group>
-              <Group gap={6}>
-                <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />}>Group</Button>
-                <Button size="xs" variant="default" leftSection={<IconTags size={15} />}>Tag</Button>
-                {context === "personal" && <Button size="xs" variant="default" leftSection={<IconShare size={15} />}>共有</Button>}
-                <Button size="xs" variant="default" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
-                <Button size="xs" variant="subtle" color="gray" leftSection={<IconX size={15} />} onClick={endSelection}>選択を終了</Button>
-              </Group>
+      <Stack gap="xs" maw={1440} mx="auto">
+        <Group justify="space-between" align="center" gap="xs" wrap="wrap">
+          {!selecting ? (
+            <Group gap="xs" style={{ flex: "1 1 360px" }}>
+              <TagsInput
+                placeholder="Tag"
+                data={["家族", "旅行", "風景", "イベント"]}
+                value={tags}
+                onChange={setTags}
+                clearable
+                leftSection={<IconSearch size={16} />}
+                size="xs"
+                style={{ flex: "1 1 280px" }}
+              />
+              <Button size="xs">検索</Button>
             </Group>
           ) : (
-            <Group justify="space-between" align="flex-end" gap="sm">
-              <TagsInput label="Tagで絞り込み" placeholder="Tagを選択" data={["家族", "旅行", "風景", "イベント"]}
-                value={tags} onChange={setTags} clearable w={{ base: "100%", sm: 320 }} />
-              <Group gap="xs">
-                <Button variant="default" onClick={() => setSelecting(true)}>選択</Button>
-                {context === "personal" ? (
-                  <Button leftSection={<IconCloudUpload size={16} />}>アップロード</Button>
-                ) : (
-                  <Menu position="bottom-end">
-                    <Menu.Target>
-                      <Button rightSection={<IconChevronDown size={14} />} leftSection={<IconPlus size={16} />}>Mediaを追加</Button>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item leftSection={<IconCloudUpload size={16} />}>Communityへアップロード</Menu.Item>
-                      <Menu.Item leftSection={<IconShare size={16} />}>Personal Mediaから共有</Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                )}
-              </Group>
+            <Group gap="xs">
+              <Badge size="lg" variant="light">{selected.size}件選択</Badge>
+              <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />}>Group</Button>
+              <Button size="xs" variant="default" leftSection={<IconTags size={15} />}>Tag</Button>
+              {context === "personal" && (
+                <Button size="xs" variant="default" leftSection={<IconShare size={15} />}>共有</Button>
+              )}
+              <Button size="xs" variant="default" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
             </Group>
           )}
-        </Paper>
+
+          <Group gap="xs" ml="auto">
+            {context === "personal" ? (
+              <Button size="xs" leftSection={<IconCloudUpload size={16} />}>アップロード</Button>
+            ) : (
+              <Menu position="bottom-end">
+                <Menu.Target>
+                  <Button size="xs" rightSection={<IconChevronDown size={14} />} leftSection={<IconPlus size={16} />}>
+                    Mediaを追加
+                  </Button>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item leftSection={<IconCloudUpload size={16} />}>Communityへアップロード</Menu.Item>
+                  <Menu.Item leftSection={<IconShare size={16} />}>Personal Mediaから共有</Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            )}
+            <SegmentedControl
+              size="xs"
+              value={selecting ? "select" : "view"}
+              onChange={(value) => {
+                if (value === "select") {
+                  setSelecting(true)
+                  return
+                }
+                endSelection()
+              }}
+              data={[
+                {
+                  value: "view",
+                  label: <Center style={{ gap: 6 }}><IconEye size={15} /><span>View</span></Center>,
+                },
+                {
+                  value: "select",
+                  label: <Center style={{ gap: 6 }}><IconCheckbox size={15} /><span>Select</span></Center>,
+                },
+              ]}
+            />
+          </Group>
+        </Group>
 
         {initialState === "loading" && (
           <Center mih={360}><Stack align="center"><Loader /><Text size="sm" c="dimmed">Mediaを読み込んでいます</Text></Stack></Center>
