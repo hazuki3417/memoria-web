@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  ActionIcon, Badge, Box, Button, Divider, Group, Menu, Paper, ScrollArea,
+  ActionIcon, Badge, Box, Button, Divider, Group, Menu, Modal, Paper, ScrollArea,
   SimpleGrid, Stack, Text, TextInput, UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
@@ -138,6 +138,70 @@ function RelationItems({ names }: { names: string[] }) {
   )
 }
 
+function RelationEditor({ label, names, onChange }: { label: string; names: string[]; onChange: (names: string[]) => void }) {
+  const [query, setQuery] = useState("")
+  const candidates = groups
+    .map((group) => group.name)
+    .filter((name) => !names.includes(name) && name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
+
+  return (
+    <Stack gap="xs">
+      <Group justify="space-between">
+        <Text fw={600} size="sm">{label}</Text>
+        <Text size="xs" c="dimmed">{names.length} / 10</Text>
+      </Group>
+      <Group gap={6}>
+        {names.length === 0 && <Text size="sm" c="dimmed">なし</Text>}
+        {names.map((name) => (
+          <Badge
+            key={name}
+            variant="light"
+            rightSection={
+              <ActionIcon
+                size="xs"
+                variant="transparent"
+                aria-label={`${name}を解除`}
+                onClick={() => onChange(names.filter((item) => item !== name))}
+              >
+                <IconX size={12} />
+              </ActionIcon>
+            }
+          >
+            {name}
+          </Badge>
+        ))}
+      </Group>
+      <TextInput
+        value={query}
+        onChange={(event) => setQuery(event.currentTarget.value)}
+        placeholder="Groupを検索"
+        leftSection={<IconSearch size={16} />}
+      />
+      {query && (
+        <Paper withBorder p={4}>
+          <Stack gap={2}>
+            {candidates.slice(0, 4).map((name) => (
+              <UnstyledButton
+                key={name}
+                p="xs"
+                bdrs="sm"
+                disabled={names.length >= 10}
+                onClick={() => {
+                  onChange([...names, name])
+                  setQuery("")
+                }}
+              >
+                <Text size="sm">{name}</Text>
+              </UnstyledButton>
+            ))}
+            {candidates.length === 0 && <Text size="sm" c="dimmed" p="xs">候補がありません</Text>}
+          </Stack>
+        </Paper>
+      )}
+    </Stack>
+  )
+}
+
 function MediaGrid() {
   const tones = ["blue", "grape", "teal", "orange", "cyan"]
   return (
@@ -165,6 +229,10 @@ export function GroupBrowserPrototype() {
   const [relationsOpened, relations] = useDisclosure(false)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [compactView, setCompactView] = useState<"groups" | "detail">("groups")
+  const [editOpened, edit] = useDisclosure(false)
+  const [draftName, setDraftName] = useState("")
+  const [draftParents, setDraftParents] = useState<string[]>([])
+  const [draftChildren, setDraftChildren] = useState<string[]>([])
 
   const visibleGroups = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase()
@@ -175,6 +243,14 @@ export function GroupBrowserPrototype() {
   }, [query])
 
   const selected = groups.find((group) => group.id === selectedId) ?? null
+
+  const openEdit = () => {
+    if (!selected) return
+    setDraftName(selected.name)
+    setDraftParents(selected.parentNames)
+    setDraftChildren(selected.childNames)
+    edit.open()
+  }
 
   useEffect(() => {
     const stored = window.localStorage.getItem("memoria-group-browser-layout")
@@ -224,6 +300,27 @@ export function GroupBrowserPrototype() {
     window.localStorage.setItem("memoria-group-browser-layout", JSON.stringify(next))
   }
 
+  const editDialog = (
+    <Modal opened={editOpened} onClose={edit.close} title="Groupを編集" size="lg" centered>
+      <Stack gap="lg">
+        <TextInput
+          label="名前"
+          value={draftName}
+          onChange={(event) => setDraftName(event.currentTarget.value)}
+          placeholder="Group名"
+        />
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+          <RelationEditor label="Parents" names={draftParents} onChange={setDraftParents} />
+          <RelationEditor label="Children" names={draftChildren} onChange={setDraftChildren} />
+        </SimpleGrid>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={edit.close}>キャンセル</Button>
+          <Button onClick={edit.close} disabled={!draftName.trim()}>保存</Button>
+        </Group>
+      </Stack>
+    </Modal>
+  )
+
   return (
     <ApplicationShell
       currentContext={personalContext}
@@ -235,6 +332,7 @@ export function GroupBrowserPrototype() {
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
+      {editDialog}
       {compact ? (
         <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
           {compactView === "groups" ? (
@@ -349,7 +447,7 @@ export function GroupBrowserPrototype() {
                       </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown>
-                      <Menu.Item leftSection={<IconEdit size={15} />}>編集</Menu.Item>
+                      <Menu.Item leftSection={<IconEdit size={15} />} onClick={openEdit}>編集</Menu.Item>
                       <Menu.Item color="red" leftSection={<IconTrash size={15} />}>削除</Menu.Item>
                     </Menu.Dropdown>
                   </Menu>
