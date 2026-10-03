@@ -283,6 +283,7 @@ export function ApplicationShell({
       </Drawer>
 
       <AppShell.Main>{children}</AppShell.Main>
+      <Box id="application-modal-root" />
     </AppShell>
   )
 }
