@@ -58,6 +58,7 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
       w="100%"
       h="100%"
       pos="relative"
+      bg="var(--mantine-color-default-hover)"
       style={{ overflow: "hidden" }}
     >
       {layers.map((mediaIndex, layer) => (
