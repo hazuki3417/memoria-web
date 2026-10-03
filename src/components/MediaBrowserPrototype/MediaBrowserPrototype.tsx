@@ -378,7 +378,7 @@ export function MediaBrowserPrototype({
         opened={detail !== null}
         onClose={() => setDetail(null)}
         fullScreen
-        zIndex={400}
+        portalProps={{ target: "#application-modal-root" }}
         padding={0}
         withCloseButton={false}
         styles={{
