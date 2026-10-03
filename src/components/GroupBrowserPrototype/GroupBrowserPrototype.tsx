@@ -413,10 +413,9 @@ export function GroupBrowserPrototype() {
     splitViewRef.current?.setLayout({ groups: 100, detail: 0 })
   }
 
-  const handleLayoutChanged = (layout: Layout, meta: LayoutChangedMeta) => {
-    const requested = meta.requestedLayout ?? layout
-    if (!selectedId || requested.detail === 0) return
-    const next = { groups: requested.groups, detail: requested.detail }
+  const handleLayoutChanged = (layout: Layout, _meta: LayoutChangedMeta) => {
+    if (!selectedId || layout.detail === 0) return
+    const next = { groups: layout.groups, detail: layout.detail }
     setSavedLayout(next)
     window.localStorage.setItem(
       "memoria-group-browser-layout",
