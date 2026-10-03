@@ -259,15 +259,15 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                           onChange={toggleAll}
                           aria-label="アップロード可能なMediaをすべて選択"
                         />
-                        <Box style={{ flex: "0 0 28%", minWidth: 0 }}>
+                        <Box w={72} style={{ flex: "0 0 72px" }}>
                           <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
-                          <Stack gap={0} mt={2}>
-                            <Text size="xs" c="dimmed">Media登録済み {registeredCount}件</Text>
-                            <Text size="xs" c="dimmed">画像処理中 {processingCount}件</Text>
-                            <Text size="xs" c="dimmed">完了 {completedCount}件</Text>
-                          </Stack>
                         </Box>
-                        <Stack gap={4} style={{ flex: "1 1 62%", minWidth: 420 }}>
+                        <Stack gap={0} style={{ flex: "0 0 22%", minWidth: 180 }}>
+                          <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>Media登録済み</Text><Text size="xs" c="dimmed">{registeredCount}件</Text></Group>
+                          <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>画像処理中</Text><Text size="xs" c="dimmed">{processingCount}件</Text></Group>
+                          <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>完了</Text><Text size="xs" c="dimmed">{completedCount}件</Text></Group>
+                        </Stack>
+                        <Stack gap={4} style={{ flex: "1 1 auto", minWidth: 420 }}>
                           <TextInput
                             value={bulkTag}
                             onChange={(event) => setBulkTag(event.currentTarget.value)}
