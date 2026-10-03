@@ -20,15 +20,17 @@ type PrototypeGroup = {
   name: string
   mediaCount: number
   previewCount: number
+  parentNames: string[]
+  childNames: string[]
 }
 
 const groups: PrototypeGroup[] = [
-  { id: "travel", name: "旅行", mediaCount: 128, previewCount: 4 },
-  { id: "family", name: "家族", mediaCount: 84, previewCount: 4 },
-  { id: "food", name: "料理", mediaCount: 42, previewCount: 3 },
-  { id: "landscape", name: "風景写真", mediaCount: 31, previewCount: 4 },
-  { id: "archive", name: "あとで整理する写真と動画をまとめた非常に長い名前のGroup", mediaCount: 18, previewCount: 2 },
-  { id: "empty", name: "新しいGroup", mediaCount: 0, previewCount: 0 },
+  { id: "travel", name: "旅行", mediaCount: 128, previewCount: 7, parentNames: ["2026"], childNames: ["北海道", "東北", "関東"] },
+  { id: "family", name: "家族", mediaCount: 84, previewCount: 4, parentNames: [], childNames: ["イベント"] },
+  { id: "food", name: "料理", mediaCount: 42, previewCount: 3, parentNames: ["日常"], childNames: [] },
+  { id: "landscape", name: "風景写真", mediaCount: 31, previewCount: 1, parentNames: [], childNames: [] },
+  { id: "archive", name: "あとで整理する写真と動画をまとめた非常に長い名前のGroup", mediaCount: 18, previewCount: 2, parentNames: ["アーカイブ"], childNames: ["未整理"] },
+  { id: "empty", name: "新しいGroup", mediaCount: 3, previewCount: 0, parentNames: [], childNames: [] },
 ]
 
 const personalContext = {
@@ -54,18 +56,49 @@ const previewTones = [
 function PreviewGrid({ count }: { count: number }) {
   return (
     <SimpleGrid cols={2} spacing={4}>
-      {Array.from({ length: 4 }, (_, index) => (
-        <Box
-          key={index}
-          bdrs="sm"
-          bg={index < count ? previewTones[index] : "var(--mantine-color-default-hover)"}
-          style={{
-            aspectRatio: "1 / 1",
-            border: "1px solid var(--mantine-color-default-border)",
-          }}
-        />
-      ))}
+      {Array.from({ length: 4 }, (_, index) => {
+        const media = index < Math.min(count, 4)
+        const continuation = count > 4 && index === 3
+        return (
+          <Box
+            key={index}
+            bdrs="sm"
+            bg={media ? previewTones[index] : "var(--mantine-color-default-hover)"}
+            style={{
+              position: "relative",
+              aspectRatio: "1 / 1",
+              border: "1px solid var(--mantine-color-default-border)",
+              display: "grid",
+              placeItems: "center",
+              overflow: "hidden",
+            }}
+          >
+            {!media && <IconUsers size={22} stroke={1.5} aria-hidden />}
+            {continuation && (
+              <Box
+                pos="absolute"
+                inset={0}
+                bg="rgba(0, 0, 0, 0.32)"
+                style={{ display: "grid", placeItems: "center" }}
+              >
+                <Text c="white" fw={700} size="lg">…</Text>
+              </Box>
+            )}
+          </Box>
+        )
+      })}
     </SimpleGrid>
+  )
+}
+
+function RelationItems({ names }: { names: string[] }) {
+  if (names.length === 0) {
+    return <Text size="sm" c="dimmed">なし</Text>
+  }
+  return (
+    <Group gap={6}>
+      {names.map((name) => <Badge key={name} variant="light">{name}</Badge>)}
+    </Group>
   )
 }
 
@@ -305,18 +338,11 @@ export function GroupBrowserPrototype() {
                 <SimpleGrid cols={2} spacing="lg">
                   <Stack gap={4}>
                     <Text size="xs" c="dimmed">Parents</Text>
-                    <Group gap={6}>
-                      <Badge variant="light">旅行</Badge>
-                      <Badge variant="light">2026</Badge>
-                    </Group>
+                    <RelationItems names={selected?.parentNames ?? []} />
                   </Stack>
                   <Stack gap={4}>
                     <Text size="xs" c="dimmed">Children</Text>
-                    <Group gap={6}>
-                      <Badge variant="light">北海道</Badge>
-                      <Badge variant="light">東北</Badge>
-                      <Badge variant="light">関東</Badge>
-                    </Group>
+                    <RelationItems names={selected?.childNames ?? []} />
                   </Stack>
                 </SimpleGrid>
               </Box>
