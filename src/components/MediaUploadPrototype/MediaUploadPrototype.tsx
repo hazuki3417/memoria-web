@@ -216,37 +216,71 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
               <Paper withBorder radius="md" style={{ overflow: "hidden" }}>
                 {!activeUpload && selectableFiles.length > 0 && (
                   <Box p="sm">
-                    <Group align="center" wrap={compact ? "wrap" : "nowrap"}>
-                      <Checkbox
-                        checked={allSelectableChecked}
-                        indeterminate={selectedFiles.length > 0 && !allSelectableChecked}
-                        onChange={toggleAll}
-                        aria-label="アップロード可能なMediaをすべて選択"
-                      />
-                      <Text size="sm" fw={600} style={{ minWidth: 88 }}>{selectedFiles.length}件選択</Text>
-                      <Group gap="xs" style={{ flex: 1 }} wrap={compact ? "wrap" : "nowrap"}>
+                    {compact ? (
+                      <Stack gap="sm">
+                        <Group justify="space-between" wrap="nowrap">
+                          <Group gap="sm" wrap="nowrap">
+                            <Checkbox
+                              checked={allSelectableChecked}
+                              indeterminate={selectedFiles.length > 0 && !allSelectableChecked}
+                              onChange={toggleAll}
+                              aria-label="アップロード可能なMediaをすべて選択"
+                            />
+                            <Box>
+                              <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
+                              <Text size="xs" c="dimmed">
+                                Media登録済み {registeredCount}件 ・ 画像処理中 {processingCount}件 ・ 完了 {completedCount}件
+                              </Text>
+                            </Box>
+                          </Group>
+                          <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除">
+                            <IconTrash size={16} />
+                          </Button>
+                        </Group>
                         <TextInput
                           value={bulkTag}
                           onChange={(event) => setBulkTag(event.currentTarget.value)}
                           placeholder="選択したMediaのTag"
-                          style={{ flex: 1, minWidth: compact ? "100%" : 200 }}
                         />
-                        <Group gap={4} wrap="nowrap">
+                        <Group gap={4} grow>
                           <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("add")}>追加</Button>
                           <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("remove")}>除去</Button>
                           <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
                         </Group>
+                      </Stack>
+                    ) : (
+                      <Group align="center" wrap="nowrap" gap="md">
+                        <Checkbox
+                          checked={allSelectableChecked}
+                          indeterminate={selectedFiles.length > 0 && !allSelectableChecked}
+                          onChange={toggleAll}
+                          aria-label="アップロード可能なMediaをすべて選択"
+                        />
+                        <Box style={{ flex: "1 1 52%", minWidth: 0 }}>
+                          <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
+                          <Text size="xs" c="dimmed" mt={2}>
+                            Media登録済み {registeredCount}件 ・ 画像処理中 {processingCount}件 ・ 完了 {completedCount}件
+                          </Text>
+                        </Box>
+                        <Stack gap={4} style={{ flex: "0 0 38%", minWidth: 320 }}>
+                          <TextInput
+                            value={bulkTag}
+                            onChange={(event) => setBulkTag(event.currentTarget.value)}
+                            placeholder="選択したMediaのTag"
+                          />
+                          <Group gap={4} justify="flex-end">
+                            <Button variant="default" size="compact-sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("add")}>追加</Button>
+                            <Button variant="default" size="compact-sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("remove")}>除去</Button>
+                            <Button variant="default" size="compact-sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
+                          </Group>
+                        </Stack>
+                        <Box w={36} style={{ flex: "0 0 36px" }}>
+                          <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除">
+                            <IconTrash size={16} />
+                          </Button>
+                        </Box>
                       </Group>
-                      <Button
-                        variant="subtle"
-                        color="gray"
-                        size="sm"
-                        leftSection={<IconTrash size={16} />}
-                        onClick={removeAll}
-                      >
-                        すべて削除
-                      </Button>
-                    </Group>
+                    )}
                   </Box>
                 )}
 
@@ -276,13 +310,6 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                 </Box>
               </Paper>
 
-              {(processingCount > 0 || completedCount > 0) && (
-                <Text size="sm" c="dimmed">
-                  Media登録済み {registeredCount}件
-                  {processingCount > 0 ? ` ・ 画像処理中 ${processingCount}件` : ""}
-                  {completedCount > 0 ? ` ・ 完了 ${completedCount}件` : ""}
-                </Text>
-              )}
             </>
           )}
         </Stack>
@@ -364,20 +391,20 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
     <Box p="sm">
       <Group align="stretch" wrap="nowrap" gap="md">
         <Checkbox mt={26} checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
-        <Group align="flex-start" wrap="nowrap" gap="sm" style={{ flex: "1 1 58%", minWidth: 0 }}>
+        <Group align="flex-start" wrap="nowrap" gap="sm" style={{ flex: "1 1 52%", minWidth: 0 }}>
           <Box w={76} h={64} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center" }}>
             <IconPhoto size={28} stroke={1.4} />
           </Box>
-          <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
+          <Stack gap={7} style={{ flex: 1, minWidth: 0 }}>
             <Box>
               <Text size="sm" fw={600} truncate>{file.name}</Text>
               <Text size="xs" c="dimmed">{file.size}</Text>
             </Box>
-            <TagsInput value={file.tags} onChange={onTagsChange} disabled={!tagEditable} size="xs" placeholder="Tagを追加" />
+            <Status file={file} presentation={presentation} StatusIcon={StatusIcon} />
           </Stack>
         </Group>
-        <Box style={{ flex: "0 0 30%", minWidth: 210, paddingTop: 4 }}>
-          <Status file={file} presentation={presentation} StatusIcon={StatusIcon} />
+        <Box style={{ flex: "0 0 38%", minWidth: 320, paddingTop: 14 }}>
+          <TagsInput value={file.tags} onChange={onTagsChange} disabled={!tagEditable} size="sm" placeholder="Tagを追加" />
         </Box>
         <Box w={36} style={{ flex: "0 0 36px", paddingTop: 18 }}>
           {removable && <Button variant="subtle" color="gray" size="compact-sm" onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>}
