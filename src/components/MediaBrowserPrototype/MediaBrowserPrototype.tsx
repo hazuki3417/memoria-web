@@ -140,34 +140,46 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
       onSelectContext={(id) => setContext(id === "community" ? "community" : "personal")}
       onSelectNavigation={() => {}} onCreateCommunity={() => {}} onOpenSettings={() => {}} onLogout={() => {}}>
       <Stack gap="xs" maw={1440} mx="auto">
-        <Group justify="space-between" align="center" gap="xs" wrap="wrap">
-          {!selecting ? (
-            <Group gap="xs" style={{ flex: "1 1 360px" }}>
-              <TagsInput
-                placeholder="Tag"
-                data={["家族", "旅行", "風景", "イベント"]}
-                value={tags}
-                onChange={setTags}
-                clearable
-                leftSection={<IconSearch size={16} />}
-                size="xs"
-                style={{ flex: "1 1 280px" }}
-              />
-              <Button size="xs">検索</Button>
-            </Group>
-          ) : (
-            <Group gap="xs">
-              <Badge size="lg" variant="light">{selected.size}件選択</Badge>
-              <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />}>Group</Button>
-              <Button size="xs" variant="default" leftSection={<IconTags size={15} />}>Tag</Button>
-              {context === "personal" && (
-                <Button size="xs" variant="default" leftSection={<IconShare size={15} />}>共有</Button>
-              )}
-              <Button size="xs" variant="default" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
-            </Group>
-          )}
+        <Box
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
+            alignItems: "center",
+            gap: "var(--mantine-spacing-xs)",
+          }}
+        >
+          <Box style={{ minWidth: 0 }}>
+            {!selecting ? (
+              <Group gap="xs" wrap="nowrap">
+                <TagsInput
+                  placeholder="Tag"
+                  data={["家族", "旅行", "風景", "イベント"]}
+                  value={tags}
+                  onChange={setTags}
+                  clearable
+                  leftSection={<IconSearch size={16} />}
+                  size="xs"
+                  w={280}
+                  maw="100%"
+                />
+                <Button size="xs" style={{ flexShrink: 0 }}>検索</Button>
+              </Group>
+            ) : (
+              <Group gap="xs">
+                <Badge size="lg" variant="light">{selected.size}件選択</Badge>
+                <Button size="xs" variant="default" leftSection={<IconFolderPlus size={15} />}>Group</Button>
+                <Button size="xs" variant="default" leftSection={<IconTags size={15} />}>Tag</Button>
+                {context === "personal" && (
+                  <Button size="xs" variant="default" leftSection={<IconShare size={15} />}>共有</Button>
+                )}
+                <Button size="xs" variant="default" color="red" leftSection={<IconTrash size={15} />}>削除</Button>
+              </Group>
+            )}
+          </Box>
 
-          <Group gap="xs" ml="auto">
+          <Box />
+
+          <Group gap="xs" justify="flex-end" wrap="nowrap">
             {context === "personal" ? (
               <Button size="xs" leftSection={<IconCloudUpload size={16} />}>アップロード</Button>
             ) : (
@@ -205,7 +217,7 @@ export function MediaBrowserPrototype({ initialState = "default", contextKind = 
               ]}
             />
           </Group>
-        </Group>
+        </Box>
 
         {initialState === "loading" && (
           <Center mih={360}><Stack align="center"><Loader /><Text size="sm" c="dimmed">Mediaを読み込んでいます</Text></Stack></Center>
