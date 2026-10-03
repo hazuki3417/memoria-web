@@ -1,4 +1,4 @@
-"use client"
+"use client"\n\nimport { PageHeader } from "@/components/PageHeader"\nimport { SectionHeader } from "@/components/SectionHeader"
 
 import {
   AppShell,
@@ -96,19 +96,8 @@ export function UserProfilePrototype({
         <AppShell.Main>
           <Box maw={880} mx="auto" w="100%">
             <Stack gap="xl">
-              <Box>
-                <Title order={1} size="h2">
-                  プロフィール
-                </Title>
-                <Text c="dimmed" size="sm" mt={4}>
-                  Memoriaで使用するプロフィール情報を管理します。
-                </Text>
-              </Box>
-              <Box>
-                <Title order={2} size="h4">
-                  基本情報
-                </Title>
-                <Divider my="md" />
+              <PageHeader title="プロフィール" description="Memoriaで使用するプロフィール情報を管理します。" />
+              <Box>\n                <SectionHeader>基本情報</SectionHeader>
                 <Stack gap="md" maw={540}>
                   <Box maw={440}>
                     <TextInput
