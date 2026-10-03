@@ -23,6 +23,23 @@ export const Selection: Story = { args: { initialState: "selection", contextKind
 export const Community: Story = { args: { initialState: "default", contextKind: "community" } }
 export const CommunitySelection: Story = { args: { initialState: "selection", contextKind: "community" } }
 
+export const GroupDialog: Story = {
+  args: { initialState: "selection", contextKind: "personal", initialDialog: "group" },
+}
+export const TagDialog: Story = {
+  args: { initialState: "selection", contextKind: "personal", initialDialog: "tag" },
+}
+export const ShareDialog: Story = {
+  args: { initialState: "selection", contextKind: "personal", initialDialog: "share" },
+}
+export const DeleteDialog: Story = {
+  args: { initialState: "selection", contextKind: "personal", initialDialog: "delete" },
+}
+export const CompactDeleteDialog: Story = {
+  args: { initialState: "selection", contextKind: "personal", initialDialog: "delete" },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+
 export const Compact: Story = {
   args: { initialState: "default", contextKind: "personal" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
