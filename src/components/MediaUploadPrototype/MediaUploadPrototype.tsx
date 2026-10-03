@@ -305,7 +305,7 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
           <Group justify="flex-end" wrap="nowrap">
             <Text size="sm" c="dimmed">{selectedFiles.length}件選択中</Text>
             <Button disabled={activeUpload || selectedFiles.length === 0}>
-              {activeUpload ? "アップロード中" : `選択した${selectedFiles.length}件をアップロード`}
+              {activeUpload ? "アップロード中" : "アップロード"}
             </Button>
           </Group>
         </Box>
