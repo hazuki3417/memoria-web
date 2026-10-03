@@ -13,6 +13,7 @@ type DialogProps = Omit<ModalProps, "children"> & {
 function DialogRoot({ children, footer, ...props }: DialogProps) {
   return (
     <Modal {...props} centered withCloseButton={false}>
+      <Box tabIndex={-1} data-autofocus style={{ position: "absolute" }} />
       <Stack gap="lg">
         {children}
         {footer}
