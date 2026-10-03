@@ -46,12 +46,10 @@ const applicationNavigation = [
   { id: "groups", label: "グループ", icon: IconUsers, active: true },
 ]
 
-const previewTones = [
-  "var(--mantine-color-blue-1)",
-  "var(--mantine-color-grape-1)",
-  "var(--mantine-color-teal-1)",
-  "var(--mantine-color-orange-1)",
-]
+const previewImages = Array.from(
+  { length: 9 },
+  (_, index) => `/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
+)
 
 function GroupVisual({ startIndex }: { startIndex: number }) {
   const layers = Array.from({ length: 3 }, (_, layer) => startIndex + layer)
@@ -70,10 +68,12 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
           w="78%"
           h="78%"
           bdrs="sm"
-          bg={previewTones[mediaIndex % previewTones.length]}
           style={{
             left: `${5 + layer * 6}%`,
             top: `${5 + layer * 6}%`,
+            backgroundImage: `url("${previewImages[mediaIndex % previewImages.length]}")`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
             boxShadow: "var(--mantine-shadow-xs)",
           }}
         />
@@ -95,12 +95,18 @@ function PreviewGrid({ count }: { count: number }) {
           <Box
             key={index}
             bdrs="sm"
-            bg={media ? previewTones[index] : undefined}
             style={{
               position: "relative",
               aspectRatio: "1 / 1",
               border: "1px solid var(--mantine-color-default-border)",
               overflow: "hidden",
+              ...(media
+                ? {
+                    backgroundImage: `url("${previewImages[index % previewImages.length]}")`,
+                    backgroundPosition: "center",
+                    backgroundSize: "cover",
+                  }
+                : {}),
             }}
           >
             {!media && <GroupVisual startIndex={groupVisualStart} />}
