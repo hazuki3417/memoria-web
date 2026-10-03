@@ -4,6 +4,7 @@ import { ApplicationShell } from "@/components/ApplicationShell"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
+import { SettingRow } from "@/components/SettingRow"
 import {
   Box,
   Button,
@@ -36,37 +37,6 @@ const sections = [
   { id: "usage", label: "利用状況", icon: IconChartBar },
   { id: "account", label: "アカウント", icon: IconUserCircle },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
-
-function SettingRow({
-  label,
-  description,
-  children,
-  compact,
-}: {
-  label: string
-  description: string
-  children: React.ReactNode
-  compact: boolean
-}) {
-  return (
-    <Group
-      justify="space-between"
-      align={compact ? "stretch" : "center"}
-      wrap={compact ? "wrap" : "nowrap"}
-      gap="md"
-    >
-      <Box style={{ flex: 1 }} miw={0}>
-        <Text fw={600} size="sm">
-          {label}
-        </Text>
-        <Text c="dimmed" size="sm" mt={2}>
-          {description}
-        </Text>
-      </Box>
-      <Box w={compact ? "100%" : 180}>{children}</Box>
-    </Group>
-  )
-}
 
 function ProfileContent() {
   const [name, setName] = useState("ユーザー")
@@ -398,7 +368,8 @@ export function SettingsPrototype({
                     accentColor="var(--mantine-color-blue-6)"
                     onClick={() => setSection(item.id)}
                   />
-                ))}              </Stack>
+                ))}
+              </Stack>
             </Box>
             <Box style={{ flex: 1 }} maw={760} miw={0}>
               {content}
