@@ -74,7 +74,6 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
           style={{
             left: `${5 + layer * 6}%`,
             top: `${5 + layer * 6}%`,
-            border: "1px solid var(--mantine-color-default-border)",
             boxShadow: "var(--mantine-shadow-xs)",
           }}
         />
