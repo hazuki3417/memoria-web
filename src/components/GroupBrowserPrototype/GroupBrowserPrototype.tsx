@@ -172,11 +172,11 @@ export function GroupBrowserPrototype() {
                 <Text size="xs" c="dimmed">{visibleGroups.length} Groups</Text>
               </Stack>
               <Divider />
-              <ScrollArea flex={1}><SimpleGrid p="sm" cols={{ base: 1, xs: 2 }} spacing="sm">{visibleGroups.map((group) => (
-                <UnstyledButton key={group.id} onClick={() => openDetail(group.id)} p="xs" bdrs="sm">
-                  <Stack gap={6}><Text fw={600} size="sm" truncate="end">{group.name}</Text><PreviewGrid count={group.previewCount} /></Stack>
+              <ScrollArea flex={1}><Box p="sm" style={{ display: "flex", flexWrap: "wrap", gap: "var(--mantine-spacing-sm)" }}>{visibleGroups.map((group) => (
+                <UnstyledButton key={group.id} onClick={() => openDetail(group.id)} p="xs" bdrs="sm" w={240}>
+                  <Stack gap={6}><Text fw={600} size="sm" truncate="end" title={group.name}>{group.name}</Text><PreviewGrid count={group.previewCount} /></Stack>
                 </UnstyledButton>
-              ))}</SimpleGrid></ScrollArea>
+              ))}</Box></ScrollArea>
             </Box>
           ) : (
             <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
@@ -233,7 +233,7 @@ export function GroupBrowserPrototype() {
                       }}
                     >
                       <Stack gap={6}>
-                        <Text fw={600} size="sm" truncate="end">{group.name}</Text>
+                        <Text fw={600} size="sm" truncate="end" title={group.name}>{group.name}</Text>
                         <PreviewGrid count={group.previewCount} />
                       </Stack>
                     </UnstyledButton>
