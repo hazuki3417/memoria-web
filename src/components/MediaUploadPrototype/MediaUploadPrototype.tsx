@@ -214,81 +214,61 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                 <FeedbackAlert kind="success" title="アップロードが完了しました">すべての画像をMediaとして利用できます。</FeedbackAlert>
               )}
 
-              <Paper withBorder radius="md" style={{ overflow: "hidden" }}>
+              <Stack gap="sm">
                 {!activeUpload && selectableFiles.length > 0 && (
-                  <Box p="sm">
-                    {compact ? (
-                      <Stack gap="sm">
-                        <Group justify="space-between" wrap="nowrap">
-                          <Group gap="sm" wrap="nowrap">
-                            <Checkbox
-                              checked={allSelectableChecked}
-                              indeterminate={selectedFiles.length > 0 && !allSelectableChecked}
-                              onChange={toggleAll}
-                              aria-label="アップロード可能なMediaをすべて選択"
-                            />
-                            <Box>
+                  <>
+                    <Paper withBorder radius="md" p="sm">
+                      {compact ? (
+                        <Stack gap="sm">
+                          <Group justify="space-between" wrap="nowrap">
+                            <Group gap="sm" wrap="nowrap">
+                              <Checkbox
+                                checked={allSelectableChecked}
+                                indeterminate={selectedFiles.length > 0 && !allSelectableChecked}
+                                onChange={toggleAll}
+                                aria-label="アップロード可能なMediaをすべて選択"
+                              />
                               <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
-                              <Stack gap={0}>
-                                <Text size="xs" c="dimmed">Media登録済み {registeredCount}件</Text>
-                                <Text size="xs" c="dimmed">画像処理中 {processingCount}件</Text>
-                                <Text size="xs" c="dimmed">完了 {completedCount}件</Text>
-                              </Stack>
-                            </Box>
+                            </Group>
+                            <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除"><IconTrash size={16} /></Button>
                           </Group>
-                          <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除">
-                            <IconTrash size={16} />
-                          </Button>
-                        </Group>
-                        <TextInput
-                          value={bulkTag}
-                          onChange={(event) => setBulkTag(event.currentTarget.value)}
-                          placeholder="選択したMediaのTag"
-                        />
-                        <Group gap={4} grow>
-                          <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("add")}>追加</Button>
-                          <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("remove")}>除去</Button>
-                          <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
-                        </Group>
-                      </Stack>
-                    ) : (
-                      <Group align="center" wrap="nowrap" gap="md">
-                        <Checkbox
-                          checked={allSelectableChecked}
-                          indeterminate={selectedFiles.length > 0 && !allSelectableChecked}
-                          onChange={toggleAll}
-                          aria-label="アップロード可能なMediaをすべて選択"
-                        />
-                        <Box w={72} style={{ flex: "0 0 72px" }}>
-                          <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
-                        </Box>
-                        <Stack gap={0} style={{ flex: "0 0 22%", minWidth: 180 }}>
-                          <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>Media登録済み</Text><Text size="xs" c="dimmed">{registeredCount}件</Text></Group>
-                          <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>画像処理中</Text><Text size="xs" c="dimmed">{processingCount}件</Text></Group>
-                          <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>完了</Text><Text size="xs" c="dimmed">{completedCount}件</Text></Group>
-                        </Stack>
-                        <Stack gap={4} style={{ flex: "1 1 auto", minWidth: 420 }}>
-                          <TextInput
-                            value={bulkTag}
-                            onChange={(event) => setBulkTag(event.currentTarget.value)}
-                            placeholder="選択したMediaのTag"
-                          />
-                          <Group gap={4} justify="flex-end">
-                            <Button variant="default" size="compact-sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("add")}>追加</Button>
-                            <Button variant="default" size="compact-sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("remove")}>除去</Button>
-                            <Button variant="default" size="compact-sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
+                          <Group gap="lg">
+                            <Stack gap={0}>
+                              <Text size="xs" c="dimmed">Media登録済み</Text>
+                              <Text size="xs" c="dimmed">画像処理中</Text>
+                              <Text size="xs" c="dimmed">完了</Text>
+                            </Stack>
+                            <Stack gap={0}>
+                              <Text size="xs" c="dimmed">{registeredCount}件</Text>
+                              <Text size="xs" c="dimmed">{processingCount}件</Text>
+                              <Text size="xs" c="dimmed">{completedCount}件</Text>
+                            </Stack>
                           </Group>
+                          <TextInput value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} placeholder="選択したMediaのTag" />
                         </Stack>
-                        <Box w={36} style={{ flex: "0 0 36px" }}>
-                          <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除">
-                            <IconTrash size={16} />
-                          </Button>
-                        </Box>
-                      </Group>
-                    )}
-                  </Box>
+                      ) : (
+                        <Group align="center" wrap="nowrap" gap="md">
+                          <Checkbox checked={allSelectableChecked} indeterminate={selectedFiles.length > 0 && !allSelectableChecked} onChange={toggleAll} aria-label="アップロード可能なMediaをすべて選択" />
+                          <Box w={72} style={{ flex: "0 0 72px" }}><Text size="sm" fw={600}>{selectedFiles.length}件選択</Text></Box>
+                          <Stack gap={0} style={{ flex: "0 0 22%", minWidth: 180 }}>
+                            <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>Media登録済み</Text><Text size="xs" c="dimmed">{registeredCount}件</Text></Group>
+                            <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>画像処理中</Text><Text size="xs" c="dimmed">{processingCount}件</Text></Group>
+                            <Group gap="xs" wrap="nowrap"><Text size="xs" c="dimmed" w={88}>完了</Text><Text size="xs" c="dimmed">{completedCount}件</Text></Group>
+                          </Stack>
+                          <TextInput style={{ flex: 1 }} value={bulkTag} onChange={(event) => setBulkTag(event.currentTarget.value)} placeholder="選択したMediaのTag" />
+                          <Box w={36} style={{ flex: "0 0 36px" }}><Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll} aria-label="すべて削除"><IconTrash size={16} /></Button></Box>
+                        </Group>
+                      )}
+                    </Paper>
+                    <Group justify="center" gap="xs">
+                      <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("add")}>追加</Button>
+                      <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("remove")}>除去</Button>
+                      <Button variant="default" size="sm" disabled={!bulkTag.trim() || selectedFiles.length === 0} onClick={() => applyTagAction("replace")}>置換</Button>
+                    </Group>
+                  </>
                 )}
 
+                <Paper withBorder radius="md" style={{ overflow: "hidden" }}>
                 {activeUpload && (
                   <Box p="sm">
                     <Text size="sm" fw={600}>アップロード中 ・ Media登録済み {registeredCount}件</Text>
@@ -314,6 +294,7 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                   ))}
                 </Box>
               </Paper>
+              </Stack>
 
             </>
           )}
