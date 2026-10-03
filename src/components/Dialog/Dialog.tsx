@@ -1,6 +1,7 @@
 "use client"
 
 import { Box, Group, Modal, Stack } from "@mantine/core"
+import { useMediaQuery } from "@mantine/hooks"
 import type { ModalProps } from "@mantine/core"
 import type { ReactNode } from "react"
 
@@ -29,12 +30,26 @@ function DialogFooter({
   secondary?: ReactNode
   primary?: ReactNode
 }) {
+  const compact = useMediaQuery("(max-width: 47.99em)")
+
   if (!leading) {
     return (
       <Group justify="flex-end" gap="sm">
         {secondary}
         {primary}
       </Group>
+    )
+  }
+
+  if (compact) {
+    return (
+      <Stack gap="sm">
+        <Group justify="flex-start">{leading}</Group>
+        <Group justify="flex-end" gap="sm">
+          {secondary}
+          {primary}
+        </Group>
+      </Stack>
     )
   }
 
