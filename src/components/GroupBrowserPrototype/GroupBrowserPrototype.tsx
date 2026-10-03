@@ -2,14 +2,16 @@
 
 import {
   ActionIcon, Badge, Box, Button, Divider, Group, Menu, Paper, ScrollArea,
-  SimpleGrid, Stack, Text, TextInput, Title, UnstyledButton,
+  SimpleGrid, Stack, Text, TextInput, UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
   IconChevronDown, IconChevronRight, IconDots, IconEdit, IconPlus,
-  IconSearch, IconTrash, IconX,
+  IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconUsers, IconX,
 } from "@tabler/icons-react"
 import { useMemo, useState } from "react"
+import { ApplicationShell } from "@/components/ApplicationShell"
+import { PageHeader } from "@/components/PageHeader"
 
 type PrototypeGroup = {
   id: string
@@ -25,6 +27,19 @@ const groups: PrototypeGroup[] = [
   { id: "landscape", name: "風景写真", mediaCount: 31, previewCount: 4 },
   { id: "archive", name: "あとで整理する写真", mediaCount: 18, previewCount: 2 },
   { id: "empty", name: "新しいGroup", mediaCount: 0, previewCount: 0 },
+]
+
+const personalContext = {
+  id: "personal",
+  kind: "personal" as const,
+  label: "Personal",
+  accentColor: "var(--mantine-color-blue-6)",
+}
+
+const applicationNavigation = [
+  { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
+  { id: "media", label: "メディア", icon: IconPhoto },
+  { id: "groups", label: "グループ", icon: IconUsers, active: true },
 ]
 
 const previewTones = [
@@ -85,9 +100,21 @@ export function GroupBrowserPrototype() {
   const selected = groups.find((group) => group.id === selectedId) ?? groups[0]
 
   return (
-    <Box h="100vh" bg="var(--mantine-color-body)" p="md">
-      <Stack h="100%" gap="sm">
-        <Title order={1} size="h3">Groups</Title>
+    <ApplicationShell
+      currentContext={personalContext}
+      contexts={[personalContext]}
+      navigationItems={applicationNavigation}
+      user={{ displayName: "ユーザー" }}
+      onSelectContext={() => undefined}
+      onSelectNavigation={() => undefined}
+      onOpenSettings={() => undefined}
+      onLogout={() => undefined}
+    >
+      <Stack h="calc(100vh - 88px)" gap="lg">
+        <PageHeader
+          title="Groups"
+          description="MediaをGroupに整理し、関連するGroupとあわせて閲覧します。"
+        />
 
         <Box
           style={{
@@ -225,6 +252,6 @@ export function GroupBrowserPrototype() {
           </Box>
         </Box>
       </Stack>
-    </Box>
+    </ApplicationShell>
   )
 }
