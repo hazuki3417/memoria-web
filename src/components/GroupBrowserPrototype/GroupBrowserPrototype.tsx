@@ -223,6 +223,7 @@ export function GroupBrowserPrototype() {
                       key={group.id}
                       onClick={() => openDetail(group.id)}
                       aria-pressed={selectedItem}
+                      w={240}
                       p="xs"
                       bdrs="sm"
                       bg={selectedItem ? "var(--mantine-color-default-hover)" : undefined}
