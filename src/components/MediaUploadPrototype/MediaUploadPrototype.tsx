@@ -241,7 +241,7 @@ export function MediaUploadPrototype({
                     <Box>
                       <Text fw={600} size="sm">共通Tag</Text>
                       <Text c="dimmed" size="xs">
-                        入力したTagを現在の画像へ追加します。各画像のTagは個別に調整できます。
+                        入力したTagを現在の画像へ共通で追加する案を検証します。個別Tag編集との関係はVisual Reviewで判断します。
                       </Text>
                     </Box>
                     <Group align="flex-end" wrap={compact ? "wrap" : "nowrap"}>
