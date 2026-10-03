@@ -1,10 +1,12 @@
 "use client"
 
-import { ApplicationShell } from "@/components/ApplicationShell"\nimport { NavigationItem } from "@/components/NavigationItem"\nimport { PageHeader } from "@/components/PageHeader"\nimport { SectionHeader } from "@/components/SectionHeader"
+import { ApplicationShell } from "@/components/ApplicationShell"
+import { NavigationItem } from "@/components/NavigationItem"
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
 import {
   Box,
   Button,
-  Divider,
   Group,
   Progress,
   Select,
@@ -13,7 +15,6 @@ import {
   Table,
   Text,
   TextInput,
-  Title,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
