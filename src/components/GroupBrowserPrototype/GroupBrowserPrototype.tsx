@@ -9,7 +9,7 @@ import {
   IconChevronDown, IconChevronRight, IconDots, IconEdit, IconPlus,
   IconLayoutDashboard, IconPhoto, IconSearch, IconTrash, IconUsers, IconX,
 } from "@tabler/icons-react"
-import { useEffect, useMemo, useState } from "react"
+import { motion } from "framer-motion"\nimport { useEffect, useMemo, useState } from "react"
 import { useGroupRef } from "react-resizable-panels"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
@@ -250,6 +250,14 @@ export function GroupBrowserPrototype() {
         />
 
         <SplitView.Pane id="detail" minWidth={360} collapsible collapsedSize={0}>
+          <motion.div
+            style={{ height: "100%" }}
+            animate={{
+              opacity: selectedId ? 1 : 0,
+              x: selectedId ? 0 : 100,
+            }}
+            transition={{ duration: 0.3 }}
+          >
           <Box style={{
             display: selectedId ? "flex" : "none", flexDirection: "column", minWidth: 0, minHeight: 0, height: "100%",
           }}>
@@ -324,6 +332,7 @@ export function GroupBrowserPrototype() {
               </Box>
             </ScrollArea>
           </Box>
+          </motion.div>
         </SplitView.Pane>
       </SplitView.Root>
       )}
