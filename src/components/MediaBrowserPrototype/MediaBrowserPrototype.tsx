@@ -1,8 +1,8 @@
 "use client"
 
 import {
-  ActionIcon, Alert, Badge, Box, Button, Center, Checkbox, Combobox, Divider, Group, Image,
-  Loader, Menu, Modal, Paper, SegmentedControl, Select, Slider, Stack, TagsInput, Text, ThemeIcon,
+  ActionIcon, Alert, Badge, Box, Button, Center, Checkbox, Combobox, Divider, Group, Image, InputBase,
+  Loader, Menu, Modal, Paper, SegmentedControl, Select, Slider, Stack, TagsInput, Text, ThemeIcon, useCombobox,
 } from "@mantine/core"
 import {
   IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
@@ -10,7 +10,7 @@ import {
   IconInfoCircle, IconPhoto, IconPhotoOff, IconPlus, IconRotate, IconRotate2, IconSearch, IconShare,
   IconTags, IconTrash, IconX, IconZoomIn, IconZoomOut, IconZoomReset,
 } from "@tabler/icons-react"
-import { useCombobox, useMediaQuery } from "@mantine/hooks"
+import { useMediaQuery } from "@mantine/hooks"
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ApplicationShell } from "@/components/ApplicationShell"
@@ -139,18 +139,19 @@ function ZoomInput({ value, onChange }: { value: number; onChange: (value: numbe
   return (
     <Combobox store={combobox} onOptionSubmit={(option) => { onChange(Number(option)); combobox.closeDropdown() }}>
       <Combobox.Target>
-        <Combobox.EventsTarget>
-          <Box
-            component="input"
-            aria-label="拡大率"
-            value={input}
-            onChange={(event) => { setInput(event.currentTarget.value.replace(/[^0-9%]/g, "").slice(0, 4)); combobox.openDropdown() }}
-            onFocus={() => combobox.openDropdown()}
-            onBlur={commit}
-            onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur() }}
-            style={{ width: 68, height: 30, paddingInline: 8, border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-body)", color: "inherit", fontSize: "var(--mantine-font-size-xs)" }}
-          />
-        </Combobox.EventsTarget>
+        <InputBase
+          size="xs"
+          w={76}
+          aria-label="拡大率"
+          value={input}
+          rightSection={<Combobox.Chevron />}
+          rightSectionPointerEvents="none"
+          onChange={(event) => { setInput(event.currentTarget.value.replace(/[^0-9%]/g, "").slice(0, 4)); combobox.openDropdown() }}
+          onFocus={() => combobox.openDropdown()}
+          onClick={() => combobox.openDropdown()}
+          onBlur={commit}
+          onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur() }}
+        />
       </Combobox.Target>
       <Combobox.Dropdown>
         <Combobox.Options mah={200} style={{ overflowY: "auto" }}>
