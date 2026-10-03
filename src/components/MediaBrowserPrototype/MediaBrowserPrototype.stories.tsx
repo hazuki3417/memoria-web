@@ -20,6 +20,13 @@ export const LoadingMore: Story = { args: { initialState: "loading-more", contex
 export const LoadMoreError: Story = { args: { initialState: "load-more-error", contextKind: "personal" } }
 export const ProcessingFailure: Story = { args: { initialState: "processing-failure", contextKind: "personal" } }
 export const Selection: Story = { args: { initialState: "selection", contextKind: "personal" } }
+export const Detail: Story = {
+  args: { initialState: "default", contextKind: "personal" },
+  play: async ({ canvasElement }) => {
+    const button = canvasElement.querySelector<HTMLButtonElement>('button[aria-label="Media 1を開く"]')
+    button?.click()
+  },
+}
 export const Community: Story = { args: { initialState: "default", contextKind: "community" } }
 export const CommunitySelection: Story = { args: { initialState: "selection", contextKind: "community" } }
 
