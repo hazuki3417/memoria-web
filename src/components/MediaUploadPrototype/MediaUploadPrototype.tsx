@@ -256,13 +256,13 @@ export function MediaUploadPrototype({ scenario = "ready", context = "personal" 
                           onChange={toggleAll}
                           aria-label="アップロード可能なMediaをすべて選択"
                         />
-                        <Box style={{ flex: "1 1 52%", minWidth: 0 }}>
+                        <Box style={{ flex: "0 0 42%", minWidth: 0 }}>
                           <Text size="sm" fw={600}>{selectedFiles.length}件選択</Text>
                           <Text size="xs" c="dimmed" mt={2}>
                             Media登録済み {registeredCount}件 ・ 画像処理中 {processingCount}件 ・ 完了 {completedCount}件
                           </Text>
                         </Box>
-                        <Stack gap={4} style={{ flex: "0 0 38%", minWidth: 320 }}>
+                        <Stack gap={4} style={{ flex: "1 1 48%", minWidth: 360 }}>
                           <TextInput
                             value={bulkTag}
                             onChange={(event) => setBulkTag(event.currentTarget.value)}
@@ -388,10 +388,10 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
   }
 
   return (
-    <Box p="sm">
-      <Group align="stretch" wrap="nowrap" gap="md">
+    <Box p="sm" mih={104}>
+      <Group align="stretch" wrap="nowrap" gap="md" mih={80}>
         <Checkbox mt={26} checked={selected} disabled={!selectable} onChange={(e) => onSelect(e.currentTarget.checked)} aria-label={`${file.name}を選択`} />
-        <Group align="flex-start" wrap="nowrap" gap="sm" style={{ flex: "1 1 52%", minWidth: 0 }}>
+        <Group align="flex-start" wrap="nowrap" gap="sm" style={{ flex: "0 0 42%", minWidth: 0 }}>
           <Box w={76} h={64} style={{ flex: "0 0 auto", borderRadius: "var(--mantine-radius-sm)", background: "var(--mantine-color-default-hover)", display: "grid", placeItems: "center" }}>
             <IconPhoto size={28} stroke={1.4} />
           </Box>
@@ -403,8 +403,15 @@ function FileRow({ file, compact, selected, selectable, onSelect, onRemove, onTa
             <Status file={file} presentation={presentation} StatusIcon={StatusIcon} />
           </Stack>
         </Group>
-        <Box style={{ flex: "0 0 38%", minWidth: 320, paddingTop: 14 }}>
-          <TagsInput value={file.tags} onChange={onTagsChange} disabled={!tagEditable} size="sm" placeholder="Tagを追加" />
+        <Box style={{ flex: "1 1 48%", minWidth: 360, alignSelf: "stretch" }}>
+          <TagsInput
+            value={file.tags}
+            onChange={onTagsChange}
+            disabled={!tagEditable}
+            size="sm"
+            placeholder="Tagを追加"
+            styles={{ root: { height: "100%" }, input: { minHeight: "100%" } }}
+          />
         </Box>
         <Box w={36} style={{ flex: "0 0 36px", paddingTop: 18 }}>
           {removable && <Button variant="subtle" color="gray" size="compact-sm" onClick={onRemove} aria-label={`${file.name}を削除`}><IconTrash size={16} /></Button>}
@@ -420,13 +427,14 @@ function Status({ file, presentation, StatusIcon }: {
   StatusIcon: typeof IconCheck
 }) {
   return (
-    <Stack gap={5}>
-      <Group gap={6}>
+    <Stack gap={5} mih={42}>
+      <Group gap={6} wrap="nowrap">
         <Badge variant="light" color={presentation.color} leftSection={<StatusIcon size={12} />}>{presentation.label}</Badge>
         {file.status === "upload-failed" && <Badge variant="outline" color="gray" leftSection={<IconRefresh size={12} />}>再試行可能</Badge>}
       </Group>
-      {file.status === "uploading" && <Text size="xs" c="dimmed">送信しています</Text>}
-      {file.reason && <Text size="xs" c="red">{file.reason}</Text>}
+      <Text size="xs" c={file.reason ? "red" : "dimmed"} truncate>
+        {file.reason ?? (file.status === "uploading" ? "送信しています" : "\u00a0")}
+      </Text>
     </Stack>
   )
 }
