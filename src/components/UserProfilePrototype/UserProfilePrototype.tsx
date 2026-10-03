@@ -16,10 +16,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
-import {
-  PrototypeFormAlert,
-  showPrototypeNotification,
-} from "../PrototypeFeedback/PrototypeFeedback"
+import { FeedbackAlert, showNotification } from "@/components/Feedback"
 
 type ReviewState =
   | "default"
@@ -54,7 +51,7 @@ export function UserProfilePrototype({
 
   const showFeedback = useCallback((kind: "success" | "failure") => {
     const success = kind === "success"
-    showPrototypeNotification({
+    showNotification({
       kind: success ? "success" : "error",
       title: success ? "保存しました" : "保存できませんでした",
       message: success
@@ -145,12 +142,12 @@ export function UserProfilePrototype({
                   </Group>
                   <Box mih={92} aria-live="polite">
                     {blocking && (
-                      <PrototypeFormAlert
+                      <FeedbackAlert
                         kind="error"
                         title="プロフィールを更新できませんでした"
                       >
                         現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
-                      </PrototypeFormAlert>
+                      </FeedbackAlert>
                     )}
                   </Box>
                 </Stack>
