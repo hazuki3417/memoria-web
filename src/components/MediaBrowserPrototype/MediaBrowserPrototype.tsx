@@ -1,8 +1,8 @@
 "use client"
 
 import {
-  ActionIcon, Alert, AspectRatio, Badge, Box, Button, Center, Checkbox, Group,
-  Image, Loader, Menu, Modal, SegmentedControl, Stack, TagsInput, Text,
+  Alert, AspectRatio, Badge, Box, Button, Center, Checkbox, Group, Image,
+  Loader, Menu, Modal, SegmentedControl, Stack, TagsInput, Text,
 } from "@mantine/core"
 import {
   IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
@@ -109,25 +109,6 @@ function MediaTile({ item, selecting, selected, onClick }: {
         />
       )}
 
-      {selecting && (
-        <ActionIcon
-          size={26}
-          color="red"
-          variant="filled"
-          aria-label={`${item.label}を削除`}
-          style={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            opacity: 0.9,
-          }}
-          onClick={(event) => {
-            event.stopPropagation()
-          }}
-        >
-          <IconTrash size={15} />
-        </ActionIcon>
-      )}
     </Box>
   )
 }
