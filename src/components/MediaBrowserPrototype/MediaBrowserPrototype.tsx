@@ -2,16 +2,17 @@
 
 import {
   ActionIcon, Alert, Badge, Box, Button, Center, Checkbox, Divider, Group, Image,
-  Loader, Menu, Modal, Paper, SegmentedControl, Select, Stack, TagsInput, Text, ThemeIcon,
+  Loader, Menu, Modal, Paper, SegmentedControl, Select, Slider, Stack, TagsInput, Text, ThemeIcon,
 } from "@mantine/core"
 import {
   IconAlertCircle, IconCheckbox, IconChevronDown, IconCloudUpload,
   IconChevronLeft, IconChevronRight, IconDownload, IconEdit, IconEye, IconFolderPlus,
-  IconInfoCircle, IconPhoto, IconPhotoOff, IconPlus, IconRotate, IconSearch, IconShare,
-  IconTags, IconTrash, IconX, IconZoomIn, IconZoomOut,
+  IconInfoCircle, IconPhoto, IconPhotoOff, IconPlus, IconRotate, IconRotateClockwise, IconSearch, IconShare,
+  IconTags, IconTrash, IconX, IconZoomIn, IconZoomOut, IconZoomReset,
 } from "@tabler/icons-react"
 import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 import { ApplicationShell } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
 
@@ -140,6 +141,8 @@ export function MediaBrowserPrototype({
   const [selected, setSelected] = useState<Set<string>>(initialState === "selection" ? new Set(["2", "5", "7"]) : new Set())
   const [detail, setDetail] = useState<MediaItem | null>(null)
   const [detailInfoOpened, setDetailInfoOpened] = useState(true)
+  const [detailZoom, setDetailZoom] = useState(100)
+  const [detailRotate, setDetailRotate] = useState(0)
   const [selectionDialog, setSelectionDialog] = useState<SelectionDialog>(initialDialog)
   const [groupTarget, setGroupTarget] = useState<string | null>(null)
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
@@ -289,7 +292,7 @@ export function MediaBrowserPrototype({
                 item={item}
                 selecting={selecting}
                 selected={selected.has(item.id)}
-                onClick={() => selecting ? toggle(item.id) : setDetail(item)}
+                onClick={() => selecting ? toggle(item.id) : (setDetailZoom(100), setDetailRotate(0), setDetail(item))}
               />
             ))}
           </Box>
@@ -395,7 +398,7 @@ export function MediaBrowserPrototype({
               h="100%"
               style={{
                 display: "grid",
-                gridTemplateColumns: compact || !detailInfoOpened ? "minmax(0, 1fr)" : "minmax(0, 1fr) 340px",
+                gridTemplateColumns: "minmax(0, 1fr) auto",
                 gridTemplateRows: compact && detailInfoOpened ? "minmax(0, 1fr) auto" : "minmax(0, 1fr)",
                 background: "transparent",
               }}
@@ -414,7 +417,7 @@ export function MediaBrowserPrototype({
                     {detail.failed ? (
                       <Stack align="center" c="dimmed"><IconPhotoOff size={48} /><Text size="sm">画像を表示できません</Text></Stack>
                     ) : (
-                      <Image src={detail.src} alt={detail.label} maw="100%" mah="100%" w="auto" h="auto" fit="contain" />
+                      <Image src={detail.src} alt={detail.label} maw="100%" mah="100%" w="auto" h="auto" fit="contain" style={{ transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`, transition: "transform 180ms ease" }} />
                     )}
                   </Center>
                   <Center>
@@ -424,13 +427,20 @@ export function MediaBrowserPrototype({
                 <Group h={48} px="sm" justify="space-between" wrap="nowrap" style={{ flexShrink: 0 }}>
                   <Group gap={4} wrap="nowrap">
                     <ActionIcon variant="subtle" aria-label="Originalをダウンロード"><IconDownload size={18} /></ActionIcon>
-                    {!compact && <ActionIcon variant="subtle" aria-label="左へ回転"><IconRotate size={18} /></ActionIcon>}
+                    {!compact && <>
+                      <ActionIcon variant="subtle" aria-label="左へ回転" onClick={() => setDetailRotate((value) => value - 90)}><IconRotate size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="回転をリセット" onClick={() => setDetailRotate(0)}><IconRotateClockwise size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="右へ回転" onClick={() => setDetailRotate((value) => value + 90)}><IconRotateClockwise size={18} /></ActionIcon>
+                    </>}
                   </Group>
                   <Text size="xs" c="dimmed">{detailIndex + 1} / {stateItems.length}</Text>
                   <Group gap={4} wrap="nowrap">
                     {!compact && <>
-                      <ActionIcon variant="subtle" aria-label="縮小"><IconZoomOut size={18} /></ActionIcon>
-                      <ActionIcon variant="subtle" aria-label="拡大"><IconZoomIn size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="拡大率をリセット" onClick={() => setDetailZoom(100)}><IconZoomReset size={18} /></ActionIcon>
+                      <ActionIcon variant="subtle" aria-label="縮小" disabled={detailZoom <= 100} onClick={() => setDetailZoom((value) => Math.max(100, value - 10))}><IconZoomOut size={18} /></ActionIcon>
+                      <Slider w={100} size="xs" min={100} max={300} step={10} value={detailZoom} onChange={setDetailZoom} label={null} />
+                      <ActionIcon variant="subtle" aria-label="拡大" disabled={detailZoom >= 300} onClick={() => setDetailZoom((value) => Math.min(300, value + 10))}><IconZoomIn size={18} /></ActionIcon>
+                      <Text size="xs" w={36} ta="right">{detailZoom}%</Text>
                     </>}
                     <ActionIcon
                       variant={detailInfoOpened ? "light" : "subtle"}
@@ -443,9 +453,18 @@ export function MediaBrowserPrototype({
                 </Group>
               </Box>
 
-              {detailInfoOpened && (
+              <AnimatePresence initial={false}>
+                {detailInfoOpened && (
+                  <motion.div
+                    initial={compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
+                    animate={compact ? { height: "auto", opacity: 1 } : { width: 340, opacity: 1 }}
+                    exit={compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ overflow: "hidden", minWidth: 0 }}
+                  >
                 <Box
                   p="md"
+                  h="100%"
                   bg="var(--mantine-color-body)"
                   style={{
                     borderLeft: compact ? undefined : "1px solid var(--mantine-color-default-border)",
@@ -481,7 +500,9 @@ export function MediaBrowserPrototype({
                     </Group>
                   </Stack>
                 </Box>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Box>
           )
         })()}
