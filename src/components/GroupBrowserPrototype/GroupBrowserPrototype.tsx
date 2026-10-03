@@ -372,11 +372,11 @@ export function GroupBrowserPrototype() {
               <Box px="lg" pb="sm">
                 <SimpleGrid cols={2} spacing="lg">
                   <Stack gap={4}>
-                    <Text size="xs" c="dimmed">所属先</Text>
+                    <Text size="xs" c="dimmed">Parents</Text>
                     <RelationItems names={selected?.parentNames ?? []} />
                   </Stack>
                   <Stack gap={4}>
-                    <Text size="xs" c="dimmed">所属Group</Text>
+                    <Text size="xs" c="dimmed">Children</Text>
                     <RelationItems names={selected?.childNames ?? []} />
                   </Stack>
                 </SimpleGrid>
