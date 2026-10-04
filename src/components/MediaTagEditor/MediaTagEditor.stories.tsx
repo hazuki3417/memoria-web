@@ -11,10 +11,24 @@ const initialItems: MediaTagEditorItem[] = [
 function Demo() {
   const [items, setItems] = useState(initialItems)
   const [selectedIds, setSelectedIds] = useState(items.map((item) => item.id))
+  const [bulkTag, setBulkTag] = useState("")
   return <MediaTagEditor
     items={items}
     selectedIds={selectedIds}
+    bulkTag={bulkTag}
     onSelectedIdsChange={setSelectedIds}
+    onBulkTagChange={setBulkTag}
+    onBulkTagAction={(action) => {
+      const tag = bulkTag.trim()
+      if (!tag) return
+      setItems((current) => current.map((item) => {
+        if (!selectedIds.includes(item.id)) return item
+        if (action === "replace") return { ...item, tags: [tag] }
+        if (action === "remove") return { ...item, tags: item.tags.filter((value) => value !== tag) }
+        return { ...item, tags: item.tags.includes(tag) ? item.tags : [...item.tags, tag] }
+      }))
+      setBulkTag("")
+    }}
     onTagsChange={(id, tags) => setItems((current) => current.map((item) => item.id === id ? { ...item, tags } : item))}
   />
 }
