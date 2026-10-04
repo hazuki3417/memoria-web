@@ -5,9 +5,10 @@ import { useState } from "react"
 import {
   type ApplicationContextOption,
   type ApplicationSection,
-  PrototypeApplicationShell,
+  
   getApplicationNavigation,
 } from "@/components/ApplicationShell"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type Context = "personal" | "community" | "communityTravel"
 type Section = ApplicationSection
