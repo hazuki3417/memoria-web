@@ -6,7 +6,7 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
-import { PrototypePrototypeApplicationShell } from "./PrototypeApplicationShell"
+import { PrototypeApplicationShell } from "./PrototypeApplicationShell"
 
 const personal = {
   id: "personal",
