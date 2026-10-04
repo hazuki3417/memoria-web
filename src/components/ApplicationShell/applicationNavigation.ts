@@ -4,33 +4,10 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
-import type {
-  ApplicationContextOption,
-  ApplicationNavigationItem,
-} from "@/components/ApplicationShell"
+import type { ApplicationContextOption, ApplicationNavigationItem } from "@/components/ApplicationShell"
 
 export type ApplicationSection = "dashboard" | "media" | "groups" | "members"
 
-export const prototypeApplicationContexts = {
-  personal: {
-    id: "personal",
-    kind: "personal",
-    label: "Personal",
-    accentColor: "var(--mantine-color-blue-6)",
-  },
-  community: {
-    id: "community",
-    kind: "community",
-    label: "家族のアルバム",
-    accentColor: "var(--mantine-color-teal-6)",
-  },
-  communityTravel: {
-    id: "communityTravel",
-    kind: "community",
-    label: "旅行の思い出",
-    accentColor: "var(--mantine-color-violet-6)",
-  },
-} satisfies Record<string, ApplicationContextOption>
 
 const baseApplicationNavigation = [
   { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
