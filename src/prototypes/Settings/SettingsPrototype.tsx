@@ -21,7 +21,8 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
+import {  getApplicationNavigation } from "@/components/ApplicationShell"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
