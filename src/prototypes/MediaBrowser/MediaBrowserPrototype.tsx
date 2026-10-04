@@ -55,8 +55,9 @@ import {
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { ApplicationShell } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeState =
   | "default"
@@ -98,10 +99,6 @@ const contexts = [
     label: "Photo Club",
     accentColor: "var(--mantine-color-violet-6)",
   },
-]
-const navigationItems = [
-  { id: "media", label: "Media", icon: IconPhoto, active: true },
-  { id: "groups", label: "Groups", icon: IconFolderPlus },
 ]
 
 function MediaTile({
@@ -305,6 +302,10 @@ export function MediaBrowserPrototype({
       ? ["旅行"]
       : [],
   )
+  const navigationItems = getApplicationNavigation({
+    contextKind: context,
+    activeSection: "media",
+  })
   const currentContext =
     contexts.find((item) => item.kind === context) ?? contexts[0]
   const stateItems = [
@@ -331,7 +332,7 @@ export function MediaBrowserPrototype({
   }
 
   return (
-    <ApplicationShell
+    <PrototypeApplicationShell
       currentContext={currentContext}
       contexts={contexts}
       navigationItems={navigationItems}
@@ -1149,6 +1150,6 @@ export function MediaBrowserPrototype({
             )
           })()}
       </Modal>
-    </ApplicationShell>
+    </PrototypeApplicationShell>
   )
 }

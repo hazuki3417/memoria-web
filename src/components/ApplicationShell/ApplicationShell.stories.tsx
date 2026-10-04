@@ -6,6 +6,13 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
+import { ApplicationAccountMenu } from "./ApplicationAccountMenu"
+import { ApplicationContextSwitcher } from "./ApplicationContextSwitcher"
+import { ApplicationHeader } from "./ApplicationHeader"
+import {
+  ApplicationNavigation,
+  ApplicationNavigationTrigger,
+} from "./ApplicationNavigation"
 import { ApplicationShell } from "./ApplicationShell"
 
 const personal = {
@@ -63,15 +70,42 @@ const meta = {
   parameters: { layout: "fullscreen" },
   args: {
     children: content,
-    currentContext: personal,
-    contexts,
-    navigationItems: personalNavigation,
-    user: { displayName: "ユーザー" },
-    onSelectContext: () => undefined,
-    onSelectNavigation: () => undefined,
-    onCreateCommunity: () => undefined,
-    onOpenSettings: () => undefined,
-    onLogout: () => undefined,
+    header: (
+      <ApplicationHeader
+        accentColor={personal.accentColor}
+        leading={
+          <ApplicationNavigationTrigger
+            opened={false}
+            onToggle={() => undefined}
+          />
+        }
+        context={
+          <ApplicationContextSwitcher
+            currentContext={personal}
+            contexts={contexts}
+            onSelect={() => undefined}
+            onCreateCommunity={() => undefined}
+          />
+        }
+        account={
+          <ApplicationAccountMenu
+            user={{ displayName: "ユーザー" }}
+            currentContext={personal}
+            onOpenSettings={() => undefined}
+            onLogout={() => undefined}
+          />
+        }
+      />
+    ),
+    navigation: (
+      <ApplicationNavigation
+        opened={false}
+        onClose={() => undefined}
+        items={personalNavigation}
+        accentColor={personal.accentColor}
+        onSelect={() => undefined}
+      />
+    ),
   },
 } satisfies Meta<typeof ApplicationShell>
 
@@ -82,8 +116,27 @@ export const Personal: Story = {}
 
 export const Community: Story = {
   args: {
-    currentContext: family,
-    navigationItems: communityNavigation,
+    header: (
+      <ApplicationHeader
+        accentColor={family.accentColor}
+        context={
+          <ApplicationContextSwitcher
+            currentContext={family}
+            contexts={contexts}
+            onSelect={() => undefined}
+          />
+        }
+      />
+    ),
+    navigation: (
+      <ApplicationNavigation
+        opened={false}
+        onClose={() => undefined}
+        items={communityNavigation}
+        accentColor={family.accentColor}
+        onSelect={() => undefined}
+      />
+    ),
   },
 }
 

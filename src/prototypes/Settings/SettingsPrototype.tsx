@@ -16,19 +16,17 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconChartBar,
-  IconLayoutDashboard,
-  IconPhoto,
   IconSettings,
   IconUser,
   IconUserCircle,
-  IconUsers,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import { ApplicationShell } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type Section = "profile" | "preferences" | "usage" | "account"
 
@@ -309,7 +307,7 @@ export function SettingsPrototype({
     )
 
   return (
-    <ApplicationShell
+    <PrototypeApplicationShell
       currentContext={{
         id: "personal",
         kind: "personal",
@@ -336,11 +334,9 @@ export function SettingsPrototype({
           accentColor: "var(--mantine-color-violet-6)",
         },
       ]}
-      navigationItems={[
-        { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
-        { id: "media", label: "メディア", icon: IconPhoto },
-        { id: "groups", label: "グループ", icon: IconUsers },
-      ]}
+      navigationItems={getApplicationNavigation({
+        contextKind: "personal",
+      })}
       user={{ displayName: "ユーザー" }}
       onSelectContext={() => undefined}
       onSelectNavigation={() => undefined}
@@ -409,6 +405,6 @@ export function SettingsPrototype({
           現在の設定: {currentLabel}
         </Text>
       </Box>
-    </ApplicationShell>
+    </PrototypeApplicationShell>
   )
 }

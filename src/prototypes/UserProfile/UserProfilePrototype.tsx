@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  AppShell,
   Box,
   Button,
   Group,
@@ -13,9 +12,18 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
+
+const personalContext = {
+  id: "personal",
+  kind: "personal" as const,
+  label: "Personal",
+  accentColor: "var(--mantine-color-blue-6)",
+}
 
 type ReviewState =
   | "default"
@@ -78,86 +86,77 @@ export function UserProfilePrototype({
   return (
     <>
       <Notifications position="top-right" />
-      <AppShell header={{ height: 40 }} padding="lg">
-        <AppShell.Header>
-          <Group h="100%" px="md" gap="sm">
-            <Text fw={750} size="lg">
-              Memoria
-            </Text>
-            <Text size="sm" c="dimmed">
-              /
-            </Text>
-            <Text size="sm">Personal</Text>
-          </Group>
-        </AppShell.Header>
-        <AppShell.Main>
-          <Box maw={880} mx="auto" w="100%">
-            <Stack gap="xl">
-              <PageHeader
-                title="プロフィール"
-                description="Memoriaで使用するプロフィール情報を管理します。"
-              />
-              <Box>
-                <SectionHeader>基本情報</SectionHeader>
-                <Stack gap="md" maw={540}>
-                  <Box maw={440}>
-                    <TextInput
-                      label="ニックネーム"
-                      description="Memoria内で表示される名前です。"
-                      value={nickname}
-                      onChange={(event) => {
-                        setNickname(event.currentTarget.value)
-                        setStatus("default")
-                      }}
-                      error={invalid}
-                      aria-describedby="nickname-error"
-                      disabled={saving || blocking}
-                      required
-                    />
-                    <Box mih={22} mt={4} id="nickname-error" aria-live="polite">
-                      {invalid && (
-                        <Text size="xs" c="red">
-                          ニックネームを入力してください。
-                        </Text>
-                      )}
-                    </Box>
+      <PrototypeApplicationShell
+        currentContext={personalContext}
+        contexts={[personalContext]}
+        navigationItems={getApplicationNavigation({ contextKind: "personal" })}
+      >
+        <Box maw={880} mx="auto" w="100%">
+          <Stack gap="xl">
+            <PageHeader
+              title="プロフィール"
+              description="Memoriaで使用するプロフィール情報を管理します。"
+            />
+            <Box>
+              <SectionHeader>基本情報</SectionHeader>
+              <Stack gap="md" maw={540}>
+                <Box maw={440}>
+                  <TextInput
+                    label="ニックネーム"
+                    description="Memoria内で表示される名前です。"
+                    value={nickname}
+                    onChange={(event) => {
+                      setNickname(event.currentTarget.value)
+                      setStatus("default")
+                    }}
+                    error={invalid}
+                    aria-describedby="nickname-error"
+                    disabled={saving || blocking}
+                    required
+                  />
+                  <Box mih={22} mt={4} id="nickname-error" aria-live="polite">
+                    {invalid && (
+                      <Text size="xs" c="red">
+                        ニックネームを入力してください。
+                      </Text>
+                    )}
                   </Box>
-                  <Group gap="sm">
+                </Box>
+                <Group gap="sm">
+                  <Button
+                    size="sm"
+                    onClick={save}
+                    disabled={!dirty || invalid || saving || blocking}
+                    loading={saving}
+                  >
+                    保存
+                  </Button>
+                  {dirty && (
                     <Button
                       size="sm"
-                      onClick={save}
-                      disabled={!dirty || invalid || saving || blocking}
-                      loading={saving}
+                      variant="default"
+                      onClick={openDiscard}
+                      disabled={saving || blocking}
                     >
-                      保存
+                      キャンセル
                     </Button>
-                    {dirty && (
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={openDiscard}
-                        disabled={saving || blocking}
-                      >
-                        キャンセル
-                      </Button>
-                    )}
-                  </Group>
-                  <Box mih={92} aria-live="polite">
-                    {blocking && (
-                      <FeedbackAlert
-                        kind="error"
-                        title="プロフィールを更新できませんでした"
-                      >
-                        現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
-                      </FeedbackAlert>
-                    )}
-                  </Box>
-                </Stack>
-              </Box>
-            </Stack>
-          </Box>
-        </AppShell.Main>
-      </AppShell>
+                  )}
+                </Group>
+                <Box mih={92} aria-live="polite">
+                  {blocking && (
+                    <FeedbackAlert
+                      kind="error"
+                      title="プロフィールを更新できませんでした"
+                    >
+                      現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
+                    </FeedbackAlert>
+                  )}
+                </Box>
+              </Stack>
+            </Box>
+          </Stack>
+        </Box>
+      </PrototypeApplicationShell>
       <Modal
         opened={discardOpened}
         onClose={closeDiscard}

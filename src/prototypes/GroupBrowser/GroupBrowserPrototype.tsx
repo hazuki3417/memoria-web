@@ -22,19 +22,17 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconEdit,
-  IconLayoutDashboard,
-  IconPhoto,
   IconPlus,
   IconSearch,
-  IconUsers,
   IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { ApplicationShell } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeGroup = {
   id: string
@@ -121,12 +119,6 @@ const personalContext = {
   label: "Personal",
   accentColor: "var(--mantine-color-blue-6)",
 }
-
-const applicationNavigation = [
-  { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
-  { id: "media", label: "メディア", icon: IconPhoto },
-  { id: "groups", label: "グループ", icon: IconUsers, active: true },
-]
 
 const previewImages = Array.from(
   { length: 9 },
@@ -528,10 +520,13 @@ export function GroupBrowserPrototype() {
   )
 
   return (
-    <ApplicationShell
+    <PrototypeApplicationShell
       currentContext={personalContext}
       contexts={[personalContext]}
-      navigationItems={applicationNavigation}
+      navigationItems={getApplicationNavigation({
+        contextKind: personalContext.kind,
+        activeSection: "groups",
+      })}
       user={{ displayName: "ユーザー" }}
       onSelectContext={() => undefined}
       onSelectNavigation={() => undefined}
@@ -838,6 +833,6 @@ export function GroupBrowserPrototype() {
           </SplitView.Pane>
         </SplitView.Root>
       )}
-    </ApplicationShell>
+    </PrototypeApplicationShell>
   )
 }
