@@ -1053,6 +1053,14 @@ export function MediaBrowserPrototype({
                           style={{ flex: 1, overflowY: "auto" }}
                         >
                           <Stack gap="xs">
+                            <Group justify="space-between" gap="md" wrap="nowrap">
+                              <Text size="xs" c="dimmed">
+                                ファイル名
+                              </Text>
+                              <Text size="xs" truncate>
+                                {detail.id}.jpg
+                              </Text>
+                            </Group>
                             <Group justify="space-between">
                               <Text size="xs" c="dimmed">
                                 ファイルサイズ
@@ -1097,6 +1105,23 @@ export function MediaBrowserPrototype({
                               <Badge variant="outline">お気に入り</Badge>
                             </Group>
                           </Box>
+                          {context === "personal" ? (
+                            <Box>
+                              <Text size="xs" c="dimmed" mb={6}>
+                                共有先Community
+                              </Text>
+                              <Group gap={6}>
+                                <Badge variant="light">Photo Club</Badge>
+                              </Group>
+                            </Box>
+                          ) : (
+                            <Group justify="space-between">
+                              <Text size="xs" c="dimmed">
+                                管理
+                              </Text>
+                              <Text size="xs">Community管理</Text>
+                            </Group>
+                          )}
                         </Stack>
                         <Box
                           p="md"
