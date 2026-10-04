@@ -29,6 +29,7 @@ export function MediaUpdatePrototype({
 }) {
   const [items, setItems] = useState(initialItems)
   const [selectedIds, setSelectedIds] = useState(initialItems.map((item) => item.id))
+  const [bulkTag, setBulkTag] = useState("")
   const currentContext = contexts[context]
   const unavailable = scenario === "partial-failure" ? new Set(["2"]) : new Set<string>()
 
@@ -52,7 +53,20 @@ export function MediaUpdatePrototype({
           <MediaTagEditor
             items={items}
             selectedIds={selectedIds}
+            bulkTag={bulkTag}
             onSelectedIdsChange={setSelectedIds}
+            onBulkTagChange={setBulkTag}
+            onBulkTagAction={(action) => {
+              const tag = bulkTag.trim()
+              if (!tag) return
+              setItems((current) => current.map((item) => {
+                if (!selectedIds.includes(item.id) || unavailable.has(item.id)) return item
+                if (action === "replace") return { ...item, tags: [tag] }
+                if (action === "remove") return { ...item, tags: item.tags.filter((value) => value !== tag) }
+                return { ...item, tags: item.tags.includes(tag) ? item.tags : [...item.tags, tag] }
+              }))
+              setBulkTag("")
+            }}
             onTagsChange={(id, tags) => {
               if (unavailable.has(id)) return
               setItems((current) => current.map((item) => item.id === id ? { ...item, tags } : item))
