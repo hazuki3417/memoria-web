@@ -40,11 +40,6 @@ export function MediaUpdatePrototype({
   >
     <Box maw={1120} mx="auto" w="100%" pb={88}>
       <Stack gap="lg">
-        <Box>
-          <Text size="xl" fw={700}>Mediaを編集</Text>
-          <Text size="sm" c="dimmed" mt={4}>{items.length}件のMediaのTagを編集します</Text>
-        </Box>
-
         {scenario === "load-failure" ? <FeedbackAlert kind="error" title="Mediaを読み込めませんでした">
           編集対象を取得できません。再試行するかMedia Browserへ戻ってください。
         </FeedbackAlert> : <>
@@ -54,6 +49,10 @@ export function MediaUpdatePrototype({
             items={items}
             selectedIds={selectedIds}
             bulkTag={bulkTag}
+            summaryItems={[{ label: "編集対象", value: `${items.length}件` }]}
+            bulkTagPlaceholder="選択したMediaのTag"
+            selectAllLabel="編集対象Mediaをすべて選択"
+            bulkActions={["add", "remove"]}
             onSelectedIdsChange={setSelectedIds}
             onBulkTagChange={setBulkTag}
             onBulkTagAction={(action) => {
