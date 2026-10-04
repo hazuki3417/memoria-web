@@ -162,6 +162,9 @@ jobs:
           path: /tmp
       - name: Extract dependencies
         run: tar -xzf /tmp/node_modules.tar.gz
+      - name: Generate GraphQL client
+        run: npm run gen:graphql
+
       - name: Build Storybook
         run: npm run build:storybook
 
