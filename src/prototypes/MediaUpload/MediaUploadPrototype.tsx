@@ -25,7 +25,7 @@ import {
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
-import { MediaTagEditor } from "@/components/MediaTagEditor"
+import { MediaTagBulkEditor, MediaTagEditorList, MediaTagEditorRow } from "@/components/MediaTagEditor"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 export type UploadScenario =
@@ -468,57 +468,64 @@ export function MediaUploadPrototype({
               )}
 
               <Stack gap="sm">
-                <MediaTagEditor
-                  items={files.map((file) => ({
-                    id: file.id,
-                    label: file.name,
-                    detail: file.size,
-                    tags: file.tags,
-                    selectable: selectableStatuses.includes(file.status),
-                    tagEditable: selectableStatuses.includes(file.status),
-                    supplementary: <UploadStatus file={file} />,
-                    actions: (
-                      <Button
-                        variant="subtle"
-                        color="gray"
-                        size="compact-sm"
-                        disabled={!removableStatuses.includes(file.status)}
-                        onClick={() => {
-                          setFiles((current) => current.filter((item) => item.id !== file.id))
-                          setSelectedIds((current) => current.filter((id) => id !== file.id))
-                        }}
-                        aria-label={`${file.name}を削除`}
-                      >
-                        <IconTrash size={16} />
-                      </Button>
-                    ),
-                  }))}
-                  selectedIds={selectedIds}
-                  bulkTag={bulkTag}
+                <MediaTagBulkEditor
+                  selectedCount={selectedFiles.length}
+                  allSelected={selectableFiles.length > 0 && selectedFiles.length === selectableFiles.length}
+                  indeterminate={selectedFiles.length > 0 && selectedFiles.length !== selectableFiles.length}
+                  selectionDisabled={selectableFiles.length === 0}
                   summaryItems={[
                     { label: "Media登録済み", value: `${registeredCount}件` },
                     { label: "画像処理中", value: `${processingCount}件` },
                     { label: "完了", value: `${completedCount}件` },
                   ]}
-                  bulkTagPlaceholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"}
+                  value={bulkTag}
+                  placeholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"}
+                  actionDisabled={!bulkTag.trim() || selectedFiles.length === 0}
                   selectAllLabel="アップロード可能なMediaをすべて選択"
                   headerAction={
-                    <Button
-                      variant="subtle"
-                      color="gray"
-                      size="compact-sm"
-                      onClick={removeAll}
-                      disabled={!files.some((file) => removableStatuses.includes(file.status))}
-                      aria-label="すべて削除"
-                    >
+                    <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll}
+                      disabled={!files.some((file) => removableStatuses.includes(file.status))} aria-label="すべて削除">
                       <IconTrash size={16} />
                     </Button>
                   }
-                  onSelectedIdsChange={setSelectedIds}
-                  onBulkTagChange={setBulkTag}
-                  onBulkTagAction={applyTagAction}
-                  onTagsChange={updateTags}
-                />              </Stack>
+                  onToggleAll={() => setSelectedIds(
+                    selectableFiles.length > 0 && selectedFiles.length === selectableFiles.length
+                      ? []
+                      : selectableFiles.map((file) => file.id),
+                  )}
+                  onChange={setBulkTag}
+                  onAction={applyTagAction}
+                />
+                <MediaTagEditorList>
+                  {files.map((file) => (
+                    <MediaTagEditorRow
+                      key={file.id}
+                      label={file.name}
+                      detail={file.size}
+                      tags={file.tags}
+                      selected={selectedIds.includes(file.id)}
+                      selectable={selectableStatuses.includes(file.status)}
+                      tagEditable={selectableStatuses.includes(file.status)}
+                      supplementary={<UploadStatus file={file} />}
+                      action={
+                        <Button variant="subtle" color="gray" size="compact-sm"
+                          disabled={!removableStatuses.includes(file.status)}
+                          onClick={() => {
+                            setFiles((current) => current.filter((item) => item.id !== file.id))
+                            setSelectedIds((current) => current.filter((id) => id !== file.id))
+                          }}
+                          aria-label={`${file.name}を削除`}>
+                          <IconTrash size={16} />
+                        </Button>
+                      }
+                      onSelect={(checked) => setSelectedIds((current) =>
+                        checked ? [...new Set([...current, file.id])] : current.filter((id) => id !== file.id)
+                      )}
+                      onTagsChange={(tags) => updateTags(file.id, tags)}
+                    />
+                  ))}
+                </MediaTagEditorList>
+              </Stack>
             </>
           }
         </Stack>
