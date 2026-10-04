@@ -4,7 +4,7 @@ import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
-import { MediaTagEditor, type MediaTagEditorItem } from "@/components/MediaTagEditor"
+import { MediaTagBulkEditor, MediaTagEditorList, MediaTagEditorRow } from "@/components/MediaTagEditor"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 export type MediaUpdateScenario = "editing" | "saving" | "saved" | "partial-failure" | "load-failure" | "leave-confirmation"
@@ -14,7 +14,7 @@ const contexts = {
   community: { id: "community", kind: "community" as const, label: "家族のアルバム", accentColor: "var(--mantine-color-teal-6)" },
 }
 
-const initialItems: MediaTagEditorItem[] = [
+const initialItems = [
   { id: "1", label: "Media 1", tags: ["旅行", "夏"] },
   { id: "2", label: "Media 2", tags: ["旅行"] },
   { id: "3", label: "Media 3", tags: ["家族"] },
@@ -45,32 +45,52 @@ export function MediaUpdatePrototype({
         </FeedbackAlert> : <>
           {scenario === "saved" && <FeedbackAlert kind="success" title="変更を保存しました">すべてのMediaの変更が保存されました。</FeedbackAlert>}
           {scenario === "partial-failure" && <FeedbackAlert kind="warning" title="一部の変更を保存できませんでした">Media 2は現在編集できません。ほかのMediaの変更は保存されています。</FeedbackAlert>}
-          <MediaTagEditor
-            items={items}
-            selectedIds={selectedIds}
-            bulkTag={bulkTag}
-            summaryItems={[{ label: "編集対象", value: `${items.length}件` }]}
-            bulkTagPlaceholder="選択したMediaのTag"
-            selectAllLabel="編集対象Mediaをすべて選択"
-            bulkActions={["add", "remove"]}
-            onSelectedIdsChange={setSelectedIds}
-            onBulkTagChange={setBulkTag}
-            onBulkTagAction={(action) => {
-              const tag = bulkTag.trim()
-              if (!tag) return
-              setItems((current) => current.map((item) => {
-                if (!selectedIds.includes(item.id) || unavailable.has(item.id)) return item
-                if (action === "replace") return { ...item, tags: [tag] }
-                if (action === "remove") return { ...item, tags: item.tags.filter((value) => value !== tag) }
-                return { ...item, tags: item.tags.includes(tag) ? item.tags : [...item.tags, tag] }
-              }))
-              setBulkTag("")
-            }}
-            onTagsChange={(id, tags) => {
-              if (unavailable.has(id)) return
-              setItems((current) => current.map((item) => item.id === id ? { ...item, tags } : item))
-            }}
-          />
+          <Stack gap="sm">
+            <MediaTagBulkEditor
+              selectedCount={selectedIds.length}
+              allSelected={items.length > 0 && selectedIds.length === items.length}
+              indeterminate={selectedIds.length > 0 && selectedIds.length !== items.length}
+              selectionDisabled={items.length === 0}
+              summaryItems={[{ label: "編集対象", value: `${items.length}件` }]}
+              value={bulkTag}
+              actions={["add", "remove"]}
+              actionDisabled={!bulkTag.trim() || selectedIds.length === 0}
+              selectAllLabel="編集対象Mediaをすべて選択"
+              onToggleAll={() => setSelectedIds(selectedIds.length === items.length ? [] : items.map((item) => item.id))}
+              onChange={setBulkTag}
+              onAction={(action) => {
+                const tag = bulkTag.trim()
+                if (!tag) return
+                setItems((current) => current.map((item) => {
+                  if (!selectedIds.includes(item.id) || unavailable.has(item.id)) return item
+                  if (action === "remove") return { ...item, tags: item.tags.filter((value) => value !== tag) }
+                  return { ...item, tags: item.tags.includes(tag) ? item.tags : [...item.tags, tag] }
+                }))
+                setBulkTag("")
+              }}
+            />
+            <MediaTagEditorList>
+              {items.map((item) => (
+                <MediaTagEditorRow
+                  key={item.id}
+                  label={item.label}
+                  tags={item.tags}
+                  selected={selectedIds.includes(item.id)}
+                  selectable={!unavailable.has(item.id)}
+                  tagEditable={!unavailable.has(item.id)}
+                  onSelect={(checked) => setSelectedIds((current) =>
+                    checked ? [...new Set([...current, item.id])] : current.filter((id) => id !== item.id)
+                  )}
+                  onTagsChange={(tags) => {
+                    if (unavailable.has(item.id)) return
+                    setItems((current) => current.map((currentItem) =>
+                      currentItem.id === item.id ? { ...currentItem, tags } : currentItem
+                    ))
+                  }}
+                />
+              ))}
+            </MediaTagEditorList>
+          </Stack>
         </>}
       </Stack>
     </Box>
