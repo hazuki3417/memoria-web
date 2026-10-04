@@ -45,6 +45,7 @@ export type UploadScenario =
   | "completed"
   | "processing-failure"
   | "leave-confirmation"
+  | "leave-uploading-confirmation"
 
 type FileStatus =
   | "ready"
@@ -67,7 +68,10 @@ type UploadFile = {
 }
 
 const fixtures: Record<
-  Exclude<UploadScenario, "empty" | "leave-confirmation">,
+  Exclude<
+    UploadScenario,
+    "empty" | "leave-confirmation" | "leave-uploading-confirmation"
+  >,
   UploadFile[]
 > = {
   ready: [
@@ -337,7 +341,9 @@ export function MediaUploadPrototype({
       ? []
       : scenario === "leave-confirmation"
         ? fixtures.ready
-        : fixtures[scenario]
+        : scenario === "leave-uploading-confirmation"
+          ? fixtures.uploading
+          : fixtures[scenario]
   const [files, setFiles] = useState<UploadFile[]>(initialFiles)
   const [selectedIds, setSelectedIds] = useState<string[]>(
     initialFiles
@@ -752,22 +758,33 @@ export function MediaUploadPrototype({
             <Text size="sm" c="dimmed">
               {selectedFiles.length}件選択中
             </Text>
-            <Button disabled={activeUpload || selectedFiles.length === 0}>
-              {activeUpload ? "アップロード中" : "アップロード"}
-            </Button>
+            {registeredCount > 0 &&
+            selectedFiles.length === 0 &&
+            !activeUpload ? (
+              <Button variant="default">Media Browserへ戻る</Button>
+            ) : (
+              <Button disabled={activeUpload || selectedFiles.length === 0}>
+                {activeUpload ? "アップロード中" : "アップロード"}
+              </Button>
+            )}
           </Group>
         </Box>
       </Box>
 
       <Modal
-        opened={scenario === "leave-confirmation"}
+        opened={
+          scenario === "leave-confirmation" ||
+          scenario === "leave-uploading-confirmation"
+        }
         onClose={() => undefined}
         title="アップロード画面を離れますか？"
         centered
       >
         <Stack>
           <Text size="sm">
-            まだアップロードしていない画像があります。この画面を離れると、未送信の画像と編集内容は失われます。
+            {scenario === "leave-uploading-confirmation"
+              ? "アップロード中または待機中の画像があります。この画面を離れると未完了の送信が中断される可能性があります。すでに登録されたMediaは削除されません。"
+              : "まだアップロードしていない画像があります。この画面を離れると、未送信の画像と編集内容は失われます。"}
           </Text>
           <Group justify="flex-end">
             <Button variant="default">この画面に残る</Button>
