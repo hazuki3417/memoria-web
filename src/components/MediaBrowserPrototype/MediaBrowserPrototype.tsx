@@ -1053,14 +1053,6 @@ export function MediaBrowserPrototype({
                           style={{ flex: 1, overflowY: "auto" }}
                         >
                           <Stack gap="xs">
-                            <Group justify="space-between" gap="md" wrap="nowrap">
-                              <Text size="xs" c="dimmed">
-                                ファイル名
-                              </Text>
-                              <Text size="xs" truncate>
-                                {detail.id}.jpg
-                              </Text>
-                            </Group>
                             <Group justify="space-between">
                               <Text size="xs" c="dimmed">
                                 ファイルサイズ
