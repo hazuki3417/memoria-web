@@ -29,7 +29,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import { ApplicationShell } from "@/components/ApplicationShell"
+import { ApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
 
 export type UploadScenario =
@@ -435,9 +435,10 @@ export function MediaUploadPrototype({
     <ApplicationShell
       currentContext={currentContext}
       contexts={Object.values(contexts)}
-      navigationItems={[
-        { id: "media", label: "メディア", icon: IconPhoto, active: true },
-      ]}
+      navigationItems={getApplicationNavigation({
+        contextKind: currentContext.kind,
+        activeSection: "media",
+      })}
       user={{ displayName: "ユーザー" }}
       onSelectContext={() => undefined}
       onSelectNavigation={() => undefined}
