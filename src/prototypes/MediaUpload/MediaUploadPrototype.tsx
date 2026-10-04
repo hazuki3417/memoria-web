@@ -10,10 +10,7 @@ import {
   Text,
   ThemeIcon,
 } from "@mantine/core"
-import { useMediaQuery } from "@mantine/hooks"
-import {
-  IconPhotoPlus,
-} from "@tabler/icons-react"
+import { IconPhotoPlus } from "@tabler/icons-react"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
@@ -282,7 +279,6 @@ export function MediaUploadPrototype({
   scenario?: UploadScenario
   context?: "personal" | "community"
 }) {
-  const compact = useMediaQuery("(max-width: 48em)")
   const initialFiles =
     scenario === "empty"
       ? []
