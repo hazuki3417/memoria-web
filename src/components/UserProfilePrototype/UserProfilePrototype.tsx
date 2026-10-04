@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  AppShell,
   Box,
   Button,
   Group,
@@ -14,8 +13,11 @@ import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
+import { getApplicationNavigation, PrototypeApplicationShell } from "@/components/ApplicationShell"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
+
+const personalContext = { id: "personal", kind: "personal" as const, label: "Personal", accentColor: "var(--mantine-color-blue-6)" }
 
 type ReviewState =
   | "default"
@@ -78,19 +80,11 @@ export function UserProfilePrototype({
   return (
     <>
       <Notifications position="top-right" />
-      <AppShell header={{ height: 40 }} padding="lg">
-        <AppShell.Header>
-          <Group h="100%" px="md" gap="sm">
-            <Text fw={750} size="lg">
-              Memoria
-            </Text>
-            <Text size="sm" c="dimmed">
-              /
-            </Text>
-            <Text size="sm">Personal</Text>
-          </Group>
-        </AppShell.Header>
-        <AppShell.Main>
+      <PrototypeApplicationShell
+        currentContext={personalContext}
+        contexts={[personalContext]}
+        navigationItems={getApplicationNavigation({ contextKind: "personal" })}
+      >
           <Box maw={880} mx="auto" w="100%">
             <Stack gap="xl">
               <PageHeader
@@ -156,8 +150,7 @@ export function UserProfilePrototype({
               </Box>
             </Stack>
           </Box>
-        </AppShell.Main>
-      </AppShell>
+      </PrototypeApplicationShell>
       <Modal
         opened={discardOpened}
         onClose={closeDiscard}
