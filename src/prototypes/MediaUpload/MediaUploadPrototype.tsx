@@ -2,15 +2,26 @@
 
 import {
   Box,
+  Badge,
   Button,
   Group,
   Modal,
+  Popover,
   Paper,
   Stack,
   Text,
   ThemeIcon,
 } from "@mantine/core"
-import { IconPhotoPlus } from "@tabler/icons-react"
+import {
+  IconAlertCircle,
+  IconCheck,
+  IconClock,
+  IconCloudUpload,
+  IconHelpCircle,
+  IconPhotoPlus,
+  IconRefresh,
+  IconTrash,
+} from "@tabler/icons-react"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
@@ -255,6 +266,21 @@ const fixtures: Record<
   ],
 }
 
+const statusPresentation: Record<
+  FileStatus,
+  { label: string; color: string; icon: typeof IconCheck }
+> = {
+  ready: { label: "準備完了", color: "gray", icon: IconClock },
+  "validation-error": { label: "アップロード不可", color: "red", icon: IconAlertCircle },
+  uploading: { label: "アップロード中", color: "blue", icon: IconCloudUpload },
+  "upload-failed": { label: "アップロード失敗", color: "red", icon: IconAlertCircle },
+  "upload-rejected": { label: "アップロード不可", color: "red", icon: IconAlertCircle },
+  "result-unknown": { label: "結果を確認中", color: "yellow", icon: IconHelpCircle },
+  processing: { label: "画像処理中", color: "blue", icon: IconClock },
+  completed: { label: "完了", color: "green", icon: IconCheck },
+  "processing-failed": { label: "画像処理失敗", color: "red", icon: IconAlertCircle },
+}
+
 const contexts = {
   personal: {
     id: "personal",
@@ -271,6 +297,7 @@ const contexts = {
 }
 
 const selectableStatuses: FileStatus[] = ["ready", "upload-failed"]
+const removableStatuses: FileStatus[] = ["ready", "validation-error", "upload-failed", "upload-rejected"]
 
 export function MediaUploadPrototype({
   scenario = "ready",
@@ -415,23 +442,32 @@ export function MediaUploadPrototype({
 
               <Stack gap="sm">
                 <MediaTagEditor
-                  items={selectableFiles.map((file) => ({
+                  items={files.map((file) => ({
                     id: file.id,
                     label: file.name,
                     tags: file.tags,
+                    selectable: selectableStatuses.includes(file.status),
+                    tagEditable: selectableStatuses.includes(file.status),
+                    supplementary: <UploadStatus file={file} />,
+                    actions: removableStatuses.includes(file.status) ? (
+                      <Button
+                        variant="subtle"
+                        color="gray"
+                        size="compact-sm"
+                        onClick={() => {
+                          setFiles((current) => current.filter((item) => item.id !== file.id))
+                          setSelectedIds((current) => current.filter((id) => id !== file.id))
+                        }}
+                        aria-label={`${file.name}を削除`}
+                      >
+                        <IconTrash size={16} />
+                      </Button>
+                    ) : undefined,
                   }))}
                   selectedIds={selectedIds}
                   onSelectedIdsChange={setSelectedIds}
                   onTagsChange={updateTags}
                 />
-
-                {files.some((file) => !selectableStatuses.includes(file.status)) && (
-                  <Paper withBorder radius="md" p="sm">
-                    <Text size="sm" c="dimmed">
-                      Upload中・処理中・完了済み・Validation errorのMediaはTag編集対象から除外されています。
-                    </Text>
-                  </Paper>
-                )}
               </Stack>
             </>
           }
@@ -492,3 +528,33 @@ export function MediaUploadPrototype({
   )
 }
 
+
+function UploadStatus({ file }: { file: UploadFile }) {
+  const presentation = statusPresentation[file.status]
+  const StatusIcon = presentation.icon
+  const badge = (
+    <Badge variant="light" color={presentation.color} leftSection={<StatusIcon size={12} />}>
+      {presentation.label}
+    </Badge>
+  )
+
+  return (
+    <Group gap={4} wrap="nowrap">
+      {file.reason ? (
+        <Popover width={300} position="bottom-start" withArrow shadow="md">
+          <Popover.Target>
+            <Box component="button" type="button" p={0} bg="transparent" style={{ border: 0, cursor: "pointer" }}>
+              {badge}
+            </Box>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Text size="sm">{file.reason}</Text>
+          </Popover.Dropdown>
+        </Popover>
+      ) : badge}
+      {file.status === "upload-failed" && (
+        <Badge variant="outline" color="gray" leftSection={<IconRefresh size={12} />}>再試行可能</Badge>
+      )}
+    </Group>
+  )
+}
