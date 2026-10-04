@@ -16,15 +16,12 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconChartBar,
-  IconLayoutDashboard,
-  IconPhoto,
   IconSettings,
   IconUser,
   IconUserCircle,
-  IconUsers,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import { ApplicationShell } from "@/components/ApplicationShell"
+import { ApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -336,11 +333,9 @@ export function SettingsPrototype({
           accentColor: "var(--mantine-color-violet-6)",
         },
       ]}
-      navigationItems={[
-        { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
-        { id: "media", label: "メディア", icon: IconPhoto },
-        { id: "groups", label: "グループ", icon: IconUsers },
-      ]}
+      navigationItems={getApplicationNavigation({
+        contextKind: "personal",
+      })}
       user={{ displayName: "ユーザー" }}
       onSelectContext={() => undefined}
       onSelectNavigation={() => undefined}
