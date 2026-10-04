@@ -7,7 +7,7 @@ import {
   type ApplicationSection,
   PrototypeApplicationShell,
   getApplicationNavigation,
-} from "@/components/PrototypeApplicationShell"
+} from "@/components/ApplicationShell"
 
 type Context = "personal" | "community" | "communityTravel"
 type Section = ApplicationSection
