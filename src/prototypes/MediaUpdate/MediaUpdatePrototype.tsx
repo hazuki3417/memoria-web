@@ -88,17 +88,6 @@ export function MediaUpdatePrototype({
                       {unavailable.has(item.id) ? "編集不可" : "編集可能"}
                     </Badge>
                   }
-                  action={
-                    <Button
-                      variant="subtle"
-                      color="gray"
-                      size="compact-sm"
-                      disabled
-                      aria-label={`${item.label}の操作`}
-                    >
-                      …
-                    </Button>
-                  }
                   onSelect={(checked) => setSelectedIds((current) =>
                     checked ? [...new Set([...current, item.id])] : current.filter((id) => id !== item.id)
                   )}
