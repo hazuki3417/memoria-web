@@ -3,7 +3,7 @@
 import { Box, Burger, Divider, Drawer, Stack, Text } from "@mantine/core"
 import { useState } from "react"
 import { NavigationItem } from "@/components/NavigationItem"
-import type { ApplicationNavigationItem } from "./applicationNavigation"
+import type { ApplicationNavigationItem } from "./types"
 
 export function useApplicationNavigation() {
   const [opened, setOpened] = useState(false)
