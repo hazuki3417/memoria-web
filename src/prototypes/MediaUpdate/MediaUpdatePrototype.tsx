@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
+import { Badge, Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
@@ -51,8 +51,13 @@ export function MediaUpdatePrototype({
               allSelected={items.length > 0 && selectedIds.length === items.length}
               indeterminate={selectedIds.length > 0 && selectedIds.length !== items.length}
               selectionDisabled={items.length === 0}
-              summaryItems={[]}
+              summaryItems={[
+                { label: "Media", value: `${items.length}件` },
+                { label: "編集可能", value: `${items.length - unavailable.size}件` },
+                { label: "変更あり", value: `${items.length}件` },
+              ]}
               value={bulkTag}
+              actions={["add", "remove"]}
               actionDisabled={!bulkTag.trim() || selectedIds.length === 0}
               selectAllLabel="Mediaをすべて選択"
               onToggleAll={() => setSelectedIds(selectedIds.length === items.length ? [] : items.map((item) => item.id))}
@@ -62,7 +67,6 @@ export function MediaUpdatePrototype({
                 if (!tag) return
                 setItems((current) => current.map((item) => {
                   if (!selectedIds.includes(item.id) || unavailable.has(item.id)) return item
-                  if (action === "replace") return { ...item, tags: [tag] }
                   if (action === "remove") return { ...item, tags: item.tags.filter((value) => value !== tag) }
                   return { ...item, tags: item.tags.includes(tag) ? item.tags : [...item.tags, tag] }
                 }))
@@ -79,6 +83,22 @@ export function MediaUpdatePrototype({
                   selected={selectedIds.includes(item.id)}
                   selectable={!unavailable.has(item.id)}
                   tagEditable={!unavailable.has(item.id)}
+                  supplementary={
+                    <Badge variant="light" color={unavailable.has(item.id) ? "red" : "green"}>
+                      {unavailable.has(item.id) ? "編集不可" : "編集可能"}
+                    </Badge>
+                  }
+                  action={
+                    <Button
+                      variant="subtle"
+                      color="gray"
+                      size="compact-sm"
+                      disabled
+                      aria-label={`${item.label}の操作`}
+                    >
+                      …
+                    </Button>
+                  }
                   onSelect={(checked) => setSelectedIds((current) =>
                     checked ? [...new Set([...current, item.id])] : current.filter((id) => id !== item.id)
                   )}
