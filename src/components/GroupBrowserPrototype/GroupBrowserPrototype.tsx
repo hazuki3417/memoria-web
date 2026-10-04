@@ -30,7 +30,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/PrototypeApplicationShell"
+import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
 
 type PrototypeGroup = {
