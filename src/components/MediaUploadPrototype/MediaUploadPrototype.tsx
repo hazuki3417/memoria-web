@@ -29,7 +29,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/PrototypeApplicationShell"
+import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
 
 export type UploadScenario =
