@@ -72,6 +72,16 @@ export const LandscapeDetail: Story = {
 export const Community: Story = {
   args: { initialState: "default", contextKind: "community" },
 }
+export const CommunityDetail: Story = {
+  args: { initialState: "default", contextKind: "community" },
+  play: async ({ canvasElement }) => {
+    canvasElement
+      .querySelector<HTMLButtonElement>(
+        'button[aria-label="縦長 Media 1を開く"]',
+      )
+      ?.click()
+  },
+}
 export const CommunitySelection: Story = {
   args: { initialState: "selection", contextKind: "community" },
 }
