@@ -55,7 +55,7 @@ import {
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { ApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
+import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/PrototypeApplicationShell"
 import { Dialog } from "@/components/Dialog"
 
 type PrototypeState =
@@ -331,7 +331,7 @@ export function MediaBrowserPrototype({
   }
 
   return (
-    <ApplicationShell
+    <PrototypeApplicationShell
       currentContext={currentContext}
       contexts={contexts}
       navigationItems={navigationItems}
@@ -1149,6 +1149,6 @@ export function MediaBrowserPrototype({
             )
           })()}
       </Modal>
-    </ApplicationShell>
+    </PrototypeApplicationShell>
   )
 }
