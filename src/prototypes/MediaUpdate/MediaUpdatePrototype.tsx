@@ -57,7 +57,6 @@ export function MediaUpdatePrototype({
                 { label: "変更あり", value: `${items.length}件` },
               ]}
               value={bulkTag}
-              actions={["add", "remove"]}
               actionDisabled={!bulkTag.trim() || selectedIds.length === 0}
               selectAllLabel="Mediaをすべて選択"
               onToggleAll={() => setSelectedIds(selectedIds.length === items.length ? [] : items.map((item) => item.id))}
@@ -67,6 +66,7 @@ export function MediaUpdatePrototype({
                 if (!tag) return
                 setItems((current) => current.map((item) => {
                   if (!selectedIds.includes(item.id) || unavailable.has(item.id)) return item
+                  if (action === "replace") return { ...item, tags: [tag] }
                   if (action === "remove") return { ...item, tags: item.tags.filter((value) => value !== tag) }
                   return { ...item, tags: item.tags.includes(tag) ? item.tags : [...item.tags, tag] }
                 }))
