@@ -6,7 +6,7 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
-import { ApplicationShell } from "./ApplicationShell"
+import { PrototypePrototypeApplicationShell } from "./PrototypeApplicationShell"
 
 const personal = {
   id: "personal",
@@ -59,7 +59,7 @@ const content = (
 
 const meta = {
   title: "Components/Application Shell",
-  component: ApplicationShell,
+  component: PrototypeApplicationShell,
   parameters: { layout: "fullscreen" },
   args: {
     children: content,
@@ -73,7 +73,7 @@ const meta = {
     onOpenSettings: () => undefined,
     onLogout: () => undefined,
   },
-} satisfies Meta<typeof ApplicationShell>
+} satisfies Meta<typeof PrototypeApplicationShell>
 
 export default meta
 type Story = StoryObj<typeof meta>
