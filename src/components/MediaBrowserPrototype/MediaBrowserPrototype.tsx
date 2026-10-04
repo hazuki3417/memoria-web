@@ -831,15 +831,15 @@ export function MediaBrowserPrototype({
                         <motion.div
                           key={detail.id}
                           custom={detailDirection}
-                          initial={(direction) => ({
-                            x: direction > 0 ? 32 : -32,
+                          initial={{
+                            x: detailDirection > 0 ? 32 : -32,
                             opacity: 0,
-                          })}
+                          }}
                           animate={{ x: 0, opacity: 1 }}
-                          exit={(direction) => ({
-                            x: direction > 0 ? -32 : 32,
+                          exit={{
+                            x: detailDirection > 0 ? -32 : 32,
                             opacity: 0,
-                          })}
+                          }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
                           style={{
                             width: "100%",
