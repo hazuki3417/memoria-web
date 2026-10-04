@@ -30,7 +30,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { ApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
+import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/PrototypeApplicationShell"
 import { SplitView } from "@/components/SplitView"
 
 type PrototypeGroup = {
@@ -520,7 +520,7 @@ export function GroupBrowserPrototype() {
   )
 
   return (
-    <ApplicationShell
+    <PrototypeApplicationShell
       currentContext={personalContext}
       contexts={[personalContext]}
       navigationItems={getApplicationNavigation({
@@ -833,6 +833,6 @@ export function GroupBrowserPrototype() {
           </SplitView.Pane>
         </SplitView.Root>
       )}
-    </ApplicationShell>
+    </PrototypeApplicationShell>
   )
 }
