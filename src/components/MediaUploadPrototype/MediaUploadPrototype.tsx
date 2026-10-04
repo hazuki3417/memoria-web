@@ -29,7 +29,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import { ApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
+import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/PrototypeApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
 
 export type UploadScenario =
@@ -432,7 +432,7 @@ export function MediaUploadPrototype({
     )
 
   return (
-    <ApplicationShell
+    <PrototypeApplicationShell
       currentContext={currentContext}
       contexts={Object.values(contexts)}
       navigationItems={getApplicationNavigation({
@@ -793,7 +793,7 @@ export function MediaUploadPrototype({
           </Group>
         </Stack>
       </Modal>
-    </ApplicationShell>
+    </PrototypeApplicationShell>
   )
 }
 
