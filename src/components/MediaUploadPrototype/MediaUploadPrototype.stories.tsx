@@ -42,6 +42,9 @@ export const ProcessingFailure: Story = {
 export const LeaveConfirmation: Story = {
   args: { scenario: "leave-confirmation", context: "personal" },
 }
+export const LeaveUploadingConfirmation: Story = {
+  args: { scenario: "leave-uploading-confirmation", context: "personal" },
+}
 export const Community: Story = {
   args: { scenario: "ready", context: "community" },
 }
