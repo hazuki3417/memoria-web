@@ -442,7 +442,7 @@ export function MediaBrowserPrototype({
               h="100%"
               style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) auto",
+                gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto",
                 gridTemplateRows: compact && detailInfoOpened ? "minmax(0, 1fr) auto" : "minmax(0, 1fr)",
                 background: "transparent",
               }}
@@ -516,7 +516,12 @@ export function MediaBrowserPrototype({
                     animate={compact ? { height: "auto", opacity: 1 } : { width: 340, opacity: 1 }}
                     exit={compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    style={{ overflow: "hidden", minWidth: 0 }}
+                    style={{
+                      overflow: "hidden",
+                      minWidth: 0,
+                      gridColumn: compact ? "1" : "2",
+                      gridRow: compact ? "2" : "1",
+                    }}
                   >
                 <Box
                   h="100%"
