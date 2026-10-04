@@ -15,9 +15,9 @@ const contexts = {
 }
 
 const initialItems = [
-  { id: "1", label: "Media 1", tags: ["旅行", "夏"] },
-  { id: "2", label: "Media 2", tags: ["旅行"] },
-  { id: "3", label: "Media 3", tags: ["家族"] },
+  { id: "1", label: "IMG_1842.HEIC", detail: "8.4 MB", tags: ["旅行", "夏"] },
+  { id: "2", label: "IMG_1843.HEIC", detail: "7.9 MB", tags: ["旅行"] },
+  { id: "3", label: "sunset.webp", detail: "3.1 MB", tags: ["家族"] },
 ]
 
 export function MediaUpdatePrototype({
@@ -51,11 +51,10 @@ export function MediaUpdatePrototype({
               allSelected={items.length > 0 && selectedIds.length === items.length}
               indeterminate={selectedIds.length > 0 && selectedIds.length !== items.length}
               selectionDisabled={items.length === 0}
-              summaryItems={[{ label: "編集対象", value: `${items.length}件` }]}
+              summaryItems={[]}
               value={bulkTag}
-              actions={["add", "remove"]}
               actionDisabled={!bulkTag.trim() || selectedIds.length === 0}
-              selectAllLabel="編集対象Mediaをすべて選択"
+              selectAllLabel="Mediaをすべて選択"
               onToggleAll={() => setSelectedIds(selectedIds.length === items.length ? [] : items.map((item) => item.id))}
               onChange={setBulkTag}
               onAction={(action) => {
@@ -63,6 +62,7 @@ export function MediaUpdatePrototype({
                 if (!tag) return
                 setItems((current) => current.map((item) => {
                   if (!selectedIds.includes(item.id) || unavailable.has(item.id)) return item
+                  if (action === "replace") return { ...item, tags: [tag] }
                   if (action === "remove") return { ...item, tags: item.tags.filter((value) => value !== tag) }
                   return { ...item, tags: item.tags.includes(tag) ? item.tags : [...item.tags, tag] }
                 }))
@@ -74,6 +74,7 @@ export function MediaUpdatePrototype({
                 <MediaTagEditorRow
                   key={item.id}
                   label={item.label}
+                  detail={item.detail}
                   tags={item.tags}
                   selected={selectedIds.includes(item.id)}
                   selectable={!unavailable.has(item.id)}
