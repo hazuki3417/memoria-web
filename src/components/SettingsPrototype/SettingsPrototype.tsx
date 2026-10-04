@@ -21,7 +21,7 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import { ApplicationShell, getApplicationNavigation } from "@/components/ApplicationShell"
+import { PrototypeApplicationShell, getApplicationNavigation } from "@/components/PrototypeApplicationShell"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -306,7 +306,7 @@ export function SettingsPrototype({
     )
 
   return (
-    <ApplicationShell
+    <PrototypeApplicationShell
       currentContext={{
         id: "personal",
         kind: "personal",
@@ -404,6 +404,6 @@ export function SettingsPrototype({
           現在の設定: {currentLabel}
         </Text>
       </Box>
-    </ApplicationShell>
+    </PrototypeApplicationShell>
   )
 }
