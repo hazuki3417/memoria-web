@@ -1,30 +1,18 @@
 "use client"
 
 import {
-  Badge,
   Box,
   Button,
-  Checkbox,
   Group,
   Modal,
   Paper,
-  Popover,
   Stack,
-  TagsInput,
   Text,
   ThemeIcon,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
-  IconAlertCircle,
-  IconCheck,
-  IconClock,
-  IconCloudUpload,
-  IconHelpCircle,
-  IconPhoto,
   IconPhotoPlus,
-  IconRefresh,
-  IconTrash,
 } from "@tabler/icons-react"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
@@ -270,41 +258,6 @@ const fixtures: Record<
   ],
 }
 
-const statusPresentation: Record<
-  FileStatus,
-  { label: string; color: string; icon: typeof IconCheck }
-> = {
-  ready: { label: "準備完了", color: "gray", icon: IconClock },
-  "validation-error": {
-    label: "アップロード不可",
-    color: "red",
-    icon: IconAlertCircle,
-  },
-  uploading: { label: "アップロード中", color: "blue", icon: IconCloudUpload },
-  "upload-failed": {
-    label: "アップロード失敗",
-    color: "red",
-    icon: IconAlertCircle,
-  },
-  "upload-rejected": {
-    label: "アップロード不可",
-    color: "red",
-    icon: IconAlertCircle,
-  },
-  "result-unknown": {
-    label: "結果を確認中",
-    color: "yellow",
-    icon: IconHelpCircle,
-  },
-  processing: { label: "画像処理中", color: "blue", icon: IconClock },
-  completed: { label: "完了", color: "green", icon: IconCheck },
-  "processing-failed": {
-    label: "画像処理失敗",
-    color: "red",
-    icon: IconAlertCircle,
-  },
-}
-
 const contexts = {
   personal: {
     id: "personal",
@@ -321,12 +274,6 @@ const contexts = {
 }
 
 const selectableStatuses: FileStatus[] = ["ready", "upload-failed"]
-const removableStatuses: FileStatus[] = [
-  "ready",
-  "validation-error",
-  "upload-failed",
-  "upload-rejected",
-]
 
 export function MediaUploadPrototype({
   scenario = "ready",
@@ -362,12 +309,6 @@ export function MediaUploadPrototype({
   const registeredCount = files.filter((file) =>
     ["processing", "completed", "processing-failed"].includes(file.status),
   ).length
-  const completedCount = files.filter(
-    (file) => file.status === "completed",
-  ).length
-  const processingCount = files.filter(
-    (file) => file.status === "processing",
-  ).length
   const failedCount = files.filter(
     (file) => file.status === "upload-failed",
   ).length
@@ -377,21 +318,6 @@ export function MediaUploadPrototype({
   const unknownCount = files.filter(
     (file) => file.status === "result-unknown",
   ).length
-  const removeFile = (id: string) => {
-    setFiles((current) => current.filter((file) => file.id !== id))
-    setSelectedIds((current) => current.filter((item) => item !== id))
-  }
-  const removeAll = () => {
-    setFiles((current) =>
-      current.filter((file) => !removableStatuses.includes(file.status)),
-    )
-    setSelectedIds((current) =>
-      current.filter((id) => {
-        const file = files.find((item) => item.id === id)
-        return file ? !removableStatuses.includes(file.status) : false
-      }),
-    )
-  }
   const updateTags = (id: string, tags: string[]) =>
     setFiles((current) =>
       current.map((file) => (file.id === id ? { ...file, tags } : file)),
@@ -511,7 +437,6 @@ export function MediaUploadPrototype({
                   </Paper>
                 )}
               </Stack>
-              </Stack>
             </>
           }
         </Stack>
@@ -571,253 +496,3 @@ export function MediaUploadPrototype({
   )
 }
 
-function FileRow({
-  file,
-  compact,
-  selected,
-  selectable,
-  onSelect,
-  onRemove,
-  onTagsChange,
-}: {
-  file: UploadFile
-  compact: boolean
-  selected: boolean
-  selectable: boolean
-  onSelect: (checked: boolean) => void
-  onRemove: () => void
-  onTagsChange: (tags: string[]) => void
-}) {
-  const presentation = statusPresentation[file.status]
-  const StatusIcon = presentation.icon
-  const removable = removableStatuses.includes(file.status)
-  const tagEditable = ["ready", "upload-failed"].includes(file.status)
-
-  if (compact) {
-    return (
-      <Box p="sm">
-        <Group align="center" wrap="nowrap" h={72}>
-          <Checkbox
-            checked={selected}
-            disabled={!selectable}
-            onChange={(e) => onSelect(e.currentTarget.checked)}
-            aria-label={`${file.name}を選択`}
-          />
-          <Box
-            w={72}
-            h={72}
-            style={{
-              flex: "0 0 auto",
-              borderRadius: "var(--mantine-radius-sm)",
-              background: "var(--mantine-color-default-hover)",
-              display: "grid",
-              placeItems: "center",
-              overflow: "hidden",
-            }}
-          >
-            <IconPhoto size={22} stroke={1.4} />
-          </Box>
-          <Stack
-            gap={4}
-            justify="center"
-            h={72}
-            style={{ flex: "0 0 28%", minWidth: 0, overflow: "hidden" }}
-          >
-            <Box style={{ minWidth: 0 }}>
-              <Text size="sm" fw={600} truncate>
-                {file.name}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {file.size}
-              </Text>
-            </Box>
-            <StatusBadge
-              file={file}
-              presentation={presentation}
-              StatusIcon={StatusIcon}
-            />
-          </Stack>
-          <Box h={72} style={{ flex: 1, minWidth: 0 }}>
-            <TagsInput
-              value={file.tags}
-              onChange={onTagsChange}
-              disabled={!tagEditable}
-              size="xs"
-              placeholder="Tagを追加"
-              styles={{
-                root: { height: "100%" },
-                wrapper: { height: "100%" },
-                input: {
-                  minHeight: "72px",
-                  height: "72px",
-                  alignContent: "flex-start",
-                  paddingTop: "8px",
-                  paddingBottom: "8px",
-                },
-              }}
-            />
-          </Box>
-          <Box w={28} style={{ flex: "0 0 28px" }}>
-            <Button
-              variant="subtle"
-              color="gray"
-              size="compact-sm"
-              disabled={!removable}
-              onClick={onRemove}
-              aria-label={`${file.name}を削除`}
-            >
-              <IconTrash size={16} />
-            </Button>
-          </Box>
-        </Group>
-      </Box>
-    )
-  }
-
-  return (
-    <Box p="sm">
-      <Group align="center" wrap="nowrap" gap="md" h={72}>
-        <Checkbox
-          checked={selected}
-          disabled={!selectable}
-          onChange={(e) => onSelect(e.currentTarget.checked)}
-          aria-label={`${file.name}を選択`}
-        />
-        <Group
-          align="center"
-          wrap="nowrap"
-          gap="sm"
-          h={72}
-          style={{ flex: "0 0 36%", minWidth: 0, overflow: "hidden" }}
-        >
-          <Box
-            w={72}
-            h={72}
-            style={{
-              flex: "0 0 auto",
-              borderRadius: "var(--mantine-radius-sm)",
-              background: "var(--mantine-color-default-hover)",
-              display: "grid",
-              placeItems: "center",
-              overflow: "hidden",
-            }}
-          >
-            <IconPhoto size={28} stroke={1.4} />
-          </Box>
-          <Stack
-            gap={4}
-            justify="center"
-            h={72}
-            style={{ flex: 1, minWidth: 0, overflow: "hidden" }}
-          >
-            <Box style={{ minWidth: 0 }}>
-              <Text size="sm" fw={600} truncate>
-                {file.name}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {file.size}
-              </Text>
-            </Box>
-            <StatusBadge
-              file={file}
-              presentation={presentation}
-              StatusIcon={StatusIcon}
-            />
-          </Stack>
-        </Group>
-        <Box h={72} style={{ flex: "1 1 54%", minWidth: 420 }}>
-          <TagsInput
-            value={file.tags}
-            onChange={onTagsChange}
-            disabled={!tagEditable}
-            size="sm"
-            placeholder="Tagを追加"
-            styles={{
-              root: { height: "100%" },
-              wrapper: { height: "100%" },
-              input: {
-                minHeight: "72px",
-                height: "72px",
-                alignContent: "flex-start",
-                paddingTop: "8px",
-                paddingBottom: "8px",
-              },
-            }}
-          />
-        </Box>
-        <Box w={36} style={{ flex: "0 0 36px" }}>
-          <Button
-            variant="subtle"
-            color="gray"
-            size="compact-sm"
-            disabled={!removable}
-            onClick={onRemove}
-            aria-label={`${file.name}を削除`}
-          >
-            <IconTrash size={16} />
-          </Button>
-        </Box>
-      </Group>
-    </Box>
-  )
-}
-
-function StatusBadge({
-  file,
-  presentation,
-  StatusIcon,
-}: {
-  file: UploadFile
-  presentation: { label: string; color: string }
-  StatusIcon: typeof IconCheck
-}) {
-  const badge = (
-    <Badge
-      variant="light"
-      color={presentation.color}
-      leftSection={<StatusIcon size={12} />}
-      style={{ cursor: file.reason ? "pointer" : undefined }}
-    >
-      {presentation.label}
-    </Badge>
-  )
-
-  return (
-    <Group gap={4} wrap="nowrap" style={{ flex: "0 0 auto" }}>
-      {file.reason ? (
-        <Popover width={300} position="bottom-start" withArrow shadow="md">
-          <Popover.Target>
-            <Box
-              component="button"
-              type="button"
-              p={0}
-              bg="transparent"
-              style={{ border: 0, cursor: "pointer" }}
-            >
-              {badge}
-            </Box>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <Stack gap={4}>
-              <Text size="sm" fw={600}>
-                {presentation.label}
-              </Text>
-              <Text size="sm">{file.reason}</Text>
-            </Stack>
-          </Popover.Dropdown>
-        </Popover>
-      ) : (
-        badge
-      )}
-      {file.status === "upload-failed" && (
-        <Badge
-          variant="outline"
-          color="gray"
-          leftSection={<IconRefresh size={12} />}
-        >
-          再試行可能
-        </Badge>
-      )}
-    </Group>
-  )
-}
