@@ -4,7 +4,7 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
-import type { ApplicationContextOption, ApplicationNavigationItem } from "@/components/ApplicationShell"
+import type { ApplicationContextOption, ApplicationNavigationItem } from "./ApplicationShell"
 
 export type ApplicationSection = "dashboard" | "media" | "groups" | "members"
 
