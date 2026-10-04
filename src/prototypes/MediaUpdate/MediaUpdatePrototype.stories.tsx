@@ -16,4 +16,6 @@ export const Saving: Story = { args: { scenario: "saving" } }
 export const Saved: Story = { args: { scenario: "saved" } }
 export const PartialFailure: Story = { args: { scenario: "partial-failure" } }
 export const LoadFailure: Story = { args: { scenario: "load-failure" } }
-export const LeaveConfirmation: Story = { args: { scenario: "leave-confirmation" } }
+export const LeaveConfirmation: Story = {
+  args: { scenario: "leave-confirmation" },
+}

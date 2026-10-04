@@ -1,13 +1,13 @@
 "use client"
 
 import {
-  Box,
   Badge,
+  Box,
   Button,
   Group,
   Modal,
-  Popover,
   Paper,
+  Popover,
   Stack,
   Text,
   ThemeIcon,
@@ -25,7 +25,11 @@ import {
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
-import { MediaTagBulkEditor, MediaTagEditorList, MediaTagEditorRow } from "@/components/MediaTagEditor"
+import {
+  MediaTagBulkEditor,
+  MediaTagEditorList,
+  MediaTagEditorRow,
+} from "@/components/MediaTagEditor"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 export type UploadScenario =
@@ -271,14 +275,34 @@ const statusPresentation: Record<
   { label: string; color: string; icon: typeof IconCheck }
 > = {
   ready: { label: "準備完了", color: "gray", icon: IconClock },
-  "validation-error": { label: "アップロード不可", color: "red", icon: IconAlertCircle },
+  "validation-error": {
+    label: "アップロード不可",
+    color: "red",
+    icon: IconAlertCircle,
+  },
   uploading: { label: "アップロード中", color: "blue", icon: IconCloudUpload },
-  "upload-failed": { label: "アップロード失敗", color: "red", icon: IconAlertCircle },
-  "upload-rejected": { label: "アップロード不可", color: "red", icon: IconAlertCircle },
-  "result-unknown": { label: "結果を確認中", color: "yellow", icon: IconHelpCircle },
+  "upload-failed": {
+    label: "アップロード失敗",
+    color: "red",
+    icon: IconAlertCircle,
+  },
+  "upload-rejected": {
+    label: "アップロード不可",
+    color: "red",
+    icon: IconAlertCircle,
+  },
+  "result-unknown": {
+    label: "結果を確認中",
+    color: "yellow",
+    icon: IconHelpCircle,
+  },
   processing: { label: "画像処理中", color: "blue", icon: IconClock },
   completed: { label: "完了", color: "green", icon: IconCheck },
-  "processing-failed": { label: "画像処理失敗", color: "red", icon: IconAlertCircle },
+  "processing-failed": {
+    label: "画像処理失敗",
+    color: "red",
+    icon: IconAlertCircle,
+  },
 }
 
 const contexts = {
@@ -297,7 +321,12 @@ const contexts = {
 }
 
 const selectableStatuses: FileStatus[] = ["ready", "upload-failed"]
-const removableStatuses: FileStatus[] = ["ready", "validation-error", "upload-failed", "upload-rejected"]
+const removableStatuses: FileStatus[] = [
+  "ready",
+  "validation-error",
+  "upload-failed",
+  "upload-rejected",
+]
 
 export function MediaUploadPrototype({
   scenario = "ready",
@@ -355,18 +384,26 @@ export function MediaUploadPrototype({
       current.map((file) => {
         if (!selectedIds.includes(file.id)) return file
         if (action === "replace") return { ...file, tags: [tag] }
-        if (action === "remove") return { ...file, tags: file.tags.filter((item) => item !== tag) }
-        return { ...file, tags: file.tags.includes(tag) ? file.tags : [...file.tags, tag] }
+        if (action === "remove")
+          return { ...file, tags: file.tags.filter((item) => item !== tag) }
+        return {
+          ...file,
+          tags: file.tags.includes(tag) ? file.tags : [...file.tags, tag],
+        }
       }),
     )
     setBulkTag("")
   }
   const removeAll = () => {
-    setFiles((current) => current.filter((file) => !removableStatuses.includes(file.status)))
-    setSelectedIds((current) => current.filter((id) => {
-      const file = files.find((item) => item.id === id)
-      return file ? !removableStatuses.includes(file.status) : false
-    }))
+    setFiles((current) =>
+      current.filter((file) => !removableStatuses.includes(file.status)),
+    )
+    setSelectedIds((current) =>
+      current.filter((id) => {
+        const file = files.find((item) => item.id === id)
+        return file ? !removableStatuses.includes(file.status) : false
+      }),
+    )
   }
   const updateTags = (id: string, tags: string[]) =>
     setFiles((current) =>
@@ -470,8 +507,14 @@ export function MediaUploadPrototype({
               <Stack gap="sm">
                 <MediaTagBulkEditor
                   selectedCount={selectedFiles.length}
-                  allSelected={selectableFiles.length > 0 && selectedFiles.length === selectableFiles.length}
-                  indeterminate={selectedFiles.length > 0 && selectedFiles.length !== selectableFiles.length}
+                  allSelected={
+                    selectableFiles.length > 0 &&
+                    selectedFiles.length === selectableFiles.length
+                  }
+                  indeterminate={
+                    selectedFiles.length > 0 &&
+                    selectedFiles.length !== selectableFiles.length
+                  }
                   selectionDisabled={selectableFiles.length === 0}
                   summaryItems={[
                     { label: "Media登録済み", value: `${registeredCount}件` },
@@ -479,20 +522,37 @@ export function MediaUploadPrototype({
                     { label: "完了", value: `${completedCount}件` },
                   ]}
                   value={bulkTag}
-                  placeholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"}
+                  placeholder={
+                    files.length === 0
+                      ? "追加するMediaの共通Tag"
+                      : "選択したMediaのTag"
+                  }
                   actionDisabled={!bulkTag.trim() || selectedFiles.length === 0}
                   selectAllLabel="アップロード可能なMediaをすべて選択"
                   headerAction={
-                    <Button variant="subtle" color="gray" size="compact-sm" onClick={removeAll}
-                      disabled={!files.some((file) => removableStatuses.includes(file.status))} aria-label="すべて削除">
+                    <Button
+                      variant="subtle"
+                      color="gray"
+                      size="compact-sm"
+                      onClick={removeAll}
+                      disabled={
+                        !files.some((file) =>
+                          removableStatuses.includes(file.status),
+                        )
+                      }
+                      aria-label="すべて削除"
+                    >
                       <IconTrash size={16} />
                     </Button>
                   }
-                  onToggleAll={() => setSelectedIds(
-                    selectableFiles.length > 0 && selectedFiles.length === selectableFiles.length
-                      ? []
-                      : selectableFiles.map((file) => file.id),
-                  )}
+                  onToggleAll={() =>
+                    setSelectedIds(
+                      selectableFiles.length > 0 &&
+                        selectedFiles.length === selectableFiles.length
+                        ? []
+                        : selectableFiles.map((file) => file.id),
+                    )
+                  }
                   onChange={setBulkTag}
                   onAction={applyTagAction}
                 />
@@ -508,19 +568,31 @@ export function MediaUploadPrototype({
                       tagEditable={selectableStatuses.includes(file.status)}
                       supplementary={<UploadStatus file={file} />}
                       action={
-                        <Button variant="subtle" color="gray" size="compact-sm"
+                        <Button
+                          variant="subtle"
+                          color="gray"
+                          size="compact-sm"
                           disabled={!removableStatuses.includes(file.status)}
                           onClick={() => {
-                            setFiles((current) => current.filter((item) => item.id !== file.id))
-                            setSelectedIds((current) => current.filter((id) => id !== file.id))
+                            setFiles((current) =>
+                              current.filter((item) => item.id !== file.id),
+                            )
+                            setSelectedIds((current) =>
+                              current.filter((id) => id !== file.id),
+                            )
                           }}
-                          aria-label={`${file.name}を削除`}>
+                          aria-label={`${file.name}を削除`}
+                        >
                           <IconTrash size={16} />
                         </Button>
                       }
-                      onSelect={(checked) => setSelectedIds((current) =>
-                        checked ? [...new Set([...current, file.id])] : current.filter((id) => id !== file.id)
-                      )}
+                      onSelect={(checked) =>
+                        setSelectedIds((current) =>
+                          checked
+                            ? [...new Set([...current, file.id])]
+                            : current.filter((id) => id !== file.id),
+                        )
+                      }
                       onTagsChange={(tags) => updateTags(file.id, tags)}
                     />
                   ))}
@@ -584,7 +656,6 @@ export function MediaUploadPrototype({
     </PrototypeApplicationShell>
   )
 }
-
 
 function UploadStatus({ file }: { file: UploadFile }) {
   const presentation = statusPresentation[file.status]
