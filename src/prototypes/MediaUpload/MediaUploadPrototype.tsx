@@ -320,6 +320,7 @@ export function MediaUploadPrototype({
       .filter((file) => selectableStatuses.includes(file.status))
       .map((file) => file.id),
   )
+  const [bulkTag, setBulkTag] = useState("")
   const currentContext = contexts[context]
 
   const selectableFiles = files.filter((file) =>
@@ -332,6 +333,12 @@ export function MediaUploadPrototype({
   const registeredCount = files.filter((file) =>
     ["processing", "completed", "processing-failed"].includes(file.status),
   ).length
+  const completedCount = files.filter(
+    (file) => file.status === "completed",
+  ).length
+  const processingCount = files.filter(
+    (file) => file.status === "processing",
+  ).length
   const failedCount = files.filter(
     (file) => file.status === "upload-failed",
   ).length
@@ -341,6 +348,26 @@ export function MediaUploadPrototype({
   const unknownCount = files.filter(
     (file) => file.status === "result-unknown",
   ).length
+  const applyTagAction = (action: "add" | "remove" | "replace") => {
+    const tag = bulkTag.trim()
+    if (!tag || selectedIds.length === 0) return
+    setFiles((current) =>
+      current.map((file) => {
+        if (!selectedIds.includes(file.id)) return file
+        if (action === "replace") return { ...file, tags: [tag] }
+        if (action === "remove") return { ...file, tags: file.tags.filter((item) => item !== tag) }
+        return { ...file, tags: file.tags.includes(tag) ? file.tags : [...file.tags, tag] }
+      }),
+    )
+    setBulkTag("")
+  }
+  const removeAll = () => {
+    setFiles((current) => current.filter((file) => !removableStatuses.includes(file.status)))
+    setSelectedIds((current) => current.filter((id) => {
+      const file = files.find((item) => item.id === id)
+      return file ? !removableStatuses.includes(file.status) : false
+    }))
+  }
   const updateTags = (id: string, tags: string[]) =>
     setFiles((current) =>
       current.map((file) => (file.id === id ? { ...file, tags } : file)),
@@ -445,15 +472,17 @@ export function MediaUploadPrototype({
                   items={files.map((file) => ({
                     id: file.id,
                     label: file.name,
+                    detail: file.size,
                     tags: file.tags,
                     selectable: selectableStatuses.includes(file.status),
                     tagEditable: selectableStatuses.includes(file.status),
                     supplementary: <UploadStatus file={file} />,
-                    actions: removableStatuses.includes(file.status) ? (
+                    actions: (
                       <Button
                         variant="subtle"
                         color="gray"
                         size="compact-sm"
+                        disabled={!removableStatuses.includes(file.status)}
                         onClick={() => {
                           setFiles((current) => current.filter((item) => item.id !== file.id))
                           setSelectedIds((current) => current.filter((id) => id !== file.id))
@@ -462,13 +491,34 @@ export function MediaUploadPrototype({
                       >
                         <IconTrash size={16} />
                       </Button>
-                    ) : undefined,
+                    ),
                   }))}
                   selectedIds={selectedIds}
+                  bulkTag={bulkTag}
+                  summaryItems={[
+                    { label: "Media登録済み", value: `${registeredCount}件` },
+                    { label: "画像処理中", value: `${processingCount}件` },
+                    { label: "完了", value: `${completedCount}件` },
+                  ]}
+                  bulkTagPlaceholder={files.length === 0 ? "追加するMediaの共通Tag" : "選択したMediaのTag"}
+                  selectAllLabel="アップロード可能なMediaをすべて選択"
+                  headerAction={
+                    <Button
+                      variant="subtle"
+                      color="gray"
+                      size="compact-sm"
+                      onClick={removeAll}
+                      disabled={!files.some((file) => removableStatuses.includes(file.status))}
+                      aria-label="すべて削除"
+                    >
+                      <IconTrash size={16} />
+                    </Button>
+                  }
                   onSelectedIdsChange={setSelectedIds}
+                  onBulkTagChange={setBulkTag}
+                  onBulkTagAction={applyTagAction}
                   onTagsChange={updateTags}
-                />
-              </Stack>
+                />              </Stack>
             </>
           }
         </Stack>
