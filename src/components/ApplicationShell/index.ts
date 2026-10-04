@@ -1,1 +1,2 @@
-export * from "./ApplicationShell"\nexport * from "./applicationNavigation"\n
+export * from "./ApplicationShell"
+export * from "./applicationNavigation"
