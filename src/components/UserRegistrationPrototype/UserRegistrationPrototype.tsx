@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  AppShell,
   Box,
   Button,
   Group,
@@ -13,6 +12,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
+import { ApplicationHeader, ApplicationShell } from "@/components/ApplicationShell"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -76,15 +76,7 @@ export function UserRegistrationPrototype({
   return (
     <>
       <Notifications position="top-right" />
-      <AppShell header={{ height: 40 }} padding="lg">
-        <AppShell.Header>
-          <Group h="100%" px="md" gap="sm">
-            <Text fw={750} size="lg">
-              Memoria
-            </Text>
-          </Group>
-        </AppShell.Header>
-        <AppShell.Main>
+      <ApplicationShell header={<ApplicationHeader />}>
           <Box maw={880} mx="auto" w="100%">
             <Stack gap="xl">
               <PageHeader
@@ -161,8 +153,7 @@ export function UserRegistrationPrototype({
               </Box>
             </Stack>
           </Box>
-        </AppShell.Main>
-      </AppShell>
+      </ApplicationShell>
       <Modal
         opened={exitOpened}
         onClose={closeExit}
