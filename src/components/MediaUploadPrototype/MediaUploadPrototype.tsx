@@ -68,7 +68,10 @@ type UploadFile = {
 }
 
 const fixtures: Record<
-  Exclude<UploadScenario, "empty" | "leave-confirmation" | "leave-uploading-confirmation">,
+  Exclude<
+    UploadScenario,
+    "empty" | "leave-confirmation" | "leave-uploading-confirmation"
+  >,
   UploadFile[]
 > = {
   ready: [
@@ -755,7 +758,9 @@ export function MediaUploadPrototype({
             <Text size="sm" c="dimmed">
               {selectedFiles.length}件選択中
             </Text>
-            {registeredCount > 0 && selectedFiles.length === 0 && !activeUpload ? (
+            {registeredCount > 0 &&
+            selectedFiles.length === 0 &&
+            !activeUpload ? (
               <Button variant="default">Media Browserへ戻る</Button>
             ) : (
               <Button disabled={activeUpload || selectedFiles.length === 0}>
