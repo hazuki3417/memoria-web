@@ -336,7 +336,15 @@ export function MediaBrowserPrototype({
                 item={item}
                 selecting={selecting}
                 selected={selected.has(item.id)}
-                onClick={() => selecting ? toggle(item.id) : (setDetailZoom(100), setDetailRotate(0), setDetail(item))}
+                onClick={() => {
+                  if (selecting) {
+                    toggle(item.id)
+                    return
+                  }
+                  setDetailZoom(100)
+                  setDetailRotate(0)
+                  setDetail(item)
+                }}
               />
             ))}
           </Box>
