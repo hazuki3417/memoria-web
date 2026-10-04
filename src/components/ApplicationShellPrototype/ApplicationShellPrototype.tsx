@@ -5,9 +5,9 @@ import { useState } from "react"
 import {
   type ApplicationContextOption,
   type ApplicationSection,
-  ApplicationShell,
+  PrototypeApplicationShell,
   getApplicationNavigation,
-} from "@/components/ApplicationShell"
+} from "@/components/PrototypeApplicationShell"
 
 type Context = "personal" | "community" | "communityTravel"
 type Section = ApplicationSection
@@ -34,7 +34,7 @@ const contexts: Record<Context, ApplicationContextOption> = {
 }
 
 /**
- * ApplicationShell共通ComponentのVisual Review用wrapper。
+ * PrototypeApplicationShell共通ComponentのVisual Review用wrapper。
  * Routing / APIとは接続せず、Story内stateだけでinteractionを確認する。
  */
 export function ApplicationShellPrototype({
@@ -57,7 +57,7 @@ export function ApplicationShellPrototype({
   }
 
   return (
-    <ApplicationShell
+    <PrototypeApplicationShell
       currentContext={currentContext}
       contexts={Object.values(contexts)}
       navigationItems={navigationItems}
@@ -94,6 +94,6 @@ export function ApplicationShellPrototype({
           </Stack>
         </Paper>
       </Box>
-    </ApplicationShell>
+    </PrototypeApplicationShell>
   )
 }
