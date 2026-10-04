@@ -29,6 +29,7 @@ export function MediaTagEditor({
   bulkTagPlaceholder = "選択したMediaのTag",
   selectAllLabel = "編集可能なMediaをすべて選択",
   headerAction,
+  bulkActions = ["add", "remove", "replace"],
   onSelectedIdsChange,
   onBulkTagChange,
   onBulkTagAction,
@@ -41,6 +42,7 @@ export function MediaTagEditor({
   bulkTagPlaceholder?: string
   selectAllLabel?: string
   headerAction?: ReactNode
+  bulkActions?: Array<"add" | "remove" | "replace">
   onSelectedIdsChange: (ids: string[]) => void
   onBulkTagChange: (value: string) => void
   onBulkTagAction: (action: "add" | "remove" | "replace") => void
@@ -112,9 +114,15 @@ export function MediaTagEditor({
       </Paper>
 
       <Group justify="center" gap="xs">
-        <Button variant="default" size="sm" disabled={actionDisabled} onClick={() => onBulkTagAction("add")}>追加</Button>
-        <Button variant="default" size="sm" disabled={actionDisabled} onClick={() => onBulkTagAction("remove")}>除去</Button>
-        <Button variant="default" size="sm" disabled={actionDisabled} onClick={() => onBulkTagAction("replace")}>置換</Button>
+        {bulkActions.includes("add") && (
+          <Button variant="default" size="sm" disabled={actionDisabled} onClick={() => onBulkTagAction("add")}>追加</Button>
+        )}
+        {bulkActions.includes("remove") && (
+          <Button variant="default" size="sm" disabled={actionDisabled} onClick={() => onBulkTagAction("remove")}>除去</Button>
+        )}
+        {bulkActions.includes("replace") && (
+          <Button variant="default" size="sm" disabled={actionDisabled} onClick={() => onBulkTagAction("replace")}>置換</Button>
+        )}
       </Group>
 
       {items.length > 0 && (
