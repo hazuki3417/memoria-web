@@ -23,8 +23,20 @@ export const Selection: Story = { args: { initialState: "selection", contextKind
 export const Detail: Story = {
   args: { initialState: "default", contextKind: "personal" },
   play: async ({ canvasElement }) => {
-    const button = canvasElement.querySelector<HTMLButtonElement>('button[aria-label="Media 1を開く"]')
+    const button = canvasElement.querySelector<HTMLButtonElement>('button[aria-label="縦長 Media 1を開く"]')
     button?.click()
+  },
+}
+export const PortraitDetail: Story = {
+  args: { initialState: "default", contextKind: "personal" },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('button[aria-label="縦長 Media 1を開く"]')?.click()
+  },
+}
+export const LandscapeDetail: Story = {
+  args: { initialState: "default", contextKind: "personal" },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('button[aria-label="横長 Media 1を開く"]')?.click()
   },
 }
 export const Community: Story = { args: { initialState: "default", contextKind: "community" } }
