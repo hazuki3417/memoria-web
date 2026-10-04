@@ -12,7 +12,10 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
-import { ApplicationHeader, ApplicationShell } from "@/components/ApplicationShell"
+import {
+  ApplicationHeader,
+  ApplicationShell,
+} from "@/components/ApplicationShell"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -77,82 +80,78 @@ export function UserRegistrationPrototype({
     <>
       <Notifications position="top-right" />
       <ApplicationShell header={<ApplicationHeader />}>
-          <Box maw={880} mx="auto" w="100%">
-            <Stack gap="xl">
-              <PageHeader
-                title="Memoriaへようこそ"
-                description="Memoriaで使用するプロフィールを設定して、登録を完了してください。"
-              />
-              <Box>
-                <SectionHeader>基本情報</SectionHeader>
-                <Stack gap="md" maw={540}>
-                  <Box maw={440}>
-                    <TextInput
-                      label="ニックネーム"
-                      description="Memoria内で表示される名前です。"
-                      value={nickname}
-                      onChange={(event) => {
-                        setNickname(event.currentTarget.value)
-                        if (status === "failure") setStatus("default")
-                      }}
-                      error={invalid}
-                      aria-describedby="registration-nickname-error"
-                      disabled={registering || blocking || registered || exited}
-                      required
-                    />
-                    <Box
-                      mih={22}
-                      mt={4}
-                      id="registration-nickname-error"
-                      aria-live="polite"
-                    >
-                      {invalid && (
-                        <Text size="xs" c="red">
-                          ニックネームを入力してください。
-                        </Text>
-                      )}
-                    </Box>
-                  </Box>
-                  <Group gap="sm">
-                    <Button
-                      size="sm"
-                      onClick={register}
-                      disabled={
-                        invalid ||
-                        registering ||
-                        blocking ||
-                        registered ||
-                        exited
-                      }
-                      loading={registering}
-                    >
-                      登録
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={openExit}
-                      disabled={registering || registered || exited}
-                    >
-                      終了
-                    </Button>
-                  </Group>
-                  <Box mih={92} aria-live="polite">
-                    {blocking && (
-                      <FeedbackAlert kind="error" title="登録できませんでした">
-                        認証情報を確認できませんでした。もう一度ログインしてください。
-                      </FeedbackAlert>
-                    )}
-                    {exited && (
-                      <FeedbackAlert kind="info" title="登録せずに終了しました">
-                        実際の画面ではログアウトして公開画面へ戻ります。
-                      </FeedbackAlert>
+        <Box maw={880} mx="auto" w="100%">
+          <Stack gap="xl">
+            <PageHeader
+              title="Memoriaへようこそ"
+              description="Memoriaで使用するプロフィールを設定して、登録を完了してください。"
+            />
+            <Box>
+              <SectionHeader>基本情報</SectionHeader>
+              <Stack gap="md" maw={540}>
+                <Box maw={440}>
+                  <TextInput
+                    label="ニックネーム"
+                    description="Memoria内で表示される名前です。"
+                    value={nickname}
+                    onChange={(event) => {
+                      setNickname(event.currentTarget.value)
+                      if (status === "failure") setStatus("default")
+                    }}
+                    error={invalid}
+                    aria-describedby="registration-nickname-error"
+                    disabled={registering || blocking || registered || exited}
+                    required
+                  />
+                  <Box
+                    mih={22}
+                    mt={4}
+                    id="registration-nickname-error"
+                    aria-live="polite"
+                  >
+                    {invalid && (
+                      <Text size="xs" c="red">
+                        ニックネームを入力してください。
+                      </Text>
                     )}
                   </Box>
-                </Stack>
-              </Box>
-            </Stack>
-          </Box>
+                </Box>
+                <Group gap="sm">
+                  <Button
+                    size="sm"
+                    onClick={register}
+                    disabled={
+                      invalid || registering || blocking || registered || exited
+                    }
+                    loading={registering}
+                  >
+                    登録
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={openExit}
+                    disabled={registering || registered || exited}
+                  >
+                    終了
+                  </Button>
+                </Group>
+                <Box mih={92} aria-live="polite">
+                  {blocking && (
+                    <FeedbackAlert kind="error" title="登録できませんでした">
+                      認証情報を確認できませんでした。もう一度ログインしてください。
+                    </FeedbackAlert>
+                  )}
+                  {exited && (
+                    <FeedbackAlert kind="info" title="登録せずに終了しました">
+                      実際の画面ではログアウトして公開画面へ戻ります。
+                    </FeedbackAlert>
+                  )}
+                </Box>
+              </Stack>
+            </Box>
+          </Stack>
+        </Box>
       </ApplicationShell>
       <Modal
         opened={exitOpened}

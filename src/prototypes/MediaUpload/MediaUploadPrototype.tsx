@@ -29,9 +29,9 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import {  getApplicationNavigation } from "@/components/ApplicationShell"
-import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 export type UploadScenario =
   | "empty"

@@ -4,10 +4,12 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
-import type { ApplicationContextOption, ApplicationNavigationItem } from "./types"
+import type {
+  ApplicationContextOption,
+  ApplicationNavigationItem,
+} from "./types"
 
 export type ApplicationSection = "dashboard" | "media" | "groups" | "members"
-
 
 const baseApplicationNavigation = [
   { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },

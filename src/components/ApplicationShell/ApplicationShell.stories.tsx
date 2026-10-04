@@ -9,7 +9,10 @@ import {
 import { ApplicationAccountMenu } from "./ApplicationAccountMenu"
 import { ApplicationContextSwitcher } from "./ApplicationContextSwitcher"
 import { ApplicationHeader } from "./ApplicationHeader"
-import { ApplicationNavigation, ApplicationNavigationTrigger } from "./ApplicationNavigation"
+import {
+  ApplicationNavigation,
+  ApplicationNavigationTrigger,
+} from "./ApplicationNavigation"
 import { ApplicationShell } from "./ApplicationShell"
 
 const personal = {
@@ -67,13 +70,42 @@ const meta = {
   parameters: { layout: "fullscreen" },
   args: {
     children: content,
-    header: <ApplicationHeader
-      accentColor={personal.accentColor}
-      leading={<ApplicationNavigationTrigger opened={false} onToggle={() => undefined} />}
-      context={<ApplicationContextSwitcher currentContext={personal} contexts={contexts} onSelect={() => undefined} onCreateCommunity={() => undefined} />}
-      account={<ApplicationAccountMenu user={{ displayName: "ユーザー" }} currentContext={personal} onOpenSettings={() => undefined} onLogout={() => undefined} />}
-    />,
-    navigation: <ApplicationNavigation opened={false} onClose={() => undefined} items={personalNavigation} accentColor={personal.accentColor} onSelect={() => undefined} />,
+    header: (
+      <ApplicationHeader
+        accentColor={personal.accentColor}
+        leading={
+          <ApplicationNavigationTrigger
+            opened={false}
+            onToggle={() => undefined}
+          />
+        }
+        context={
+          <ApplicationContextSwitcher
+            currentContext={personal}
+            contexts={contexts}
+            onSelect={() => undefined}
+            onCreateCommunity={() => undefined}
+          />
+        }
+        account={
+          <ApplicationAccountMenu
+            user={{ displayName: "ユーザー" }}
+            currentContext={personal}
+            onOpenSettings={() => undefined}
+            onLogout={() => undefined}
+          />
+        }
+      />
+    ),
+    navigation: (
+      <ApplicationNavigation
+        opened={false}
+        onClose={() => undefined}
+        items={personalNavigation}
+        accentColor={personal.accentColor}
+        onSelect={() => undefined}
+      />
+    ),
   },
 } satisfies Meta<typeof ApplicationShell>
 
@@ -84,8 +116,27 @@ export const Personal: Story = {}
 
 export const Community: Story = {
   args: {
-    header: <ApplicationHeader accentColor={family.accentColor} context={<ApplicationContextSwitcher currentContext={family} contexts={contexts} onSelect={() => undefined} />} />,
-    navigation: <ApplicationNavigation opened={false} onClose={() => undefined} items={communityNavigation} accentColor={family.accentColor} onSelect={() => undefined} />,
+    header: (
+      <ApplicationHeader
+        accentColor={family.accentColor}
+        context={
+          <ApplicationContextSwitcher
+            currentContext={family}
+            contexts={contexts}
+            onSelect={() => undefined}
+          />
+        }
+      />
+    ),
+    navigation: (
+      <ApplicationNavigation
+        opened={false}
+        onClose={() => undefined}
+        items={communityNavigation}
+        accentColor={family.accentColor}
+        onSelect={() => undefined}
+      />
+    ),
   },
 }
 

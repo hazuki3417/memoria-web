@@ -21,12 +21,12 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import {  getApplicationNavigation } from "@/components/ApplicationShell"
-import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type Section = "profile" | "preferences" | "usage" | "account"
 

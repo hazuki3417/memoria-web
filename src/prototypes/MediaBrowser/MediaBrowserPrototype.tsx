@@ -55,9 +55,9 @@ import {
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import {  getApplicationNavigation } from "@/components/ApplicationShell"
-import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeState =
   | "default"

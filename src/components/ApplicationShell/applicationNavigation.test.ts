@@ -8,7 +8,9 @@ describe("getApplicationNavigation", () => {
       activeSection: "media",
     })
 
-    expect(items.map(({ id, label, active }) => ({ id, label, active }))).toEqual([
+    expect(
+      items.map(({ id, label, active }) => ({ id, label, active })),
+    ).toEqual([
       { id: "dashboard", label: "ダッシュボード", active: false },
       { id: "media", label: "メディア", active: true },
       { id: "groups", label: "グループ", active: false },
@@ -21,7 +23,9 @@ describe("getApplicationNavigation", () => {
       activeSection: "members",
     })
 
-    expect(items.map(({ id, label, active }) => ({ id, label, active }))).toEqual([
+    expect(
+      items.map(({ id, label, active }) => ({ id, label, active })),
+    ).toEqual([
       { id: "dashboard", label: "ダッシュボード", active: false },
       { id: "media", label: "メディア", active: false },
       { id: "groups", label: "グループ", active: false },

@@ -3,7 +3,12 @@ import { IconLayoutDashboard, IconPhoto, IconUsers } from "@tabler/icons-react"
 import { ApplicationNavigation } from "./ApplicationNavigation"
 
 const items = [
-  { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard, active: true },
+  {
+    id: "dashboard",
+    label: "ダッシュボード",
+    icon: IconLayoutDashboard,
+    active: true,
+  },
   { id: "media", label: "メディア", icon: IconPhoto },
   { id: "groups", label: "グループ", icon: IconUsers },
 ]
@@ -25,4 +30,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Opened: Story = {}
-export const CommunityAccent: Story = { args: { accentColor: "var(--mantine-color-teal-6)" } }
+export const CommunityAccent: Story = {
+  args: { accentColor: "var(--mantine-color-teal-6)" },
+}

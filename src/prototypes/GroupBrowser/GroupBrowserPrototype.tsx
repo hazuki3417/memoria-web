@@ -30,9 +30,9 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import {  getApplicationNavigation } from "@/components/ApplicationShell"
-import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeGroup = {
   id: string
@@ -119,7 +119,6 @@ const personalContext = {
   label: "Personal",
   accentColor: "var(--mantine-color-blue-6)",
 }
-
 
 const previewImages = Array.from(
   { length: 9 },

@@ -9,17 +9,26 @@ export type ApplicationShellProps = {
   navigation?: ReactNode
 }
 
-export function ApplicationShell({ children, header, navigation }: ApplicationShellProps) {
+export function ApplicationShell({
+  children,
+  header,
+  navigation,
+}: ApplicationShellProps) {
   return (
     <AppShell
       header={{ height: 40 }}
       padding="lg"
-      styles={{ main: { minHeight: "100vh", background: "var(--mantine-color-body)" } }}
+      styles={{
+        main: { minHeight: "100vh", background: "var(--mantine-color-body)" },
+      }}
     >
       {header}
       {navigation}
       <AppShell.Main>{children}</AppShell.Main>
-      <Box id="application-modal-root" style={{ position: "relative", zIndex: 400 }} />
+      <Box
+        id="application-modal-root"
+        style={{ position: "relative", zIndex: 400 }}
+      />
     </AppShell>
   )
 }

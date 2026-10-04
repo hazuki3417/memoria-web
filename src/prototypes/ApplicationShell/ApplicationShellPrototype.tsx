@@ -5,7 +5,6 @@ import { useState } from "react"
 import {
   type ApplicationContextOption,
   type ApplicationSection,
-  
   getApplicationNavigation,
 } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
