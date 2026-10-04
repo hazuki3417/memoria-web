@@ -44,7 +44,11 @@ export const ThreeRegionFooter: Story = {
     title: "編集",
     footer: (
       <Dialog.Footer
-        leading={<Button variant="subtle" color="red">削除</Button>}
+        leading={
+          <Button variant="subtle" color="red">
+            削除
+          </Button>
+        }
         secondary={<Button variant="default">キャンセル</Button>}
         primary={<Button>保存</Button>}
       />

@@ -1,8 +1,8 @@
 "use client"
 
+import type { ModalProps } from "@mantine/core"
 import { Box, Group, Modal, Stack } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import type { ModalProps } from "@mantine/core"
 import type { ReactNode } from "react"
 
 type DialogProps = Omit<ModalProps, "children"> & {
