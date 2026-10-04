@@ -3,14 +3,35 @@
 import { Box, Paper, Stack, Text } from "@mantine/core"
 import { useState } from "react"
 import {
+  type ApplicationContextOption,
   type ApplicationSection,
   ApplicationShell,
   getApplicationNavigation,
-  prototypeApplicationContexts,
 } from "@/components/ApplicationShell"
 
-type Context = keyof typeof prototypeApplicationContexts
+type Context = "personal" | "community" | "communityTravel"
 type Section = ApplicationSection
+
+const contexts: Record<Context, ApplicationContextOption> = {
+  personal: {
+    id: "personal",
+    kind: "personal",
+    label: "Personal",
+    accentColor: "var(--mantine-color-blue-6)",
+  },
+  community: {
+    id: "community",
+    kind: "community",
+    label: "家族のアルバム",
+    accentColor: "var(--mantine-color-teal-6)",
+  },
+  communityTravel: {
+    id: "communityTravel",
+    kind: "community",
+    label: "旅行の思い出",
+    accentColor: "var(--mantine-color-violet-6)",
+  },
+}
 
 /**
  * ApplicationShell共通ComponentのVisual Review用wrapper。
@@ -23,7 +44,7 @@ export function ApplicationShellPrototype({
 }) {
   const [contextId, setContextId] = useState<Context>(initialContext)
   const [section, setSection] = useState<Section>("dashboard")
-  const currentContext = prototypeApplicationContexts[contextId]
+  const currentContext = contexts[contextId]
 
   const navigationItems = getApplicationNavigation({
     contextKind: currentContext.kind,
@@ -38,7 +59,7 @@ export function ApplicationShellPrototype({
   return (
     <ApplicationShell
       currentContext={currentContext}
-      contexts={Object.values(prototypeApplicationContexts)}
+      contexts={Object.values(contexts)}
       navigationItems={navigationItems}
       user={{ displayName: "ユーザー" }}
       onSelectContext={selectContext}
