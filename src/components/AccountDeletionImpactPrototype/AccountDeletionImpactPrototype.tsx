@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  AppShell,
   Badge,
   Box,
   Button,
@@ -19,6 +18,9 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
 import { FeedbackAlert } from "@/components/Feedback"
+import { getApplicationNavigation, PrototypeApplicationShell } from "@/components/ApplicationShell"
+
+const personalContext = { id: "personal", kind: "personal" as const, label: "Personal", accentColor: "var(--mantine-color-blue-6)" }
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
 type CommunityScenario =
@@ -221,19 +223,11 @@ export function AccountDeletionImpactPrototype({
           </Group>
         </Stack>
       </Modal>
-      <AppShell header={{ height: 40 }} padding="lg">
-        <AppShell.Header>
-          <Group h="100%" px="md" gap="sm">
-            <Text fw={750} size="lg">
-              Memoria
-            </Text>
-            <Text c="dimmed" size="sm">
-              /
-            </Text>
-            <Text size="sm">Personal</Text>
-          </Group>
-        </AppShell.Header>
-        <AppShell.Main>
+      <PrototypeApplicationShell
+        currentContext={personalContext}
+        contexts={[personalContext]}
+        navigationItems={getApplicationNavigation({ contextKind: "personal" })}
+      >
           <Box maw={960} mx="auto" w="100%">
             <Stack gap="xl">
               <Box>
@@ -962,8 +956,7 @@ export function AccountDeletionImpactPrototype({
               )}
             </Stack>
           </Box>
-        </AppShell.Main>
-      </AppShell>
+      </PrototypeApplicationShell>
     </>
   )
 }
