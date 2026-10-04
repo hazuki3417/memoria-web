@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Divider,
   Group,
   Modal,
   Paper,
@@ -13,7 +12,6 @@ import {
   Stack,
   TagsInput,
   Text,
-  TextInput,
   ThemeIcon,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
@@ -352,7 +350,6 @@ export function MediaUploadPrototype({
       .filter((file) => selectableStatuses.includes(file.status))
       .map((file) => file.id),
   )
-  const [bulkTag, setBulkTag] = useState("")
   const currentContext = contexts[context]
 
   const selectableFiles = files.filter((file) =>
@@ -380,39 +377,6 @@ export function MediaUploadPrototype({
   const unknownCount = files.filter(
     (file) => file.status === "result-unknown",
   ).length
-  const allSelectableChecked =
-    selectableFiles.length > 0 &&
-    selectedFiles.length === selectableFiles.length
-
-  const toggleAll = () =>
-    setSelectedIds(
-      allSelectableChecked ? [] : selectableFiles.map((file) => file.id),
-    )
-  const toggleFile = (id: string, checked: boolean) =>
-    setSelectedIds((current) =>
-      checked
-        ? [...new Set([...current, id])]
-        : current.filter((item) => item !== id),
-    )
-
-  const applyTagAction = (action: "add" | "remove" | "replace") => {
-    const tag = bulkTag.trim()
-    if (!tag || selectedIds.length === 0) return
-    setFiles((current) =>
-      current.map((file) => {
-        if (!selectedIds.includes(file.id)) return file
-        if (action === "replace") return { ...file, tags: [tag] }
-        if (action === "remove")
-          return { ...file, tags: file.tags.filter((item) => item !== tag) }
-        return {
-          ...file,
-          tags: file.tags.includes(tag) ? file.tags : [...file.tags, tag],
-        }
-      }),
-    )
-    setBulkTag("")
-  }
-
   const removeFile = (id: string) => {
     setFiles((current) => current.filter((file) => file.id !== id))
     setSelectedIds((current) => current.filter((item) => item !== id))
