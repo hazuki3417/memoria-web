@@ -18,7 +18,8 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
 import { FeedbackAlert } from "@/components/Feedback"
-import { getApplicationNavigation, PrototypeApplicationShell } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 const personalContext = { id: "personal", kind: "personal" as const, label: "Personal", accentColor: "var(--mantine-color-blue-6)" }
 
