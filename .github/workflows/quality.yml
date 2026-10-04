@@ -15,20 +15,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  web:
-    name: web
+  prepare:
+    name: prepare
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    env:
-      NEXT_TELEMETRY_DISABLED: "1"
-      BIOME_BASE_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
-      API_URI: http://localhost:8080/graphql
-      APP_BASE_URL: http://localhost:3000
-      AUTH0_DOMAIN: ci-example.auth0.com
-      AUTH0_CLIENT_ID: ci-client-id
-      AUTH0_CLIENT_SECRET: ci-placeholder-client-secret
-      AUTH0_SECRET: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -44,6 +34,46 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Archive dependencies
+        run: tar -czf /tmp/node_modules.tar.gz node_modules
+
+      - name: Upload dependencies
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-modules-${{ github.sha }}
+          path: /tmp/node_modules.tar.gz
+          retention-days: 1
+
+  source:
+    name: source
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      BIOME_BASE_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+      API_URI: http://localhost:8080/graphql
+      APP_BASE_URL: http://localhost:3000
+      AUTH0_DOMAIN: ci-example.auth0.com
+      AUTH0_CLIENT_ID: ci-client-id
+      AUTH0_CLIENT_SECRET: ci-placeholder-client-secret
+      AUTH0_SECRET: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: package.json
+      - name: Restore dependencies
+        uses: actions/download-artifact@v4
+        with:
+          name: node-modules-${{ github.sha }}
+          path: /tmp
+      - name: Extract dependencies
+        run: tar -xzf /tmp/node_modules.tar.gz
       - name: Generate GraphQL client
         run: npm run gen:graphql
 
@@ -56,8 +86,84 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
+  application-build:
+    name: application-build
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      BIOME_BASE_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+      API_URI: http://localhost:8080/graphql
+      APP_BASE_URL: http://localhost:3000
+      AUTH0_DOMAIN: ci-example.auth0.com
+      AUTH0_CLIENT_ID: ci-client-id
+      AUTH0_CLIENT_SECRET: ci-placeholder-client-secret
+      AUTH0_SECRET: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: package.json
+      - name: Restore dependencies
+        uses: actions/download-artifact@v4
+        with:
+          name: node-modules-${{ github.sha }}
+          path: /tmp
+      - name: Extract dependencies
+        run: tar -xzf /tmp/node_modules.tar.gz
+      - name: Generate GraphQL client
+        run: npm run gen:graphql
+
       - name: Build Next.js application
         run: npm run build
+
+      - name: Check client bundle for server secrets
+        shell: bash
+        run: |
+          for secret_name in AUTH0_SECRET AUTH0_CLIENT_SECRET; do
+            secret_value="${!secret_name}"
+            if grep -R -l -F -- "$secret_value" .next/static; then
+              echo "::error::$secret_name was found in the client bundle"
+              exit 1
+            fi
+          done
+  storybook:
+    name: storybook
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      BIOME_BASE_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+      API_URI: http://localhost:8080/graphql
+      APP_BASE_URL: http://localhost:3000
+      AUTH0_DOMAIN: ci-example.auth0.com
+      AUTH0_CLIENT_ID: ci-client-id
+      AUTH0_CLIENT_SECRET: ci-placeholder-client-secret
+      AUTH0_SECRET: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: package.json
+      - name: Restore dependencies
+        uses: actions/download-artifact@v4
+        with:
+          name: node-modules-${{ github.sha }}
+          path: /tmp
+      - name: Extract dependencies
+        run: tar -xzf /tmp/node_modules.tar.gz
+      - name: Generate GraphQL client
+        run: npm run gen:graphql
 
       - name: Build Storybook
         run: npm run build:storybook
@@ -76,13 +182,3 @@ jobs:
           path: e2e/vrt/report
           if-no-files-found: ignore
 
-      - name: Check client bundle for server secrets
-        shell: bash
-        run: |
-          for secret_name in AUTH0_SECRET AUTH0_CLIENT_SECRET; do
-            secret_value="${!secret_name}"
-            if grep -R -l -F -- "$secret_value" .next/static; then
-              echo "::error::$secret_name was found in the client bundle"
-              exit 1
-            fi
-          done
