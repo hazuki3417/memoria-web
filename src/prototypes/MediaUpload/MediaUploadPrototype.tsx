@@ -586,15 +586,9 @@ export function MediaUploadPrototype({
 }
 
 
-function UploadStatus({
-  file,
-  presentation,
-  StatusIcon,
-}: {
-  file: UploadFile
-  presentation: { label: string; color: string }
-  StatusIcon: typeof IconCheck
-}) {
+function UploadStatus({ file }: { file: UploadFile }) {
+  const presentation = statusPresentation[file.status]
+  const StatusIcon = presentation.icon
   const badge = (
     <Badge
       variant="light"
