@@ -22,7 +22,6 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconEdit,
-  IconPhoto,
   IconPlus,
   IconSearch,
   IconX,
