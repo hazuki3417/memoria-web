@@ -1,12 +1,17 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { ApplicationAccountMenu } from "./ApplicationAccountMenu"
-import { ApplicationContextSwitcher } from "./ApplicationContextSwitcher"
-import { ApplicationHeader } from "./ApplicationHeader"
-import { ApplicationNavigation, ApplicationNavigationTrigger, useApplicationNavigation } from "./ApplicationNavigation"
-import { ApplicationShell } from "./ApplicationShell"
-import type { ApplicationContextOption, ApplicationNavigationItem } from "./types"
+import {
+  ApplicationAccountMenu,
+  ApplicationContextSwitcher,
+  ApplicationHeader,
+  ApplicationNavigation,
+  ApplicationNavigationTrigger,
+  ApplicationShell,
+  type ApplicationContextOption,
+  type ApplicationNavigationItem,
+  useApplicationNavigation,
+} from "@/components/ApplicationShell"
 
 export function PrototypeApplicationShell({ children, currentContext, contexts, navigationItems, user = { displayName: "ユーザー" }, onSelectContext = () => undefined, onSelectNavigation = () => undefined, onCreateCommunity, onOpenSettings = () => undefined, onLogout = () => undefined }: {
   children: ReactNode
