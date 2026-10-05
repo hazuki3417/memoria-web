@@ -4,26 +4,20 @@ import {
   Badge,
   Box,
   Button,
-  Checkbox,
-  Divider,
   Group,
   Modal,
   Paper,
   Popover,
   Stack,
-  TagsInput,
   Text,
-  TextInput,
   ThemeIcon,
 } from "@mantine/core"
-import { useMediaQuery } from "@mantine/hooks"
 import {
   IconAlertCircle,
   IconCheck,
   IconClock,
   IconCloudUpload,
   IconHelpCircle,
-  IconPhoto,
   IconPhotoPlus,
   IconRefresh,
   IconTrash,
@@ -31,6 +25,11 @@ import {
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
+import {
+  MediaTagBulkEditor,
+  MediaTagEditorList,
+  MediaTagEditorRow,
+} from "@/components/MediaTagEditor"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 export type UploadScenario =
@@ -336,7 +335,6 @@ export function MediaUploadPrototype({
   scenario?: UploadScenario
   context?: "personal" | "community"
 }) {
-  const compact = useMediaQuery("(max-width: 48em)")
   const initialFiles =
     scenario === "empty"
       ? []
@@ -379,21 +377,6 @@ export function MediaUploadPrototype({
   const unknownCount = files.filter(
     (file) => file.status === "result-unknown",
   ).length
-  const allSelectableChecked =
-    selectableFiles.length > 0 &&
-    selectedFiles.length === selectableFiles.length
-
-  const toggleAll = () =>
-    setSelectedIds(
-      allSelectableChecked ? [] : selectableFiles.map((file) => file.id),
-    )
-  const toggleFile = (id: string, checked: boolean) =>
-    setSelectedIds((current) =>
-      checked
-        ? [...new Set([...current, id])]
-        : current.filter((item) => item !== id),
-    )
-
   const applyTagAction = (action: "add" | "remove" | "replace") => {
     const tag = bulkTag.trim()
     if (!tag || selectedIds.length === 0) return
@@ -410,11 +393,6 @@ export function MediaUploadPrototype({
       }),
     )
     setBulkTag("")
-  }
-
-  const removeFile = (id: string) => {
-    setFiles((current) => current.filter((file) => file.id !== id))
-    setSelectedIds((current) => current.filter((item) => item !== id))
   }
   const removeAll = () => {
     setFiles((current) =>
@@ -527,217 +505,98 @@ export function MediaUploadPrototype({
               )}
 
               <Stack gap="sm">
-                <Paper withBorder radius="md" p="sm">
-                  {compact ? (
-                    <Stack gap="sm">
-                      <Group justify="space-between" wrap="nowrap">
-                        <Group gap="sm" wrap="nowrap">
-                          <Checkbox
-                            checked={allSelectableChecked}
-                            indeterminate={
-                              selectedFiles.length > 0 && !allSelectableChecked
-                            }
-                            onChange={toggleAll}
-                            disabled={selectableFiles.length === 0}
-                            aria-label="アップロード可能なMediaをすべて選択"
-                          />
-                          <Text size="sm" fw={600}>
-                            {selectedFiles.length}件選択
-                          </Text>
-                        </Group>
+                <MediaTagBulkEditor
+                  selectedCount={selectedFiles.length}
+                  allSelected={
+                    selectableFiles.length > 0 &&
+                    selectedFiles.length === selectableFiles.length
+                  }
+                  indeterminate={
+                    selectedFiles.length > 0 &&
+                    selectedFiles.length !== selectableFiles.length
+                  }
+                  selectionDisabled={selectableFiles.length === 0}
+                  summaryItems={[
+                    { label: "Media登録済み", value: `${registeredCount}件` },
+                    { label: "画像処理中", value: `${processingCount}件` },
+                    { label: "完了", value: `${completedCount}件` },
+                  ]}
+                  value={bulkTag}
+                  placeholder={
+                    files.length === 0
+                      ? "追加するMediaの共通Tag"
+                      : "選択したMediaのTag"
+                  }
+                  actionDisabled={!bulkTag.trim() || selectedFiles.length === 0}
+                  selectAllLabel="アップロード可能なMediaをすべて選択"
+                  headerAction={
+                    <Button
+                      variant="subtle"
+                      color="gray"
+                      size="compact-sm"
+                      onClick={removeAll}
+                      disabled={
+                        !files.some((file) =>
+                          removableStatuses.includes(file.status),
+                        )
+                      }
+                      aria-label="すべて削除"
+                    >
+                      <IconTrash size={16} />
+                    </Button>
+                  }
+                  onToggleAll={() =>
+                    setSelectedIds(
+                      selectableFiles.length > 0 &&
+                        selectedFiles.length === selectableFiles.length
+                        ? []
+                        : selectableFiles.map((file) => file.id),
+                    )
+                  }
+                  onChange={setBulkTag}
+                  onAction={applyTagAction}
+                />
+                <MediaTagEditorList>
+                  {files.map((file) => (
+                    <MediaTagEditorRow
+                      key={file.id}
+                      label={file.name}
+                      detail={file.size}
+                      tags={file.tags}
+                      selected={selectedIds.includes(file.id)}
+                      selectable={selectableStatuses.includes(file.status)}
+                      tagEditable={selectableStatuses.includes(file.status)}
+                      supplementary={<UploadStatus file={file} />}
+                      action={
                         <Button
                           variant="subtle"
                           color="gray"
                           size="compact-sm"
-                          onClick={removeAll}
-                          disabled={
-                            !files.some((file) =>
-                              removableStatuses.includes(file.status),
+                          disabled={!removableStatuses.includes(file.status)}
+                          onClick={() => {
+                            setFiles((current) =>
+                              current.filter((item) => item.id !== file.id),
                             )
-                          }
-                          aria-label="すべて削除"
+                            setSelectedIds((current) =>
+                              current.filter((id) => id !== file.id),
+                            )
+                          }}
+                          aria-label={`${file.name}を削除`}
                         >
                           <IconTrash size={16} />
                         </Button>
-                      </Group>
-                      <Group gap="lg">
-                        <Stack gap={0}>
-                          <Text size="xs" c="dimmed">
-                            Media登録済み
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            画像処理中
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            完了
-                          </Text>
-                        </Stack>
-                        <Stack gap={0}>
-                          <Text size="xs" c="dimmed">
-                            {registeredCount}件
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {processingCount}件
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {completedCount}件
-                          </Text>
-                        </Stack>
-                      </Group>
-                      <TextInput
-                        value={bulkTag}
-                        onChange={(event) =>
-                          setBulkTag(event.currentTarget.value)
-                        }
-                        disabled={
-                          files.length > 0 && selectableFiles.length === 0
-                        }
-                        placeholder={
-                          files.length === 0
-                            ? "追加するMediaの共通Tag"
-                            : "選択したMediaのTag"
-                        }
-                      />
-                    </Stack>
-                  ) : (
-                    <Group align="center" wrap="nowrap" gap="md">
-                      <Checkbox
-                        checked={allSelectableChecked}
-                        indeterminate={
-                          selectedFiles.length > 0 && !allSelectableChecked
-                        }
-                        onChange={toggleAll}
-                        disabled={selectableFiles.length === 0}
-                        aria-label="アップロード可能なMediaをすべて選択"
-                      />
-                      <Box w={72} style={{ flex: "0 0 72px" }}>
-                        <Text size="sm" fw={600}>
-                          {selectedFiles.length}件選択
-                        </Text>
-                      </Box>
-                      <Divider orientation="vertical" />
-                      <Stack gap={0} style={{ flex: "0 0 22%", minWidth: 180 }}>
-                        <Group gap="xs" wrap="nowrap">
-                          <Text size="xs" c="dimmed" w={88}>
-                            Media登録済み
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {registeredCount}件
-                          </Text>
-                        </Group>
-                        <Group gap="xs" wrap="nowrap">
-                          <Text size="xs" c="dimmed" w={88}>
-                            画像処理中
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {processingCount}件
-                          </Text>
-                        </Group>
-                        <Group gap="xs" wrap="nowrap">
-                          <Text size="xs" c="dimmed" w={88}>
-                            完了
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {completedCount}件
-                          </Text>
-                        </Group>
-                      </Stack>
-                      <Divider orientation="vertical" />
-                      <TextInput
-                        style={{ flex: 1 }}
-                        value={bulkTag}
-                        onChange={(event) =>
-                          setBulkTag(event.currentTarget.value)
-                        }
-                        disabled={
-                          files.length > 0 && selectableFiles.length === 0
-                        }
-                        placeholder={
-                          files.length === 0
-                            ? "追加するMediaの共通Tag"
-                            : "選択したMediaのTag"
-                        }
-                      />
-                      <Box w={36} style={{ flex: "0 0 36px" }}>
-                        <Button
-                          variant="subtle"
-                          color="gray"
-                          size="compact-sm"
-                          onClick={removeAll}
-                          disabled={
-                            !files.some((file) =>
-                              removableStatuses.includes(file.status),
-                            )
-                          }
-                          aria-label="すべて削除"
-                        >
-                          <IconTrash size={16} />
-                        </Button>
-                      </Box>
-                    </Group>
-                  )}
-                </Paper>
-                <Group justify="center" gap="xs">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    disabled={
-                      files.length === 0 ||
-                      !bulkTag.trim() ||
-                      selectedFiles.length === 0
-                    }
-                    onClick={() => applyTagAction("add")}
-                  >
-                    追加
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    disabled={
-                      files.length === 0 ||
-                      !bulkTag.trim() ||
-                      selectedFiles.length === 0
-                    }
-                    onClick={() => applyTagAction("remove")}
-                  >
-                    除去
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    disabled={
-                      files.length === 0 ||
-                      !bulkTag.trim() ||
-                      selectedFiles.length === 0
-                    }
-                    onClick={() => applyTagAction("replace")}
-                  >
-                    置換
-                  </Button>
-                </Group>
-
-                {files.length > 0 && (
-                  <Paper withBorder radius="md" style={{ overflow: "hidden" }}>
-                    <Box>
-                      {files.map((file, index) => (
-                        <Box key={file.id}>
-                          {index > 0 && <Divider />}
-                          <FileRow
-                            file={file}
-                            compact={compact}
-                            selected={selectedIds.includes(file.id)}
-                            selectable={selectableStatuses.includes(
-                              file.status,
-                            )}
-                            onSelect={(checked) => toggleFile(file.id, checked)}
-                            onRemove={() => removeFile(file.id)}
-                            onTagsChange={(tags) => updateTags(file.id, tags)}
-                          />
-                        </Box>
-                      ))}
-                    </Box>
-                  </Paper>
-                )}
+                      }
+                      onSelect={(checked) =>
+                        setSelectedIds((current) =>
+                          checked
+                            ? [...new Set([...current, file.id])]
+                            : current.filter((id) => id !== file.id),
+                        )
+                      }
+                      onTagsChange={(tags) => updateTags(file.id, tags)}
+                    />
+                  ))}
+                </MediaTagEditorList>
               </Stack>
             </>
           }
@@ -798,206 +657,9 @@ export function MediaUploadPrototype({
   )
 }
 
-function FileRow({
-  file,
-  compact,
-  selected,
-  selectable,
-  onSelect,
-  onRemove,
-  onTagsChange,
-}: {
-  file: UploadFile
-  compact: boolean
-  selected: boolean
-  selectable: boolean
-  onSelect: (checked: boolean) => void
-  onRemove: () => void
-  onTagsChange: (tags: string[]) => void
-}) {
+function UploadStatus({ file }: { file: UploadFile }) {
   const presentation = statusPresentation[file.status]
   const StatusIcon = presentation.icon
-  const removable = removableStatuses.includes(file.status)
-  const tagEditable = ["ready", "upload-failed"].includes(file.status)
-
-  if (compact) {
-    return (
-      <Box p="sm">
-        <Group align="center" wrap="nowrap" h={72}>
-          <Checkbox
-            checked={selected}
-            disabled={!selectable}
-            onChange={(e) => onSelect(e.currentTarget.checked)}
-            aria-label={`${file.name}を選択`}
-          />
-          <Box
-            w={72}
-            h={72}
-            style={{
-              flex: "0 0 auto",
-              borderRadius: "var(--mantine-radius-sm)",
-              background: "var(--mantine-color-default-hover)",
-              display: "grid",
-              placeItems: "center",
-              overflow: "hidden",
-            }}
-          >
-            <IconPhoto size={22} stroke={1.4} />
-          </Box>
-          <Stack
-            gap={4}
-            justify="center"
-            h={72}
-            style={{ flex: "0 0 28%", minWidth: 0, overflow: "hidden" }}
-          >
-            <Box style={{ minWidth: 0 }}>
-              <Text size="sm" fw={600} truncate>
-                {file.name}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {file.size}
-              </Text>
-            </Box>
-            <StatusBadge
-              file={file}
-              presentation={presentation}
-              StatusIcon={StatusIcon}
-            />
-          </Stack>
-          <Box h={72} style={{ flex: 1, minWidth: 0 }}>
-            <TagsInput
-              value={file.tags}
-              onChange={onTagsChange}
-              disabled={!tagEditable}
-              size="xs"
-              placeholder="Tagを追加"
-              styles={{
-                root: { height: "100%" },
-                wrapper: { height: "100%" },
-                input: {
-                  minHeight: "72px",
-                  height: "72px",
-                  alignContent: "flex-start",
-                  paddingTop: "8px",
-                  paddingBottom: "8px",
-                },
-              }}
-            />
-          </Box>
-          <Box w={28} style={{ flex: "0 0 28px" }}>
-            <Button
-              variant="subtle"
-              color="gray"
-              size="compact-sm"
-              disabled={!removable}
-              onClick={onRemove}
-              aria-label={`${file.name}を削除`}
-            >
-              <IconTrash size={16} />
-            </Button>
-          </Box>
-        </Group>
-      </Box>
-    )
-  }
-
-  return (
-    <Box p="sm">
-      <Group align="center" wrap="nowrap" gap="md" h={72}>
-        <Checkbox
-          checked={selected}
-          disabled={!selectable}
-          onChange={(e) => onSelect(e.currentTarget.checked)}
-          aria-label={`${file.name}を選択`}
-        />
-        <Group
-          align="center"
-          wrap="nowrap"
-          gap="sm"
-          h={72}
-          style={{ flex: "0 0 36%", minWidth: 0, overflow: "hidden" }}
-        >
-          <Box
-            w={72}
-            h={72}
-            style={{
-              flex: "0 0 auto",
-              borderRadius: "var(--mantine-radius-sm)",
-              background: "var(--mantine-color-default-hover)",
-              display: "grid",
-              placeItems: "center",
-              overflow: "hidden",
-            }}
-          >
-            <IconPhoto size={28} stroke={1.4} />
-          </Box>
-          <Stack
-            gap={4}
-            justify="center"
-            h={72}
-            style={{ flex: 1, minWidth: 0, overflow: "hidden" }}
-          >
-            <Box style={{ minWidth: 0 }}>
-              <Text size="sm" fw={600} truncate>
-                {file.name}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {file.size}
-              </Text>
-            </Box>
-            <StatusBadge
-              file={file}
-              presentation={presentation}
-              StatusIcon={StatusIcon}
-            />
-          </Stack>
-        </Group>
-        <Box h={72} style={{ flex: "1 1 54%", minWidth: 420 }}>
-          <TagsInput
-            value={file.tags}
-            onChange={onTagsChange}
-            disabled={!tagEditable}
-            size="sm"
-            placeholder="Tagを追加"
-            styles={{
-              root: { height: "100%" },
-              wrapper: { height: "100%" },
-              input: {
-                minHeight: "72px",
-                height: "72px",
-                alignContent: "flex-start",
-                paddingTop: "8px",
-                paddingBottom: "8px",
-              },
-            }}
-          />
-        </Box>
-        <Box w={36} style={{ flex: "0 0 36px" }}>
-          <Button
-            variant="subtle"
-            color="gray"
-            size="compact-sm"
-            disabled={!removable}
-            onClick={onRemove}
-            aria-label={`${file.name}を削除`}
-          >
-            <IconTrash size={16} />
-          </Button>
-        </Box>
-      </Group>
-    </Box>
-  )
-}
-
-function StatusBadge({
-  file,
-  presentation,
-  StatusIcon,
-}: {
-  file: UploadFile
-  presentation: { label: string; color: string }
-  StatusIcon: typeof IconCheck
-}) {
   const badge = (
     <Badge
       variant="light"
