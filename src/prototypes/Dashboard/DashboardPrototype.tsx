@@ -2,7 +2,7 @@
 
 import { ActionIcon, Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title } from "@mantine/core"
 import { IconChevronLeft, IconChevronRight, IconPhoto } from "@tabler/icons-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
@@ -50,9 +50,9 @@ const media = [
 
 ]
 
-function MediaPage({ items, page, pageSize }: { items: typeof media; page: number; pageSize: number }) {
+function MediaPage({ items, page, pageSize, columns }: { items: typeof media; page: number; pageSize: number; columns: number }) {
   return (
-    <SimpleGrid cols={{ base: 2, sm: 8 }} spacing="xs" verticalSpacing="xs" w="100%" style={{ flex: "0 0 100%" }}>
+    <SimpleGrid cols={columns} spacing="xs" verticalSpacing="xs" w="100%" style={{ flex: "0 0 100%" }}>
       {items.map((item, index) => (
         <Box key={item.id} bdrs="md" style={{ aspectRatio: "1 / 1", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)", background: "var(--mantine-color-default-hover)" }}>
           <Image src={item.src} alt={`最近のMedia ${page * pageSize + index + 1}`} w="100%" h="100%" fit="cover" draggable={false} />
@@ -67,12 +67,42 @@ function RecentMediaCarousel() {
   const [fromPage, setFromPage] = useState<number | null>(null)
   const [direction, setDirection] = useState<"previous" | "next">("next")
   const [sliding, setSliding] = useState(false)
-  const pageSize = 8
+  const [pageSize, setPageSize] = useState(8)
+  const containerRef = useRef<HTMLDivElement>(null)
   const pageCount = Math.ceil(media.length / pageSize)
   const itemsFor = (targetPage: number) =>
     media.slice(targetPage * pageSize, targetPage * pageSize + pageSize)
   const hasPrevious = page > 0
   const hasNext = page < pageCount - 1
+
+  useEffect(() => {
+    const element = containerRef.current
+    if (!element) return
+
+    const updatePageSize = (width: number) => {
+      const gap = 8
+      const targetThumbnailWidth = 132
+      const nextPageSize = Math.max(
+        2,
+        Math.min(8, Math.floor((width + gap) / (targetThumbnailWidth + gap))),
+      )
+      setPageSize((current) => {
+        if (current === nextPageSize) return current
+        setPage(0)
+        setFromPage(null)
+        setSliding(false)
+        return nextPageSize
+      })
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (entry) updatePageSize(entry.contentRect.width)
+    })
+    observer.observe(element)
+    updatePageSize(element.getBoundingClientRect().width)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (!sliding) return
@@ -94,7 +124,7 @@ function RecentMediaCarousel() {
   const oldPage = fromPage ?? page
 
   return (
-    <Box pos="relative" style={{ overflow: "hidden" }}>
+    <Box ref={containerRef} pos="relative" style={{ overflow: "hidden" }}>
       <style>{`
         .dashboard-carousel-track { display: flex; width: 200%; }
         .dashboard-carousel-track.next { transform: translateX(0); }
@@ -108,20 +138,20 @@ function RecentMediaCarousel() {
       `}</style>
 
       {fromPage === null ? (
-        <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
+        <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} columns={pageSize} />
       ) : (
         <Box
           className={`dashboard-carousel-track ${direction} ${sliding ? "sliding" : ""}`}
         >
           {direction === "next" ? (
             <>
-              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} />
-              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
+              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} columns={pageSize} />
+              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} columns={pageSize} />
             </>
           ) : (
             <>
-              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
-              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} />
+              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} columns={pageSize} />
+              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} columns={pageSize} />
             </>
           )}
         </Box>
