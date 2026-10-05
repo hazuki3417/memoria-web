@@ -59,26 +59,55 @@ const recentGroups = [
   { name: "記録", media: [] },
 ]
 
-function GroupPreview({ sources }: { sources: string[] }) {
+function GroupPreview({ sources, name }: { sources: string[]; name: string }) {
   return (
-    <SimpleGrid cols={2} spacing={3} w={88} h={88} style={{ flex: "0 0 auto" }}>
-      {Array.from({ length: 4 }, (_, index) => {
-        const src = sources[index]
-        return (
-          <Box
-            key={index}
-            bdrs="xs"
-            style={{
-              overflow: "hidden",
-              background: "var(--mantine-color-default-hover)",
-              border: "1px solid var(--mantine-color-default-border)",
-            }}
-          >
-            {src ? <Image src={src} alt="" w="100%" h="100%" fit="cover" /> : <Center h="100%"><IconPhoto size={16} stroke={1.4} /></Center>}
-          </Box>
-        )
-      })}
-    </SimpleGrid>
+    <Box pos="relative">
+      <SimpleGrid cols={2} spacing={4}>
+        {Array.from({ length: 4 }, (_, index) => {
+          const src = sources[index]
+          return (
+            <Box
+              key={index}
+              bdrs="sm"
+              style={{
+                position: "relative",
+                aspectRatio: "1 / 1",
+                overflow: "hidden",
+                border: src ? "1px solid var(--mantine-color-default-border)" : undefined,
+                background: "var(--mantine-color-default-hover)",
+              }}
+            >
+              {src ? (
+                <Image src={src} alt="" w="100%" h="100%" fit="cover" />
+              ) : (
+                <Center h="100%"><IconPhoto size={24} stroke={1.4} /></Center>
+              )}
+            </Box>
+          )
+        })}
+      </SimpleGrid>
+      <Text
+        pos="absolute"
+        top="sm"
+        left="sm"
+        c="white"
+        fw={700}
+        size="sm"
+        maw="calc(100% - 32px)"
+        truncate="end"
+        title={name}
+        px={8}
+        py={4}
+        bdrs="sm"
+        style={{
+          zIndex: 1,
+          background: "rgba(0, 0, 0, 0.58)",
+          backdropFilter: "blur(2px)",
+        }}
+      >
+        {name}
+      </Text>
+    </Box>
   )
 }
 
@@ -86,17 +115,9 @@ function RecentGroups() {
   return (
     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
       {recentGroups.map((group) => (
-        <Group
-          key={group.name}
-          wrap="nowrap"
-          gap="md"
-          p="sm"
-          bdrs="md"
-          style={{ border: "1px solid var(--mantine-color-default-border)" }}
-        >
-          <GroupPreview sources={group.media} />
-          <Text fw={650} lineClamp={2}>{group.name}</Text>
-        </Group>
+        <Box key={group.name}>
+          <GroupPreview sources={group.media} name={group.name} />
+        </Box>
       ))}
     </SimpleGrid>
   )
