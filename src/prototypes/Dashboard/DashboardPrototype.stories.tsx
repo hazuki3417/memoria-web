@@ -26,3 +26,24 @@ export const Medium: Story = {
   args: { initialContext: "personal", initialState: "default" },
   parameters: { viewport: { defaultViewport: "tablet" } },
 }
+
+export const MiddlePage: Story = {
+  args: { initialContext: "personal", initialState: "default" },
+  play: async ({ canvasElement }) => {
+    canvasElement
+      .querySelector<HTMLButtonElement>('button[aria-label="次のMediaへ"]')
+      ?.click()
+  },
+}
+
+export const LastPage: Story = {
+  args: { initialContext: "personal", initialState: "default" },
+  play: async ({ canvasElement }) => {
+    const next = () =>
+      canvasElement.querySelector<HTMLButtonElement>(
+        'button[aria-label="次のMediaへ"]',
+      )
+    next()?.click()
+    next()?.click()
+  },
+}
