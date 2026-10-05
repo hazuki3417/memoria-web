@@ -52,10 +52,10 @@ const media = [
 
 const recentGroups = [
   { name: "旅行", media: ["/group-browser/group-media-01.jpg", "/group-browser/group-media-02.jpg", "/group-browser/group-media-03.jpg", "/group-browser/group-media-04.jpg"], nestedGroups: 0 },
-  { name: "家族", media: ["/media-browser/h-01.png", "/media-browser/w-01.png", "/group-browser/group-media-05.jpg"], nestedGroups: 1 },
-  { name: "風景", media: ["/media-browser/h-02.png", "/media-browser/w-02.png"], nestedGroups: 2 },
-  { name: "イベント", media: ["/group-browser/group-media-06.jpg", "/group-browser/group-media-07.jpg", "/group-browser/group-media-08.jpg", "/media-browser/h-01.png"], nestedGroups: 0 },
-  { name: "お気に入り", media: ["/media-browser/w-01.png"], nestedGroups: 3 },
+  { name: "家族", media: ["/media-browser/h-01.png", "/media-browser/w-01.png", "/group-browser/group-media-05.jpg"], nestedGroups: 0 },
+  { name: "風景", media: ["/media-browser/h-02.png", "/media-browser/w-02.png"], nestedGroups: 0 },
+  { name: "お気に入り", media: ["/media-browser/w-01.png"], nestedGroups: 0 },
+  { name: "イベント", media: ["/group-browser/group-media-06.jpg", "/group-browser/group-media-07.jpg"], nestedGroups: 2 },
   { name: "記録", media: [], nestedGroups: 4 },
 ]
 
