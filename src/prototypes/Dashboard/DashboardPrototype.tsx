@@ -1,7 +1,7 @@
 "use client"
 
 import { ActionIcon, Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title } from "@mantine/core"
-import { IconChevronLeft, IconChevronRight, IconPhoto } from "@tabler/icons-react"
+import { IconChevronLeft, IconChevronRight, IconFolder, IconPhoto } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -306,8 +306,8 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
             {initialState === "default" && <Button variant="subtle" size="compact-sm">すべて見る</Button>}
           </Group>
           {initialState === "default" ? <RecentMediaCarousel /> : (
-            <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
-              <Stack align="center" gap="sm">
+            <Center mih={176} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
+              <Stack align="center" gap="sm" py="md">
                 <IconPhoto size={36} stroke={1.4} color="var(--mantine-color-dimmed)" aria-hidden="true" />
                 <Text fw={650}>メディアはまだありません</Text>
                 <Button variant="default">メディアへ移動</Button>
@@ -323,8 +323,9 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
           {initialState === "default" ? (
             <RecentGroups />
           ) : (
-            <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
-              <Stack align="center" gap="sm">
+            <Center mih={176} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
+              <Stack align="center" gap="sm" py="md">
+                <IconFolder size={36} stroke={1.4} color="var(--mantine-color-dimmed)" aria-hidden="true" />
                 <Text fw={650}>Groupはまだありません</Text>
                 <Button variant="default">Groupへ移動</Button>
               </Stack>
