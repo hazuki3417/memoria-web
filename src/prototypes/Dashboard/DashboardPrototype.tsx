@@ -52,7 +52,7 @@ const media = [
 
 function MediaPage({ items, page, pageSize, columns }: { items: typeof media; page: number; pageSize: number; columns: number }) {
   return (
-    <SimpleGrid cols={columns} spacing="xs" verticalSpacing="xs" w="100%" style={{ flex: "0 0 100%" }}>
+    <SimpleGrid cols={columns} spacing="xs" verticalSpacing="xs" w="100%" style={{ flex: "0 0 50%", width: "50%" }}>
       {items.map((item, index) => (
         <Box key={item.id} bdrs="md" style={{ aspectRatio: "1 / 1", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)", background: "var(--mantine-color-default-hover)" }}>
           <Image src={item.src} alt={`最近のMedia ${page * pageSize + index + 1}`} w="100%" h="100%" fit="cover" draggable={false} />
@@ -126,7 +126,11 @@ function RecentMediaCarousel() {
   return (
     <Box ref={containerRef} pos="relative" style={{ overflow: "hidden" }}>
       <style>{`
-        .dashboard-carousel-track { display: flex; width: 200%; }
+        .dashboard-carousel-track {
+          display: flex;
+          width: 200%;
+          will-change: transform;
+        }
         .dashboard-carousel-track.next { transform: translateX(0); }
         .dashboard-carousel-track.next.sliding { transform: translateX(-50%); }
         .dashboard-carousel-track.previous { transform: translateX(-50%); }
