@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import { waitFor } from "storybook/test"
 import { DashboardPrototype } from "./DashboardPrototype"
 
 const meta = {
@@ -51,7 +52,16 @@ export const LastPage: Story = {
       canvasElement.querySelector<HTMLButtonElement>(
         'button[aria-label="次のMediaへ"]',
       )
-    next()?.click()
-    next()?.click()
+
+    while (next()) {
+      const button = next()
+      if (!button) break
+      button.click()
+      await waitFor(() => {
+        if (button.isConnected && button.disabled) {
+          throw new Error("Carousel is still sliding")
+        }
+      })
+    }
   },
 }
