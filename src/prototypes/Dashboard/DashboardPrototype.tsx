@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title } from "@mantine/core"
+import { ActionIcon, Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title, Transition } from "@mantine/core"
 import { IconChevronLeft, IconChevronRight, IconPhoto } from "@tabler/icons-react"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
@@ -52,6 +52,7 @@ const media = [
 
 function RecentMediaCarousel() {
   const [page, setPage] = useState(0)
+  const [direction, setDirection] = useState<"previous" | "next">("next")
   const pageSize = 8
   const pageCount = Math.ceil(media.length / pageSize)
   const items = media.slice(page * pageSize, page * pageSize + pageSize)
@@ -60,29 +61,81 @@ function RecentMediaCarousel() {
 
   return (
     <Box pos="relative">
-      <SimpleGrid cols={{ base: 2, sm: 8 }} spacing="xs" verticalSpacing="xs">
-        {items.map((item, index) => (
-          <Box
-            key={item.id}
-            bdrs="md"
+      <style>{`
+        @keyframes dashboard-page-next {
+          from { opacity: 0; transform: translateX(24px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes dashboard-page-previous {
+          from { opacity: 0; transform: translateX(-24px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="dashboard-page-"] {
+            animation: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
+      <Transition
+        key={page}
+        mounted
+        transition={{
+          in: {
+            opacity: 1,
+            transform: "translateX(0)",
+          },
+          out: {
+            opacity: 0,
+            transform:
+              direction === "next"
+                ? "translateX(-24px)"
+                : "translateX(24px)",
+          },
+          common: {
+            transition: "opacity 180ms ease, transform 180ms ease",
+          },
+          transitionProperty: "opacity, transform",
+        }}
+        duration={180}
+      >
+        {(styles) => (
+          <SimpleGrid
+            cols={{ base: 2, sm: 8 }}
+            spacing="xs"
+            verticalSpacing="xs"
             style={{
-              aspectRatio: "1 / 1",
-              overflow: "hidden",
-              border: "1px solid var(--mantine-color-default-border)",
-              background: "var(--mantine-color-default-hover)",
+              ...styles,
+              animation:
+                direction === "next"
+                  ? "dashboard-page-next 180ms ease"
+                  : "dashboard-page-previous 180ms ease",
             }}
           >
-            <Image
-              src={item.src}
-              alt={`最近のMedia ${page * pageSize + index + 1}`}
-              w="100%"
-              h="100%"
-              fit="cover"
-              draggable={false}
-            />
-          </Box>
-        ))}
-      </SimpleGrid>
+            {items.map((item, index) => (
+              <Box
+                key={item.id}
+                bdrs="md"
+                style={{
+                  aspectRatio: "1 / 1",
+                  overflow: "hidden",
+                  border: "1px solid var(--mantine-color-default-border)",
+                  background: "var(--mantine-color-default-hover)",
+                }}
+              >
+                <Image
+                  src={item.src}
+                  alt={`最近のMedia ${page * pageSize + index + 1}`}
+                  w="100%"
+                  h="100%"
+                  fit="cover"
+                  draggable={false}
+                />
+              </Box>
+            ))}
+          </SimpleGrid>
+        )}
+      </Transition>
 
       {hasPrevious && (
         <>
@@ -113,7 +166,10 @@ function RecentMediaCarousel() {
               transform: "translateY(-50%)",
               zIndex: 2,
             }}
-            onClick={() => setPage((current) => Math.max(0, current - 1))}
+            onClick={() => {
+              setDirection("previous")
+              setPage((current) => Math.max(0, current - 1))
+            }}
           >
             <IconChevronLeft size={22} />
           </ActionIcon>
@@ -149,9 +205,10 @@ function RecentMediaCarousel() {
               transform: "translateY(-50%)",
               zIndex: 2,
             }}
-            onClick={() =>
+            onClick={() => {
+              setDirection("next")
               setPage((current) => Math.min(pageCount - 1, current + 1))
-            }
+            }}
           >
             <IconChevronRight size={22} />
           </ActionIcon>
