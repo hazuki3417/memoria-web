@@ -95,13 +95,13 @@ function NestedGroupVisual({ startIndex }: { startIndex: number }) {
 function GroupPreview({ sources, nestedGroups }: { sources: string[]; nestedGroups: number }) {
   return (
     <SimpleGrid cols={2} spacing={4}>
-      {Array.from({ length: 4 }, (_, index) => {
+      {(["top-left", "top-right", "bottom-left", "bottom-right"] as const).map((slot, index) => {
         const src = sources[index]
         const nestedIndex = index - sources.length
         const nested = !src && nestedIndex >= 0 && nestedIndex < nestedGroups
         return (
           <Box
-            key={index}
+            key={slot}
             bdrs="sm"
             style={{
               position: "relative",
