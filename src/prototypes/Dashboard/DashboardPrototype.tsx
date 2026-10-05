@@ -490,14 +490,6 @@ export function DashboardPrototype({
       onLogout={() => undefined}
     >
       <Stack gap="xl" maw={1280} mx="auto" w="100%">
-        <Box>
-          <Title order={2} size="h3">
-            {contextKind === "personal" ? "Personal" : currentContext.label}
-          </Title>
-          <Text size="sm" c="dimmed" mt={4}>
-            最近のMediaを確認して、現在のContextの主要な機能へ移動できます。
-          </Text>
-        </Box>
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="nowrap">
             <Title order={3} size="h4">
