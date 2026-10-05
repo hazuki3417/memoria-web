@@ -50,6 +50,58 @@ const media = [
 
 ]
 
+const recentGroups = [
+  { name: "旅行", media: ["/group-browser/group-media-01.jpg", "/group-browser/group-media-02.jpg", "/group-browser/group-media-03.jpg", "/group-browser/group-media-04.jpg"] },
+  { name: "家族", media: ["/media-browser/h-01.png", "/media-browser/w-01.png", "/group-browser/group-media-05.jpg"] },
+  { name: "風景", media: ["/media-browser/h-02.png", "/media-browser/w-02.png"] },
+  { name: "イベント", media: ["/group-browser/group-media-06.jpg", "/group-browser/group-media-07.jpg", "/group-browser/group-media-08.jpg", "/media-browser/h-01.png"] },
+  { name: "お気に入り", media: ["/media-browser/w-01.png"] },
+  { name: "記録", media: [] },
+]
+
+function GroupPreview({ sources }: { sources: string[] }) {
+  return (
+    <SimpleGrid cols={2} spacing={3} w={88} h={88} style={{ flex: "0 0 auto" }}>
+      {Array.from({ length: 4 }, (_, index) => {
+        const src = sources[index]
+        return (
+          <Box
+            key={index}
+            bdrs="xs"
+            style={{
+              overflow: "hidden",
+              background: "var(--mantine-color-default-hover)",
+              border: "1px solid var(--mantine-color-default-border)",
+            }}
+          >
+            {src ? <Image src={src} alt="" w="100%" h="100%" fit="cover" /> : <Center h="100%"><IconPhoto size={16} stroke={1.4} /></Center>}
+          </Box>
+        )
+      })}
+    </SimpleGrid>
+  )
+}
+
+function RecentGroups() {
+  return (
+    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+      {recentGroups.map((group) => (
+        <Group
+          key={group.name}
+          wrap="nowrap"
+          gap="md"
+          p="sm"
+          bdrs="md"
+          style={{ border: "1px solid var(--mantine-color-default-border)" }}
+        >
+          <GroupPreview sources={group.media} />
+          <Text fw={650} lineClamp={2}>{group.name}</Text>
+        </Group>
+      ))}
+    </SimpleGrid>
+  )
+}
+
 function MediaPage({ items, page, pageSize, columns }: { items: typeof media; page: number; pageSize: number; columns: number }) {
   return (
     <SimpleGrid cols={columns} spacing="xs" verticalSpacing="xs" w="100%" style={{ flex: "0 0 50%", width: "50%" }}>
@@ -219,6 +271,15 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
             </Center>
           )}
         </Stack>
+        {initialState === "default" && (
+          <Stack gap="sm">
+            <Group justify="space-between" align="center" wrap="nowrap">
+              <Title order={3} size="h4">最近のGroup</Title>
+              <Button variant="subtle" size="compact-sm">すべて見る</Button>
+            </Group>
+            <RecentGroups />
+          </Stack>
+        )}
       </Stack>
     </PrototypeApplicationShell>
   )
