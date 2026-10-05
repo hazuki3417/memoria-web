@@ -25,7 +25,7 @@ const media = [
 
 function RecentMediaCarousel() {
   const [page, setPage] = useState(0)
-  const pageSize = 4
+  const pageSize = 6
   const pageCount = Math.ceil(media.length / pageSize)
   const items = media.slice(page * pageSize, page * pageSize + pageSize)
   const hasPrevious = page > 0
@@ -33,7 +33,7 @@ function RecentMediaCarousel() {
 
   return (
     <Box pos="relative">
-      <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs" verticalSpacing="xs">
+      <SimpleGrid cols={{ base: 2, sm: 6 }} spacing="xs" verticalSpacing="xs">
         {items.map((src, index) => (
           <Box
             key={src}
@@ -79,9 +79,13 @@ function RecentMediaCarousel() {
             radius="xl"
             size="lg"
             pos="absolute"
-            left="sm"
-            top="50%"
-            style={{ transform: "translateY(-50%)" }}
+            style={{
+              position: "absolute",
+              left: "var(--mantine-spacing-sm)",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+            }}
             onClick={() => setPage((current) => Math.max(0, current - 1))}
           >
             <IconChevronLeft size={22} />
@@ -111,9 +115,13 @@ function RecentMediaCarousel() {
             radius="xl"
             size="lg"
             pos="absolute"
-            right="sm"
-            top="50%"
-            style={{ transform: "translateY(-50%)" }}
+            style={{
+              position: "absolute",
+              right: "var(--mantine-spacing-sm)",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+            }}
             onClick={() =>
               setPage((current) => Math.min(pageCount - 1, current + 1))
             }
