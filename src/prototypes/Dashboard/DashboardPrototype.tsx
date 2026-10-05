@@ -116,7 +116,7 @@ function GroupPreview({ sources, nestedGroups }: { sources: string[]; nestedGrou
             ) : nested ? (
               <NestedGroupVisual startIndex={nestedIndex * 3} />
             ) : (
-              <Center h="100%"><IconPhoto size={24} stroke={1.4} /></Center>
+              <Center h="100%"><IconPhoto size={20} stroke={1.5} /></Center>
             )}
           </Box>
         )
@@ -307,12 +307,12 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
           </Group>
           {initialState === "default" ? <RecentMediaCarousel /> : (
             <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
-              <Stack align="center" gap="sm">
-                <Group gap="xs">
-                  <IconPhoto size={24} stroke={1.4} color="var(--mantine-color-dimmed)" aria-hidden="true" />
-                  <Text fw={650}>メディアはまだありません</Text>
+              <Stack align="center" gap={8}>
+                <Group gap={6}>
+                  <IconPhoto size={20} stroke={1.5} color="var(--mantine-color-dimmed)" aria-hidden="true" />
+                  <Text size="sm" c="dimmed" fw={500}>メディアはまだありません</Text>
                 </Group>
-                <Button variant="default">メディアへ移動</Button>
+                <Button variant="subtle" size="compact-sm">メディアへ移動</Button>
               </Stack>
             </Center>
           )}
@@ -326,12 +326,12 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
             <RecentGroups />
           ) : (
             <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
-              <Stack align="center" gap="sm">
-                <Group gap="xs">
-                  <IconFolder size={24} stroke={1.4} color="var(--mantine-color-dimmed)" aria-hidden="true" />
-                  <Text fw={650}>Groupはまだありません</Text>
+              <Stack align="center" gap={8}>
+                <Group gap={6}>
+                  <IconFolder size={20} stroke={1.5} color="var(--mantine-color-dimmed)" aria-hidden="true" />
+                  <Text size="sm" c="dimmed" fw={500}>Groupはまだありません</Text>
                 </Group>
-                <Button variant="default">Groupへ移動</Button>
+                <Button variant="subtle" size="compact-sm">Groupへ移動</Button>
               </Stack>
             </Center>
           )}
