@@ -306,7 +306,7 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
             {initialState === "default" && <Button variant="subtle" size="compact-sm">すべて見る</Button>}
           </Group>
           {initialState === "default" ? <RecentMediaCarousel /> : (
-            <Center mih={280} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
+            <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
               <Stack align="center" gap="sm">
                 <IconPhoto size={36} stroke={1.4} color="var(--mantine-color-dimmed)" aria-hidden="true" />
                 <Text fw={650}>メディアはまだありません</Text>
@@ -315,15 +315,22 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
             </Center>
           )}
         </Stack>
-        {initialState === "default" && (
-          <Stack gap="sm">
-            <Group justify="space-between" align="center" wrap="nowrap">
-              <Title order={3} size="h4">最近のGroup</Title>
-              <Button variant="subtle" size="compact-sm">すべて見る</Button>
-            </Group>
+        <Stack gap="sm">
+          <Group justify="space-between" align="center" wrap="nowrap">
+            <Title order={3} size="h4">最近のGroup</Title>
+            {initialState === "default" && <Button variant="subtle" size="compact-sm">すべて見る</Button>}
+          </Group>
+          {initialState === "default" ? (
             <RecentGroups />
-          </Stack>
-        )}
+          ) : (
+            <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
+              <Stack align="center" gap="sm">
+                <Text fw={650}>Groupはまだありません</Text>
+                <Button variant="default">Groupへ移動</Button>
+              </Stack>
+            </Center>
+          )}
+        </Stack>
       </Stack>
     </PrototypeApplicationShell>
   )
