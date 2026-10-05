@@ -15,17 +15,44 @@ const contexts = [
 ]
 
 const media = [
-  "/media-browser/h-01.png", "/media-browser/w-01.png",
-  "/group-browser/group-media-01.jpg", "/group-browser/group-media-02.jpg",
-  "/media-browser/h-02.png", "/group-browser/group-media-03.jpg",
-  "/group-browser/group-media-04.jpg", "/media-browser/w-02.png",
-  "/group-browser/group-media-05.jpg", "/group-browser/group-media-06.jpg",
-  "/group-browser/group-media-07.jpg", "/group-browser/group-media-08.jpg",
+  { src: "/media-browser/h-01.png", id: 1 },
+  { src: "/media-browser/w-01.png", id: 2 },
+  { src: "/group-browser/group-media-01.jpg", id: 3 },
+  { src: "/group-browser/group-media-02.jpg", id: 4 },
+  { src: "/media-browser/h-02.png", id: 5 },
+  { src: "/group-browser/group-media-03.jpg", id: 6 },
+  { src: "/group-browser/group-media-04.jpg", id: 7 },
+  { src: "/media-browser/w-02.png", id: 8 },
+  { src: "/group-browser/group-media-05.jpg", id: 9 },
+  { src: "/group-browser/group-media-06.jpg", id: 10 },
+  { src: "/group-browser/group-media-07.jpg", id: 11 },
+  { src: "/group-browser/group-media-08.jpg", id: 12 },
+  { src: "/media-browser/h-01.png", id: 13 },
+  { src: "/media-browser/w-01.png", id: 14 },
+  { src: "/group-browser/group-media-01.jpg", id: 15 },
+  { src: "/group-browser/group-media-02.jpg", id: 16 },
+  { src: "/media-browser/h-02.png", id: 17 },
+  { src: "/group-browser/group-media-03.jpg", id: 18 },
+  { src: "/group-browser/group-media-04.jpg", id: 19 },
+  { src: "/media-browser/w-02.png", id: 20 },
+  { src: "/group-browser/group-media-05.jpg", id: 21 },
+  { src: "/group-browser/group-media-06.jpg", id: 22 },
+  { src: "/group-browser/group-media-07.jpg", id: 23 },
+  { src: "/group-browser/group-media-08.jpg", id: 24 },
+  { src: "/media-browser/h-01.png", id: 25 },
+  { src: "/media-browser/w-01.png", id: 26 },
+  { src: "/group-browser/group-media-01.jpg", id: 27 },
+  { src: "/group-browser/group-media-02.jpg", id: 28 },
+  { src: "/media-browser/h-02.png", id: 29 },
+  { src: "/group-browser/group-media-03.jpg", id: 30 },
+  { src: "/group-browser/group-media-04.jpg", id: 31 },
+  { src: "/media-browser/w-02.png", id: 32 },
+
 ]
 
 function RecentMediaCarousel() {
   const [page, setPage] = useState(0)
-  const pageSize = 6
+  const pageSize = 8
   const pageCount = Math.ceil(media.length / pageSize)
   const items = media.slice(page * pageSize, page * pageSize + pageSize)
   const hasPrevious = page > 0
@@ -33,10 +60,10 @@ function RecentMediaCarousel() {
 
   return (
     <Box pos="relative">
-      <SimpleGrid cols={{ base: 2, sm: 6 }} spacing="xs" verticalSpacing="xs">
-        {items.map((src, index) => (
+      <SimpleGrid cols={{ base: 2, sm: 8 }} spacing="xs" verticalSpacing="xs">
+        {items.map((item, index) => (
           <Box
-            key={src}
+            key={item.id}
             bdrs="md"
             style={{
               aspectRatio: "1 / 1",
@@ -46,7 +73,7 @@ function RecentMediaCarousel() {
             }}
           >
             <Image
-              src={src}
+              src={item.src}
               alt={`最近のMedia ${page * pageSize + index + 1}`}
               w="100%"
               h="100%"
