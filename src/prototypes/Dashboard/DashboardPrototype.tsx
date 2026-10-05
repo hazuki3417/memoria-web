@@ -92,7 +92,13 @@ function RecentGroups() {
   return (
     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
       {recentGroups.map((group) => (
-        <Stack key={group.name} gap={6}>
+        <Stack
+          key={group.name}
+          gap={8}
+          p="xs"
+          bdrs="md"
+          bg="var(--mantine-color-default-hover)"
+        >
           <Text fw={600} size="sm" truncate="end" title={group.name}>
             {group.name}
           </Text>
