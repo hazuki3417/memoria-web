@@ -1,7 +1,23 @@
 "use client"
 
-import { ActionIcon, Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title } from "@mantine/core"
-import { IconChevronLeft, IconChevronRight, IconFolder, IconPhoto } from "@tabler/icons-react"
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Center,
+  Group,
+  Image,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core"
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconFolder,
+  IconPhoto,
+} from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -10,8 +26,18 @@ type ContextKind = "personal" | "community"
 type DashboardState = "default" | "empty"
 
 const contexts = [
-  { id: "personal", kind: "personal" as const, label: "Personal", accentColor: "var(--mantine-color-blue-6)" },
-  { id: "community", kind: "community" as const, label: "家族のアルバム", accentColor: "var(--mantine-color-teal-6)" },
+  {
+    id: "personal",
+    kind: "personal" as const,
+    label: "Personal",
+    accentColor: "var(--mantine-color-blue-6)",
+  },
+  {
+    id: "community",
+    kind: "community" as const,
+    label: "家族のアルバム",
+    accentColor: "var(--mantine-color-teal-6)",
+  },
 ]
 
 const media = [
@@ -47,22 +73,50 @@ const media = [
   { src: "/group-browser/group-media-03.jpg", id: 30 },
   { src: "/group-browser/group-media-04.jpg", id: 31 },
   { src: "/media-browser/w-02.png", id: 32 },
-
 ]
 
 const recentGroups = [
-  { name: "旅行", media: ["/group-browser/group-media-01.jpg", "/group-browser/group-media-02.jpg", "/group-browser/group-media-03.jpg", "/group-browser/group-media-04.jpg"], nestedGroups: 0 },
-  { name: "家族", media: ["/media-browser/h-01.png", "/media-browser/w-01.png", "/group-browser/group-media-05.jpg"], nestedGroups: 0 },
-  { name: "風景", media: ["/media-browser/h-02.png", "/media-browser/w-02.png"], nestedGroups: 0 },
+  {
+    name: "旅行",
+    media: [
+      "/group-browser/group-media-01.jpg",
+      "/group-browser/group-media-02.jpg",
+      "/group-browser/group-media-03.jpg",
+      "/group-browser/group-media-04.jpg",
+    ],
+    nestedGroups: 0,
+  },
+  {
+    name: "家族",
+    media: [
+      "/media-browser/h-01.png",
+      "/media-browser/w-01.png",
+      "/group-browser/group-media-05.jpg",
+    ],
+    nestedGroups: 0,
+  },
+  {
+    name: "風景",
+    media: ["/media-browser/h-02.png", "/media-browser/w-02.png"],
+    nestedGroups: 0,
+  },
   { name: "お気に入り", media: ["/media-browser/w-01.png"], nestedGroups: 0 },
-  { name: "イベント", media: ["/group-browser/group-media-06.jpg", "/group-browser/group-media-07.jpg"], nestedGroups: 2 },
+  {
+    name: "イベント",
+    media: [
+      "/group-browser/group-media-06.jpg",
+      "/group-browser/group-media-07.jpg",
+    ],
+    nestedGroups: 2,
+  },
   { name: "記録", media: [], nestedGroups: 4 },
 ]
 
 function NestedGroupVisual({ startIndex }: { startIndex: number }) {
   const sources = Array.from(
     { length: 3 },
-    (_, index) => `/group-browser/group-media-${String(((startIndex + index) % 8) + 1).padStart(2, "0")}.jpg`,
+    (_, index) =>
+      `/group-browser/group-media-${String(((startIndex + index) % 8) + 1).padStart(2, "0")}.jpg`,
   )
   return (
     <Box
@@ -92,35 +146,47 @@ function NestedGroupVisual({ startIndex }: { startIndex: number }) {
   )
 }
 
-function GroupPreview({ sources, nestedGroups }: { sources: string[]; nestedGroups: number }) {
+function GroupPreview({
+  sources,
+  nestedGroups,
+}: {
+  sources: string[]
+  nestedGroups: number
+}) {
   return (
     <SimpleGrid cols={2} spacing={4}>
-      {(["top-left", "top-right", "bottom-left", "bottom-right"] as const).map((slot, index) => {
-        const src = sources[index]
-        const nestedIndex = index - sources.length
-        const nested = !src && nestedIndex >= 0 && nestedIndex < nestedGroups
-        return (
-          <Box
-            key={slot}
-            bdrs="sm"
-            style={{
-              position: "relative",
-              aspectRatio: "1 / 1",
-              overflow: "hidden",
-              border: src ? "1px solid var(--mantine-color-default-border)" : undefined,
-              background: "var(--mantine-color-default-hover)",
-            }}
-          >
-            {src ? (
-              <Image src={src} alt="" w="100%" h="100%" fit="cover" />
-            ) : nested ? (
-              <NestedGroupVisual startIndex={nestedIndex * 3} />
-            ) : (
-              <Center h="100%"><IconPhoto size={20} stroke={1.5} /></Center>
-            )}
-          </Box>
-        )
-      })}
+      {(["top-left", "top-right", "bottom-left", "bottom-right"] as const).map(
+        (slot, index) => {
+          const src = sources[index]
+          const nestedIndex = index - sources.length
+          const nested = !src && nestedIndex >= 0 && nestedIndex < nestedGroups
+          return (
+            <Box
+              key={slot}
+              bdrs="sm"
+              style={{
+                position: "relative",
+                aspectRatio: "1 / 1",
+                overflow: "hidden",
+                border: src
+                  ? "1px solid var(--mantine-color-default-border)"
+                  : undefined,
+                background: "var(--mantine-color-default-hover)",
+              }}
+            >
+              {src ? (
+                <Image src={src} alt="" w="100%" h="100%" fit="cover" />
+              ) : nested ? (
+                <NestedGroupVisual startIndex={nestedIndex * 3} />
+              ) : (
+                <Center h="100%">
+                  <IconPhoto size={20} stroke={1.5} />
+                </Center>
+              )}
+            </Box>
+          )
+        },
+      )}
     </SimpleGrid>
   )
 }
@@ -139,19 +205,54 @@ function RecentGroups() {
           <Text fw={600} size="sm" truncate="end" title={group.name}>
             {group.name}
           </Text>
-          <GroupPreview sources={group.media} nestedGroups={group.nestedGroups} />
+          <GroupPreview
+            sources={group.media}
+            nestedGroups={group.nestedGroups}
+          />
         </Stack>
       ))}
     </SimpleGrid>
   )
 }
 
-function MediaPage({ items, page, pageSize, columns }: { items: typeof media; page: number; pageSize: number; columns: number }) {
+function MediaPage({
+  items,
+  page,
+  pageSize,
+  columns,
+}: {
+  items: typeof media
+  page: number
+  pageSize: number
+  columns: number
+}) {
   return (
-    <SimpleGrid cols={columns} spacing="xs" verticalSpacing="xs" w="100%" style={{ flex: "0 0 50%", width: "50%" }}>
+    <SimpleGrid
+      cols={columns}
+      spacing="xs"
+      verticalSpacing="xs"
+      w="100%"
+      style={{ flex: "0 0 50%", width: "50%" }}
+    >
       {items.map((item, index) => (
-        <Box key={item.id} bdrs="md" style={{ aspectRatio: "1 / 1", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)", background: "var(--mantine-color-default-hover)" }}>
-          <Image src={item.src} alt={`最近のMedia ${page * pageSize + index + 1}`} w="100%" h="100%" fit="cover" draggable={false} />
+        <Box
+          key={item.id}
+          bdrs="md"
+          style={{
+            aspectRatio: "1 / 1",
+            overflow: "hidden",
+            border: "1px solid var(--mantine-color-default-border)",
+            background: "var(--mantine-color-default-hover)",
+          }}
+        >
+          <Image
+            src={item.src}
+            alt={`最近のMedia ${page * pageSize + index + 1}`}
+            w="100%"
+            h="100%"
+            fit="cover"
+            draggable={false}
+          />
         </Box>
       ))}
     </SimpleGrid>
@@ -238,20 +339,45 @@ function RecentMediaCarousel() {
       `}</style>
 
       {fromPage === null ? (
-        <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} columns={pageSize} />
+        <MediaPage
+          items={itemsFor(page)}
+          page={page}
+          pageSize={pageSize}
+          columns={pageSize}
+        />
       ) : (
         <Box
           className={`dashboard-carousel-track ${direction} ${sliding ? "sliding" : ""}`}
         >
           {direction === "next" ? (
             <>
-              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} columns={pageSize} />
-              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} columns={pageSize} />
+              <MediaPage
+                items={itemsFor(oldPage)}
+                page={oldPage}
+                pageSize={pageSize}
+                columns={pageSize}
+              />
+              <MediaPage
+                items={itemsFor(page)}
+                page={page}
+                pageSize={pageSize}
+                columns={pageSize}
+              />
             </>
           ) : (
             <>
-              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} columns={pageSize} />
-              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} columns={pageSize} />
+              <MediaPage
+                items={itemsFor(page)}
+                page={page}
+                pageSize={pageSize}
+                columns={pageSize}
+              />
+              <MediaPage
+                items={itemsFor(oldPage)}
+                page={oldPage}
+                pageSize={pageSize}
+                columns={pageSize}
+              />
             </>
           )}
         </Box>
@@ -259,8 +385,36 @@ function RecentMediaCarousel() {
 
       {hasPrevious && (
         <>
-          <Box aria-hidden="true" pos="absolute" top={0} bottom={0} left={0} w={72} style={{ pointerEvents: "none", background: "linear-gradient(90deg, var(--mantine-color-body), transparent)", zIndex: 1 }} />
-          <ActionIcon aria-label="前のMediaへ" variant="filled" color="dark" radius="xl" size="lg" disabled={sliding} style={{ position: "absolute", left: "var(--mantine-spacing-sm)", top: "50%", transform: "translateY(-50%)", zIndex: 2 }} onClick={() => moveTo(page - 1, "previous")}>
+          <Box
+            aria-hidden="true"
+            pos="absolute"
+            top={0}
+            bottom={0}
+            left={0}
+            w={72}
+            style={{
+              pointerEvents: "none",
+              background:
+                "linear-gradient(90deg, var(--mantine-color-body), transparent)",
+              zIndex: 1,
+            }}
+          />
+          <ActionIcon
+            aria-label="前のMediaへ"
+            variant="filled"
+            color="dark"
+            radius="xl"
+            size="lg"
+            disabled={sliding}
+            style={{
+              position: "absolute",
+              left: "var(--mantine-spacing-sm)",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+            }}
+            onClick={() => moveTo(page - 1, "previous")}
+          >
             <IconChevronLeft size={22} />
           </ActionIcon>
         </>
@@ -268,8 +422,36 @@ function RecentMediaCarousel() {
 
       {hasNext && (
         <>
-          <Box aria-hidden="true" pos="absolute" top={0} bottom={0} right={0} w={72} style={{ pointerEvents: "none", background: "linear-gradient(270deg, var(--mantine-color-body), transparent)", zIndex: 1 }} />
-          <ActionIcon aria-label="次のMediaへ" variant="filled" color="dark" radius="xl" size="lg" disabled={sliding} style={{ position: "absolute", right: "var(--mantine-spacing-sm)", top: "50%", transform: "translateY(-50%)", zIndex: 2 }} onClick={() => moveTo(page + 1, "next")}>
+          <Box
+            aria-hidden="true"
+            pos="absolute"
+            top={0}
+            bottom={0}
+            right={0}
+            w={72}
+            style={{
+              pointerEvents: "none",
+              background:
+                "linear-gradient(270deg, var(--mantine-color-body), transparent)",
+              zIndex: 1,
+            }}
+          />
+          <ActionIcon
+            aria-label="次のMediaへ"
+            variant="filled"
+            color="dark"
+            radius="xl"
+            size="lg"
+            disabled={sliding}
+            style={{
+              position: "absolute",
+              right: "var(--mantine-spacing-sm)",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+            }}
+            onClick={() => moveTo(page + 1, "next")}
+          >
             <IconChevronRight size={22} />
           </ActionIcon>
         </>
@@ -278,10 +460,20 @@ function RecentMediaCarousel() {
   )
 }
 
-export function DashboardPrototype({ initialContext = "personal", initialState = "default" }: { initialContext?: ContextKind; initialState?: DashboardState }) {
+export function DashboardPrototype({
+  initialContext = "personal",
+  initialState = "default",
+}: {
+  initialContext?: ContextKind
+  initialState?: DashboardState
+}) {
   const [contextKind, setContextKind] = useState<ContextKind>(initialContext)
-  const currentContext = contexts.find((context) => context.kind === contextKind) ?? contexts[0]
-  const navigationItems = getApplicationNavigation({ contextKind, activeSection: "dashboard" })
+  const currentContext =
+    contexts.find((context) => context.kind === contextKind) ?? contexts[0]
+  const navigationItems = getApplicationNavigation({
+    contextKind,
+    activeSection: "dashboard",
+  })
 
   return (
     <PrototypeApplicationShell
@@ -289,7 +481,9 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
       contexts={contexts}
       navigationItems={navigationItems}
       user={{ displayName: "Hazuki" }}
-      onSelectContext={(id) => setContextKind(id === "community" ? "community" : "personal")}
+      onSelectContext={(id) =>
+        setContextKind(id === "community" ? "community" : "personal")
+      }
       onSelectNavigation={() => undefined}
       onCreateCommunity={() => undefined}
       onOpenSettings={() => undefined}
@@ -297,41 +491,91 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
     >
       <Stack gap="xl" maw={1280} mx="auto" w="100%">
         <Box>
-          <Title order={2} size="h3">{contextKind === "personal" ? "Personal" : currentContext.label}</Title>
-          <Text size="sm" c="dimmed" mt={4}>最近のMediaを確認して、現在のContextの主要な機能へ移動できます。</Text>
+          <Title order={2} size="h3">
+            {contextKind === "personal" ? "Personal" : currentContext.label}
+          </Title>
+          <Text size="sm" c="dimmed" mt={4}>
+            最近のMediaを確認して、現在のContextの主要な機能へ移動できます。
+          </Text>
         </Box>
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="nowrap">
-            <Title order={3} size="h4">最近のメディア</Title>
-            {initialState === "default" && <Button variant="subtle" size="compact-sm">すべて見る</Button>}
+            <Title order={3} size="h4">
+              最近のメディア
+            </Title>
+            {initialState === "default" && (
+              <Button variant="subtle" size="compact-sm">
+                すべて見る
+              </Button>
+            )}
           </Group>
-          {initialState === "default" ? <RecentMediaCarousel /> : (
-            <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
+          {initialState === "default" ? (
+            <RecentMediaCarousel />
+          ) : (
+            <Center
+              mih={132}
+              px="md"
+              style={{
+                border: "1px solid var(--mantine-color-default-border)",
+                borderRadius: "var(--mantine-radius-md)",
+              }}
+            >
               <Stack align="center" gap={8}>
                 <Group gap={6}>
-                  <IconPhoto size={20} stroke={1.5} color="var(--mantine-color-dimmed)" aria-hidden="true" />
-                  <Text size="sm" c="dimmed" fw={500}>メディアはまだありません</Text>
+                  <IconPhoto
+                    size={20}
+                    stroke={1.5}
+                    color="var(--mantine-color-dimmed)"
+                    aria-hidden="true"
+                  />
+                  <Text size="sm" c="dimmed" fw={500}>
+                    メディアはまだありません
+                  </Text>
                 </Group>
-                <Button variant="subtle" size="compact-sm">メディアへ移動</Button>
+                <Button variant="subtle" size="compact-sm">
+                  メディアへ移動
+                </Button>
               </Stack>
             </Center>
           )}
         </Stack>
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="nowrap">
-            <Title order={3} size="h4">最近のGroup</Title>
-            {initialState === "default" && <Button variant="subtle" size="compact-sm">すべて見る</Button>}
+            <Title order={3} size="h4">
+              最近のGroup
+            </Title>
+            {initialState === "default" && (
+              <Button variant="subtle" size="compact-sm">
+                すべて見る
+              </Button>
+            )}
           </Group>
           {initialState === "default" ? (
             <RecentGroups />
           ) : (
-            <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
+            <Center
+              mih={132}
+              px="md"
+              style={{
+                border: "1px solid var(--mantine-color-default-border)",
+                borderRadius: "var(--mantine-radius-md)",
+              }}
+            >
               <Stack align="center" gap={8}>
                 <Group gap={6}>
-                  <IconFolder size={20} stroke={1.5} color="var(--mantine-color-dimmed)" aria-hidden="true" />
-                  <Text size="sm" c="dimmed" fw={500}>Groupはまだありません</Text>
+                  <IconFolder
+                    size={20}
+                    stroke={1.5}
+                    color="var(--mantine-color-dimmed)"
+                    aria-hidden="true"
+                  />
+                  <Text size="sm" c="dimmed" fw={500}>
+                    Groupはまだありません
+                  </Text>
                 </Group>
-                <Button variant="subtle" size="compact-sm">Groupへ移動</Button>
+                <Button variant="subtle" size="compact-sm">
+                  Groupへ移動
+                </Button>
               </Stack>
             </Center>
           )}

@@ -10,10 +10,18 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Personal: Story = { args: { initialContext: "personal", initialState: "default" } }
-export const Community: Story = { args: { initialContext: "community", initialState: "default" } }
-export const Empty: Story = { args: { initialContext: "personal", initialState: "empty" } }
-export const CommunityEmpty: Story = { args: { initialContext: "community", initialState: "empty" } }
+export const Personal: Story = {
+  args: { initialContext: "personal", initialState: "default" },
+}
+export const Community: Story = {
+  args: { initialContext: "community", initialState: "default" },
+}
+export const Empty: Story = {
+  args: { initialContext: "personal", initialState: "empty" },
+}
+export const CommunityEmpty: Story = {
+  args: { initialContext: "community", initialState: "empty" },
+}
 export const Compact: Story = {
   args: { initialContext: "personal", initialState: "default" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
