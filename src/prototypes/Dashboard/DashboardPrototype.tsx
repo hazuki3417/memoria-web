@@ -1,8 +1,8 @@
 "use client"
 
-import { ActionIcon, Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title, Transition } from "@mantine/core"
+import { ActionIcon, Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title } from "@mantine/core"
 import { IconChevronLeft, IconChevronRight, IconPhoto } from "@tabler/icons-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
@@ -50,127 +50,87 @@ const media = [
 
 ]
 
+function MediaPage({ items, page, pageSize }: { items: typeof media; page: number; pageSize: number }) {
+  return (
+    <SimpleGrid cols={{ base: 2, sm: 8 }} spacing="xs" verticalSpacing="xs" w="100%" style={{ flex: "0 0 100%" }}>
+      {items.map((item, index) => (
+        <Box key={item.id} bdrs="md" style={{ aspectRatio: "1 / 1", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)", background: "var(--mantine-color-default-hover)" }}>
+          <Image src={item.src} alt={`最近のMedia ${page * pageSize + index + 1}`} w="100%" h="100%" fit="cover" draggable={false} />
+        </Box>
+      ))}
+    </SimpleGrid>
+  )
+}
+
 function RecentMediaCarousel() {
   const [page, setPage] = useState(0)
+  const [fromPage, setFromPage] = useState<number | null>(null)
   const [direction, setDirection] = useState<"previous" | "next">("next")
+  const [sliding, setSliding] = useState(false)
   const pageSize = 8
   const pageCount = Math.ceil(media.length / pageSize)
-  const items = media.slice(page * pageSize, page * pageSize + pageSize)
+  const itemsFor = (targetPage: number) =>
+    media.slice(targetPage * pageSize, targetPage * pageSize + pageSize)
   const hasPrevious = page > 0
   const hasNext = page < pageCount - 1
 
+  useEffect(() => {
+    if (!sliding) return
+    const timer = window.setTimeout(() => {
+      setSliding(false)
+      setFromPage(null)
+    }, 260)
+    return () => window.clearTimeout(timer)
+  }, [sliding])
+
+  const moveTo = (targetPage: number, nextDirection: "previous" | "next") => {
+    if (sliding || targetPage === page) return
+    setFromPage(page)
+    setDirection(nextDirection)
+    setPage(targetPage)
+    requestAnimationFrame(() => requestAnimationFrame(() => setSliding(true)))
+  }
+
+  const oldPage = fromPage ?? page
+
   return (
-    <Box pos="relative">
+    <Box pos="relative" style={{ overflow: "hidden" }}>
       <style>{`
-        @keyframes dashboard-page-next {
-          from { opacity: 0; transform: translateX(24px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes dashboard-page-previous {
-          from { opacity: 0; transform: translateX(-24px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
+        .dashboard-carousel-track { display: flex; width: 200%; }
+        .dashboard-carousel-track.next { transform: translateX(0); }
+        .dashboard-carousel-track.next.sliding { transform: translateX(-50%); }
+        .dashboard-carousel-track.previous { transform: translateX(-50%); }
+        .dashboard-carousel-track.previous.sliding { transform: translateX(0); }
+        .dashboard-carousel-track.sliding { transition: transform 260ms ease; }
         @media (prefers-reduced-motion: reduce) {
-          [style*="dashboard-page-"] {
-            animation: none !important;
-            transition: none !important;
-          }
+          .dashboard-carousel-track.sliding { transition: none; }
         }
       `}</style>
-      <Transition
-        key={page}
-        mounted
-        transition={{
-          in: {
-            opacity: 1,
-            transform: "translateX(0)",
-          },
-          out: {
-            opacity: 0,
-            transform:
-              direction === "next"
-                ? "translateX(-24px)"
-                : "translateX(24px)",
-          },
-          common: {
-            transition: "opacity 180ms ease, transform 180ms ease",
-          },
-          transitionProperty: "opacity, transform",
-        }}
-        duration={180}
-      >
-        {(styles) => (
-          <SimpleGrid
-            cols={{ base: 2, sm: 8 }}
-            spacing="xs"
-            verticalSpacing="xs"
-            style={{
-              ...styles,
-              animation:
-                direction === "next"
-                  ? "dashboard-page-next 180ms ease"
-                  : "dashboard-page-previous 180ms ease",
-            }}
-          >
-            {items.map((item, index) => (
-              <Box
-                key={item.id}
-                bdrs="md"
-                style={{
-                  aspectRatio: "1 / 1",
-                  overflow: "hidden",
-                  border: "1px solid var(--mantine-color-default-border)",
-                  background: "var(--mantine-color-default-hover)",
-                }}
-              >
-                <Image
-                  src={item.src}
-                  alt={`最近のMedia ${page * pageSize + index + 1}`}
-                  w="100%"
-                  h="100%"
-                  fit="cover"
-                  draggable={false}
-                />
-              </Box>
-            ))}
-          </SimpleGrid>
-        )}
-      </Transition>
+
+      {fromPage === null ? (
+        <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
+      ) : (
+        <Box
+          className={`dashboard-carousel-track ${direction} ${sliding ? "sliding" : ""}`}
+        >
+          {direction === "next" ? (
+            <>
+              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} />
+              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
+            </>
+          ) : (
+            <>
+              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
+              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} />
+            </>
+          )}
+        </Box>
+      )}
 
       {hasPrevious && (
         <>
-          <Box
-            aria-hidden="true"
-            pos="absolute"
-            top={0}
-            bottom={0}
-            left={0}
-            w={72}
-            style={{
-              pointerEvents: "none",
-              background:
-                "linear-gradient(90deg, var(--mantine-color-body), transparent)",
-            }}
-          />
-          <ActionIcon
-            aria-label="前のMediaへ"
-            variant="filled"
-            color="dark"
-            radius="xl"
-            size="lg"
-            pos="absolute"
-            style={{
-              position: "absolute",
-              left: "var(--mantine-spacing-sm)",
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 2,
-            }}
-            onClick={() => {
-              setDirection("previous")
-              setPage((current) => Math.max(0, current - 1))
-            }}
-          >
+          <Box aria-hidden="true" pos="absolute" top={0} bottom={0} left={0} w={72} style={{ pointerEvents: "none", background: "linear-gradient(90deg, var(--mantine-color-body), transparent)", zIndex: 1 }} />
+          <ActionIcon aria-label="前のMediaへ" variant="filled" color="dark" radius="xl" size="lg" disabled={sliding} style={{ position: "absolute", left: "var(--mantine-spacing-sm)", top: "50%", transform: "translateY(-50%)", zIndex: 2 }} onClick={() => moveTo(page - 1, "previous")}>
             <IconChevronLeft size={22} />
           </ActionIcon>
         </>
@@ -178,38 +138,8 @@ function RecentMediaCarousel() {
 
       {hasNext && (
         <>
-          <Box
-            aria-hidden="true"
-            pos="absolute"
-            top={0}
-            bottom={0}
-            right={0}
-            w={72}
-            style={{
-              pointerEvents: "none",
-              background:
-                "linear-gradient(270deg, var(--mantine-color-body), transparent)",
-            }}
-          />
-          <ActionIcon
-            aria-label="次のMediaへ"
-            variant="filled"
-            color="dark"
-            radius="xl"
-            size="lg"
-            pos="absolute"
-            style={{
-              position: "absolute",
-              right: "var(--mantine-spacing-sm)",
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 2,
-            }}
-            onClick={() => {
-              setDirection("next")
-              setPage((current) => Math.min(pageCount - 1, current + 1))
-            }}
-          >
+          <Box aria-hidden="true" pos="absolute" top={0} bottom={0} right={0} w={72} style={{ pointerEvents: "none", background: "linear-gradient(270deg, var(--mantine-color-body), transparent)", zIndex: 1 }} />
+          <ActionIcon aria-label="次のMediaへ" variant="filled" color="dark" radius="xl" size="lg" disabled={sliding} style={{ position: "absolute", right: "var(--mantine-spacing-sm)", top: "50%", transform: "translateY(-50%)", zIndex: 2 }} onClick={() => moveTo(page + 1, "next")}>
             <IconChevronRight size={22} />
           </ActionIcon>
         </>
