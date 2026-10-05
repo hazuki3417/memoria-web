@@ -1,7 +1,7 @@
 "use client"
 
-import { Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title } from "@mantine/core"
-import { IconPhoto } from "@tabler/icons-react"
+import { ActionIcon, Box, Button, Center, Group, Image, SimpleGrid, Stack, Text, Title } from "@mantine/core"
+import { IconChevronLeft, IconChevronRight, IconPhoto } from "@tabler/icons-react"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -23,15 +23,106 @@ const media = [
   "/group-browser/group-media-07.jpg", "/group-browser/group-media-08.jpg",
 ]
 
-function RecentMediaGrid() {
+function RecentMediaCarousel() {
+  const [page, setPage] = useState(0)
+  const pageSize = 4
+  const pageCount = Math.ceil(media.length / pageSize)
+  const items = media.slice(page * pageSize, page * pageSize + pageSize)
+  const hasPrevious = page > 0
+  const hasNext = page < pageCount - 1
+
   return (
-    <SimpleGrid cols={{ base: 2, xs: 3, sm: 4, md: 5, lg: 6 }} spacing="xs" verticalSpacing="xs">
-      {media.map((src, index) => (
-        <Box key={src} bdrs="md" style={{ aspectRatio: "1 / 1", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)", background: "var(--mantine-color-default-hover)" }}>
-          <Image src={src} alt={`最近のMedia ${index + 1}`} w="100%" h="100%" fit="cover" draggable={false} />
-        </Box>
-      ))}
-    </SimpleGrid>
+    <Box pos="relative">
+      <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs" verticalSpacing="xs">
+        {items.map((src, index) => (
+          <Box
+            key={src}
+            bdrs="md"
+            style={{
+              aspectRatio: "1 / 1",
+              overflow: "hidden",
+              border: "1px solid var(--mantine-color-default-border)",
+              background: "var(--mantine-color-default-hover)",
+            }}
+          >
+            <Image
+              src={src}
+              alt={`最近のMedia ${page * pageSize + index + 1}`}
+              w="100%"
+              h="100%"
+              fit="cover"
+              draggable={false}
+            />
+          </Box>
+        ))}
+      </SimpleGrid>
+
+      {hasPrevious && (
+        <>
+          <Box
+            aria-hidden="true"
+            pos="absolute"
+            top={0}
+            bottom={0}
+            left={0}
+            w={72}
+            style={{
+              pointerEvents: "none",
+              background:
+                "linear-gradient(90deg, var(--mantine-color-body), transparent)",
+            }}
+          />
+          <ActionIcon
+            aria-label="前のMediaへ"
+            variant="filled"
+            color="dark"
+            radius="xl"
+            size="lg"
+            pos="absolute"
+            left="sm"
+            top="50%"
+            style={{ transform: "translateY(-50%)" }}
+            onClick={() => setPage((current) => Math.max(0, current - 1))}
+          >
+            <IconChevronLeft size={22} />
+          </ActionIcon>
+        </>
+      )}
+
+      {hasNext && (
+        <>
+          <Box
+            aria-hidden="true"
+            pos="absolute"
+            top={0}
+            bottom={0}
+            right={0}
+            w={72}
+            style={{
+              pointerEvents: "none",
+              background:
+                "linear-gradient(270deg, var(--mantine-color-body), transparent)",
+            }}
+          />
+          <ActionIcon
+            aria-label="次のMediaへ"
+            variant="filled"
+            color="dark"
+            radius="xl"
+            size="lg"
+            pos="absolute"
+            right="sm"
+            top="50%"
+            style={{ transform: "translateY(-50%)" }}
+            onClick={() =>
+              setPage((current) => Math.min(pageCount - 1, current + 1))
+            }
+          >
+            <IconChevronRight size={22} />
+          </ActionIcon>
+        </>
+      )}
+    </Box>
   )
 }
 
@@ -62,7 +153,7 @@ export function DashboardPrototype({ initialContext = "personal", initialState =
             <Title order={3} size="h4">最近のメディア</Title>
             {initialState === "default" && <Button variant="subtle" size="compact-sm">すべて見る</Button>}
           </Group>
-          {initialState === "default" ? <RecentMediaGrid /> : (
+          {initialState === "default" ? <RecentMediaCarousel /> : (
             <Center mih={280} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
               <Stack align="center" gap="sm">
                 <IconPhoto size={36} stroke={1.4} color="var(--mantine-color-dimmed)" aria-hidden="true" />
