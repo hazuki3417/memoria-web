@@ -305,12 +305,6 @@ export function MediaBrowser({
       ? ["旅行"]
       : [],
   )
-  const navigationItems = getApplicationNavigation({
-    contextKind: context,
-    activeSection: "media",
-  })
-  const currentContext =
-    contexts.find((item) => item.kind === context) ?? contexts[0]
   const stateItems = [
     "true-empty",
     "filtered-empty",
