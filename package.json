@@ -16,16 +16,11 @@
     "build": "npm run build:next",
     "start": "next start",
     "lint": "next lint",
-    "gen:graphql": "graphql-codegen",
     "test:unit": "vitest run",
     "test:vrt": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts",
     "test:vrt:update": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts --update-snapshots",
     "test:vrt:report": "playwright show-report ./e2e/vrt/report",
-    "test:app": "playwright test --config=playwright.app.config.ts",
-    "test:app:update": "playwright test --config=playwright.app.config.ts --update-snapshots",
-    "test:app:report": "playwright show-report ./e2e/app/report",
-    "storybook": "storybook dev -p 6006",
-    "quality": "npm run gen:graphql && npm run check && npm run typecheck && npm run test:unit && npm run build"
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
