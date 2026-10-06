@@ -1,4 +1,4 @@
-import { Text } from "@mantine/core"
+import { AppShell, Text } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { ApplicationHeader } from "./ApplicationHeader"
 
@@ -6,6 +6,13 @@ const meta = {
   title: "Components/Application Shell/Header",
   component: ApplicationHeader,
   parameters: { layout: "fullscreen" },
+  decorators: [
+    (Story) => (
+      <AppShell header={{ height: 40 }}>
+        <Story />
+      </AppShell>
+    ),
+  ],
   args: { accentColor: "var(--mantine-color-blue-6)" },
 } satisfies Meta<typeof ApplicationHeader>
 
