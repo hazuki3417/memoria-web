@@ -276,10 +276,12 @@ export function MediaBrowser({
   initialState = "default",
   contextKind = "personal",
   initialDialog = null,
+  communityId = "photo-club",
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
   initialDialog?: SelectionDialog
+  communityId?: string
 }) {
   const [context, setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -340,6 +342,7 @@ export function MediaBrowser({
       onSelectContext={(id) =>
         setContext(id === "community" ? "community" : "personal")
       }
+      communityId={communityId}
       onSelectNavigation={() => {}}
       onCreateCommunity={() => {}}
       onOpenSettings={() => {}}
