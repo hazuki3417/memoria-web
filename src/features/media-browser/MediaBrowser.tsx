@@ -57,9 +57,7 @@ import {
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
-import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
 
 type MediaBrowserState =
   | "default"
@@ -337,20 +335,7 @@ export function MediaBrowser({
   }
 
   return (
-    <ProductionApplicationShell
-      currentContext={currentContext}
-      contexts={contexts}
-      navigationItems={navigationItems}
-      user={{ displayName: "Hazuki" }}
-      onSelectContext={(id) =>
-        setContext(id === "community" ? "community" : "personal")
-      }
-      communityId={communityId}
-      onSelectNavigation={() => {}}
-      onCreateCommunity={() => {}}
-      onOpenSettings={() => {}}
-      onLogout={() => {}}
-    >
+    <>
       <Stack gap="xs" maw={1440} mx="auto">
         <Box
           style={{
@@ -1157,6 +1142,6 @@ export function MediaBrowser({
             )
           })()}
       </Modal>
-    </ProductionApplicationShell>
+    </>
   )
 }
