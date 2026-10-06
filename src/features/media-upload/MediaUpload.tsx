@@ -25,14 +25,12 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
 import {
   MediaTagBulkEditor,
   MediaTagEditorList,
   MediaTagEditorRow,
 } from "@/components/MediaTagEditor"
-import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
 
 export type UploadScenario =
   | "empty"
@@ -416,20 +414,7 @@ export function MediaUpload({
     )
 
   return (
-    <ProductionApplicationShell
-      currentContext={currentContext}
-      contexts={Object.values(contexts)}
-      communityId={communityId}
-      navigationItems={getApplicationNavigation({
-        contextKind: currentContext.kind,
-        activeSection: "media",
-      })}
-      user={{ displayName: "ユーザー" }}
-      onSelectContext={() => undefined}
-      onSelectNavigation={() => undefined}
-      onOpenSettings={() => undefined}
-      onLogout={() => undefined}
-    >
+    <>
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
           <Paper
@@ -659,7 +644,7 @@ export function MediaUpload({
           </Group>
         </Stack>
       </Modal>
-    </ProductionApplicationShell>
+    </>
   )
 }
 
