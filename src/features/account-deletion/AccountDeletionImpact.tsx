@@ -17,16 +17,7 @@ import {
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
-import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
-
-const personalContext = {
-  id: "personal",
-  kind: "personal" as const,
-  label: "Personal",
-  accentColor: "var(--mantine-color-blue-6)",
-}
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
 type CommunityScenario =
@@ -229,11 +220,7 @@ export function AccountDeletionImpact({
           </Group>
         </Stack>
       </Modal>
-      <ProductionApplicationShell
-        currentContext={personalContext}
-        contexts={[personalContext]}
-        navigationItems={getApplicationNavigation({ contextKind: "personal" })}
-      >
+      <>
         <Box maw={960} mx="auto" w="100%">
           <Stack gap="xl">
             <Box>
@@ -958,7 +945,7 @@ export function AccountDeletionImpact({
             )}
           </Stack>
         </Box>
-      </ProductionApplicationShell>
+      </>
     </>
   )
 }
