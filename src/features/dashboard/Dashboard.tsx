@@ -19,7 +19,7 @@ import {
   IconPhoto,
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { recentGroups, recentMedia } from "./dashboardData"
 
 function MediaPage({
@@ -218,7 +218,7 @@ function RecentGroups() {
   )
 }
 
-function EmptyState({ kind, onNavigate }: { kind: "media" | "group"; onNavigate: () => void }) {
+function EmptyState({ kind, href }: { kind: "media" | "group"; href: string }) {
   const media = kind === "media"
   return (
     <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
@@ -227,33 +227,32 @@ function EmptyState({ kind, onNavigate }: { kind: "media" | "group"; onNavigate:
           {media ? <IconPhoto size={20} stroke={1.5} /> : <IconFolder size={20} stroke={1.5} />}
           <Text size="sm" c="dimmed" fw={500}>{media ? "メディアはまだありません" : "Groupはまだありません"}</Text>
         </Group>
-        <Button variant="subtle" size="compact-sm" onClick={onNavigate}>{media ? "メディアへ移動" : "Groupへ移動"}</Button>
+        <Button component={Link} href={href} variant="subtle" size="compact-sm">{media ? "メディアへ移動" : "Groupへ移動"}</Button>
       </Stack>
     </Center>
   )
 }
 
 export function Dashboard({ empty = false, contextKind = "personal", communityId = "photo-club" }: { empty?: boolean; contextKind?: "personal" | "community"; communityId?: string }) {
-  const router = useRouter()
   const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
-  const openMedia = () => router.push(`${prefix}/media`)
-  const openGroups = () => router.push(`${prefix}/groups`)
+  const mediaHref = `${prefix}/media`
+  const groupsHref = `${prefix}/groups`
 
   return (
     <Stack gap="xl" maw={1280} mx="auto" w="100%">
       <Stack gap="sm">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Title order={3} size="h4">最近のメディア</Title>
-          {!empty && <Button variant="subtle" size="compact-sm" onClick={openMedia}>すべて見る</Button>}
+          {!empty && <Button variant="subtle" size="compact-sm" component={Link} href={mediaHref}>すべて見る</Button>}
         </Group>
-        {empty ? <EmptyState kind="media" onNavigate={openMedia} /> : <RecentMediaCarousel items={recentMedia} />}
+        {empty ? <EmptyState kind="media" href={mediaHref} /> : <RecentMediaCarousel items={recentMedia} />}
       </Stack>
       <Stack gap="sm">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Title order={3} size="h4">最近のGroup</Title>
-          {!empty && <Button variant="subtle" size="compact-sm" onClick={openGroups}>すべて見る</Button>}
+          {!empty && <Button variant="subtle" size="compact-sm" component={Link} href={groupsHref}>すべて見る</Button>}
         </Group>
-        {empty ? <EmptyState kind="group" onNavigate={openGroups} /> : <RecentGroups />}
+        {empty ? <EmptyState kind="group" href={groupsHref} /> : <RecentGroups />}
       </Stack>
     </Stack>
   )
