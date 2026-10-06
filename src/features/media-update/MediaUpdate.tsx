@@ -44,9 +44,11 @@ const initialItems = [
 export function MediaUpdate({
   scenario = "editing",
   context = "personal",
+  communityId = "photo-club",
 }: {
   scenario?: MediaUpdateScenario
   context?: "personal" | "community"
+  communityId?: string
 }) {
   const [items, setItems] = useState(initialItems)
   const [selectedIds, setSelectedIds] = useState(
@@ -61,6 +63,7 @@ export function MediaUpdate({
     <ProductionApplicationShell
       currentContext={currentContext}
       contexts={Object.values(contexts)}
+      communityId={communityId}
       navigationItems={getApplicationNavigation({
         contextKind: currentContext.kind,
         activeSection: "media",
