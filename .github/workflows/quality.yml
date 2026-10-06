@@ -68,7 +68,7 @@ jobs:
         with:
           node-version-file: package.json
       - name: Restore dependencies
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: node-modules-${{ github.sha }}
           path: /tmp
@@ -110,7 +110,7 @@ jobs:
         with:
           node-version-file: package.json
       - name: Restore dependencies
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: node-modules-${{ github.sha }}
           path: /tmp
@@ -156,7 +156,7 @@ jobs:
         with:
           node-version-file: package.json
       - name: Restore dependencies
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: node-modules-${{ github.sha }}
           path: /tmp
