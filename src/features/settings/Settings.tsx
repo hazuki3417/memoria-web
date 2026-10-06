@@ -131,10 +131,9 @@ function AccountContent() {
   </Stack>
 }
 
-export function Settings() {
+export function Settings({ section }: { section: Section }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
-  const [section, setSection] = useState<Section>("profile")
   const content = section === "profile" ? <ProfileContent /> : section === "preferences" ? <PreferencesContent compact={compact} /> : section === "usage" ? <UsageContent /> : <AccountContent />
 
   return <Box maw={1120} mx="auto" w="100%">
