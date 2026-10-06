@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
@@ -50,6 +52,7 @@ export function MediaUpdate({
   context?: "personal" | "community"
   communityId?: string
 }) {
+  const router = useRouter()
   const [items, setItems] = useState(initialItems)
   const [selectedIds, setSelectedIds] = useState(
     initialItems.map((item) => item.id),
@@ -233,7 +236,7 @@ export function MediaUpdate({
           <Group justify="flex-end">
             {scenario === "load-failure" ? (
               <>
-                <Button variant="default">Media Browserへ戻る</Button>
+                <Button variant="default" onClick={() => router.push(context === "community" ? `/communities/${communityId}/media` : "/media")}>Media Browserへ戻る</Button>
                 <Button>再試行</Button>
               </>
             ) : (
