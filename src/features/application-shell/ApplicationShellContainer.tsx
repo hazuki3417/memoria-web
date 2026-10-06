@@ -75,7 +75,7 @@ export function ApplicationShellContainer({
             <ApplicationAccountMenu
               user={{ displayName: "ユーザー" }}
               currentContext={currentContext}
-              onOpenSettings={() => router.push("/settings")}
+              onOpenSettings={() => router.push("/settings/profile")}
               onLogout={() => undefined}
             />
           }
