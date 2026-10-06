@@ -79,7 +79,7 @@ export function ProductionApplicationShell({
               currentContext={currentContext}
               onOpenSettings={() => {
                 onOpenSettings()
-                router.push("/settings")
+                router.push("/settings/profile")
               }}
               onLogout={onLogout}
             />
