@@ -103,6 +103,12 @@ GraphQLクライアントとApplication E2Eは再実装に合わせて整備し�
 - APIスキーマ変更時は、その契約を提供するAPI側のPRまたはcommitを示し、null許容性、scalar、upload、paginationの意味を確認します。
 - 判断を記録せず、API契約の不一致を推測によるクライアント側回避策で隠しません。
 
+## GitHub上の記述言語
+
+- Issueのタイトル・本文、PRのタイトル・本文、commit messageは原則として日本語で記述します。
+- branch名、コード、識別子、コマンド、固有の技術用語など、日本語化が不自然なものは英語のままで構いません。
+- AIがGitHubへIssue、PR、commitを書き込む場合は、実行前にタイトル・本文、commit messageがこの言語方針に従っていることを確認します。
+
 ## 作業規約
 
 1. 編集前に対象のroute、component・feature、provider、GraphQL operation、テストを確認します。
