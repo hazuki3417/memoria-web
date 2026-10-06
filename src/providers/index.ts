@@ -1,7 +1,5 @@
 export * from "./ConfirmProvider"
 export * from "./FeedbackProvider"
 export * from "./GraphQLProvider"
-export * from "./ImageDetailModalProvider"
-export * from "./LangProvider"
 export * from "./ThemeProvider"
 export * from "./UserProvider"
