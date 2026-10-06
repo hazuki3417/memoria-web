@@ -43,13 +43,13 @@ export function ProductionApplicationShell({
   const navigation = useApplicationNavigation()
   const selectContext = (id: string) => {
     onSelectContext(id)
-    router.push(id === "personal" ? "/" : `/communities/${communityId}`)
+    router.push(id === "personal" ? "/dashboard" : `/communities/${communityId}/dashboard`)
     navigation.close()
   }
   const selectNavigation = (itemId: string) => {
     onSelectNavigation(itemId)
     const prefix = currentContext.kind === "community" ? `/communities/${communityId}` : ""
-    const path = itemId === "dashboard" ? prefix || "/" : `${prefix}/${itemId}`
+    const path = itemId === "dashboard" ? prefix ? `${prefix}/dashboard` : "/dashboard" : `${prefix}/${itemId}`
     router.push(path)
     navigation.close()
   }
