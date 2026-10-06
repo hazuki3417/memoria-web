@@ -1,3 +1,10 @@
+import { ApplicationShellContainer } from "@/features/application-shell/ApplicationShellContainer"
+import { Dashboard } from "@/features/dashboard/Dashboard"
+
 export default function Home() {
-  return <main>Hello, Next.js!</main>
+  return (
+    <ApplicationShellContainer>
+      <Dashboard />
+    </ApplicationShellContainer>
+  )
 }
