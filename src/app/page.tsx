@@ -1,10 +1,5 @@
-import { ApplicationShellContainer } from "@/features/application-shell/ApplicationShellContainer"
-import { Dashboard } from "@/features/dashboard/Dashboard"
+import { redirect } from "next/navigation"
 
-export default function Home() {
-  return (
-    <ApplicationShellContainer>
-      <Dashboard />
-    </ApplicationShellContainer>
-  )
+export default function Page() {
+  redirect("/dashboard")
 }
