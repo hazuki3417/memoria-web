@@ -405,7 +405,6 @@ function RecentMediaCarousel() {
             color="dark"
             radius="xl"
             size="lg"
-            disabled={sliding}
             style={{
               position: "absolute",
               left: "var(--mantine-spacing-sm)",
@@ -442,7 +441,6 @@ function RecentMediaCarousel() {
             color="dark"
             radius="xl"
             size="lg"
-            disabled={sliding}
             style={{
               position: "absolute",
               right: "var(--mantine-spacing-sm)",
