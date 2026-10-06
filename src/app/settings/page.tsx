@@ -1,6 +1,5 @@
-import { ApplicationShellContainer } from "@/features/application-shell/ApplicationShellContainer"
-import { Settings } from "@/features/settings/Settings"
+import { redirect } from "next/navigation"
 
-export default function SettingsPage() {
-  return <ApplicationShellContainer><Settings /></ApplicationShellContainer>
+export default function Page() {
+  redirect("/settings/profile")
 }
