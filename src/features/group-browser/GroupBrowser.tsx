@@ -514,6 +514,15 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
 
   return (
     <>
+      {editDialog}
+      {deleteDialog}
+      {compact ? (
+        <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
+          {compactView === "groups" ? (
+            <Box
+              h="100%"
+              style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
+            >
               <Stack p="sm" gap="xs">
                 <Group gap="xs" wrap="nowrap">
                   <TextInput
