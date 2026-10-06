@@ -1,6 +1,7 @@
 "use client"
 
-import { useRouter } from "next/navigation"\nimport type { ReactNode } from "react"
+import { useRouter } from "next/navigation"
+import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -24,7 +25,8 @@ export function ApplicationShellContainer({
 }: {
   children: ReactNode
 }) {
-  const router = useRouter()\n  const navigation = useApplicationNavigation()
+  const router = useRouter()
+  const navigation = useApplicationNavigation()
   const navigationItems = getApplicationNavigation({
     contextKind: personalContext.kind,
     activeSection: "dashboard",
