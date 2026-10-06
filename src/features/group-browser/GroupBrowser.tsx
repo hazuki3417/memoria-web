@@ -34,7 +34,7 @@ import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
 import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
 
-type PrototypeGroup = {
+type GroupFixture = {
   id: string
   name: string
   mediaCount: number
@@ -43,7 +43,7 @@ type PrototypeGroup = {
   childNames: string[]
 }
 
-const groups: PrototypeGroup[] = [
+const groups: GroupFixture[] = [
   {
     id: "travel",
     name: "旅行",

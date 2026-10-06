@@ -1,4 +1,5 @@
 import "@mantine/core/styles.css"
+import "@mantine/notifications/styles.css"
 import type { Metadata } from "next"
 import { theme } from "@/lib/theme"
 import { ThemeProvider } from "@/providers/ThemeProvider"

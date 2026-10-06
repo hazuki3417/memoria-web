@@ -59,7 +59,7 @@ import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
 import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
 
-type PrototypeState =
+type MediaBrowserState =
   | "default"
   | "tag-filtered"
   | "true-empty"
@@ -277,7 +277,7 @@ export function MediaBrowser({
   contextKind = "personal",
   initialDialog = null,
 }: {
-  initialState?: PrototypeState
+  initialState?: MediaBrowserState
   contextKind?: ContextKind
   initialDialog?: SelectionDialog
 }) {
