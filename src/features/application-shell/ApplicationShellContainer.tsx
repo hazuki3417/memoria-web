@@ -22,13 +22,17 @@ const personalContext = {
 
 export function ApplicationShellContainer({
   children,
+  contextKind = "personal",
+  communityId = "photo-club",
 }: {
   children: ReactNode
+  contextKind?: "personal" | "community"
+  communityId?: string
 }) {
   const router = useRouter()
   const navigation = useApplicationNavigation()
   const navigationItems = getApplicationNavigation({
-    contextKind: personalContext.kind,
+    contextKind,
     activeSection: "dashboard",
   })
 
@@ -45,9 +49,12 @@ export function ApplicationShellContainer({
           }
           context={
             <ApplicationContextSwitcher
-              currentContext={personalContext}
+              currentContext={contextKind === "community" ? communityContext : personalContext}
               contexts={[personalContext]}
-              onSelect={() => undefined}
+              onSelect={(itemId) => {
+                const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
+                router.push(itemId === "dashboard" ? prefix || "/" : `${prefix}/${itemId}`)
+              }}
             />
           }
           account={
