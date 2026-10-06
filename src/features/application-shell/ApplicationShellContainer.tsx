@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
@@ -24,6 +25,7 @@ export function ApplicationShellContainer({
 }: {
   children: ReactNode
 }) {
+  const router = useRouter()
   const navigation = useApplicationNavigation()
   const navigationItems = getApplicationNavigation({
     contextKind: personalContext.kind,
@@ -52,7 +54,7 @@ export function ApplicationShellContainer({
             <ApplicationAccountMenu
               user={{ displayName: "ユーザー" }}
               currentContext={personalContext}
-              onOpenSettings={() => undefined}
+              onOpenSettings={() => router.push("/settings")}
               onLogout={() => undefined}
             />
           }
