@@ -140,7 +140,7 @@ export function Settings() {
   return <Box maw={1120} mx="auto" w="100%">
     {compact ? <Stack gap="xl">
       <Box><Text size="xs" c="dimmed" mb={6}>設定</Text>
-        <Select aria-label="設定画面" value={section} onChange={(value) => value && setSection(value as Section)}
+        <Select aria-label="設定画面" value={section} onChange={(value) => value && router.push(`/settings/${value}`)}
           data={sections.map((item) => ({ value: item.id, label: item.label }))} allowDeselect={false} />
       </Box>
       <Box>{content}</Box>
@@ -149,7 +149,7 @@ export function Settings() {
         <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
         <Stack gap={0}>{sections.map((item) =>
           <NavigationItem key={item.id} label={item.label} icon={item.icon} active={section === item.id}
-            accentColor="var(--mantine-color-blue-6)" onClick={() => setSection(item.id)} />)}
+            accentColor="var(--mantine-color-blue-6)" onClick={() => router.push(`/settings/${item.id}`)} />)}
         </Stack>
       </Box>
       <Box style={{ flex: 1 }} maw={760} miw={0}>{content}</Box>
