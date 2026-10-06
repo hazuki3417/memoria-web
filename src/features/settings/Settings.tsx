@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 import {
   Box,
   Button,
@@ -124,12 +126,13 @@ function AccountContent() {
     <PageHeader title="アカウント" description="アカウントを管理します。" />
     <Box><SectionHeader>アカウント削除</SectionHeader><Stack gap="md" maw={620}>
       <Text size="sm">アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。</Text>
-      <Box><Button variant="default" size="sm">アカウントを削除する</Button></Box>
+      <Box><Button variant="default" size="sm" onClick={() => router.push("/settings/account/delete")}>アカウントを削除する</Button></Box>
     </Stack></Box>
   </Stack>
 }
 
 export function Settings() {
+  const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>("profile")
   const content = section === "profile" ? <ProfileContent /> : section === "preferences" ? <PreferencesContent compact={compact} /> : section === "usage" ? <UsageContent /> : <AccountContent />
