@@ -120,6 +120,13 @@ const personalContext = {
   accentColor: "var(--mantine-color-blue-6)",
 }
 
+const communityContext = {
+  id: "community",
+  kind: "community" as const,
+  label: "家族のアルバム",
+  accentColor: "var(--mantine-color-teal-6)",
+}
+
 const previewImages = Array.from(
   { length: 9 },
   (_, index) =>
@@ -522,7 +529,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
   return (
     <ProductionApplicationShell
       currentContext={contextKind === "community" ? communityContext : personalContext}
-      contexts={[personalContext]}
+      contexts={[personalContext, communityContext]}
       navigationItems={getApplicationNavigation({
         contextKind,
         activeSection: "groups",
