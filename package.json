@@ -6,7 +6,7 @@
     "node": ">=24.0.0 <25"
   },
   "scripts": {
-    "dev:next": "next dev",
+    "dev:next": "npm run dev:assets && next dev",
     "dev:storybook": "storybook dev -p 6006",
     "format": "biome format --write",
     "check": "biome check --changed --since=${BIOME_BASE_REF:-origin/develop} --no-errors-on-unmatched",
@@ -20,7 +20,8 @@
     "test:vrt": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts",
     "test:vrt:update": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts --update-snapshots",
     "test:vrt:report": "playwright show-report ./e2e/vrt/report",
-    "storybook": "storybook dev -p 6006"
+    "storybook": "storybook dev -p 6006",
+    "dev:assets": "node scripts/link-dev-assets.mjs"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
