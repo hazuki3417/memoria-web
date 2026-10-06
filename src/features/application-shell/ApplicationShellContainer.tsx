@@ -46,7 +46,7 @@ export function ApplicationShellContainer({
 
   const selectNavigation = (itemId: string) => {
     const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
-    router.push(itemId === "dashboard" ? prefix || "/" : `${prefix}/${itemId}`)
+    router.push(itemId === "dashboard" ? prefix ? `${prefix}/dashboard` : "/dashboard" : `${prefix}/${itemId}`)
     navigation.close()
   }
 
@@ -66,7 +66,7 @@ export function ApplicationShellContainer({
               currentContext={currentContext}
               contexts={[personalContext, communityContext]}
               onSelect={(id) => {
-                router.push(id === "personal" ? "/" : `/communities/${communityId}`)
+                router.push(id === "personal" ? "/dashboard" : `/communities/${communityId}/dashboard`)
                 navigation.close()
               }}
             />
