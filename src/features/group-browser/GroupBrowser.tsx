@@ -30,9 +30,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
-import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
 
 type GroupFixture = {
   id: string
@@ -113,19 +111,7 @@ const relationCandidateNames = [
   "未整理",
 ]
 
-const personalContext = {
-  id: "personal",
-  kind: "personal" as const,
-  label: "Personal",
-  accentColor: "var(--mantine-color-blue-6)",
-}
 
-const communityContext = {
-  id: "community",
-  kind: "community" as const,
-  label: "家族のアルバム",
-  accentColor: "var(--mantine-color-teal-6)",
-}
 
 const previewImages = Array.from(
   { length: 9 },
@@ -527,29 +513,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
   )
 
   return (
-    <ProductionApplicationShell
-      currentContext={contextKind === "community" ? communityContext : personalContext}
-      contexts={[personalContext, communityContext]}
-      navigationItems={getApplicationNavigation({
-        contextKind,
-        activeSection: "groups",
-      })}
-      user={{ displayName: "ユーザー" }}
-      communityId={communityId}
-      onSelectContext={() => undefined}
-      onSelectNavigation={() => undefined}
-      onOpenSettings={() => undefined}
-      onLogout={() => undefined}
-    >
-      {editDialog}
-      {deleteDialog}
-      {compact ? (
-        <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
-          {compactView === "groups" ? (
-            <Box
-              h="100%"
-              style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
-            >
+    <>
               <Stack p="sm" gap="xs">
                 <Group gap="xs" wrap="nowrap">
                   <TextInput
@@ -841,6 +805,6 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
           </SplitView.Pane>
         </SplitView.Root>
       )}
-    </ProductionApplicationShell>
+    </>
   )
 }
