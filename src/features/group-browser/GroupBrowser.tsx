@@ -333,7 +333,7 @@ function MediaGrid() {
   )
 }
 
-export function GroupBrowser() {
+export function GroupBrowser({ contextKind = "personal", communityId = "photo-club" }: { contextKind?: "personal" | "community"; communityId?: string }) {
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const splitViewRef = useGroupRef()
@@ -521,13 +521,14 @@ export function GroupBrowser() {
 
   return (
     <ProductionApplicationShell
-      currentContext={personalContext}
+      currentContext={contextKind === "community" ? communityContext : personalContext}
       contexts={[personalContext]}
       navigationItems={getApplicationNavigation({
-        contextKind: personalContext.kind,
+        contextKind,
         activeSection: "groups",
       })}
       user={{ displayName: "ユーザー" }}
+      communityId={communityId}
       onSelectContext={() => undefined}
       onSelectNavigation={() => undefined}
       onOpenSettings={() => undefined}
