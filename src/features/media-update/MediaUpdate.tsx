@@ -5,14 +5,12 @@ import { useRouter } from "next/navigation"
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { FeedbackAlert } from "@/components/Feedback"
 import {
   MediaTagBulkEditor,
   MediaTagEditorList,
   MediaTagEditorRow,
 } from "@/components/MediaTagEditor"
-import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
 
 export type MediaUpdateScenario =
   | "editing"
@@ -63,15 +61,7 @@ export function MediaUpdate({
     scenario === "partial-failure" ? new Set(["2"]) : new Set<string>()
 
   return (
-    <ProductionApplicationShell
-      currentContext={currentContext}
-      contexts={Object.values(contexts)}
-      communityId={communityId}
-      navigationItems={getApplicationNavigation({
-        contextKind: currentContext.kind,
-        activeSection: "media",
-      })}
-    >
+    <>
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
           {scenario === "load-failure" ? (
@@ -270,6 +260,6 @@ export function MediaUpdate({
           </Group>
         </Stack>
       </Modal>
-    </ProductionApplicationShell>
+    </>
   )
 }
