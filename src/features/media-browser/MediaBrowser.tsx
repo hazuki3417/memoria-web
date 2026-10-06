@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 import {
   ActionIcon,
   Alert,
@@ -283,6 +285,7 @@ export function MediaBrowser({
   initialDialog?: SelectionDialog
   communityId?: string
 }) {
+  const router = useRouter()
   const [context, setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [selecting, setSelecting] = useState(initialState === "selection")
@@ -442,7 +445,7 @@ export function MediaBrowser({
             )}
             {!selecting &&
               (context === "personal" ? (
-                <Button size="xs" leftSection={<IconCloudUpload size={16} />}>
+                <Button size="xs" leftSection={<IconCloudUpload size={16} />} onClick={() => router.push("/media/upload")}>
                   アップロード
                 </Button>
               ) : (
@@ -457,7 +460,7 @@ export function MediaBrowser({
                     </Button>
                   </Menu.Target>
                   <Menu.Dropdown>
-                    <Menu.Item leftSection={<IconCloudUpload size={16} />}>
+                    <Menu.Item leftSection={<IconCloudUpload size={16} />} onClick={() => router.push(`/communities/${communityId}/media/upload`)}>
                       Communityへアップロード
                     </Menu.Item>
                     <Menu.Item leftSection={<IconShare size={16} />}>
