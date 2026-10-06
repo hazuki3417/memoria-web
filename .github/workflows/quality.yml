@@ -38,7 +38,7 @@ jobs:
         run: tar -cf /tmp/node_modules.tar node_modules
 
       - name: Upload dependencies
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: node-modules-${{ github.sha }}
           path: /tmp/node_modules.tar
@@ -187,7 +187,7 @@ jobs:
 
       - name: Upload Storybook smoke test report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: storybook-smoke-report
           path: e2e/vrt/report
