@@ -39,77 +39,24 @@ WindowsのWebブラウザから、起動時に表示される`localhost` URLへ�
 
 Devbox shellを終了する場合は`exit`を実行します。
 
-## 環境変数とSecret
-
-Server側の環境変数は`src/env/server.ts`で検証し、Server Component、Route Handler、middlewareからのみ参照します。必須値が不足している場合、URLが不正な場合、または`AUTH0_SECRET`が32文字未満の場合は安全に失敗します。
-
-| 変数 | 必須 | 用途 |
-| --- | --- | --- |
-| `APP_BASE_URL` | 必須 | Web applicationのURL |
-| `AUTH0_DOMAIN` | 必須 | Auth0 tenantのdomain |
-| `AUTH0_CLIENT_ID` | 必須 | Auth0 applicationのclient ID |
-| `AUTH0_CLIENT_SECRET` | 必須 | Auth0 applicationのclient secret |
-| `AUTH0_SECRET` | 必須 | Session暗号化用の32文字以上のsecret |
-| `API_URI` | 任意 | GraphQL APIのURL。未指定時は`http://localhost:8080/graphql` |
-| `AUTH0_SCOPE` | 任意 | 認可時に要求するscope |
-| `AUTH0_AUDIENCE` | 任意 | 認可時に要求するaudience |
-
-ローカル開発ではGit管理対象外の`.env`または実行環境の環境変数に設定します。Secretを`next.config.mjs`の`env`、`NEXT_PUBLIC_*`、Client Component、Git管理対象のfileへ記載しません。
-
-GitHub ActionsではNext.js buildに必要な項目へCI専用の無効な仮値を設定します。実際のAuth0 credentialや本番Secretは使用しません。
-
 ## 検証
 
-GitHub Actionsの`quality / web`は、Pull Requestと`develop`・`main`へのpushで、Node.js 24の依存関係導入、GraphQL client生成、Biome、TypeScript、Vitest、Next.js buildを実行します。Node.jsのversionは`package.json`の`engines.node`を正本とします。
-
-Biomeは既存コード全体の違反によって新しい変更を停止させないため、比較元commitから変更されたTypeScript fileだけを段階的に検査します。TypeScript、Vitest、Next.js buildはプロジェクト全体を対象とします。
-
-人間がローカル環境で同等のquality gateを再現する場合:
+Quality Gateは再実装期間中のため一時停止しています。ローカルでは変更内容に応じて次を実行します。
 
 ```sh
-npm ci
-npm run quality
-```
-
-各checkは個別にも実行できます。
-
-```sh
-npm run gen:graphql
 npm run check
 npm run typecheck
 npm run test:unit
 npm run build
 npm run build:storybook
-npx playwright install chromium
-npx playwright test --config=playwright.vrt.config.ts --grep 'Storybook smoke'
-```
-
-GraphQL生成物はGit管理対象外のため、clean checkoutでは型検査とbuildの前に生成します。Storybook buildとPlaywright ChromiumによるStorybookのブラウザsmoke testを必須quality gateに含めます。VRTの画像比較はsnapshot baselineの整備と差分承認の運用が必要なため、現時点では必須gateに含めません。Application E2EとAuth0・APIを含む結合testも別途整備します。
-
-UI変更では必要に応じて次も実行します。
-
-```sh
-npm run build:storybook
 npm run test:vrt
-npm run test:app
 ```
 
 snapshotは表示差分を確認してから更新します。
 
 ## GraphQL
 
-以下は現在の実装上の配置です。目標Architectureではoperation / fragmentをFeatureへ近接配置し、schema mirrorと生成物を`src/infrastructure/graphql/`配下へ移します。移行は一括ではなく、Codegen設定・import・文書を整合させる実装変更として行います。
-
-- operation: `src/graphql/operation/`
-- fragment: `src/graphql/fragment/`
-- API schemaの反映先: `src/graphql/schema/`
-- 生成コード: `src/graphql/gql/`
-
-```sh
-npm run gen:graphql
-```
-
-API契約の正本は`memoria-api/schemas/graphql/`です。生成コードを直接編集しません。
+GraphQLクライアントは再実装予定です。API契約の正本は`memoria-api/schemas/graphql/`です。実装時は`memoria-design`のFrontend実装規約に従って配置・Codegen設定を整備します。
 
 ## 文書の配置
 

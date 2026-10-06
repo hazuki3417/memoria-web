@@ -43,7 +43,7 @@
 
 Application Architectureの正本は `memoria-design/content/system/web/implementation-conventions.mdx` です。目標構成は `src/app`、`src/features`、`src/ui`、`src/infrastructure` をownership boundaryとして使用します。
 
-既存の `src/components`、`src/feature`、`src/providers`、`src/graphql`、`src/lib` 等は旧構成を含みます。存在していることだけを理由に新規実装の配置規則とはみなしません。一括移行は行わず、変更対象ごとに正本Architectureへ適合させる範囲を判断します。
+現在の `src/components` と `src/prototypes` はStorybookで検証する新しいUI・prototypeを含みます。新規のApplication実装は正本Architectureに従い、`src/app`、`src/features`、`src/ui`、`src/infrastructure` のownership boundaryへ配置します。
 
 - `src/app` はNext.jsのentry、routing、layout等を担当し、Product/Application Logicを蓄積しません。
 - Product Capabilityは `src/features` をownerとし、Feature間の直接依存を原則として避けます。
@@ -83,45 +83,23 @@ Storybookは`npm run dev:storybook`で起動します。シークレット、ロ
 
 ## 検証
 
-GitHub Actionsの`quality / web`はPull Requestと`develop`・`main`へのpushで、`npm ci`、GraphQL client生成、Biome、TypeScript、Vitest、Next.js buildを実行します。Node.jsのversionは`package.json`の`engines.node`を正本とします。
-
-Biomeは既存コード全体の違反によって新しい変更を停止させないため、比較元commitから変更されたTypeScript fileだけを段階的に検査します。TypeScript、Vitest、Next.js buildはプロジェクト全体を対象とします。
-
-人間がローカル開発環境で同じ検証を再現する場合:
+Quality Gateは再実装期間中のため一時停止しています。変更内容に応じてローカルでBiome、TypeScript、Vitest、Next.js build、Storybook build、VRTを実行します。
 
 ```sh
-npm ci
-npm run quality
-```
-
-各検証を個別に確認する場合:
-
-```sh
-npm run gen:graphql
 npm run check
 npm run typecheck
 npm run test:unit
 npm run build
-```
-
-GraphQL生成物はGit管理対象外のため、clean checkoutでは型検査とbuildの前に生成します。ChatGPTの実行環境ではbuild、test、静的解析、構文検証を実行せず、GitHub Actionsへ委譲します。
-
-表示や操作を変更する場合は、関連する検証も実行します。
-
-```sh
 npm run build:storybook
 npm run test:vrt
-npm run test:app
 ```
 
-表示差分を確認せずに、テストを通す目的だけでVisual Regression Testのsnapshotを更新しません。
+GraphQLクライアントとApplication E2Eは再実装に合わせて整備します。表示差分を確認せずに、テストを通す目的だけでVisual Regression Testのsnapshotを更新しません。
 
 ## GraphQL開発手順
 
-- `src/graphql/schema`のクライアントスキーマは、`memoria-api/schemas/graphql`が所有するAPI契約を反映します。
-- 現行構成ではoperation / fragmentを変更してから`npm run gen:graphql`を実行します。Feature近接配置への移行はArchitecture正本と実装Issueに従います。
-- GraphQL生成物はGit管理対象外です。clean checkoutでも生成可能な状態を維持し、生成物を直接編集しません。
-- 目標構成ではAPI schema mirrorを`src/infrastructure/graphql/schema`、生成物を`src/infrastructure/graphql/generated`で扱います。実装移行前にREADME・Codegen設定・importを同じ変更で整合させます。
+- GraphQLクライアントは再実装予定です。配置とCodegen設定はArchitecture正本に従って整備します。
+- API契約の正本は`memoria-api/schemas/graphql`です。
 - APIスキーマ変更時は、その契約を提供するAPI側のPRまたはcommitを示し、null許容性、scalar、upload、paginationの意味を確認します。
 - 判断を記録せず、API契約の不一致を推測によるクライアント側回避策で隠しません。
 
