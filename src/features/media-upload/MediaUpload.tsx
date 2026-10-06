@@ -331,9 +331,11 @@ const removableStatuses: FileStatus[] = [
 export function MediaUpload({
   scenario = "ready",
   context = "personal",
+  communityId = "photo-club",
 }: {
   scenario?: UploadScenario
   context?: "personal" | "community"
+  communityId?: string
 }) {
   const initialFiles =
     scenario === "empty"
@@ -414,6 +416,7 @@ export function MediaUpload({
     <ProductionApplicationShell
       currentContext={currentContext}
       contexts={Object.values(contexts)}
+      communityId={communityId}
       navigationItems={getApplicationNavigation({
         contextKind: currentContext.kind,
         activeSection: "media",
