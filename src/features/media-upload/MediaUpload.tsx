@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 import {
   Badge,
   Box,
@@ -337,6 +339,7 @@ export function MediaUpload({
   context?: "personal" | "community"
   communityId?: string
 }) {
+  const router = useRouter()
   const initialFiles =
     scenario === "empty"
       ? []
@@ -625,7 +628,7 @@ export function MediaUpload({
             {registeredCount > 0 &&
             selectedFiles.length === 0 &&
             !activeUpload ? (
-              <Button variant="default">Media Browserへ戻る</Button>
+              <Button variant="default" onClick={() => router.push(context === "community" ? `/communities/${communityId}/media` : "/media")}>Media Browserへ戻る</Button>
             ) : (
               <Button disabled={activeUpload || selectedFiles.length === 0}>
                 {activeUpload ? "アップロード中" : "アップロード"}
