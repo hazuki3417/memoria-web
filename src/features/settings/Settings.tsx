@@ -1,5 +1,8 @@
 "use client"
 
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+
 import {
   Box,
   Button,
@@ -124,20 +127,20 @@ function AccountContent() {
     <PageHeader title="アカウント" description="アカウントを管理します。" />
     <Box><SectionHeader>アカウント削除</SectionHeader><Stack gap="md" maw={620}>
       <Text size="sm">アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。</Text>
-      <Box><Button variant="default" size="sm">アカウントを削除する</Button></Box>
+      <Box><Button component={Link} href="/settings/account/delete" variant="default" size="sm">アカウントを削除する</Button></Box>
     </Stack></Box>
   </Stack>
 }
 
-export function Settings() {
+export function Settings({ section }: { section: Section }) {
+  const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
-  const [section, setSection] = useState<Section>("profile")
   const content = section === "profile" ? <ProfileContent /> : section === "preferences" ? <PreferencesContent compact={compact} /> : section === "usage" ? <UsageContent /> : <AccountContent />
 
   return <Box maw={1120} mx="auto" w="100%">
     {compact ? <Stack gap="xl">
       <Box><Text size="xs" c="dimmed" mb={6}>設定</Text>
-        <Select aria-label="設定画面" value={section} onChange={(value) => value && setSection(value as Section)}
+        <Select aria-label="設定画面" value={section} onChange={(value) => value && router.push(`/settings/${value}`)}
           data={sections.map((item) => ({ value: item.id, label: item.label }))} allowDeselect={false} />
       </Box>
       <Box>{content}</Box>
@@ -146,7 +149,7 @@ export function Settings() {
         <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
         <Stack gap={0}>{sections.map((item) =>
           <NavigationItem key={item.id} label={item.label} icon={item.icon} active={section === item.id}
-            accentColor="var(--mantine-color-blue-6)" onClick={() => setSection(item.id)} />)}
+            accentColor="var(--mantine-color-blue-6)" onClick={() => router.push(`/settings/${item.id}`)} />)}
         </Stack>
       </Box>
       <Box style={{ flex: 1 }} maw={760} miw={0}>{content}</Box>

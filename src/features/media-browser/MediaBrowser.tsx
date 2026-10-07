@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 import {
   ActionIcon,
   Alert,
@@ -55,9 +57,7 @@ import {
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
-import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
 
 type MediaBrowserState =
   | "default"
@@ -276,11 +276,14 @@ export function MediaBrowser({
   initialState = "default",
   contextKind = "personal",
   initialDialog = null,
+  communityId = "photo-club",
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
   initialDialog?: SelectionDialog
+  communityId?: string
 }) {
+  const router = useRouter()
   const [context, setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [selecting, setSelecting] = useState(initialState === "selection")
@@ -302,12 +305,6 @@ export function MediaBrowser({
       ? ["旅行"]
       : [],
   )
-  const navigationItems = getApplicationNavigation({
-    contextKind: context,
-    activeSection: "media",
-  })
-  const currentContext =
-    contexts.find((item) => item.kind === context) ?? contexts[0]
   const stateItems = [
     "true-empty",
     "filtered-empty",
@@ -332,19 +329,7 @@ export function MediaBrowser({
   }
 
   return (
-    <ProductionApplicationShell
-      currentContext={currentContext}
-      contexts={contexts}
-      navigationItems={navigationItems}
-      user={{ displayName: "Hazuki" }}
-      onSelectContext={(id) =>
-        setContext(id === "community" ? "community" : "personal")
-      }
-      onSelectNavigation={() => {}}
-      onCreateCommunity={() => {}}
-      onOpenSettings={() => {}}
-      onLogout={() => {}}
-    >
+    <>
       <Stack gap="xs" maw={1440} mx="auto">
         <Box
           style={{
@@ -411,6 +396,7 @@ export function MediaBrowser({
                   variant="default"
                   leftSection={<IconEdit size={15} />}
                   disabled={selected.size === 0}
+                  onClick={() => router.push(context === "community" ? `/communities/${communityId}/media/edit` : "/media/edit")}
                 >
                   編集
                 </Button>
@@ -439,7 +425,7 @@ export function MediaBrowser({
             )}
             {!selecting &&
               (context === "personal" ? (
-                <Button size="xs" leftSection={<IconCloudUpload size={16} />}>
+                <Button size="xs" leftSection={<IconCloudUpload size={16} />} onClick={() => router.push("/media/upload")}>
                   アップロード
                 </Button>
               ) : (
@@ -454,7 +440,7 @@ export function MediaBrowser({
                     </Button>
                   </Menu.Target>
                   <Menu.Dropdown>
-                    <Menu.Item leftSection={<IconCloudUpload size={16} />}>
+                    <Menu.Item leftSection={<IconCloudUpload size={16} />} onClick={() => router.push(`/communities/${communityId}/media/upload`)}>
                       Communityへアップロード
                     </Menu.Item>
                     <Menu.Item leftSection={<IconShare size={16} />}>
@@ -1150,6 +1136,6 @@ export function MediaBrowser({
             )
           })()}
       </Modal>
-    </ProductionApplicationShell>
+    </>
   )
 }

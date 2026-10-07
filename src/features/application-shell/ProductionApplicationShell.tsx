@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
@@ -24,6 +25,7 @@ export function ProductionApplicationShell({
   onCreateCommunity,
   onOpenSettings = () => undefined,
   onLogout = () => undefined,
+  communityId = "photo-club",
 }: {
   children: ReactNode
   currentContext: ApplicationContextOption
@@ -35,10 +37,20 @@ export function ProductionApplicationShell({
   onCreateCommunity?: () => void
   onOpenSettings?: () => void
   onLogout?: () => void
+  communityId?: string
 }) {
+  const router = useRouter()
   const navigation = useApplicationNavigation()
   const selectContext = (id: string) => {
     onSelectContext(id)
+    router.push(id === "personal" ? "/dashboard" : `/communities/${communityId}/dashboard`)
+    navigation.close()
+  }
+  const selectNavigation = (itemId: string) => {
+    onSelectNavigation(itemId)
+    const prefix = currentContext.kind === "community" ? `/communities/${communityId}` : ""
+    const path = itemId === "dashboard" ? prefix ? `${prefix}/dashboard` : "/dashboard" : `${prefix}/${itemId}`
+    router.push(path)
     navigation.close()
   }
 
@@ -65,7 +77,10 @@ export function ProductionApplicationShell({
             <ApplicationAccountMenu
               user={user}
               currentContext={currentContext}
-              onOpenSettings={onOpenSettings}
+              onOpenSettings={() => {
+                onOpenSettings()
+                router.push("/settings/profile")
+              }}
               onLogout={onLogout}
             />
           }
@@ -77,7 +92,7 @@ export function ProductionApplicationShell({
           onClose={navigation.close}
           items={navigationItems}
           accentColor={currentContext.accentColor}
-          onSelect={onSelectNavigation}
+          onSelect={selectNavigation}
         />
       }
     >

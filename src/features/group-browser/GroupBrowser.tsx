@@ -30,9 +30,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
-import { ProductionApplicationShell } from "@/features/application-shell/ProductionApplicationShell"
 
 type GroupFixture = {
   id: string
@@ -113,12 +111,7 @@ const relationCandidateNames = [
   "未整理",
 ]
 
-const personalContext = {
-  id: "personal",
-  kind: "personal" as const,
-  label: "Personal",
-  accentColor: "var(--mantine-color-blue-6)",
-}
+
 
 const previewImages = Array.from(
   { length: 9 },
@@ -333,7 +326,7 @@ function MediaGrid() {
   )
 }
 
-export function GroupBrowser() {
+export function GroupBrowser({ contextKind = "personal", communityId = "photo-club" }: { contextKind?: "personal" | "community"; communityId?: string }) {
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const splitViewRef = useGroupRef()
@@ -520,19 +513,7 @@ export function GroupBrowser() {
   )
 
   return (
-    <ProductionApplicationShell
-      currentContext={personalContext}
-      contexts={[personalContext]}
-      navigationItems={getApplicationNavigation({
-        contextKind: personalContext.kind,
-        activeSection: "groups",
-      })}
-      user={{ displayName: "ユーザー" }}
-      onSelectContext={() => undefined}
-      onSelectNavigation={() => undefined}
-      onOpenSettings={() => undefined}
-      onLogout={() => undefined}
-    >
+    <>
       {editDialog}
       {deleteDialog}
       {compact ? (
@@ -833,6 +814,6 @@ export function GroupBrowser() {
           </SplitView.Pane>
         </SplitView.Root>
       )}
-    </ProductionApplicationShell>
+    </>
   )
 }

@@ -20,23 +20,41 @@ const personalContext = {
   accentColor: "var(--mantine-color-blue-6)",
 }
 
+const communityContext = {
+  id: "community",
+  kind: "community" as const,
+  label: "家族のアルバム",
+  accentColor: "var(--mantine-color-teal-6)",
+}
+
 export function ApplicationShellContainer({
   children,
+  contextKind = "personal",
+  communityId = "photo-club",
 }: {
   children: ReactNode
+  contextKind?: "personal" | "community"
+  communityId?: string
 }) {
   const router = useRouter()
   const navigation = useApplicationNavigation()
+  const currentContext = contextKind === "community" ? communityContext : personalContext
   const navigationItems = getApplicationNavigation({
-    contextKind: personalContext.kind,
+    contextKind,
     activeSection: "dashboard",
   })
+
+  const selectNavigation = (itemId: string) => {
+    const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
+    router.push(itemId === "dashboard" ? prefix ? `${prefix}/dashboard` : "/dashboard" : `${prefix}/${itemId}`)
+    navigation.close()
+  }
 
   return (
     <ApplicationShell
       header={
         <ApplicationHeader
-          accentColor={personalContext.accentColor}
+          accentColor={currentContext.accentColor}
           leading={
             <ApplicationNavigationTrigger
               opened={navigation.opened}
@@ -45,16 +63,19 @@ export function ApplicationShellContainer({
           }
           context={
             <ApplicationContextSwitcher
-              currentContext={personalContext}
-              contexts={[personalContext]}
-              onSelect={() => undefined}
+              currentContext={currentContext}
+              contexts={[personalContext, communityContext]}
+              onSelect={(id) => {
+                router.push(id === "personal" ? "/dashboard" : `/communities/${communityId}/dashboard`)
+                navigation.close()
+              }}
             />
           }
           account={
             <ApplicationAccountMenu
               user={{ displayName: "ユーザー" }}
-              currentContext={personalContext}
-              onOpenSettings={() => router.push("/settings")}
+              currentContext={currentContext}
+              onOpenSettings={() => router.push("/settings/profile")}
               onLogout={() => undefined}
             />
           }
@@ -65,8 +86,8 @@ export function ApplicationShellContainer({
           opened={navigation.opened}
           onClose={navigation.close}
           items={navigationItems}
-          accentColor={personalContext.accentColor}
-          onSelect={() => undefined}
+          accentColor={currentContext.accentColor}
+          onSelect={selectNavigation}
         />
       }
     >
