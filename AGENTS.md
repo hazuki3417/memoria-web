@@ -43,16 +43,22 @@
 
 Application Architectureの正本は `memoria-design/content/system/web/implementation-conventions.mdx` です。目標構成は `src/app`、`src/features`、`src/ui`、`src/infrastructure` をownership boundaryとして使用します。
 
-現在の `src/components` と `src/prototypes` はStorybookで検証する新しいUI・prototypeを含みます。新規のApplication実装は正本Architectureに従い、`src/app`、`src/features`、`src/ui`、`src/infrastructure` のownership boundaryへ配置します。
+現在の `src/components`、`src/lib`、`src/providers`、`src/prototypes` はlegacy / migration structureです。既存Codeの参照・段階的移行には利用しますが、新規Application Codeの標準配置先にはしません。新規実装は正本Architectureに従い、意味のownerへ配置します。`src/app`、`src/features`、`src/ui`、`src/infrastructure` は現在の主要ownership boundaryですが、独立したArchitecture責務が実例として成立した場合は正本の合意を経て拡張できます。
 
 - `src/app` はNext.jsのentry、routing、layout等を担当し、Product/Application Logicを蓄積しません。
-- Product Capabilityは `src/features` をownerとし、Feature間の直接依存を原則として避けます。
-- Feature非依存のMemoria UI / Pattern実装は `src/ui` が所有します。再利用されるだけではFeature Componentを移動しません。
-- GraphQL Client等の外部Integrationは `src/infrastructure` が所有します。
+- Product Capabilityは `src/features` をownerとします。FeatureはURL hierarchyではなく独立したUser Purpose / Use Caseで分け、`src/features` 直下へkebab-caseでflatに配置します。Feature間の直接依存はtype-only importを含め原則として避けます。
+- Feature内部はflatをdefaultとし、`components` / `hooks` / `types` / `utils` 等のtechnical-type directoryを標準化しません。必要なnestingはresponsibility名で行います。
+- Feature rootの `index.ts` をPublic APIとし、外部consumerからFeature内部Fileへのdeep importを行いません。
+- Feature非依存のMemoria UI / Pattern実装は `src/ui` が所有します。再利用されるだけではFeature Componentを移動しません。`src/ui/<Component>/index.ts` をPublic APIとします。
+- GraphQL Client等の外部Integrationは `src/infrastructure` が所有し、`src/infrastructure/<integration>/index.ts` をPublic APIとします。
+- App Routerのroute-local private Componentは `app/.../_components` へ配置できます。`_components` は明示的なApp Router例外であり、technical bucketを一般化しません。
+- Codeは再利用性やCode種別ではなく、その意味を所有する対象・責務の近くへ配置します。
 - Product FeatureのGraphQL Remote StateはClient Apolloをdefaultとし、Server QueryはServer固有の明確な責務がある場合に利用します。
 - ComponentとPure Product/Application LogicへApolloやGenerated GraphQL Typeを漏らしません。
 - Reactを必要としない判断、変換、Validation、State Transition、Derived StateはPure TypeScriptを優先します。
-- `shared` / `common` や、Code形態だけを表すTop-level `utils` / `hooks` / `types` 等を新しい標準境界として追加しません。
+- `shared` / `common` や、Code形態だけを表すTop-level `utils` / `lib` / `hooks` / `types` / `constants` / `providers` 等を新しい標準境界として追加しません。
+- File / Component sizeに固定行数上限を設けず、独立した責務・contract・Interaction / Test boundaryを基準に分割します。
+- Module内部はrelative import、Module外部は `@/` absolute importを基本とし、Architecture Boundaryを越えるimportは各ModuleのPublic APIを経由します。
 - サーバー専用の環境変数や認証情報を、Client Componentやブラウザ向けbundleへ含めません。
 - 認証済みルートと公開ルートの境界を維持します。
 
@@ -118,8 +124,11 @@ GraphQLクライアントとApplication E2Eは再実装に合わせて整備し�
 3. ユーザー向け文言には`memoria-design/pages/ubiquitous.mdx`のユビキタス言語を使用します。
 4. 横断変更が明示されていない限り、変更範囲をこのリポジトリ内に限定します。
 5. 横断変更ではリポジトリごとにブランチとPRを分け、契約上の依存関係を相互リンクします。
-6. ロジックには単体テスト、重要なUI挙動にはStorybookまたはPlaywrightの検証を追加します。
-7. 明示的なセキュリティレビューなしに、認証、Cookie、CSRF、環境変数の公開範囲を変更しません。
+6. ロジックには単体テスト、重要なUI挙動にはStorybookまたはPlaywrightの検証を追加します。Test Levelは実装単位ではなく守るcontractに応じて選択します。
+7. UI変更ではScreen Specification、Prototype、変更前contractと比較し、visual / behavioral / responsive regressionを確認します。
+8. 実行できなかったQuality Gateを成功扱いせず、確認済みと未確認を明確に報告します。
+9. 明示的なセキュリティレビューなしに、認証、Cookie、CSRF、環境変数の公開範囲を変更しません。
+10. 実装中にProduct / Architecture上の重要な未決事項が判明した場合は推測で補完せず、合意を得てから進めます。
 
 ## コードレビュー規則
 
