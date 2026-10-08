@@ -1,3 +1,4 @@
+import { GroupPreviewGrid } from "@/components/GroupPreviewGrid"
 "use client"
 
 import {
@@ -112,85 +113,6 @@ const recentGroups = [
   { name: "記録", media: [], nestedGroups: 4 },
 ]
 
-function NestedGroupVisual({ startIndex }: { startIndex: number }) {
-  const sources = Array.from(
-    { length: 3 },
-    (_, index) =>
-      `/group-browser/group-media-${String(((startIndex + index) % 8) + 1).padStart(2, "0")}.jpg`,
-  )
-  return (
-    <Box
-      w="100%"
-      h="100%"
-      bg="var(--mantine-color-default-hover)"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "2fr 1fr",
-        gridTemplateRows: "1fr 1fr",
-        gap: 2,
-        overflow: "hidden",
-      }}
-    >
-      {sources.map((src, index) => (
-        <Box
-          key={src}
-          style={{
-            gridRow: index === 0 ? "1 / 3" : undefined,
-            backgroundImage: `url("${src}")`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        />
-      ))}
-    </Box>
-  )
-}
-
-function GroupPreview({
-  sources,
-  nestedGroups,
-}: {
-  sources: string[]
-  nestedGroups: number
-}) {
-  return (
-    <SimpleGrid cols={2} spacing={4}>
-      {(["top-left", "top-right", "bottom-left", "bottom-right"] as const).map(
-        (slot, index) => {
-          const src = sources[index]
-          const nestedIndex = index - sources.length
-          const nested = !src && nestedIndex >= 0 && nestedIndex < nestedGroups
-          return (
-            <Box
-              key={slot}
-              bdrs="sm"
-              style={{
-                position: "relative",
-                aspectRatio: "1 / 1",
-                overflow: "hidden",
-                border: src
-                  ? "1px solid var(--mantine-color-default-border)"
-                  : undefined,
-                background: "var(--mantine-color-default-hover)",
-              }}
-            >
-              {src ? (
-                <Image src={src} alt="" w="100%" h="100%" fit="cover" />
-              ) : nested ? (
-                <NestedGroupVisual startIndex={nestedIndex * 3} />
-              ) : (
-                <Center h="100%">
-                  <IconPhoto size={20} stroke={1.5} />
-                </Center>
-              )}
-            </Box>
-          )
-        },
-      )}
-    </SimpleGrid>
-  )
-}
-
 function RecentGroups() {
   return (
     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
@@ -205,9 +127,9 @@ function RecentGroups() {
           <Text fw={600} size="sm" truncate="end" title={group.name}>
             {group.name}
           </Text>
-          <GroupPreview
-            sources={group.media}
-            nestedGroups={group.nestedGroups}
+          <GroupPreviewGrid
+            directMedia={group.media}
+            aggregateMedia={Array.from({ length: 12 }, (_, index) => `/group-browser/group-media-${String((index % 9) + 1).padStart(2, "0")}.jpg`)}
           />
         </Stack>
       ))}
