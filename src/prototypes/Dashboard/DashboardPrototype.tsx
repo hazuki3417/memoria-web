@@ -1,6 +1,6 @@
 "use client"
 
-import { GroupPreviewGrid } from "@/components/GroupPreviewGrid"
+import { GroupItem } from "@/components/GroupItem"
 
 import {
   ActionIcon,
@@ -125,12 +125,11 @@ function RecentGroups() {
           bdrs="md"
           bg="var(--mantine-color-default-hover)"
         >
-          <Text fw={600} size="sm" truncate="end" title={group.name}>
-            {group.name}
-          </Text>
-          <GroupPreviewGrid
+          <GroupItem
+            name={group.name}
             directMedia={group.media}
             aggregateMedia={Array.from({ length: 12 }, (_, index) => `/group-browser/group-media-${String((index % 9) + 1).padStart(2, "0")}.jpg`)}
+            gap={8}
           />
         </Stack>
       ))}
