@@ -53,7 +53,7 @@ export function ApplicationShellPrototype({
 
   const selectContext = (id: string) => {
     setContextId(id as Context)
-    setSection("dashboard")
+    setSection((current) => current === "dashboard" || current === "media" || current === "groups" ? current : "dashboard")
   }
 
   return (
