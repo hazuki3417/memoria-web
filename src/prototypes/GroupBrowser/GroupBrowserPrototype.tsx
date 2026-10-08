@@ -30,6 +30,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
+import { GroupPreviewGrid } from "@/components/GroupPreviewGrid"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -126,88 +127,10 @@ const previewImages = Array.from(
     `/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
 )
 
-function GroupVisual({ startIndex }: { startIndex: number }) {
-  const mediaIndexes = Array.from(
-    { length: 3 },
-    (_, index) => startIndex + index,
-  )
-
-  return (
-    <Box
-      w="100%"
-      h="100%"
-      bg="var(--mantine-color-default-hover)"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "2fr 1fr",
-        gridTemplateRows: "1fr 1fr",
-        gap: 2,
-        overflow: "hidden",
-      }}
-    >
-      {mediaIndexes.map((mediaIndex, index) => (
-        <Box
-          key={mediaIndex}
-          style={{
-            gridRow: index === 0 ? "1 / 3" : undefined,
-            backgroundImage: `url("${previewImages[mediaIndex % previewImages.length]}")`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        />
-      ))}
-    </Box>
-  )
-}
-
 function PreviewGrid({ count }: { count: number }) {
-  const previewCellIds = ["preview-1", "preview-2", "preview-3", "preview-4"]
-  let groupVisualIndex = 0
-  return (
-    <SimpleGrid cols={2} spacing={4}>
-      {previewCellIds.map((cellId, index) => {
-        const media = index < Math.min(count, 4)
-        const continuation = count > 4 && index === 3
-        const groupVisualStart = groupVisualIndex * 3
-        if (!media) groupVisualIndex += 1
-        return (
-          <Box
-            key={cellId}
-            bdrs="sm"
-            style={{
-              position: "relative",
-              aspectRatio: "1 / 1",
-              border: media
-                ? "1px solid var(--mantine-color-default-border)"
-                : undefined,
-              overflow: "hidden",
-              ...(media
-                ? {
-                    backgroundImage: `url("${previewImages[index % previewImages.length]}")`,
-                    backgroundPosition: "center",
-                    backgroundSize: "cover",
-                  }
-                : {}),
-            }}
-          >
-            {!media && <GroupVisual startIndex={groupVisualStart} />}
-            {continuation && (
-              <Box
-                pos="absolute"
-                inset={0}
-                bg="rgba(0, 0, 0, 0.32)"
-                style={{ display: "grid", placeItems: "center" }}
-              >
-                <Text c="white" fw={700} size="lg">
-                  …
-                </Text>
-              </Box>
-            )}
-          </Box>
-        )
-      })}
-    </SimpleGrid>
-  )
+  const directMedia = Array.from({ length: Math.min(count, 4) }, (_, index) => previewImages[index % previewImages.length])
+  const aggregateMedia = Array.from({ length: 12 }, (_, index) => previewImages[index % previewImages.length])
+  return <GroupPreviewGrid directMedia={directMedia} directMediaCount={count} aggregateMedia={aggregateMedia} />
 }
 
 function RelationItems({ names }: { names: string[] }) {
