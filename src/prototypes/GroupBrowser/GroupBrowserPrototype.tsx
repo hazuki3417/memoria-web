@@ -30,7 +30,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { GroupPreviewGrid } from "@/components/GroupPreviewGrid"
+import { GroupItem } from "@/components/GroupItem"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { SplitView } from "@/components/SplitView"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -127,10 +127,10 @@ const previewImages = Array.from(
     `/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
 )
 
-function PreviewGrid({ count }: { count: number }) {
+function PreviewItem({ name, count }: { name: string; count: number }) {
   const directMedia = Array.from({ length: Math.min(count, 4) }, (_, index) => previewImages[index % previewImages.length])
   const aggregateMedia = Array.from({ length: 12 }, (_, index) => previewImages[index % previewImages.length])
-  return <GroupPreviewGrid directMedia={directMedia} directMediaCount={count} aggregateMedia={aggregateMedia} />
+  return <GroupItem name={name} directMedia={directMedia} directMediaCount={count} aggregateMedia={aggregateMedia} />
 }
 
 function RelationItems({ names }: { names: string[] }) {
@@ -505,17 +505,7 @@ export function GroupBrowserPrototype() {
                       bdrs="sm"
                       w={240}
                     >
-                      <Stack gap={6}>
-                        <Text
-                          fw={600}
-                          size="sm"
-                          truncate="end"
-                          title={group.name}
-                        >
-                          {group.name}
-                        </Text>
-                        <PreviewGrid count={group.previewCount} />
-                      </Stack>
+                      <PreviewItem name={group.name} count={group.previewCount} />
                     </UnstyledButton>
                   ))}
                 </Box>
@@ -624,17 +614,7 @@ export function GroupBrowserPrototype() {
                             : "1px solid transparent",
                         }}
                       >
-                        <Stack gap={6}>
-                          <Text
-                            fw={600}
-                            size="sm"
-                            truncate="end"
-                            title={group.name}
-                          >
-                            {group.name}
-                          </Text>
-                          <PreviewGrid count={group.previewCount} />
-                        </Stack>
+                        <PreviewItem name={group.name} count={group.previewCount} />
                       </UnstyledButton>
                     )
                   })}
