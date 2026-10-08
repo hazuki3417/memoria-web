@@ -383,13 +383,22 @@ function RecentMediaCarousel() {
 export function DashboardPrototype({
   initialContext = "personal",
   initialState = "default",
+  communityId,
 }: {
   initialContext?: ContextKind
   initialState?: DashboardState
+  communityId?: string
 }) {
   const [contextKind, setContextKind] = useState<ContextKind>(initialContext)
   const currentContext =
     contexts.find((context) => context.kind === contextKind) ?? contexts[0]
+  const collectionHref = (section: "media" | "groups") =>
+    contextKind === "personal"
+      ? `/${section}`
+      : communityId
+        ? `/communities/${encodeURIComponent(communityId)}/${section}`
+        : undefined
+
   const navigationItems = getApplicationNavigation({
     contextKind,
     activeSection: "dashboard",
@@ -416,7 +425,7 @@ export function DashboardPrototype({
               最近のメディア
             </Title>
             {initialState === "default" && (
-              <Button variant="subtle" size="compact-sm">
+              <Button component="a" href={collectionHref("media")} disabled={!collectionHref("media")} variant="subtle" size="compact-sm">
                 すべて見る
               </Button>
             )}
@@ -444,7 +453,7 @@ export function DashboardPrototype({
                     メディアはまだありません
                   </Text>
                 </Group>
-                <Button variant="subtle" size="compact-sm">
+                <Button component="a" href={collectionHref("media")} disabled={!collectionHref("media")} variant="subtle" size="compact-sm">
                   メディアへ移動
                 </Button>
               </Stack>
@@ -457,7 +466,7 @@ export function DashboardPrototype({
               最近のGroup
             </Title>
             {initialState === "default" && (
-              <Button variant="subtle" size="compact-sm">
+              <Button component="a" href={collectionHref("groups")} disabled={!collectionHref("groups")} variant="subtle" size="compact-sm">
                 すべて見る
               </Button>
             )}
@@ -485,7 +494,7 @@ export function DashboardPrototype({
                     Groupはまだありません
                   </Text>
                 </Group>
-                <Button variant="subtle" size="compact-sm">
+                <Button component="a" href={collectionHref("groups")} disabled={!collectionHref("groups")} variant="subtle" size="compact-sm">
                   Groupへ移動
                 </Button>
               </Stack>
