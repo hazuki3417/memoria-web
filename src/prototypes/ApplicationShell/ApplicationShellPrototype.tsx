@@ -53,7 +53,14 @@ export function ApplicationShellPrototype({
 
   const selectContext = (id: string) => {
     setContextId(id as Context)
-    setSection((current) => current === "dashboard" || current === "media" || current === "groups" ? current : "dashboard")
+    setSection((current) => {
+      const targetItems = getApplicationNavigation({
+        contextKind: contexts[id as Context].kind,
+      })
+      return targetItems.some((item) => item.id === current && !item.disabled)
+        ? current
+        : "dashboard"
+    })
   }
 
   return (
