@@ -1,0 +1,52 @@
+import { Meta } from "@storybook/blocks"
+
+<Meta title="Design Prototypes/Application Shell/Design Guide" />
+
+# Application Shell：UI設計ガイド
+
+## 参照先と位置づけ
+
+- [Application Shellの機能仕様](https://github.com/hazuki3417/memoria-design/blob/feature/storybook-design-responsibilities/content/system/application-shell.mdx)
+- [Application ShellのStory](./ApplicationShellPrototype.stories.tsx)
+- [Application ShellのPrototype](./ApplicationShellPrototype.tsx)
+
+## 現在のUI構成
+
+- ヘッダーにはナビゲーションの開閉、Memoriaの名称、現在の利用範囲の切り替え、アカウント操作を配置しています。
+- 利用範囲ごとのアクセント色をヘッダーとナビゲーションに使用します。
+- ナビゲーションは左側から開く領域で、現在の利用範囲に応じた項目と選択状態を表示します。
+- 本文領域は個別画面の表示を受け取り、Shell自体のStoryではダミーのコンテンツを表示します。
+
+## Storyごとの確認観点
+
+### Personal
+
+Personalの利用範囲が選択された状態で、現在の利用範囲の識別、ヘッダー、ナビゲーション、アカウント操作への到達方法を確認します。
+
+### Community
+
+Communityが選択された状態で、名称とアクセント色、ナビゲーションの項目が切り替わることを確認します。
+
+### Compact
+
+狭い表示領域で、ヘッダー、利用範囲の切り替え、ナビゲーションの開閉と本文領域が利用できることを確認します。
+
+## 操作時の確認観点
+
+- ナビゲーションを開閉でき、項目選択後に閉じること。
+- 利用範囲を変更した場合、切り替え先の利用範囲で現在のページに対応するページが利用できればそのページを表示し、利用できなければDashboardへ戻ること。現在はDashboard・Media・Groupが両方の利用範囲で共通していること。開いたナビゲーションは閉じること。
+- アカウント操作の表示を確認すること。設定・ログアウト等の実際の処理はPrototypeに接続されていません。
+
+## 画面幅と入力方法
+
+表示幅が狭い場合も、ヘッダー、利用範囲の切り替え、ナビゲーションの開閉を利用できるようにします。キーボード操作と焦点移動は追加検証が必要です。
+
+## テストの役割分担
+
+Storybookでは画面遷移を実行せず、表示状態と操作部品の見た目を確認します。VRTはStoryのCanvasを対象とし、URL変更は検証しません。
+
+コンテキスト切り替えによる実際のURL変更、遷移先ページ、表示データ、ブラウザ履歴はE2Eテストで検証します。対応するページがない場合の遷移もE2Eの対象であり、そのためだけのStoryは追加しません。
+
+## 未決定事項
+
+実際のURL遷移の実装、通信、権限喪失時の振る舞い、未保存データの扱いは、機能仕様側で決定します。これらをMDX側で独自に確定しません。
