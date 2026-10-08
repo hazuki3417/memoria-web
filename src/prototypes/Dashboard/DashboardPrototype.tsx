@@ -1,13 +1,12 @@
-import { GroupPreviewGrid } from "@/components/GroupPreviewGrid"
 "use client"
+
+import { GroupPreviewGrid } from "@/components/GroupPreviewGrid"
 
 import {
   ActionIcon,
   Box,
   Button,
-  Center,
   Group,
-  Image,
   SimpleGrid,
   Stack,
   Text,
@@ -17,7 +16,6 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconFolder,
-  IconPhoto,
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
