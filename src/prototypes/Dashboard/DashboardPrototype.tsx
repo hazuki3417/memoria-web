@@ -6,6 +6,8 @@ import {
   ActionIcon,
   Box,
   Button,
+  Center,
+  Image,
   Group,
   SimpleGrid,
   Stack,
@@ -16,6 +18,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconFolder,
+  IconPhoto,
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
