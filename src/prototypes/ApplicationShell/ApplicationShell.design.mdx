@@ -10,8 +10,6 @@ import { Meta } from "@storybook/blocks"
 - [Application ShellのStory](./ApplicationShellPrototype.stories.tsx)
 - [Application ShellのPrototype](./ApplicationShellPrototype.tsx)
 
-Application Shellは機能仕様より先にVisual Prototypeが作成されています。現在のPrototypeを表示・操作・画面幅への対応の比較基準とし、差異を伴う変更は確認後に行います。この文書は既存UIの設計意図を整理するためのもので、Prototypeの見た目を変更しません。
-
 ## 現在のUI構成
 
 - ヘッダーにはナビゲーションの開閉、Memoriaの名称、現在の利用範囲の切り替え、アカウント操作を配置しています。
@@ -41,7 +39,7 @@ Communityが選択された状態で、名称とアクセント色、ナビゲ�
 
 ## 画面幅と入力方法
 
-既存Storyの表示を基準にします。表示幅による具体的な差異を変更する場合は、現在のCanvasと比較して合意を得ます。キーボード操作と焦点移動は追加検証が必要です。
+表示幅が狭い場合も、ヘッダー、利用範囲の切り替え、ナビゲーションの開閉を利用できるようにします。キーボード操作と焦点移動は追加検証が必要です。
 
 ## テストの役割分担
 
