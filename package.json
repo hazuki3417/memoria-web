@@ -21,7 +21,9 @@
     "test:vrt:update": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts --update-snapshots",
     "test:vrt:report": "playwright show-report ./e2e/vrt/report",
     "storybook": "storybook dev -p 6006",
-    "dev:assets": "node scripts/link-dev-assets.mjs"
+    "dev:assets": "node scripts/link-dev-assets.mjs",
+    "test:storybook-visual": "playwright test --config=playwright.storybook-visual.config.ts",
+    "test:storybook-visual:update": "playwright test --config=playwright.storybook-visual.config.ts --update-snapshots"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
