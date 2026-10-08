@@ -15,13 +15,13 @@ export const Personal: Story = {
   args: { initialContext: "personal", initialState: "default" },
 }
 export const Community: Story = {
-  args: { initialContext: "community", initialState: "default" },
+  args: { initialContext: "community", initialState: "default", communityId: "storybook-community" },
 }
 export const Empty: Story = {
   args: { initialContext: "personal", initialState: "empty" },
 }
 export const CommunityEmpty: Story = {
-  args: { initialContext: "community", initialState: "empty" },
+  args: { initialContext: "community", initialState: "empty", communityId: "storybook-community" },
 }
 export const Compact: Story = {
   args: { initialContext: "personal", initialState: "default" },
