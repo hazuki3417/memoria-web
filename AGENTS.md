@@ -13,7 +13,7 @@
 
 ## 開発プロセスとFeedback
 
-- MemoriaはGoalを単位とするイテレーション型のアジャイル開発を採用します。正本は`memoria-design/pages/development-process.mdx`です。
+- MemoriaはGoalを単位とするイテレーション型のアジャイル開発を採用します。正本は`memoria-design/content/development-process.mdx`です。
 - 開発頻度が不定期であるため固定期間を設けず、イテレーションIssueへGoal、対象、対象外、Checkpoint、Review、振り返りを記載します。3イテレーション完了後に運用を見直します。
 - 機能単位で要求を合意して設計・実装へ進み、すべての要求完了を待つ一括工程にはしません。
 - 大規模機能は利用者価値または独立して検証できる境界でPhaseへ分割し、工程別Phase、長期Feature branch、巨大PRを前提にしません。中断時は再開に必要なCheckpointをIssueへ記録します。
