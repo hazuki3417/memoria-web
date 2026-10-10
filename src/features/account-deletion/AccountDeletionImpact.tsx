@@ -263,7 +263,7 @@ export function AccountDeletionImpact({
                 <Box
                   style={{
                     position: "sticky",
-                    top: 40,
+                    top: 0,
                     zIndex: 10,
                     background: "var(--mantine-color-body)",
                     borderBottom:
