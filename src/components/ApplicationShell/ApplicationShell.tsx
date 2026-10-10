@@ -19,7 +19,14 @@ export function ApplicationShell({
       header={{ height: 40 }}
       padding="lg"
       styles={{
-        main: { minHeight: "100vh", background: "var(--mantine-color-body)" },
+        root: { height: "100dvh", overflow: "hidden" },
+        main: {
+          height: "calc(100dvh - 40px)",
+          minHeight: 0,
+          overflowY: "auto",
+          overscrollBehavior: "contain",
+          background: "var(--mantine-color-body)",
+        },
       }}
     >
       {header}
