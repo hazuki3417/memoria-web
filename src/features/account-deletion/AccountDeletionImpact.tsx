@@ -183,6 +183,7 @@ export function AccountDeletionImpact({
     setFlowError(null)
     setReauth(false)
     setGrant(null)
+    setReview(null)
     try {
       const nextReview = await gateway.current.createReview(reviewFingerprint)
       const result = await gateway.current.reauthenticate(nextReview)
@@ -236,7 +237,12 @@ export function AccountDeletionImpact({
     if (step === 3) void startReauthentication()
   }
   const back = () => {
-    if (step === 3) setStep(hasCommunities ? 2 : 0)
+    if (step === 3) {
+      setReauth(false)
+      setGrant(null)
+      setReview(null)
+      setStep(hasCommunities ? 2 : 0)
+    }
     if (step === 2) setStep(1)
     if (step === 1) setStep(0)
   }
