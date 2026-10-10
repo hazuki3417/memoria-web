@@ -19,9 +19,9 @@ export function ApplicationShell({
       header={{ height: 40 }}
       padding="lg"
       styles={{
-        root: { position: "relative", height: "100dvh", overflow: "hidden" },
+        root: { height: "100dvh", overflow: "hidden" },
         main: {
-          position: "absolute",
+          position: "fixed",
           top: 40,
           right: 0,
           bottom: 0,
