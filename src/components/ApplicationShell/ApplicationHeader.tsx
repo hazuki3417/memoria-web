@@ -20,7 +20,7 @@ export function ApplicationHeader({
   return (
     <AppShell.Header
       style={{
-        zIndex: 300,
+        zIndex: 100,
         borderTop: `2px solid ${accentColor ?? "transparent"}`,
       }}
     >
