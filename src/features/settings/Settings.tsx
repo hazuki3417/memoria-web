@@ -19,7 +19,7 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import { IconChartBar, IconSettings, IconUser, IconUserCircle } from "@tabler/icons-react"
 import { useState } from "react"
-import { FeedbackAlert, showNotification } from "@/components/Feedback"
+import { showNotification } from "@/components/Feedback"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
