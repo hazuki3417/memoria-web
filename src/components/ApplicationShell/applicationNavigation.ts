@@ -1,6 +1,7 @@
 import {
   IconLayoutDashboard,
   IconPhoto,
+  IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
 import type {
@@ -8,7 +9,7 @@ import type {
   ApplicationNavigationItem,
 } from "./types"
 
-export type ApplicationSection = "dashboard" | "media" | "groups"
+export type ApplicationSection = "dashboard" | "media" | "groups" | "members"
 
 const baseApplicationNavigation = [
   { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
@@ -16,7 +17,10 @@ const baseApplicationNavigation = [
   { id: "groups", label: "グループ", icon: IconUsers },
 ] satisfies ApplicationNavigationItem[]
 
-const communityApplicationNavigation = [...baseApplicationNavigation] satisfies ApplicationNavigationItem[]
+const communityApplicationNavigation = [
+  ...baseApplicationNavigation,
+  { id: "members", label: "メンバー", icon: IconUserCircle },
+] satisfies ApplicationNavigationItem[]
 
 export function getApplicationNavigation({
   contextKind,
