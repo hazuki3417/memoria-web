@@ -49,12 +49,18 @@ export function SettingsUsage({ usage }: { usage: SettingsUsageData }) {
       {usage.formatBreakdown && (
         <Box>
           <SectionHeader>ファイル形式別内訳</SectionHeader>
-          <Table striped highlightOnHover>
-            <Table.Thead><Table.Tr><Table.Th>形式</Table.Th><Table.Th ta="right">登録件数</Table.Th><Table.Th ta="right">使用量</Table.Th></Table.Tr></Table.Thead>
-            <Table.Tbody>{usage.formatBreakdown.map((item) => (
-              <Table.Tr key={item.format}><Table.Td>{item.format}</Table.Td><Table.Td ta="right">{item.count.toLocaleString("ja-JP")}件</Table.Td><Table.Td ta="right">{item.sizeLabel}</Table.Td></Table.Tr>
-            ))}</Table.Tbody>
-          </Table>
+          <Table
+            striped
+            highlightOnHover
+            data={{
+              head: ["形式", "登録件数", "使用量"],
+              body: usage.formatBreakdown.map((item) => [
+                item.format,
+                item.count.toLocaleString("ja-JP") + "件",
+                item.sizeLabel,
+              ]),
+            }}
+          />
         </Box>
       )}
     </Stack>
