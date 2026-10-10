@@ -19,6 +19,7 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import { IconChartBar, IconSettings, IconUser, IconUserCircle } from "@tabler/icons-react"
 import { useState } from "react"
+import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -33,28 +34,58 @@ const sections = [
   { id: "account", label: "アカウント", icon: IconUserCircle },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
 
+const MOCK_PROFILE = { nickname: "ユーザー" }
+
 function ProfileContent() {
-  const [name, setName] = useState("ユーザー")
-  const [saved, setSaved] = useState("ユーザー")
+  const [name, setName] = useState(MOCK_PROFILE.nickname)
+  const [saved, setSaved] = useState(MOCK_PROFILE.nickname)
+  const [isSaving, setIsSaving] = useState(false)
   const normalized = name.trim()
   const dirty = normalized !== saved
   const invalid = normalized.length === 0
 
-  return <Stack gap="xl">
-    <PageHeader title="プロフィール" description="プロフィール情報を変更します。" />
-    <Box>
-      <SectionHeader>基本情報</SectionHeader>
-      <Stack gap="md" maw={540}>
-        <TextInput label="ニックネーム" description="Memoriaで表示する名前です。" value={name}
-          onChange={(event) => setName(event.currentTarget.value)}
-          error={invalid ? "ニックネームを入力してください。" : undefined} required />
-        <Group gap="sm">
-          <Button size="sm" disabled={!dirty || invalid} onClick={() => { setSaved(normalized); setName(normalized) }}>保存</Button>
-          {dirty && <Button size="sm" variant="default" onClick={() => setName(saved)}>キャンセル</Button>}
-        </Group>
-      </Stack>
-    </Box>
-  </Stack>
+  const save = async () => {
+    if (!dirty || invalid || isSaving) return
+
+    setIsSaving(true)
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    setSaved(normalized)
+    setName(normalized)
+    setIsSaving(false)
+    showNotification({
+      kind: "success",
+      title: "保存しました",
+      message: "プロフィールを更新しました。",
+    })
+  }
+
+  return (
+    <Stack gap="xl">
+      <PageHeader title="プロフィール" description="プロフィール情報を変更します。" />
+      <Box>
+        <SectionHeader>基本情報</SectionHeader>
+        <Stack gap="md" maw={540}>
+          <TextInput
+            label="ニックネーム"
+            description="Memoriaで表示する名前です。"
+            value={name}
+            onChange={(event) => setName(event.currentTarget.value)}
+            error={invalid ? "ニックネームを入力してください。" : undefined}
+            required
+            disabled={isSaving}
+          />
+          <Button
+            size="sm"
+            disabled={!dirty || invalid || isSaving}
+            loading={isSaving}
+            onClick={save}
+          >
+            {isSaving ? "保存中" : "保存"}
+          </Button>
+        </Stack>
+      </Box>
+    </Stack>
+  )
 }
 
 function PreferencesContent({ compact }: { compact: boolean }) {
