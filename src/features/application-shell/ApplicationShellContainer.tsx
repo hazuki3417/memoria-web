@@ -62,13 +62,14 @@ export function ApplicationShellContainer({
   })
 
   useEffect(() => {
-    if (communityMatch) {
+    const routeCommunityMatch = pathname.match(/^\/communities\/([^/]+)/)
+    if (routeCommunityMatch) {
       setRememberedContextKind("community")
-      setRememberedCommunityId(communityMatch[1])
-    } else if (!isSettingsRoute) {
+      setRememberedCommunityId(routeCommunityMatch[1])
+    } else if (!pathname.startsWith("/settings")) {
       setRememberedContextKind("personal")
     }
-  }, [pathname, communityMatch, isSettingsRoute])
+  }, [pathname])
 
   const getContextPath = (contextId: string) => {
     const targetIsCommunity = contextId !== "personal"
