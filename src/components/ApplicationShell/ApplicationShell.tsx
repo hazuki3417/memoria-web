@@ -27,7 +27,7 @@ export function ApplicationShell({
           bottom: 0,
           left: 0,
           height: "auto",
-          paddingTop: "var(--mantine-spacing-lg)",
+          paddingTop: 0,
           minHeight: 0,
           overflowY: "auto",
           overscrollBehavior: "contain",
