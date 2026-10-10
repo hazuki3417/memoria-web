@@ -394,12 +394,6 @@ export function AccountDeletionImpactPrototype({
                           </Button>
                         </Box>
                         <Box style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
-                        <Box
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
                           {loadState !== "ready" ? (
                             <Button
                               size="sm"
