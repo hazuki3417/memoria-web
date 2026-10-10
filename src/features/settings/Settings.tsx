@@ -19,7 +19,7 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import { IconChartBar, IconSettings, IconUser, IconUserCircle } from "@tabler/icons-react"
 import { useState } from "react"
-import { showNotification } from "@/components/Feedback"
+import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -36,35 +36,82 @@ const sections = [
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
 
-function ProfileContent() {
+type ProfileSaveErrorKind = "retryable" | "blocked"
+type SaveProfile = (nickname: string) => Promise<void>
+
+async function saveMockProfile() {
+  await new Promise((resolve) => setTimeout(resolve, 500))
+}
+
+function isBlockingProfileSaveError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "kind" in error &&
+    error.kind === "blocked"
+  )
+}
+
+function ProfileContent({ onSave = saveMockProfile }: { onSave?: SaveProfile }) {
   const [name, setName] = useState(MOCK_PROFILE.nickname)
   const [saved, setSaved] = useState(MOCK_PROFILE.nickname)
-  const [isSaving, setIsSaving] = useState(false)
+  const [saveState, setSaveState] = useState<
+    "idle" | "saving" | "retryable-error" | "blocked"
+  >("idle")
   const normalized = name.trim()
   const dirty = normalized !== saved
   const invalid = normalized.length === 0
+  const isSaving = saveState === "saving"
+  const isBlocked = saveState === "blocked"
 
   const save = async () => {
-    if (!dirty || invalid || isSaving) return
+    if (!dirty || invalid || isSaving || isBlocked) return
 
-    setIsSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    setSaved(normalized)
-    setName(normalized)
-    setIsSaving(false)
-    showNotification({
-      kind: "success",
-      title: "保存しました",
-      message: "プロフィールを更新しました。",
-    })
+    setSaveState("saving")
+    try {
+      await onSave(normalized)
+      setSaved(normalized)
+      setName(normalized)
+      setSaveState("idle")
+      showNotification({
+        kind: "success",
+        title: "保存しました",
+        message: "プロフィールを更新しました。",
+      })
+    } catch (error) {
+      setSaveState(
+        isBlockingProfileSaveError(error) ? "blocked" : "retryable-error",
+      )
+    }
   }
 
   return (
     <Stack gap="xl">
-      <PageHeader title="プロフィール" description="プロフィール情報を変更します。" />
+      <PageHeader
+        title="プロフィール"
+        description="プロフィール情報を変更します。"
+      />
       <Box>
         <SectionHeader>基本情報</SectionHeader>
         <Stack gap="md" maw={540}>
+          {saveState === "retryable-error" && (
+            <FeedbackAlert
+              kind="error"
+              title="保存の完了を確認できませんでした"
+              role="alert"
+            >
+              入力内容は保持されています。内容を確認して、もう一度保存してください。
+            </FeedbackAlert>
+          )}
+          {isBlocked && (
+            <FeedbackAlert
+              kind="error"
+              title="プロフィールを変更できません"
+              role="alert"
+            >
+              Userの状態が変わったため、この画面での変更を続けられません。画面を再読み込みして現在の状態を確認してください。
+            </FeedbackAlert>
+          )}
           <TextInput
             label="ニックネーム"
             description="Memoriaで表示する名前です。"
@@ -72,15 +119,19 @@ function ProfileContent() {
             onChange={(event) => setName(event.currentTarget.value)}
             error={invalid ? "ニックネームを入力してください。" : undefined}
             required
-            disabled={isSaving}
+            disabled={isSaving || isBlocked}
           />
           <Button
             size="sm"
-            disabled={!dirty || invalid || isSaving}
+            disabled={!dirty || invalid || isSaving || isBlocked}
             loading={isSaving}
             onClick={save}
           >
-            {isSaving ? "保存中" : "保存"}
+            {saveState === "retryable-error"
+              ? "再試行"
+              : isSaving
+                ? "保存中"
+                : "保存"}
           </Button>
         </Stack>
       </Box>
@@ -163,10 +214,16 @@ function AccountContent() {
   </Stack>
 }
 
-export function Settings({ section }: { section: Section }) {
+export function Settings({
+  section,
+  saveProfile,
+}: {
+  section: Section
+  saveProfile?: SaveProfile
+}) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
-  const content = section === "profile" ? <ProfileContent /> : section === "preferences" ? <PreferencesContent compact={compact} /> : section === "usage" ? <UsageContent /> : <AccountContent />
+  const content = section === "profile" ? <ProfileContent onSave={saveProfile} /> : section === "preferences" ? <PreferencesContent compact={compact} /> : section === "usage" ? <UsageContent /> : <AccountContent />
 
   return <Box maw={1120} mx="auto" w="100%">
     {compact ? <Stack gap="xl">
