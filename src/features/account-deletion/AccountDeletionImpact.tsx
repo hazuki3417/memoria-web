@@ -16,6 +16,7 @@ import {
   Title,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { FeedbackAlert } from "@/components/Feedback"
 
@@ -116,6 +117,7 @@ export function AccountDeletionImpact({
   communityScenario?: CommunityScenario
   retryOutcome?: RetryOutcome
 }) {
+  const router = useRouter()
   const [step, setStep] = useState(0)
   const compactStepper = useMediaQuery("(max-width: 48em)")
   const [loadState, setLoadState] = useState<"ready" | "failed" | "retrying">(
@@ -171,7 +173,7 @@ export function AccountDeletionImpact({
       setCancelConfirmationOpened(true)
       return
     }
-    setCancelled(true)
+    router.push("/settings/account")
   }
   const skipped = (index: number) =>
     (index === 1 && !hasCommunities) || (index === 2 && !hasCommunities)
@@ -212,7 +214,7 @@ export function AccountDeletionImpact({
             <Button
               onClick={() => {
                 setCancelConfirmationOpened(false)
-                setCancelled(true)
+                router.push("/settings/account")
               }}
             >
               中止する
@@ -942,6 +944,13 @@ export function AccountDeletionImpact({
                   </Box>
                 )}
               </>
+            )}
+            {!cancelled && !confirmed && (
+              <Group justify="flex-start" mt="md">
+                <Button size="sm" variant="subtle" color="gray" onClick={cancel}>
+                  削除手続きを中止して設定に戻る
+                </Button>
+              </Group>
             )}
           </Stack>
         </Box>
