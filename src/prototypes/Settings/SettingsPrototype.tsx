@@ -23,6 +23,7 @@ import {
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { NavigationItem } from "@/components/NavigationItem"
+import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
@@ -37,12 +38,38 @@ const sections = [
   { id: "account", label: "アカウント", icon: IconUserCircle },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
 
-function ProfileContent() {
-  const [name, setName] = useState("ユーザー")
-  const [saved, setSaved] = useState("ユーザー")
+type ProfileSaveState = "idle" | "saving" | "retryable-error" | "blocked"
+
+const MOCK_PROFILE = { nickname: "ユーザー" }
+
+function ProfileContent({
+  initialSaveState = "idle",
+}: {
+  initialSaveState?: ProfileSaveState
+}) {
+  const [name, setName] = useState(MOCK_PROFILE.nickname)
+  const [saved, setSaved] = useState(MOCK_PROFILE.nickname)
+  const [saveState, setSaveState] = useState<ProfileSaveState>(initialSaveState)
   const normalized = name.trim()
   const dirty = normalized !== saved
   const invalid = normalized.length === 0
+  const blocked = saveState === "blocked"
+  const saving = saveState === "saving"
+
+  const save = async () => {
+    if (!dirty || invalid || blocked || saving) return
+
+    setSaveState("saving")
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    setSaved(normalized)
+    setName(normalized)
+    setSaveState("idle")
+    showNotification({
+      kind: "success",
+      title: "保存しました",
+      message: "プロフィールを更新しました。",
+    })
+  }
 
   return (
     <Stack gap="xl">
@@ -53,6 +80,24 @@ function ProfileContent() {
       <Box>
         <SectionHeader>基本情報</SectionHeader>
         <Stack gap="md" maw={540}>
+          {blocked && (
+            <FeedbackAlert
+              kind="error"
+              title="プロフィールを変更できません"
+              role="alert"
+            >
+              Userの状態が変わったため、この画面での変更を続けられません。ページを再読み込みして現在の状態を確認してください。
+            </FeedbackAlert>
+          )}
+          {saveState === "retryable-error" && (
+            <FeedbackAlert
+              kind="error"
+              title="保存の完了を確認できませんでした"
+              role="alert"
+            >
+              入力内容は保持されています。内容を確認して、もう一度保存してください。
+            </FeedbackAlert>
+          )}
           <TextInput
             label="ニックネーム"
             description="Memoriaで表示する名前です。"
@@ -60,28 +105,16 @@ function ProfileContent() {
             onChange={(event) => setName(event.currentTarget.value)}
             error={invalid ? "ニックネームを入力してください。" : undefined}
             required
+            disabled={blocked || saving}
           />
-          <Group gap="sm">
-            <Button
-              size="sm"
-              disabled={!dirty || invalid}
-              onClick={() => {
-                setSaved(normalized)
-                setName(normalized)
-              }}
-            >
-              保存
-            </Button>
-            {dirty && (
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => setName(saved)}
-              >
-                キャンセル
-              </Button>
-            )}
-          </Group>
+          <Button
+            size="sm"
+            disabled={!dirty || invalid || blocked || saving}
+            loading={saving}
+            onClick={save}
+          >
+            {saveState === "retryable-error" ? "再試行" : saving ? "保存中" : "保存"}
+          </Button>
         </Stack>
       </Box>
     </Stack>
@@ -288,8 +321,10 @@ function AccountContent() {
 
 export function SettingsPrototype({
   initialSection = "profile",
+  initialProfileSaveState = "idle",
 }: {
   initialSection?: Section
+  initialProfileSaveState?: ProfileSaveState
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>(initialSection)
@@ -297,7 +332,7 @@ export function SettingsPrototype({
 
   const content =
     section === "profile" ? (
-      <ProfileContent />
+      <ProfileContent initialSaveState={initialProfileSaveState} />
     ) : section === "preferences" ? (
       <PreferencesContent compact={compact} />
     ) : section === "usage" ? (
