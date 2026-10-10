@@ -292,12 +292,12 @@ export function AccountDeletionImpact({
               <Stack gap="md">
                 <Title order={2} size="h4">
                   {confirmed
-                    ? "削除を確認しました（プロトタイプ）"
+                    ? "削除処理を確認しました（モック）"
                     : "削除手続きを中止しました"}
                 </Title>
                 <Text c="dimmed">
                   {confirmed
-                    ? "このプロトタイプではアカウントとデータは削除されません。"
+                    ? "モックの確認処理が完了しました。アカウントとデータは削除されていません。"
                     : "削除は開始されていません。"}
                 </Text>
                 <Button
@@ -307,6 +307,9 @@ export function AccountDeletionImpact({
                     setCancelled(false)
                     setConfirmed(false)
                     setReauth(false)
+                    setReview(null)
+                    setGrant(null)
+                    setFlowError(null)
                     setStep(0)
                   }}
                 >
