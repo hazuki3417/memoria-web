@@ -9,6 +9,7 @@ import {
   ApplicationNavigation,
   ApplicationNavigationTrigger,
   ApplicationShell,
+  isApplicationChromeFeatureVisible,
   getApplicationNavigation,
   getApplicationSection,
   getContextSwitchPath,
@@ -40,6 +41,7 @@ export function ApplicationShellContainer({
   const [rememberedContextKind, setRememberedContextKind] = useState<"personal" | "community">("personal")
   const [rememberedCommunityId, setRememberedCommunityId] = useState("photo-club")
   const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
+  const chromeVariant = pathname === "/settings/account/delete" ? "restricted-flow" : "authenticated"
   const isSettingsRoute = pathname.startsWith("/settings")
   const contextKind = communityMatch
     ? "community"
@@ -75,13 +77,14 @@ export function ApplicationShellContainer({
       header={
         <ApplicationHeader
           accentColor={currentContext.accentColor}
-          leading={
+          reserveNavigationSpace={chromeVariant === "restricted-flow"}
+          leading={isApplicationChromeFeatureVisible(chromeVariant, "navigation") ? (
             <ApplicationNavigationTrigger
               opened={navigation.opened}
               onToggle={navigation.toggle}
             />
-          }
-          context={
+          ) : undefined}
+          context={isApplicationChromeFeatureVisible(chromeVariant, "context-switcher") ? (
             <ApplicationContextSwitcher
               currentContext={currentContext}
               contexts={[personalContext, communityContext]}
@@ -94,18 +97,18 @@ export function ApplicationShellContainer({
                 navigation.close()
               }}
             />
-          }
-          account={
+          ) : undefined}
+          account={isApplicationChromeFeatureVisible(chromeVariant, "account-menu") ? (
             <ApplicationAccountMenu
               user={{ displayName: "ユーザー" }}
               currentContext={currentContext}
               onOpenSettings={() => router.push("/settings/profile")}
               onLogout={() => undefined}
             />
-          }
+          ) : undefined}
         />
       }
-      navigation={
+      navigation={isApplicationChromeFeatureVisible(chromeVariant, "navigation") ? (
         <ApplicationNavigation
           opened={navigation.opened}
           onClose={navigation.close}
@@ -113,7 +116,7 @@ export function ApplicationShellContainer({
           accentColor={currentContext.accentColor}
           onSelect={selectNavigation}
         />
-      }
+      ) : undefined}
     >
       {children}
     </ApplicationShell>
