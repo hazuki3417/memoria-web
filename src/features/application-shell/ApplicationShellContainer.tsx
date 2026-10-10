@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation"
-import type { ReactNode } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -38,22 +38,37 @@ function getApplicationSection(pathname: string) {
 
 export function ApplicationShellContainer({
   children,
-  contextKind = "personal",
-  communityId = "photo-club",
 }: {
   children: ReactNode
-  contextKind?: "personal" | "community"
-  communityId?: string
 }) {
   const router = useRouter()
   const pathname = usePathname()
   const navigation = useApplicationNavigation()
+  const [rememberedContextKind, setRememberedContextKind] = useState<"personal" | "community">("personal")
+  const [rememberedCommunityId, setRememberedCommunityId] = useState("photo-club")
+  const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
+  const isSettingsRoute = pathname.startsWith("/settings")
+  const contextKind = communityMatch
+    ? "community"
+    : isSettingsRoute
+      ? rememberedContextKind
+      : "personal"
+  const communityId = communityMatch?.[1] ?? rememberedCommunityId
   const currentContext = contextKind === "community" ? communityContext : personalContext
   const activeSection = getApplicationSection(pathname)
   const navigationItems = getApplicationNavigation({
     contextKind,
     activeSection,
   })
+
+  useEffect(() => {
+    if (communityMatch) {
+      setRememberedContextKind("community")
+      setRememberedCommunityId(communityMatch[1])
+    } else if (!isSettingsRoute) {
+      setRememberedContextKind("personal")
+    }
+  }, [pathname, communityMatch, isSettingsRoute])
 
   const getContextPath = (contextId: string) => {
     const targetIsCommunity = contextId !== "personal"
