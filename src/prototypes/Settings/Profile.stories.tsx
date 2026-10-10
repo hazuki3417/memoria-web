@@ -16,3 +16,15 @@ export const Default: Story = {}
 export const Compact: Story = {
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
+
+export const Saving: Story = {
+  args: { initialProfileSaveState: "saving" },
+}
+
+export const RetryableFailure: Story = {
+  args: { initialProfileSaveState: "retryable-error" },
+}
+
+export const BlockingError: Story = {
+  args: { initialProfileSaveState: "blocked" },
+}
