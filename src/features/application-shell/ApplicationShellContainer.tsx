@@ -10,6 +10,8 @@ import {
   ApplicationNavigationTrigger,
   ApplicationShell,
   getApplicationNavigation,
+  getApplicationSection,
+  getContextSwitchPath,
   useApplicationNavigation,
 } from "@/components/ApplicationShell"
 
@@ -25,15 +27,6 @@ const communityContext = {
   kind: "community" as const,
   label: "家族のアルバム",
   accentColor: "var(--mantine-color-teal-6)",
-}
-
-const applicationSections = ["dashboard", "media", "groups", "members"] as const
-
-function getApplicationSection(pathname: string) {
-  const section = pathname.split("/").filter(Boolean).at(-1)
-  return applicationSections.includes(section as (typeof applicationSections)[number])
-    ? (section as (typeof applicationSections)[number])
-    : "dashboard"
 }
 
 export function ApplicationShellContainer({
@@ -71,14 +64,6 @@ export function ApplicationShellContainer({
     }
   }, [pathname])
 
-  const getContextPath = (contextId: string) => {
-    const targetIsCommunity = contextId !== "personal"
-    const targetPrefix = targetIsCommunity ? `/communities/${communityId}` : ""
-    const targetSupportsSection = targetIsCommunity || activeSection !== "members"
-    const section = targetSupportsSection ? activeSection : "dashboard"
-    return section === "dashboard" ? targetPrefix || "/dashboard" : `${targetPrefix}/${section}`
-  }
-
   const selectNavigation = (itemId: string) => {
     const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
     router.push(itemId === "dashboard" ? prefix ? `${prefix}/dashboard` : "/dashboard" : `${prefix}/${itemId}`)
@@ -101,7 +86,11 @@ export function ApplicationShellContainer({
               currentContext={currentContext}
               contexts={[personalContext, communityContext]}
               onSelect={(id) => {
-                router.push(getContextPath(id))
+                router.push(getContextSwitchPath({
+                  currentPathname: pathname,
+                  targetContextKind: id === "personal" ? "personal" : "community",
+                  communityId,
+                }))
                 navigation.close()
               }}
             />

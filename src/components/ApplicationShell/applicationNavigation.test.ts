@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { getApplicationNavigation } from "./applicationNavigation"
+import {
+  getApplicationNavigation,
+  getContextSwitchPath,
+} from "./applicationNavigation"
 
 describe("getApplicationNavigation", () => {
   it("returns the standard personal navigation", () => {
@@ -45,5 +48,37 @@ describe("getApplicationNavigation", () => {
 
     expect(first.find((item) => item.id === "media")?.active).toBe(true)
     expect(second.find((item) => item.id === "media")?.active).toBe(false)
+  })
+})
+
+describe("getContextSwitchPath", () => {
+  it("preserves the media destination when switching from Personal to Community", () => {
+    expect(
+      getContextSwitchPath({
+        currentPathname: "/media",
+        targetContextKind: "community",
+        communityId: "family-123",
+      }),
+    ).toBe("/communities/family-123/media")
+  })
+
+  it("preserves Groups when switching from Community to Personal", () => {
+    expect(
+      getContextSwitchPath({
+        currentPathname: "/communities/family-123/groups",
+        targetContextKind: "personal",
+        communityId: "family-123",
+      }),
+    ).toBe("/groups")
+  })
+
+  it("falls back to the selected context Dashboard when the section is unavailable", () => {
+    expect(
+      getContextSwitchPath({
+        currentPathname: "/communities/family-123/members",
+        targetContextKind: "personal",
+        communityId: "family-123",
+      }),
+    ).toBe("/dashboard")
   })
 })

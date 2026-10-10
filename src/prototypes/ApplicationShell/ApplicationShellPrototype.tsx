@@ -6,6 +6,7 @@ import {
   type ApplicationContextOption,
   type ApplicationSection,
   getApplicationNavigation,
+  getContextSwitchSection,
 } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
@@ -52,15 +53,11 @@ export function ApplicationShellPrototype({
   })
 
   const selectContext = (id: string) => {
+    const targetContext = contexts[id as Context]
     setContextId(id as Context)
-    setSection((current) => {
-      const targetItems = getApplicationNavigation({
-        contextKind: contexts[id as Context].kind,
-      })
-      return targetItems.some((item) => item.id === current && !item.disabled)
-        ? current
-        : "dashboard"
-    })
+    setSection((current) =>
+      getContextSwitchSection(current, targetContext.kind),
+    )
   }
 
   return (

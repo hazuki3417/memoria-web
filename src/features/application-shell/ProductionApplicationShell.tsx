@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
@@ -11,6 +11,7 @@ import {
   type ApplicationNavigationItem,
   ApplicationNavigationTrigger,
   ApplicationShell,
+  getContextSwitchPath,
   useApplicationNavigation,
 } from "@/components/ApplicationShell"
 
@@ -40,10 +41,20 @@ export function ProductionApplicationShell({
   communityId?: string
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const navigation = useApplicationNavigation()
   const selectContext = (id: string) => {
     onSelectContext(id)
-    router.push(id === "personal" ? "/dashboard" : `/communities/${communityId}/dashboard`)
+    const selectedContext = contexts.find((context) => context.id === id)
+    const targetContextKind =
+      selectedContext?.kind ?? (id === "personal" ? "personal" : "community")
+    router.push(
+      getContextSwitchPath({
+        currentPathname: pathname,
+        targetContextKind,
+        communityId,
+      }),
+    )
     navigation.close()
   }
   const selectNavigation = (itemId: string) => {
