@@ -3,6 +3,7 @@
 import {
   Box,
   Button,
+  ColorInput,
   Group,
   Select,
   Stack,
@@ -133,10 +134,13 @@ function ProfileContent({
 
 function PreferencesContent({ compact }: { compact: boolean }) {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
-  const [dateFormat, setDateFormat] = useState("YYYY-MM-DD")
+  const [dateFormat, setDateFormat] = useState("YYYY/MM/DD")
   const [fileSizeUnit, setFileSizeUnit] = useState("SI")
-  const [loop, setLoop] = useState(true)
-  const [showDetails, setShowDetails] = useState(false)
+  const [loop, setLoop] = useState(false)
+  const [wideDetails, setWideDetails] = useState(true)
+  const [mediumDetails, setMediumDetails] = useState(false)
+  const [thumbnailSize, setThumbnailSize] = useState("medium")
+  const [accentColor, setAccentColor] = useState("#10B981")
 
   return (
     <Stack gap="xl">
@@ -166,6 +170,9 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               allowDeselect={false}
             />
           </SettingRow>
+          <SettingRow compact={compact} label="Personal Accent Color" description="Personal Contextのアクセントカラーを選びます。">
+            <ColorInput aria-label="Personal Accent Color" format="hex" value={accentColor} onChange={setAccentColor} />
+          </SettingRow>
           <SettingRow
             compact={compact}
             label="日付形式"
@@ -175,7 +182,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               aria-label="日付形式"
               value={dateFormat}
               onChange={(value) => value && setDateFormat(value)}
-              data={["YYYY-MM-DD"]}
+              data={["YYYY/MM/DD", "MM/DD/YYYY", "DD/MM/YYYY"]}
               allowDeselect={false}
             />
           </SettingRow>
@@ -195,6 +202,9 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               allowDeselect={false}
             />
           </SettingRow>
+          <SettingRow compact={compact} label="Mediaサムネイルサイズ" description="Media一覧のサムネイルサイズを選びます。">
+            <Select aria-label="Mediaサムネイルサイズ" value={thumbnailSize} onChange={(value) => value && setThumbnailSize(value)} data={[{value:"small",label:"小"},{value:"medium",label:"中"},{value:"large",label:"大"}]} allowDeselect={false} />
+          </SettingRow>
         </Stack>
       </Box>
       <Box>
@@ -202,7 +212,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
         <Stack gap="xl">
           <SettingRow
             compact={compact}
-            label="繰り返し表示"
+            label="Media Detailの前後Navigation循環"
             description="最後まで進んだら最初のMediaに戻ります。"
           >
             <Switch
@@ -213,14 +223,13 @@ function PreferencesContent({ compact }: { compact: boolean }) {
           </SettingRow>
           <SettingRow
             compact={compact}
-            label="詳細情報を表示"
-            description="プレビューを開いたときに詳細情報を表示します。"
+            label="詳細情報の初期表示（Wide）"
+            description="WideでMedia Detailを開くときに詳細情報を展開します。"
           >
-            <Switch
-              checked={showDetails}
-              onChange={(event) => setShowDetails(event.currentTarget.checked)}
-              label={showDetails ? "オン" : "オフ"}
-            />
+            <Switch checked={wideDetails} onChange={(event) => setWideDetails(event.currentTarget.checked)} label={wideDetails ? "オン" : "オフ"} />
+          </SettingRow>
+          <SettingRow compact={compact} label="詳細情報の初期表示（Medium）" description="MediumでMedia Detailを開くときに詳細情報を展開します。">
+            <Switch checked={mediumDetails} onChange={(event) => setMediumDetails(event.currentTarget.checked)} label={mediumDetails ? "オン" : "オフ"} />
           </SettingRow>
         </Stack>
       </Box>
