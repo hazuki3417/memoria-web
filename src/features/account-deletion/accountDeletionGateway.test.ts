@@ -12,6 +12,23 @@ describe("mock account deletion gateway", () => {
     await expect(gateway.confirm(review, result.grant)).resolves.toBeUndefined()
     await expect(gateway.confirm(review, result.grant)).rejects.toThrow()
   })
+  it("rejects grants after ten minutes", async () => {
+    let currentTime = 1000
+    const gateway = mockAccountDeletionGateway("success", () => currentTime)
+    const review = await gateway.createReview("plan")
+    const result = await gateway.reauthenticate(review)
+    if (result.status !== "success") throw new Error("expected success")
+    currentTime += 600000
+    await expect(gateway.confirm(review, result.grant)).rejects.toThrow()
+  })
+  it("does not allow grants from another review", async () => {
+    const gateway = mockAccountDeletionGateway()
+    const first = await gateway.createReview("one")
+    const second = await gateway.createReview("two")
+    const result = await gateway.reauthenticate(first)
+    if (result.status !== "success") throw new Error("expected success")
+    await expect(gateway.confirm(second, result.grant)).rejects.toThrow()
+  })
   it("rejects expired grants", async () => {
     const gateway = mockAccountDeletionGateway("expired")
     const review = await gateway.createReview("plan")
