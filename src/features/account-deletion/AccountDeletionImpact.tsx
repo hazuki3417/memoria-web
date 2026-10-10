@@ -17,7 +17,8 @@ import {
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { mockAccountDeletionGateway, unavailableAccountDeletionGateway, type DeletionReview, type DeletionGrant, type MockScenario } from "./accountDeletionGateway"
 import { FeedbackAlert } from "@/components/Feedback"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
@@ -112,10 +113,12 @@ export function AccountDeletionImpact({
   reviewState = "default",
   communityScenario = "mixed-memberships",
   retryOutcome = "success",
+  mockScenario,
 }: {
   reviewState?: ReviewState
   communityScenario?: CommunityScenario
   retryOutcome?: RetryOutcome
+  mockScenario?: MockScenario
 }) {
   const router = useRouter()
   const [step, setStep] = useState(0)
@@ -132,7 +135,12 @@ export function AccountDeletionImpact({
   const [cancelled, setCancelled] = useState(false)
   const [cancelConfirmationOpened, setCancelConfirmationOpened] =
     useState(false)
+  const gateway = useRef(mockScenario ? mockAccountDeletionGateway(mockScenario) : unavailableAccountDeletionGateway)
   const [reauth, setReauth] = useState(false)
+  const [review, setReview] = useState<DeletionReview | null>(null)
+  const [grant, setGrant] = useState<DeletionGrant | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [flowError, setFlowError] = useState<string | null>(null)
   const [confirmed, setConfirmed] = useState(false)
   const mediaCount = reviewState === "empty" ? 0 : 24
   const communities = communitiesForScenario(communityScenario)
@@ -168,6 +176,50 @@ export function AccountDeletionImpact({
   const hasPendingChanges =
     Object.keys(decisions).length > 0 ||
     Object.values(confirmations).some((value) => value.length > 0)
+  const reviewFingerprint = JSON.stringify({ decisions, confirmations, communityScenario, mediaCount: reviewState === "empty" ? 0 : 24 })
+  const startReauthentication = async () => {
+    if (busy) return
+    setBusy(true)
+    setFlowError(null)
+    setReauth(false)
+    setGrant(null)
+    try {
+      const nextReview = await gateway.current.createReview(reviewFingerprint)
+      const result = await gateway.current.reauthenticate(nextReview)
+      if (result.status !== "success") {
+        setFlowError(result.status === "cancelled" ? "再認証がキャンセルされました。" : "再認証に失敗しました。")
+        return
+      }
+      setReview(nextReview)
+      setGrant(result.grant)
+      setReauth(true)
+    } catch (error) {
+      setFlowError(error instanceof Error ? error.message : "再認証を開始できませんでした。")
+    } finally {
+      setBusy(false)
+    }
+  }
+  const confirmDeletion = async () => {
+    if (busy || !review || !grant) return
+    if (review.fingerprint !== reviewFingerprint) {
+      setGrant(null)
+      setReauth(false)
+      setFlowError("削除計画が変更されました。再認証してください。")
+      return
+    }
+    setBusy(true)
+    setFlowError(null)
+    try {
+      await gateway.current.confirm(review, grant)
+      setConfirmed(true)
+    } catch (error) {
+      setFlowError(error instanceof Error ? error.message : "削除処理に失敗しました。")
+      setGrant(null)
+      setReauth(false)
+    } finally {
+      setBusy(false)
+    }
+  }
   const cancel = () => {
     if (hasPendingChanges) {
       setCancelConfirmationOpened(true)
@@ -181,7 +233,7 @@ export function AccountDeletionImpact({
     if (step === 0) setStep(hasCommunities ? 1 : 3)
     if (step === 1 && allResolved) setStep(2)
     if (step === 2 && allConfirmed) setStep(3)
-    if (step === 3) setReauth(true)
+    if (step === 3) void startReauthentication()
   }
   const back = () => {
     if (step === 3) setStep(hasCommunities ? 2 : 0)
@@ -189,6 +241,9 @@ export function AccountDeletionImpact({
     if (step === 1) setStep(0)
   }
   const changeDecision = (id: string, decision: Decision) => {
+    setGrant(null)
+    setReview(null)
+    setReauth(false)
     setDecisions((previous) => ({ ...previous, [id]: decision }))
     setConfirmations((previous) => ({ ...previous, [id]: "" }))
   }
@@ -884,12 +939,13 @@ export function AccountDeletionImpact({
                       >
                         削除を続けるには再認証が必要です。
                       </FeedbackAlert>
+                      {flowError && <FeedbackAlert kind="error" title="処理を完了できませんでした">{flowError}</FeedbackAlert>}
                       {reauth && (
                         <FeedbackAlert
                           kind="info"
-                          title="再認証（プロトタイプ）"
+                          title="再認証済み（モック）"
                         >
-                          実際のAuth0認証は行いません。削除処理も実行されません。
+                          Auth0とBackendはモックです。実際のアカウント削除は行われません。
                         </FeedbackAlert>
                       )}
                       <Group gap="sm" justify="space-between">
@@ -899,6 +955,7 @@ export function AccountDeletionImpact({
                             variant="default"
                             onClick={() => {
                               setReauth(false)
+                              setGrant(null)
                               back()
                             }}
                           >
@@ -931,13 +988,12 @@ export function AccountDeletionImpact({
                           <Button
                             size="sm"
                             color={reauth ? "red" : undefined}
-                            onClick={() =>
-                              reauth ? setConfirmed(true) : next()
-                            }
+                            loading={busy}
+                            onClick={() => reauth ? void confirmDeletion() : void startReauthentication()}
                           >
                             {reauth
-                              ? "アカウントを削除する（デモ）"
-                              : "再認証する（デモ）"}
+                              ? "アカウントを削除する（モック）"
+                              : "再認証する"}
                           </Button>
                         </Box>
                       </Group>
