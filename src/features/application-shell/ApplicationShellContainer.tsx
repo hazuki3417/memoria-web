@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
@@ -27,6 +27,15 @@ const communityContext = {
   accentColor: "var(--mantine-color-teal-6)",
 }
 
+const applicationSections = ["dashboard", "media", "groups", "members"] as const
+
+function getApplicationSection(pathname: string) {
+  const section = pathname.split("/").filter(Boolean).at(-1)
+  return applicationSections.includes(section as (typeof applicationSections)[number])
+    ? (section as (typeof applicationSections)[number])
+    : "dashboard"
+}
+
 export function ApplicationShellContainer({
   children,
   contextKind = "personal",
@@ -37,12 +46,22 @@ export function ApplicationShellContainer({
   communityId?: string
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const navigation = useApplicationNavigation()
   const currentContext = contextKind === "community" ? communityContext : personalContext
+  const activeSection = getApplicationSection(pathname)
   const navigationItems = getApplicationNavigation({
     contextKind,
-    activeSection: "dashboard",
+    activeSection,
   })
+
+  const getContextPath = (contextId: string) => {
+    const targetIsCommunity = contextId !== "personal"
+    const targetPrefix = targetIsCommunity ? `/communities/${communityId}` : ""
+    const targetSupportsSection = targetIsCommunity || activeSection !== "members"
+    const section = targetSupportsSection ? activeSection : "dashboard"
+    return section === "dashboard" ? targetPrefix || "/dashboard" : `${targetPrefix}/${section}`
+  }
 
   const selectNavigation = (itemId: string) => {
     const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
@@ -66,7 +85,7 @@ export function ApplicationShellContainer({
               currentContext={currentContext}
               contexts={[personalContext, communityContext]}
               onSelect={(id) => {
-                router.push(id === "personal" ? "/dashboard" : `/communities/${communityId}/dashboard`)
+                router.push(getContextPath(id))
                 navigation.close()
               }}
             />
