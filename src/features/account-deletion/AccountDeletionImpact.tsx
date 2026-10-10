@@ -375,7 +375,14 @@ export function AccountDeletionImpact({
                           Communityに参加している場合は、次のステップで各Communityへの対応と影響を確認します。
                         </Text>
                       )}
-                      <Group gap="sm" justify="flex-end">
+                      <Group gap="sm" justify="space-between" wrap="nowrap">
+                        <Box style={{ flex: 1 }} />
+                        <Box style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+                          <Button size="sm" variant="subtle" color="gray" onClick={cancel}>
+                            削除手続きを中止して設定に戻る
+                          </Button>
+                        </Box>
+                        <Box style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
                         <Box
                           style={{
                             display: "flex",
@@ -599,7 +606,7 @@ export function AccountDeletionImpact({
                             color="gray"
                             onClick={cancel}
                           >
-                            キャンセル
+                            削除手続きを中止して設定に戻る
                           </Button>
                         </Box>
                         <Box
@@ -733,7 +740,7 @@ export function AccountDeletionImpact({
                             color="gray"
                             onClick={cancel}
                           >
-                            キャンセル
+                            削除手続きを中止して設定に戻る
                           </Button>
                         </Box>
                         <Box
@@ -917,7 +924,7 @@ export function AccountDeletionImpact({
                             color="gray"
                             onClick={cancel}
                           >
-                            キャンセル
+                            削除手続きを中止して設定に戻る
                           </Button>
                         </Box>
                         <Box
@@ -944,13 +951,6 @@ export function AccountDeletionImpact({
                   </Box>
                 )}
               </>
-            )}
-            {!cancelled && !confirmed && (
-              <Group justify="flex-start" mt="md">
-                <Button size="sm" variant="subtle" color="gray" onClick={cancel}>
-                  削除手続きを中止して設定に戻る
-                </Button>
-              </Group>
             )}
           </Stack>
         </Box>
