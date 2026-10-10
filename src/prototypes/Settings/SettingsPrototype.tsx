@@ -47,7 +47,10 @@ function ProfileContent({
 }: {
   initialSaveState?: ProfileSaveState
 }) {
-  const [name, setName] = useState(MOCK_PROFILE.nickname)
+  const initialName = initialSaveState === "saving" || initialSaveState === "retryable-error"
+    ? "ユーザー新"
+    : MOCK_PROFILE.nickname
+  const [name, setName] = useState(initialName)
   const [saved, setSaved] = useState(MOCK_PROFILE.nickname)
   const [saveState, setSaveState] = useState<ProfileSaveState>(initialSaveState)
   const normalized = name.trim()
