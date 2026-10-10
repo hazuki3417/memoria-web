@@ -19,9 +19,15 @@ export function ApplicationShell({
       header={{ height: 40 }}
       padding="lg"
       styles={{
-        root: { height: "100dvh", overflow: "hidden" },
+        root: { position: "relative", height: "100dvh", overflow: "hidden" },
         main: {
-          height: "calc(100dvh - 40px)",
+          position: "absolute",
+          top: 40,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          height: "auto",
+          paddingTop: "var(--mantine-spacing-lg)",
           minHeight: 0,
           overflowY: "auto",
           overscrollBehavior: "contain",
