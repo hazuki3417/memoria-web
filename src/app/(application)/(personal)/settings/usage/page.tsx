@@ -1,4 +1,4 @@
-import { Settings } from "@/features/settings/Settings"
+import { Settings } from "@/features/settings"
 
 export default function Page() {
   return <Settings section="usage" />

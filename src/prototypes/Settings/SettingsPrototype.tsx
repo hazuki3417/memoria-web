@@ -4,11 +4,9 @@ import {
   Box,
   Button,
   Group,
-  Progress,
   Select,
   Stack,
   Switch,
-  Table,
   Text,
   TextInput,
   useMantineColorScheme,
@@ -27,6 +25,7 @@ import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
+import { SettingsUsage, type SettingsUsageData } from "@/features/settings"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type Section = "profile" | "preferences" | "usage" | "account"
@@ -41,6 +40,14 @@ const sections = [
 type ProfileSaveState = "idle" | "saving" | "retryable-error" | "blocked"
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
+
+// Deterministic Storybook sample data; these values are not product values.
+const MOCK_USAGE: SettingsUsageData = {
+  usedStorageLabel: "12.4 GB",
+  effectiveLimitLabel: "50 GB",
+  storageUsagePercent: 25,
+  mediaCount: 1248,
+}
 
 function ProfileContent({
   initialSaveState = "idle",
@@ -222,83 +229,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
 }
 
 function UsageContent() {
-  return (
-    <Stack gap="xl">
-      <PageHeader
-        title="利用状況"
-        description="ストレージの使用量とアップロード上限を確認します。"
-      />
-      <Box>
-        <SectionHeader>ストレージ</SectionHeader>
-        <Stack gap="sm">
-          <Group justify="space-between" align="end">
-            <Box>
-              <Text fw={700} size="xl">
-                12.4 GB 使用中
-              </Text>
-              <Text size="sm" c="dimmed">
-                50 GB 中
-              </Text>
-            </Box>
-            <Text size="sm" fw={600}>
-              25%
-            </Text>
-          </Group>
-          <Progress value={25} size="md" aria-label="ストレージ使用率 25%" />
-        </Stack>
-      </Box>
-      <Box>
-        <SectionHeader>Media</SectionHeader>
-        <Table.ScrollContainer minWidth={420}>
-          <Table verticalSpacing="sm">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>種類</Table.Th>
-                <Table.Th ta="right">件数</Table.Th>
-                <Table.Th ta="right">使用量</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              <Table.Tr>
-                <Table.Td fw={600}>すべて</Table.Td>
-                <Table.Td ta="right">1,248件</Table.Td>
-                <Table.Td ta="right">12.4 GB</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>JPEG</Table.Td>
-                <Table.Td ta="right">1,020件</Table.Td>
-                <Table.Td ta="right">10.8 GB</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>PNG</Table.Td>
-                <Table.Td ta="right">228件</Table.Td>
-                <Table.Td ta="right">1.6 GB</Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
-      </Box>
-      <Box>
-        <SectionHeader>アップロード</SectionHeader>
-        <Stack gap="md">
-          {[
-            ["1回のアップロード", "100 Media"],
-            ["1 Mediaのサイズ", "50 MB"],
-            ["対応形式", "JPEG, PNG"],
-          ].map(([label, value]) => (
-            <Group key={label} justify="space-between" gap="xl" wrap="nowrap">
-              <Text size="sm" c="dimmed">
-                {label}
-              </Text>
-              <Text size="sm" fw={600} ta="right">
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
-      </Box>
-    </Stack>
-  )
+  return <SettingsUsage usage={MOCK_USAGE} />
 }
 
 function AccountContent() {
