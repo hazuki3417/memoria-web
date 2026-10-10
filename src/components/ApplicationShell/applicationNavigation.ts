@@ -39,3 +39,45 @@ export function getApplicationNavigation({
     active: item.id === activeSection,
   }))
 }
+
+export function getApplicationSection(pathname: string): ApplicationSection {
+  const section = pathname.split("/").filter(Boolean).at(-1)
+  return section === "dashboard" ||
+    section === "media" ||
+    section === "groups" ||
+    section === "members"
+    ? section
+    : "dashboard"
+}
+
+export function getContextSwitchSection(
+  currentSection: ApplicationSection,
+  targetContextKind: ApplicationContextOption["kind"],
+): ApplicationSection {
+  const targetItems = getApplicationNavigation({ contextKind: targetContextKind })
+  return targetItems.some(
+    (item) => item.id === currentSection && !item.disabled,
+  )
+    ? currentSection
+    : "dashboard"
+}
+
+export function getContextSwitchPath({
+  currentPathname,
+  targetContextKind,
+  communityId,
+}: {
+  currentPathname: string
+  targetContextKind: ApplicationContextOption["kind"]
+  communityId: string
+}): string {
+  const currentSection = getApplicationSection(currentPathname)
+  const section = getContextSwitchSection(currentSection, targetContextKind)
+  const prefix =
+    targetContextKind === "community" ? `/communities/${communityId}` : ""
+  return section === "dashboard"
+    ? prefix
+      ? `${prefix}/dashboard`
+      : "/dashboard"
+    : `${prefix}/${section}`
+}
