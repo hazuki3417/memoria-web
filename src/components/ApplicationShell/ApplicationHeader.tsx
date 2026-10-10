@@ -20,12 +20,12 @@ export function ApplicationHeader({
     <AppShell.Header
       style={{
         zIndex: 300,
-        borderTop: accentColor ? `2px solid ${accentColor}` : undefined,
+        borderTop: `2px solid ${accentColor ?? "transparent"}`,
       }}
     >
       <Group h="100%" px="md" justify="space-between" wrap="nowrap">
         <Group gap="sm" wrap="nowrap">
-          {leading ?? (reserveNavigationSpace ? <Box w={20} h={20} aria-hidden="true" style={{ flexShrink: 0 }} /> : null)}
+          {leading ?? (reserveNavigationSpace ? <Box w="var(--burger-size, 20px)" h="var(--burger-size, 20px)" aria-hidden="true" style={{ flexShrink: 0 }} /> : null)}
           <Text fw={750} size="lg">
             Memoria
           </Text>
