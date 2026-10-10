@@ -37,13 +37,16 @@ const sections = [
 const MOCK_PROFILE = { nickname: "ユーザー" }
 
 type ProfileSaveErrorKind = "retryable" | "blocked"
+type ProfileSaveError = { kind: ProfileSaveErrorKind }
 type SaveProfile = (nickname: string) => Promise<void>
 
 async function saveMockProfile() {
   await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
-function isBlockingProfileSaveError(error: unknown) {
+function isBlockingProfileSaveError(
+  error: unknown,
+): error is ProfileSaveError {
   return (
     typeof error === "object" &&
     error !== null &&
