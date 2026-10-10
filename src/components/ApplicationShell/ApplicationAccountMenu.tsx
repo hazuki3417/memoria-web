@@ -1,18 +1,20 @@
 "use client"
 
 import { Avatar, Box, Button, Group, Menu, Text } from "@mantine/core"
-import { IconLogout, IconSettings } from "@tabler/icons-react"
+import { IconChartBar, IconLogout, IconSettings } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "./types"
 
 export function ApplicationAccountMenu({
   user,
   currentContext,
   onOpenSettings,
+  onOpenUsage,
   onLogout,
 }: {
   user: { displayName: string; avatarLabel?: string }
   currentContext: ApplicationContextOption
   onOpenSettings: () => void
+  onOpenUsage: () => void
   onLogout: () => void
 }) {
   return (
@@ -51,6 +53,9 @@ export function ApplicationAccountMenu({
           onClick={onOpenSettings}
         >
           設定
+        </Menu.Item>
+        <Menu.Item leftSection={<IconChartBar size={16} stroke={1.6} />} onClick={onOpenUsage}>
+          利用状況
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item

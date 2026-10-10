@@ -40,7 +40,7 @@ export function ApplicationShellContainer({
   const [rememberedContextKind, setRememberedContextKind] = useState<"personal" | "community">("personal")
   const [rememberedCommunityId, setRememberedCommunityId] = useState("photo-club")
   const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
-  const isSettingsRoute = pathname.startsWith("/settings")
+  const isSettingsRoute = (pathname.startsWith("/settings") || pathname === "/usage")
   const contextKind = communityMatch
     ? "community"
     : isSettingsRoute
@@ -59,7 +59,7 @@ export function ApplicationShellContainer({
     if (routeCommunityMatch) {
       setRememberedContextKind("community")
       setRememberedCommunityId(routeCommunityMatch[1])
-    } else if (!pathname.startsWith("/settings")) {
+    } else if (!(pathname.startsWith("/settings") || pathname === "/usage")) {
       setRememberedContextKind("personal")
     }
   }, [pathname])
@@ -100,6 +100,7 @@ export function ApplicationShellContainer({
               user={{ displayName: "ユーザー" }}
               currentContext={currentContext}
               onOpenSettings={() => router.push("/settings/profile")}
+              onOpenUsage={() => router.push("/usage")}
               onLogout={() => undefined}
             />
           }

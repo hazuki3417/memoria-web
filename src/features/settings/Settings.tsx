@@ -15,39 +15,23 @@ import {
   useMantineColorScheme,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { IconChartBar, IconSettings, IconUser, IconUserCircle } from "@tabler/icons-react"
+import { IconSettings, IconUser, IconUserCircle } from "@tabler/icons-react"
 import { useState } from "react"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import { SettingsUsage, type SettingsUsageData } from "./SettingsUsage"
 
-type Section = "profile" | "preferences" | "usage" | "account"
+type Section = "profile" | "preferences" | "account"
 
 const sections = [
   { id: "profile", label: "プロフィール", icon: IconUser },
   { id: "preferences", label: "環境設定", icon: IconSettings },
-  { id: "usage", label: "利用状況", icon: IconChartBar },
   { id: "account", label: "アカウント", icon: IconUserCircle },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
-
-// Static sample values remain until the Usage data connection is implemented.
-const MOCK_USAGE: SettingsUsageData = {
-  usedStorageLabel: "1.24 GB",
-  effectiveLimitLabel: "5 GB",
-  storageUsagePercent: 24.8,
-  mediaCount: 1248,
-  formatBreakdown: [
-    { format: "JPEG", count: 900, sizeLabel: "0.90 GB" },
-    { format: "PNG", count: 200, sizeLabel: "0.20 GB" },
-    { format: "WebP", count: 100, sizeLabel: "0.10 GB" },
-    { format: "HEIC / HEIF", count: 48, sizeLabel: "0.04 GB" },
-  ],
-}
 
 type ProfileSaveErrorKind = "retryable" | "blocked"
 type ProfileSaveError = { kind: ProfileSaveErrorKind }
@@ -198,10 +182,6 @@ function PreferencesContent({ compact }: { compact: boolean }) {
   </Stack>
 }
 
-function UsageContent() {
-  return <SettingsUsage usage={MOCK_USAGE} />
-}
-
 function AccountContent() {
   return <Stack gap="xl">
     <PageHeader title="アカウント" description="アカウントを管理します。" />
@@ -221,7 +201,7 @@ export function Settings({
 }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
-  const content = section === "profile" ? <ProfileContent onSave={saveProfile} /> : section === "preferences" ? <PreferencesContent compact={compact} /> : section === "usage" ? <UsageContent /> : <AccountContent />
+  const content = section === "profile" ? <ProfileContent onSave={saveProfile} /> : section === "preferences" ? <PreferencesContent compact={compact} /> : <AccountContent />
 
   return <Box maw={1120} mx="auto" w="100%">
     {compact ? <Stack gap="xl">

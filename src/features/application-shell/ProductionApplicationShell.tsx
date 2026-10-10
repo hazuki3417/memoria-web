@@ -92,6 +92,7 @@ export function ProductionApplicationShell({
                 onOpenSettings()
                 router.push("/settings/profile")
               }}
+              onOpenUsage={() => router.push("/usage")}
               onLogout={onLogout}
             />
           }

@@ -23,6 +23,7 @@ export function PrototypeApplicationShell({
   onSelectNavigation = () => undefined,
   onCreateCommunity,
   onOpenSettings = () => undefined,
+  onOpenUsage = () => undefined,
   onLogout = () => undefined,
 }: {
   children: ReactNode
@@ -34,6 +35,7 @@ export function PrototypeApplicationShell({
   onSelectNavigation?: (itemId: string) => void
   onCreateCommunity?: () => void
   onOpenSettings?: () => void
+  onOpenUsage?: () => void
   onLogout?: () => void
 }) {
   const navigation = useApplicationNavigation()
@@ -66,6 +68,7 @@ export function PrototypeApplicationShell({
               user={user}
               currentContext={currentContext}
               onOpenSettings={onOpenSettings}
+              onOpenUsage={onOpenUsage}
               onLogout={onLogout}
             />
           }

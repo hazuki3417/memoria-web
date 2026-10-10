@@ -14,7 +14,6 @@ import {
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
-  IconChartBar,
   IconSettings,
   IconUser,
   IconUserCircle,
@@ -29,12 +28,11 @@ import { SettingRow } from "@/components/SettingRow"
 import { SettingsUsage, type SettingsUsageData } from "@/features/settings"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
-type Section = "profile" | "preferences" | "usage" | "account"
+type Section = "profile" | "preferences" | "account"
 
 const sections = [
   { id: "profile", label: "プロフィール", icon: IconUser },
   { id: "preferences", label: "環境設定", icon: IconSettings },
-  { id: "usage", label: "利用状況", icon: IconChartBar },
   { id: "account", label: "アカウント", icon: IconUserCircle },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
 
@@ -272,11 +270,12 @@ export function SettingsPrototype({
   initialSection = "profile",
   initialProfileSaveState = "idle",
 }: {
-  initialSection?: Section
+  initialSection?: Section | "usage"
   initialProfileSaveState?: ProfileSaveState
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
-  const [section, setSection] = useState<Section>(initialSection)
+  const [showUsage, setShowUsage] = useState(initialSection === "usage")
+  const [section, setSection] = useState<Section>(initialSection === "usage" ? "profile" : initialSection)
   const currentLabel = sections.find((item) => item.id === section)?.label
 
   const content =
@@ -284,8 +283,6 @@ export function SettingsPrototype({
       <ProfileContent initialSaveState={initialProfileSaveState} />
     ) : section === "preferences" ? (
       <PreferencesContent compact={compact} />
-    ) : section === "usage" ? (
-      <UsageContent />
     ) : (
       <AccountContent />
     )
@@ -325,11 +322,12 @@ export function SettingsPrototype({
       onSelectContext={() => undefined}
       onSelectNavigation={() => undefined}
       onCreateCommunity={() => undefined}
-      onOpenSettings={() => undefined}
+      onOpenSettings={() => { setShowUsage(false); setSection("profile") }}
+      onOpenUsage={() => setShowUsage(true)}
       onLogout={() => undefined}
     >
       <Box maw={1120} mx="auto" w="100%">
-        {compact ? (
+        {showUsage ? <UsageContent /> : compact ? (
           <Stack gap="xl">
             <Box>
               <Text size="xs" c="dimmed" mb={6}>
@@ -338,7 +336,7 @@ export function SettingsPrototype({
               <Select
                 aria-label="設定画面"
                 value={section}
-                onChange={(value) => value && setSection(value as Section)}
+                onChange={(value) => { if (value) { setShowUsage(false); setSection(value as Section) } }}
                 data={sections.map((item) => ({
                   value: item.id,
                   label: item.label,
@@ -367,7 +365,7 @@ export function SettingsPrototype({
                     icon={item.icon}
                     active={section === item.id}
                     accentColor="var(--mantine-color-blue-6)"
-                    onClick={() => setSection(item.id)}
+                    onClick={() => { setShowUsage(false); setSection(item.id) }}
                   />
                 ))}
               </Stack>

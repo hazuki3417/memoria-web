@@ -15,6 +15,7 @@ const meta = {
     user: { displayName: "ユーザー" },
     currentContext: personal,
     onOpenSettings: () => undefined,
+    onOpenUsage: () => undefined,
     onLogout: () => undefined,
   },
 } satisfies Meta<typeof ApplicationAccountMenu>
