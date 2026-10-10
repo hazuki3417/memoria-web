@@ -87,6 +87,18 @@ npm run dev:next
 
 Storybookは`npm run dev:storybook`で起動します。シークレット、ローカル環境ファイル、Playwrightレポート、build生成物をコミットしません。
 
+### Storybook Docsブロックのimport規則
+
+- Storybook 10系のMDXでは、Docsブロック（`Meta`、`Canvas`、`Controls`等）を`@storybook/addon-docs/blocks`からimportします。
+- 旧パッケージ`@storybook/blocks`からのimportおよび新規依存追加は禁止します。
+- Storybook関連パッケージを追加・更新する際は、Storybook本体とのpeer dependencyの互換性を確認し、`--force`や`--legacy-peer-deps`によって不整合を回避しません。
+- Storybookのメジャーバージョンを更新する際は、Docs API、MDX import先、および依存関係の互換性を再確認します。
+
+```mdx
+import { Meta } from '@storybook/addon-docs/blocks';
+```
+
+
 ## 検証
 
 Quality Gateは再実装期間中のため一時停止しています。変更内容に応じてローカルでBiome、TypeScript、Vitest、Next.js build、Storybook build、VRTを実行します。
