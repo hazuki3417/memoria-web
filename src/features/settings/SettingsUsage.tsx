@@ -1,4 +1,4 @@
-import { Box, Group, Progress, Stack, Table, Text } from "@mantine/core"
+import { Box, Group, Progress, Stack, Table, TableTbody, TableTd, TableTh, TableThead, TableTr, Text } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 
@@ -50,10 +50,10 @@ export function SettingsUsage({ usage }: { usage: SettingsUsageData }) {
         <Box>
           <SectionHeader>ファイル形式別内訳</SectionHeader>
           <Table striped highlightOnHover>
-            <Table.Thead><Table.Tr><Table.Th>形式</Table.Th><Table.Th ta="right">登録件数</Table.Th><Table.Th ta="right">使用量</Table.Th></Table.Tr></Table.Thead>
-            <Table.Tbody>{usage.formatBreakdown.map((item) => (
-              <Table.Tr key={item.format}><Table.Td>{item.format}</Table.Td><Table.Td ta="right">{item.count.toLocaleString("ja-JP")}件</Table.Td><Table.Td ta="right">{item.sizeLabel}</Table.Td></Table.Tr>
-            ))}</Table.Tbody>
+            <TableThead><TableTr><TableTh>形式</TableTh><TableTh ta="right">登録件数</TableTh><TableTh ta="right">使用量</TableTh></TableTr></TableThead>
+            <TableTbody>{usage.formatBreakdown.map((item) => (
+              <TableTr key={item.format}><TableTd>{item.format}</TableTd><TableTd ta="right">{item.count.toLocaleString("ja-JP")}件</TableTd><TableTd ta="right">{item.sizeLabel}</TableTd></TableTr>
+            ))}</TableTbody>
           </Table>
         </Box>
       )}
