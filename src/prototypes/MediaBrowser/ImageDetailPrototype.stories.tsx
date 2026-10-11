@@ -66,3 +66,25 @@ export const CompactManyAssociations: Story = {
     canvasElement.querySelector<HTMLButtonElement>('button[aria-label="縦長 Media 1を開く"]')?.click()
   },
 }
+
+export const DownloadUnavailable: Story = {
+  args: { initialState: "default", contextKind: "personal", downloadMock: "forbidden" },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('button[aria-label="縦長 Media 1を開く"]')?.click()
+  },
+}
+
+export const DownloadProcessing: Story = {
+  args: { initialState: "default", contextKind: "personal", downloadMock: "processing" },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('button[aria-label="縦長 Media 1を開く"]')?.click()
+  },
+}
+
+export const CompactDownloadUnavailable: Story = {
+  args: { initialState: "default", contextKind: "personal", downloadMock: "forbidden" },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('button[aria-label="縦長 Media 1を開く"]')?.click()
+  },
+}
