@@ -18,6 +18,7 @@ import {
   Loader,
   Menu,
   Modal,
+  MultiSelect,
   Paper,
   SegmentedControl,
   Select,
@@ -300,16 +301,16 @@ export function MediaBrowser({
   const [detailDirection, setDetailDirection] = useState<-1 | 1>(1)
   const [selectionDialog, setSelectionDialog] =
     useState<SelectionDialog>(initialDialog)
-  const [groupTarget, setGroupTarget] = useState<string | null>(null)
+  const [groupTargets, setGroupTargets] = useState<string[]>([])
   const completeMockSelection = (kind: "group" | "delete") => {
     const count = selected.size
-    if (!count || (kind === "group" && !groupTarget)) return
+    if (!count || (kind === "group" && groupTargets.length === 0)) return
     setSelectionDialog(null)
     showNotification({
       kind: "info",
       title: kind === "group" ? "Groupへの追加（デモ）" : "Mediaの削除（デモ）",
       message: kind === "group"
-        ? `${count}件のMediaを「${groupTarget}」へ追加する操作を確認しました。実際のデータは変更されていません。`
+        ? `${count}件のMediaを${groupTargets.length}件のGroup（${groupTargets.join("、")}）へ追加する操作を確認しました。実際のデータは変更されていません。`
         : `${count}件のMediaを削除する操作を確認しました。実際のデータは削除されていません。`,
     })
   }
@@ -634,7 +635,7 @@ export function MediaBrowser({
             }
             primary={
               <Button
-                disabled={!groupTarget}
+                disabled={groupTargets.length === 0}
                 onClick={() => completeMockSelection("group")}
               >
                 追加
@@ -645,15 +646,15 @@ export function MediaBrowser({
       >
         <Stack gap="xs">
           <Text size="sm">
-            {selected.size}件のMediaを既存のGroupに追加します。
+            {selected.size}件のMediaを選択したすべてのGroupに追加します。
           </Text>
-          <Select
+          <MultiSelect
             label="Group"
             placeholder="Groupを選択"
             searchable
             data={["旅行", "家族", "風景写真", "お気に入り"]}
-            value={groupTarget}
-            onChange={setGroupTarget}
+            value={groupTargets}
+            onChange={setGroupTargets}
           />
         </Stack>
       </Dialog>
