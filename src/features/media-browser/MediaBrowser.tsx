@@ -349,6 +349,9 @@ export function MediaBrowser({
       message: "画面上の共有先から解除しました。サーバーには保存されていません。",
     })
   }
+  const [detailSectionsExpanded, setDetailSectionsExpanded] = useState<Record<"groups" | "tags" | "communities", boolean>>({ groups: false, tags: false, communities: false })
+  const toggleDetailSection = (kind: "groups" | "tags" | "communities") =>
+    setDetailSectionsExpanded((current) => ({ ...current, [kind]: !current[kind] }))
   const [detailInfoOpened, setDetailInfoOpened] = useState(true)
   const [detailZoom, setDetailZoom] = useState(100)
   const [detailRotate, setDetailRotate] = useState(0)
@@ -1142,27 +1145,40 @@ export function MediaBrowser({
                             Originalをダウンロード
                           </Button>
                           <Divider />
-                          {(["tags", "groups"] as const).map((kind) => (
-                            <Box key={kind}>
-                              <Group justify="space-between" mb={6}>
-                                <Text size="xs" c="dimmed">{kind === "tags" ? "Tags" : "Groups"}</Text>
-                                <Button size="compact-xs" variant="subtle" onClick={() => openDetailEditor(kind)}>
-                                  編集
-                                </Button>
-                              </Group>
-                              <Group gap={6}>
-                                {detailValues[kind].length === 0 ? (
-                                  <Text size="xs" c="dimmed">未設定</Text>
-                                ) : detailValues[kind].map((value) => (
-                                  <Badge key={value} variant={kind === "tags" ? "light" : "outline"}>{value}</Badge>
-                                ))}
-                              </Group>
-                            </Box>
-                          ))}
+                          {(["groups", "tags"] as const).map((kind) => {
+                            const values = detailValues[kind]
+                            const visible = detailSectionsExpanded[kind] ? values : values.slice(0, 6)
+                            return (
+                              <Box key={kind}>
+                                <Group justify="space-between" mb="sm" wrap="nowrap">
+                                  <Group gap={6}>
+                                    <Text size="xs" c="dimmed">{kind === "groups" ? "Groups" : "Tags"}</Text>
+                                    <Text size="xs" c="dimmed">({values.length})</Text>
+                                  </Group>
+                                  <Button size="compact-xs" variant="subtle" onClick={() => openDetailEditor(kind)}>編集</Button>
+                                </Group>
+                                <Group gap={6}>
+                                  {values.length === 0 ? (
+                                    <Text size="xs" c="dimmed">未設定</Text>
+                                  ) : visible.map((value) => (
+                                    <Badge key={value} variant={kind === "tags" ? "light" : "outline"} style={{ maxWidth: "100%", overflowWrap: "anywhere", height: "auto", whiteSpace: "normal" }}>{value}</Badge>
+                                  ))}
+                                </Group>
+                                {values.length > 6 && (
+                                  <Button mt="xs" size="compact-xs" variant="subtle" onClick={() => toggleDetailSection(kind)}>
+                                    {detailSectionsExpanded[kind] ? "折りたたむ" : `ほか${values.length - 6}件を表示`}
+                                  </Button>
+                                )}
+                              </Box>
+                            )
+                          })}
                           {context === "personal" ? (
                             <Box>
-                              <Group justify="space-between" mb="sm">
-                                <Text size="xs" c="dimmed">共有先Community</Text>
+                              <Group justify="space-between" mb="sm" wrap="nowrap">
+                                <Group gap={6}>
+                                  <Text size="xs" c="dimmed">共有先Community</Text>
+                                  <Text size="xs" c="dimmed">({detailValues.communities.length})</Text>
+                                </Group>
                                 <Button size="compact-xs" variant="subtle" leftSection={<IconPlus size={13} />} onClick={() => { setShareTarget(null); setDetailEditor("communities") }}>
                                   共有
                                 </Button>
@@ -1171,13 +1187,28 @@ export function MediaBrowser({
                               <Stack gap="xs">
                                 {detailValues.communities.length === 0 ? (
                                   <Text size="xs" c="dimmed">未共有</Text>
-                                ) : detailValues.communities.map((value) => (
-                                  <Group key={value} justify="space-between" wrap="nowrap" mih={32}>
-                                    <Badge variant="light">{value}</Badge>
-                                    <Button size="compact-xs" variant="subtle" color="red" onClick={() => setUnshareTarget(value)}>共有解除</Button>
+                                ) : (detailSectionsExpanded.communities ? detailValues.communities : detailValues.communities.slice(0, 3)).map((value) => (
+                                  <Group key={value} justify="space-between" wrap="nowrap" mih={32} gap="xs">
+                                    <Box style={{ minWidth: 0, flex: 1, overflowWrap: "anywhere" }}>
+                                      <Text size="xs">{value}</Text>
+                                    </Box>
+                                    <Button size="compact-xs" variant="subtle" color="red" style={{ flexShrink: 0 }} onClick={() => setUnshareTarget(value)}>共有解除</Button>
                                   </Group>
                                 ))}
+                                {detailValues.communities.length > 3 && (
+                                  <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection("communities")}>
+                                    {detailSectionsExpanded.communities ? "折りたたむ" : `ほか${detailValues.communities.length - 3}件を表示`}
+                                  </Button>
+                                )}
                               </Stack>
+                            </Box>
+                          ) : (
+                            <Group justify="space-between">
+                              <Text size="xs" c="dimmed">管理</Text>
+                              <Text size="xs">Community管理</Text>
+                            </Group>
+                          )}
+                        </Stack>
                             </Box>
                           ) : (
                             <Group justify="space-between">
