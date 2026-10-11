@@ -76,7 +76,7 @@ type MediaBrowserState =
   | "selection"
 type ContextKind = "personal" | "community"
 type SelectionDialog = "group" | "share" | "delete" | null
-type MediaItem = { id: string; label: string; src: string; failed?: boolean }
+export type MediaItem = { id: string; label: string; src: string; failed?: boolean }
 
 const media: MediaItem[] = [
   { id: "portrait-01", label: "縦長 Media 1", src: "/__dev-assets/media-browser/h-01.png" },
@@ -282,12 +282,18 @@ export function MediaBrowser({
   initialDialog = null,
   communityId = "photo-club",
   downloadMock = "available",
+  detailOnlyItems,
+  initialDetailId,
+  onDetailClose,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
   initialDialog?: SelectionDialog
   communityId?: string
   downloadMock?: "available" | "forbidden" | "processing"
+  detailOnlyItems?: MediaItem[]
+  initialDetailId?: string
+  onDetailClose?: () => void
 }) {
   const router = useRouter()
   const [context, setContext] = useState(contextKind)
@@ -296,7 +302,8 @@ export function MediaBrowser({
   const [selected, setSelected] = useState<Set<string>>(
     initialState === "selection" ? new Set(["2", "5", "7"]) : new Set(),
   )
-  const [detail, setDetail] = useState<MediaItem | null>(null)
+  const [detail, setDetail] = useState<MediaItem | null>(() => detailOnlyItems?.find((item) => item.id === initialDetailId) ?? null)
+  const closeImageDetail = () => { setDetail(null); onDetailClose?.() }
   const [detailEditor, setDetailEditor] = useState<"tags" | "groups" | "communities" | null>(null)
   const [detailDraft, setDetailDraft] = useState<string[]>([])
   const [shareTarget, setShareTarget] = useState<string | null>(null)
@@ -384,7 +391,7 @@ export function MediaBrowser({
   const [appliedTags, setAppliedTags] = useState<string[]>(tags)
   // The mock has no tag metadata or Relay connection; keep the submitted filter separate.
   void appliedTags
-  const stateItems = [
+  const stateItems = detailOnlyItems ?? ([
     "true-empty",
     "filtered-empty",
     "loading",
@@ -393,7 +400,7 @@ export function MediaBrowser({
     ? []
     : initialState === "processing-failure"
       ? [...media.slice(0, 5), media[media.length - 1]]
-      : media.slice(0, 12)
+      : media.slice(0, 12))
 
   const toggle = (id: string) =>
     setSelected((current) => {
@@ -410,7 +417,7 @@ export function MediaBrowser({
   return (
     <>
       <Notifications position="top-right" />
-      <Stack gap={0} w="100%">
+      {!detailOnlyItems && <Stack gap={0} w="100%">
         <Box
           pb="xs"
           style={{
@@ -767,7 +774,7 @@ export function MediaBrowser({
             value={communityTarget}
             onChange={setCommunityTarget}
           />
-        </Stack>
+        </Stack>}
       </Dialog>
 
       <Dialog
@@ -801,7 +808,7 @@ export function MediaBrowser({
 
       <Modal
         opened={detail !== null}
-        onClose={() => setDetail(null)}
+        onClose={closeImageDetail}
         fullScreen
         portalProps={{ target: "#application-modal-root" }}
         padding={0}
@@ -854,7 +861,7 @@ export function MediaBrowser({
                       variant="subtle"
                       color="gray"
                       aria-label="閉じる"
-                      onClick={() => setDetail(null)}
+                      onClick={closeImageDetail}
                     >
                       <IconX size={18} />
                     </ActionIcon>
