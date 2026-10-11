@@ -861,15 +861,12 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
           </SplitView.Pane>
         </SplitView.Root>
       )}
-      {imageDetailIndex !== null && (
-        <ImageDetailDialog
-          key={selectedId ?? "group"}
-          items={groupMediaItems}
-          initialId={groupMediaItems[imageDetailIndex].id}
-          onClose={() => setImageDetailIndex(null)}
-          contextKind={contextKind}
-        />
-      )}
+      <ImageDetailDialog
+        items={groupMediaItems}
+        initialId={imageDetailIndex !== null ? groupMediaItems[imageDetailIndex].id : undefined}
+        onClose={() => setImageDetailIndex(null)}
+        contextKind={contextKind}
+      />
     </>
   )
 }
