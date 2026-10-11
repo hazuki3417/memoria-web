@@ -1008,7 +1008,7 @@ export function MediaBrowserPrototype({
                               setDetailRotate((value) => value + 90)
                             }}
                           >
-                            <IconRotate2 size={18} />
+                            <IconRotate size={18} style={{ transform: "scaleX(-1)" }} />
                           </ActionIcon>
                         </>
                       )}
