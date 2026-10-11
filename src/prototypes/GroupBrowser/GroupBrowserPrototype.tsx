@@ -466,9 +466,9 @@ export function GroupBrowserPrototype() {
               h="100%"
               style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
             >
-              <Stack px={0} pt={0} pb="xs" gap={0}>
-                <Group gap="xs" wrap="nowrap" justify="space-between">
-                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                <Box style={{ minWidth: 0 }}>
+                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
                     <TextInput
                       w={compact ? "100%" : 280}
                       maw="100%"
@@ -484,11 +484,13 @@ export function GroupBrowserPrototype() {
                       {visibleGroups.length}件
                     </Text>
                   </Group>
+                </Box>
+                <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ gridColumn: compact ? "1" : undefined }}>
                   <Button size="xs" leftSection={<IconFolderPlus size={16} />}>
                     Groupを作成
                   </Button>
                 </Group>
-              </Stack>
+              </Box>
               <Divider />
               <ScrollArea flex={1}>
                 <Box
@@ -563,9 +565,9 @@ export function GroupBrowserPrototype() {
                 minHeight: 0,
               }}
             >
-              <Stack px={0} pt={0} pb="xs" gap={0}>
-                <Group gap="xs" wrap="nowrap" justify="space-between">
-                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                <Box style={{ minWidth: 0 }}>
+                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
                     <TextInput
                       w={compact ? "100%" : 280}
                       maw="100%"
@@ -581,11 +583,13 @@ export function GroupBrowserPrototype() {
                       {visibleGroups.length}件
                     </Text>
                   </Group>
+                </Box>
+                <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ gridColumn: compact ? "1" : undefined }}>
                   <Button size="xs" leftSection={<IconFolderPlus size={16} />}>
                     Groupを作成
                   </Button>
                 </Group>
-              </Stack>
+              </Box>
               <Divider />
               <ScrollArea flex={1}>
                 <Box
