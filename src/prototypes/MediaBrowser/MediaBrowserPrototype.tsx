@@ -952,14 +952,18 @@ export function MediaBrowserPrototype({
                       )}
                     </Center>
                   </Box>
-                  <Group
+                  <Box
                     h={48}
                     px="sm"
-                    justify="space-between"
-                    wrap="nowrap"
-                    style={{ flexShrink: 0 }}
+                    style={{
+                      flexShrink: 0,
+                      display: "grid",
+                      gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
+                      alignItems: "center",
+                      columnGap: 8,
+                    }}
                   >
-                    <Group gap={4} wrap="nowrap">
+                    <Group gap={4} wrap="nowrap" justify="flex-start">
                       <ActionIcon
                         variant="subtle"
                         aria-label="Originalをダウンロード"
@@ -1001,10 +1005,10 @@ export function MediaBrowserPrototype({
                         </>
                       )}
                     </Group>
-                    <Text size="xs" c="dimmed">
+                    <Text size="xs" c="dimmed" ta="center" style={{ whiteSpace: "nowrap" }}>
                       {detailIndex + 1} / {stateItems.length}
                     </Text>
-                    <Group gap={4} wrap="nowrap">
+                    <Group gap={4} wrap="nowrap" justify="flex-end" style={{ minWidth: 0 }}>
                       {!compact && (
                         <>
                           <ActionIcon
@@ -1062,7 +1066,7 @@ export function MediaBrowserPrototype({
                         <IconInfoCircle size={18} />
                       </ActionIcon>
                     </Group>
-                  </Group>
+                  </Box>
                 </Box>
 
                 <AnimatePresence initial={false}>
