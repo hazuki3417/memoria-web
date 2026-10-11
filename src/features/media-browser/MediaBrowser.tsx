@@ -62,6 +62,7 @@ import { useEffect, useState } from "react"
 import { Dialog } from "@/components/Dialog"
 import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
+import { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
 
 type MediaBrowserState =
   | "default"
@@ -362,11 +363,13 @@ export function MediaBrowser({
   const [detailSectionsExpanded, setDetailSectionsExpanded] = useState<Record<"groups" | "tags" | "communities", boolean>>({ groups: false, tags: false, communities: false })
   const toggleDetailSection = (kind: "groups" | "tags" | "communities") =>
     setDetailSectionsExpanded((current) => ({ ...current, [kind]: !current[kind] }))
-  const [detailInfoOpened, setDetailInfoOpened] = useState(true)
-  const [detailZoom, setDetailZoom] = useState(100)
-  const [detailRotate, setDetailRotate] = useState(0)
-  const [detailRotateAnimated, setDetailRotateAnimated] = useState(true)
-  const [detailDirection, setDetailDirection] = useState<-1 | 1>(1)
+  const {
+    detailInfoOpened, setDetailInfoOpened,
+    detailZoom, setDetailZoom,
+    detailRotate, setDetailRotate,
+    detailRotateAnimated, setDetailRotateAnimated,
+    detailDirection, setDetailDirection,
+  } = useImageDetailViewport()
   const [selectionDialog, setSelectionDialog] =
     useState<SelectionDialog>(initialDialog)
   const [groupTargets, setGroupTargets] = useState<string[]>([])
