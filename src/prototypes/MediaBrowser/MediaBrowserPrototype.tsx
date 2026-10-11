@@ -279,10 +279,12 @@ export function MediaBrowserPrototype({
   initialState = "default",
   contextKind = "personal",
   initialDialog = null,
+  detailMock = "default",
 }: {
   initialState?: PrototypeState
   contextKind?: ContextKind
   initialDialog?: SelectionDialog
+  detailMock?: "default" | "many"
 }) {
   const [context, setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -296,11 +298,17 @@ export function MediaBrowserPrototype({
   const [shareTarget, setShareTarget] = useState<string | null>(null)
   const [unshareTarget, setUnshareTarget] = useState<string | null>(null)
   const [detailEdits, setDetailEdits] = useState<Record<string, { tags: string[]; groups: string[]; communities: string[] }>>({})
-  const detailValues = detailEdits[detail?.id ?? ""] ?? {
-    tags: ["旅行", "風景"],
-    groups: ["旅行", "お気に入り"],
-    communities: ["Photo Club"],
-  }
+  const detailValues = detailEdits[detail?.id ?? ""] ?? (detailMock === "many"
+    ? {
+        groups: ["旅行", "お気に入り", "家族", "2026年", "アルバム", "風景", "とても長い名前のグループを使った表示確認", "思い出"],
+        tags: ["旅行", "風景", "秋", "紅葉", "山", "自然", "写真", "休日", "家族", "散歩", "日本", "アルバム", "長い名前のタグを表示するためのサンプル", "日記"],
+        communities: ["Photo Club", "Family", "Travel", "Landscape Photography Community With Long Name", "Friends", "Memoria Community"],
+      }
+    : {
+        tags: ["旅行", "風景"],
+        groups: ["旅行", "お気に入り"],
+        communities: ["Photo Club"],
+      })
   const openDetailEditor = (kind: "tags" | "groups" | "communities") => {
     setDetailDraft([...detailValues[kind]])
     setDetailEditor(kind)
@@ -1146,6 +1154,7 @@ export function MediaBrowserPrototype({
                             Originalをダウンロード
                           </Button>
                           <Divider />
+                          <Divider />
                           {(["groups", "tags"] as const).map((kind) => {
                             const values = detailValues[kind]
                             const visible = detailSectionsExpanded[kind] ? values : values.slice(0, 6)
@@ -1173,6 +1182,7 @@ export function MediaBrowserPrototype({
                               </Box>
                             )
                           })}
+                          <Divider />
                           {context === "personal" ? (
                             <Box>
                               <Group justify="space-between" mb="sm" wrap="nowrap">
