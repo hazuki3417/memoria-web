@@ -1249,7 +1249,7 @@ export function MediaBrowserPrototype({
           })()}
       </Modal>
       <Notifications position="top-right" />
-      <Modal opened={unshareTarget !== null} onClose={() => setUnshareTarget(null)} title="Communityの共有を解除" centered zIndex={410}>
+      <Modal withCloseButton={false} opened={unshareTarget !== null} onClose={() => setUnshareTarget(null)} title="Communityの共有を解除" centered zIndex={410}>
         <Stack gap="md">
           <Text size="sm">{unshareTarget} への共有を解除しますか？ このCommunityからMediaを閲覧できなくなります。他の共有先やMedia本体は削除されません。</Text>
           <Text size="xs" c="dimmed">デモ表示です。サーバーには保存されません。</Text>
@@ -1259,7 +1259,7 @@ export function MediaBrowserPrototype({
           </Group>
         </Stack>
       </Modal>
-      <Modal opened={detailEditor === "communities"} onClose={() => setDetailEditor(null)} title="Communityへ共有" centered zIndex={400}>
+      <Modal withCloseButton={false} opened={detailEditor === "communities"} onClose={() => setDetailEditor(null)} title="Communityへ共有" centered zIndex={400}>
         <Stack gap="md">
           <Text size="sm" c="dimmed">このMediaを共有するCommunityを1つ選択します。</Text>
           <Select
@@ -1277,7 +1277,7 @@ export function MediaBrowserPrototype({
           </Group>
         </Stack>
       </Modal>
-      <Modal opened={detailEditor === "tags"} onClose={() => setDetailEditor(null)} title="Tagsを編集" centered zIndex={400}>
+      <Modal withCloseButton={false} opened={detailEditor === "tags"} onClose={() => setDetailEditor(null)} title="Tagsを編集" centered zIndex={400}>
         <Stack gap="md">
           <Text size="sm" c="dimmed">このMediaのTagを追加・除外できます。</Text>
           <TagsInput label="Tags" data={["旅行", "風景", "家族", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
@@ -1288,7 +1288,7 @@ export function MediaBrowserPrototype({
           </Group>
         </Stack>
       </Modal>
-      <Modal opened={detailEditor === "groups"} onClose={() => setDetailEditor(null)} title="Groupsを編集" centered zIndex={400}>
+      <Modal withCloseButton={false} opened={detailEditor === "groups"} onClose={() => setDetailEditor(null)} title="Groupsを編集" centered zIndex={400}>
         <Stack gap="md">
           <Text size="sm" c="dimmed">現在の所属Groupを追加・除外できます。</Text>
           <MultiSelect label="Groups" searchable data={["旅行", "家族", "風景写真", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
