@@ -245,11 +245,11 @@ function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
   }))
   return (
     <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
-      {mediaItems.map(({ id, src }) => (
+      {mediaItems.map(({ id, src }, index) => (
         <UnstyledButton
           key={id}
-          aria-label={`Media ${Number(id.split("-")[1])}の詳細を開く`}
-          onClick={() => onOpen(Number(id.split("-")[1]) - 1)}
+          aria-label={`Media ${index + 1}の詳細を開く`}
+          onClick={() => onOpen(index)}
           bdrs="sm"
           style={{
             display: "block",
