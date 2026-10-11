@@ -401,20 +401,20 @@ export function MediaBrowser({
                 <Button
                   size="xs"
                   variant="default"
-                  leftSection={<IconFolderPlus size={15} />}
-                  disabled={selected.size === 0}
-                  onClick={() => setSelectionDialog("group")}
-                >
-                  Group
-                </Button>
-                <Button
-                  size="xs"
-                  variant="default"
                   leftSection={<IconEdit size={15} />}
                   disabled={selected.size === 0}
                   onClick={() => router.push(context === "community" ? `/communities/${communityId}/media/edit` : "/media/edit")}
                 >
                   編集
+                </Button>
+                <Button
+                  size="xs"
+                  variant="default"
+                  leftSection={<IconFolderPlus size={15} />}
+                  disabled={selected.size === 0}
+                  onClick={() => setSelectionDialog("group")}
+                >
+                  Group
                 </Button>
                 {context === "personal" && (
                   <Button
