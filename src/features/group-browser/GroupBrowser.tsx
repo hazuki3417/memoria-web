@@ -587,23 +587,15 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
             </Box>
           ) : (
             <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
-              <Group p="sm" justify="space-between" wrap="nowrap">
-                <Box miw={0}>
-                  <Text fw={700} truncate="end">
-                    {selected?.name ?? ""}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    {selected?.mediaCount ?? 0}件のMedia
-                  </Text>
-                </Box>
-                <ActionIcon
-                  variant="subtle"
-                  aria-label="Group一覧に戻る"
-                  onClick={closeDetail}
-                >
-                  <IconX size={18} />
-                </ActionIcon>
-              </Group>
+              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                  <Text fw={700} truncate="end">{selected?.name ?? ""}</Text>
+                  <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{selected?.mediaCount ?? 0}件のMedia</Text>
+                </Group>
+                <Button size="xs" variant="default" leftSection={<IconX size={16} />} onClick={closeDetail}>
+                  一覧に戻る
+                </Button>
+              </Box>
               <Divider />
               <ScrollArea flex={1}>
                 <Box p="sm">
@@ -738,32 +730,18 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       height: "100%",
                     }}
                   >
-                    <Box p="sm">
-                      <Group justify="space-between" wrap="nowrap">
-                        <Box miw={0}>
-                          <Text fw={700} truncate="end">
-                            {selected?.name ?? ""}
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {selected?.mediaCount ?? 0}件のMedia
-                          </Text>
-                        </Box>
-                        <Group gap="xs" wrap="nowrap">
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="Groupを編集"
-                            onClick={openEdit}
-                          >
-                            <IconEdit size={18} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="Groupの選択を解除"
-                            onClick={closeDetail}
-                          >
-                            <IconX size={18} />
-                          </ActionIcon>
-                        </Group>
+                    <Box pb="xs" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                      <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                        <Text fw={700} truncate="end">{selected?.name ?? ""}</Text>
+                        <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{selected?.mediaCount ?? 0}件のMedia</Text>
+                      </Group>
+                      <Group gap="xs" wrap="nowrap" justify="flex-end">
+                        <Button size="xs" variant="default" leftSection={<IconEdit size={16} />} onClick={openEdit}>
+                          編集
+                        </Button>
+                        <Button size="xs" variant="default" leftSection={<IconX size={16} />} onClick={closeDetail}>
+                          選択解除
+                        </Button>
                       </Group>
                     </Box>
                     <Divider />
