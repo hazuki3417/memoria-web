@@ -142,6 +142,7 @@ export function AccountDeletionImpact({
   const [busy, setBusy] = useState(false)
   const [flowError, setFlowError] = useState<string | null>(null)
   const [confirmed, setConfirmed] = useState(false)
+  const [deletionPending, setDeletionPending] = useState(false)
   const mediaCount = reviewState === "empty" ? 0 : 24
   const communities = communitiesForScenario(communityScenario)
   const communitiesToResolve = communities.filter(
@@ -209,6 +210,7 @@ export function AccountDeletionImpact({
       return
     }
     setBusy(true)
+    setDeletionPending(true)
     setFlowError(null)
     try {
       await gateway.current.confirm(review, grant)
@@ -219,6 +221,7 @@ export function AccountDeletionImpact({
       setReauth(false)
     } finally {
       setBusy(false)
+      setDeletionPending(false)
     }
   }
   const cancel = () => {
@@ -294,35 +297,47 @@ export function AccountDeletionImpact({
                 アカウントを削除した場合の影響と、削除前に必要な対応を確認します。
               </Text>
             </Box>
-            {cancelled || confirmed ? (
-              <Stack gap="md">
-                <Title order={2} size="h4">
-                  {confirmed
-                    ? "削除処理を確認しました（モック）"
-                    : "削除手続きを中止しました"}
-                </Title>
-                <Text c="dimmed">
-                  {confirmed
-                    ? "モックの確認処理が完了しました。アカウントとデータは削除されていません。"
-                    : "削除は開始されていません。"}
-                </Text>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => {
-                    setCancelled(false)
-                    setConfirmed(false)
-                    setReauth(false)
-                    setReview(null)
-                    setGrant(null)
-                    setFlowError(null)
-                    setStep(0)
-                  }}
-                >
-                  最初に戻る
-                </Button>
-              </Stack>
-            ) : (
+            {cancelled || confirmed || deletionPending ? (
+              <Stack gap="lg" maw={600} mx="auto" w="100%" py="xl">
+                {deletionPending ? (
+                  <>
+                    <Title order={2} size="h3">削除リクエストを処理しています</Title>
+                    <Text c="dimmed">アカウント削除の受付結果を確認しています。画面を閉じずにお待ちください。</Text>
+                    <Button loading disabled>処理中</Button>
+                  </>
+                ) : confirmed ? (
+                  <>
+                    <Title order={2} size="h3">
+                      {mockScenario ? "削除受付の確認が完了しました（モック）" : "アカウント削除を受け付けました"}
+                    </Title>
+                    <FeedbackAlert kind="info" title={mockScenario ? "デモ環境での受付完了" : "アカウントの利用は終了しました"}>
+                      {mockScenario
+                        ? "削除受付の成功を模擬しました。実際のアカウントやデータは削除されておらず、ログイン状態も変更されていません。"
+                        : "アカウントは利用できなくなりました。対象データの削除はバックグラウンドで進みます。"}
+                    </FeedbackAlert>
+                    {mockScenario && (
+                      <Button variant="default" onClick={() => {
+                        setCancelled(false)
+                        setConfirmed(false)
+                        setReauth(false)
+                        setReview(null)
+                        setGrant(null)
+                        setFlowError(null)
+                        setStep(0)
+                      }}>デモを最初から確認する</Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Title order={2} size="h4">削除手続きを中止しました</Title>
+                    <Text c="dimmed">削除は開始されていません。</Text>
+                    <Button variant="default" onClick={() => {
+                      setCancelled(false)
+                      setStep(0)
+                    }}>最初に戻る</Button>
+                  </>
+                )}
+              </Stack>            ) : (
               <>
                 <Box
                   style={{
