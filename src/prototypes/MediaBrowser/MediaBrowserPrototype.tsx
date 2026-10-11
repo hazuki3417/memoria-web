@@ -1171,7 +1171,7 @@ export function MediaBrowserPrototype({
                               </Group>
                             )}
                           </Stack>
-                          <Divider color="gray.3" />
+                          <Divider color="gray.2" />
                           {(["groups", "tags"] as const).map((kind) => {
                             const values = detailValues[kind]
                             const visible = values.slice(0, 6)
@@ -1184,7 +1184,7 @@ export function MediaBrowserPrototype({
                                   </Group>
                                   <Button size="compact-xs" variant="subtle" onClick={() => openDetailEditor(kind)}>編集</Button>
                                 </Group>
-                                <Divider color="gray.3" mb="sm" />
+                                <Divider color="gray.2" mb="sm" />
                                 <Group gap={6}>
                                   {values.length === 0 ? (
                                     <Text size="xs" c="dimmed">未設定</Text>
@@ -1208,11 +1208,11 @@ export function MediaBrowserPrototype({
                                     </Group>
                                   </>
                                 )}
-                                {kind === "groups" && <Divider color="gray.3" mt="md" />}
+                                {kind === "groups" && <Divider color="gray.2" mt="md" />}
                               </Box>
                             )
                           })}
-                          <Divider color="gray.3" />
+                          <Divider color="gray.2" />
                           {context === "personal" ? (
                             <Box>
                               <Group justify="space-between" mb="xs" wrap="nowrap">
@@ -1224,7 +1224,7 @@ export function MediaBrowserPrototype({
                                   共有
                                 </Button>
                               </Group>
-                              <Divider color="gray.3" mb="sm" />
+                              <Divider color="gray.2" mb="sm" />
                               <Stack gap="xs">
                                 {detailValues.communities.length === 0 ? (
                                   <Text size="xs" c="dimmed">未共有</Text>
