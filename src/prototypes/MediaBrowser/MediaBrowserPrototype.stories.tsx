@@ -40,48 +40,13 @@ export const ProcessingFailure: Story = {
 export const Selection: Story = {
   args: { initialState: "selection", contextKind: "personal" },
 }
-export const Detail: Story = {
-  args: { initialState: "default", contextKind: "personal" },
-  play: async ({ canvasElement }) => {
-    const button = canvasElement.querySelector<HTMLButtonElement>(
-      'button[aria-label="縦長 Media 1を開く"]',
-    )
-    button?.click()
-  },
-}
-export const PortraitDetail: Story = {
-  args: { initialState: "default", contextKind: "personal" },
-  play: async ({ canvasElement }) => {
-    canvasElement
-      .querySelector<HTMLButtonElement>(
-        'button[aria-label="縦長 Media 1を開く"]',
-      )
-      ?.click()
-  },
-}
-export const LandscapeDetail: Story = {
-  args: { initialState: "default", contextKind: "personal" },
-  play: async ({ canvasElement }) => {
-    canvasElement
-      .querySelector<HTMLButtonElement>(
-        'button[aria-label="横長 Media 1を開く"]',
-      )
-      ?.click()
-  },
-}
+
+
+
 export const Community: Story = {
   args: { initialState: "default", contextKind: "community" },
 }
-export const CommunityDetail: Story = {
-  args: { initialState: "default", contextKind: "community" },
-  play: async ({ canvasElement }) => {
-    canvasElement
-      .querySelector<HTMLButtonElement>(
-        'button[aria-label="縦長 Media 1を開く"]',
-      )
-      ?.click()
-  },
-}
+
 export const CommunitySelection: Story = {
   args: { initialState: "selection", contextKind: "community" },
 }
