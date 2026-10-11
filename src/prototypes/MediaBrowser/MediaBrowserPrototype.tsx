@@ -58,6 +58,8 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
+import { Notifications } from "@mantine/notifications"
+import { showNotification } from "@/components/Feedback"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeState =
@@ -307,8 +309,13 @@ export function MediaBrowserPrototype({
       ...current,
       [detail.id]: { ...detailValues, [detailEditor]: [...detailDraft] },
     }))
+    const label = detailEditor === "tags" ? "Tags" : detailEditor === "groups" ? "Groups" : "共有先Community"
     setDetailEditor(null)
-    // Prototype-only state: no mutation is sent to the backend.
+    showNotification({
+      kind: "success",
+      title: `${label}を更新しました（デモ）`,
+      message: "画面上の変更を反映しました。サーバーには保存されていません。",
+    })
   }
   const [detailInfoOpened, setDetailInfoOpened] = useState(true)
   const [detailZoom, setDetailZoom] = useState(100)
@@ -1174,6 +1181,7 @@ export function MediaBrowserPrototype({
             )
           })()}
       </Modal>
+      <Notifications position="top-right" />
       <Modal
         opened={detailEditor !== null}
         onClose={() => setDetailEditor(null)}
