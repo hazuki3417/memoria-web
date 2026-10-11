@@ -1179,6 +1179,7 @@ export function MediaBrowserPrototype({
                                     {detailSectionsExpanded[kind] ? "折りたたむ" : `ほか${values.length - 6}件を表示`}
                                   </Button>
                                 )}
+                                {kind === "groups" && <Divider mt="md" />}
                               </Box>
                             )
                           })}
