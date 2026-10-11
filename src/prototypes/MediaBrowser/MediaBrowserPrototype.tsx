@@ -417,7 +417,7 @@ export function MediaBrowserPrototype({
       onOpenSettings={() => {}}
       onLogout={() => {}}
     >
-      <Stack gap="xs" maw={1440} mx="auto">
+      <Stack gap="xs" w="100%">
         <Box
           style={{
             display: "grid",
