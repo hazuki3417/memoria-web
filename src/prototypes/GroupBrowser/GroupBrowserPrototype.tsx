@@ -1,5 +1,7 @@
 "use client"
 
+import { MediaBrowserPrototype } from "@/prototypes/MediaBrowser/MediaBrowserPrototype"
+
 import {
   ActionIcon,
   Badge,
@@ -235,7 +237,7 @@ function RelationEditor({
     </Stack>
   )
 }
-function MediaGrid() {
+function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
   // Local dummy thumbnails; actual Group media will be supplied by the Connection.
   const mediaItems = Array.from({ length: 24 }, (_, index) => ({
     id: `media-${index + 1}`,
@@ -244,10 +246,13 @@ function MediaGrid() {
   return (
     <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
       {mediaItems.map(({ id, src }) => (
-        <Box
+        <UnstyledButton
           key={id}
+          aria-label={`Media ${Number(id.split("-")[1])}の詳細を開く`}
+          onClick={() => onOpen(Number(id.split("-")[1]) - 1)}
           bdrs="sm"
           style={{
+            display: "block",
             aspectRatio: "1 / 1",
             border: "1px solid var(--mantine-color-default-border)",
             backgroundImage: `url("${src}")`,
@@ -283,6 +288,13 @@ export function GroupBrowserPrototype() {
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [imageDetailIndex, setImageDetailIndex] = useState<number | null>(null)
+  const groupMediaItems = Array.from({ length: 24 }, (_, index) => ({
+    id: `group-media-${index + 1}`,
+    label: `Media ${index + 1}`,
+    src: previewImages[index % previewImages.length],
+  }))
+
   const splitViewRef = useGroupRef()
   const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
   const [relationsOpened, relations] = useDisclosure(false)
@@ -582,7 +594,7 @@ export function GroupBrowserPrototype() {
                       <Text fw={600}>Mediaがありません</Text>
                     </Paper>
                   ) : (
-                    <MediaGrid />
+                    <MediaGrid onOpen={setImageDetailIndex} />
                   )}
                 </Box>
               </ScrollArea>
@@ -760,7 +772,7 @@ export function GroupBrowserPrototype() {
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid />
+                          <MediaGrid onOpen={setImageDetailIndex} />
                         )}
                       </Box>
                     </ScrollArea>
@@ -770,6 +782,14 @@ export function GroupBrowserPrototype() {
             </AnimatePresence>
           </SplitView.Pane>
         </SplitView.Root>
+      )}
+      {imageDetailIndex !== null && (
+        <MediaBrowserPrototype
+          detailOnlyItems={groupMediaItems}
+          initialDetailId={groupMediaItems[imageDetailIndex].id}
+          onDetailClose={() => setImageDetailIndex(null)}
+          contextKind={contextKind}
+        />
       )}
     </PrototypeApplicationShell>
   )
