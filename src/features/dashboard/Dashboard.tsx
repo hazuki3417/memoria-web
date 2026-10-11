@@ -249,7 +249,7 @@ export function Dashboard({ empty = false, contextKind = "personal", communityId
   return (
     <>
     {contextKind === "personal" && <Notifications position="top-right" />}
-    <Stack gap="xl" maw={1280} mx="auto" w="100%">
+    <Stack gap="xl" w="100%">
       <Stack gap="sm">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Title order={3} size="h4">最近のメディア</Title>
