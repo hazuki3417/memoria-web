@@ -1171,7 +1171,7 @@ export function MediaBrowserPrototype({
                               </Group>
                             )}
                           </Stack>
-                          <Divider color="gray.2" />
+                          <Divider />
                           {(["groups", "tags"] as const).map((kind) => {
                             const values = detailValues[kind]
                             const visible = values.slice(0, 6)
@@ -1208,11 +1208,11 @@ export function MediaBrowserPrototype({
                                     </Group>
                                   </>
                                 )}
-                                {kind === "groups" && <Divider color="gray.2" mt="md" />}
+                                {kind === "groups" && <Divider mt="md" />}
                               </Box>
                             )
                           })}
-                          <Divider color="gray.2" />
+                          <Divider />
                           {context === "personal" ? (
                             <Box>
                               <Group justify="space-between" mb="xs" wrap="nowrap">
