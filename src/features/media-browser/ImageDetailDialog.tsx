@@ -15,7 +15,7 @@ export function ImageDetailDialog({
   contextKind = "personal",
 }: {
   items: MediaItem[]
-  initialId: string
+  initialId?: string
   onClose: () => void
   contextKind?: "personal" | "community"
 }) {
