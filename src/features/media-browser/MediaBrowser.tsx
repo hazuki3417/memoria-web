@@ -818,7 +818,6 @@ export function MediaBrowser({
       <Modal
         opened={detail !== null}
         onClose={closeImageDetail}
-        transitionProps={{ transition: "pop", duration: 220, exitDuration: 160, timingFunction: "ease-out" }}
         fullScreen
         portalProps={{ target: "#application-modal-root" }}
         padding={0}
