@@ -1162,19 +1162,20 @@ export function MediaBrowser({
                               </Group>
                             )}
                           </Stack>
-                          <Divider />
+                          <Divider color="gray.3" />
                           {(["groups", "tags"] as const).map((kind) => {
                             const values = detailValues[kind]
                             const visible = values.slice(0, 6)
                             return (
                               <Box key={kind}>
-                                <Group justify="space-between" mb="sm" wrap="nowrap">
+                                <Group justify="space-between" mb="xs" wrap="nowrap">
                                   <Group gap={6}>
                                     <Text size="xs" c="dimmed">{kind === "groups" ? "Groups" : "Tags"}</Text>
                                     <Text size="xs" c="dimmed">({values.length})</Text>
                                   </Group>
                                   <Button size="compact-xs" variant="subtle" onClick={() => openDetailEditor(kind)}>編集</Button>
                                 </Group>
+                                <Divider color="gray.3" mb="sm" />
                                 <Group gap={6}>
                                   {values.length === 0 ? (
                                     <Text size="xs" c="dimmed">未設定</Text>
@@ -1192,20 +1193,19 @@ export function MediaBrowser({
                                       </Group>
                                     </Collapse>
                                     <Group justify="center" mt="xs">
-                                      <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection(kind)} aria-expanded={detailSectionsExpanded[kind]} rightSection={<IconChevronDown size={14} style={{ transform: detailSectionsExpanded[kind] ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
+                                      <Button size="compact-xs" variant="subtle" color="gray" fw={400} onClick={() => toggleDetailSection(kind)} aria-expanded={detailSectionsExpanded[kind]} rightSection={<IconChevronDown size={14} style={{ transform: detailSectionsExpanded[kind] ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
                                         {detailSectionsExpanded[kind] ? "折りたたむ" : `ほか${values.length - 6}件を表示`}
                                       </Button>
                                     </Group>
                                   </>
                                 )}
-                                {kind === "groups" && <Divider mt="md" />}
                               </Box>
                             )
                           })}
-                          <Divider />
+                          <Divider color="gray.3" />
                           {context === "personal" ? (
                             <Box>
-                              <Group justify="space-between" mb="sm" wrap="nowrap">
+                              <Group justify="space-between" mb="xs" wrap="nowrap">
                                 <Group gap={6}>
                                   <Text size="xs" c="dimmed">共有先Community</Text>
                                   <Text size="xs" c="dimmed">({detailValues.communities.length})</Text>
@@ -1214,7 +1214,7 @@ export function MediaBrowser({
                                   共有
                                 </Button>
                               </Group>
-                              <Divider mb="sm" />
+                              <Divider color="gray.3" mb="sm" />
                               <Stack gap="xs">
                                 {detailValues.communities.length === 0 ? (
                                   <Text size="xs" c="dimmed">未共有</Text>
@@ -1241,7 +1241,7 @@ export function MediaBrowser({
                                       </Stack>
                                     </Collapse>
                                     <Group justify="center">
-                                      <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection("communities")} aria-expanded={detailSectionsExpanded.communities} rightSection={<IconChevronDown size={14} style={{ transform: detailSectionsExpanded.communities ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
+                                      <Button size="compact-xs" variant="subtle" color="gray" fw={400} onClick={() => toggleDetailSection("communities")} aria-expanded={detailSectionsExpanded.communities} rightSection={<IconChevronDown size={14} style={{ transform: detailSectionsExpanded.communities ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
                                         {detailSectionsExpanded.communities ? "折りたたむ" : `ほか${detailValues.communities.length - 3}件を表示`}
                                       </Button>
                                     </Group>
