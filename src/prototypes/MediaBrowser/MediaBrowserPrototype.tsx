@@ -76,14 +76,14 @@ type SelectionDialog = "group" | "share" | "delete" | null
 type MediaItem = { id: string; label: string; src: string; failed?: boolean }
 
 const media: MediaItem[] = [
-  { id: "portrait-01", label: "縦長 Media 1", src: "/media-browser/h-01.png" },
-  { id: "portrait-02", label: "縦長 Media 2", src: "/media-browser/h-02.png" },
-  { id: "landscape-01", label: "横長 Media 1", src: "/media-browser/w-01.png" },
-  { id: "landscape-02", label: "横長 Media 2", src: "/media-browser/w-02.png" },
+  { id: "portrait-01", label: "縦長 Media 1", src: "/__dev-assets/media-browser/h-01.png" },
+  { id: "portrait-02", label: "縦長 Media 2", src: "/__dev-assets/media-browser/h-02.png" },
+  { id: "landscape-01", label: "横長 Media 1", src: "/__dev-assets/media-browser/w-01.png" },
+  { id: "landscape-02", label: "横長 Media 2", src: "/__dev-assets/media-browser/w-02.png" },
   ...Array.from({ length: 8 }, (_, index) => ({
     id: String(index + 1),
     label: `Media ${index + 1}`,
-    src: `/group-browser/group-media-${String((index % 9) + 1).padStart(2, "0")}.jpg`,
+    src: `/__dev-assets/group-browser/group-media-${String((index % 9) + 1).padStart(2, "0")}.jpg`,
   })),
 ]
 media.push({ id: "failed", label: "画像処理失敗", src: "", failed: true })
