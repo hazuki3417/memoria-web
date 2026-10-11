@@ -31,6 +31,8 @@ import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
 import { SplitView } from "@/components/SplitView"
+import { Notifications } from "@mantine/notifications"
+import { showNotification } from "@/components/Feedback"
 
 type GroupFixture = {
   id: string
@@ -329,6 +331,25 @@ function MediaGrid() {
 }
 
 export function GroupBrowser({ contextKind = "personal", communityId = "photo-club" }: { contextKind?: "personal" | "community"; communityId?: string }) {
+  const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
+  const [createOpened, create] = useDisclosure(false)
+  const [createName, setCreateName] = useState("")
+  const [createParents, setCreateParents] = useState<string[]>([])
+  const [createChildren, setCreateChildren] = useState<string[]>([])
+  const allGroups = [...groups, ...createdGroups]
+  const openCreate = () => {
+    setCreateName("")
+    setCreateParents([])
+    setCreateChildren([])
+    create.open()
+  }
+  const submitCreate = () => {
+    const name = createName.trim()
+    if (!name || Array.from(name).length > 100) return
+    setCreatedGroups((current) => [...current, { id: `created-${Date.now()}-${current.length}`, name, mediaCount: 0, previewCount: 0, parentNames: createParents, childNames: createChildren }])
+    create.close()
+    showNotification({ kind: "success", title: "Groupを作成しました", message: `「${name}」を作成しました。` })
+  }
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -345,13 +366,13 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
 
   const visibleGroups = useMemo(() => {
     const normalized = appliedQuery.trim().toLocaleLowerCase()
-    if (!normalized) return groups
-    return groups.filter((group) =>
+    if (!normalized) return allGroups
+    return allGroups.filter((group) =>
       group.name.toLocaleLowerCase().includes(normalized),
     )
-  }, [appliedQuery])
+  }, [appliedQuery, createdGroups])
 
-  const selected = groups.find((group) => group.id === selectedId) ?? null
+  const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
   const openEdit = () => {
     if (!selected) return
@@ -410,6 +431,29 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
       JSON.stringify(next),
     )
   }
+
+  const createDialog = (
+    <Modal opened={createOpened} onClose={create.close} title="Groupを作成" size="lg" centered withCloseButton={false}>
+      <Stack gap="lg">
+        <TextInput
+          label={<Group justify="space-between" wrap="nowrap"><Text component="span" size="sm" fw={500}>名前</Text><Text component="span" size="xs" c="dimmed">{Array.from(createName).length} / 100</Text></Group>}
+          value={createName}
+          onChange={(event) => { const value = event.currentTarget.value; if (Array.from(value).length <= 100) setCreateName(value) }}
+          placeholder="Group名"
+          styles={{ label: { display: "block", width: "100%" } }}
+          required
+        />
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+          <RelationEditor label="Parents" names={createParents} oppositeNames={createChildren} onChange={setCreateParents} currentGroupName={createName.trim()} />
+          <RelationEditor label="Children" names={createChildren} oppositeNames={createParents} onChange={setCreateChildren} currentGroupName={createName.trim()} />
+        </SimpleGrid>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={create.close}>キャンセル</Button>
+          <Button onClick={submitCreate} disabled={!createName.trim()}>作成</Button>
+        </Group>
+      </Stack>
+    </Modal>
+  )
 
   const editDialog = (
     <Modal
@@ -517,6 +561,8 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
 
   return (
     <>
+      <Notifications position="top-right" />
+      {createDialog}
       {editDialog}
       {deleteDialog}
       {compact ? (
@@ -546,7 +592,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                   </Group>
                 </Box>
                 <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ gridColumn: compact ? "1" : undefined }}>
-                  <Button size="xs" leftSection={<IconFolderPlus size={16} />}>
+                  <Button size="xs" leftSection={<IconFolderPlus size={16} />} onClick={openCreate}>
                     Groupを作成
                   </Button>
                 </Group>
@@ -647,7 +693,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                   </Group>
                 </Box>
                 <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ gridColumn: compact ? "1" : undefined }}>
-                  <Button size="xs" leftSection={<IconFolderPlus size={16} />}>
+                  <Button size="xs" leftSection={<IconFolderPlus size={16} />} onClick={openCreate}>
                     Groupを作成
                   </Button>
                 </Group>
