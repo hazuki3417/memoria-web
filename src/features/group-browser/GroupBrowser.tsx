@@ -1,5 +1,7 @@
 "use client"
 
+import { ImageDetailDialog } from "@/features/media-browser/ImageDetailDialog"
+
 import {
   ActionIcon,
   Badge,
@@ -305,7 +307,7 @@ function RelationEditor({
     </Stack>
   )
 }
-function MediaGrid() {
+function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
   // Local dummy thumbnails; actual Group media will be supplied by the Connection.
   const mediaItems = Array.from({ length: 24 }, (_, index) => ({
     id: `media-${index + 1}`,
@@ -314,10 +316,13 @@ function MediaGrid() {
   return (
     <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
       {mediaItems.map(({ id, src }) => (
-        <Box
+        <UnstyledButton
           key={id}
+          aria-label={`Media ${Number(id.split("-")[1])}の詳細を開く`}
+          onClick={() => onOpen(Number(id.split("-")[1]) - 1)}
           bdrs="sm"
           style={{
+            display: "block",
             aspectRatio: "1 / 1",
             border: "1px solid var(--mantine-color-default-border)",
             backgroundImage: `url("${src}")`,
@@ -353,6 +358,13 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [imageDetailIndex, setImageDetailIndex] = useState<number | null>(null)
+  const groupMediaItems = Array.from({ length: 24 }, (_, index) => ({
+    id: `group-media-${index + 1}`,
+    label: `Media ${index + 1}`,
+    src: previewImages[index % previewImages.length],
+  }))
+
   const splitViewRef = useGroupRef()
   const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
   const [relationsOpened, relations] = useDisclosure(false)
@@ -650,7 +662,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       <Text fw={600}>Mediaがありません</Text>
                     </Paper>
                   ) : (
-                    <MediaGrid />
+                    <MediaGrid onOpen={setImageDetailIndex} />
                   )}
                 </Box>
               </ScrollArea>
@@ -838,7 +850,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid />
+                          <MediaGrid onOpen={setImageDetailIndex} />
                         )}
                       </Box>
                     </ScrollArea>
@@ -848,6 +860,15 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
             </AnimatePresence>
           </SplitView.Pane>
         </SplitView.Root>
+      )}
+      {imageDetailIndex !== null && (
+        <ImageDetailDialog
+          key={selectedId ?? "group"}
+          items={groupMediaItems}
+          initialId={groupMediaItems[imageDetailIndex].id}
+          onClose={() => setImageDetailIndex(null)}
+          contextKind={contextKind}
+        />
       )}
     </>
   )
