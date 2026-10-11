@@ -16,6 +16,7 @@ import {
   Loader,
   Menu,
   Modal,
+  MultiSelect,
   Paper,
   SegmentedControl,
   Select,
@@ -295,7 +296,7 @@ export function MediaBrowserPrototype({
   const [detailDirection, setDetailDirection] = useState<-1 | 1>(1)
   const [selectionDialog, setSelectionDialog] =
     useState<SelectionDialog>(initialDialog)
-  const [groupTarget, setGroupTarget] = useState<string | null>(null)
+  const [groupTargets, setGroupTargets] = useState<string[]>([])
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
   const [tags, setTags] = useState<string[]>(
     initialState === "tag-filtered" || initialState === "filtered-empty"
@@ -633,7 +634,7 @@ export function MediaBrowserPrototype({
             }
             primary={
               <Button
-                disabled={!groupTarget}
+                disabled={groupTargets.length === 0}
                 onClick={() => setSelectionDialog(null)}
               >
                 追加
@@ -644,15 +645,15 @@ export function MediaBrowserPrototype({
       >
         <Stack gap="xs">
           <Text size="sm">
-            {selected.size}件のMediaを既存のGroupに追加します。
+            {selected.size}件のMediaを選択したすべてのGroupに追加します。
           </Text>
-          <Select
+          <MultiSelect
             label="Group"
             placeholder="Groupを選択"
             searchable
             data={["旅行", "家族", "風景写真", "お気に入り"]}
-            value={groupTarget}
-            onChange={setGroupTarget}
+            value={groupTargets}
+            onChange={setGroupTargets}
           />
         </Stack>
       </Dialog>
