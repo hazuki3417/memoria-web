@@ -1162,17 +1162,18 @@ export function MediaBrowserPrototype({
                           ))}
                           {context === "personal" ? (
                             <Box>
-                              <Group justify="space-between" mb={6}>
+                              <Group justify="space-between" mb="sm">
                                 <Text size="xs" c="dimmed">共有先Community</Text>
                                 <Button size="compact-xs" variant="subtle" leftSection={<IconPlus size={13} />} onClick={() => { setShareTarget(null); setDetailEditor("communities") }}>
                                   共有
                                 </Button>
                               </Group>
-                              <Stack gap={6}>
+                              <Divider mb="sm" />
+                              <Stack gap="xs">
                                 {detailValues.communities.length === 0 ? (
                                   <Text size="xs" c="dimmed">未共有</Text>
                                 ) : detailValues.communities.map((value) => (
-                                  <Group key={value} justify="space-between" wrap="nowrap">
+                                  <Group key={value} justify="space-between" wrap="nowrap" mih={32}>
                                     <Badge variant="light">{value}</Badge>
                                     <Button size="compact-xs" variant="subtle" color="red" onClick={() => setUnshareTarget(value)}>共有解除</Button>
                                   </Group>
