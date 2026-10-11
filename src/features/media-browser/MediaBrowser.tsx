@@ -1209,14 +1209,6 @@ export function MediaBrowser({
                             </Group>
                           )}
                         </Stack>
-                            </Box>
-                          ) : (
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">管理</Text>
-                              <Text size="xs">Community管理</Text>
-                            </Group>
-                          )}
-                        </Stack>
                         <Box
                           p="md"
                           style={{
