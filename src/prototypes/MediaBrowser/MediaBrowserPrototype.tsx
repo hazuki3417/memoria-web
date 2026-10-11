@@ -450,8 +450,8 @@ export function MediaBrowserPrototype({
                   <Button size="xs" type="submit" style={{ flexShrink: 0 }}>
                     検索
                   </Button>
+                  <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{stateItems.length}件</Text>
                 </Group>
-                <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{stateItems.length}件</Text>
               </Box>
             ) : (
               <Badge size="lg" variant="light">
