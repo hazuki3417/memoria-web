@@ -420,8 +420,9 @@ export function MediaBrowserPrototype({
       onOpenSettings={() => {}}
       onLogout={() => {}}
     >
-      <Stack gap="xs" w="100%">
+      <Stack gap={0} w="100%">
         <Box
+          pb="xs"
           style={{
             display: "grid",
             gridTemplateColumns: compact
