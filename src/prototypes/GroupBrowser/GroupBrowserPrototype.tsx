@@ -5,6 +5,7 @@ import {
   Badge,
   Box,
   Button,
+  Collapse,
   Divider,
   Group,
   Modal,
@@ -19,8 +20,6 @@ import {
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
-  IconChevronDown,
-  IconChevronRight,
   IconEdit,
   IconFolderPlus,
   IconSearch,
@@ -714,38 +713,40 @@ export function GroupBrowserPrototype() {
                     </Box>
                     <Divider />
 
-                    <UnstyledButton onClick={relations.toggle} px="sm" py={6}>
-                      <Group gap="xs">
-                        {relationsOpened ? (
-                          <IconChevronDown size={16} />
-                        ) : (
-                          <IconChevronRight size={16} />
-                        )}
+                    <UnstyledButton
+                      onClick={relations.toggle}
+                      px="sm"
+                      py={6}
+                      aria-expanded={relationsOpened}
+                      aria-label="このGroupとの関係を開閉"
+                    >
+                      <Group justify="space-between" wrap="nowrap">
                         <Text size="xs" c="dimmed">
                           このGroupとの関係
                         </Text>
+                        <IconChevronDown
+                          size={16}
+                          style={{
+                            transform: relationsOpened ? "rotate(180deg)" : "rotate(0deg)",
+                            transition: "transform 200ms ease",
+                          }}
+                        />
                       </Group>
                     </UnstyledButton>
-                    {relationsOpened && (
+                    <Collapse in={relationsOpened} transitionDuration={200}>
                       <Box px="lg" pb="sm">
                         <SimpleGrid cols={2} spacing="lg">
                           <Stack gap={4}>
-                            <Text size="xs" c="dimmed">
-                              Parents
-                            </Text>
-                            <RelationItems
-                              names={selected?.parentNames ?? []}
-                            />
+                            <Text size="xs" c="dimmed">Parents</Text>
+                            <RelationItems names={selected?.parentNames ?? []} />
                           </Stack>
                           <Stack gap={4}>
-                            <Text size="xs" c="dimmed">
-                              Children
-                            </Text>
+                            <Text size="xs" c="dimmed">Children</Text>
                             <RelationItems names={selected?.childNames ?? []} />
                           </Stack>
                         </SimpleGrid>
                       </Box>
-                    )}
+                    </Collapse>
                     <Divider />
 
                     <ScrollArea flex={1}>
