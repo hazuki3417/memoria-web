@@ -28,9 +28,9 @@ type Section = "profile" | "preferences" | "usage" | "account"
 
 const sections = [
   { id: "profile", label: "プロフィール", icon: IconUser },
+  { id: "account", label: "アカウント", icon: IconUserCircle },
   { id: "preferences", label: "環境設定", icon: IconSettings },
   { id: "usage", label: "利用状況", icon: IconChartBar },
-  { id: "account", label: "アカウント", icon: IconUserCircle },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
