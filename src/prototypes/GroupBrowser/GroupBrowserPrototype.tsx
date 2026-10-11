@@ -783,14 +783,12 @@ export function GroupBrowserPrototype() {
           </SplitView.Pane>
         </SplitView.Root>
       )}
-      {imageDetailIndex !== null && (
-        <MediaBrowserPrototype
-          detailOnlyItems={groupMediaItems}
-          initialDetailId={groupMediaItems[imageDetailIndex].id}
-          onDetailClose={() => setImageDetailIndex(null)}
-          contextKind={contextKind}
-        />
-      )}
+      <MediaBrowserPrototype
+        detailOnlyItems={groupMediaItems}
+        initialDetailId={imageDetailIndex !== null ? groupMediaItems[imageDetailIndex].id : undefined}
+        onDetailClose={() => setImageDetailIndex(null)}
+        contextKind={contextKind}
+      />
     </PrototypeApplicationShell>
   )
 }
