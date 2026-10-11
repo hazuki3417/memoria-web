@@ -294,6 +294,27 @@ export function MediaBrowser({
     initialState === "selection" ? new Set(["2", "5", "7"]) : new Set(),
   )
   const [detail, setDetail] = useState<MediaItem | null>(null)
+  const [detailEditor, setDetailEditor] = useState<"tags" | "groups" | "communities" | null>(null)
+  const [detailDraft, setDetailDraft] = useState<string[]>([])
+  const [detailEdits, setDetailEdits] = useState<Record<string, { tags: string[]; groups: string[]; communities: string[] }>>({})
+  const detailValues = detailEdits[detail?.id ?? ""] ?? {
+    tags: ["旅行", "風景"],
+    groups: ["旅行", "お気に入り"],
+    communities: ["Photo Club"],
+  }
+  const openDetailEditor = (kind: "tags" | "groups" | "communities") => {
+    setDetailDraft([...detailValues[kind]])
+    setDetailEditor(kind)
+  }
+  const saveDetailDraft = () => {
+    if (!detail || !detailEditor) return
+    setDetailEdits((current) => ({
+      ...current,
+      [detail.id]: { ...detailValues, [detailEditor]: [...detailDraft] },
+    }))
+    setDetailEditor(null)
+    // Prototype-only state: no mutation is sent to the backend.
+  }
   const [detailInfoOpened, setDetailInfoOpened] = useState(true)
   const [detailZoom, setDetailZoom] = useState(100)
   const [detailRotate, setDetailRotate] = useState(0)
@@ -1082,38 +1103,40 @@ export function MediaBrowser({
                             </Group>
                           </Stack>
                           <Divider />
-                          <Box>
-                            <Text size="xs" c="dimmed" mb={6}>
-                              Tags
-                            </Text>
-                            <Group gap={6}>
-                              <Badge variant="light">旅行</Badge>
-                              <Badge variant="light">風景</Badge>
-                            </Group>
-                          </Box>
-                          <Box>
-                            <Text size="xs" c="dimmed" mb={6}>
-                              Groups
-                            </Text>
-                            <Group gap={6}>
-                              <Badge variant="outline">旅行</Badge>
-                              <Badge variant="outline">お気に入り</Badge>
-                            </Group>
-                          </Box>
+                          {(["tags", "groups"] as const).map((kind) => (
+                            <Box key={kind}>
+                              <Group justify="space-between" mb={6}>
+                                <Text size="xs" c="dimmed">{kind === "tags" ? "Tags" : "Groups"}</Text>
+                                <Button size="compact-xs" variant="subtle" onClick={() => openDetailEditor(kind)}>
+                                  編集
+                                </Button>
+                              </Group>
+                              <Group gap={6}>
+                                {detailValues[kind].length === 0 ? (
+                                  <Text size="xs" c="dimmed">未設定</Text>
+                                ) : detailValues[kind].map((value) => (
+                                  <Badge key={value} variant={kind === "tags" ? "light" : "outline"}>{value}</Badge>
+                                ))}
+                              </Group>
+                            </Box>
+                          ))}
                           {context === "personal" ? (
                             <Box>
-                              <Text size="xs" c="dimmed" mb={6}>
-                                共有先Community
-                              </Text>
+                              <Group justify="space-between" mb={6}>
+                                <Text size="xs" c="dimmed">共有先Community</Text>
+                                <Button size="compact-xs" variant="subtle" onClick={() => openDetailEditor("communities")}>編集</Button>
+                              </Group>
                               <Group gap={6}>
-                                <Badge variant="light">Photo Club</Badge>
+                                {detailValues.communities.length === 0 ? (
+                                  <Text size="xs" c="dimmed">未共有</Text>
+                                ) : detailValues.communities.map((value) => (
+                                  <Badge key={value} variant="light">{value}</Badge>
+                                ))}
                               </Group>
                             </Box>
                           ) : (
                             <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                管理
-                              </Text>
+                              <Text size="xs" c="dimmed">管理</Text>
                               <Text size="xs">Community管理</Text>
                             </Group>
                           )}
@@ -1151,6 +1174,39 @@ export function MediaBrowser({
               </Box>
             )
           })()}
+      </Modal>
+      <Modal
+        opened={detailEditor !== null}
+        onClose={() => setDetailEditor(null)}
+        title={detailEditor === "tags" ? "Tagsを編集" : detailEditor === "groups" ? "Groupsを編集" : "共有先Communityを編集"}
+        centered
+        zIndex={400}
+      >
+        <Stack gap="md">
+          <Text size="sm" c="dimmed">
+            {detailEditor === "groups"
+              ? "現在の所属Groupを追加・除外できます。"
+              : detailEditor === "tags"
+                ? "このMediaのTagを追加・除外できます。"
+                : "共有先Communityを追加・解除できます。"}
+          </Text>
+          {detailEditor === "tags" ? (
+            <TagsInput label="Tags" data={["旅行", "風景", "家族", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
+          ) : (
+            <MultiSelect
+              label={detailEditor === "groups" ? "Groups" : "Community"}
+              searchable
+              data={detailEditor === "groups" ? ["旅行", "家族", "風景写真", "お気に入り"] : ["Photo Club", "Family", "Travel"]}
+              value={detailDraft}
+              onChange={setDetailDraft}
+            />
+          )}
+          <Text size="xs" c="dimmed">デモ表示です。変更はサーバーに保存されません。</Text>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
+            <Button onClick={saveDetailDraft}>デモに反映</Button>
+          </Group>
+        </Stack>
       </Modal>
     </>
   )
