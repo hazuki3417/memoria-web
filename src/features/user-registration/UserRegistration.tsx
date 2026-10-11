@@ -12,6 +12,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   ApplicationHeader,
   ApplicationShell,
@@ -34,6 +35,7 @@ export function UserRegistration({
 }: {
   reviewState?: ReviewState
 }) {
+  const router = useRouter()
   const [nickname, setNickname] = useState(
     reviewState === "invalid"
       ? "   "
@@ -73,7 +75,8 @@ export function UserRegistration({
     if (invalid || registering || blocking || registered) return
     // Visual prototype only: actual registration and navigation are not connected.
     setStatus("registered")
-    showFeedback("success")
+    window.sessionStorage.setItem("memoria:registration-success", "1")
+    router.replace("/dashboard")
   }
 
   return (
