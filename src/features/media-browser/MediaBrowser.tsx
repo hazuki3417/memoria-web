@@ -417,7 +417,7 @@ export function MediaBrowser({
             display: "grid",
             gridTemplateColumns: compact
               ? "minmax(0, 1fr)"
-              : "minmax(0, 1fr) auto minmax(0, 1fr)",
+              : "minmax(0, 1fr) auto",
             alignItems: "center",
             gap: "var(--mantine-spacing-xs)",
           }}
@@ -453,8 +453,6 @@ export function MediaBrowser({
               </Badge>
             )}
           </Box>
-
-          {!compact && <Box />}
 
           <Group
             gap="xs"
