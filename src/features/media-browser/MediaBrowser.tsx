@@ -1146,7 +1146,6 @@ export function MediaBrowser({
                             Originalをダウンロード
                           </Button>
                           <Divider />
-                          <Divider />
                           {(["groups", "tags"] as const).map((kind) => {
                             const values = detailValues[kind]
                             const visible = values.slice(0, 6)
