@@ -9,6 +9,7 @@ import {
   Center,
   Checkbox,
   Combobox,
+  Collapse,
   Divider,
   Group,
   Image,
@@ -1157,7 +1158,7 @@ export function MediaBrowserPrototype({
                           <Divider />
                           {(["groups", "tags"] as const).map((kind) => {
                             const values = detailValues[kind]
-                            const visible = detailSectionsExpanded[kind] ? values : values.slice(0, 6)
+                            const visible = values.slice(0, 6)
                             return (
                               <Box key={kind}>
                                 <Group justify="space-between" mb="sm" wrap="nowrap">
@@ -1175,9 +1176,20 @@ export function MediaBrowserPrototype({
                                   ))}
                                 </Group>
                                 {values.length > 6 && (
-                                  <Button mt="xs" size="compact-xs" variant="subtle" onClick={() => toggleDetailSection(kind)}>
-                                    {detailSectionsExpanded[kind] ? "折りたたむ" : `ほか${values.length - 6}件を表示`}
-                                  </Button>
+                                  <>
+                                    <Collapse in={detailSectionsExpanded[kind]} transitionDuration={200}>
+                                      <Group gap={6} mt="xs">
+                                        {values.slice(6).map((value) => (
+                                          <Badge key={value} variant={kind === "tags" ? "light" : "outline"} style={{ maxWidth: "100%", overflowWrap: "anywhere", height: "auto", whiteSpace: "normal" }}>{value}</Badge>
+                                        ))}
+                                      </Group>
+                                    </Collapse>
+                                    <Group justify="center" mt="xs">
+                                      <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection(kind)} aria-expanded={detailSectionsExpanded[kind]} rightSection={<IconChevronRight size={14} style={{ transform: detailSectionsExpanded[kind] ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
+                                        {detailSectionsExpanded[kind] ? "折りたたむ" : `ほか${values.length - 6}件を表示`}
+                                      </Button>
+                                    </Group>
+                                  </>
                                 )}
                                 {kind === "groups" && <Divider mt="md" />}
                               </Box>
@@ -1199,7 +1211,7 @@ export function MediaBrowserPrototype({
                               <Stack gap="xs">
                                 {detailValues.communities.length === 0 ? (
                                   <Text size="xs" c="dimmed">未共有</Text>
-                                ) : (detailSectionsExpanded.communities ? detailValues.communities : detailValues.communities.slice(0, 3)).map((value) => (
+                                ) : detailValues.communities.slice(0, 3).map((value) => (
                                   <Group key={value} justify="space-between" wrap="nowrap" mih={32} gap="xs">
                                     <Box style={{ minWidth: 0, flex: 1, overflowWrap: "anywhere" }}>
                                       <Text size="xs">{value}</Text>
@@ -1208,9 +1220,25 @@ export function MediaBrowserPrototype({
                                   </Group>
                                 ))}
                                 {detailValues.communities.length > 3 && (
-                                  <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection("communities")}>
-                                    {detailSectionsExpanded.communities ? "折りたたむ" : `ほか${detailValues.communities.length - 3}件を表示`}
-                                  </Button>
+                                  <>
+                                    <Collapse in={detailSectionsExpanded.communities} transitionDuration={200}>
+                                      <Stack gap="xs">
+                                        {detailValues.communities.slice(3).map((value) => (
+                                          <Group key={value} justify="space-between" wrap="nowrap" mih={32} gap="xs">
+                                            <Box style={{ minWidth: 0, flex: 1, overflowWrap: "anywhere" }}>
+                                              <Text size="xs">{value}</Text>
+                                            </Box>
+                                            <Button size="compact-xs" variant="subtle" color="red" style={{ flexShrink: 0 }} onClick={() => setUnshareTarget(value)}>共有解除</Button>
+                                          </Group>
+                                        ))}
+                                      </Stack>
+                                    </Collapse>
+                                    <Group justify="center">
+                                      <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection("communities")} aria-expanded={detailSectionsExpanded.communities} rightSection={<IconChevronRight size={14} style={{ transform: detailSectionsExpanded.communities ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
+                                        {detailSectionsExpanded.communities ? "折りたたむ" : `ほか${detailValues.communities.length - 3}件を表示`}
+                                      </Button>
+                                    </Group>
+                                  </>
                                 )}
                               </Stack>
                             </Box>
