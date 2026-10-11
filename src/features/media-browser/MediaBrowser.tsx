@@ -296,6 +296,8 @@ export function MediaBrowser({
   const [detail, setDetail] = useState<MediaItem | null>(null)
   const [detailEditor, setDetailEditor] = useState<"tags" | "groups" | "communities" | null>(null)
   const [detailDraft, setDetailDraft] = useState<string[]>([])
+  const [shareTarget, setShareTarget] = useState<string | null>(null)
+  const [unshareTarget, setUnshareTarget] = useState<string | null>(null)
   const [detailEdits, setDetailEdits] = useState<Record<string, { tags: string[]; groups: string[]; communities: string[] }>>({})
   const detailValues = detailEdits[detail?.id ?? ""] ?? {
     tags: ["旅行", "風景"],
@@ -318,6 +320,33 @@ export function MediaBrowser({
       kind: "success",
       title: `${label}を更新しました（デモ）`,
       message: "画面上の変更を反映しました。サーバーには保存されていません。",
+    })
+  }
+  const addCommunityShare = () => {
+    if (!detail || !shareTarget || detailValues.communities.includes(shareTarget)) return
+    setDetailEdits((current) => ({
+      ...current,
+      [detail.id]: { ...detailValues, communities: [...detailValues.communities, shareTarget] },
+    }))
+    setShareTarget(null)
+    setDetailEditor(null)
+    showNotification({
+      kind: "success",
+      title: "Communityへ共有しました（デモ）",
+      message: "画面上の共有先に追加しました。サーバーには保存されていません。",
+    })
+  }
+  const removeCommunityShare = () => {
+    if (!detail || !unshareTarget || !detailValues.communities.includes(unshareTarget)) return
+    setDetailEdits((current) => ({
+      ...current,
+      [detail.id]: { ...detailValues, communities: detailValues.communities.filter((name) => name !== unshareTarget) },
+    }))
+    setUnshareTarget(null)
+    showNotification({
+      kind: "success",
+      title: "Communityの共有を解除しました（デモ）",
+      message: "画面上の共有先から解除しました。サーバーには保存されていません。",
     })
   }
   const [detailInfoOpened, setDetailInfoOpened] = useState(true)
@@ -1129,15 +1158,20 @@ export function MediaBrowser({
                             <Box>
                               <Group justify="space-between" mb={6}>
                                 <Text size="xs" c="dimmed">共有先Community</Text>
-                                <Button size="compact-xs" variant="subtle" onClick={() => openDetailEditor("communities")}>編集</Button>
+                                <Button size="compact-xs" variant="subtle" leftSection={<IconPlus size={13} />} onClick={() => { setShareTarget(null); setDetailEditor("communities") }}>
+                                  共有
+                                </Button>
                               </Group>
-                              <Group gap={6}>
+                              <Stack gap={6}>
                                 {detailValues.communities.length === 0 ? (
                                   <Text size="xs" c="dimmed">未共有</Text>
                                 ) : detailValues.communities.map((value) => (
-                                  <Badge key={value} variant="light">{value}</Badge>
+                                  <Group key={value} justify="space-between" wrap="nowrap">
+                                    <Badge variant="light">{value}</Badge>
+                                    <Button size="compact-xs" variant="subtle" color="red" onClick={() => setUnshareTarget(value)}>共有解除</Button>
+                                  </Group>
                                 ))}
-                              </Group>
+                              </Stack>
                             </Box>
                           ) : (
                             <Group justify="space-between">
@@ -1180,13 +1214,41 @@ export function MediaBrowser({
             )
           })()}
       </Modal>
+      <Modal opened={unshareTarget !== null} onClose={() => setUnshareTarget(null)} title="Communityの共有を解除" centered zIndex={410}>
+        <Stack gap="md">
+          <Text size="sm">{unshareTarget} への共有を解除しますか？ このCommunityからMediaを閲覧できなくなります。他の共有先やMedia本体は削除されません。</Text>
+          <Text size="xs" c="dimmed">デモ表示です。サーバーには保存されません。</Text>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setUnshareTarget(null)}>キャンセル</Button>
+            <Button color="red" onClick={removeCommunityShare}>共有解除（デモ）</Button>
+          </Group>
+        </Stack>
+      </Modal>
       <Modal
         opened={detailEditor !== null}
         onClose={() => setDetailEditor(null)}
-        title={detailEditor === "tags" ? "Tagsを編集" : detailEditor === "groups" ? "Groupsを編集" : "共有先Communityを編集"}
+        title={detailEditor === "tags" ? "Tagsを編集" : detailEditor === "groups" ? "Groupsを編集" : "Communityへ共有"}
         centered
         zIndex={400}
       >
+        {detailEditor === "communities" ? (
+          <Stack gap="md">
+            <Text size="sm" c="dimmed">このMediaを共有するCommunityを1つ選択します。</Text>
+            <Select
+              label="共有先Community"
+              searchable
+              data={["Photo Club", "Family", "Travel"].filter((name) => !detailValues.communities.includes(name))}
+              value={shareTarget}
+              onChange={setShareTarget}
+              placeholder="Communityを選択"
+            />
+            <Text size="xs" c="dimmed">デモ表示です。サーバーには保存されません。</Text>
+            <Group justify="flex-end">
+              <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
+              <Button disabled={!shareTarget} onClick={addCommunityShare}>共有する（デモ）</Button>
+            </Group>
+          </Stack>
+        ) : (
         <Stack gap="md">
           <Text size="sm" c="dimmed">
             {detailEditor === "groups"
@@ -1199,9 +1261,9 @@ export function MediaBrowser({
             <TagsInput label="Tags" data={["旅行", "風景", "家族", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
           ) : (
             <MultiSelect
-              label={detailEditor === "groups" ? "Groups" : "Community"}
+              label="Groups"
               searchable
-              data={detailEditor === "groups" ? ["旅行", "家族", "風景写真", "お気に入り"] : ["Photo Club", "Family", "Travel"]}
+              data={["旅行", "家族", "風景写真", "お気に入り"]}
               value={detailDraft}
               onChange={setDetailDraft}
             />
@@ -1212,6 +1274,8 @@ export function MediaBrowser({
             <Button onClick={saveDetailDraft}>デモに反映</Button>
           </Group>
         </Stack>
+
+        )}
       </Modal>
     </>
   )
