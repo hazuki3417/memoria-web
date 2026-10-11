@@ -688,7 +688,7 @@ export function MediaBrowser({
             </Group>
           </Paper>
         )}
-      </Stack>
+      </Stack>}
 
       <Dialog
         opened={selectionDialog === "group"}
@@ -774,7 +774,7 @@ export function MediaBrowser({
             value={communityTarget}
             onChange={setCommunityTarget}
           />
-        </Stack>}
+        </Stack>
       </Dialog>
 
       <Dialog
