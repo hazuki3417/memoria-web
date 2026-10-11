@@ -465,27 +465,27 @@ export function GroupBrowserPrototype() {
               h="100%"
               style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
             >
-              <Stack p="sm" gap="xs">
-                <Group gap="xs" wrap="nowrap">
-                  <TextInput
-                    flex={1}
-                    size="sm"
-                    value={query}
-                    onChange={(event) => setQuery(event.currentTarget.value)}
-                    placeholder="Groupを検索"
-                    leftSection={<IconSearch size={16} />}
-                  />
-                  <ActionIcon
-                    size="input-sm"
-                    variant="subtle"
-                    aria-label="Groupを作成"
-                  >
+              <Stack px={0} pt={0} pb="xs" gap="xs">
+                <Group gap="xs" wrap="nowrap" justify="space-between">
+                  <Group gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+                    <TextInput
+                      w={compact ? "100%" : 280}
+                      maw="100%"
+                      size="xs"
+                      value={query}
+                      onChange={(event) => setQuery(event.currentTarget.value)}
+                      placeholder="Groupを検索"
+                      leftSection={<IconSearch size={16} />}
+                      style={{ flex: compact ? "1 1 auto" : undefined }}
+                    />
+                    <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
+                      {visibleGroups.length}件
+                    </Text>
+                  </Group>
+                  <ActionIcon size="input-xs" variant="subtle" aria-label="Groupを作成">
                     <IconPlus size={18} />
                   </ActionIcon>
                 </Group>
-                <Text size="xs" c="dimmed">
-                  {visibleGroups.length}件
-                </Text>
               </Stack>
               <Divider />
               <ScrollArea flex={1}>
@@ -561,27 +561,27 @@ export function GroupBrowserPrototype() {
                 minHeight: 0,
               }}
             >
-              <Stack p="sm" gap="xs">
-                <Group gap="xs" wrap="nowrap">
-                  <TextInput
-                    flex={1}
-                    size="sm"
-                    value={query}
-                    onChange={(event) => setQuery(event.currentTarget.value)}
-                    placeholder="Groupを検索"
-                    leftSection={<IconSearch size={16} />}
-                  />
-                  <ActionIcon
-                    size="input-sm"
-                    variant="subtle"
-                    aria-label="Groupを作成"
-                  >
+              <Stack px={0} pt={0} pb="xs" gap="xs">
+                <Group gap="xs" wrap="nowrap" justify="space-between">
+                  <Group gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+                    <TextInput
+                      w={compact ? "100%" : 280}
+                      maw="100%"
+                      size="xs"
+                      value={query}
+                      onChange={(event) => setQuery(event.currentTarget.value)}
+                      placeholder="Groupを検索"
+                      leftSection={<IconSearch size={16} />}
+                      style={{ flex: compact ? "1 1 auto" : undefined }}
+                    />
+                    <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
+                      {visibleGroups.length}件
+                    </Text>
+                  </Group>
+                  <ActionIcon size="input-xs" variant="subtle" aria-label="Groupを作成">
                     <IconPlus size={18} />
                   </ActionIcon>
                 </Group>
-                <Text size="xs" c="dimmed">
-                  {visibleGroups.length}件
-                </Text>
               </Stack>
               <Divider />
               <ScrollArea flex={1}>
