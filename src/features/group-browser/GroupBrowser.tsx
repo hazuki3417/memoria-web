@@ -524,7 +524,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
               h="100%"
               style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
             >
-              <Stack px={0} pt={0} pb="xs" gap="xs">
+              <Stack px={0} pt={0} pb="xs" gap={0}>
                 <Group gap="xs" wrap="nowrap" justify="space-between">
                   <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
                     <TextInput
@@ -631,7 +631,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                 minHeight: 0,
               }}
             >
-              <Stack px={0} pt={0} pb="xs" gap="xs">
+              <Stack px={0} pt={0} pb="xs" gap={0}>
                 <Group gap="xs" wrap="nowrap" justify="space-between">
                   <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
                     <TextInput
