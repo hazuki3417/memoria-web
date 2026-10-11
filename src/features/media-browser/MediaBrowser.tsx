@@ -1176,7 +1176,7 @@ export function MediaBrowser({
                                       </Group>
                                     </Collapse>
                                     <Group justify="center" mt="xs">
-                                      <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection(kind)} aria-expanded={detailSectionsExpanded[kind]} rightSection={<IconChevronRight size={14} style={{ transform: detailSectionsExpanded[kind] ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
+                                      <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection(kind)} aria-expanded={detailSectionsExpanded[kind]} rightSection={<IconChevronDown size={14} style={{ transform: detailSectionsExpanded[kind] ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
                                         {detailSectionsExpanded[kind] ? "折りたたむ" : `ほか${values.length - 6}件を表示`}
                                       </Button>
                                     </Group>
@@ -1225,7 +1225,7 @@ export function MediaBrowser({
                                       </Stack>
                                     </Collapse>
                                     <Group justify="center">
-                                      <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection("communities")} aria-expanded={detailSectionsExpanded.communities} rightSection={<IconChevronRight size={14} style={{ transform: detailSectionsExpanded.communities ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
+                                      <Button size="compact-xs" variant="subtle" onClick={() => toggleDetailSection("communities")} aria-expanded={detailSectionsExpanded.communities} rightSection={<IconChevronDown size={14} style={{ transform: detailSectionsExpanded.communities ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }} />}>
                                         {detailSectionsExpanded.communities ? "折りたたむ" : `ほか${detailValues.communities.length - 3}件を表示`}
                                       </Button>
                                     </Group>
