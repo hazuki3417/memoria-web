@@ -451,6 +451,7 @@ export function MediaBrowserPrototype({
                     検索
                   </Button>
                 </Group>
+                <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{stateItems.length}件</Text>
               </Box>
             ) : (
               <Badge size="lg" variant="light">
@@ -568,6 +569,7 @@ export function MediaBrowserPrototype({
             />
           </Group>
         </Box>
+        <Divider />
 
         {initialState === "loading" && (
           <Center mih={360}>
