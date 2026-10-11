@@ -1199,6 +1199,7 @@ export function MediaBrowser({
                                     </Group>
                                   </>
                                 )}
+                                {kind === "groups" && <Divider color="gray.3" mt="md" />}
                               </Box>
                             )
                           })}
