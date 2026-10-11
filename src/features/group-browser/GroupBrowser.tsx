@@ -116,7 +116,7 @@ const relationCandidateNames = [
 const previewImages = Array.from(
   { length: 9 },
   (_, index) =>
-    `/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
+    `/__dev-assets/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
 )
 
 function GroupVisual({ startIndex }: { startIndex: number }) {
