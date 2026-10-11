@@ -540,9 +540,9 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       {visibleGroups.length}件
                     </Text>
                   </Group>
-                  <ActionIcon size="input-xs" variant="subtle" aria-label="Groupを作成">
-                    <IconPlus size={18} />
-                  </ActionIcon>
+                  <Button size="xs" leftSection={<IconPlus size={16} />}>
+                    Groupを作成
+                  </Button>
                 </Group>
               </Stack>
               <Divider />
@@ -646,9 +646,9 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       {visibleGroups.length}件
                     </Text>
                   </Group>
-                  <ActionIcon size="input-xs" variant="subtle" aria-label="Groupを作成">
-                    <IconPlus size={18} />
-                  </ActionIcon>
+                  <Button size="xs" leftSection={<IconPlus size={16} />}>
+                    Groupを作成
+                  </Button>
                 </Group>
               </Stack>
               <Divider />
