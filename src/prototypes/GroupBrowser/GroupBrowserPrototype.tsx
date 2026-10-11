@@ -22,7 +22,7 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconEdit,
-  IconPlus,
+  IconFolderPlus,
   IconSearch,
   IconX,
 } from "@tabler/icons-react"
@@ -482,7 +482,7 @@ export function GroupBrowserPrototype() {
                       {visibleGroups.length}件
                     </Text>
                   </Group>
-                  <Button size="xs" leftSection={<IconPlus size={16} />}>
+                  <Button size="xs" leftSection={<IconFolderPlus size={16} />}>
                     Groupを作成
                   </Button>
                 </Group>
@@ -578,7 +578,7 @@ export function GroupBrowserPrototype() {
                       {visibleGroups.length}件
                     </Text>
                   </Group>
-                  <Button size="xs" leftSection={<IconPlus size={16} />}>
+                  <Button size="xs" leftSection={<IconFolderPlus size={16} />}>
                     Groupを作成
                   </Button>
                 </Group>
