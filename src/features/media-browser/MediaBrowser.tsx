@@ -973,16 +973,6 @@ export function MediaBrowser({
                         <>
                           <ActionIcon
                             variant="subtle"
-                            aria-label="左へ回転"
-                            onClick={() => {
-                              setDetailRotateAnimated(true)
-                              setDetailRotate((value) => value - 90)
-                            }}
-                          >
-                            <IconRotate size={18} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="subtle"
                             aria-label="回転をリセット"
                             onClick={() => {
                               setDetailRotateAnimated(false)
@@ -990,6 +980,16 @@ export function MediaBrowser({
                             }}
                           >
                             <IconRotate2 size={18} />
+                          </ActionIcon>
+                          <ActionIcon
+                            variant="subtle"
+                            aria-label="左へ回転"
+                            onClick={() => {
+                              setDetailRotateAnimated(true)
+                              setDetailRotate((value) => value - 90)
+                            }}
+                          >
+                            <IconRotate size={18} />
                           </ActionIcon>
                           <ActionIcon
                             variant="subtle"
