@@ -380,6 +380,9 @@ export function MediaBrowserPrototype({
   })
   const currentContext =
     contexts.find((item) => item.kind === context) ?? contexts[0]
+  const [appliedTags, setAppliedTags] = useState<string[]>(tags)
+  // The mock has no tag metadata or Relay connection; keep the submitted filter separate.
+  void appliedTags
   const stateItems = [
     "true-empty",
     "filtered-empty",
@@ -432,11 +435,11 @@ export function MediaBrowserPrototype({
             {!selecting ? (
               <Box
                 component="form"
-                onSubmit={(event) => event.preventDefault()}
+                onSubmit={(event) => { event.preventDefault(); setAppliedTags([...tags]) }}
               >
                 <Group gap="xs" wrap="nowrap">
                   <TagsInput
-                    placeholder="Tag"
+                    placeholder="Tagを検索"
                     value={tags}
                     onChange={setTags}
                     clearable
