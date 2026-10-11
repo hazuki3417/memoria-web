@@ -22,6 +22,7 @@ import {
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { PageWidth } from "@/components/PageWidth/PageWidth"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type ContextKind = "personal" | "community"
@@ -418,7 +419,8 @@ export function DashboardPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <Stack gap="xl" maw={1280} mx="auto" w="100%">
+      <PageWidth variant="contained">
+      <Stack gap="xl" w="100%">
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="nowrap">
             <Title order={3} size="h4">
@@ -502,6 +504,7 @@ export function DashboardPrototype({
           )}
         </Stack>
       </Stack>
+      </PageWidth>
     </PrototypeApplicationShell>
   )
 }
