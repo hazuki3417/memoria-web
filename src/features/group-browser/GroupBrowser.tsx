@@ -740,7 +740,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                           編集
                         </Button>
                         <Button size="xs" variant="default" leftSection={<IconX size={16} />} onClick={closeDetail}>
-                          選択解除
+                          閉じる
                         </Button>
                       </Group>
                     </Box>
