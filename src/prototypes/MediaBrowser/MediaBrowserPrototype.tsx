@@ -304,6 +304,12 @@ export function MediaBrowserPrototype({
   )
   const [detail, setDetail] = useState<MediaItem | null>(() => detailOnlyItems?.find((item) => item.id === initialDetailId) ?? null)
   const closeImageDetail = () => { setDetail(null); onDetailClose?.() }
+  useEffect(() => {
+    if (detailOnlyItems) {
+      setDetail(detailOnlyItems.find((item) => item.id === initialDetailId) ?? null)
+    }
+  }, [initialDetailId, detailOnlyItems])
+
   const [detailEditor, setDetailEditor] = useState<"tags" | "groups" | "communities" | null>(null)
   const [detailDraft, setDetailDraft] = useState<string[]>([])
   const [shareTarget, setShareTarget] = useState<string | null>(null)
