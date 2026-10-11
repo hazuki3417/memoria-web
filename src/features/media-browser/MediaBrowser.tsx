@@ -410,8 +410,9 @@ export function MediaBrowser({
   return (
     <>
       <Notifications position="top-right" />
-      <Stack gap="xs" w="100%">
+      <Stack gap={0} w="100%">
         <Box
+          pb="xs"
           style={{
             display: "grid",
             gridTemplateColumns: compact
