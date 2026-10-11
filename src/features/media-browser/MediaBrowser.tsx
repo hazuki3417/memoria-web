@@ -1145,6 +1145,7 @@ export function MediaBrowser({
                             Originalをダウンロード
                           </Button>
                           <Divider />
+                          <Divider />
                           {(["groups", "tags"] as const).map((kind) => {
                             const values = detailValues[kind]
                             const visible = detailSectionsExpanded[kind] ? values : values.slice(0, 6)
@@ -1172,6 +1173,7 @@ export function MediaBrowser({
                               </Box>
                             )
                           })}
+                          <Divider />
                           {context === "personal" ? (
                             <Box>
                               <Group justify="space-between" mb="sm" wrap="nowrap">
