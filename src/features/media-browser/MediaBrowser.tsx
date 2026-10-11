@@ -58,6 +58,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { Dialog } from "@/components/Dialog"
+import { Notifications } from "@mantine/notifications"
+import { showNotification } from "@/components/Feedback"
 
 type MediaBrowserState =
   | "default"
@@ -299,6 +301,18 @@ export function MediaBrowser({
   const [selectionDialog, setSelectionDialog] =
     useState<SelectionDialog>(initialDialog)
   const [groupTarget, setGroupTarget] = useState<string | null>(null)
+  const completeMockSelection = (kind: "group" | "delete") => {
+    const count = selected.size
+    if (!count || (kind === "group" && !groupTarget)) return
+    setSelectionDialog(null)
+    showNotification({
+      kind: "info",
+      title: kind === "group" ? "Groupへの追加（デモ）" : "Mediaの削除（デモ）",
+      message: kind === "group"
+        ? `${count}件のMediaを「${groupTarget}」へ追加する操作を確認しました。実際のデータは変更されていません。`
+        : `${count}件のMediaを削除する操作を確認しました。実際のデータは削除されていません。`,
+    })
+  }
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
   const [tags, setTags] = useState<string[]>(
     initialState === "tag-filtered" || initialState === "filtered-empty"
@@ -330,6 +344,7 @@ export function MediaBrowser({
 
   return (
     <>
+      <Notifications position="top-right" />
       <Stack gap="xs" maw={1440} mx="auto">
         <Box
           style={{
@@ -620,7 +635,7 @@ export function MediaBrowser({
             primary={
               <Button
                 disabled={!groupTarget}
-                onClick={() => setSelectionDialog(null)}
+                onClick={() => completeMockSelection("group")}
               >
                 追加
               </Button>
@@ -705,7 +720,7 @@ export function MediaBrowser({
               </Button>
             }
             primary={
-              <Button color="red" onClick={() => setSelectionDialog(null)}>
+              <Button color="red" onClick={() => completeMockSelection("delete")}>
                 削除
               </Button>
             }
