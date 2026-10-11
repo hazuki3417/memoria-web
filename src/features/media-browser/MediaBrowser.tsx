@@ -407,7 +407,7 @@ export function MediaBrowser({
   return (
     <>
       <Notifications position="top-right" />
-      <Stack gap="xs" maw={1440} mx="auto">
+      <Stack gap="xs" w="100%">
         <Box
           style={{
             display: "grid",
