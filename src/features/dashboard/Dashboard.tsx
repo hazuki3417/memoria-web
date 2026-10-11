@@ -20,6 +20,8 @@ import {
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import { Notifications } from "@mantine/notifications"
+import { showNotification } from "@/components/Feedback"
 import { recentGroups, recentMedia } from "./dashboardData"
 
 function MediaPage({
@@ -234,11 +236,19 @@ function EmptyState({ kind, href }: { kind: "media" | "group"; href: string }) {
 }
 
 export function Dashboard({ empty = false, contextKind = "personal", communityId = "photo-club" }: { empty?: boolean; contextKind?: "personal" | "community"; communityId?: string }) {
+  useEffect(() => {
+    if (contextKind !== "personal") return
+    if (window.sessionStorage.getItem("memoria:registration-success") !== "1") return
+    window.sessionStorage.removeItem("memoria:registration-success")
+    showNotification({ kind: "success", title: "登録しました", message: "登録が完了しました。" })
+  }, [contextKind])
   const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
   const mediaHref = `${prefix}/media`
   const groupsHref = `${prefix}/groups`
 
   return (
+    <>
+    {contextKind === "personal" && <Notifications position="top-right" />}
     <Stack gap="xl" maw={1280} mx="auto" w="100%">
       <Stack gap="sm">
         <Group justify="space-between" align="center" wrap="nowrap">
@@ -255,5 +265,6 @@ export function Dashboard({ empty = false, contextKind = "personal", communityId
         {empty ? <EmptyState kind="group" href={groupsHref} /> : <RecentGroups />}
       </Stack>
     </Stack>
+    </>
   )
 }
