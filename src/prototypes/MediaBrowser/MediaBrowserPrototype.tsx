@@ -1177,14 +1177,13 @@ export function MediaBrowserPrototype({
                             const visible = values.slice(0, 6)
                             return (
                               <Box key={kind}>
-                                <Group justify="space-between" mb="xs" wrap="nowrap">
+                                <Group justify="space-between" mb="sm" wrap="nowrap">
                                   <Group gap={6}>
                                     <Text size="xs" c="dimmed">{kind === "groups" ? "Groups" : "Tags"}</Text>
                                     <Text size="xs" c="dimmed">({values.length})</Text>
                                   </Group>
                                   <Button size="compact-xs" variant="subtle" onClick={() => openDetailEditor(kind)}>編集</Button>
                                 </Group>
-                                <Divider color="gray.2" mb="sm" />
                                 <Group gap={6}>
                                   {values.length === 0 ? (
                                     <Text size="xs" c="dimmed">未設定</Text>
@@ -1224,7 +1223,7 @@ export function MediaBrowserPrototype({
                                   共有
                                 </Button>
                               </Group>
-                              <Divider color="gray.2" mb="sm" />
+                              <Divider mb="sm" />
                               <Stack gap="xs">
                                 {detailValues.communities.length === 0 ? (
                                   <Text size="xs" c="dimmed">未共有</Text>
