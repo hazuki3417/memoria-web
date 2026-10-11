@@ -401,19 +401,19 @@ export function MediaBrowserPrototype({
                 <Button
                   size="xs"
                   variant="default"
+                  leftSection={<IconEdit size={15} />}
+                  disabled={selected.size === 0}
+                >
+                  編集
+                </Button>
+                <Button
+                  size="xs"
+                  variant="default"
                   leftSection={<IconFolderPlus size={15} />}
                   disabled={selected.size === 0}
                   onClick={() => setSelectionDialog("group")}
                 >
                   Group
-                </Button>
-                <Button
-                  size="xs"
-                  variant="default"
-                  leftSection={<IconEdit size={15} />}
-                  disabled={selected.size === 0}
-                >
-                  編集
                 </Button>
                 {context === "personal" && (
                   <Button
