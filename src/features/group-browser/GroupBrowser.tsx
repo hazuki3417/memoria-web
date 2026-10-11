@@ -304,21 +304,23 @@ function RelationEditor({
   )
 }
 function MediaGrid() {
-  const tones = ["blue", "grape", "teal", "orange", "cyan"]
+  // Local dummy thumbnails; actual Group media will be supplied by the Connection.
   const mediaItems = Array.from({ length: 24 }, (_, index) => ({
     id: `media-${index + 1}`,
-    index,
+    src: previewImages[index % previewImages.length],
   }))
   return (
     <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
-      {mediaItems.map(({ id, index }) => (
+      {mediaItems.map(({ id, src }) => (
         <Box
           key={id}
-          bg={`var(--mantine-color-${tones[index % tones.length]}-1)`}
           bdrs="sm"
           style={{
             aspectRatio: "1 / 1",
             border: "1px solid var(--mantine-color-default-border)",
+            backgroundImage: `url("${src}")`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
           }}
         />
       ))}
