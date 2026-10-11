@@ -1259,58 +1259,45 @@ export function MediaBrowserPrototype({
           </Group>
         </Stack>
       </Modal>
-      <Modal
-        opened={detailEditor !== null}
-        onClose={() => setDetailEditor(null)}
-        title={detailEditor === "tags" ? "Tagsを編集" : detailEditor === "groups" ? "Groupsを編集" : "Communityへ共有"}
-        centered
-        zIndex={400}
-      >
-        {detailEditor === "communities" ? (
-          <Stack gap="md">
-            <Text size="sm" c="dimmed">このMediaを共有するCommunityを1つ選択します。</Text>
-            <Select
-              label="共有先Community"
-              searchable
-              data={["Photo Club", "Family", "Travel"].filter((name) => !detailValues.communities.includes(name))}
-              value={shareTarget}
-              onChange={setShareTarget}
-              placeholder="Communityを選択"
-            />
-            <Text size="xs" c="dimmed">デモ表示です。サーバーには保存されません。</Text>
-            <Group justify="flex-end">
-              <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
-              <Button disabled={!shareTarget} onClick={addCommunityShare}>共有する（デモ）</Button>
-            </Group>
-          </Stack>
-        ) : (
+      <Modal opened={detailEditor === "communities"} onClose={() => setDetailEditor(null)} title="Communityへ共有" centered zIndex={400}>
         <Stack gap="md">
-          <Text size="sm" c="dimmed">
-            {detailEditor === "groups"
-              ? "現在の所属Groupを追加・除外できます。"
-              : detailEditor === "tags"
-                ? "このMediaのTagを追加・除外できます。"
-                : "共有先Communityを追加・解除できます。"}
-          </Text>
-          {detailEditor === "tags" ? (
-            <TagsInput label="Tags" data={["旅行", "風景", "家族", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
-          ) : (
-            <MultiSelect
-              label="Groups"
-              searchable
-              data={["旅行", "家族", "風景写真", "お気に入り"]}
-              value={detailDraft}
-              onChange={setDetailDraft}
-            />
-          )}
+          <Text size="sm" c="dimmed">このMediaを共有するCommunityを1つ選択します。</Text>
+          <Select
+            label="共有先Community"
+            searchable
+            data={["Photo Club", "Family", "Travel"].filter((name) => !detailValues.communities.includes(name))}
+            value={shareTarget}
+            onChange={setShareTarget}
+            placeholder="Communityを選択"
+          />
+          <Text size="xs" c="dimmed">デモ表示です。サーバーには保存されません。</Text>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
+            <Button disabled={!shareTarget} onClick={addCommunityShare}>共有する（デモ）</Button>
+          </Group>
+        </Stack>
+      </Modal>
+      <Modal opened={detailEditor === "tags"} onClose={() => setDetailEditor(null)} title="Tagsを編集" centered zIndex={400}>
+        <Stack gap="md">
+          <Text size="sm" c="dimmed">このMediaのTagを追加・除外できます。</Text>
+          <TagsInput label="Tags" data={["旅行", "風景", "家族", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
           <Text size="xs" c="dimmed">デモ表示です。変更はサーバーに保存されません。</Text>
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
             <Button onClick={saveDetailDraft}>デモに反映</Button>
           </Group>
         </Stack>
-
-        )}
+      </Modal>
+      <Modal opened={detailEditor === "groups"} onClose={() => setDetailEditor(null)} title="Groupsを編集" centered zIndex={400}>
+        <Stack gap="md">
+          <Text size="sm" c="dimmed">現在の所属Groupを追加・除外できます。</Text>
+          <MultiSelect label="Groups" searchable data={["旅行", "家族", "風景写真", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
+          <Text size="xs" c="dimmed">デモ表示です。変更はサーバーに保存されません。</Text>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
+            <Button onClick={saveDetailDraft}>デモに反映</Button>
+          </Group>
+        </Stack>
       </Modal>
     </PrototypeApplicationShell>
   )
