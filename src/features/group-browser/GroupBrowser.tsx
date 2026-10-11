@@ -20,7 +20,7 @@ import {
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
-  IconChevronDown,
+  IconChevronRight,
   IconEdit,
   IconFolderPlus,
   IconSearch,
@@ -799,17 +799,17 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       aria-expanded={relationsOpened}
                       aria-label="このGroupとの関係を開閉"
                     >
-                      <Group justify="space-between" wrap="nowrap">
-                        <Text size="xs" c="dimmed">
-                          このGroupとの関係
-                        </Text>
-                        <IconChevronDown
+                      <Group gap="xs" wrap="nowrap">
+                        <IconChevronRight
                           size={16}
                           style={{
-                            transform: relationsOpened ? "rotate(180deg)" : "rotate(0deg)",
+                            transform: relationsOpened ? "rotate(90deg)" : "rotate(0deg)",
                             transition: "transform 200ms ease",
                           }}
                         />
+                        <Text size="xs" c="dimmed">
+                          このGroupとの関係
+                        </Text>
                       </Group>
                     </UnstyledButton>
                     <Collapse in={relationsOpened} transitionDuration={200}>
