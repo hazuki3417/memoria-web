@@ -964,12 +964,6 @@ export function MediaBrowserPrototype({
                     }}
                   >
                     <Group gap={4} wrap="nowrap" justify="flex-start">
-                      <ActionIcon
-                        variant="subtle"
-                        aria-label="Originalをダウンロード"
-                      >
-                        <IconDownload size={18} />
-                      </ActionIcon>
                       {!compact && (
                         <>
                           <ActionIcon
@@ -1141,6 +1135,13 @@ export function MediaBrowserPrototype({
                               <Text size="xs">Hazuki</Text>
                             </Group>
                           </Stack>
+                          <Button
+                            size="xs"
+                            variant="default"
+                            leftSection={<IconDownload size={15} />}
+                          >
+                            Originalをダウンロード
+                          </Button>
                           <Divider />
                           {(["tags", "groups"] as const).map((kind) => (
                             <Box key={kind}>
@@ -1193,14 +1194,7 @@ export function MediaBrowserPrototype({
                             flexShrink: 0,
                           }}
                         >
-                          <Group justify="space-between">
-                            <Button
-                              size="xs"
-                              variant="default"
-                              leftSection={<IconEdit size={15} />}
-                            >
-                              編集
-                            </Button>
+                          <Group justify="flex-end">
                             <Button
                               size="xs"
                               variant="subtle"
