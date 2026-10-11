@@ -281,11 +281,13 @@ export function MediaBrowser({
   contextKind = "personal",
   initialDialog = null,
   communityId = "photo-club",
+  downloadMock = "available",
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
   initialDialog?: SelectionDialog
   communityId?: string
+  downloadMock?: "available" | "forbidden" | "processing"
 }) {
   const router = useRouter()
   const [context, setContext] = useState(contextKind)
@@ -1138,13 +1140,28 @@ export function MediaBrowser({
                               <Text size="xs">Hazuki</Text>
                             </Group>
                           </Stack>
-                          <Button
-                            size="xs"
-                            variant="default"
-                            leftSection={<IconDownload size={15} />}
-                          >
-                            Originalをダウンロード
-                          </Button>
+                          <Stack gap={4}>
+                            <Button
+                              size="xs"
+                              variant="default"
+                              fullWidth
+                              disabled={downloadMock !== "available"}
+                              leftSection={<IconDownload size={15} />}
+                              aria-describedby={downloadMock === "available" ? undefined : "original-download-unavailable"}
+                            >
+                              Originalをダウンロード
+                            </Button>
+                            {downloadMock !== "available" && (
+                              <Group gap={5} align="flex-start" wrap="nowrap" id="original-download-unavailable">
+                                <IconInfoCircle size={14} style={{ flexShrink: 0, marginTop: 2 }} />
+                                <Text size="xs" c="dimmed">
+                                  {downloadMock === "forbidden"
+                                    ? "このMediaのOriginalをダウンロードする権限がありません。"
+                                    : "Originalを準備中です。処理完了後にダウンロードできます。"}
+                                </Text>
+                              </Group>
+                            )}
+                          </Stack>
                           <Divider />
                           {(["groups", "tags"] as const).map((kind) => {
                             const values = detailValues[kind]
