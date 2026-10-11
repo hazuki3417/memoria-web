@@ -20,6 +20,7 @@ import {
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
+  IconChevronDown,
   IconEdit,
   IconFolderPlus,
   IconSearch,
