@@ -328,6 +328,7 @@ function MediaGrid() {
 
 export function GroupBrowser({ contextKind = "personal", communityId = "photo-club" }: { contextKind?: "personal" | "community"; communityId?: string }) {
   const [query, setQuery] = useState("")
+  const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const splitViewRef = useGroupRef()
   const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
@@ -341,12 +342,12 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
   const [draftChildren, setDraftChildren] = useState<string[]>([])
 
   const visibleGroups = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase()
+    const normalized = appliedQuery.trim().toLocaleLowerCase()
     if (!normalized) return groups
     return groups.filter((group) =>
       group.name.toLocaleLowerCase().includes(normalized),
     )
-  }, [query])
+  }, [appliedQuery])
 
   const selected = groups.find((group) => group.id === selectedId) ?? null
 
@@ -525,7 +526,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
             >
               <Stack px={0} pt={0} pb="xs" gap="xs">
                 <Group gap="xs" wrap="nowrap" justify="space-between">
-                  <Group gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
                     <TextInput
                       w={compact ? "100%" : 280}
                       maw="100%"
@@ -536,6 +537,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       leftSection={<IconSearch size={16} />}
                       style={{ flex: compact ? "1 1 auto" : undefined }}
                     />
+                    <Button size="xs" type="submit">検索</Button>
                     <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
                       {visibleGroups.length}件
                     </Text>
@@ -631,7 +633,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
             >
               <Stack px={0} pt={0} pb="xs" gap="xs">
                 <Group gap="xs" wrap="nowrap" justify="space-between">
-                  <Group gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
                     <TextInput
                       w={compact ? "100%" : 280}
                       maw="100%"
@@ -642,6 +644,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       leftSection={<IconSearch size={16} />}
                       style={{ flex: compact ? "1 1 auto" : undefined }}
                     />
+                    <Button size="xs" type="submit">検索</Button>
                     <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
                       {visibleGroups.length}件
                     </Text>
