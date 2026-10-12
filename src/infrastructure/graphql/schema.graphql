@@ -1,0 +1,21 @@
+# Snapshot of memoria-api/develop schemas/graphql/*.graphql (2026-10-12).
+# Query/Mutation roots are made explicit for client-side GraphQL tooling.
+scalar Upload
+scalar DateTime
+scalar Int64
+type Query { me: User }
+type Mutation {
+ registerUser(input: RegisterUserInput!): RegisterUserPayload!
+ updateUserProfile(input: UpdateUserProfileInput!): UpdateUserProfilePayload!
+ createCommunity(input: CreateCommunityInput!): CreateCommunityPayload!
+}
+type User { id: ID! profile: UserProfile! createdAt: DateTime! updatedAt: DateTime! }
+type UserProfile { nickname: String! }
+input RegisterUserInput { nickname: String! }
+type RegisterUserPayload { user: User! }
+input UpdateUserProfileInput { nickname: String! }
+type UpdateUserProfilePayload { user: User! }
+type Community { id: ID! name: String! createdAt: DateTime! updatedAt: DateTime! }
+input CreateCommunityInput { name: String! }
+type CreateCommunityPayload { community: Community! }
+type PageInfo { hasNextPage: Boolean! hasPrevPage: Boolean! startCursor: String endCursor: String }
