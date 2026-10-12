@@ -20,10 +20,10 @@ describe("getApplicationNavigation", () => {
     ])
   })
 
-  it("adds members navigation for community context", () => {
+  it("adds settings navigation for community context", () => {
     const items = getApplicationNavigation({
       contextKind: "community",
-      activeSection: "members",
+      activeSection: "settings",
     })
 
     expect(
@@ -32,7 +32,7 @@ describe("getApplicationNavigation", () => {
       { id: "dashboard", label: "ダッシュボード", active: false },
       { id: "media", label: "メディア", active: false },
       { id: "groups", label: "グループ", active: false },
-      { id: "members", label: "メンバー", active: true },
+      { id: "settings", label: "設定", active: true },
     ])
   })
 
