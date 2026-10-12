@@ -336,7 +336,7 @@ function MediaBrowserContent({
     setDetailEditor(null)
     showNotification({
       kind: "success",
-      title: `${label}を更新しました（デモ）`,
+      title: `${label}を更新しました`,
       message: "画面上の変更を反映しました。サーバーには保存されていません。",
     })
   }
@@ -350,7 +350,7 @@ function MediaBrowserContent({
     setDetailEditor(null)
     showNotification({
       kind: "success",
-      title: "Communityへ共有しました（デモ）",
+      title: "Communityへ共有しました",
       message: "画面上の共有先に追加しました。サーバーには保存されていません。",
     })
   }
@@ -363,7 +363,7 @@ function MediaBrowserContent({
     setUnshareTarget(null)
     showNotification({
       kind: "success",
-      title: "Communityの共有を解除しました（デモ）",
+      title: "Communityの共有を解除しました",
       message: "画面上の共有先から解除しました。サーバーには保存されていません。",
     })
   }
@@ -386,7 +386,7 @@ function MediaBrowserContent({
     setSelectionDialog(null)
     showNotification({
       kind: "info",
-      title: kind === "group" ? "Groupへの追加（デモ）" : "Mediaの削除（デモ）",
+      title: kind === "group" ? "Groupへの追加" : "Mediaの削除",
       message: kind === "group"
         ? `${count}件のMediaを${groupTargets.length}件のGroup（${groupTargets.join("、")}）へ追加する操作を確認しました。実際のデータは変更されていません。`
         : `${count}件のMediaを削除する操作を確認しました。実際のデータは削除されていません。`,
@@ -1306,10 +1306,10 @@ function MediaBrowserContent({
       <Modal withCloseButton={false} opened={unshareTarget !== null} onClose={() => setUnshareTarget(null)} title="Communityの共有を解除" centered zIndex={410}>
         <Stack gap="md">
           <Text size="sm">{unshareTarget} への共有を解除しますか？ このCommunityからMediaを閲覧できなくなります。他の共有先やMedia本体は削除されません。</Text>
-          <Text size="xs" c="dimmed">デモ表示です。サーバーには保存されません。</Text>
+          
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setUnshareTarget(null)}>キャンセル</Button>
-            <Button color="red" onClick={removeCommunityShare}>共有解除（デモ）</Button>
+            <Button color="red" onClick={removeCommunityShare}>共有解除</Button>
           </Group>
         </Stack>
       </Modal>
@@ -1324,10 +1324,10 @@ function MediaBrowserContent({
             onChange={setShareTarget}
             placeholder="Communityを選択"
           />
-          <Text size="xs" c="dimmed">デモ表示です。サーバーには保存されません。</Text>
+          
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
-            <Button disabled={!shareTarget} onClick={addCommunityShare}>共有する（デモ）</Button>
+            <Button disabled={!shareTarget} onClick={addCommunityShare}>共有する</Button>
           </Group>
         </Stack>
       </Modal>
@@ -1335,10 +1335,10 @@ function MediaBrowserContent({
         <Stack gap="md">
           <Text size="sm" c="dimmed">このMediaのTagを追加・除外できます。</Text>
           <TagsInput label="Tags" data={["旅行", "風景", "家族", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
-          <Text size="xs" c="dimmed">デモ表示です。変更はサーバーに保存されません。</Text>
+          
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
-            <Button onClick={saveDetailDraft}>デモに反映</Button>
+            <Button onClick={saveDetailDraft}>変更を反映</Button>
           </Group>
         </Stack>
       </Modal>
@@ -1346,10 +1346,10 @@ function MediaBrowserContent({
         <Stack gap="md">
           <Text size="sm" c="dimmed">現在の所属Groupを追加・除外できます。</Text>
           <MultiSelect label="Groups" searchable data={["旅行", "家族", "風景写真", "お気に入り"]} value={detailDraft} onChange={setDetailDraft} />
-          <Text size="xs" c="dimmed">デモ表示です。変更はサーバーに保存されません。</Text>
+          
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setDetailEditor(null)}>キャンセル</Button>
-            <Button onClick={saveDetailDraft}>デモに反映</Button>
+            <Button onClick={saveDetailDraft}>変更を反映</Button>
           </Group>
         </Stack>
       </Modal>
