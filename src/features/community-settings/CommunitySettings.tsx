@@ -53,14 +53,14 @@ export function CommunitySettings({
     setInvitation("active")
     setExpiresAt(new Date(Date.now() + 7 * 86400000).toLocaleString("sv-SE", { timeZone: "Asia/Tokyo", hour12: false }).replace("T", " ").replaceAll("-", "/"))
     setBusy(false)
-    showNotification({ kind: "success", title: "招待URLを発行しました", message: "Prototype上の操作です。" })
+    showNotification({ kind: "success", title: "招待URLを発行しました" })
   }
 
   const changeInvitation = () => {
     if (confirm === "revoke") {
       setInvitation("revoked")
       setExpiresAt("")
-      showNotification({ kind: "success", title: "招待URLを無効化しました", message: "Prototype上の操作です。" })
+      showNotification({ kind: "success", title: "招待URLを無効化しました" })
     } else {
       issue()
     }
@@ -105,7 +105,7 @@ export function CommunitySettings({
                 const updated = draft.trim()
                 setName(updated)
                 setDraft(updated)
-                showNotification({ kind: "success", title: "Community名を変更しました", message: "Prototype上の操作です。" })
+                showNotification({ kind: "success", title: "Community名を変更しました" })
               }}>保存</Button>
             </Box>
           )}
@@ -174,7 +174,7 @@ export function CommunitySettings({
     <Stack gap="xl">
       <PageHeader title="利用状況" description="このCommunityが管理するオリジナルファイルの利用状況です。" />
       <Box><SectionHeader>ストレージ</SectionHeader>
-        <Text size="sm" c="dimmed">Community Usageのデータ取得は未接続です。容量・登録件数は取得後に表示します。</Text>
+        <Text size="sm" c="dimmed">利用状況は現在表示できません。</Text>
       </Box>
     </Stack>
   )
