@@ -62,3 +62,24 @@ export async function registerMemoriaUser(nickname: string): Promise<Registratio
   const user = result.data?.registerUser?.user
   return user ? { kind: "registered", user } : { kind: "error" }
 }
+
+const UPDATE_PROFILE_MUTATION = "mutation UpdateUserProfile($input: UpdateUserProfileInput!) { updateUserProfile(input: $input) { user { id profile { nickname } } } }"
+
+export type UpdateProfileResult =
+  | { kind: "updated"; user: CurrentUser }
+  | { kind: "unavailable" | "validation" | "error" }
+
+export async function updateMemoriaProfile(nickname: string): Promise<UpdateProfileResult> {
+  const response = await request<{ updateUserProfile: { user: CurrentUser } }>(
+    UPDATE_PROFILE_MUTATION, "UpdateUserProfile", { input: { nickname } },
+  )
+  if (response.kind !== "ok") return { kind: response.kind }
+  const { result } = response
+  if (result.errors?.length) {
+    if (result.errors.some(e => e.extensions?.code === "UNAUTHENTICATED")) return { kind: "unavailable" }
+    if (result.errors.some(e => e.extensions?.code === "VALIDATION")) return { kind: "validation" }
+    return { kind: "error" }
+  }
+  const user = result.data?.updateUserProfile?.user
+  return user ? { kind: "updated", user } : { kind: "error" }
+}
