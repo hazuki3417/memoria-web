@@ -60,7 +60,6 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { Dialog } from "@/components/Dialog"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
 import { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
 
@@ -490,7 +489,6 @@ function MediaBrowserContent({
 
   return (
     <>
-      <Notifications position="top-right" />
       {!detailOnlyItems && (
         <Stack gap={0} w="100%">
           <Box
