@@ -2,7 +2,7 @@
 
 ## Mount points
 
-- The Next.js root layout mounts one Mantine `<Notifications />` inside `ThemeProvider`. This supports notifications from authenticated and unauthenticated routes.
+- The Next.js root layout mounts one Mantine `<Notifications position="top-right" />` inside `ThemeProvider`. The top-right position is the system-wide notification placement. This supports notifications from authenticated and unauthenticated routes.
 - The shared `ApplicationShell` renders `#application-modal-root` outside the scrollable page content. Image Detail's full-screen Mantine Modal uses `portalProps={{ target: "#application-modal-root" }}`, keeping its visual overlay outside page scrolling.
 - Browser features call `showNotification` but must not mount another `<Notifications />` in their page content.
 
