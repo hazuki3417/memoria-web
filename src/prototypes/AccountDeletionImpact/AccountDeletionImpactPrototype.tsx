@@ -947,8 +947,8 @@ export function AccountDeletionImpactPrototype({
                             }
                           >
                             {reauth
-                              ? "アカウントを削除する（デモ）"
-                              : "再認証する（デモ）"}
+                              ? "アカウントを削除する"
+                              : "再認証する"}
                           </Button>
                         </Box>
                       </Group>
