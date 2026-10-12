@@ -127,16 +127,20 @@ export function CommunityDeletionConfirmation({
               {error && <Text size="sm" c="red" role="alert">{error}</Text>}
             </Stack>
           )}
-          <Group justify="space-between" gap="sm">
-            <Button variant="subtle" color="gray" disabled={busy || completed} onClick={cancel}>削除手続きを中止して設定に戻る</Button>
-            <Group gap="sm">
-              {step > 0 && <Button variant="default" disabled={busy || completed} onClick={() => setStep(step - 1)}>戻る</Button>}
+          <Group gap="sm" justify="space-between" wrap="nowrap">
+            <Box style={{ flex: 1, minWidth: 0, display: "flex", justifyContent: "flex-start" }}>
+              {step > 0 && <Button size="sm" variant="default" disabled={busy || completed} onClick={() => setStep(step - 1)}>戻る</Button>}
+            </Box>
+            <Box style={{ flex: 1, minWidth: 0, display: "flex", justifyContent: "center" }}>
+              <Button size="sm" variant="subtle" color="gray" disabled={busy || completed} onClick={cancel}>削除手続きを中止して設定に戻る</Button>
+            </Box>
+            <Box style={{ flex: 1, minWidth: 0, display: "flex", justifyContent: "flex-end" }}>
               {step < 2 ? (
-                <Button disabled={!isAdministrator || busy} onClick={() => setStep(step + 1)}>次へ</Button>
+                <Button size="sm" disabled={!isAdministrator || busy} onClick={() => setStep(step + 1)}>次へ</Button>
               ) : (
-                <Button color="red" loading={busy} disabled={!canDelete} onClick={() => void remove()}>Communityを削除する</Button>
+                <Button size="sm" color="red" loading={busy} disabled={!canDelete} onClick={() => void remove()}>Communityを削除する</Button>
               )}
-            </Group>
+            </Box>
           </Group>
         </Stack>
       </Box>
