@@ -1,6 +1,7 @@
 import "@mantine/core/styles.css"
 import "@mantine/notifications/styles.css"
 import type { Metadata } from "next"
+import { ColorSchemeScript } from "@mantine/core"
 import { theme } from "@/lib/theme"
 import { ThemeProvider } from "@/providers/ThemeProvider"
 import "./globals.css"
@@ -16,7 +17,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
+      <head>
+        <ColorSchemeScript defaultColorScheme="auto" />
+      </head>
       <body>
         <ThemeProvider theme={theme}>{children}</ThemeProvider>
       </body>
