@@ -59,8 +59,14 @@ export function ProductionApplicationShell({
   }
   const selectNavigation = (itemId: string) => {
     onSelectNavigation(itemId)
-    const prefix = currentContext.kind === "community" ? `/communities/${communityId}` : ""
-    const path = itemId === "dashboard" ? prefix ? `${prefix}/dashboard` : "/dashboard" : `${prefix}/${itemId}`
+    const prefix =
+      currentContext.kind === "community" ? `/communities/${communityId}` : ""
+    const path =
+      itemId === "dashboard"
+        ? prefix
+          ? `${prefix}/dashboard`
+          : "/dashboard"
+        : `${prefix}/${itemId}`
     router.push(path)
     navigation.close()
   }

@@ -1,6 +1,9 @@
 "use client"
 
-import { MediaBrowser, type MediaItem } from "@/features/media-browser/MediaBrowser"
+import {
+  MediaBrowser,
+  type MediaItem,
+} from "@/features/media-browser/MediaBrowser"
 
 /**
  * Reuses the existing Image Detail viewer and its editing dialogs without

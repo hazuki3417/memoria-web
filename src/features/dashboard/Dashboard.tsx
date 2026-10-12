@@ -147,16 +147,34 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
       {fromPage === null ? (
         <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
       ) : (
-        <Box className={`dashboard-carousel-track ${direction} ${sliding ? "sliding" : ""}`}>
+        <Box
+          className={`dashboard-carousel-track ${direction} ${sliding ? "sliding" : ""}`}
+        >
           {direction === "next" ? (
             <>
-              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} />
-              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
+              <MediaPage
+                items={itemsFor(oldPage)}
+                page={oldPage}
+                pageSize={pageSize}
+              />
+              <MediaPage
+                items={itemsFor(page)}
+                page={page}
+                pageSize={pageSize}
+              />
             </>
           ) : (
             <>
-              <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
-              <MediaPage items={itemsFor(oldPage)} page={oldPage} pageSize={pageSize} />
+              <MediaPage
+                items={itemsFor(page)}
+                page={page}
+                pageSize={pageSize}
+              />
+              <MediaPage
+                items={itemsFor(oldPage)}
+                page={oldPage}
+                pageSize={pageSize}
+              />
             </>
           )}
         </Box>
@@ -171,7 +189,13 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
           size="lg"
           disabled={sliding}
           onClick={() => moveTo(page - 1, "previous")}
-          style={{ position: "absolute", left: "var(--mantine-spacing-sm)", top: "50%", transform: "translateY(-50%)", zIndex: 2 }}
+          style={{
+            position: "absolute",
+            left: "var(--mantine-spacing-sm)",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 2,
+          }}
         >
           <IconChevronLeft size={22} />
         </ActionIcon>
@@ -185,7 +209,13 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
           size="lg"
           disabled={sliding}
           onClick={() => moveTo(page + 1, "next")}
-          style={{ position: "absolute", right: "var(--mantine-spacing-sm)", top: "50%", transform: "translateY(-50%)", zIndex: 2 }}
+          style={{
+            position: "absolute",
+            right: "var(--mantine-spacing-sm)",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 2,
+          }}
         >
           <IconChevronRight size={22} />
         </ActionIcon>
@@ -198,17 +228,35 @@ function RecentGroups() {
   return (
     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
       {recentGroups.map((group) => (
-        <Stack key={group.name} gap={8} p="xs" bdrs="md" bg="var(--mantine-color-default-hover)">
-          <Text fw={600} size="sm">{group.name}</Text>
+        <Stack
+          key={group.name}
+          gap={8}
+          p="xs"
+          bdrs="md"
+          bg="var(--mantine-color-default-hover)"
+        >
+          <Text fw={600} size="sm">
+            {group.name}
+          </Text>
           <SimpleGrid cols={2} spacing={4}>
             {Array.from({ length: 4 }, (_, index) => {
               const src = group.media[index]
               return (
-                <Box key={index} bdrs="sm" style={{ aspectRatio: "1 / 1", overflow: "hidden", background: "var(--mantine-color-default-hover)" }}>
+                <Box
+                  key={index}
+                  bdrs="sm"
+                  style={{
+                    aspectRatio: "1 / 1",
+                    overflow: "hidden",
+                    background: "var(--mantine-color-default-hover)",
+                  }}
+                >
                   {src ? (
                     <Image src={src} alt="" w="100%" h="100%" fit="cover" />
                   ) : (
-                    <Center h="100%"><IconPhoto size={20} stroke={1.5} /></Center>
+                    <Center h="100%">
+                      <IconPhoto size={20} stroke={1.5} />
+                    </Center>
                   )}
                 </Box>
               )
@@ -223,48 +271,107 @@ function RecentGroups() {
 function EmptyState({ kind, href }: { kind: "media" | "group"; href: string }) {
   const media = kind === "media"
   return (
-    <Center mih={132} px="md" style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "var(--mantine-radius-md)" }}>
+    <Center
+      mih={132}
+      px="md"
+      style={{
+        border: "1px solid var(--mantine-color-default-border)",
+        borderRadius: "var(--mantine-radius-md)",
+      }}
+    >
       <Stack align="center" gap={8}>
         <Group gap={6}>
-          {media ? <IconPhoto size={20} stroke={1.5} /> : <IconFolder size={20} stroke={1.5} />}
-          <Text size="sm" c="dimmed" fw={500}>{media ? "メディアはまだありません" : "Groupはまだありません"}</Text>
+          {media ? (
+            <IconPhoto size={20} stroke={1.5} />
+          ) : (
+            <IconFolder size={20} stroke={1.5} />
+          )}
+          <Text size="sm" c="dimmed" fw={500}>
+            {media ? "メディアはまだありません" : "Groupはまだありません"}
+          </Text>
         </Group>
-        <Button component={Link} href={href} variant="subtle" size="compact-sm">{media ? "メディアへ移動" : "Groupへ移動"}</Button>
+        <Button component={Link} href={href} variant="subtle" size="compact-sm">
+          {media ? "メディアへ移動" : "Groupへ移動"}
+        </Button>
       </Stack>
     </Center>
   )
 }
 
-export function Dashboard({ empty = false, contextKind = "personal", communityId = "photo-club" }: { empty?: boolean; contextKind?: "personal" | "community"; communityId?: string }) {
+export function Dashboard({
+  empty = false,
+  contextKind = "personal",
+  communityId = "photo-club",
+}: {
+  empty?: boolean
+  contextKind?: "personal" | "community"
+  communityId?: string
+}) {
   useEffect(() => {
     if (contextKind !== "personal") return
-    if (window.sessionStorage.getItem("memoria:registration-success") !== "1") return
+    if (window.sessionStorage.getItem("memoria:registration-success") !== "1")
+      return
     window.sessionStorage.removeItem("memoria:registration-success")
-    showNotification({ kind: "success", title: "登録しました", message: "登録が完了しました。" })
+    showNotification({
+      kind: "success",
+      title: "登録しました",
+      message: "登録が完了しました。",
+    })
   }, [contextKind])
-  const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
+  const prefix =
+    contextKind === "community" ? `/communities/${communityId}` : ""
   const mediaHref = `${prefix}/media`
   const groupsHref = `${prefix}/groups`
 
   return (
     <>
-    {contextKind === "personal" && <Notifications position="top-right" />}
-    <Stack gap="xl" w="100%">
-      <Stack gap="sm">
-        <Group justify="space-between" align="center" wrap="nowrap">
-          <Title order={3} size="h4">最近のメディア</Title>
-          {!empty && <Button variant="subtle" size="compact-sm" component={Link} href={mediaHref}>すべて見る</Button>}
-        </Group>
-        {empty ? <EmptyState kind="media" href={mediaHref} /> : <RecentMediaCarousel items={recentMedia} />}
+      {contextKind === "personal" && <Notifications position="top-right" />}
+      <Stack gap="xl" w="100%">
+        <Stack gap="sm">
+          <Group justify="space-between" align="center" wrap="nowrap">
+            <Title order={3} size="h4">
+              最近のメディア
+            </Title>
+            {!empty && (
+              <Button
+                variant="subtle"
+                size="compact-sm"
+                component={Link}
+                href={mediaHref}
+              >
+                すべて見る
+              </Button>
+            )}
+          </Group>
+          {empty ? (
+            <EmptyState kind="media" href={mediaHref} />
+          ) : (
+            <RecentMediaCarousel items={recentMedia} />
+          )}
+        </Stack>
+        <Stack gap="sm">
+          <Group justify="space-between" align="center" wrap="nowrap">
+            <Title order={3} size="h4">
+              最近のGroup
+            </Title>
+            {!empty && (
+              <Button
+                variant="subtle"
+                size="compact-sm"
+                component={Link}
+                href={groupsHref}
+              >
+                すべて見る
+              </Button>
+            )}
+          </Group>
+          {empty ? (
+            <EmptyState kind="group" href={groupsHref} />
+          ) : (
+            <RecentGroups />
+          )}
+        </Stack>
       </Stack>
-      <Stack gap="sm">
-        <Group justify="space-between" align="center" wrap="nowrap">
-          <Title order={3} size="h4">最近のGroup</Title>
-          {!empty && <Button variant="subtle" size="compact-sm" component={Link} href={groupsHref}>すべて見る</Button>}
-        </Group>
-        {empty ? <EmptyState kind="group" href={groupsHref} /> : <RecentGroups />}
-      </Stack>
-    </Stack>
     </>
   )
 }

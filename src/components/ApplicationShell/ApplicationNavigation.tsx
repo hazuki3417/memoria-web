@@ -1,6 +1,14 @@
 "use client"
 
-import { Box, Burger, Divider, Drawer, ScrollArea, Stack, Text } from "@mantine/core"
+import {
+  Box,
+  Burger,
+  Divider,
+  Drawer,
+  ScrollArea,
+  Stack,
+  Text,
+} from "@mantine/core"
 import { useState } from "react"
 import { NavigationItem } from "@/components/NavigationItem"
 import type { ApplicationNavigationItem } from "./types"
@@ -77,28 +85,28 @@ export function ApplicationNavigation({
     >
       <Stack gap={0} h="100%" p="xs" style={{ minHeight: 0 }}>
         <ScrollArea type="hover" style={{ flex: 1, minHeight: 0 }}>
-        <Box
-          component="nav"
-          id="application-context-navigation"
-          aria-label="現在のコンテキスト内のナビゲーション"
-        >
-          <Stack gap={0}>
-            {items.map((item) => (
-              <NavigationItem
-                key={item.id}
-                label={item.label}
-                icon={item.icon}
-                active={item.active}
-                disabled={item.disabled}
-                accentColor={accentColor}
-                onClick={() => {
-                  onSelect(item.id)
-                  onClose()
-                }}
-              />
-            ))}
-          </Stack>
-        </Box>
+          <Box
+            component="nav"
+            id="application-context-navigation"
+            aria-label="現在のコンテキスト内のナビゲーション"
+          >
+            <Stack gap={0}>
+              {items.map((item) => (
+                <NavigationItem
+                  key={item.id}
+                  label={item.label}
+                  icon={item.icon}
+                  active={item.active}
+                  disabled={item.disabled}
+                  accentColor={accentColor}
+                  onClick={() => {
+                    onSelect(item.id)
+                    onClose()
+                  }}
+                />
+              ))}
+            </Stack>
+          </Box>
         </ScrollArea>
         <Box mt="auto">
           <Divider mb="xs" />

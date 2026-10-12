@@ -100,10 +100,17 @@ const recentGroups = [
   },
   {
     name: "風景",
-    media: ["/__dev-assets/media-browser/h-02.png", "/__dev-assets/media-browser/w-02.png"],
+    media: [
+      "/__dev-assets/media-browser/h-02.png",
+      "/__dev-assets/media-browser/w-02.png",
+    ],
     nestedGroups: 0,
   },
-  { name: "お気に入り", media: ["/__dev-assets/media-browser/w-01.png"], nestedGroups: 0 },
+  {
+    name: "お気に入り",
+    media: ["/__dev-assets/media-browser/w-01.png"],
+    nestedGroups: 0,
+  },
   {
     name: "イベント",
     media: [
@@ -129,7 +136,11 @@ function RecentGroups() {
           <GroupItem
             name={group.name}
             directMedia={group.media}
-            aggregateMedia={Array.from({ length: 12 }, (_, index) => `/__dev-assets/group-browser/group-media-${String((index % 9) + 1).padStart(2, "0")}.jpg`)}
+            aggregateMedia={Array.from(
+              { length: 12 },
+              (_, index) =>
+                `/__dev-assets/group-browser/group-media-${String((index % 9) + 1).padStart(2, "0")}.jpg`,
+            )}
             gap={8}
           />
         </Stack>
@@ -420,90 +431,114 @@ export function DashboardPrototype({
       onLogout={() => undefined}
     >
       <PageWidth variant="contained">
-      <Stack gap="xl" w="100%">
-        <Stack gap="sm">
-          <Group justify="space-between" align="center" wrap="nowrap">
-            <Title order={3} size="h4">
-              最近のメディア
-            </Title>
-            {initialState === "default" && (
-              <Button component="a" href={collectionHref("media")} disabled={!collectionHref("media")} variant="subtle" size="compact-sm">
-                すべて見る
-              </Button>
-            )}
-          </Group>
-          {initialState === "default" ? (
-            <RecentMediaCarousel />
-          ) : (
-            <Center
-              mih={132}
-              px="md"
-              style={{
-                border: "1px solid var(--mantine-color-default-border)",
-                borderRadius: "var(--mantine-radius-md)",
-              }}
-            >
-              <Stack align="center" gap={8}>
-                <Group gap={6}>
-                  <IconPhoto
-                    size={20}
-                    stroke={1.5}
-                    color="var(--mantine-color-dimmed)"
-                    aria-hidden="true"
-                  />
-                  <Text size="sm" c="dimmed" fw={500}>
-                    メディアはまだありません
-                  </Text>
-                </Group>
-                <Button component="a" href={collectionHref("media")} disabled={!collectionHref("media")} variant="subtle" size="compact-sm">
-                  メディアへ移動
+        <Stack gap="xl" w="100%">
+          <Stack gap="sm">
+            <Group justify="space-between" align="center" wrap="nowrap">
+              <Title order={3} size="h4">
+                最近のメディア
+              </Title>
+              {initialState === "default" && (
+                <Button
+                  component="a"
+                  href={collectionHref("media")}
+                  disabled={!collectionHref("media")}
+                  variant="subtle"
+                  size="compact-sm"
+                >
+                  すべて見る
                 </Button>
-              </Stack>
-            </Center>
-          )}
-        </Stack>
-        <Stack gap="sm">
-          <Group justify="space-between" align="center" wrap="nowrap">
-            <Title order={3} size="h4">
-              最近のGroup
-            </Title>
-            {initialState === "default" && (
-              <Button component="a" href={collectionHref("groups")} disabled={!collectionHref("groups")} variant="subtle" size="compact-sm">
-                すべて見る
-              </Button>
+              )}
+            </Group>
+            {initialState === "default" ? (
+              <RecentMediaCarousel />
+            ) : (
+              <Center
+                mih={132}
+                px="md"
+                style={{
+                  border: "1px solid var(--mantine-color-default-border)",
+                  borderRadius: "var(--mantine-radius-md)",
+                }}
+              >
+                <Stack align="center" gap={8}>
+                  <Group gap={6}>
+                    <IconPhoto
+                      size={20}
+                      stroke={1.5}
+                      color="var(--mantine-color-dimmed)"
+                      aria-hidden="true"
+                    />
+                    <Text size="sm" c="dimmed" fw={500}>
+                      メディアはまだありません
+                    </Text>
+                  </Group>
+                  <Button
+                    component="a"
+                    href={collectionHref("media")}
+                    disabled={!collectionHref("media")}
+                    variant="subtle"
+                    size="compact-sm"
+                  >
+                    メディアへ移動
+                  </Button>
+                </Stack>
+              </Center>
             )}
-          </Group>
-          {initialState === "default" ? (
-            <RecentGroups />
-          ) : (
-            <Center
-              mih={132}
-              px="md"
-              style={{
-                border: "1px solid var(--mantine-color-default-border)",
-                borderRadius: "var(--mantine-radius-md)",
-              }}
-            >
-              <Stack align="center" gap={8}>
-                <Group gap={6}>
-                  <IconFolder
-                    size={20}
-                    stroke={1.5}
-                    color="var(--mantine-color-dimmed)"
-                    aria-hidden="true"
-                  />
-                  <Text size="sm" c="dimmed" fw={500}>
-                    Groupはまだありません
-                  </Text>
-                </Group>
-                <Button component="a" href={collectionHref("groups")} disabled={!collectionHref("groups")} variant="subtle" size="compact-sm">
-                  Groupへ移動
+          </Stack>
+          <Stack gap="sm">
+            <Group justify="space-between" align="center" wrap="nowrap">
+              <Title order={3} size="h4">
+                最近のGroup
+              </Title>
+              {initialState === "default" && (
+                <Button
+                  component="a"
+                  href={collectionHref("groups")}
+                  disabled={!collectionHref("groups")}
+                  variant="subtle"
+                  size="compact-sm"
+                >
+                  すべて見る
                 </Button>
-              </Stack>
-            </Center>
-          )}
+              )}
+            </Group>
+            {initialState === "default" ? (
+              <RecentGroups />
+            ) : (
+              <Center
+                mih={132}
+                px="md"
+                style={{
+                  border: "1px solid var(--mantine-color-default-border)",
+                  borderRadius: "var(--mantine-radius-md)",
+                }}
+              >
+                <Stack align="center" gap={8}>
+                  <Group gap={6}>
+                    <IconFolder
+                      size={20}
+                      stroke={1.5}
+                      color="var(--mantine-color-dimmed)"
+                      aria-hidden="true"
+                    />
+                    <Text size="sm" c="dimmed" fw={500}>
+                      Groupはまだありません
+                    </Text>
+                  </Group>
+                  <Button
+                    component="a"
+                    href={collectionHref("groups")}
+                    disabled={!collectionHref("groups")}
+                    variant="subtle"
+                    size="compact-sm"
+                  >
+                    Groupへ移動
+                  </Button>
+                </Stack>
+              </Center>
+            )}
+          </Stack>
         </Stack>
-      </Stack>
       </PageWidth>
     </PrototypeApplicationShell>
   )

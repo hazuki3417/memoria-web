@@ -9,7 +9,12 @@ import type {
   ApplicationNavigationItem,
 } from "./types"
 
-export type ApplicationSection = "dashboard" | "media" | "groups" | "members" | "settings"
+export type ApplicationSection =
+  | "dashboard"
+  | "media"
+  | "groups"
+  | "members"
+  | "settings"
 
 const baseApplicationNavigation = [
   { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
@@ -43,7 +48,11 @@ export function getApplicationNavigation({
 export function getApplicationSection(pathname: string): ApplicationSection {
   const parts = pathname.split("/").filter(Boolean)
   const section = parts.at(-1)
-  if (parts[0] === "communities" && ["members", "usage", "preferences", "settings"].includes(parts[2])) return "settings"
+  if (
+    parts[0] === "communities" &&
+    ["members", "usage", "preferences", "settings"].includes(parts[2])
+  )
+    return "settings"
   return section === "dashboard" ||
     section === "media" ||
     section === "groups" ||
@@ -57,7 +66,9 @@ export function getContextSwitchSection(
   currentSection: ApplicationSection,
   targetContextKind: ApplicationContextOption["kind"],
 ): ApplicationSection {
-  const targetItems = getApplicationNavigation({ contextKind: targetContextKind })
+  const targetItems = getApplicationNavigation({
+    contextKind: targetContextKind,
+  })
   return targetItems.some(
     (item) => item.id === currentSection && !item.disabled,
   )

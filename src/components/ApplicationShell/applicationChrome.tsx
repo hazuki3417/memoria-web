@@ -1,6 +1,9 @@
 import type { ReactNode } from "react"
 
-export type ApplicationChromeVariant = "authenticated" | "pre-registration" | "restricted-flow"
+export type ApplicationChromeVariant =
+  | "authenticated"
+  | "pre-registration"
+  | "restricted-flow"
 export type ApplicationChromeFeature =
   | "navigation"
   | "context-switcher"

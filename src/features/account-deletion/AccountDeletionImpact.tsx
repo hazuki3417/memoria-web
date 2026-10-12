@@ -18,7 +18,13 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import { useRouter } from "next/navigation"
 import { useRef, useState } from "react"
-import { mockAccountDeletionGateway, unavailableAccountDeletionGateway, type DeletionReview, type DeletionGrant, type MockScenario } from "./accountDeletionGateway"
+import {
+  mockAccountDeletionGateway,
+  unavailableAccountDeletionGateway,
+  type DeletionReview,
+  type DeletionGrant,
+  type MockScenario,
+} from "./accountDeletionGateway"
 import { FeedbackAlert } from "@/components/Feedback"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
@@ -135,7 +141,11 @@ export function AccountDeletionImpact({
   const [cancelled, setCancelled] = useState(false)
   const [cancelConfirmationOpened, setCancelConfirmationOpened] =
     useState(false)
-  const gateway = useRef(mockScenario ? mockAccountDeletionGateway(mockScenario) : unavailableAccountDeletionGateway)
+  const gateway = useRef(
+    mockScenario
+      ? mockAccountDeletionGateway(mockScenario)
+      : unavailableAccountDeletionGateway,
+  )
   const [reauth, setReauth] = useState(false)
   const [review, setReview] = useState<DeletionReview | null>(null)
   const [grant, setGrant] = useState<DeletionGrant | null>(null)
@@ -177,7 +187,12 @@ export function AccountDeletionImpact({
   const hasPendingChanges =
     Object.keys(decisions).length > 0 ||
     Object.values(confirmations).some((value) => value.length > 0)
-  const reviewFingerprint = JSON.stringify({ decisions, confirmations, communityScenario, mediaCount: reviewState === "empty" ? 0 : 24 })
+  const reviewFingerprint = JSON.stringify({
+    decisions,
+    confirmations,
+    communityScenario,
+    mediaCount: reviewState === "empty" ? 0 : 24,
+  })
   const startReauthentication = async () => {
     if (busy) return
     setBusy(true)
@@ -189,14 +204,22 @@ export function AccountDeletionImpact({
       const nextReview = await gateway.current.createReview(reviewFingerprint)
       const result = await gateway.current.reauthenticate(nextReview)
       if (result.status !== "success") {
-        setFlowError(result.status === "cancelled" ? "再認証がキャンセルされました。" : "再認証に失敗しました。")
+        setFlowError(
+          result.status === "cancelled"
+            ? "再認証がキャンセルされました。"
+            : "再認証に失敗しました。",
+        )
         return
       }
       setReview(nextReview)
       setGrant(result.grant)
       setReauth(true)
     } catch (error) {
-      setFlowError(error instanceof Error ? error.message : "再認証を開始できませんでした。")
+      setFlowError(
+        error instanceof Error
+          ? error.message
+          : "再認証を開始できませんでした。",
+      )
     } finally {
       setBusy(false)
     }
@@ -216,7 +239,9 @@ export function AccountDeletionImpact({
       await gateway.current.confirm(review, grant)
       setConfirmed(true)
     } catch (error) {
-      setFlowError(error instanceof Error ? error.message : "削除処理に失敗しました。")
+      setFlowError(
+        error instanceof Error ? error.message : "削除処理に失敗しました。",
+      )
       setGrant(null)
       setReauth(false)
     } finally {
@@ -301,43 +326,71 @@ export function AccountDeletionImpact({
               <Stack gap="lg" maw={600} mx="auto" w="100%" py="xl">
                 {deletionPending ? (
                   <>
-                    <Title order={2} size="h3">削除リクエストを処理しています</Title>
-                    <Text c="dimmed">アカウント削除の受付結果を確認しています。画面を閉じずにお待ちください。</Text>
-                    <Button loading disabled>処理中</Button>
+                    <Title order={2} size="h3">
+                      削除リクエストを処理しています
+                    </Title>
+                    <Text c="dimmed">
+                      アカウント削除の受付結果を確認しています。画面を閉じずにお待ちください。
+                    </Text>
+                    <Button loading disabled>
+                      処理中
+                    </Button>
                   </>
                 ) : confirmed ? (
                   <>
                     <Title order={2} size="h3">
-                      {mockScenario ? "確認フローが完了しました" : "アカウント削除を受け付けました"}
+                      {mockScenario
+                        ? "確認フローが完了しました"
+                        : "アカウント削除を受け付けました"}
                     </Title>
-                    <FeedbackAlert kind="info" title={mockScenario ? "確認が完了しました" : "アカウントの利用は終了しました"}>
+                    <FeedbackAlert
+                      kind="info"
+                      title={
+                        mockScenario
+                          ? "確認が完了しました"
+                          : "アカウントの利用は終了しました"
+                      }
+                    >
                       {mockScenario
                         ? "確認手続きが終了しました。"
                         : "アカウントは利用できなくなりました。対象データの削除はバックグラウンドで進みます。"}
                     </FeedbackAlert>
                     {mockScenario && (
-                      <Button variant="default" onClick={() => {
-                        setCancelled(false)
-                        setConfirmed(false)
-                        setReauth(false)
-                        setReview(null)
-                        setGrant(null)
-                        setFlowError(null)
-                        setStep(0)
-                      }}>最初から確認する</Button>
+                      <Button
+                        variant="default"
+                        onClick={() => {
+                          setCancelled(false)
+                          setConfirmed(false)
+                          setReauth(false)
+                          setReview(null)
+                          setGrant(null)
+                          setFlowError(null)
+                          setStep(0)
+                        }}
+                      >
+                        最初から確認する
+                      </Button>
                     )}
                   </>
                 ) : (
                   <>
-                    <Title order={2} size="h4">削除手続きを中止しました</Title>
+                    <Title order={2} size="h4">
+                      削除手続きを中止しました
+                    </Title>
                     <Text c="dimmed">削除は開始されていません。</Text>
-                    <Button variant="default" onClick={() => {
-                      setCancelled(false)
-                      setStep(0)
-                    }}>最初に戻る</Button>
+                    <Button
+                      variant="default"
+                      onClick={() => {
+                        setCancelled(false)
+                        setStep(0)
+                      }}
+                    >
+                      最初に戻る
+                    </Button>
                   </>
                 )}
-              </Stack>            ) : (
+              </Stack>
+            ) : (
               <>
                 <Box
                   style={{
@@ -456,12 +509,29 @@ export function AccountDeletionImpact({
                       )}
                       <Group gap="sm" justify="space-between" wrap="nowrap">
                         <Box style={{ flex: 1 }} />
-                        <Box style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-                          <Button size="sm" variant="subtle" color="gray" onClick={cancel}>
+                        <Box
+                          style={{
+                            flex: 1,
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Button
+                            size="sm"
+                            variant="subtle"
+                            color="gray"
+                            onClick={cancel}
+                          >
                             削除手続きを中止して設定に戻る
                           </Button>
                         </Box>
-                        <Box style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+                        <Box
+                          style={{
+                            flex: 1,
+                            display: "flex",
+                            justifyContent: "flex-end",
+                          }}
+                        >
                           {loadState !== "ready" ? (
                             <Button
                               size="sm"
@@ -963,12 +1033,16 @@ export function AccountDeletionImpact({
                       >
                         削除を続けるには再認証が必要です。
                       </FeedbackAlert>
-                      {flowError && <FeedbackAlert kind="error" title="処理を完了できませんでした">{flowError}</FeedbackAlert>}
-                      {reauth && (
+                      {flowError && (
                         <FeedbackAlert
-                          kind="info"
-                          title="再認証済み"
+                          kind="error"
+                          title="処理を完了できませんでした"
                         >
+                          {flowError}
+                        </FeedbackAlert>
+                      )}
+                      {reauth && (
+                        <FeedbackAlert kind="info" title="再認証済み">
                           削除を確定する前に、内容をもう一度確認してください。
                         </FeedbackAlert>
                       )}
@@ -1013,11 +1087,13 @@ export function AccountDeletionImpact({
                             size="sm"
                             color={reauth ? "red" : undefined}
                             loading={busy}
-                            onClick={() => reauth ? void confirmDeletion() : void startReauthentication()}
+                            onClick={() =>
+                              reauth
+                                ? void confirmDeletion()
+                                : void startReauthentication()
+                            }
                           >
-                            {reauth
-                              ? "アカウントを削除する"
-                              : "再認証する"}
+                            {reauth ? "アカウントを削除する" : "再認証する"}
                           </Button>
                         </Box>
                       </Group>

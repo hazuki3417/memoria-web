@@ -388,12 +388,29 @@ export function AccountDeletionImpactPrototype({
                       )}
                       <Group gap="sm" justify="space-between" wrap="nowrap">
                         <Box style={{ flex: 1 }} />
-                        <Box style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-                          <Button size="sm" variant="subtle" color="gray" onClick={cancel}>
+                        <Box
+                          style={{
+                            flex: 1,
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Button
+                            size="sm"
+                            variant="subtle"
+                            color="gray"
+                            onClick={cancel}
+                          >
                             削除手続きを中止して設定に戻る
                           </Button>
                         </Box>
-                        <Box style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+                        <Box
+                          style={{
+                            flex: 1,
+                            display: "flex",
+                            justifyContent: "flex-end",
+                          }}
+                        >
                           {loadState !== "ready" ? (
                             <Button
                               size="sm"
@@ -946,9 +963,7 @@ export function AccountDeletionImpactPrototype({
                               reauth ? setConfirmed(true) : next()
                             }
                           >
-                            {reauth
-                              ? "アカウントを削除する"
-                              : "再認証する"}
+                            {reauth ? "アカウントを削除する" : "再認証する"}
                           </Button>
                         </Box>
                       </Group>

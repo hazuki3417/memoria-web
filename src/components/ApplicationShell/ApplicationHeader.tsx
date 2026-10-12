@@ -26,7 +26,14 @@ export function ApplicationHeader({
     >
       <Group h="100%" px="md" justify="space-between" wrap="nowrap">
         <Group gap="sm" wrap="nowrap">
-          {leading ?? (reserveNavigationSpace ? <ApplicationNavigationTrigger opened={false} onToggle={() => undefined} hidden /> : null)}
+          {leading ??
+            (reserveNavigationSpace ? (
+              <ApplicationNavigationTrigger
+                opened={false}
+                onToggle={() => undefined}
+                hidden
+              />
+            ) : null)}
           <Text fw={750} size="lg">
             Memoria
           </Text>

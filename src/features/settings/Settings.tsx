@@ -16,7 +16,12 @@ import {
   useMantineColorScheme,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { IconChartBar, IconSettings, IconUser, IconUserCircle } from "@tabler/icons-react"
+import {
+  IconChartBar,
+  IconSettings,
+  IconUser,
+  IconUserCircle,
+} from "@tabler/icons-react"
 import { useState } from "react"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { NavigationItem } from "@/components/NavigationItem"
@@ -47,7 +52,12 @@ const MOCK_USAGE: SettingsUsageData = {
     { format: "JPEG", count: 900, sizeLabel: "0.90 GB", capacityPercent: 18 },
     { format: "PNG", count: 200, sizeLabel: "0.20 GB", capacityPercent: 4 },
     { format: "WebP", count: 100, sizeLabel: "0.10 GB", capacityPercent: 2 },
-    { format: "HEIC / HEIF", count: 48, sizeLabel: "0.04 GB", capacityPercent: 0.8 },
+    {
+      format: "HEIC / HEIF",
+      count: 48,
+      sizeLabel: "0.04 GB",
+      capacityPercent: 0.8,
+    },
   ],
 }
 
@@ -59,9 +69,7 @@ async function saveMockProfile() {
   await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
-function isBlockingProfileSaveError(
-  error: unknown,
-): error is ProfileSaveError {
+function isBlockingProfileSaveError(error: unknown): error is ProfileSaveError {
   return (
     typeof error === "object" &&
     error !== null &&
@@ -70,7 +78,11 @@ function isBlockingProfileSaveError(
   )
 }
 
-function ProfileContent({ onSave = saveMockProfile }: { onSave?: SaveProfile }) {
+function ProfileContent({
+  onSave = saveMockProfile,
+}: {
+  onSave?: SaveProfile
+}) {
   const [name, setName] = useState(MOCK_PROFILE.nickname)
   const [saved, setSaved] = useState(MOCK_PROFILE.nickname)
   const [saveState, setSaveState] = useState<
@@ -195,8 +207,17 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               allowDeselect={false}
             />
           </SettingRow>
-          <SettingRow compact={compact} label="Personal Accent Color" description="Personal Contextのアクセントカラーを選びます。">
-            <ColorInput aria-label="Personal Accent Color" format="hex" value={accentColor} onChange={setAccentColor} />
+          <SettingRow
+            compact={compact}
+            label="Personal Accent Color"
+            description="Personal Contextのアクセントカラーを選びます。"
+          >
+            <ColorInput
+              aria-label="Personal Accent Color"
+              format="hex"
+              value={accentColor}
+              onChange={setAccentColor}
+            />
           </SettingRow>
           <SettingRow
             compact={compact}
@@ -227,8 +248,22 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               allowDeselect={false}
             />
           </SettingRow>
-          <SettingRow compact={compact} label="Mediaサムネイルサイズ" description="Media一覧のサムネイルサイズを選びます。">
-            <Select aria-label="Mediaサムネイルサイズ" value={thumbnailSize} onChange={(value) => value && setThumbnailSize(value)} data={[{value:"small",label:"小"},{value:"medium",label:"中"},{value:"large",label:"大"}]} allowDeselect={false} />
+          <SettingRow
+            compact={compact}
+            label="Mediaサムネイルサイズ"
+            description="Media一覧のサムネイルサイズを選びます。"
+          >
+            <Select
+              aria-label="Mediaサムネイルサイズ"
+              value={thumbnailSize}
+              onChange={(value) => value && setThumbnailSize(value)}
+              data={[
+                { value: "small", label: "小" },
+                { value: "medium", label: "中" },
+                { value: "large", label: "大" },
+              ]}
+              allowDeselect={false}
+            />
           </SettingRow>
         </Stack>
       </Box>
@@ -251,10 +286,24 @@ function PreferencesContent({ compact }: { compact: boolean }) {
             label="詳細情報の初期表示（Wide）"
             description="WideでMedia Detailを開くときに詳細情報を展開します。"
           >
-            <Switch checked={wideDetails} onChange={(event) => setWideDetails(event.currentTarget.checked)} label={wideDetails ? "オン" : "オフ"} />
+            <Switch
+              checked={wideDetails}
+              onChange={(event) => setWideDetails(event.currentTarget.checked)}
+              label={wideDetails ? "オン" : "オフ"}
+            />
           </SettingRow>
-          <SettingRow compact={compact} label="詳細情報の初期表示（Medium）" description="MediumでMedia Detailを開くときに詳細情報を展開します。">
-            <Switch checked={mediumDetails} onChange={(event) => setMediumDetails(event.currentTarget.checked)} label={mediumDetails ? "オン" : "オフ"} />
+          <SettingRow
+            compact={compact}
+            label="詳細情報の初期表示（Medium）"
+            description="MediumでMedia Detailを開くときに詳細情報を展開します。"
+          >
+            <Switch
+              checked={mediumDetails}
+              onChange={(event) =>
+                setMediumDetails(event.currentTarget.checked)
+              }
+              label={mediumDetails ? "オン" : "オフ"}
+            />
           </SettingRow>
         </Stack>
       </Box>
@@ -267,13 +316,31 @@ function UsageContent() {
 }
 
 function AccountContent() {
-  return <Stack gap="xl">
-    <PageHeader title="アカウント" description="アカウントを管理します。" />
-    <Box><Box c="red"><SectionHeader>アカウント削除</SectionHeader></Box><Stack gap="md" maw={620}>
-      <Text size="sm">アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。</Text>
-      <Box><Button component={Link} href="/settings/account/delete" color="red" size="sm">アカウントを削除する</Button></Box>
-    </Stack></Box>
-  </Stack>
+  return (
+    <Stack gap="xl">
+      <PageHeader title="アカウント" description="アカウントを管理します。" />
+      <Box>
+        <Box c="red">
+          <SectionHeader>アカウント削除</SectionHeader>
+        </Box>
+        <Stack gap="md" maw={620}>
+          <Text size="sm">
+            アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。
+          </Text>
+          <Box>
+            <Button
+              component={Link}
+              href="/settings/account/delete"
+              color="red"
+              size="sm"
+            >
+              アカウントを削除する
+            </Button>
+          </Box>
+        </Stack>
+      </Box>
+    </Stack>
+  )
 }
 
 export function Settings({
@@ -285,24 +352,67 @@ export function Settings({
 }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
-  const content = section === "profile" ? <ProfileContent onSave={saveProfile} /> : section === "preferences" ? <PreferencesContent compact={compact} /> : section === "usage" ? <UsageContent /> : <AccountContent />
+  const content =
+    section === "profile" ? (
+      <ProfileContent onSave={saveProfile} />
+    ) : section === "preferences" ? (
+      <PreferencesContent compact={compact} />
+    ) : section === "usage" ? (
+      <UsageContent />
+    ) : (
+      <AccountContent />
+    )
 
-  return <Box maw={1120} mx="auto" w="100%">
-    {compact ? <Stack gap="xl">
-      <Box><Text size="xs" c="dimmed" mb={6}>設定</Text>
-        <Select aria-label="設定画面" value={section} onChange={(value) => value && router.push(`/settings/${value}`)}
-          data={sections.map((item) => ({ value: item.id, label: item.label }))} allowDeselect={false} />
-      </Box>
-      <Box>{content}</Box>
-    </Stack> : <Group align="flex-start" gap={56} wrap="nowrap">
-      <Box component="nav" aria-label="設定" w={200} style={{ flexShrink: 0 }}>
-        <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
-        <Stack gap={0}>{sections.map((item) =>
-          <NavigationItem key={item.id} label={item.label} icon={item.icon} active={section === item.id}
-            accentColor="var(--mantine-color-blue-6)" onClick={() => router.push(`/settings/${item.id}`)} />)}
+  return (
+    <Box maw={1120} mx="auto" w="100%">
+      {compact ? (
+        <Stack gap="xl">
+          <Box>
+            <Text size="xs" c="dimmed" mb={6}>
+              設定
+            </Text>
+            <Select
+              aria-label="設定画面"
+              value={section}
+              onChange={(value) => value && router.push(`/settings/${value}`)}
+              data={sections.map((item) => ({
+                value: item.id,
+                label: item.label,
+              }))}
+              allowDeselect={false}
+            />
+          </Box>
+          <Box>{content}</Box>
         </Stack>
-      </Box>
-      <Box style={{ flex: 1 }} maw={760} miw={0}>{content}</Box>
-    </Group>}
-  </Box>
+      ) : (
+        <Group align="flex-start" gap={56} wrap="nowrap">
+          <Box
+            component="nav"
+            aria-label="設定"
+            w={200}
+            style={{ flexShrink: 0 }}
+          >
+            <Text size="xs" fw={700} c="dimmed" mb="xs">
+              設定
+            </Text>
+            <Stack gap={0}>
+              {sections.map((item) => (
+                <NavigationItem
+                  key={item.id}
+                  label={item.label}
+                  icon={item.icon}
+                  active={section === item.id}
+                  accentColor="var(--mantine-color-blue-6)"
+                  onClick={() => router.push(`/settings/${item.id}`)}
+                />
+              ))}
+            </Stack>
+          </Box>
+          <Box style={{ flex: 1 }} maw={760} miw={0}>
+            {content}
+          </Box>
+        </Group>
+      )}
+    </Box>
+  )
 }

@@ -12,11 +12,23 @@ type GroupItemProps = {
 }
 
 /** Shared Group name and preview; screens own the outer surface and interactions. */
-export function GroupItem({ name, directMedia, aggregateMedia, directMediaCount, gap = 6 }: GroupItemProps) {
+export function GroupItem({
+  name,
+  directMedia,
+  aggregateMedia,
+  directMediaCount,
+  gap = 6,
+}: GroupItemProps) {
   return (
     <Stack gap={gap}>
-      <Text fw={600} size="sm" truncate="end" title={name}>{name}</Text>
-      <GroupPreviewGrid directMedia={directMedia} aggregateMedia={aggregateMedia} directMediaCount={directMediaCount} />
+      <Text fw={600} size="sm" truncate="end" title={name}>
+        {name}
+      </Text>
+      <GroupPreviewGrid
+        directMedia={directMedia}
+        aggregateMedia={aggregateMedia}
+        directMediaCount={directMediaCount}
+      />
     </Stack>
   )
 }

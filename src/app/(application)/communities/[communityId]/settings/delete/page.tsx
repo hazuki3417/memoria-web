@@ -12,7 +12,9 @@ export default function CommunityDeletePage() {
       communityName="家族のアルバム"
       managedMediaCount={12}
       isAdministrator
-      onDelete={async () => { await Promise.resolve() }}
+      onDelete={async () => {
+        await Promise.resolve()
+      }}
     />
   )
 }

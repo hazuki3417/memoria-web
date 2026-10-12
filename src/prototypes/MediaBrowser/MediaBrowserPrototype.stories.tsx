@@ -41,8 +41,6 @@ export const Selection: Story = {
   args: { initialState: "selection", contextKind: "personal" },
 }
 
-
-
 export const Community: Story = {
   args: { initialState: "default", contextKind: "community" },
 }

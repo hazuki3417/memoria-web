@@ -53,7 +53,12 @@ const MOCK_USAGE: SettingsUsageData = {
     { format: "JPEG", count: 900, sizeLabel: "0.90 GB", capacityPercent: 18 },
     { format: "PNG", count: 200, sizeLabel: "0.20 GB", capacityPercent: 4 },
     { format: "WebP", count: 100, sizeLabel: "0.10 GB", capacityPercent: 2 },
-    { format: "HEIC / HEIF", count: 48, sizeLabel: "0.04 GB", capacityPercent: 0.8 },
+    {
+      format: "HEIC / HEIF",
+      count: 48,
+      sizeLabel: "0.04 GB",
+      capacityPercent: 0.8,
+    },
   ],
 }
 
@@ -62,9 +67,10 @@ function ProfileContent({
 }: {
   initialSaveState?: ProfileSaveState
 }) {
-  const initialName = initialSaveState === "saving" || initialSaveState === "retryable-error"
-    ? "ユーザー新"
-    : MOCK_PROFILE.nickname
+  const initialName =
+    initialSaveState === "saving" || initialSaveState === "retryable-error"
+      ? "ユーザー新"
+      : MOCK_PROFILE.nickname
   const [name, setName] = useState(initialName)
   const [saved, setSaved] = useState(MOCK_PROFILE.nickname)
   const [saveState, setSaveState] = useState<ProfileSaveState>(initialSaveState)
@@ -131,7 +137,11 @@ function ProfileContent({
             loading={saving}
             onClick={save}
           >
-            {saveState === "retryable-error" ? "再試行" : saving ? "保存中" : "保存"}
+            {saveState === "retryable-error"
+              ? "再試行"
+              : saving
+                ? "保存中"
+                : "保存"}
           </Button>
         </Stack>
       </Box>
@@ -177,8 +187,17 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               allowDeselect={false}
             />
           </SettingRow>
-          <SettingRow compact={compact} label="Personal Accent Color" description="Personal Contextのアクセントカラーを選びます。">
-            <ColorInput aria-label="Personal Accent Color" format="hex" value={accentColor} onChange={setAccentColor} />
+          <SettingRow
+            compact={compact}
+            label="Personal Accent Color"
+            description="Personal Contextのアクセントカラーを選びます。"
+          >
+            <ColorInput
+              aria-label="Personal Accent Color"
+              format="hex"
+              value={accentColor}
+              onChange={setAccentColor}
+            />
           </SettingRow>
           <SettingRow
             compact={compact}
@@ -209,8 +228,22 @@ function PreferencesContent({ compact }: { compact: boolean }) {
               allowDeselect={false}
             />
           </SettingRow>
-          <SettingRow compact={compact} label="Mediaサムネイルサイズ" description="Media一覧のサムネイルサイズを選びます。">
-            <Select aria-label="Mediaサムネイルサイズ" value={thumbnailSize} onChange={(value) => value && setThumbnailSize(value)} data={[{value:"small",label:"小"},{value:"medium",label:"中"},{value:"large",label:"大"}]} allowDeselect={false} />
+          <SettingRow
+            compact={compact}
+            label="Mediaサムネイルサイズ"
+            description="Media一覧のサムネイルサイズを選びます。"
+          >
+            <Select
+              aria-label="Mediaサムネイルサイズ"
+              value={thumbnailSize}
+              onChange={(value) => value && setThumbnailSize(value)}
+              data={[
+                { value: "small", label: "小" },
+                { value: "medium", label: "中" },
+                { value: "large", label: "大" },
+              ]}
+              allowDeselect={false}
+            />
           </SettingRow>
         </Stack>
       </Box>
@@ -233,10 +266,24 @@ function PreferencesContent({ compact }: { compact: boolean }) {
             label="詳細情報の初期表示（Wide）"
             description="WideでMedia Detailを開くときに詳細情報を展開します。"
           >
-            <Switch checked={wideDetails} onChange={(event) => setWideDetails(event.currentTarget.checked)} label={wideDetails ? "オン" : "オフ"} />
+            <Switch
+              checked={wideDetails}
+              onChange={(event) => setWideDetails(event.currentTarget.checked)}
+              label={wideDetails ? "オン" : "オフ"}
+            />
           </SettingRow>
-          <SettingRow compact={compact} label="詳細情報の初期表示（Medium）" description="MediumでMedia Detailを開くときに詳細情報を展開します。">
-            <Switch checked={mediumDetails} onChange={(event) => setMediumDetails(event.currentTarget.checked)} label={mediumDetails ? "オン" : "オフ"} />
+          <SettingRow
+            compact={compact}
+            label="詳細情報の初期表示（Medium）"
+            description="MediumでMedia Detailを開くときに詳細情報を展開します。"
+          >
+            <Switch
+              checked={mediumDetails}
+              onChange={(event) =>
+                setMediumDetails(event.currentTarget.checked)
+              }
+              label={mediumDetails ? "オン" : "オフ"}
+            />
           </SettingRow>
         </Stack>
       </Box>

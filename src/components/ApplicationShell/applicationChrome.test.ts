@@ -15,8 +15,14 @@ describe("isApplicationChromeFeatureVisible", () => {
   })
 
   it("hides global controls in restricted deletion flows", () => {
-    for (const feature of ["navigation", "context-switcher", "account-menu"] as const) {
-      expect(isApplicationChromeFeatureVisible("restricted-flow", feature)).toBe(false)
+    for (const feature of [
+      "navigation",
+      "context-switcher",
+      "account-menu",
+    ] as const) {
+      expect(
+        isApplicationChromeFeatureVisible("restricted-flow", feature),
+      ).toBe(false)
     }
   })
 

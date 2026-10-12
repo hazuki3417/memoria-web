@@ -132,9 +132,22 @@ const previewImages = Array.from(
 )
 
 function PreviewItem({ name, count }: { name: string; count: number }) {
-  const directMedia = Array.from({ length: Math.min(count, 4) }, (_, index) => previewImages[index % previewImages.length])
-  const aggregateMedia = Array.from({ length: 12 }, (_, index) => previewImages[index % previewImages.length])
-  return <GroupItem name={name} directMedia={directMedia} directMediaCount={count} aggregateMedia={aggregateMedia} />
+  const directMedia = Array.from(
+    { length: Math.min(count, 4) },
+    (_, index) => previewImages[index % previewImages.length],
+  )
+  const aggregateMedia = Array.from(
+    { length: 12 },
+    (_, index) => previewImages[index % previewImages.length],
+  )
+  return (
+    <GroupItem
+      name={name}
+      directMedia={directMedia}
+      directMediaCount={count}
+      aggregateMedia={aggregateMedia}
+    />
+  )
 }
 
 function RelationItems({ names }: { names: string[] }) {
@@ -281,9 +294,23 @@ export function GroupBrowserPrototype() {
   const submitCreate = () => {
     const name = createName.trim()
     if (!name || Array.from(name).length > 100) return
-    setCreatedGroups((current) => [...current, { id: `created-${Date.now()}-${current.length}`, name, mediaCount: 0, previewCount: 0, parentNames: createParents, childNames: createChildren }])
+    setCreatedGroups((current) => [
+      ...current,
+      {
+        id: `created-${Date.now()}-${current.length}`,
+        name,
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: createParents,
+        childNames: createChildren,
+      },
+    ])
     create.close()
-    showNotification({ kind: "success", title: "Groupを作成しました", message: `「${name}」を作成しました。` })
+    showNotification({
+      kind: "success",
+      title: "Groupを作成しました",
+      message: `「${name}」を作成しました。`,
+    })
   }
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
@@ -375,23 +402,58 @@ export function GroupBrowserPrototype() {
   }
 
   const createDialog = (
-    <Modal opened={createOpened} onClose={create.close} title="Groupを作成" size="lg" centered withCloseButton={false}>
+    <Modal
+      opened={createOpened}
+      onClose={create.close}
+      title="Groupを作成"
+      size="lg"
+      centered
+      withCloseButton={false}
+    >
       <Stack gap="lg">
         <TextInput
-          label={<Group justify="space-between" wrap="nowrap"><Text component="span" size="sm" fw={500}>名前</Text><Text component="span" size="xs" c="dimmed">{Array.from(createName).length} / 100</Text></Group>}
+          label={
+            <Group justify="space-between" wrap="nowrap">
+              <Text component="span" size="sm" fw={500}>
+                名前
+              </Text>
+              <Text component="span" size="xs" c="dimmed">
+                {Array.from(createName).length} / 100
+              </Text>
+            </Group>
+          }
           value={createName}
-          onChange={(event) => { const value = event.currentTarget.value; if (Array.from(value).length <= 100) setCreateName(value) }}
+          onChange={(event) => {
+            const value = event.currentTarget.value
+            if (Array.from(value).length <= 100) setCreateName(value)
+          }}
           placeholder="Group名"
           styles={{ label: { display: "block", width: "100%" } }}
           required
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-          <RelationEditor label="Parents" names={createParents} oppositeNames={createChildren} onChange={setCreateParents} currentGroupName={createName.trim()} />
-          <RelationEditor label="Children" names={createChildren} oppositeNames={createParents} onChange={setCreateChildren} currentGroupName={createName.trim()} />
+          <RelationEditor
+            label="Parents"
+            names={createParents}
+            oppositeNames={createChildren}
+            onChange={setCreateParents}
+            currentGroupName={createName.trim()}
+          />
+          <RelationEditor
+            label="Children"
+            names={createChildren}
+            oppositeNames={createParents}
+            onChange={setCreateChildren}
+            currentGroupName={createName.trim()}
+          />
         </SimpleGrid>
         <Group justify="flex-end">
-          <Button variant="default" onClick={create.close}>キャンセル</Button>
-          <Button onClick={submitCreate} disabled={!createName.trim()}>作成</Button>
+          <Button variant="default" onClick={create.close}>
+            キャンセル
+          </Button>
+          <Button onClick={submitCreate} disabled={!createName.trim()}>
+            作成
+          </Button>
         </Group>
       </Stack>
     </Modal>
@@ -526,9 +588,28 @@ export function GroupBrowserPrototype() {
               h="100%"
               style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
             >
-              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+              <Box
+                pb="xs"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: compact
+                    ? "minmax(0, 1fr)"
+                    : "minmax(0, 1fr) auto",
+                  alignItems: "center",
+                  gap: "var(--mantine-spacing-xs)",
+                }}
+              >
                 <Box style={{ minWidth: 0 }}>
-                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                  <Group
+                    component="form"
+                    onSubmit={(event) => {
+                      event.preventDefault()
+                      setAppliedQuery(query)
+                    }}
+                    gap="xs"
+                    wrap="nowrap"
+                    style={{ minWidth: 0 }}
+                  >
                     <TextInput
                       w={compact ? "100%" : 280}
                       maw="100%"
@@ -539,14 +620,25 @@ export function GroupBrowserPrototype() {
                       leftSection={<IconSearch size={16} />}
                       style={{ flex: compact ? "1 1 auto" : undefined }}
                     />
-                    <Button size="xs" type="submit">検索</Button>
+                    <Button size="xs" type="submit">
+                      検索
+                    </Button>
                     <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
                       {visibleGroups.length}件
                     </Text>
                   </Group>
                 </Box>
-                <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ gridColumn: compact ? "1" : undefined }}>
-                  <Button size="xs" leftSection={<IconFolderPlus size={16} />} onClick={openCreate}>
+                <Group
+                  gap="xs"
+                  wrap="nowrap"
+                  justify="flex-end"
+                  style={{ gridColumn: compact ? "1" : undefined }}
+                >
+                  <Button
+                    size="xs"
+                    leftSection={<IconFolderPlus size={16} />}
+                    onClick={openCreate}
+                  >
                     Groupを作成
                   </Button>
                 </Group>
@@ -569,7 +661,10 @@ export function GroupBrowserPrototype() {
                       bdrs="sm"
                       w={240}
                     >
-                      <PreviewItem name={group.name} count={group.previewCount} />
+                      <PreviewItem
+                        name={group.name}
+                        count={group.previewCount}
+                      />
                     </UnstyledButton>
                   ))}
                 </Box>
@@ -577,12 +672,29 @@ export function GroupBrowserPrototype() {
             </Box>
           ) : (
             <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
-              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+              <Box
+                pb="xs"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "minmax(0, 1fr) auto",
+                  alignItems: "center",
+                  gap: "var(--mantine-spacing-xs)",
+                }}
+              >
                 <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
-                  <Text fw={700} truncate="end">{selected?.name ?? ""}</Text>
-                  <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{selected?.mediaCount ?? 0}件のMedia</Text>
+                  <Text fw={700} truncate="end">
+                    {selected?.name ?? ""}
+                  </Text>
+                  <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
+                    {selected?.mediaCount ?? 0}件のMedia
+                  </Text>
                 </Group>
-                <Button size="xs" variant="default" leftSection={<IconX size={16} />} onClick={closeDetail}>
+                <Button
+                  size="xs"
+                  variant="default"
+                  leftSection={<IconX size={16} />}
+                  onClick={closeDetail}
+                >
                   一覧に戻る
                 </Button>
               </Box>
@@ -617,9 +729,28 @@ export function GroupBrowserPrototype() {
                 minHeight: 0,
               }}
             >
-              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+              <Box
+                pb="xs"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: compact
+                    ? "minmax(0, 1fr)"
+                    : "minmax(0, 1fr) auto",
+                  alignItems: "center",
+                  gap: "var(--mantine-spacing-xs)",
+                }}
+              >
                 <Box style={{ minWidth: 0 }}>
-                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                  <Group
+                    component="form"
+                    onSubmit={(event) => {
+                      event.preventDefault()
+                      setAppliedQuery(query)
+                    }}
+                    gap="xs"
+                    wrap="nowrap"
+                    style={{ minWidth: 0 }}
+                  >
                     <TextInput
                       w={compact ? "100%" : 280}
                       maw="100%"
@@ -630,14 +761,25 @@ export function GroupBrowserPrototype() {
                       leftSection={<IconSearch size={16} />}
                       style={{ flex: compact ? "1 1 auto" : undefined }}
                     />
-                    <Button size="xs" type="submit">検索</Button>
+                    <Button size="xs" type="submit">
+                      検索
+                    </Button>
                     <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
                       {visibleGroups.length}件
                     </Text>
                   </Group>
                 </Box>
-                <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ gridColumn: compact ? "1" : undefined }}>
-                  <Button size="xs" leftSection={<IconFolderPlus size={16} />} onClick={openCreate}>
+                <Group
+                  gap="xs"
+                  wrap="nowrap"
+                  justify="flex-end"
+                  style={{ gridColumn: compact ? "1" : undefined }}
+                >
+                  <Button
+                    size="xs"
+                    leftSection={<IconFolderPlus size={16} />}
+                    onClick={openCreate}
+                  >
                     Groupを作成
                   </Button>
                 </Group>
@@ -673,7 +815,10 @@ export function GroupBrowserPrototype() {
                             : "1px solid transparent",
                         }}
                       >
-                        <PreviewItem name={group.name} count={group.previewCount} />
+                        <PreviewItem
+                          name={group.name}
+                          count={group.previewCount}
+                        />
                       </UnstyledButton>
                     )
                   })}
@@ -710,16 +855,42 @@ export function GroupBrowserPrototype() {
                       height: "100%",
                     }}
                   >
-                    <Box pb="xs" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                    <Box
+                      pb="xs"
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "minmax(0, 1fr) auto",
+                        alignItems: "center",
+                        gap: "var(--mantine-spacing-xs)",
+                      }}
+                    >
                       <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
-                        <Text fw={700} truncate="end">{selected?.name ?? ""}</Text>
-                        <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{selected?.mediaCount ?? 0}件のMedia</Text>
+                        <Text fw={700} truncate="end">
+                          {selected?.name ?? ""}
+                        </Text>
+                        <Text
+                          size="xs"
+                          c="dimmed"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          {selected?.mediaCount ?? 0}件のMedia
+                        </Text>
                       </Group>
                       <Group gap="xs" wrap="nowrap" justify="flex-end">
-                        <Button size="xs" variant="default" leftSection={<IconEdit size={16} />} onClick={openEdit}>
+                        <Button
+                          size="xs"
+                          variant="default"
+                          leftSection={<IconEdit size={16} />}
+                          onClick={openEdit}
+                        >
                           編集
                         </Button>
-                        <Button size="xs" variant="default" leftSection={<IconX size={16} />} onClick={closeDetail}>
+                        <Button
+                          size="xs"
+                          variant="default"
+                          leftSection={<IconX size={16} />}
+                          onClick={closeDetail}
+                        >
                           閉じる
                         </Button>
                       </Group>
@@ -737,7 +908,9 @@ export function GroupBrowserPrototype() {
                         <IconChevronRight
                           size={16}
                           style={{
-                            transform: relationsOpened ? "rotate(90deg)" : "rotate(0deg)",
+                            transform: relationsOpened
+                              ? "rotate(90deg)"
+                              : "rotate(0deg)",
                             transition: "transform 200ms ease",
                           }}
                         />
@@ -750,11 +923,17 @@ export function GroupBrowserPrototype() {
                       <Box px="lg" pb="sm">
                         <SimpleGrid cols={2} spacing="lg">
                           <Stack gap={4}>
-                            <Text size="xs" c="dimmed">Parents</Text>
-                            <RelationItems names={selected?.parentNames ?? []} />
+                            <Text size="xs" c="dimmed">
+                              Parents
+                            </Text>
+                            <RelationItems
+                              names={selected?.parentNames ?? []}
+                            />
                           </Stack>
                           <Stack gap={4}>
-                            <Text size="xs" c="dimmed">Children</Text>
+                            <Text size="xs" c="dimmed">
+                              Children
+                            </Text>
                             <RelationItems names={selected?.childNames ?? []} />
                           </Stack>
                         </SimpleGrid>
@@ -785,7 +964,11 @@ export function GroupBrowserPrototype() {
       )}
       <MediaBrowserPrototype
         detailOnlyItems={groupMediaItems}
-        initialDetailId={imageDetailIndex !== null ? groupMediaItems[imageDetailIndex].id : undefined}
+        initialDetailId={
+          imageDetailIndex !== null
+            ? groupMediaItems[imageDetailIndex].id
+            : undefined
+        }
         onDetailClose={() => setImageDetailIndex(null)}
         contextKind={personalContext.kind}
       />

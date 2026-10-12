@@ -38,7 +38,12 @@ export function ApplicationShell({
       {header}
       {navigation}
       <AppShell.Main>
-        <ScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}>
+        <ScrollArea
+          type="hover"
+          h="100%"
+          w="100%"
+          style={{ overscrollBehavior: "contain" }}
+        >
           <Box pt="lg">{children}</Box>
         </ScrollArea>
       </AppShell.Main>
