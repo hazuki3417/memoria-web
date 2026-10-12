@@ -334,7 +334,6 @@ function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
 
 export function GroupBrowser({
   contextKind = "personal",
-  communityId = "photo-club",
 }: {
   contextKind?: "personal" | "community"
   communityId?: string
@@ -344,7 +343,7 @@ export function GroupBrowser({
   const [createName, setCreateName] = useState("")
   const [createParents, setCreateParents] = useState<string[]>([])
   const [createChildren, setCreateChildren] = useState<string[]>([])
-  const allGroups = [...groups, ...createdGroups]
+  const allGroups = useMemo(() => [...groups, ...createdGroups], [createdGroups])
   const openCreate = () => {
     setCreateName("")
     setCreateParents([])
@@ -399,7 +398,7 @@ export function GroupBrowser({
     return allGroups.filter((group) =>
       group.name.toLocaleLowerCase().includes(normalized),
     )
-  }, [appliedQuery, createdGroups])
+  }, [appliedQuery, allGroups])
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
