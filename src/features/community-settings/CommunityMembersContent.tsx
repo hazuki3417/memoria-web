@@ -65,16 +65,16 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
         {adminLimitReached && <Text size="sm" c="dimmed" mb="sm">Administratorの上限に達しています。これ以上Administratorへ変更できません。</Text>}
         <TextInput aria-label="参加者を名前で検索" placeholder="名前で検索" leftSection={<IconSearch size={16} />} value={query} onChange={(event) => setQuery(event.currentTarget.value)} mb="md" />
         <Box style={{ borderRadius: "var(--mantine-radius-md)", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)" }}>
-          <ScrollArea type="hover" w="100%" offsetScrollbars>
+          <Box style={{ overflowX: "auto" }}>
             <Box miw={400}>
-              <Table striped withRowBorders style={{ tableLayout: "fixed" }}>
+              <Table striped withRowBorders style={{ tableLayout: "fixed", paddingRight: 10 }}>
                 <Table.Thead><Table.Tr style={{ height: tableHeaderHeight }}>
                   <Table.Th w="45%"><UnstyledButton onClick={() => changeSort("name")} aria-label="名前で並び替え">名前 {sortKey === "name" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
                   <Table.Th><UnstyledButton onClick={() => changeSort("role")} aria-label="役割で並び替え">役割 {sortKey === "role" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
                   {self?.role === "admin" && <Table.Th w={52}><Text size="xs">操作</Text></Table.Th>}
                 </Table.Tr></Table.Thead>
               </Table>
-              <ScrollArea type="hover" h={visibleRowCount * tableRowHeight} offsetScrollbars>
+              <ScrollArea type="always" scrollbarSize={10} h={visibleRowCount * tableRowHeight}>
                 <Table striped highlightOnHover withRowBorders style={{ tableLayout: "fixed" }} styles={{ td: { height: tableRowHeight, borderBottom: "1px solid var(--mantine-color-default-border)" } }}>
                   <Table.Tbody>
                     {rows.map((member) => <Table.Tr key={member.id}>
@@ -87,7 +87,7 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
                 </Table>
               </ScrollArea>
             </Box>
-          </ScrollArea>
+          </Box>
         </Box>
       </Box>
       <Box>
