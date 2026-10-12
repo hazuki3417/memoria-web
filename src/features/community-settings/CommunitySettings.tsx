@@ -170,7 +170,19 @@ export function CommunitySettings({
     </Stack>
   )
 
-  const membersContent = <CommunityMembersContent />
+  // Prototype-only operation: replace with the Membership API when available.
+  const mockLeave = async () => {
+    await Promise.resolve()
+  }
+  const membersContent = (
+    <CommunityMembersContent
+      onLeave={mockLeave}
+      onLeaveSuccess={() => {
+        if (onNavigate) onNavigate("/dashboard")
+        else window.location.assign("/dashboard")
+      }}
+    />
+  )
   const communityUsage: SettingsUsageData = {
     usedStorageLabel: "1.24 GB",
     effectiveLimitLabel: "5 GB",
