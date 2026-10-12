@@ -13,6 +13,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { registerUserAction } from "@/app/register/actions"
 import {
   ApplicationHeader,
   ApplicationShell,
@@ -71,12 +72,25 @@ export function UserRegistration({
     }
   }, [reviewState, showFeedback])
 
-  const register = () => {
+  const register = async () => {
     if (invalid || registering || blocking || registered) return
-    // Visual prototype only: actual registration and navigation are not connected.
-    setStatus("registered")
-    window.sessionStorage.setItem("memoria:registration-success", "1")
-    router.replace("/dashboard")
+    setStatus("registering")
+    try {
+      const result = await registerUserAction(nickname)
+      if (result.kind === "registered" || result.kind === "conflict") {
+        setStatus("registered")
+        router.replace("/dashboard")
+        router.refresh()
+      } else if (result.kind === "unavailable") {
+        setStatus("blocking")
+      } else {
+        setStatus("failure")
+        showFeedback("failure")
+      }
+    } catch {
+      setStatus("failure")
+      showFeedback("failure")
+    }
   }
 
   return (
