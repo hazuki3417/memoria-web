@@ -7,6 +7,13 @@
 - The shared `ApplicationShell` renders `#application-modal-root` outside the scrollable page content. Image Detail's full-screen Mantine Modal uses `portalProps={{ target: "#application-modal-root" }}`, keeping its visual overlay outside page scrolling.
 - Browser features call `showNotification` but must not mount another `<Notifications />` in their page content.
 
+## Application main scroll ownership
+
+- `ApplicationShell` owns the fixed main viewport and does not impose a `ScrollArea` or content padding on its children.
+- Each consumer explicitly chooses whether to use `ApplicationContentScroll`. This wrapper preserves the previous `ScrollArea` behavior (`type="hover"`, 100% width/height, contained overscroll, and `lg` top padding).
+- The production Application Shell container and existing production/prototype consumers currently opt in to preserve existing scrolling and layout. Future consumers may omit the wrapper and manage scrolling themselves; existing consumers should only change this after visual/behavioral regression review.
+- The notification offset remains anchored to the `AppShell.Main` bounds and is unaffected by the content scroll choice.
+
 ## Image Detail consumers and contracts
 
 - Media Browser opens Image Detail from its media list; Group Browser opens the same viewer from Group Detail thumbnails.
