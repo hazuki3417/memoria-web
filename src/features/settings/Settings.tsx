@@ -39,6 +39,7 @@ const MOCK_PROFILE = { nickname: "ユーザー" }
 const MOCK_USAGE: SettingsUsageData = {
   usedStorageLabel: "1.24 GB",
   effectiveLimitLabel: "5 GB",
+  availableStorageLabel: "3.76 GB",
   storageUsagePercent: 24.8,
   mediaCount: 1248,
   formatBreakdown: [
