@@ -5,6 +5,7 @@ import { Badge, Box, Button, Group, Menu, Modal, ScrollArea, Stack, Table, Text,
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
+import { showNotification } from "@/components/Feedback"
 
 export type CommunityMember = { id: string; name: string; role: "admin" | "member"; isSelf?: boolean }
 export const COMMUNITY_MEMBER_LIMIT = 30
@@ -16,9 +17,10 @@ const previewMembers: CommunityMember[] = [
   { id: "m3", name: "鈴木 太郎", role: "member" },
 ]
 type SortKey = "name" | "role"
-export function CommunityMembersContent({ members = previewMembers, onLeave }: {
+export function CommunityMembersContent({ members = previewMembers, onLeave, onLeaveSuccess }: {
   members?: CommunityMember[]
   onLeave?: () => Promise<void>
+  onLeaveSuccess?: () => void
 }) {
   const [query, setQuery] = useState("")
   const [sortKey, setSortKey] = useState<SortKey>("name")
@@ -49,8 +51,16 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
   const leave = async () => {
     if (!onLeave || blocked || busy) return
     setBusy(true); setError("")
-    try { await onLeave(); setDone(true); setOpened(false) }
-    catch { setError("退会処理に失敗しました。現在の参加状況を確認して再試行してください。") }
+    try {
+      await onLeave()
+      setDone(true)
+      setOpened(false)
+      showNotification({ kind: "success", title: "Communityから退会しました", message: "退会処理が完了しました。" })
+      onLeaveSuccess?.()
+    }
+    catch {
+      setError("退会処理に失敗しました。現在の参加状況を確認して再試行してください。")
+    }
     finally { setBusy(false) }
   }
   return (
