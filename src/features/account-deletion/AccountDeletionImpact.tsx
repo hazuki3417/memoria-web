@@ -308,11 +308,11 @@ export function AccountDeletionImpact({
                 ) : confirmed ? (
                   <>
                     <Title order={2} size="h3">
-                      {mockScenario ? "削除受付の確認が完了しました（モック）" : "アカウント削除を受け付けました"}
+                      {mockScenario ? "確認フローが完了しました" : "アカウント削除を受け付けました"}
                     </Title>
-                    <FeedbackAlert kind="info" title={mockScenario ? "デモ環境での受付完了" : "アカウントの利用は終了しました"}>
+                    <FeedbackAlert kind="info" title={mockScenario ? "確認が完了しました" : "アカウントの利用は終了しました"}>
                       {mockScenario
-                        ? "削除受付の成功を模擬しました。実際のアカウントやデータは削除されておらず、ログイン状態も変更されていません。"
+                        ? "確認手続きが終了しました。"
                         : "アカウントは利用できなくなりました。対象データの削除はバックグラウンドで進みます。"}
                     </FeedbackAlert>
                     {mockScenario && (
@@ -324,7 +324,7 @@ export function AccountDeletionImpact({
                         setGrant(null)
                         setFlowError(null)
                         setStep(0)
-                      }}>デモを最初から確認する</Button>
+                      }}>最初から確認する</Button>
                     )}
                   </>
                 ) : (
@@ -967,9 +967,9 @@ export function AccountDeletionImpact({
                       {reauth && (
                         <FeedbackAlert
                           kind="info"
-                          title="再認証済み（モック）"
+                          title="再認証済み"
                         >
-                          Auth0とBackendはモックです。実際のアカウント削除は行われません。
+                          削除を確定する前に、内容をもう一度確認してください。
                         </FeedbackAlert>
                       )}
                       <Group gap="sm" justify="space-between">
@@ -1016,7 +1016,7 @@ export function AccountDeletionImpact({
                             onClick={() => reauth ? void confirmDeletion() : void startReauthentication()}
                           >
                             {reauth
-                              ? "アカウントを削除する（モック）"
+                              ? "アカウントを削除する"
                               : "再認証する"}
                           </Button>
                         </Box>
