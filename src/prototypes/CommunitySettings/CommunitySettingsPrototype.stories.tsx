@@ -40,3 +40,7 @@ export const Compact: Story = {
   args: { role: "admin" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
+
+export const Members: Story = { args: { role: "admin", section: "members" } }
+export const Usage: Story = { args: { role: "member", section: "usage" } }
+export const Preferences: Story = { args: { role: "member", section: "preferences" } }
