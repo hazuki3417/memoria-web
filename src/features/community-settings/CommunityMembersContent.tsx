@@ -40,7 +40,7 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
     const result = aValue.localeCompare(bValue, "ja-JP")
     return descending ? -result : result
   }), [members, query, sortKey, descending])
-  const visibleRowCount = 8
+  const visibleRowCount = 4
   const tableRowHeight = 48
   const tableHeaderHeight = 44
   const changeSort = (key: SortKey) => {
@@ -66,7 +66,7 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
         <TextInput aria-label="参加者を名前で検索" placeholder="名前で検索" leftSection={<IconSearch size={16} />} value={query} onChange={(event) => setQuery(event.currentTarget.value)} mb="md" />
         <Box style={{ borderRadius: "var(--mantine-radius-md)", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)" }}>
           <ScrollArea type="hover" w="100%" h={tableHeaderHeight + visibleRowCount * tableRowHeight}>
-          <Table striped highlightOnHover miw={400} stickyHeader styles={{ th: { height: tableHeaderHeight }, td: { height: tableRowHeight } }}>
+            <Table striped highlightOnHover withRowBorders miw={400} stickyHeader styles={{ th: { height: tableHeaderHeight }, td: { height: tableRowHeight, borderBottom: "1px solid var(--mantine-color-default-border)" } }}>
             <Table.Thead><Table.Tr>
               <Table.Th><UnstyledButton onClick={() => changeSort("name")} aria-label="名前で並び替え">名前 {sortKey === "name" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
               <Table.Th><UnstyledButton onClick={() => changeSort("role")} aria-label="役割で並び替え">役割 {sortKey === "role" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
@@ -79,6 +79,7 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
                 {self?.role === "admin" && <Table.Td>{!member.isSelf && <Menu position="bottom-end" withinPortal><Menu.Target><Button size="compact-xs" variant="subtle" aria-label={member.name + "の管理操作"}><IconDots size={18} /></Button></Menu.Target><Menu.Dropdown><Menu.Item disabled>役割を変更</Menu.Item><Menu.Item disabled color="red">除外</Menu.Item></Menu.Dropdown></Menu>}</Table.Td>}
               </Table.Tr>)}
               {rows.length === 0 && <Table.Tr><Table.Td colSpan={self?.role === "admin" ? 3 : 2}><Text c="dimmed" ta="center" py="md">該当する参加者はいません。</Text></Table.Td></Table.Tr>}
+              {Array.from({ length: Math.max(0, visibleRowCount - Math.max(rows.length, 1)) }, (_, index) => <Table.Tr key={`empty-${index}`} aria-hidden="true"><Table.Td colSpan={self?.role === "admin" ? 3 : 2}>&nbsp;</Table.Td></Table.Tr>)}
             </Table.Tbody>
           </Table>
           </ScrollArea>
