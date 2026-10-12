@@ -16,7 +16,8 @@ export default async function Page() {
         "use server"
         const result = await updateProfileAction(nickname)
         if (result.kind === "updated") return
-        throw new Error(result.kind === "unavailable" ? "blocked" : "retryable")
+        if (result.kind === "unavailable") throw { kind: "blocked" }
+        throw { kind: "retryable" }
       }}
     />
   )
