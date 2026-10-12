@@ -312,7 +312,7 @@ export function GroupBrowserPrototype() {
     return allGroups.filter((group) =>
       group.name.toLocaleLowerCase().includes(normalized),
     )
-  }, [appliedQuery]
+  }, [appliedQuery])
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
