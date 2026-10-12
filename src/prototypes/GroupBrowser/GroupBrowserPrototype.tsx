@@ -787,7 +787,7 @@ export function GroupBrowserPrototype() {
         detailOnlyItems={groupMediaItems}
         initialDetailId={imageDetailIndex !== null ? groupMediaItems[imageDetailIndex].id : undefined}
         onDetailClose={() => setImageDetailIndex(null)}
-        contextKind={contextKind}
+        contextKind={personalContext.kind}
       />
     </PrototypeApplicationShell>
   )
