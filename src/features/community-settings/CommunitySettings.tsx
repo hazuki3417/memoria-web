@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { CommunityMembersContent } from "./CommunityMembersContent"
+import { SettingsUsage, type SettingsUsageData } from "@/features/settings/SettingsUsage"
 import { useMediaQuery } from "@mantine/hooks"
 import { IconSettings, IconUsers, IconChartBar, IconPalette } from "@tabler/icons-react"
 import { NavigationItem } from "@/components/NavigationItem"
@@ -170,14 +171,19 @@ export function CommunitySettings({
   )
 
   const membersContent = <CommunityMembersContent />
-  const usageContent = (
-    <Stack gap="xl">
-      <PageHeader title="利用状況" description="このCommunityが管理するオリジナルファイルの利用状況です。" />
-      <Box><SectionHeader>ストレージ</SectionHeader>
-        <Text size="sm" c="dimmed">利用状況は現在表示できません。</Text>
-      </Box>
-    </Stack>
-  )
+  const communityUsage: SettingsUsageData = {
+    usedStorageLabel: "1.24 GB",
+    effectiveLimitLabel: "5 GB",
+    storageUsagePercent: 24.8,
+    mediaCount: 1248,
+    formatBreakdown: [
+      { format: "JPEG", count: 900, sizeLabel: "0.90 GB" },
+      { format: "PNG", count: 200, sizeLabel: "0.20 GB" },
+      { format: "WebP", count: 100, sizeLabel: "0.10 GB" },
+      { format: "HEIC / HEIF", count: 48, sizeLabel: "0.04 GB" },
+    ],
+  }
+  const usageContent = <SettingsUsage scope="community" usage={communityUsage} />
   const preferencesContent = (
     <Stack gap="xl">
       <PageHeader title="環境設定" description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。" />
