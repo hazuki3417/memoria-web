@@ -1,6 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation"
+import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { useEffect, useState, type ReactNode } from "react"
 import {
   ApplicationAccountMenu,
@@ -38,6 +39,10 @@ export function ApplicationShellContainer({
   const router = useRouter()
   const pathname = usePathname()
   const navigation = useApplicationNavigation()
+  const [createOpened, setCreateOpened] = useState(false)
+  const [draftName, setDraftName] = useState("")
+  const [createError, setCreateError] = useState("")
+  const [created, setCreated] = useState<{ id: string; label: string }[]>([])
   const [rememberedContextKind, setRememberedContextKind] = useState<"personal" | "community">("personal")
   const [rememberedCommunityId, setRememberedCommunityId] = useState("photo-club")
   const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
@@ -49,7 +54,8 @@ export function ApplicationShellContainer({
       ? rememberedContextKind
       : "personal"
   const communityId = communityMatch?.[1] ?? rememberedCommunityId
-  const currentContext = contextKind === "community" ? communityContext : personalContext
+  const currentCreated = created.find((item) => item.id === communityMatch?.[1])
+  const currentContext = contextKind === "community" ? { ...communityContext, label: currentCreated?.label ?? communityContext.label } : personalContext
   const activeSection = getApplicationSection(pathname)
   const navigationItems = getApplicationNavigation({
     contextKind,
@@ -66,6 +72,26 @@ export function ApplicationShellContainer({
     }
   }, [pathname])
 
+  const closeCreate = () => {
+    setCreateOpened(false)
+    setDraftName("")
+    setCreateError("")
+  }
+  const createCommunity = () => {
+    const name = draftName.trim()
+    if (!name) {
+      setCreateError("Community名を入力してください。")
+      return
+    }
+    // Preview only: no backend mutation or persistent membership.
+    const id = `preview-${Date.now()}`
+    setCreated((items) => [...items, { id, label: name }])
+    setRememberedContextKind("community")
+    setRememberedCommunityId(id)
+    closeCreate()
+    router.push(`/communities/${encodeURIComponent(id)}/dashboard`)
+  }
+
   const selectNavigation = (itemId: string) => {
     const prefix = contextKind === "community" ? `/communities/${communityId}` : ""
     router.push(itemId === "dashboard" ? prefix ? `${prefix}/dashboard` : "/dashboard" : `${prefix}/${itemId}`)
@@ -73,6 +99,21 @@ export function ApplicationShellContainer({
   }
 
   return (
+    <>
+    <Modal opened={createOpened} onClose={closeCreate} title="Communityを作成" centered>
+      <Stack gap="md">
+        <TextInput label="Community名" required autoFocus value={draftName}
+          onChange={(event) => { setDraftName(event.currentTarget.value); setCreateError("") }}
+          error={createError || undefined}
+          onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); createCommunity() } }}
+        />
+        <Text size="xs" c="dimmed">プレビュー用です。実際のCommunityは保存されません。</Text>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={closeCreate}>キャンセル</Button>
+          <Button disabled={!draftName.trim()} onClick={createCommunity}>Communityを作成</Button>
+        </Group>
+      </Stack>
+    </Modal>
     <ApplicationShell
       header={
         <ApplicationHeader
@@ -87,8 +128,13 @@ export function ApplicationShellContainer({
           context={isApplicationChromeFeatureVisible(chromeVariant, "context-switcher") ? (
             <ApplicationContextSwitcher
               currentContext={currentContext}
-              contexts={[personalContext, communityContext]}
+              contexts={[personalContext, communityContext, ...created.map((item) => ({ ...communityContext, id: item.id, label: item.label }))]}
               onSelect={(id) => {
+                if (id !== "personal" && id !== "community") {
+                  router.push(`/communities/${encodeURIComponent(id)}/dashboard`)
+                  navigation.close()
+                  return
+                }
                 router.push(getContextSwitchPath({
                   currentPathname: pathname,
                   targetContextKind: id === "personal" ? "personal" : "community",
@@ -96,6 +142,7 @@ export function ApplicationShellContainer({
                 }))
                 navigation.close()
               }}
+              onCreateCommunity={() => setCreateOpened(true)}
             />
           ) : undefined}
           account={isApplicationChromeFeatureVisible(chromeVariant, "account-menu") ? (
@@ -120,5 +167,6 @@ export function ApplicationShellContainer({
     >
       {children}
     </ApplicationShell>
+    </>
   )
 }
