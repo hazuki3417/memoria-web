@@ -13,7 +13,7 @@ const personalContext = {
 const meta = {
   title: "Design Prototypes/Group Browser",
   component: GroupBrowser,
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", nextjs: { appDirectory: true } },
   decorators: [
     (Story) => (
       <PrototypeApplicationShell
