@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Burger, Divider, Drawer, Stack, Text } from "@mantine/core"
+import { Box, Burger, Divider, Drawer, ScrollArea, Stack, Text } from "@mantine/core"
 import { useState } from "react"
 import { NavigationItem } from "@/components/NavigationItem"
 import type { ApplicationNavigationItem } from "./types"
@@ -75,7 +75,8 @@ export function ApplicationNavigation({
         body: { height: "100%" },
       }}
     >
-      <Stack gap={0} h="100%" p="xs">
+      <Stack gap={0} h="100%" p="xs" style={{ minHeight: 0 }}>
+        <ScrollArea type="hover" style={{ flex: 1, minHeight: 0 }}>
         <Box
           component="nav"
           id="application-context-navigation"
@@ -98,6 +99,7 @@ export function ApplicationNavigation({
             ))}
           </Stack>
         </Box>
+        </ScrollArea>
         <Box mt="auto">
           <Divider mb="xs" />
           <Text size="10px" c="dimmed" px="sm" pb={4}>
