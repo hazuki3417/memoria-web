@@ -43,10 +43,10 @@ const MOCK_USAGE: SettingsUsageData = {
   storageUsagePercent: 24.8,
   mediaCount: 1248,
   formatBreakdown: [
-    { format: "JPEG", count: 900, sizeLabel: "0.90 GB" },
-    { format: "PNG", count: 200, sizeLabel: "0.20 GB" },
-    { format: "WebP", count: 100, sizeLabel: "0.10 GB" },
-    { format: "HEIC / HEIF", count: 48, sizeLabel: "0.04 GB" },
+    { format: "JPEG", count: 900, sizeLabel: "0.90 GB", capacityPercent: 18 },
+    { format: "PNG", count: 200, sizeLabel: "0.20 GB", capacityPercent: 4 },
+    { format: "WebP", count: 100, sizeLabel: "0.10 GB", capacityPercent: 2 },
+    { format: "HEIC / HEIF", count: 48, sizeLabel: "0.04 GB", capacityPercent: 0.8 },
   ],
 }
 
