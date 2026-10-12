@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   getApplicationNavigation,
+  getApplicationSection,
   getContextSwitchPath,
 } from "./applicationNavigation"
 
@@ -80,5 +81,13 @@ describe("getContextSwitchPath", () => {
         communityId: "family-123",
       }),
     ).toBe("/dashboard")
+  })
+})
+
+describe("getApplicationSection", () => {
+  it("groups community subpages under settings", () => {
+    for (const section of ["members", "usage", "preferences", "settings"]) {
+      expect(getApplicationSection(`/communities/family-123/${section}`)).toBe("settings")
+    }
   })
 })
