@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { CommunityMembersContent } from "./CommunityMembersContent"
 import { useMediaQuery } from "@mantine/hooks"
 import { IconSettings, IconUsers, IconChartBar, IconPalette } from "@tabler/icons-react"
 import { NavigationItem } from "@/components/NavigationItem"
@@ -168,17 +169,7 @@ export function CommunitySettings({
     </Stack>
   )
 
-  const membersContent = (
-    <Stack gap="xl">
-      <PageHeader title="メンバー" description="Communityの参加者と役割を確認します。" />
-      <Box><SectionHeader>参加者</SectionHeader>
-        <Text size="sm" c="dimmed">参加者データの接続前です。実際のメンバー一覧と管理操作は利用できません。</Text>
-      </Box>
-      <Box><SectionHeader>Communityから退会</SectionHeader>
-        <Text size="sm" c="dimmed">退会操作はMembership APIの接続後に利用できます。</Text>
-      </Box>
-    </Stack>
-  )
+  const membersContent = <CommunityMembersContent />
   const usageContent = (
     <Stack gap="xl">
       <PageHeader title="利用状況" description="このCommunityが管理するオリジナルファイルの利用状況です。" />
