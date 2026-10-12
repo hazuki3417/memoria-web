@@ -1,5 +1,23 @@
-import { Settings } from "@/features/settings/Settings"
+import { redirect } from "next/navigation"
+import { Settings } from "@/features/settings"
+import { getCurrentMemoriaUser } from "@/infrastructure/graphql"
+import { updateProfileAction } from "./actions"
 
-export default function Page() {
-  return <Settings section="profile" />
+export default async function Page() {
+  const currentUser = await getCurrentMemoriaUser()
+  if (currentUser.kind === "unregistered") redirect("/register")
+  if (currentUser.kind === "unavailable") redirect("/auth/unavailable")
+  if (currentUser.kind === "error") redirect("/auth/error")
+  return (
+    <Settings
+      section="profile"
+      profileNickname={currentUser.user.profile.nickname}
+      saveProfile={async (nickname) => {
+        "use server"
+        const result = await updateProfileAction(nickname)
+        if (result.kind === "updated") return
+        throw new Error(result.kind === "unavailable" ? "blocked" : "retryable")
+      }}
+    />
+  )
 }
