@@ -65,7 +65,6 @@ export function ApplicationNavigation({
       opened={opened}
       onClose={onClose}
       position="left"
-      zIndex={200}
       size={248}
       withCloseButton={false}
       padding={0}
