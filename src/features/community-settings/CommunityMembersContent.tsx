@@ -65,23 +65,28 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
         {adminLimitReached && <Text size="sm" c="dimmed" mb="sm">Administratorの上限に達しています。これ以上Administratorへ変更できません。</Text>}
         <TextInput aria-label="参加者を名前で検索" placeholder="名前で検索" leftSection={<IconSearch size={16} />} value={query} onChange={(event) => setQuery(event.currentTarget.value)} mb="md" />
         <Box style={{ borderRadius: "var(--mantine-radius-md)", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)" }}>
-          <ScrollArea type="hover" w="100%" h={tableHeaderHeight + visibleRowCount * tableRowHeight}>
-            <Table striped highlightOnHover withRowBorders miw={400} stickyHeader styles={{ th: { height: tableHeaderHeight }, td: { height: tableRowHeight, borderBottom: "1px solid var(--mantine-color-default-border)" } }}>
-            <Table.Thead><Table.Tr>
-              <Table.Th><UnstyledButton onClick={() => changeSort("name")} aria-label="名前で並び替え">名前 {sortKey === "name" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
-              <Table.Th><UnstyledButton onClick={() => changeSort("role")} aria-label="役割で並び替え">役割 {sortKey === "role" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
-              {self?.role === "admin" && <Table.Th w={52}><Text size="xs">操作</Text></Table.Th>}
-            </Table.Tr></Table.Thead>
-            <Table.Tbody>
-              {rows.map((member) => <Table.Tr key={member.id}>
-                <Table.Td>{member.name} {member.isSelf && <Badge size="xs" variant="light">自分</Badge>}</Table.Td>
-                <Table.Td>{member.role === "admin" ? "Administrator" : "Member"}</Table.Td>
-                {self?.role === "admin" && <Table.Td>{!member.isSelf && <Menu position="bottom-end" withinPortal><Menu.Target><Button size="compact-xs" variant="subtle" aria-label={member.name + "の管理操作"}><IconDots size={18} /></Button></Menu.Target><Menu.Dropdown><Menu.Item disabled>役割を変更</Menu.Item><Menu.Item disabled color="red">除外</Menu.Item></Menu.Dropdown></Menu>}</Table.Td>}
-              </Table.Tr>)}
-              {rows.length === 0 && <Table.Tr><Table.Td colSpan={self?.role === "admin" ? 3 : 2}><Text c="dimmed" ta="center" py="md">該当する参加者はいません。</Text></Table.Td></Table.Tr>}
-              {Array.from({ length: Math.max(0, visibleRowCount - Math.max(rows.length, 1)) }, (_, index) => <Table.Tr key={`empty-${index}`} aria-hidden="true"><Table.Td colSpan={self?.role === "admin" ? 3 : 2}>&nbsp;</Table.Td></Table.Tr>)}
-            </Table.Tbody>
-          </Table>
+          <ScrollArea type="hover" w="100%" offsetScrollbars>
+            <Box miw={400}>
+              <Table striped withRowBorders style={{ tableLayout: "fixed" }}>
+                <Table.Thead><Table.Tr style={{ height: tableHeaderHeight }}>
+                  <Table.Th w="45%"><UnstyledButton onClick={() => changeSort("name")} aria-label="名前で並び替え">名前 {sortKey === "name" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
+                  <Table.Th><UnstyledButton onClick={() => changeSort("role")} aria-label="役割で並び替え">役割 {sortKey === "role" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
+                  {self?.role === "admin" && <Table.Th w={52}><Text size="xs">操作</Text></Table.Th>}
+                </Table.Tr></Table.Thead>
+              </Table>
+              <ScrollArea type="hover" h={visibleRowCount * tableRowHeight} offsetScrollbars>
+                <Table striped highlightOnHover withRowBorders style={{ tableLayout: "fixed" }} styles={{ td: { height: tableRowHeight, borderBottom: "1px solid var(--mantine-color-default-border)" } }}>
+                  <Table.Tbody>
+                    {rows.map((member) => <Table.Tr key={member.id}>
+                      <Table.Td w="45%">{member.name} {member.isSelf && <Badge size="xs" variant="light">自分</Badge>}</Table.Td>
+                      <Table.Td>{member.role === "admin" ? "Administrator" : "Member"}</Table.Td>
+                      {self?.role === "admin" && <Table.Td w={52}>{!member.isSelf && <Menu position="bottom-end" withinPortal><Menu.Target><Button size="compact-xs" variant="subtle" aria-label={member.name + "の管理操作"}><IconDots size={18} /></Button></Menu.Target><Menu.Dropdown><Menu.Item disabled>役割を変更</Menu.Item><Menu.Item disabled color="red">除外</Menu.Item></Menu.Dropdown></Menu>}</Table.Td>}
+                    </Table.Tr>)}
+                    {rows.length === 0 && <Table.Tr><Table.Td colSpan={self?.role === "admin" ? 3 : 2}><Text c="dimmed" ta="center" py="md">該当する参加者はいません。</Text></Table.Td></Table.Tr>}
+                  </Table.Tbody>
+                </Table>
+              </ScrollArea>
+            </Box>
           </ScrollArea>
         </Box>
       </Box>
