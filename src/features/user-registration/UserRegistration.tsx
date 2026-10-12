@@ -174,7 +174,7 @@ export function UserRegistration({
               color="red"
               onClick={() => {
                 closeExit()
-                setExited(true)
+                window.location.assign("/auth/logout")
               }}
             >
               終了
