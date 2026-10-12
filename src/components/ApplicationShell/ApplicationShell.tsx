@@ -22,6 +22,7 @@ export function ApplicationShell({
         root: { height: "100dvh", overflow: "hidden" },
         main: {
           position: "fixed",
+          zIndex: 0,
           top: 40,
           right: 0,
           bottom: 0,
