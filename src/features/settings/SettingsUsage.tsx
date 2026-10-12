@@ -28,17 +28,17 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
       <Box>
         <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
-          <Group justify="space-between" align="center">
+          <Group justify="space-between" align="center" wrap="wrap">
             <Text size="sm">使用済み</Text>
-            <Text ta="right">{usage.usedStorageLabel} ({usage.storageUsagePercent} %)</Text>
+            <Text size="sm" ta="right">
+              {usage.usedStorageLabel}{` ( ${usage.storageUsagePercent} % )`}
+            </Text>
           </Group>
-          <Group justify="space-between" align="center">
+          <Group justify="space-between" align="center" wrap="wrap">
             <Text size="sm">空き容量</Text>
-            <Text ta="right">{usage.availableStorageLabel} ({Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} %)</Text>
-          </Group>
-          <Group justify="space-between" align="center">
-            <Text size="sm">総容量</Text>
-            <Text ta="right">{usage.effectiveLimitLabel} (100 %)</Text>
+            <Text size="sm" ta="right">
+              {usage.availableStorageLabel}{` ( ${Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} % )`}
+            </Text>
           </Group>
           <Progress.Root size="md" aria-label={`ストレージ使用率 ${usage.storageUsagePercent}%、ファイル形式別内訳`}>
             {usage.formatBreakdown?.map((item) => (
@@ -50,6 +50,12 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
               />
             )) ?? <Progress.Section value={usage.storageUsagePercent} color="blue" />}
           </Progress.Root>
+          <Group justify="space-between" align="center" wrap="wrap">
+            <Text size="sm">総容量</Text>
+            <Text size="sm" ta="right">
+              {usage.effectiveLimitLabel} ( 100 % )
+            </Text>
+          </Group>
         </Stack>
       </Box>
       {usage.formatBreakdown && (
