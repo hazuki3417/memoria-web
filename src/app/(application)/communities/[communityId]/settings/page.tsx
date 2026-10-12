@@ -1,7 +1,7 @@
-import { CommunitySettings } from "@/features/community-settings/CommunitySettings"
+import { CommunitySettingsRoute } from "@/features/community-settings/CommunitySettingsRoute"
 
 export default async function Page({ params }: { params: Promise<{ communityId: string }> }) {
   const { communityId } = await params
   // Presentation-only until the Community API and current Membership are connected.
-  return <CommunitySettings communityId={communityId} />
+  return <CommunitySettingsRoute communityId={communityId} />
 }
