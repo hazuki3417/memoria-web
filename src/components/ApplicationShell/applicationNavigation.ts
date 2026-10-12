@@ -3,13 +3,14 @@ import {
   IconPhoto,
   IconUserCircle,
   IconUsers,
+  IconSettings,
 } from "@tabler/icons-react"
 import type {
   ApplicationContextOption,
   ApplicationNavigationItem,
 } from "./types"
 
-export type ApplicationSection = "dashboard" | "media" | "groups" | "members"
+export type ApplicationSection = "dashboard" | "media" | "groups" | "members" | "settings"
 
 const baseApplicationNavigation = [
   { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
@@ -20,6 +21,7 @@ const baseApplicationNavigation = [
 const communityApplicationNavigation = [
   ...baseApplicationNavigation,
   { id: "members", label: "メンバー", icon: IconUserCircle },
+  { id: "settings", label: "設定", icon: IconSettings },
 ] satisfies ApplicationNavigationItem[]
 
 export function getApplicationNavigation({
@@ -45,7 +47,8 @@ export function getApplicationSection(pathname: string): ApplicationSection {
   return section === "dashboard" ||
     section === "media" ||
     section === "groups" ||
-    section === "members"
+    section === "members" ||
+    section === "settings"
     ? section
     : "dashboard"
 }
