@@ -4,7 +4,7 @@ import { useState } from "react"
 import { CommunityMembersContent } from "./CommunityMembersContent"
 import { SettingsUsage, type SettingsUsageData } from "@/features/settings/SettingsUsage"
 import { useMediaQuery } from "@mantine/hooks"
-import { IconSettings, IconUsers, IconChartBar, IconPalette } from "@tabler/icons-react"
+import { IconSettings, IconUsers, IconChartBar, IconAdjustments } from "@tabler/icons-react"
 import { NavigationItem } from "@/components/NavigationItem"
 import { ActionIcon, Badge, Box, Button, Group, Modal, Stack, Text, TextInput, Select } from "@mantine/core"
 import { IconCopy } from "@tabler/icons-react"
@@ -79,10 +79,10 @@ export function CommunitySettings({
   }
 
   const sections = [
-    { id: "general", label: "一般", icon: IconSettings, href: `/communities/${encodeURIComponent(communityId)}/settings` },
+    { id: "general", label: "一般", icon: IconAdjustments, href: `/communities/${encodeURIComponent(communityId)}/settings` },
     { id: "members", label: "メンバー", icon: IconUsers, href: `/communities/${encodeURIComponent(communityId)}/members` },
+    { id: "preferences", label: "環境設定", icon: IconSettings, href: `/communities/${encodeURIComponent(communityId)}/preferences` },
     { id: "usage", label: "利用状況", icon: IconChartBar, href: `/communities/${encodeURIComponent(communityId)}/usage` },
-    { id: "preferences", label: "環境設定", icon: IconPalette, href: `/communities/${encodeURIComponent(communityId)}/preferences` },
   ]
 
   const generalContent = (
