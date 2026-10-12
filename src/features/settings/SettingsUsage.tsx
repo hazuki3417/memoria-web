@@ -8,7 +8,14 @@ export type SettingsUsageData = {
   availableStorageLabel: string
   storageUsagePercent: number
   mediaCount: number
-  formatBreakdown?: { format: string; count: number; sizeLabel: string }[]
+  formatBreakdown?: { format: string; count: number; sizeLabel: string; capacityPercent: number }[]
+}
+
+const formatColors: Record<string, string> = {
+  JPEG: "blue",
+  PNG: "teal",
+  WebP: "violet",
+  "HEIC / HEIF": "orange",
 }
 
 export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUsageData; scope?: "personal" | "community" }) {
@@ -23,23 +30,28 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
         <Stack gap="sm">
           <Group justify="space-between" align="center">
             <Text size="sm">使用済み</Text>
-            <Text fw={600} ta="right">{usage.usedStorageLabel}</Text>
+            <Text fw={600} ta="right">{usage.usedStorageLabel} ({usage.storageUsagePercent} %)</Text>
           </Group>
           <Group justify="space-between" align="center">
             <Text size="sm">空き容量</Text>
-            <Text fw={600} ta="right">{usage.availableStorageLabel}</Text>
+            <Text fw={600} ta="right">{usage.availableStorageLabel} ({Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\\.0$/, "")} %)</Text>
           </Group>
           <Box style={{ borderTop: "1px solid var(--mantine-color-default-border)" }} pt="sm">
             <Group justify="space-between" align="center">
               <Text size="sm" fw={700}>総容量</Text>
-              <Text fw={700} ta="right">{usage.effectiveLimitLabel}</Text>
+              <Text fw={700} ta="right">{usage.effectiveLimitLabel} (100 %)</Text>
             </Group>
           </Box>
-          <Progress
-            value={usage.storageUsagePercent}
-            size="md"
-            aria-label={`ストレージ使用率 ${usage.storageUsagePercent}%`}
-          />
+          <Progress.Root size="md" aria-label={`ストレージ使用率 ${usage.storageUsagePercent}%、ファイル形式別内訳`}>
+            {usage.formatBreakdown?.map((item) => (
+              <Progress.Section
+                key={item.format}
+                value={item.capacityPercent}
+                color={formatColors[item.format] ?? "gray"}
+                aria-label={`${item.format} ${item.capacityPercent}%`}
+              />
+            )) ?? <Progress.Section value={usage.storageUsagePercent} color="blue" />}
+          </Progress.Root>
         </Stack>
       </Box>
       {usage.formatBreakdown && (
@@ -56,7 +68,12 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
             <Table.Tbody>
               {usage.formatBreakdown.map((item) => (
                 <Table.Tr key={item.format}>
-                  <Table.Td>{item.format}</Table.Td>
+                  <Table.Td>
+                    <Group gap="xs" wrap="nowrap">
+                      <Box w={12} h={12} bg={`var(--mantine-color-${formatColors[item.format] ?? "gray"}-6)`} style={{ flexShrink: 0 }} aria-hidden="true" />
+                      <Text size="sm">{item.format}</Text>
+                    </Group>
+                  </Table.Td>
                   <Table.Td ta="right">{item.count.toLocaleString("ja-JP")} 件</Table.Td>
                   <Table.Td ta="right">{item.sizeLabel}</Table.Td>
                 </Table.Tr>
