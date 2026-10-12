@@ -19,7 +19,12 @@ const config: StorybookConfig = {
       ...config.resolve,
       alias: [
         { find: /^@\//, replacement: `${fileURLToPath(new URL("../src/", import.meta.url))}` },
-        ...(Array.isArray(config.resolve?.alias) ? config.resolve.alias : []),
+        ...(Array.isArray(config.resolve?.alias)
+          ? config.resolve.alias
+          : Object.entries(config.resolve?.alias ?? {}).map(([find, replacement]) => ({
+              find,
+              replacement,
+            }))),
       ],
     },
   }),
