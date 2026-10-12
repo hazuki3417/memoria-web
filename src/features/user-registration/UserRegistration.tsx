@@ -77,7 +77,7 @@ export function UserRegistration({
     setStatus("registering")
     try {
       const result = await registerUserAction(nickname)
-      if (result.kind === "registered" || result.kind === "conflict") {
+      if (result.kind === "registered") {
         setStatus("registered")
         router.replace("/dashboard")
         router.refresh()
