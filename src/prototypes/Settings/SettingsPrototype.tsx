@@ -133,6 +133,7 @@ function ProfileContent({
           />
           <Button
             size="sm"
+            style={{ alignSelf: "flex-start" }}
             disabled={!dirty || invalid || blocked || saving}
             loading={saving}
             onClick={save}
@@ -140,8 +141,8 @@ function ProfileContent({
             {saveState === "retryable-error"
               ? "再試行"
               : saving
-                ? "保存中"
-                : "保存"}
+                ? "更新中"
+                : "更新"}
           </Button>
         </Stack>
       </Box>
