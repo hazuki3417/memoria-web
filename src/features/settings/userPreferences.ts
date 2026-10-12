@@ -5,7 +5,7 @@
  */
 export type UserPreferences = {
   personalAccentColor: string
-  dateFormat: "YYYY/MM/DD" | "MM/DD/YYYY" | "DD/MM/YYYY"
+  dateFormat: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
   fileSizeUnit: "DECIMAL" | "BINARY"
   mediaThumbnailSize: "SMALL" | "MEDIUM" | "LARGE"
   mediaDetailNavigationWrap: boolean
@@ -17,7 +17,7 @@ export type UserPreferencesPatch = Partial<UserPreferences>
 
 export const defaultUserPreferences: Readonly<UserPreferences> = {
   personalAccentColor: "#10B981",
-  dateFormat: "YYYY/MM/DD",
+  dateFormat: "YYYY_MM_DD",
   fileSizeUnit: "DECIMAL",
   mediaThumbnailSize: "MEDIUM",
   mediaDetailNavigationWrap: false,
