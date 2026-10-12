@@ -34,7 +34,7 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
           </Group>
           <Group justify="space-between" align="center">
             <Text size="sm">空き容量</Text>
-            <Text fw={600} ta="right">{usage.availableStorageLabel} ({Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\\.0$/, "")} %)</Text>
+            <Text fw={600} ta="right">{usage.availableStorageLabel} ({Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} %)</Text>
           </Group>
           <Box style={{ borderTop: "1px solid var(--mantine-color-default-border)" }} pt="sm">
             <Group justify="space-between" align="center">
