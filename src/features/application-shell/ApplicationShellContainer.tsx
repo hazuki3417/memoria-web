@@ -10,6 +10,7 @@ import {
   ApplicationNavigation,
   ApplicationNavigationTrigger,
   ApplicationShell,
+  ApplicationContentScroll,
   isApplicationChromeFeatureVisible,
   getApplicationNavigation,
   getApplicationSection,
@@ -234,7 +235,7 @@ export function ApplicationShellContainer({
           ) : undefined
         }
       >
-        {children}
+        <ApplicationContentScroll>{children}</ApplicationContentScroll>
       </ApplicationShell>
     </>
   )
