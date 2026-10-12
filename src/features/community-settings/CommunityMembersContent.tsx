@@ -16,9 +16,8 @@ const previewMembers: CommunityMember[] = [
   { id: "m3", name: "鈴木 太郎", role: "member" },
 ]
 type SortKey = "name" | "role"
-export function CommunityMembersContent({ members = previewMembers, preview = true, onLeave }: {
+export function CommunityMembersContent({ members = previewMembers, onLeave }: {
   members?: CommunityMember[]
-  preview?: boolean
   onLeave?: () => Promise<void>
 }) {
   const [query, setQuery] = useState("")
@@ -61,7 +60,6 @@ export function CommunityMembersContent({ members = previewMembers, preview = tr
         <Group gap="xs" mb="sm"><Badge variant="light">参加者 {members.length} / {COMMUNITY_MEMBER_LIMIT}</Badge><Badge variant="light">Administrator {adminCount} / {COMMUNITY_ADMIN_LIMIT}</Badge></Group>
         {memberLimitReached && <Text size="sm" c="orange" mb="sm">参加者の上限に達しています。新しい参加者を追加できません。</Text>}
         {adminLimitReached && <Text size="sm" c="dimmed" mb="sm">Administratorの上限に達しています。これ以上Administratorへ変更できません。</Text>}
-        {preview && <Text size="xs" c="dimmed" mb="sm">表示している参加者はPrototype用のサンプルです。管理操作はAPI未接続です。</Text>}
         <TextInput aria-label="参加者を名前で検索" placeholder="名前で検索" leftSection={<IconSearch size={16} />} value={query} onChange={(event) => setQuery(event.currentTarget.value)} mb="md" />
         <ScrollArea type="hover" w="100%">
           <Table striped highlightOnHover withTableBorder miw={400}>
@@ -74,7 +72,7 @@ export function CommunityMembersContent({ members = previewMembers, preview = tr
               {rows.map((member) => <Table.Tr key={member.id}>
                 <Table.Td>{member.name} {member.isSelf && <Badge size="xs" variant="light">自分</Badge>}</Table.Td>
                 <Table.Td>{member.role === "admin" ? "Administrator" : "Member"}</Table.Td>
-                {self?.role === "admin" && <Table.Td>{!member.isSelf && <Menu position="bottom-end" withinPortal><Menu.Target><Button size="compact-xs" variant="subtle" aria-label={member.name + "の管理操作"}><IconDots size={18} /></Button></Menu.Target><Menu.Dropdown><Menu.Item disabled>役割を変更（API未接続）</Menu.Item><Menu.Item disabled color="red">除外（API未接続）</Menu.Item></Menu.Dropdown></Menu>}</Table.Td>}
+                {self?.role === "admin" && <Table.Td>{!member.isSelf && <Menu position="bottom-end" withinPortal><Menu.Target><Button size="compact-xs" variant="subtle" aria-label={member.name + "の管理操作"}><IconDots size={18} /></Button></Menu.Target><Menu.Dropdown><Menu.Item disabled>役割を変更</Menu.Item><Menu.Item disabled color="red">除外</Menu.Item></Menu.Dropdown></Menu>}</Table.Td>}
               </Table.Tr>)}
               {rows.length === 0 && <Table.Tr><Table.Td colSpan={self?.role === "admin" ? 3 : 2}><Text c="dimmed" ta="center" py="md">該当する参加者はいません。</Text></Table.Td></Table.Tr>}
             </Table.Tbody>
@@ -103,7 +101,6 @@ export function CommunityMembersContent({ members = previewMembers, preview = tr
           </Stack> : <Stack gap="sm">
             <Text size="sm">操作を確定するには「退会する」と入力してください。退会後に元の参加状態へ自動的には戻りません。</Text>
             <TextInput label="確認用テキスト" placeholder="退会する" value={confirmation} onChange={(event) => setConfirmation(event.currentTarget.value)} />
-            {!onLeave && <Text size="xs" c="dimmed">退会APIが未接続のため、確定操作は無効です。</Text>}
           </Stack>}
           {error && <Text size="sm" c="red" role="alert">{error}</Text>}
           <Group justify="space-between">
