@@ -2,7 +2,8 @@
 
 ## Mount points
 
-- The Next.js root layout mounts one Mantine `<Notifications position="top-right" />` inside `ThemeProvider`. The top-right position is the system-wide notification placement. This supports notifications from authenticated and unauthenticated routes.
+- The Next.js root layout mounts one Mantine `<Notifications position="top-right" />` inside `ThemeProvider`. The top-right position is the system-wide notification placement. This supports notifications from authenticated and unauthenticated routes. The root notification container reads `--memoria-notification-top`, falling back to the standard Mantine top inset outside the application.
+- `ApplicationShell` measures the top edge of `AppShell.Main` (not a duplicated header height) and sets `--memoria-notification-top` to that edge plus 12px. It updates on viewport/main resize and clears the override on unmount. Notifications remain viewport-fixed and outside the scrolling `ScrollArea`.
 - The shared `ApplicationShell` renders `#application-modal-root` outside the scrollable page content. Image Detail's full-screen Mantine Modal uses `portalProps={{ target: "#application-modal-root" }}`, keeping its visual overlay outside page scrolling.
 - Browser features call `showNotification` but must not mount another `<Notifications />` in their page content.
 
