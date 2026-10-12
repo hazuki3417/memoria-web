@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Badge, Box, Button, Group, Menu, Modal, ScrollArea, Stack, Stepper, Table, Text, TextInput, UnstyledButton } from "@mantine/core"
+import { Badge, Box, Button, Group, Menu, Modal, ScrollArea, Stack, Table, Text, TextInput, UnstyledButton } from "@mantine/core"
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -24,8 +24,6 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
   const [sortKey, setSortKey] = useState<SortKey>("name")
   const [descending, setDescending] = useState(false)
   const [opened, setOpened] = useState(false)
-  const [step, setStep] = useState(0)
-  const [confirmation, setConfirmation] = useState("")
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
   const [done, setDone] = useState(false)
@@ -47,9 +45,9 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
     if (key === sortKey) setDescending((value) => !value)
     else { setSortKey(key); setDescending(false) }
   }
-  const close = () => { if (!busy) { setOpened(false); setStep(0); setConfirmation(""); setError("") } }
+  const close = () => { if (!busy) { setOpened(false); setError("") } }
   const leave = async () => {
-    if (!onLeave || confirmation !== "退会する" || blocked || busy) return
+    if (!onLeave || blocked || busy) return
     setBusy(true); setError("")
     try { await onLeave(); setDone(true); setOpened(false) }
     catch { setError("退会処理に失敗しました。現在の参加状況を確認して再試行してください。") }
@@ -99,24 +97,18 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
           <Group><Button color="red" variant="light" disabled={blocked || done} onClick={() => setOpened(true)}>Communityから退会する</Button></Group>
         </Stack>
       </Box>
-      <Modal opened={opened} onClose={close} title="Communityから退会" centered size="lg" closeOnClickOutside={!busy}>
+      <Modal opened={opened} onClose={close} title="Communityから退会" centered size="xl" closeOnClickOutside={!busy} closeOnEscape={!busy} withCloseButton={!busy}>
         <Stack gap="lg">
-          <Stepper active={step} size="sm" allowNextStepsSelect={false}>
-            <Stepper.Step label="影響を確認" description="アクセスと共有" />
-            <Stepper.Step label="最終確認" description="退会を確定" />
-          </Stepper>
-          {step === 0 ? <Stack gap="sm">
-            <Text fw={600}>退会すると変更されること</Text>
-            <Text size="sm">このCommunityにアクセスできなくなります。自分が管理するMediaのこのCommunityへの共有と分類は解除されます。</Text>
+          <Stack gap="sm">
+            <Text fw={600}>このCommunityから退会しますか？</Text>
+            <Text size="sm">退会すると、このCommunityにアクセスできなくなります。自分が管理するMediaのこのCommunityへの共有と分類は解除されます。</Text>
             <Text size="sm">自分のアカウント、Personal Media、Communityが管理するMediaは削除されません。</Text>
-          </Stack> : <Stack gap="sm">
-            <Text size="sm">操作を確定するには「退会する」と入力してください。退会後に元の参加状態へ自動的には戻りません。</Text>
-            <TextInput label="確認用テキスト" placeholder="退会する" value={confirmation} onChange={(event) => setConfirmation(event.currentTarget.value)} />
-          </Stack>}
+            <Text size="sm" c="dimmed">退会後に元の参加状態へ自動的には戻りません。</Text>
+          </Stack>
           {error && <Text size="sm" c="red" role="alert">{error}</Text>}
-          <Group justify="space-between">
-            <Button variant="default" disabled={busy} onClick={step === 0 ? close : () => setStep(0)}>{step === 0 ? "キャンセル" : "戻る"}</Button>
-            {step === 0 ? <Button onClick={() => setStep(1)}>次へ</Button> : <Button color="red" loading={busy} disabled={!onLeave || confirmation !== "退会する" || blocked} onClick={() => void leave()}>退会を確定する</Button>}
+          <Group justify="flex-end">
+            <Button variant="default" disabled={busy} onClick={close}>キャンセル</Button>
+            <Button color="red" loading={busy} disabled={!onLeave || blocked} onClick={() => void leave()}>退会する</Button>
           </Group>
         </Stack>
       </Modal>
