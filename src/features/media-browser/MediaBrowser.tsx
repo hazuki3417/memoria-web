@@ -277,7 +277,7 @@ function ZoomInput({
   )
 }
 
-export function MediaBrowser({
+function MediaBrowserContent({
   initialState = "default",
   contextKind = "personal",
   initialDialog = null,
@@ -286,6 +286,7 @@ export function MediaBrowser({
   detailOnlyItems,
   initialDetailId,
   onDetailClose,
+  navigate,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
@@ -295,8 +296,8 @@ export function MediaBrowser({
   detailOnlyItems?: MediaItem[]
   initialDetailId?: string
   onDetailClose?: () => void
+  navigate: (path: string) => void
 }) {
-  const router = useRouter()
   const [context, setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [selecting, setSelecting] = useState(initialState === "selection")
@@ -483,7 +484,7 @@ export function MediaBrowser({
                   variant="default"
                   leftSection={<IconEdit size={15} />}
                   disabled={selected.size === 0}
-                  onClick={() => router.push(context === "community" ? `/communities/${communityId}/media/edit` : "/media/edit")}
+                  onClick={() => navigate(context === "community" ? `/communities/${communityId}/media/edit` : "/media/edit")}
                 >
                   編集
                 </Button>
@@ -521,7 +522,7 @@ export function MediaBrowser({
             )}
             {!selecting &&
               (context === "personal" ? (
-                <Button size="xs" leftSection={<IconCloudUpload size={16} />} onClick={() => router.push("/media/upload")}>
+                <Button size="xs" leftSection={<IconCloudUpload size={16} />} onClick={() => navigate("/media/upload")}>
                   アップロード
                 </Button>
               ) : (
@@ -536,7 +537,7 @@ export function MediaBrowser({
                     </Button>
                   </Menu.Target>
                   <Menu.Dropdown>
-                    <Menu.Item leftSection={<IconCloudUpload size={16} />} onClick={() => router.push(`/communities/${communityId}/media/upload`)}>
+                    <Menu.Item leftSection={<IconCloudUpload size={16} />} onClick={() => navigate(`/communities/${communityId}/media/upload`)}>
                       Communityへアップロード
                     </Menu.Item>
                     <Menu.Item leftSection={<IconShare size={16} />}>
@@ -1354,4 +1355,22 @@ export function MediaBrowser({
       </Modal>
     </>
   )
+}
+
+
+/** Route integration stays outside the reusable image-detail rendering path. */
+function RoutedMediaBrowser(props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">) {
+  const router = useRouter()
+  return <MediaBrowserContent {...props} navigate={(path) => router.push(path)} />
+}
+
+/**
+ * The detail-only consumer must not require the Next.js App Router.
+ * Media Browser's list actions retain their original Next.js navigation.
+ */
+export function MediaBrowser(props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">) {
+  if (props.detailOnlyItems) {
+    return <MediaBrowserContent {...props} navigate={() => undefined} />
+  }
+  return <RoutedMediaBrowser {...props} />
 }
