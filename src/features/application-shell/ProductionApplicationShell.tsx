@@ -11,6 +11,7 @@ import {
   type ApplicationNavigationItem,
   ApplicationNavigationTrigger,
   ApplicationShell,
+  ApplicationContentScroll,
   getContextSwitchPath,
   useApplicationNavigation,
 } from "@/components/ApplicationShell"
@@ -113,7 +114,7 @@ export function ProductionApplicationShell({
         />
       }
     >
-      {children}
+      <ApplicationContentScroll>{children}</ApplicationContentScroll>
     </ApplicationShell>
   )
 }
