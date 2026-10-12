@@ -19,3 +19,13 @@ body {
 :root:has([data-memoria-application-main]) {
   --memoria-notification-top: calc(var(--memoria-app-header-height) + 12px);
 }
+
+/* The fixed notification region must not intercept clicks on menus or drawers.
+   Re-enable pointer events only on actual notification cards. */
+.mantine-Notifications-root {
+  pointer-events: none;
+}
+
+.mantine-Notifications-notification {
+  pointer-events: auto;
+}
