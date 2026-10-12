@@ -103,7 +103,7 @@ export function CommunitySettings({
             }
             rightSectionPointerEvents="all"
           />
-          <TextInput label="有効期限" value={active ? expiresAt : "—"} readOnly />
+          <Text size="sm" c="dimmed">有効期限: {active ? expiresAt : "—"}</Text>
           {isAdmin ? (
             <Group gap="sm">
               {!active ? (
