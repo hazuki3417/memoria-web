@@ -1,7 +1,6 @@
 import {
   IconLayoutDashboard,
   IconPhoto,
-  IconUserCircle,
   IconUsers,
   IconSettings,
 } from "@tabler/icons-react"
@@ -20,7 +19,6 @@ const baseApplicationNavigation = [
 
 const communityApplicationNavigation = [
   ...baseApplicationNavigation,
-  { id: "members", label: "メンバー", icon: IconUserCircle },
   { id: "settings", label: "設定", icon: IconSettings },
 ] satisfies ApplicationNavigationItem[]
 
