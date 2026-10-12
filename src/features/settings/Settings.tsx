@@ -1,8 +1,5 @@
 "use client"
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-
 import {
   Box,
   Button,
@@ -22,6 +19,8 @@ import {
   IconUser,
   IconUserCircle,
 } from "@tabler/icons-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { NavigationItem } from "@/components/NavigationItem"
@@ -80,11 +79,13 @@ function isBlockingProfileSaveError(error: unknown): error is ProfileSaveError {
 
 function ProfileContent({
   onSave = saveMockProfile,
+  initialNickname = MOCK_PROFILE.nickname,
 }: {
   onSave?: SaveProfile
+  initialNickname?: string
 }) {
-  const [name, setName] = useState(MOCK_PROFILE.nickname)
-  const [saved, setSaved] = useState(MOCK_PROFILE.nickname)
+  const [name, setName] = useState(initialNickname)
+  const [saved, setSaved] = useState(initialNickname)
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "retryable-error" | "blocked"
   >("idle")
@@ -153,6 +154,7 @@ function ProfileContent({
           />
           <Button
             size="sm"
+            style={{ alignSelf: "flex-start" }}
             disabled={!dirty || invalid || isSaving || isBlocked}
             loading={isSaving}
             onClick={save}
@@ -160,8 +162,8 @@ function ProfileContent({
             {saveState === "retryable-error"
               ? "再試行"
               : isSaving
-                ? "保存中"
-                : "保存"}
+                ? "更新中"
+                : "更新"}
           </Button>
         </Stack>
       </Box>
@@ -346,15 +348,17 @@ function AccountContent() {
 export function Settings({
   section,
   saveProfile,
+  profileNickname,
 }: {
   section: Section
   saveProfile?: SaveProfile
+  profileNickname?: string
 }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
   const content =
     section === "profile" ? (
-      <ProfileContent onSave={saveProfile} />
+      <ProfileContent onSave={saveProfile} initialNickname={profileNickname} />
     ) : section === "preferences" ? (
       <PreferencesContent compact={compact} />
     ) : section === "usage" ? (

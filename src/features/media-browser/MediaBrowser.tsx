@@ -1,7 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-
 import {
   ActionIcon,
   Alert,
@@ -10,8 +8,8 @@ import {
   Button,
   Center,
   Checkbox,
-  Combobox,
   Collapse,
+  Combobox,
   Divider,
   Group,
   Image,
@@ -58,9 +56,9 @@ import {
   IconZoomReset,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Dialog } from "@/components/Dialog"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
 import { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
 
@@ -112,7 +110,7 @@ const media: MediaItem[] = [
   })),
 ]
 media.push({ id: "failed", label: "画像処理失敗", src: "", failed: true })
-const contexts = [
+const _contexts = [
   {
     id: "personal",
     kind: "personal" as const,
@@ -319,7 +317,7 @@ function MediaBrowserContent({
   onDetailClose?: () => void
   navigate: (path: string) => void
 }) {
-  const [context, setContext] = useState(contextKind)
+  const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [selecting, setSelecting] = useState(initialState === "selection")
   const [selected, setSelected] = useState<Set<string>>(
@@ -490,7 +488,6 @@ function MediaBrowserContent({
 
   return (
     <>
-      <Notifications position="top-right" />
       {!detailOnlyItems && (
         <Stack gap={0} w="100%">
           <Box

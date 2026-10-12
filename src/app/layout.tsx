@@ -1,7 +1,8 @@
 import "@mantine/core/styles.css"
 import "@mantine/notifications/styles.css"
-import type { Metadata } from "next"
 import { ColorSchemeScript } from "@mantine/core"
+import { Notifications } from "@mantine/notifications"
+import type { Metadata } from "next"
 import { theme } from "@/lib/theme"
 import { ThemeProvider } from "@/providers/ThemeProvider"
 import "./globals.css"
@@ -22,7 +23,19 @@ export default function RootLayout({
         <ColorSchemeScript defaultColorScheme="auto" />
       </head>
       <body>
-        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+        <ThemeProvider theme={theme}>
+          <Notifications
+            position="top-right"
+            styles={{
+              root: {
+                top: "var(--memoria-notification-top, var(--mantine-spacing-md))",
+                pointerEvents: "none",
+              },
+              notification: { pointerEvents: "auto" },
+            }}
+          />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

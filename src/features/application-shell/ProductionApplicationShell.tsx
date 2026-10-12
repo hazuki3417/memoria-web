@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
+  ApplicationContentScroll,
   type ApplicationContextOption,
   ApplicationContextSwitcher,
   ApplicationHeader,
@@ -113,7 +114,7 @@ export function ProductionApplicationShell({
         />
       }
     >
-      {children}
+      <ApplicationContentScroll>{children}</ApplicationContentScroll>
     </ApplicationShell>
   )
 }

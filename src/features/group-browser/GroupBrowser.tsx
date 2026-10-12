@@ -1,9 +1,6 @@
 "use client"
 
-import { ImageDetailDialog } from "@/features/media-browser/ImageDetailDialog"
-
 import {
-  ActionIcon,
   Badge,
   Box,
   Button,
@@ -32,9 +29,9 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { SplitView } from "@/components/SplitView"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
+import { SplitView } from "@/components/SplitView"
+import { ImageDetailDialog } from "@/features/media-browser/ImageDetailDialog"
 
 type GroupFixture = {
   id: string
@@ -335,7 +332,6 @@ function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
 
 export function GroupBrowser({
   contextKind = "personal",
-  communityId = "photo-club",
 }: {
   contextKind?: "personal" | "community"
   communityId?: string
@@ -345,7 +341,10 @@ export function GroupBrowser({
   const [createName, setCreateName] = useState("")
   const [createParents, setCreateParents] = useState<string[]>([])
   const [createChildren, setCreateChildren] = useState<string[]>([])
-  const allGroups = [...groups, ...createdGroups]
+  const allGroups = useMemo(
+    () => [...groups, ...createdGroups],
+    [createdGroups],
+  )
   const openCreate = () => {
     setCreateName("")
     setCreateParents([])
@@ -400,7 +399,7 @@ export function GroupBrowser({
     return allGroups.filter((group) =>
       group.name.toLocaleLowerCase().includes(normalized),
     )
-  }, [appliedQuery, createdGroups])
+  }, [appliedQuery, allGroups])
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
@@ -626,7 +625,6 @@ export function GroupBrowser({
 
   return (
     <>
-      <Notifications position="top-right" />
       {createDialog}
       {editDialog}
       {deleteDialog}

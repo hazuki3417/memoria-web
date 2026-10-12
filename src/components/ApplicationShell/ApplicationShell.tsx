@@ -1,6 +1,6 @@
 "use client"
 
-import { AppShell, Box, ScrollArea } from "@mantine/core"
+import { AppShell, Box } from "@mantine/core"
 import type { ReactNode } from "react"
 
 export type ApplicationShellProps = {
@@ -37,16 +37,7 @@ export function ApplicationShell({
     >
       {header}
       {navigation}
-      <AppShell.Main>
-        <ScrollArea
-          type="hover"
-          h="100%"
-          w="100%"
-          style={{ overscrollBehavior: "contain" }}
-        >
-          <Box pt="lg">{children}</Box>
-        </ScrollArea>
-      </AppShell.Main>
+      <AppShell.Main data-memoria-application-main>{children}</AppShell.Main>
       <Box
         id="application-modal-root"
         style={{ position: "relative", zIndex: 400 }}

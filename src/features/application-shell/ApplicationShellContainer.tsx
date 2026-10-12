@@ -1,19 +1,20 @@
 "use client"
 
-import { usePathname, useRouter } from "next/navigation"
 import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
-import { useEffect, useState, type ReactNode } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { type ReactNode, useEffect, useState } from "react"
 import {
   ApplicationAccountMenu,
+  ApplicationContentScroll,
   ApplicationContextSwitcher,
   ApplicationHeader,
   ApplicationNavigation,
   ApplicationNavigationTrigger,
   ApplicationShell,
-  isApplicationChromeFeatureVisible,
   getApplicationNavigation,
   getApplicationSection,
   getContextSwitchPath,
+  isApplicationChromeFeatureVisible,
   useApplicationNavigation,
 } from "@/components/ApplicationShell"
 
@@ -216,7 +217,9 @@ export function ApplicationShellContainer({
                   user={{ displayName: "ユーザー" }}
                   currentContext={currentContext}
                   onOpenSettings={() => router.push("/settings/profile")}
-                  onLogout={() => undefined}
+                  onLogout={() => {
+                    window.location.assign("/auth/logout")
+                  }}
                 />
               ) : undefined
             }
@@ -234,7 +237,7 @@ export function ApplicationShellContainer({
           ) : undefined
         }
       >
-        {children}
+        <ApplicationContentScroll>{children}</ApplicationContentScroll>
       </ApplicationShell>
     </>
   )

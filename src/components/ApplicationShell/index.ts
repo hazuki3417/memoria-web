@@ -1,4 +1,5 @@
 export * from "./ApplicationAccountMenu"
+export * from "./ApplicationContentScroll"
 export * from "./ApplicationContextSwitcher"
 export * from "./ApplicationHeader"
 export * from "./ApplicationNavigation"

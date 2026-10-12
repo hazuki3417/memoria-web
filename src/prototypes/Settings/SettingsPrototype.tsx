@@ -21,8 +21,8 @@ import {
 } from "@tabler/icons-react"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
-import { NavigationItem } from "@/components/NavigationItem"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
+import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
@@ -133,6 +133,7 @@ function ProfileContent({
           />
           <Button
             size="sm"
+            style={{ alignSelf: "flex-start" }}
             disabled={!dirty || invalid || blocked || saving}
             loading={saving}
             onClick={save}
@@ -140,8 +141,8 @@ function ProfileContent({
             {saveState === "retryable-error"
               ? "再試行"
               : saving
-                ? "保存中"
-                : "保存"}
+                ? "更新中"
+                : "更新"}
           </Button>
         </Stack>
       </Box>

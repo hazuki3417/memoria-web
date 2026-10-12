@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
+  ApplicationContentScroll,
   type ApplicationContextOption,
   ApplicationContextSwitcher,
   ApplicationHeader,
@@ -81,7 +82,7 @@ export function PrototypeApplicationShell({
         />
       }
     >
-      {children}
+      <ApplicationContentScroll>{children}</ApplicationContentScroll>
     </ApplicationShell>
   )
 }

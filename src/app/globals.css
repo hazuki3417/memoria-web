@@ -9,3 +9,13 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
 }
+
+/* Shared shell geometry; the root-level Notifications portal uses the same token. */
+:root {
+  --memoria-app-header-height: 40px;
+}
+
+/* Apply the shell inset only while an Application Shell main viewport exists. */
+:root:has([data-memoria-application-main]) {
+  --memoria-notification-top: calc(var(--memoria-app-header-height) + 12px);
+}
