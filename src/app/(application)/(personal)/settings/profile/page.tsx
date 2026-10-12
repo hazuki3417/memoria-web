@@ -15,8 +15,8 @@ export default async function Page() {
       saveProfile={async (nickname) => {
         "use server"
         const result = await updateProfileAction(nickname)
-        if (result.kind === "updated") return
-        if (result.kind === "unavailable") throw Object.assign(new Error("Profile update blocked"), { kind: "blocked" })
+        if (result === "updated") return
+        if (result === "blocked") throw Object.assign(new Error("Profile update blocked"), { kind: "blocked" })
         throw new Error("Profile update failed")
       }}
     />
