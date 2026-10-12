@@ -11,15 +11,18 @@ import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { showNotification } from "@/components/Feedback"
 
+export type CommunitySettingsSection = "general" | "members" | "usage" | "preferences"
 type Role = "admin" | "member"
 type InvitationState = "none" | "active" | "expired" | "revoked"
 
 export function CommunitySettings({
   role = "admin",
   communityId = "photo-club",
+  section = "general",
 }: {
   role?: Role
   communityId?: string
+  section?: CommunitySettingsSection
 }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
@@ -31,6 +34,7 @@ export function CommunitySettings({
   const [generation, setGeneration] = useState(0)
   const [confirm, setConfirm] = useState<"reissue" | "revoke" | null>(null)
   const [busy, setBusy] = useState(false)
+  const [accent, setAccent] = useState("#7950f2")
   const invitationUrl = `https://example.com/invitations/${communityId}-demo-${generation}`
   const active = invitation === "active"
   const dirty = draft.trim() !== name
@@ -73,7 +77,7 @@ export function CommunitySettings({
     { id: "preferences", label: "環境設定", icon: IconPalette, href: `/communities/${encodeURIComponent(communityId)}/preferences` },
   ]
 
-  const content = (
+  const generalContent = (
     <Stack gap="xl">
       <PageHeader title="Community Settings" description="Communityの基本情報と管理" />
 
@@ -158,17 +162,52 @@ export function CommunitySettings({
     </Stack>
   )
 
+  const membersContent = (
+    <Stack gap="xl">
+      <PageHeader title="メンバー" description="Communityの参加者と役割を確認します。" />
+      <Box><SectionHeader>参加者</SectionHeader>
+        <Text size="sm" c="dimmed">参加者データの接続前です。実際のメンバー一覧と管理操作は利用できません。</Text>
+      </Box>
+      <Box><SectionHeader>Communityから退会</SectionHeader>
+        <Text size="sm" c="dimmed">退会操作はMembership APIの接続後に利用できます。</Text>
+      </Box>
+    </Stack>
+  )
+  const usageContent = (
+    <Stack gap="xl">
+      <PageHeader title="利用状況" description="このCommunityが管理するオリジナルファイルの利用状況です。" />
+      <Box><SectionHeader>ストレージ</SectionHeader>
+        <Text size="sm" c="dimmed">Community Usageのデータ取得は未接続です。容量・登録件数は取得後に表示します。</Text>
+      </Box>
+    </Stack>
+  )
+  const preferencesContent = (
+    <Stack gap="xl">
+      <PageHeader title="環境設定" description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。" />
+      <Box><SectionHeader>アクセントカラー</SectionHeader>
+        <Stack gap="sm" maw={540}>
+          <Text size="sm" c="dimmed">色の選択はプレビューです。保存・Contextへの反映はまだ行われません。</Text>
+          <Group gap="sm">
+            <input type="color" aria-label="Communityアクセントカラー" value={accent} onChange={(event) => setAccent(event.currentTarget.value)} />
+            <Text size="sm">{accent.toUpperCase()}</Text>
+          </Group>
+        </Stack>
+      </Box>
+    </Stack>
+  )
+  const content = section === "general" ? generalContent : section === "members" ? membersContent : section === "usage" ? usageContent : preferencesContent
+
   return (
     <Box maw={1120} mx="auto" w="100%">
       {compact ? (
         <Stack gap="xl">
           <Box>
             <Text size="xs" c="dimmed" mb={6}>設定</Text>
-            <Select aria-label="Community設定画面" value="general" allowDeselect={false}
+            <Select aria-label="Community設定画面" value={section} allowDeselect={false}
               data={sections.map(({ id, label }) => ({ value: id, label }))}
               onChange={(value) => {
                 const target = sections.find((item) => item.id === value)
-                if (target && target.id !== "general") router.push(target.href)
+                if (target && target.id !== section) router.push(target.href)
               }} />
           </Box>
           {content}
@@ -180,8 +219,8 @@ export function CommunitySettings({
             <Stack gap={0}>
               {sections.map((item) => (
                 <NavigationItem key={item.id} label={item.label} icon={item.icon}
-                  active={item.id === "general"} accentColor="var(--mantine-color-violet-6)"
-                  onClick={() => { if (item.id !== "general") router.push(item.href) }} />
+                  active={item.id === section} accentColor="var(--mantine-color-violet-6)"
+                  onClick={() => { if (item.id !== section) router.push(item.href) }} />
               ))}
             </Stack>
           </Box>
