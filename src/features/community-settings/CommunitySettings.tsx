@@ -1,7 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { ActionIcon, Badge, Box, Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
+import { useMediaQuery } from "@mantine/hooks"
+import { IconSettings, IconUsers, IconChartBar, IconPalette } from "@tabler/icons-react"
+import { NavigationItem } from "@/components/NavigationItem"
+import { ActionIcon, Badge, Box, Button, Group, Modal, Stack, Text, TextInput, Select } from "@mantine/core"
 import { IconCopy } from "@tabler/icons-react"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -17,6 +20,7 @@ export function CommunitySettings({
   role?: Role
   communityId?: string
 }) {
+  const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
   const [name, setName] = useState("家族のアルバム")
   const [draft, setDraft] = useState(name)
@@ -60,7 +64,14 @@ export function CommunitySettings({
     }
   }
 
-  return (
+  const sections = [
+    { id: "general", label: "一般", icon: IconSettings, href: `/communities/${encodeURIComponent(communityId)}/settings` },
+    { id: "members", label: "メンバー", icon: IconUsers, href: `/communities/${encodeURIComponent(communityId)}/members` },
+    { id: "usage", label: "利用状況", icon: IconChartBar, href: `/communities/${encodeURIComponent(communityId)}/usage` },
+    { id: "preferences", label: "環境設定", icon: IconPalette, href: `/communities/${encodeURIComponent(communityId)}/preferences` },
+  ]
+
+  const content = (
     <Stack gap="xl">
       <PageHeader title="Community Settings" description="Communityの基本情報と管理" />
 
@@ -143,5 +154,38 @@ export function CommunitySettings({
         </Stack>
       </Modal>
     </Stack>
+  )
+
+  return (
+    <Box maw={1120} mx="auto" w="100%">
+      {compact ? (
+        <Stack gap="xl">
+          <Box>
+            <Text size="xs" c="dimmed" mb={6}>設定</Text>
+            <Select aria-label="Community設定画面" value="general" allowDeselect={false}
+              data={sections.map(({ id, label }) => ({ value: id, label }))}
+              onChange={(value) => {
+                const target = sections.find((item) => item.id === value)
+                if (target && target.id !== "general") window.location.assign(target.href)
+              }} />
+          </Box>
+          {content}
+        </Stack>
+      ) : (
+        <Group align="flex-start" gap={56} wrap="nowrap">
+          <Box component="nav" aria-label="Community設定" w={200} style={{ flexShrink: 0 }}>
+            <Text size="xs" fw={700} c="dimmed" mb="xs">設定</Text>
+            <Stack gap={0}>
+              {sections.map((item) => (
+                <NavigationItem key={item.id} label={item.label} icon={item.icon}
+                  active={item.id === "general"} accentColor="var(--mantine-color-violet-6)"
+                  onClick={() => { if (item.id !== "general") window.location.assign(item.href) }} />
+              ))}
+            </Stack>
+          </Box>
+          <Box style={{ flex: 1 }} maw={760} miw={0}>{content}</Box>
+        </Group>
+      )}
+    </Box>
   )
 }
