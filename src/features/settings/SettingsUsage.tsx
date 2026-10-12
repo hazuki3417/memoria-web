@@ -30,18 +30,16 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
         <Stack gap="sm">
           <Group justify="space-between" align="center">
             <Text size="sm">使用済み</Text>
-            <Text fw={600} ta="right">{usage.usedStorageLabel} ({usage.storageUsagePercent} %)</Text>
+            <Text ta="right">{usage.usedStorageLabel} ({usage.storageUsagePercent} %)</Text>
           </Group>
           <Group justify="space-between" align="center">
             <Text size="sm">空き容量</Text>
-            <Text fw={600} ta="right">{usage.availableStorageLabel} ({Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} %)</Text>
+            <Text ta="right">{usage.availableStorageLabel} ({Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} %)</Text>
           </Group>
-          <Box style={{ borderTop: "1px solid var(--mantine-color-default-border)" }} pt="sm">
-            <Group justify="space-between" align="center">
-              <Text size="sm" fw={700}>総容量</Text>
-              <Text fw={700} ta="right">{usage.effectiveLimitLabel} (100 %)</Text>
-            </Group>
-          </Box>
+          <Group justify="space-between" align="center">
+            <Text size="sm">総容量</Text>
+            <Text ta="right">{usage.effectiveLimitLabel} (100 %)</Text>
+          </Group>
           <Progress.Root size="md" aria-label={`ストレージ使用率 ${usage.storageUsagePercent}%、ファイル形式別内訳`}>
             {usage.formatBreakdown?.map((item) => (
               <Progress.Section
