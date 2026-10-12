@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { useMediaQuery } from "@mantine/hooks"
 import { IconSettings, IconUsers, IconChartBar, IconPalette } from "@tabler/icons-react"
 import { NavigationItem } from "@/components/NavigationItem"
@@ -19,12 +18,19 @@ export function CommunitySettings({
   role = "admin",
   communityId = "photo-club",
   section = "general",
+  onNavigate,
 }: {
   role?: Role
   communityId?: string
   section?: CommunitySettingsSection
+  onNavigate?: (href: string) => void
 }) {
-  const router = useRouter()
+  const [previewSection, setPreviewSection] = useState<CommunitySettingsSection>(section)
+  const currentSection = onNavigate ? section : previewSection
+  const navigate = (target: typeof sections[number]) => {
+    if (onNavigate) onNavigate(target.href)
+    else setPreviewSection(target.id as CommunitySettingsSection)
+  }
   const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
   const [name, setName] = useState("家族のアルバム")
@@ -195,7 +201,7 @@ export function CommunitySettings({
       </Box>
     </Stack>
   )
-  const content = section === "general" ? generalContent : section === "members" ? membersContent : section === "usage" ? usageContent : preferencesContent
+  const content = currentSection === "general" ? generalContent : currentSection === "members" ? membersContent : currentSection === "usage" ? usageContent : preferencesContent
 
   return (
     <Box maw={1120} mx="auto" w="100%">
@@ -203,11 +209,11 @@ export function CommunitySettings({
         <Stack gap="xl">
           <Box>
             <Text size="xs" c="dimmed" mb={6}>設定</Text>
-            <Select aria-label="Community設定画面" value={section} allowDeselect={false}
+            <Select aria-label="Community設定画面" value={currentSection} allowDeselect={false}
               data={sections.map(({ id, label }) => ({ value: id, label }))}
               onChange={(value) => {
                 const target = sections.find((item) => item.id === value)
-                if (target && target.id !== section) router.push(target.href)
+                if (target && target.id !== currentSection) navigate(target)
               }} />
           </Box>
           {content}
@@ -219,8 +225,8 @@ export function CommunitySettings({
             <Stack gap={0}>
               {sections.map((item) => (
                 <NavigationItem key={item.id} label={item.label} icon={item.icon}
-                  active={item.id === section} accentColor="var(--mantine-color-violet-6)"
-                  onClick={() => { if (item.id !== section) router.push(item.href) }} />
+                  active={item.id === currentSection} accentColor="var(--mantine-color-violet-6)"
+                  onClick={() => { if (item.id !== currentSection) navigate(item) }} />
               ))}
             </Stack>
           </Box>
