@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import {
-  Alert, Badge, Box, Button, Group, Modal, Paper, Stack, Text, TextInput, Title,
-} from "@mantine/core"
+import { ActionIcon, Badge, Box, Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
+import { IconCopy } from "@tabler/icons-react"
+import { PageHeader } from "@/components/PageHeader"
+import { SectionHeader } from "@/components/SectionHeader"
+import { showNotification } from "@/components/Feedback"
 
 type Role = "admin" | "member"
 type InvitationState = "none" | "active" | "expired" | "revoked"
@@ -18,97 +20,119 @@ export function CommunitySettings({
   const isAdmin = role === "admin"
   const [name, setName] = useState("家族のアルバム")
   const [draft, setDraft] = useState(name)
-  const [editing, setEditing] = useState(false)
   const [invitation, setInvitation] = useState<InvitationState>("none")
   const [expiresAt, setExpiresAt] = useState("")
+  const [generation, setGeneration] = useState(0)
   const [confirm, setConfirm] = useState<"reissue" | "revoke" | null>(null)
-  const [feedback, setFeedback] = useState("")
   const [busy, setBusy] = useState(false)
-  const invitationUrl = `https://example.com/invitations/${communityId}-demo`
+  const invitationUrl = `https://example.com/invitations/${communityId}-demo-${generation}`
+  const active = invitation === "active"
+  const dirty = draft.trim() !== name
+  const invalid = !draft.trim()
 
   const issue = () => {
     setBusy(true)
+    setGeneration((current) => current + 1)
     setInvitation("active")
     setExpiresAt(new Date(Date.now() + 7 * 86400000).toLocaleString("ja-JP"))
-    setFeedback("招待URLを発行しました（Prototype上の操作です）")
     setBusy(false)
+    showNotification({ kind: "success", title: "招待URLを発行しました", message: "Prototype上の操作です。" })
   }
+
   const changeInvitation = () => {
     if (confirm === "revoke") {
       setInvitation("revoked")
-      setFeedback("招待URLを無効化しました（Prototype上の操作です）")
+      setExpiresAt("")
+      showNotification({ kind: "success", title: "招待URLを無効化しました", message: "Prototype上の操作です。" })
     } else {
       issue()
-      setFeedback("招待URLを再発行しました。旧URLは利用できません（Prototype上の操作です）")
     }
     setConfirm(null)
   }
+
+  const copyInvitation = async () => {
+    if (!active) return
+    try {
+      await navigator.clipboard.writeText(invitationUrl)
+      showNotification({ kind: "success", title: "招待URLをコピーしました" })
+    } catch {
+      showNotification({ kind: "error", title: "コピーに失敗しました" })
+    }
+  }
+
   return (
-    <Box maw={760} mx="auto" px={{ base: "md", sm: "xl" }} py="xl">
-      <Stack gap="xl">
+    <Stack gap="xl">
+      <PageHeader title="Community Settings" description="Communityの基本情報と管理" />
+
+      <Box>
+        <SectionHeader>基本情報</SectionHeader>
+        <Stack gap="md" maw={540}>
+          <TextInput
+            label="Community名"
+            value={draft}
+            onChange={(event) => setDraft(event.currentTarget.value)}
+            error={invalid ? "Community名を入力してください" : undefined}
+            disabled={!isAdmin}
+            required
+          />
+          {isAdmin && (
+            <Box>
+              <Button size="sm" disabled={!dirty || invalid} onClick={() => {
+                const updated = draft.trim()
+                setName(updated)
+                setDraft(updated)
+                showNotification({ kind: "success", title: "Community名を変更しました", message: "Prototype上の操作です。" })
+              }}>保存</Button>
+            </Box>
+          )}
+        </Stack>
+      </Box>
+
+      <Box>
+        <SectionHeader>招待URL</SectionHeader>
+        <Stack gap="md" maw={540}>
+          <Box><Badge variant="light">{active ? "有効" : invitation === "expired" ? "期限切れ" : invitation === "revoked" ? "無効化済み" : "未発行"}</Badge></Box>
+          <TextInput
+            label="招待URL"
+            value={active ? invitationUrl : "—"}
+            readOnly
+            rightSection={
+              <ActionIcon variant="subtle" aria-label="招待URLをコピー" title="招待URLをコピー" disabled={!active} onClick={() => { void copyInvitation() }}>
+                <IconCopy size={16} />
+              </ActionIcon>
+            }
+            rightSectionPointerEvents="all"
+          />
+          <TextInput label="有効期限" value={active ? expiresAt : "—"} readOnly />
+          {isAdmin ? (
+            <Group gap="sm">
+              {!active ? (
+                <Button size="sm" loading={busy} onClick={issue}>招待URLを発行</Button>
+              ) : (
+                <>
+                  <Button size="sm" variant="default" onClick={() => setConfirm("reissue")}>再発行</Button>
+                  <Button size="sm" color="red" variant="outline" onClick={() => setConfirm("revoke")}>無効化</Button>
+                </>
+              )}
+            </Group>
+          ) : (
+            <Text size="sm" c="dimmed">招待URLの発行と管理はAdministratorのみ行えます。</Text>
+          )}
+        </Stack>
+      </Box>
+
+      {isAdmin && (
         <Box>
-          <Title order={2}>Community Settings</Title>
-          <Text c="dimmed" size="sm">Communityの基本情報と管理</Text>
+          <Box c="red"><SectionHeader>Community削除</SectionHeader></Box>
+          <Stack gap="md" maw={620}>
+            <Text size="sm">Communityの削除は元に戻せません。Community管理Mediaも削除対象になります。</Text>
+            <Box>
+              <Button color="red" variant="default" size="sm" component="a" href={`/communities/${encodeURIComponent(communityId)}/settings/delete`}>Communityを削除する</Button>
+            </Box>
+          </Stack>
         </Box>
-        {feedback && <Alert withCloseButton onClose={() => setFeedback("")}>{feedback}</Alert>}
-        <Paper withBorder p="lg" radius="md">
-          <Stack>
-            <Title order={3}>General</Title>
-            <Text size="sm" c="dimmed">Community名</Text>
-            {editing && isAdmin ? (
-              <>
-                <TextInput aria-label="Community名" value={draft} onChange={(event) => setDraft(event.currentTarget.value)} error={!draft.trim() ? "Community名を入力してください" : undefined} />
-                <Group justify="flex-end">
-                  <Button variant="default" onClick={() => { setDraft(name); setEditing(false) }}>キャンセル</Button>
-                  <Button disabled={!draft.trim()} onClick={() => { setName(draft.trim()); setEditing(false); setFeedback("Community名を変更しました（Prototype上の操作です）") }}>保存</Button>
-                </Group>
-              </>
-            ) : (
-              <Group justify="space-between" align="center">
-                <Text fw={600}>{name}</Text>
-                {isAdmin && <Button variant="default" onClick={() => setEditing(true)}>変更</Button>}
-              </Group>
-            )}
-          </Stack>
-        </Paper>
-        <Paper withBorder p="lg" radius="md">
-          <Stack>
-            <Title order={3}>Invitation</Title>
-            {!isAdmin ? (
-              <Text c="dimmed" size="sm">招待はAdministratorが管理します。</Text>
-            ) : (
-              <>
-                <Group><Badge variant="light">{invitation === "active" ? "有効" : invitation === "expired" ? "期限切れ" : invitation === "revoked" ? "無効化済み" : "未発行"}</Badge></Group>
-                {invitation === "active" ? (
-                  <>
-                    <TextInput label="招待URL" value={invitationUrl} readOnly />
-                    <Text size="sm" c="dimmed">有効期限: {expiresAt}</Text>
-                    <Group>
-                      <Button variant="default" onClick={() => { void navigator.clipboard.writeText(invitationUrl).then(() => setFeedback("招待URLをコピーしました")).catch(() => setFeedback("コピーに失敗しました")) }}>URLをコピー</Button>
-                      <Button variant="default" onClick={() => setConfirm("reissue")}>再発行</Button>
-                      <Button color="red" variant="outline" onClick={() => setConfirm("revoke")}>無効化</Button>
-                    </Group>
-                  </>
-                ) : (
-                  <>
-                    <Text c="dimmed" size="sm">現在利用できる招待URLはありません。</Text>
-                    <Group><Button loading={busy} onClick={issue}>招待URLを発行</Button></Group>
-                  </>
-                )}
-              </>
-            )}
-          </Stack>
-        </Paper>
-        {isAdmin && (
-          <Paper withBorder p="lg" radius="md">
-            <Stack>
-              <Title order={3} c="red">Danger Zone</Title>
-              <Text size="sm">Communityの削除は元に戻せません。Community管理Mediaも削除対象になります。</Text>
-              <Group><Button color="red" variant="outline" component="a" href={`/communities/${encodeURIComponent(communityId)}/settings/delete`}>削除の確認へ</Button></Group>
-            </Stack>
-          </Paper>
-        )}
-      </Stack>
+      )}
+
       <Modal opened={confirm !== null} onClose={() => setConfirm(null)} title={confirm === "reissue" ? "招待URLを再発行" : "招待URLを無効化"} centered>
         <Stack>
           <Text size="sm">現在の招待URLは利用できなくなります。共有済みのURLからも参加できなくなります。</Text>
@@ -118,6 +142,6 @@ export function CommunitySettings({
           </Group>
         </Stack>
       </Modal>
-    </Box>
+    </Stack>
   )
 }
