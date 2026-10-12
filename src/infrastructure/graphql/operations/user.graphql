@@ -1,0 +1,7 @@
+query CurrentUser {
+  me { id profile { nickname } }
+}
+
+mutation RegisterUser($input: RegisterUserInput!) {
+  registerUser(input: $input) { user { id profile { nickname } } }
+}
