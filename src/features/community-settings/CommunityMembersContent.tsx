@@ -40,6 +40,9 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
     const result = aValue.localeCompare(bValue, "ja-JP")
     return descending ? -result : result
   }), [members, query, sortKey, descending])
+  const visibleRowCount = 8
+  const tableRowHeight = 48
+  const tableHeaderHeight = 44
   const changeSort = (key: SortKey) => {
     if (key === sortKey) setDescending((value) => !value)
     else { setSortKey(key); setDescending(false) }
@@ -61,8 +64,9 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
         {memberLimitReached && <Text size="sm" c="orange" mb="sm">参加者の上限に達しています。新しい参加者を追加できません。</Text>}
         {adminLimitReached && <Text size="sm" c="dimmed" mb="sm">Administratorの上限に達しています。これ以上Administratorへ変更できません。</Text>}
         <TextInput aria-label="参加者を名前で検索" placeholder="名前で検索" leftSection={<IconSearch size={16} />} value={query} onChange={(event) => setQuery(event.currentTarget.value)} mb="md" />
-        <ScrollArea type="hover" w="100%">
-          <Table striped highlightOnHover withTableBorder miw={400}>
+        <Box style={{ borderRadius: "var(--mantine-radius-md)", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)" }}>
+          <ScrollArea type="hover" w="100%" h={tableHeaderHeight + visibleRowCount * tableRowHeight}>
+          <Table striped highlightOnHover miw={400} stickyHeader styles={{ th: { height: tableHeaderHeight }, td: { height: tableRowHeight } }}>
             <Table.Thead><Table.Tr>
               <Table.Th><UnstyledButton onClick={() => changeSort("name")} aria-label="名前で並び替え">名前 {sortKey === "name" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
               <Table.Th><UnstyledButton onClick={() => changeSort("role")} aria-label="役割で並び替え">役割 {sortKey === "role" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
@@ -77,7 +81,8 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
               {rows.length === 0 && <Table.Tr><Table.Td colSpan={self?.role === "admin" ? 3 : 2}><Text c="dimmed" ta="center" py="md">該当する参加者はいません。</Text></Table.Td></Table.Tr>}
             </Table.Tbody>
           </Table>
-        </ScrollArea>
+          </ScrollArea>
+        </Box>
       </Box>
       <Box>
         <Box c="red"><SectionHeader>Communityから退会</SectionHeader></Box>
