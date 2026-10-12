@@ -67,6 +67,7 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
                 <Table.Th>形式</Table.Th>
                 <Table.Th ta="right">登録件数</Table.Th>
                 <Table.Th ta="right">使用量</Table.Th>
+                <Table.Th ta="right">割合</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -80,6 +81,7 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
                   </Table.Td>
                   <Table.Td ta="right">{item.count.toLocaleString("ja-JP")} 件</Table.Td>
                   <Table.Td ta="right">{item.sizeLabel}</Table.Td>
+                  <Table.Td ta="right">{item.capacityPercent} %</Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -88,6 +90,7 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
                 <Table.Th>合計</Table.Th>
                 <Table.Th ta="right">{usage.mediaCount.toLocaleString("ja-JP")} 件</Table.Th>
                 <Table.Th ta="right">{usage.usedStorageLabel}</Table.Th>
+                <Table.Th ta="right">{usage.storageUsagePercent} %</Table.Th>
               </Table.Tr>
             </Table.Tfoot>
           </Table>
