@@ -10,6 +10,7 @@ import {
   type ApplicationNavigationItem,
   ApplicationNavigationTrigger,
   ApplicationShell,
+  ApplicationContentScroll,
   useApplicationNavigation,
 } from "@/components/ApplicationShell"
 
@@ -81,7 +82,7 @@ export function PrototypeApplicationShell({
         />
       }
     >
-      {children}
+      <ApplicationContentScroll>{children}</ApplicationContentScroll>
     </ApplicationShell>
   )
 }
