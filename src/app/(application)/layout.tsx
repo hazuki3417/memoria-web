@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
-import { auth0 } from "@/lib/auth0"
-import { getCurrentMemoriaUser } from "@/infrastructure/graphql"
 import { ApplicationShellContainer } from "@/features/application-shell/ApplicationShellContainer"
+import { getCurrentMemoriaUser } from "@/infrastructure/graphql"
+import { auth0 } from "@/lib/auth0"
 
 export default async function ApplicationLayout({
   children,

@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
+  ApplicationContentScroll,
   type ApplicationContextOption,
   ApplicationContextSwitcher,
   ApplicationHeader,
@@ -11,7 +12,6 @@ import {
   type ApplicationNavigationItem,
   ApplicationNavigationTrigger,
   ApplicationShell,
-  ApplicationContentScroll,
   getContextSwitchPath,
   useApplicationNavigation,
 } from "@/components/ApplicationShell"

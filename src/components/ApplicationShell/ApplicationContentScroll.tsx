@@ -7,7 +7,11 @@ import type { ReactNode } from "react"
  * Opt-in scrolling for a page/content consumer.
  * ApplicationShell itself only owns the main viewport, not its scroll behavior.
  */
-export function ApplicationContentScroll({ children }: { children: ReactNode }) {
+export function ApplicationContentScroll({
+  children,
+}: {
+  children: ReactNode
+}) {
   return (
     <ScrollArea
       type="hover"

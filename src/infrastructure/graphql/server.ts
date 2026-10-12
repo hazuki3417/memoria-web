@@ -2,7 +2,8 @@ import "server-only"
 import { auth0 } from "@/lib/auth0"
 
 const ME_QUERY = "query CurrentUser { me { id profile { nickname } } }"
-const REGISTER_MUTATION = "mutation RegisterUser($input: RegisterUserInput!) { registerUser(input: $input) { user { id profile { nickname } } } }"
+const REGISTER_MUTATION =
+  "mutation RegisterUser($input: RegisterUserInput!) { registerUser(input: $input) { user { id profile { nickname } } } }"
 
 type GraphQLError = { message?: string; extensions?: { code?: string } }
 type GraphQLResult<T> = { data?: T; errors?: GraphQLError[] }
@@ -16,7 +17,13 @@ export type RegistrationResult =
   | { kind: "registered"; user: CurrentUser }
   | { kind: "unavailable" | "validation" | "conflict" | "error" }
 
-async function request<T>(query: string, operationName: string, variables?: object): Promise<{ kind: "ok"; result: GraphQLResult<T> } | { kind: "unavailable" | "error" }> {
+async function request<T>(
+  query: string,
+  operationName: string,
+  variables?: object,
+): Promise<
+  { kind: "ok"; result: GraphQLResult<T> } | { kind: "unavailable" | "error" }
+> {
   const endpoint = process.env.MEMORIA_GRAPHQL_URL
   if (!endpoint) return { kind: "error" }
   let accessToken: string
@@ -28,7 +35,10 @@ async function request<T>(query: string, operationName: string, variables?: obje
   try {
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify({ query, operationName, variables }),
       cache: "no-store",
     })
@@ -41,43 +51,69 @@ async function request<T>(query: string, operationName: string, variables?: obje
 }
 
 export async function getCurrentMemoriaUser(): Promise<CurrentUserResult> {
-  const response = await request<{ me: CurrentUser | null }>(ME_QUERY, "CurrentUser")
+  const response = await request<{ me: CurrentUser | null }>(
+    ME_QUERY,
+    "CurrentUser",
+  )
   if (response.kind !== "ok") return { kind: response.kind }
   const { result } = response
-  if (result.errors?.length) return { kind: result.errors.some(e => e.extensions?.code === "UNAUTHENTICATED") ? "unavailable" : "error" }
+  if (result.errors?.length)
+    return {
+      kind: result.errors.some((e) => e.extensions?.code === "UNAUTHENTICATED")
+        ? "unavailable"
+        : "error",
+    }
   if (!result.data || !("me" in result.data)) return { kind: "error" }
-  return result.data.me ? { kind: "active", user: result.data.me } : { kind: "unregistered" }
+  return result.data.me
+    ? { kind: "active", user: result.data.me }
+    : { kind: "unregistered" }
 }
 
-export async function registerMemoriaUser(nickname: string): Promise<RegistrationResult> {
-  const response = await request<{ registerUser: { user: CurrentUser } }>(REGISTER_MUTATION, "RegisterUser", { input: { nickname } })
+export async function registerMemoriaUser(
+  nickname: string,
+): Promise<RegistrationResult> {
+  const response = await request<{ registerUser: { user: CurrentUser } }>(
+    REGISTER_MUTATION,
+    "RegisterUser",
+    { input: { nickname } },
+  )
   if (response.kind !== "ok") return { kind: response.kind }
   const { result } = response
   if (result.errors?.length) {
-    if (result.errors.some(e => e.extensions?.code === "UNAUTHENTICATED")) return { kind: "unavailable" }
-    if (result.errors.some(e => e.extensions?.code === "VALIDATION")) return { kind: "validation" }
-    if (result.errors.some(e => e.extensions?.code === "CONFLICT")) return { kind: "conflict" }
+    if (result.errors.some((e) => e.extensions?.code === "UNAUTHENTICATED"))
+      return { kind: "unavailable" }
+    if (result.errors.some((e) => e.extensions?.code === "VALIDATION"))
+      return { kind: "validation" }
+    if (result.errors.some((e) => e.extensions?.code === "CONFLICT"))
+      return { kind: "conflict" }
     return { kind: "error" }
   }
   const user = result.data?.registerUser?.user
   return user ? { kind: "registered", user } : { kind: "error" }
 }
 
-const UPDATE_PROFILE_MUTATION = "mutation UpdateUserProfile($input: UpdateUserProfileInput!) { updateUserProfile(input: $input) { user { id profile { nickname } } } }"
+const UPDATE_PROFILE_MUTATION =
+  "mutation UpdateUserProfile($input: UpdateUserProfileInput!) { updateUserProfile(input: $input) { user { id profile { nickname } } } }"
 
 export type UpdateProfileResult =
   | { kind: "updated"; user: CurrentUser }
   | { kind: "unavailable" | "validation" | "error" }
 
-export async function updateMemoriaProfile(nickname: string): Promise<UpdateProfileResult> {
+export async function updateMemoriaProfile(
+  nickname: string,
+): Promise<UpdateProfileResult> {
   const response = await request<{ updateUserProfile: { user: CurrentUser } }>(
-    UPDATE_PROFILE_MUTATION, "UpdateUserProfile", { input: { nickname } },
+    UPDATE_PROFILE_MUTATION,
+    "UpdateUserProfile",
+    { input: { nickname } },
   )
   if (response.kind !== "ok") return { kind: response.kind }
   const { result } = response
   if (result.errors?.length) {
-    if (result.errors.some(e => e.extensions?.code === "UNAUTHENTICATED")) return { kind: "unavailable" }
-    if (result.errors.some(e => e.extensions?.code === "VALIDATION")) return { kind: "validation" }
+    if (result.errors.some((e) => e.extensions?.code === "UNAUTHENTICATED"))
+      return { kind: "unavailable" }
+    if (result.errors.some((e) => e.extensions?.code === "VALIDATION"))
+      return { kind: "validation" }
     return { kind: "error" }
   }
   const user = result.data?.updateUserProfile?.user

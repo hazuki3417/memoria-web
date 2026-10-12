@@ -37,9 +37,7 @@ export function ApplicationShell({
     >
       {header}
       {navigation}
-      <AppShell.Main data-memoria-application-main>
-        {children}
-      </AppShell.Main>
+      <AppShell.Main data-memoria-application-main>{children}</AppShell.Main>
       <Box
         id="application-modal-root"
         style={{ position: "relative", zIndex: 400 }}

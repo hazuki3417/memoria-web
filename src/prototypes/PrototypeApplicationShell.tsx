@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import {
   ApplicationAccountMenu,
+  ApplicationContentScroll,
   type ApplicationContextOption,
   ApplicationContextSwitcher,
   ApplicationHeader,
@@ -10,7 +11,6 @@ import {
   type ApplicationNavigationItem,
   ApplicationNavigationTrigger,
   ApplicationShell,
-  ApplicationContentScroll,
   useApplicationNavigation,
 } from "@/components/ApplicationShell"
 

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
-import { auth0 } from "@/lib/auth0"
-import { getCurrentMemoriaUser } from "@/infrastructure/graphql"
 import { UserRegistration } from "@/features/user-registration/UserRegistration"
+import { getCurrentMemoriaUser } from "@/infrastructure/graphql"
+import { auth0 } from "@/lib/auth0"
 
 export default async function Page() {
   const session = await auth0.getSession()

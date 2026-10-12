@@ -11,8 +11,8 @@ import {
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
-import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import { registerUserAction } from "@/app/register/actions"
 import {
   ApplicationHeader,

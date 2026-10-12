@@ -39,9 +39,13 @@ export async function getCurrentMemoriaUser(): Promise<CurrentUserResult> {
     if (response.status === 401) return { kind: "unavailable" }
     if (!response.ok) return { kind: "error" }
 
-    const result = (await response.json()) as GraphQLResult<{ me: CurrentUser | null }>
+    const result = (await response.json()) as GraphQLResult<{
+      me: CurrentUser | null
+    }>
     if (result.errors?.length) {
-      return result.errors.some((error) => error.extensions?.code === "UNAUTHENTICATED")
+      return result.errors.some(
+        (error) => error.extensions?.code === "UNAUTHENTICATED",
+      )
         ? { kind: "unavailable" }
         : { kind: "error" }
     }
