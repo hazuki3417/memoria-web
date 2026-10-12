@@ -6,6 +6,7 @@
 - `ApplicationShell` currently passes numeric `40` to Mantine's `header.height` and `main.top` to preserve its working interaction/layout behavior. The CSS `--memoria-app-header-height` token mirrors that value for notification positioning; this duplication is temporary pending verification of a safe shared source of truth. CSS `:root:has([data-memoria-application-main])` sets `--memoria-notification-top` to that token plus 12px only while the shell exists. No DOM measurement or effect is required; outside the shell the notification uses the standard Mantine top inset. Notifications remain viewport-fixed and outside content scrolling.
 - The shared `ApplicationShell` renders `#application-modal-root` outside the scrollable page content. Image Detail's full-screen Mantine Modal uses `portalProps={{ target: "#application-modal-root" }}`, keeping its visual overlay outside page scrolling.
 - Browser features call `showNotification` but must not mount another `<Notifications />` in their page content.
+- The fixed `.mantine-Notifications-root` container uses `pointer-events: none` to avoid intercepting clicks on Menu/Drawer overlays (which may have a lower z-index); actual `.mantine-Notifications-notification` cards retain `pointer-events: auto` so their controls remain interactive. This prevents a confirmed click-through regression.
 
 ## Application main scroll ownership
 
