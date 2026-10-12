@@ -34,7 +34,7 @@ export function CommunitySettings({
     setBusy(true)
     setGeneration((current) => current + 1)
     setInvitation("active")
-    setExpiresAt(new Date(Date.now() + 7 * 86400000).toLocaleString("ja-JP"))
+    setExpiresAt(new Date(Date.now() + 7 * 86400000).toLocaleString("sv-SE", { timeZone: "Asia/Tokyo", hour12: false }).replace("T", " ").replaceAll("-", "/"))
     setBusy(false)
     showNotification({ kind: "success", title: "招待URLを発行しました", message: "Prototype上の操作です。" })
   }
@@ -94,7 +94,7 @@ export function CommunitySettings({
           <Box><Badge variant="light">{active ? "有効" : invitation === "expired" ? "期限切れ" : invitation === "revoked" ? "無効化済み" : "未発行"}</Badge></Box>
           <TextInput
             label="招待URL"
-            value={active ? invitationUrl : "—"}
+            value={active ? invitationUrl : "-"}
             readOnly
             rightSection={
               <ActionIcon variant="subtle" aria-label="招待URLをコピー" title="招待URLをコピー" disabled={!active} onClick={() => { void copyInvitation() }}>
@@ -103,7 +103,7 @@ export function CommunitySettings({
             }
             rightSectionPointerEvents="all"
           />
-          <Text size="sm" c="dimmed">有効期限: {active ? expiresAt : "—"}</Text>
+          <Text size="sm" c="dimmed">有効期限: {active ? expiresAt : "----/--/-- --:--:--"}</Text>
           {isAdmin ? (
             <Group gap="sm">
               {!active ? (
