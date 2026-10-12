@@ -11,7 +11,7 @@
     "format": "biome format --write",
     "check": "biome check --changed --since=${BIOME_BASE_REF:-origin/develop} --no-errors-on-unmatched",
     "typecheck": "tsc --noEmit",
-    "build:next": "next build",
+    "build:next": "npm run dev:assets && next build",
     "build:storybook": "storybook build",
     "build": "npm run build:next",
     "start": "next start",

@@ -79,7 +79,7 @@ export function UserRegistrationPrototype({
   return (
     <>
       <Notifications position="top-right" />
-      <ApplicationShell header={<ApplicationHeader />}>
+      <ApplicationShell header={<ApplicationHeader reserveNavigationSpace />}>
         <Box maw={880} mx="auto" w="100%">
           <Stack gap="xl">
             <PageHeader

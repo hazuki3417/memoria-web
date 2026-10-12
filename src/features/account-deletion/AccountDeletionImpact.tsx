@@ -16,7 +16,9 @@ import {
   Title,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useRef, useState } from "react"
+import { mockAccountDeletionGateway, unavailableAccountDeletionGateway, type DeletionReview, type DeletionGrant, type MockScenario } from "./accountDeletionGateway"
 import { FeedbackAlert } from "@/components/Feedback"
 
 type ReviewState = "default" | "empty" | "failure" | "retrying"
@@ -111,11 +113,14 @@ export function AccountDeletionImpact({
   reviewState = "default",
   communityScenario = "mixed-memberships",
   retryOutcome = "success",
+  mockScenario,
 }: {
   reviewState?: ReviewState
   communityScenario?: CommunityScenario
   retryOutcome?: RetryOutcome
+  mockScenario?: MockScenario
 }) {
+  const router = useRouter()
   const [step, setStep] = useState(0)
   const compactStepper = useMediaQuery("(max-width: 48em)")
   const [loadState, setLoadState] = useState<"ready" | "failed" | "retrying">(
@@ -130,8 +135,14 @@ export function AccountDeletionImpact({
   const [cancelled, setCancelled] = useState(false)
   const [cancelConfirmationOpened, setCancelConfirmationOpened] =
     useState(false)
+  const gateway = useRef(mockScenario ? mockAccountDeletionGateway(mockScenario) : unavailableAccountDeletionGateway)
   const [reauth, setReauth] = useState(false)
+  const [review, setReview] = useState<DeletionReview | null>(null)
+  const [grant, setGrant] = useState<DeletionGrant | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [flowError, setFlowError] = useState<string | null>(null)
   const [confirmed, setConfirmed] = useState(false)
+  const [deletionPending, setDeletionPending] = useState(false)
   const mediaCount = reviewState === "empty" ? 0 : 24
   const communities = communitiesForScenario(communityScenario)
   const communitiesToResolve = communities.filter(
@@ -166,12 +177,59 @@ export function AccountDeletionImpact({
   const hasPendingChanges =
     Object.keys(decisions).length > 0 ||
     Object.values(confirmations).some((value) => value.length > 0)
+  const reviewFingerprint = JSON.stringify({ decisions, confirmations, communityScenario, mediaCount: reviewState === "empty" ? 0 : 24 })
+  const startReauthentication = async () => {
+    if (busy) return
+    setBusy(true)
+    setFlowError(null)
+    setReauth(false)
+    setGrant(null)
+    setReview(null)
+    try {
+      const nextReview = await gateway.current.createReview(reviewFingerprint)
+      const result = await gateway.current.reauthenticate(nextReview)
+      if (result.status !== "success") {
+        setFlowError(result.status === "cancelled" ? "再認証がキャンセルされました。" : "再認証に失敗しました。")
+        return
+      }
+      setReview(nextReview)
+      setGrant(result.grant)
+      setReauth(true)
+    } catch (error) {
+      setFlowError(error instanceof Error ? error.message : "再認証を開始できませんでした。")
+    } finally {
+      setBusy(false)
+    }
+  }
+  const confirmDeletion = async () => {
+    if (busy || !review || !grant) return
+    if (review.fingerprint !== reviewFingerprint) {
+      setGrant(null)
+      setReauth(false)
+      setFlowError("削除計画が変更されました。再認証してください。")
+      return
+    }
+    setBusy(true)
+    setDeletionPending(true)
+    setFlowError(null)
+    try {
+      await gateway.current.confirm(review, grant)
+      setConfirmed(true)
+    } catch (error) {
+      setFlowError(error instanceof Error ? error.message : "削除処理に失敗しました。")
+      setGrant(null)
+      setReauth(false)
+    } finally {
+      setBusy(false)
+      setDeletionPending(false)
+    }
+  }
   const cancel = () => {
     if (hasPendingChanges) {
       setCancelConfirmationOpened(true)
       return
     }
-    setCancelled(true)
+    router.push("/settings/account")
   }
   const skipped = (index: number) =>
     (index === 1 && !hasCommunities) || (index === 2 && !hasCommunities)
@@ -179,14 +237,22 @@ export function AccountDeletionImpact({
     if (step === 0) setStep(hasCommunities ? 1 : 3)
     if (step === 1 && allResolved) setStep(2)
     if (step === 2 && allConfirmed) setStep(3)
-    if (step === 3) setReauth(true)
+    if (step === 3) void startReauthentication()
   }
   const back = () => {
-    if (step === 3) setStep(hasCommunities ? 2 : 0)
+    if (step === 3) {
+      setReauth(false)
+      setGrant(null)
+      setReview(null)
+      setStep(hasCommunities ? 2 : 0)
+    }
     if (step === 2) setStep(1)
     if (step === 1) setStep(0)
   }
   const changeDecision = (id: string, decision: Decision) => {
+    setGrant(null)
+    setReview(null)
+    setReauth(false)
     setDecisions((previous) => ({ ...previous, [id]: decision }))
     setConfirmations((previous) => ({ ...previous, [id]: "" }))
   }
@@ -212,7 +278,7 @@ export function AccountDeletionImpact({
             <Button
               onClick={() => {
                 setCancelConfirmationOpened(false)
-                setCancelled(true)
+                router.push("/settings/account")
               }}
             >
               中止する
@@ -231,37 +297,52 @@ export function AccountDeletionImpact({
                 アカウントを削除した場合の影響と、削除前に必要な対応を確認します。
               </Text>
             </Box>
-            {cancelled || confirmed ? (
-              <Stack gap="md">
-                <Title order={2} size="h4">
-                  {confirmed
-                    ? "削除を確認しました（プロトタイプ）"
-                    : "削除手続きを中止しました"}
-                </Title>
-                <Text c="dimmed">
-                  {confirmed
-                    ? "このプロトタイプではアカウントとデータは削除されません。"
-                    : "削除は開始されていません。"}
-                </Text>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => {
-                    setCancelled(false)
-                    setConfirmed(false)
-                    setReauth(false)
-                    setStep(0)
-                  }}
-                >
-                  最初に戻る
-                </Button>
-              </Stack>
-            ) : (
+            {cancelled || confirmed || deletionPending ? (
+              <Stack gap="lg" maw={600} mx="auto" w="100%" py="xl">
+                {deletionPending ? (
+                  <>
+                    <Title order={2} size="h3">削除リクエストを処理しています</Title>
+                    <Text c="dimmed">アカウント削除の受付結果を確認しています。画面を閉じずにお待ちください。</Text>
+                    <Button loading disabled>処理中</Button>
+                  </>
+                ) : confirmed ? (
+                  <>
+                    <Title order={2} size="h3">
+                      {mockScenario ? "確認フローが完了しました" : "アカウント削除を受け付けました"}
+                    </Title>
+                    <FeedbackAlert kind="info" title={mockScenario ? "確認が完了しました" : "アカウントの利用は終了しました"}>
+                      {mockScenario
+                        ? "確認手続きが終了しました。"
+                        : "アカウントは利用できなくなりました。対象データの削除はバックグラウンドで進みます。"}
+                    </FeedbackAlert>
+                    {mockScenario && (
+                      <Button variant="default" onClick={() => {
+                        setCancelled(false)
+                        setConfirmed(false)
+                        setReauth(false)
+                        setReview(null)
+                        setGrant(null)
+                        setFlowError(null)
+                        setStep(0)
+                      }}>最初から確認する</Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Title order={2} size="h4">削除手続きを中止しました</Title>
+                    <Text c="dimmed">削除は開始されていません。</Text>
+                    <Button variant="default" onClick={() => {
+                      setCancelled(false)
+                      setStep(0)
+                    }}>最初に戻る</Button>
+                  </>
+                )}
+              </Stack>            ) : (
               <>
                 <Box
                   style={{
                     position: "sticky",
-                    top: 40,
+                    top: 0,
                     zIndex: 10,
                     background: "var(--mantine-color-body)",
                     borderBottom:
@@ -373,13 +454,14 @@ export function AccountDeletionImpact({
                           Communityに参加している場合は、次のステップで各Communityへの対応と影響を確認します。
                         </Text>
                       )}
-                      <Group gap="sm" justify="flex-end">
-                        <Box
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
+                      <Group gap="sm" justify="space-between" wrap="nowrap">
+                        <Box style={{ flex: 1 }} />
+                        <Box style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+                          <Button size="sm" variant="subtle" color="gray" onClick={cancel}>
+                            削除手続きを中止して設定に戻る
+                          </Button>
+                        </Box>
+                        <Box style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
                           {loadState !== "ready" ? (
                             <Button
                               size="sm"
@@ -597,7 +679,7 @@ export function AccountDeletionImpact({
                             color="gray"
                             onClick={cancel}
                           >
-                            キャンセル
+                            削除手続きを中止して設定に戻る
                           </Button>
                         </Box>
                         <Box
@@ -731,7 +813,7 @@ export function AccountDeletionImpact({
                             color="gray"
                             onClick={cancel}
                           >
-                            キャンセル
+                            削除手続きを中止して設定に戻る
                           </Button>
                         </Box>
                         <Box
@@ -881,12 +963,13 @@ export function AccountDeletionImpact({
                       >
                         削除を続けるには再認証が必要です。
                       </FeedbackAlert>
+                      {flowError && <FeedbackAlert kind="error" title="処理を完了できませんでした">{flowError}</FeedbackAlert>}
                       {reauth && (
                         <FeedbackAlert
                           kind="info"
-                          title="再認証（プロトタイプ）"
+                          title="再認証済み"
                         >
-                          実際のAuth0認証は行いません。削除処理も実行されません。
+                          削除を確定する前に、内容をもう一度確認してください。
                         </FeedbackAlert>
                       )}
                       <Group gap="sm" justify="space-between">
@@ -896,6 +979,7 @@ export function AccountDeletionImpact({
                             variant="default"
                             onClick={() => {
                               setReauth(false)
+                              setGrant(null)
                               back()
                             }}
                           >
@@ -915,7 +999,7 @@ export function AccountDeletionImpact({
                             color="gray"
                             onClick={cancel}
                           >
-                            キャンセル
+                            削除手続きを中止して設定に戻る
                           </Button>
                         </Box>
                         <Box
@@ -928,13 +1012,12 @@ export function AccountDeletionImpact({
                           <Button
                             size="sm"
                             color={reauth ? "red" : undefined}
-                            onClick={() =>
-                              reauth ? setConfirmed(true) : next()
-                            }
+                            loading={busy}
+                            onClick={() => reauth ? void confirmDeletion() : void startReauthentication()}
                           >
                             {reauth
-                              ? "アカウントを削除する（デモ）"
-                              : "再認証する（デモ）"}
+                              ? "アカウントを削除する"
+                              : "再認証する"}
                           </Button>
                         </Box>
                       </Group>

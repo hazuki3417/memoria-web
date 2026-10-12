@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 
-export type ApplicationChromeVariant = "authenticated" | "pre-registration"
+export type ApplicationChromeVariant = "authenticated" | "pre-registration" | "restricted-flow"
 export type ApplicationChromeFeature =
   | "navigation"
   | "context-switcher"
@@ -14,6 +14,11 @@ const visibility: Record<
     navigation: true,
     "context-switcher": true,
     "account-menu": true,
+  },
+  "restricted-flow": {
+    navigation: false,
+    "context-switcher": false,
+    "account-menu": false,
   },
   "pre-registration": {
     navigation: false,

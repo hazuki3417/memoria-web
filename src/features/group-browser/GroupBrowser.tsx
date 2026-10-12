@@ -1,10 +1,13 @@
 "use client"
 
+import { ImageDetailDialog } from "@/features/media-browser/ImageDetailDialog"
+
 import {
   ActionIcon,
   Badge,
   Box,
   Button,
+  Collapse,
   Divider,
   Group,
   Modal,
@@ -19,10 +22,9 @@ import {
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
-  IconChevronDown,
   IconChevronRight,
   IconEdit,
-  IconPlus,
+  IconFolderPlus,
   IconSearch,
   IconX,
 } from "@tabler/icons-react"
@@ -31,6 +33,8 @@ import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
 import { SplitView } from "@/components/SplitView"
+import { Notifications } from "@mantine/notifications"
+import { showNotification } from "@/components/Feedback"
 
 type GroupFixture = {
   id: string
@@ -116,7 +120,7 @@ const relationCandidateNames = [
 const previewImages = Array.from(
   { length: 9 },
   (_, index) =>
-    `/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
+    `/__dev-assets/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
 )
 
 function GroupVisual({ startIndex }: { startIndex: number }) {
@@ -303,22 +307,27 @@ function RelationEditor({
     </Stack>
   )
 }
-function MediaGrid() {
-  const tones = ["blue", "grape", "teal", "orange", "cyan"]
+function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
+  // Local dummy thumbnails; actual Group media will be supplied by the Connection.
   const mediaItems = Array.from({ length: 24 }, (_, index) => ({
     id: `media-${index + 1}`,
-    index,
+    src: previewImages[index % previewImages.length],
   }))
   return (
     <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
-      {mediaItems.map(({ id, index }) => (
-        <Box
+      {mediaItems.map(({ id, src }, index) => (
+        <UnstyledButton
           key={id}
-          bg={`var(--mantine-color-${tones[index % tones.length]}-1)`}
+          aria-label={`Media ${index + 1}の詳細を開く`}
+          onClick={() => onOpen(index)}
           bdrs="sm"
           style={{
+            display: "block",
             aspectRatio: "1 / 1",
             border: "1px solid var(--mantine-color-default-border)",
+            backgroundImage: `url("${src}")`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
           }}
         />
       ))}
@@ -327,8 +336,35 @@ function MediaGrid() {
 }
 
 export function GroupBrowser({ contextKind = "personal", communityId = "photo-club" }: { contextKind?: "personal" | "community"; communityId?: string }) {
+  const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
+  const [createOpened, create] = useDisclosure(false)
+  const [createName, setCreateName] = useState("")
+  const [createParents, setCreateParents] = useState<string[]>([])
+  const [createChildren, setCreateChildren] = useState<string[]>([])
+  const allGroups = [...groups, ...createdGroups]
+  const openCreate = () => {
+    setCreateName("")
+    setCreateParents([])
+    setCreateChildren([])
+    create.open()
+  }
+  const submitCreate = () => {
+    const name = createName.trim()
+    if (!name || Array.from(name).length > 100) return
+    setCreatedGroups((current) => [...current, { id: `created-${Date.now()}-${current.length}`, name, mediaCount: 0, previewCount: 0, parentNames: createParents, childNames: createChildren }])
+    create.close()
+    showNotification({ kind: "success", title: "Groupを作成しました", message: `「${name}」を作成しました。` })
+  }
   const [query, setQuery] = useState("")
+  const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [imageDetailIndex, setImageDetailIndex] = useState<number | null>(null)
+  const groupMediaItems = Array.from({ length: 24 }, (_, index) => ({
+    id: `group-media-${index + 1}`,
+    label: `Media ${index + 1}`,
+    src: previewImages[index % previewImages.length],
+  }))
+
   const splitViewRef = useGroupRef()
   const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
   const [relationsOpened, relations] = useDisclosure(false)
@@ -341,14 +377,14 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
   const [draftChildren, setDraftChildren] = useState<string[]>([])
 
   const visibleGroups = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase()
-    if (!normalized) return groups
-    return groups.filter((group) =>
+    const normalized = appliedQuery.trim().toLocaleLowerCase()
+    if (!normalized) return allGroups
+    return allGroups.filter((group) =>
       group.name.toLocaleLowerCase().includes(normalized),
     )
-  }, [query])
+  }, [appliedQuery, createdGroups])
 
-  const selected = groups.find((group) => group.id === selectedId) ?? null
+  const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
   const openEdit = () => {
     if (!selected) return
@@ -407,6 +443,29 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
       JSON.stringify(next),
     )
   }
+
+  const createDialog = (
+    <Modal opened={createOpened} onClose={create.close} title="Groupを作成" size="lg" centered withCloseButton={false}>
+      <Stack gap="lg">
+        <TextInput
+          label={<Group justify="space-between" wrap="nowrap"><Text component="span" size="sm" fw={500}>名前</Text><Text component="span" size="xs" c="dimmed">{Array.from(createName).length} / 100</Text></Group>}
+          value={createName}
+          onChange={(event) => { const value = event.currentTarget.value; if (Array.from(value).length <= 100) setCreateName(value) }}
+          placeholder="Group名"
+          styles={{ label: { display: "block", width: "100%" } }}
+          required
+        />
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+          <RelationEditor label="Parents" names={createParents} oppositeNames={createChildren} onChange={setCreateParents} currentGroupName={createName.trim()} />
+          <RelationEditor label="Children" names={createChildren} oppositeNames={createParents} onChange={setCreateChildren} currentGroupName={createName.trim()} />
+        </SimpleGrid>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={create.close}>キャンセル</Button>
+          <Button onClick={submitCreate} disabled={!createName.trim()}>作成</Button>
+        </Group>
+      </Stack>
+    </Modal>
+  )
 
   const editDialog = (
     <Modal
@@ -514,6 +573,8 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
 
   return (
     <>
+      <Notifications position="top-right" />
+      {createDialog}
       {editDialog}
       {deleteDialog}
       {compact ? (
@@ -523,28 +584,31 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
               h="100%"
               style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
             >
-              <Stack p="sm" gap="xs">
-                <Group gap="xs" wrap="nowrap">
-                  <TextInput
-                    flex={1}
-                    size="sm"
-                    value={query}
-                    onChange={(event) => setQuery(event.currentTarget.value)}
-                    placeholder="Groupを検索"
-                    leftSection={<IconSearch size={16} />}
-                  />
-                  <ActionIcon
-                    size="input-sm"
-                    variant="subtle"
-                    aria-label="Groupを作成"
-                  >
-                    <IconPlus size={18} />
-                  </ActionIcon>
+              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                <Box style={{ minWidth: 0 }}>
+                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                    <TextInput
+                      w={compact ? "100%" : 280}
+                      maw="100%"
+                      size="xs"
+                      value={query}
+                      onChange={(event) => setQuery(event.currentTarget.value)}
+                      placeholder="Groupを検索"
+                      leftSection={<IconSearch size={16} />}
+                      style={{ flex: compact ? "1 1 auto" : undefined }}
+                    />
+                    <Button size="xs" type="submit">検索</Button>
+                    <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
+                      {visibleGroups.length}件
+                    </Text>
+                  </Group>
+                </Box>
+                <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ gridColumn: compact ? "1" : undefined }}>
+                  <Button size="xs" leftSection={<IconFolderPlus size={16} />} onClick={openCreate}>
+                    Groupを作成
+                  </Button>
                 </Group>
-                <Text size="xs" c="dimmed">
-                  {visibleGroups.length}件
-                </Text>
-              </Stack>
+              </Box>
               <Divider />
               <ScrollArea flex={1}>
                 <Box
@@ -581,23 +645,15 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
             </Box>
           ) : (
             <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
-              <Group p="sm" justify="space-between" wrap="nowrap">
-                <Box miw={0}>
-                  <Text fw={700} truncate="end">
-                    {selected?.name ?? ""}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    {selected?.mediaCount ?? 0}件のMedia
-                  </Text>
-                </Box>
-                <ActionIcon
-                  variant="subtle"
-                  aria-label="Group一覧に戻る"
-                  onClick={closeDetail}
-                >
-                  <IconX size={18} />
-                </ActionIcon>
-              </Group>
+              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                  <Text fw={700} truncate="end">{selected?.name ?? ""}</Text>
+                  <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{selected?.mediaCount ?? 0}件のMedia</Text>
+                </Group>
+                <Button size="xs" variant="default" leftSection={<IconX size={16} />} onClick={closeDetail}>
+                  一覧に戻る
+                </Button>
+              </Box>
               <Divider />
               <ScrollArea flex={1}>
                 <Box p="sm">
@@ -606,7 +662,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       <Text fw={600}>Mediaがありません</Text>
                     </Paper>
                   ) : (
-                    <MediaGrid />
+                    <MediaGrid onOpen={setImageDetailIndex} />
                   )}
                 </Box>
               </ScrollArea>
@@ -629,28 +685,31 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                 minHeight: 0,
               }}
             >
-              <Stack p="sm" gap="xs">
-                <Group gap="xs" wrap="nowrap">
-                  <TextInput
-                    flex={1}
-                    size="sm"
-                    value={query}
-                    onChange={(event) => setQuery(event.currentTarget.value)}
-                    placeholder="Groupを検索"
-                    leftSection={<IconSearch size={16} />}
-                  />
-                  <ActionIcon
-                    size="input-sm"
-                    variant="subtle"
-                    aria-label="Groupを作成"
-                  >
-                    <IconPlus size={18} />
-                  </ActionIcon>
+              <Box pb="xs" style={{ display: "grid", gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                <Box style={{ minWidth: 0 }}>
+                  <Group component="form" onSubmit={(event) => { event.preventDefault(); setAppliedQuery(query) }} gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                    <TextInput
+                      w={compact ? "100%" : 280}
+                      maw="100%"
+                      size="xs"
+                      value={query}
+                      onChange={(event) => setQuery(event.currentTarget.value)}
+                      placeholder="Groupを検索"
+                      leftSection={<IconSearch size={16} />}
+                      style={{ flex: compact ? "1 1 auto" : undefined }}
+                    />
+                    <Button size="xs" type="submit">検索</Button>
+                    <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
+                      {visibleGroups.length}件
+                    </Text>
+                  </Group>
+                </Box>
+                <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ gridColumn: compact ? "1" : undefined }}>
+                  <Button size="xs" leftSection={<IconFolderPlus size={16} />} onClick={openCreate}>
+                    Groupを作成
+                  </Button>
                 </Group>
-                <Text size="xs" c="dimmed">
-                  {visibleGroups.length}件
-                </Text>
-              </Stack>
+              </Box>
               <Divider />
               <ScrollArea flex={1}>
                 <Box
@@ -729,68 +788,56 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                       height: "100%",
                     }}
                   >
-                    <Box p="sm">
-                      <Group justify="space-between" wrap="nowrap">
-                        <Box miw={0}>
-                          <Text fw={700} truncate="end">
-                            {selected?.name ?? ""}
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {selected?.mediaCount ?? 0}件のMedia
-                          </Text>
-                        </Box>
-                        <Group gap="xs" wrap="nowrap">
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="Groupを編集"
-                            onClick={openEdit}
-                          >
-                            <IconEdit size={18} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="Groupの選択を解除"
-                            onClick={closeDetail}
-                          >
-                            <IconX size={18} />
-                          </ActionIcon>
-                        </Group>
+                    <Box pb="xs" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", alignItems: "center", gap: "var(--mantine-spacing-xs)" }}>
+                      <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                        <Text fw={700} truncate="end">{selected?.name ?? ""}</Text>
+                        <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>{selected?.mediaCount ?? 0}件のMedia</Text>
+                      </Group>
+                      <Group gap="xs" wrap="nowrap" justify="flex-end">
+                        <Button size="xs" variant="default" leftSection={<IconEdit size={16} />} onClick={openEdit}>
+                          編集
+                        </Button>
+                        <Button size="xs" variant="default" leftSection={<IconX size={16} />} onClick={closeDetail}>
+                          閉じる
+                        </Button>
                       </Group>
                     </Box>
                     <Divider />
 
-                    <UnstyledButton onClick={relations.toggle} px="sm" py={6}>
-                      <Group gap="xs">
-                        {relationsOpened ? (
-                          <IconChevronDown size={16} />
-                        ) : (
-                          <IconChevronRight size={16} />
-                        )}
+                    <UnstyledButton
+                      onClick={relations.toggle}
+                      px="sm"
+                      py={6}
+                      aria-expanded={relationsOpened}
+                      aria-label="このGroupとの関係を開閉"
+                    >
+                      <Group gap="xs" wrap="nowrap">
+                        <IconChevronRight
+                          size={16}
+                          style={{
+                            transform: relationsOpened ? "rotate(90deg)" : "rotate(0deg)",
+                            transition: "transform 200ms ease",
+                          }}
+                        />
                         <Text size="xs" c="dimmed">
                           このGroupとの関係
                         </Text>
                       </Group>
                     </UnstyledButton>
-                    {relationsOpened && (
+                    <Collapse in={relationsOpened} transitionDuration={200}>
                       <Box px="lg" pb="sm">
                         <SimpleGrid cols={2} spacing="lg">
                           <Stack gap={4}>
-                            <Text size="xs" c="dimmed">
-                              Parents
-                            </Text>
-                            <RelationItems
-                              names={selected?.parentNames ?? []}
-                            />
+                            <Text size="xs" c="dimmed">Parents</Text>
+                            <RelationItems names={selected?.parentNames ?? []} />
                           </Stack>
                           <Stack gap={4}>
-                            <Text size="xs" c="dimmed">
-                              Children
-                            </Text>
+                            <Text size="xs" c="dimmed">Children</Text>
                             <RelationItems names={selected?.childNames ?? []} />
                           </Stack>
                         </SimpleGrid>
                       </Box>
-                    )}
+                    </Collapse>
                     <Divider />
 
                     <ScrollArea flex={1}>
@@ -803,7 +850,7 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid />
+                          <MediaGrid onOpen={setImageDetailIndex} />
                         )}
                       </Box>
                     </ScrollArea>
@@ -814,6 +861,12 @@ export function GroupBrowser({ contextKind = "personal", communityId = "photo-cl
           </SplitView.Pane>
         </SplitView.Root>
       )}
+      <ImageDetailDialog
+        items={groupMediaItems}
+        initialId={imageDetailIndex !== null ? groupMediaItems[imageDetailIndex].id : undefined}
+        onClose={() => setImageDetailIndex(null)}
+        contextKind={contextKind}
+      />
     </>
   )
 }

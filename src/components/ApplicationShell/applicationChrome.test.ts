@@ -14,6 +14,12 @@ describe("isApplicationChromeFeatureVisible", () => {
     ).toBe(true)
   })
 
+  it("hides global controls in restricted deletion flows", () => {
+    for (const feature of ["navigation", "context-switcher", "account-menu"] as const) {
+      expect(isApplicationChromeFeatureVisible("restricted-flow", feature)).toBe(false)
+    }
+  })
+
   it("hides application chrome before user registration", () => {
     expect(
       isApplicationChromeFeatureVisible("pre-registration", "navigation"),

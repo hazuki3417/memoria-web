@@ -1,15 +1,15 @@
 import {
   IconLayoutDashboard,
   IconPhoto,
-  IconUserCircle,
   IconUsers,
+  IconSettings,
 } from "@tabler/icons-react"
 import type {
   ApplicationContextOption,
   ApplicationNavigationItem,
 } from "./types"
 
-export type ApplicationSection = "dashboard" | "media" | "groups" | "members"
+export type ApplicationSection = "dashboard" | "media" | "groups" | "members" | "settings"
 
 const baseApplicationNavigation = [
   { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard },
@@ -19,7 +19,7 @@ const baseApplicationNavigation = [
 
 const communityApplicationNavigation = [
   ...baseApplicationNavigation,
-  { id: "members", label: "メンバー", icon: IconUserCircle },
+  { id: "settings", label: "設定", icon: IconSettings },
 ] satisfies ApplicationNavigationItem[]
 
 export function getApplicationNavigation({
@@ -41,11 +41,14 @@ export function getApplicationNavigation({
 }
 
 export function getApplicationSection(pathname: string): ApplicationSection {
-  const section = pathname.split("/").filter(Boolean).at(-1)
+  const parts = pathname.split("/").filter(Boolean)
+  const section = parts.at(-1)
+  if (parts[0] === "communities" && ["members", "usage", "preferences", "settings"].includes(parts[2])) return "settings"
   return section === "dashboard" ||
     section === "media" ||
     section === "groups" ||
-    section === "members"
+    section === "members" ||
+    section === "settings"
     ? section
     : "dashboard"
 }

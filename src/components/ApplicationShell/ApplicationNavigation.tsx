@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Burger, Divider, Drawer, Stack, Text } from "@mantine/core"
+import { Box, Burger, Divider, Drawer, ScrollArea, Stack, Text } from "@mantine/core"
 import { useState } from "react"
 import { NavigationItem } from "@/components/NavigationItem"
 import type { ApplicationNavigationItem } from "./types"
@@ -17,15 +17,21 @@ export function useApplicationNavigation() {
 export function ApplicationNavigationTrigger({
   opened,
   onToggle,
+  hidden = false,
 }: {
   opened: boolean
   onToggle: () => void
+  hidden?: boolean
 }) {
   return (
     <Burger
       opened={opened}
       onClick={onToggle}
       size="sm"
+      disabled={hidden}
+      tabIndex={hidden ? -1 : undefined}
+      aria-hidden={hidden || undefined}
+      style={hidden ? { visibility: "hidden" } : undefined}
       aria-label="ナビゲーションを開閉"
       aria-controls="application-context-navigation"
       aria-expanded={opened}
@@ -69,7 +75,8 @@ export function ApplicationNavigation({
         body: { height: "100%" },
       }}
     >
-      <Stack gap={0} h="100%" p="xs">
+      <Stack gap={0} h="100%" p="xs" style={{ minHeight: 0 }}>
+        <ScrollArea type="hover" style={{ flex: 1, minHeight: 0 }}>
         <Box
           component="nav"
           id="application-context-navigation"
@@ -92,6 +99,7 @@ export function ApplicationNavigation({
             ))}
           </Stack>
         </Box>
+        </ScrollArea>
         <Box mt="auto">
           <Divider mb="xs" />
           <Text size="10px" c="dimmed" px="sm" pb={4}>

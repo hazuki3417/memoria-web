@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   getApplicationNavigation,
+  getApplicationSection,
   getContextSwitchPath,
 } from "./applicationNavigation"
 
@@ -20,10 +21,10 @@ describe("getApplicationNavigation", () => {
     ])
   })
 
-  it("adds members navigation for community context", () => {
+  it("adds settings navigation for community context", () => {
     const items = getApplicationNavigation({
       contextKind: "community",
-      activeSection: "members",
+      activeSection: "settings",
     })
 
     expect(
@@ -32,7 +33,7 @@ describe("getApplicationNavigation", () => {
       { id: "dashboard", label: "ダッシュボード", active: false },
       { id: "media", label: "メディア", active: false },
       { id: "groups", label: "グループ", active: false },
-      { id: "members", label: "メンバー", active: true },
+      { id: "settings", label: "設定", active: true },
     ])
   })
 
@@ -80,5 +81,13 @@ describe("getContextSwitchPath", () => {
         communityId: "family-123",
       }),
     ).toBe("/dashboard")
+  })
+})
+
+describe("getApplicationSection", () => {
+  it("groups community subpages under settings", () => {
+    for (const section of ["members", "usage", "preferences", "settings"]) {
+      expect(getApplicationSection(`/communities/family-123/${section}`)).toBe("settings")
+    }
   })
 })
