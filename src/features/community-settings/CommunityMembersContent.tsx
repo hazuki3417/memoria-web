@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 
 export type CommunityMember = { id: string; name: string; role: "admin" | "member"; isSelf?: boolean }
+export const COMMUNITY_MEMBER_LIMIT = 30
+export const COMMUNITY_ADMIN_LIMIT = 3
 const previewMembers: CommunityMember[] = [
   { id: "self", name: "ユーザー", role: "admin", isSelf: true },
   { id: "m1", name: "山田 花子", role: "admin" },
@@ -30,6 +32,8 @@ export function CommunityMembersContent({ members = previewMembers, preview = tr
   const [done, setDone] = useState(false)
   const self = members.find((member) => member.isSelf)
   const adminCount = members.filter((member) => member.role === "admin").length
+  const memberLimitReached = members.length >= COMMUNITY_MEMBER_LIMIT
+  const adminLimitReached = adminCount >= COMMUNITY_ADMIN_LIMIT
   const blocked = self?.role === "admin" && adminCount <= 1
   const rows = useMemo(() => members.filter((member) => member.name.toLocaleLowerCase("ja-JP").includes(query.trim().toLocaleLowerCase("ja-JP"))).sort((a, b) => {
     const aValue = sortKey === "role" ? a.role : a.name
@@ -54,6 +58,9 @@ export function CommunityMembersContent({ members = previewMembers, preview = tr
       <PageHeader title="メンバー" description="Communityの参加者と役割を確認します。" />
       <Box>
         <SectionHeader>参加者</SectionHeader>
+        <Group gap="xs" mb="sm"><Badge variant="light">参加者 {members.length} / {COMMUNITY_MEMBER_LIMIT}</Badge><Badge variant="light">Administrator {adminCount} / {COMMUNITY_ADMIN_LIMIT}</Badge></Group>
+        {memberLimitReached && <Text size="sm" c="orange" mb="sm">参加者の上限に達しています。新しい参加者を追加できません。</Text>}
+        {adminLimitReached && <Text size="sm" c="dimmed" mb="sm">Administratorの上限に達しています。これ以上Administratorへ変更できません。</Text>}
         {preview && <Text size="xs" c="dimmed" mb="sm">表示している参加者はPrototype用のサンプルです。管理操作はAPI未接続です。</Text>}
         <TextInput aria-label="参加者を名前で検索" placeholder="名前で検索" leftSection={<IconSearch size={16} />} value={query} onChange={(event) => setQuery(event.currentTarget.value)} mb="md" />
         <ScrollArea type="hover" w="100%">
