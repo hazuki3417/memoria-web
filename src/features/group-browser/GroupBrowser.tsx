@@ -33,7 +33,6 @@ import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
 import { SplitView } from "@/components/SplitView"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
 
 type GroupFixture = {
@@ -626,7 +625,6 @@ export function GroupBrowser({
 
   return (
     <>
-      <Notifications position="top-right" />
       {createDialog}
       {editDialog}
       {deleteDialog}
