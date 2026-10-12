@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useMediaQuery } from "@mantine/hooks"
 import { IconSettings, IconUsers, IconChartBar, IconPalette } from "@tabler/icons-react"
 import { NavigationItem } from "@/components/NavigationItem"
@@ -20,6 +21,7 @@ export function CommunitySettings({
   role?: Role
   communityId?: string
 }) {
+  const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
   const [name, setName] = useState("家族のアルバム")
@@ -166,7 +168,7 @@ export function CommunitySettings({
               data={sections.map(({ id, label }) => ({ value: id, label }))}
               onChange={(value) => {
                 const target = sections.find((item) => item.id === value)
-                if (target && target.id !== "general") window.location.assign(target.href)
+                if (target && target.id !== "general") router.push(target.href)
               }} />
           </Box>
           {content}
@@ -179,7 +181,7 @@ export function CommunitySettings({
               {sections.map((item) => (
                 <NavigationItem key={item.id} label={item.label} icon={item.icon}
                   active={item.id === "general"} accentColor="var(--mantine-color-violet-6)"
-                  onClick={() => { if (item.id !== "general") window.location.assign(item.href) }} />
+                  onClick={() => { if (item.id !== "general") router.push(item.href) }} />
               ))}
             </Stack>
           </Box>
