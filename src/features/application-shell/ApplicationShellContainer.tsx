@@ -216,7 +216,7 @@ export function ApplicationShellContainer({
                   user={{ displayName: "ユーザー" }}
                   currentContext={currentContext}
                   onOpenSettings={() => router.push("/settings/profile")}
-                  onLogout={() => undefined}
+                  onLogout={() => { window.location.assign("/auth/logout") }}
                 />
               ) : undefined
             }
