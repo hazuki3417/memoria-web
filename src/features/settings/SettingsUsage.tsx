@@ -26,7 +26,7 @@ type SortDirection = "asc" | "desc"
 
 const sizeMultipliers: Record<string, number> = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3, TB: 1024 ** 4, PB: 1024 ** 5 }
 function parseSize(label: string): number {
-  const match = label.trim().match(/^([\\d,.]+)\\s*(B|KB|MB|GB|TB|PB)$/i)
+  const match = label.trim().match(/^([\d,.]+)\s*(B|KB|MB|GB|TB|PB)$/i)
   if (!match) return 0
   return Number(match[1].replace(/,/g, "")) * sizeMultipliers[match[2].toUpperCase()]
 }
