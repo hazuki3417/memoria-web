@@ -67,13 +67,15 @@ export function CommunityMembersContent({ members = previewMembers, onLeave }: {
         <Box style={{ borderRadius: "var(--mantine-radius-md)", overflow: "hidden", border: "1px solid var(--mantine-color-default-border)" }}>
           <Box style={{ overflowX: "auto" }}>
             <Box miw={400}>
-              <Table striped withRowBorders style={{ tableLayout: "fixed", paddingRight: 10 }}>
+              <Box style={{ paddingRight: 10 }}>
+              <Table striped withRowBorders style={{ tableLayout: "fixed" }}>
                 <Table.Thead><Table.Tr style={{ height: tableHeaderHeight }}>
                   <Table.Th w="45%"><UnstyledButton onClick={() => changeSort("name")} aria-label="名前で並び替え">名前 {sortKey === "name" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
                   <Table.Th><UnstyledButton onClick={() => changeSort("role")} aria-label="役割で並び替え">役割 {sortKey === "role" ? descending ? "↓" : "↑" : "↕"}</UnstyledButton></Table.Th>
                   {self?.role === "admin" && <Table.Th w={52}><Text size="xs">操作</Text></Table.Th>}
                 </Table.Tr></Table.Thead>
               </Table>
+              </Box>
               <ScrollArea type="always" scrollbarSize={10} h={visibleRowCount * tableRowHeight}>
                 <Table striped highlightOnHover withRowBorders style={{ tableLayout: "fixed" }} styles={{ td: { height: tableRowHeight, borderBottom: "1px solid var(--mantine-color-default-border)" } }}>
                   <Table.Tbody>
