@@ -22,7 +22,6 @@ const meta = {
         navigationItems={getApplicationNavigation({
           contextKind: communityContext.kind,
           activeSection: "settings",
-          communityId: communityContext.id,
         })}
         user={{ displayName: "ユーザー" }}
       >
