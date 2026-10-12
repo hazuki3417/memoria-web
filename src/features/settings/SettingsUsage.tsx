@@ -60,7 +60,7 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
                 </Table.Tr>
               ))}
             </Table.Tbody>
-            <Table.Tfoot>
+            <Table.Tfoot style={{ borderTop: "2px solid var(--mantine-color-default-border)" }}>
               <Table.Tr>
                 <Table.Th>合計</Table.Th>
                 <Table.Th ta="right">{usage.mediaCount.toLocaleString("ja-JP")} 件</Table.Th>
