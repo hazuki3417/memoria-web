@@ -26,7 +26,13 @@ export default function RootLayout({
         <ThemeProvider theme={theme}>
           <Notifications
             position="top-right"
-            style={{ top: "var(--memoria-notification-top, var(--mantine-spacing-md))" }}
+            styles={{
+              root: {
+                top: "var(--memoria-notification-top, var(--mantine-spacing-md))",
+                pointerEvents: "none",
+              },
+              notification: { pointerEvents: "auto" },
+            }}
           />
           {children}
         </ThemeProvider>
