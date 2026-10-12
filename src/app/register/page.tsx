@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { auth0 } from "@/lib/auth0"
-import { getCurrentMemoriaUser } from "@/lib/memoria-api"
+import { getCurrentMemoriaUser } from "@/infrastructure/graphql"
 import { UserRegistration } from "@/features/user-registration/UserRegistration"
 
 export default async function Page() {
