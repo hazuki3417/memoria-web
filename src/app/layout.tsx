@@ -24,7 +24,10 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider theme={theme}>
-          <Notifications position="top-right" />
+          <Notifications
+            position="top-right"
+            style={{ top: "var(--memoria-notification-top, var(--mantine-spacing-md))" }}
+          />
           {children}
         </ThemeProvider>
       </body>
