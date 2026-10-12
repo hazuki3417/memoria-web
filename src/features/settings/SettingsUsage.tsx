@@ -5,6 +5,7 @@ import { SectionHeader } from "@/components/SectionHeader"
 export type SettingsUsageData = {
   usedStorageLabel: string
   effectiveLimitLabel: string
+  availableStorageLabel: string
   storageUsagePercent: number
   mediaCount: number
   formatBreakdown?: { format: string; count: number; sizeLabel: string }[]
@@ -20,19 +21,20 @@ export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUs
       <Box>
         <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
-          <Group justify="space-between" align="end">
-            <Box>
-              <Text fw={700} size="xl">
-                {usage.usedStorageLabel} 使用中
-              </Text>
-              <Text size="sm" c="dimmed">
-                {usage.effectiveLimitLabel} 中
-              </Text>
-            </Box>
-            <Text size="sm" fw={600}>
-              {usage.storageUsagePercent}%
-            </Text>
+          <Group justify="space-between" align="center">
+            <Text size="sm">使用済み</Text>
+            <Text fw={600} ta="right">{usage.usedStorageLabel}</Text>
           </Group>
+          <Group justify="space-between" align="center">
+            <Text size="sm">空き容量</Text>
+            <Text fw={600} ta="right">{usage.availableStorageLabel}</Text>
+          </Group>
+          <Box style={{ borderTop: "1px solid var(--mantine-color-default-border)" }} pt="sm">
+            <Group justify="space-between" align="center">
+              <Text size="sm" fw={700}>総容量</Text>
+              <Text fw={700} ta="right">{usage.effectiveLimitLabel}</Text>
+            </Group>
+          </Box>
           <Progress
             value={usage.storageUsagePercent}
             size="md"
