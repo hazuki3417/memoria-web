@@ -1,7 +1,7 @@
 "use client"
 
 import { AppShell, Box } from "@mantine/core"
-import { useEffect, type ReactNode } from "react"
+import type { ReactNode } from "react"
 
 export type ApplicationShellProps = {
   children: ReactNode
@@ -14,37 +14,15 @@ export function ApplicationShell({
   header,
   navigation,
 }: ApplicationShellProps) {
-  useEffect(() => {
-    const main = document.querySelector<HTMLElement>("[data-memoria-application-main]")
-    if (!main) return
-
-    const updateOffset = () => {
-      const top = main.getBoundingClientRect().top
-      document.documentElement.style.setProperty(
-        "--memoria-notification-top",
-        `${Math.max(0, top) + 12}px`,
-      )
-    }
-    const observer = new ResizeObserver(updateOffset)
-    observer.observe(main)
-    window.addEventListener("resize", updateOffset)
-    updateOffset()
-    return () => {
-      observer.disconnect()
-      window.removeEventListener("resize", updateOffset)
-      document.documentElement.style.removeProperty("--memoria-notification-top")
-    }
-  }, [])
-
   return (
     <AppShell
-      header={{ height: 40 }}
+      header={{ height: "var(--memoria-app-header-height)" }}
       padding="lg"
       styles={{
         root: { height: "100dvh", overflow: "hidden" },
         main: {
           position: "fixed",
-          top: 40,
+          top: "var(--memoria-app-header-height)",
           right: 0,
           bottom: 0,
           left: 0,
