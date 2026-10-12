@@ -10,12 +10,12 @@ export type SettingsUsageData = {
   formatBreakdown?: { format: string; count: number; sizeLabel: string }[]
 }
 
-export function SettingsUsage({ usage }: { usage: SettingsUsageData }) {
+export function SettingsUsage({ usage, scope = "personal" }: { usage: SettingsUsageData; scope?: "personal" | "community" }) {
   return (
     <Stack gap="xl">
       <PageHeader
         title="利用状況"
-        description="Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。"
+        description={scope === "community" ? "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。" : "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。"}
       />
       <Box>
         <SectionHeader>ストレージ</SectionHeader>
