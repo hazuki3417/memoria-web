@@ -24,7 +24,7 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider theme={theme}>
-          <Notifications />
+          <Notifications position="top-right" />
           {children}
         </ThemeProvider>
       </body>
