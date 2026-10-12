@@ -1,7 +1,7 @@
 "use client"
 
 import { AppShell, Box, ScrollArea } from "@mantine/core"
-import type { ReactNode } from "react"
+import { useEffect, type ReactNode } from "react"
 
 export type ApplicationShellProps = {
   children: ReactNode
@@ -14,6 +14,28 @@ export function ApplicationShell({
   header,
   navigation,
 }: ApplicationShellProps) {
+  useEffect(() => {
+    const main = document.querySelector<HTMLElement>("[data-memoria-application-main]")
+    if (!main) return
+
+    const updateOffset = () => {
+      const top = main.getBoundingClientRect().top
+      document.documentElement.style.setProperty(
+        "--memoria-notification-top",
+        `${Math.max(0, top) + 12}px`,
+      )
+    }
+    const observer = new ResizeObserver(updateOffset)
+    observer.observe(main)
+    window.addEventListener("resize", updateOffset)
+    updateOffset()
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("resize", updateOffset)
+      document.documentElement.style.removeProperty("--memoria-notification-top")
+    }
+  }, [])
+
   return (
     <AppShell
       header={{ height: 40 }}
@@ -37,7 +59,7 @@ export function ApplicationShell({
     >
       {header}
       {navigation}
-      <AppShell.Main>
+      <AppShell.Main data-memoria-application-main>
         <ScrollArea
           type="hover"
           h="100%"
