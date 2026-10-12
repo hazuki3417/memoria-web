@@ -1,2 +1,2 @@
-export { getCurrentMemoriaUser, registerMemoriaUser } from "./server"
-export type { CurrentUser, CurrentUserResult, RegistrationResult } from "./server"
+export { getCurrentMemoriaUser, registerMemoriaUser, updateMemoriaProfile } from "./server"
+export type { CurrentUser, CurrentUserResult, RegistrationResult, UpdateProfileResult } from "./server"
