@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { CommunitySettings } from "@/features/community-settings/CommunitySettings"
+import { CommunitySettings } from "../../features/community-settings/CommunitySettings"
 
 const meta = {
   title: "Design Prototypes/Community Settings",
