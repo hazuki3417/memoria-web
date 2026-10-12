@@ -16,13 +16,13 @@ export function ApplicationShell({
 }: ApplicationShellProps) {
   return (
     <AppShell
-      header={{ height: "var(--memoria-app-header-height)" }}
+      header={{ height: 40 }}
       padding="lg"
       styles={{
         root: { height: "100dvh", overflow: "hidden" },
         main: {
           position: "fixed",
-          top: "var(--memoria-app-header-height)",
+          top: 40,
           right: 0,
           bottom: 0,
           left: 0,
