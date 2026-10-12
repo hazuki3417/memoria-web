@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import {
   Box,
   Button,
+  ColorInput,
   Group,
   Select,
   Stack,
@@ -158,45 +159,107 @@ function ProfileContent({ onSave = saveMockProfile }: { onSave?: SaveProfile }) 
 
 function PreferencesContent({ compact }: { compact: boolean }) {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
-  const [dateFormat, setDateFormat] = useState("YYYY-MM-DD")
+  const [dateFormat, setDateFormat] = useState("YYYY/MM/DD")
   const [fileSizeUnit, setFileSizeUnit] = useState("SI")
-  const [loop, setLoop] = useState(true)
-  const [showDetails, setShowDetails] = useState(false)
+  const [loop, setLoop] = useState(false)
+  const [wideDetails, setWideDetails] = useState(true)
+  const [mediumDetails, setMediumDetails] = useState(false)
+  const [thumbnailSize, setThumbnailSize] = useState("medium")
+  const [accentColor, setAccentColor] = useState("#10B981")
 
-  return <Stack gap="xl">
-    <PageHeader title="環境設定" description="表示とプレビューの動作を設定します。" />
-    <Box>
-      <SectionHeader>表示</SectionHeader>
-      <Stack gap="xl">
-        <SettingRow compact={compact} label="表示テーマ" description="画面の表示テーマを選びます。">
-          <Select aria-label="表示テーマ" value={colorScheme}
-            onChange={(value) => value && setColorScheme(value as "auto" | "light" | "dark")}
-            data={[{ value: "auto", label: "システム" }, { value: "light", label: "ライト" }, { value: "dark", label: "ダーク" }]}
-            allowDeselect={false} />
-        </SettingRow>
-        <SettingRow compact={compact} label="日付形式" description="日付の表示形式を選びます。">
-          <Select aria-label="日付形式" value={dateFormat} onChange={(value) => value && setDateFormat(value)}
-            data={["YYYY-MM-DD"]} allowDeselect={false} />
-        </SettingRow>
-        <SettingRow compact={compact} label="ファイルサイズの単位" description="Mediaサイズの表示単位を選びます。">
-          <Select aria-label="ファイルサイズの単位" value={fileSizeUnit} onChange={(value) => value && setFileSizeUnit(value)}
-            data={[{ value: "SI", label: "SI（KB, MB, GB）" }, { value: "BINARY", label: "2進（KiB, MiB, GiB）" }]}
-            allowDeselect={false} />
-        </SettingRow>
-      </Stack>
-    </Box>
-    <Box>
-      <SectionHeader>プレビュー</SectionHeader>
-      <Stack gap="xl">
-        <SettingRow compact={compact} label="繰り返し表示" description="最後まで進んだら最初のMediaに戻ります。">
-          <Switch checked={loop} onChange={(event) => setLoop(event.currentTarget.checked)} label={loop ? "オン" : "オフ"} />
-        </SettingRow>
-        <SettingRow compact={compact} label="詳細情報を表示" description="プレビューを開いたときに詳細情報を表示します。">
-          <Switch checked={showDetails} onChange={(event) => setShowDetails(event.currentTarget.checked)} label={showDetails ? "オン" : "オフ"} />
-        </SettingRow>
-      </Stack>
-    </Box>
-  </Stack>
+  return (
+    <Stack gap="xl">
+      <PageHeader
+        title="環境設定"
+        description="表示とプレビューの動作を設定します。"
+      />
+      <Box>
+        <SectionHeader>表示</SectionHeader>
+        <Stack gap="xl">
+          <SettingRow
+            compact={compact}
+            label="表示テーマ"
+            description="画面の表示テーマを選びます。"
+          >
+            <Select
+              aria-label="表示テーマ"
+              value={colorScheme}
+              onChange={(value) =>
+                value && setColorScheme(value as "auto" | "light" | "dark")
+              }
+              data={[
+                { value: "auto", label: "システム" },
+                { value: "light", label: "ライト" },
+                { value: "dark", label: "ダーク" },
+              ]}
+              allowDeselect={false}
+            />
+          </SettingRow>
+          <SettingRow compact={compact} label="Personal Accent Color" description="Personal Contextのアクセントカラーを選びます。">
+            <ColorInput aria-label="Personal Accent Color" format="hex" value={accentColor} onChange={setAccentColor} />
+          </SettingRow>
+          <SettingRow
+            compact={compact}
+            label="日付形式"
+            description="日付の表示形式を選びます。"
+          >
+            <Select
+              aria-label="日付形式"
+              value={dateFormat}
+              onChange={(value) => value && setDateFormat(value)}
+              data={["YYYY/MM/DD", "MM/DD/YYYY", "DD/MM/YYYY"]}
+              allowDeselect={false}
+            />
+          </SettingRow>
+          <SettingRow
+            compact={compact}
+            label="ファイルサイズの単位"
+            description="Mediaサイズの表示単位を選びます。"
+          >
+            <Select
+              aria-label="ファイルサイズの単位"
+              value={fileSizeUnit}
+              onChange={(value) => value && setFileSizeUnit(value)}
+              data={[
+                { value: "SI", label: "SI（KB, MB, GB）" },
+                { value: "BINARY", label: "2進（KiB, MiB, GiB）" },
+              ]}
+              allowDeselect={false}
+            />
+          </SettingRow>
+          <SettingRow compact={compact} label="Mediaサムネイルサイズ" description="Media一覧のサムネイルサイズを選びます。">
+            <Select aria-label="Mediaサムネイルサイズ" value={thumbnailSize} onChange={(value) => value && setThumbnailSize(value)} data={[{value:"small",label:"小"},{value:"medium",label:"中"},{value:"large",label:"大"}]} allowDeselect={false} />
+          </SettingRow>
+        </Stack>
+      </Box>
+      <Box>
+        <SectionHeader>プレビュー</SectionHeader>
+        <Stack gap="xl">
+          <SettingRow
+            compact={compact}
+            label="Media Detailの前後Navigation循環"
+            description="最後まで進んだら最初のMediaに戻ります。"
+          >
+            <Switch
+              checked={loop}
+              onChange={(event) => setLoop(event.currentTarget.checked)}
+              label={loop ? "オン" : "オフ"}
+            />
+          </SettingRow>
+          <SettingRow
+            compact={compact}
+            label="詳細情報の初期表示（Wide）"
+            description="WideでMedia Detailを開くときに詳細情報を展開します。"
+          >
+            <Switch checked={wideDetails} onChange={(event) => setWideDetails(event.currentTarget.checked)} label={wideDetails ? "オン" : "オフ"} />
+          </SettingRow>
+          <SettingRow compact={compact} label="詳細情報の初期表示（Medium）" description="MediumでMedia Detailを開くときに詳細情報を展開します。">
+            <Switch checked={mediumDetails} onChange={(event) => setMediumDetails(event.currentTarget.checked)} label={mediumDetails ? "オン" : "オフ"} />
+          </SettingRow>
+        </Stack>
+      </Box>
+    </Stack>
+  )
 }
 
 function UsageContent() {
