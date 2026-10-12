@@ -41,7 +41,9 @@ export function getApplicationNavigation({
 }
 
 export function getApplicationSection(pathname: string): ApplicationSection {
-  const section = pathname.split("/").filter(Boolean).at(-1)
+  const parts = pathname.split("/").filter(Boolean)
+  const section = parts.at(-1)
+  if (parts[0] === "communities" && ["members", "usage", "preferences", "settings"].includes(parts[2])) return "settings"
   return section === "dashboard" ||
     section === "media" ||
     section === "groups" ||
