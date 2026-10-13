@@ -74,7 +74,7 @@ export async function registerMemoriaUser(
 ): Promise<RegistrationResult> {
   const response = await request<{ registerUser: { user: CurrentUser } }>(
     REGISTER_MUTATION,
-    "RegisterUser",
+    "RegisterMemoriaUser",
     { input: { nickname } },
   )
   if (response.kind !== "ok") return { kind: response.kind }
@@ -104,7 +104,7 @@ export async function updateMemoriaProfile(
 ): Promise<UpdateProfileResult> {
   const response = await request<{ updateUserProfile: { user: CurrentUser } }>(
     UPDATE_PROFILE_MUTATION,
-    "UpdateUserProfile",
+    "UpdateMemoriaUserProfile",
     { input: { nickname } },
   )
   if (response.kind !== "ok") return { kind: response.kind }
