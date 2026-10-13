@@ -3,7 +3,7 @@ import { auth0 } from "@/lib/auth0"
 
 const ME_QUERY = "query CurrentUser { me { id profile { nickname } } }"
 const REGISTER_MUTATION =
-  "mutation RegisterUser($input: RegisterUserInput!) { registerUser(input: $input) { user { id profile { nickname } } } }"
+  "mutation RegisterMemoriaUser($input: RegisterUserInput!) { registerUser(input: $input) { user { id profile { nickname } } } }"
 
 type GraphQLError = { message?: string; extensions?: { code?: string } }
 type GraphQLResult<T> = { data?: T; errors?: GraphQLError[] }
@@ -93,7 +93,7 @@ export async function registerMemoriaUser(
 }
 
 const UPDATE_PROFILE_MUTATION =
-  "mutation UpdateUserProfile($input: UpdateUserProfileInput!) { updateUserProfile(input: $input) { user { id profile { nickname } } } }"
+  "mutation UpdateMemoriaUserProfile($input: UpdateUserProfileInput!) { updateUserProfile(input: $input) { user { id profile { nickname } } } }"
 
 export type UpdateProfileResult =
   | { kind: "updated"; user: CurrentUser }
