@@ -1,4 +1,4 @@
-# Snapshot of memoria-api/develop schemas/graphql/*.graphql (2026-10-12).
+# Snapshot aligned with memoria-api feature/user-preferences GraphQL schema.
 # Query/Mutation roots are made explicit for client-side GraphQL tooling.
 scalar Upload
 scalar DateTime
@@ -7,9 +7,10 @@ type Query { me: User }
 type Mutation {
  registerUser(input: RegisterUserInput!): RegisterUserPayload!
  updateUserProfile(input: UpdateUserProfileInput!): UpdateUserProfilePayload!
+ updateUserPreferences(input: UpdateUserPreferencesInput!): UpdateUserPreferencesPayload!
  createCommunity(input: CreateCommunityInput!): CreateCommunityPayload!
 }
-type User { id: ID! profile: UserProfile! createdAt: DateTime! updatedAt: DateTime! }
+type User { id: ID! profile: UserProfile! preferences: UserPreferences! createdAt: DateTime! updatedAt: DateTime! }
 type UserProfile { nickname: String! }
 input RegisterUserInput { nickname: String! }
 type RegisterUserPayload { user: User! }
@@ -19,3 +20,26 @@ type Community { id: ID! name: String! createdAt: DateTime! updatedAt: DateTime!
 input CreateCommunityInput { name: String! }
 type CreateCommunityPayload { community: Community! }
 type PageInfo { hasNextPage: Boolean! hasPrevPage: Boolean! startCursor: String endCursor: String }
+
+enum DateFormat { YYYY_MM_DD MM_DD_YYYY DD_MM_YYYY }
+enum FileSizeUnit { DECIMAL BINARY }
+enum MediaThumbnailSize { SMALL MEDIUM LARGE }
+type UserPreferences {
+ personalAccentColor: String!
+ dateFormat: DateFormat!
+ fileSizeUnit: FileSizeUnit!
+ mediaThumbnailSize: MediaThumbnailSize!
+ mediaDetailNavigationWrap: Boolean!
+ mediaDetailInitialInfoWide: Boolean!
+ mediaDetailInitialInfoMedium: Boolean!
+}
+input UpdateUserPreferencesInput {
+ personalAccentColor: String
+ dateFormat: DateFormat
+ fileSizeUnit: FileSizeUnit
+ mediaThumbnailSize: MediaThumbnailSize
+ mediaDetailNavigationWrap: Boolean
+ mediaDetailInitialInfoWide: Boolean
+ mediaDetailInitialInfoMedium: Boolean
+}
+type UpdateUserPreferencesPayload { preferences: UserPreferences! }
