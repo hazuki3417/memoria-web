@@ -2,10 +2,10 @@ query CurrentUser {
   me { id profile { nickname } }
 }
 
-mutation RegisterUser($input: RegisterUserInput!) {
+mutation RegisterMemoriaUser($input: RegisterUserInput!) {
   registerUser(input: $input) { user { id profile { nickname } } }
 }
 
-mutation UpdateUserProfile($input: UpdateUserProfileInput!) {
+mutation UpdateMemoriaUserProfile($input: UpdateUserProfileInput!) {
   updateUserProfile(input: $input) { user { id profile { nickname } } }
 }
