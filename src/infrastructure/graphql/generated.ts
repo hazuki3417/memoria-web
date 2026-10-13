@@ -4,8 +4,8 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type Incremental<T> =
   | T
   | {
-      [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never
-    }
+    [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never
+  }
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
 /** All built-in and custom scalars, mapped to their actual values */
@@ -100,24 +100,32 @@ export type UserProfile = {
   nickname: Scalars["String"]["output"]
 }
 
+export type RegisterMemoriaUserInput = {
+  nickname: string
+}
+
+export type UpdateMemoriaUserProfileInput = {
+  nickname: string
+}
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>
 
 export type CurrentUserQuery = {
   me: { id: string; profile: { nickname: string } } | null
 }
 
-export type RegisterUserMutationVariables = Exact<{
-  input: RegisterUserInput
+export type RegisterMemoriaUserMutationVariables = Exact<{
+  input: RegisterMemoriaUserInput
 }>
 
-export type RegisterUserMutation = {
+export type RegisterMemoriaUserMutation = {
   registerUser: { user: { id: string; profile: { nickname: string } } }
 }
 
-export type UpdateUserProfileMutationVariables = Exact<{
-  input: UpdateUserProfileInput
+export type UpdateMemoriaUserProfileMutationVariables = Exact<{
+  input: UpdateMemoriaUserProfileInput
 }>
 
-export type UpdateUserProfileMutation = {
+export type UpdateMemoriaUserProfileMutation = {
   updateUserProfile: { user: { id: string; profile: { nickname: string } } }
 }
