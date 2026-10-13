@@ -1,5 +1,5 @@
 query CurrentUser {
-  me { id profile { nickname } }
+  me { id profile { nickname } preferences { personalAccentColor dateFormat fileSizeUnit mediaThumbnailSize mediaDetailNavigationWrap mediaDetailInitialInfoWide mediaDetailInitialInfoMedium } }
 }
 
 mutation RegisterMemoriaUser($input: RegisterUserInput!) {
@@ -8,4 +8,18 @@ mutation RegisterMemoriaUser($input: RegisterUserInput!) {
 
 mutation UpdateMemoriaUserProfile($input: UpdateUserProfileInput!) {
   updateUserProfile(input: $input) { user { id profile { nickname } } }
+}
+
+mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
+  updateUserPreferences(input: $input) {
+    preferences {
+      personalAccentColor
+      dateFormat
+      fileSizeUnit
+      mediaThumbnailSize
+      mediaDetailNavigationWrap
+      mediaDetailInitialInfoWide
+      mediaDetailInitialInfoMedium
+    }
+  }
 }
