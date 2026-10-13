@@ -18,26 +18,17 @@
 - 機能単位で要求を合意して設計・実装へ進み、すべての要求完了を待つ一括工程にはしません。
 - 大規模機能は利用者価値または独立して検証できる境界でPhaseへ分割し、工程別Phase、長期Feature branch、巨大PRを前提にしません。中断時は再開に必要なCheckpointをIssueへ記録します。
 - AIは人間の提案へ受動的に同意せず、妥当性、前提、risk、既存設計との矛盾、過剰設計を評価します。
-- 懸念がある場合は変更前に指摘し、代替案、trade-off、推奨案を示します。詳細は`memoria-design/pages/ai-development.mdx`を参照します。
+- 懸念がある場合は変更前に指摘し、代替案、trade-off、推奨案を示します。詳細は`memoria-design/content/ai-development.mdx`を参照します。
 - 複数の論点は番号を付けて一つずつ扱い、回答後に合意、前提、影響範囲、制限、未決定事項を整理します。
 
-## ブランチ運用
+## ブランチ運用とGitHub操作
 
-- `main`は本番リリース可能な安定版を表します。通常の開発作業や直接pushは行いません。
-- `develop`は日常開発の統合先であり、このリポジトリの既定ブランチとして扱います。
-- `feature/*`、`fix/*`、`docs/*`、`refactor/*`、`chore/*`は最新の`develop`から作成し、PRのbaseを`develop`にします。
-- 通常リリースは`develop`から`main`へのPRで行い、人間が差分と検証結果を確認して承認します。
-- 緊急修正の`hotfix/*`だけは`main`から作成し、`main`への反映後に同じ修正を`develop`へ同期します。
-- `master`は使用しません。存在する場合は`main`との差分を確認して`main`へ統合した後、参照や未完了PRがないことを確認して廃止します。
-- ステージング・テスト専用ブランチは設けません。必要になった環境はブランチではなくデプロイ設定で分離します。
-- 詳細な共通規約は`memoria-design/pages/branch-strategy.mdx`を参照します。
-- PRは原則として通常の状態で作成し、Draftは人間が明示的に指示した場合だけ使用します。
-- 通常PRは受け入れ条件と必要な検証を満たし、レビュー可能な状態で作成します。
-- AIが作業する場合、作業ブランチへの実装・commitとPR作成を別工程として扱います。受け入れ条件と必要な検証が完了しても、人間からPR作成を明示的に指示されるまではPRを作成しません。レビュー可能になったこと、実装がまとまったこと、CIで検証したいことをPR作成の暗黙の許可として扱いません。
-- PRのマージには、原則として通常のmerge commitを使用します。squash mergeまたはrebase mergeは、明示的な理由と合意がある場合だけ使用します。
-- 作業ブランチへ派生元の更新を取り込む場合は、原則としてrebaseを使用します。`develop`を作業ブランチへmergeしません。
-- rebase後にリモートの作業ブランチを更新する必要がある場合は、本人だけが使用するブランチであることを確認し、`--force-with-lease`を使用します。
-- 共有ブランチである`main`と`develop`はrebaseまたはforce pushしません。
+- ブランチ・commit・PR・mergeの正本は `memoria-design/content/branch-strategy.mdx`、AIの操作許可と標準ワークフローの正本は `memoria-design/content/ai-development.mdx` です。詳細ルールをこのファイルで重複定義しません。
+- 作業開始時は `memoria-design/content/context/index.mdx` の情報の優先順位とタスク別参照手順を適用します。branch・commit・PRなどのGitHub変更操作の前には、同文書の「GitHub変更操作の事前確認」を必ず適用します。
+- `main`と`develop`への直接pushは禁止です。通常の作業は最新の`develop`から作業ブランチを作り、統合は`develop`へのPRで行います。
+- AIによる作業ブランチへのcommitとPR作成は別工程です。PR作成は人間の明示的な指示を受けた場合だけ行います。Draft PRは人間が明示的に指示した場合だけ使用します。
+- PRのmerge、Release、本番環境への操作は、別途必要な人間の明示的な承認なしに実行しません。
+- 作業の再開時やwrite操作の結果が不明な場合は、GitHubの最新状態を読み取り、重複操作を避けます。変更後は正本を再取得して反映を確認します。
 
 ## アプリケーション境界
 
@@ -67,12 +58,12 @@ Application Architectureの正本は `memoria-design/content/system/web/implemen
 - プロダクト設計、画面・コンポーネント設計、横断的な判断の正本は`memoria-design`です。
 - このリポジトリにはREADME、実行コマンド、GraphQL operation・fragment・生成設定など、実装に密着した情報を置きます。
 - 設計内容をこのリポジトリへ複製せず、正本へのリンクと実装上の参照先だけを記載します。
-- AI contextは`memoria-design/pages/context/`を索引として使用し、タスク固有の要件はIssueへ記録します。
+- AI contextは`memoria-design/content/context/index.mdx`を索引として使用し、タスク固有の要件はIssueへ記録します。
 - 資料、クライアントschema、APIの実際の挙動が一致しない場合は差異を報告します。
 
 ## ローカル開発環境
 
-標準環境はWindowsホスト、WSL2 Ubuntu、VS Code、Devboxです。Node.js 24を含むDevboxを使用します。共通方針は`memoria-design/pages/local-development.mdx`を参照します。
+標準環境はWindowsホスト、WSL2 Ubuntu、VS Code、Devboxです。Node.js 24を含むDevboxを使用します。共通方針は`memoria-design/content/local-development.mdx`を参照します。
 
 - リポジトリはUbuntu側で開き、npm・Node.jsなどのプロジェクトコマンドはUbuntu上のDevbox内で実行します。
 - Windowsホストから直接プロジェクトコマンドを実行しません。
@@ -133,7 +124,7 @@ GraphQLクライアントとApplication E2Eは再実装に合わせて整備し�
 
 1. 編集前に対象のroute、component・feature、provider、GraphQL operation、テストを確認します。
 2. 別のUIシステムを追加する前に、既存のMantine部品とMemoriaの実装パターンを優先します。
-3. ユーザー向け文言には`memoria-design/pages/ubiquitous.mdx`のユビキタス言語を使用します。
+3. ユーザー向け文言には`memoria-design/content/ubiquitous.mdx`のユビキタス言語を使用します。
 4. 横断変更が明示されていない限り、変更範囲をこのリポジトリ内に限定します。
 5. 横断変更ではリポジトリごとにブランチとPRを分け、契約上の依存関係を相互リンクします。
 6. ロジックには単体テスト、重要なUI挙動にはStorybookまたはPlaywrightの検証を追加します。Test Levelは実装単位ではなく守るcontractに応じて選択します。
