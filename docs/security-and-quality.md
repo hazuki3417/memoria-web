@@ -23,9 +23,17 @@ private repositoryでCode scanningを利用できるかは、現在のGitHubプ�
 
 ## 3. Quality Gate
 
-Application再実装期間中のため、GitHub ActionsのQuality Gateは一時停止しています。再開時に、現在の実装と必要な検証項目に合わせてworkflowとrequired checkを再設計します。
+Application再実装期間中のため、GitHub ActionsのQuality Gateは一時停止しています。現行Workflowの削除は過去の暫定措置であり、今後の標準運用には採用しません。
 
-Storybook build、Chromiumによるsmoke test、画像差分VRTについても、再開時に必須チェックとする範囲を再評価します。
+### 一時停止・再開の運用方針
+
+- 一時停止は**Workflowファイルや検査Jobを削除せず、PR・Push・schedule等の自動トリガーを無効化する**方法を原則とする。検査を常時成功するダミーJobへ置き換えない。
+- 原則として`workflow_dispatch`を残し、停止中も手動検証を可能にする。完全停止は理由・範囲・再開条件を明記する例外として扱う。
+- 停止理由、開始時点、対象Workflow、再開条件、停止中のPR確認手順をIssue等に記録する。未実行の検査を成功扱いせず、人間が未検証範囲を確認して統合可否を判断する。
+- 再開時は自動トリガーを復元し、現在の実装・依存関係で標準Gate全体が成功することを確認する。Manual Selectiveの成功を標準Gate全体の成功と混同しない。
+- Branch Protection / Required Checksには依存しない。GitHub Actionsのトリガー設定は有効な構文と意図したイベントを検証する。
+
+Storybook build、Chromiumによるsmoke test、画像差分VRTの標準Gateへの採用範囲は再開時に再評価します。詳細設計はmemoria-web Issue #101で管理します。
 
 ## 4. ブランチRuleset
 
