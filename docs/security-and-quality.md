@@ -23,22 +23,20 @@ private repositoryでCode scanningを利用できるかは、現在のGitHubプ�
 
 ## 3. Quality Gate
 
-Application再実装期間中のため、GitHub ActionsのQuality Gateは一時停止しています。再開時に、現在の実装と必要な検証項目に合わせてworkflowとrequired checkを再設計します。
+Quality Gateの一時停止・再開に関する**全Repository共通の運用ルール**は、`memoria-design/content/test-design.mdx`を正本とします。この文書では共通ルールを重複記載しません。
 
-Storybook build、Chromiumによるsmoke test、画像差分VRTについても、再開時に必須チェックとする範囲を再評価します。
+Web固有の検査対象と実行条件は、WebのQuality Gate詳細設計で定義します。
 
 ## 4. ブランチRuleset
 
 `develop`と`main`に対するRulesetでrequired checkを設定する場合は、Quality Gate再開後に実際に成功したworkflowのチェック名を選択します。停止中のworkflowをrequired checkとして要求しないよう、既存Rulesetとの整合を確認します。
-
-Required approvals、merge方式、デフォルトブランチ、公開範囲、リリース・デプロイ方針は今回変更しません。
 
 ## 5. 設定確認
 
 1. `Settings` → `Advanced Security`で利用可能なSecurity機能を確認する。
 2. Dependabotが設定ファイルを認識し、npmとGitHub Actionsの更新PRを作成できることを確認する。
 3. Private vulnerability reportingの利用可否を確認する。
-4. Quality Gateが一時停止中であることと、既存Rulesetのrequired checkが停止中workflowを要求していないことを確認する。
-5. Quality Gate再開時に必要なチェックを改めて合意する。
+4. Required Checksを設定する場合、対象Workflowが有効であることを確認する。
+5. Quality Gateのトリガー変更時は、実行対象と必要な検査を確認する。
 
 GitHub管理画面でしか変更できない設定は、この文書を追加しただけでは有効になりません。
