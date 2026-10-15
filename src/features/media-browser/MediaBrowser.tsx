@@ -42,14 +42,8 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Dialog } from "@/components/Dialog"
+import { ImageDetailDialog, type MediaItem } from "@/features/image-detail"
 import { showNotification } from "@/components/Feedback"
-import { useImageDetailViewport } from "@/features/image-detail/useImageDetailViewport"
-import { useImageDetailEditing } from "@/features/image-detail/useImageDetailEditing"
-import { CommunityUnshareDialog } from "@/features/image-detail/CommunityUnshareDialog"
-import { CommunityShareDialog } from "@/features/image-detail/CommunityShareDialog"
-import { TagsEditDialog } from "@/features/image-detail/TagsEditDialog"
-import { GroupsEditDialog } from "@/features/image-detail/GroupsEditDialog"
-import { ImageDetailViewer } from "@/features/image-detail/ImageDetailViewer"
 
 type MediaBrowserState =
   | "default"
@@ -64,13 +58,6 @@ type MediaBrowserState =
   | "selection"
 type ContextKind = "personal" | "community"
 type SelectionDialog = "group" | "share" | "delete" | null
-export type MediaItem = {
-  id: string
-  label: string
-  src: string
-  failed?: boolean
-}
-
 const media: MediaItem[] = [
   {
     id: "portrait-01",
@@ -225,9 +212,6 @@ function MediaBrowserContent({
   initialDialog = null,
   communityId = "photo-club",
   downloadMock = "available",
-  detailOnlyItems,
-  initialDetailId,
-  onDetailClose,
   navigate,
 }: {
   initialState?: MediaBrowserState
@@ -235,9 +219,6 @@ function MediaBrowserContent({
   initialDialog?: SelectionDialog
   communityId?: string
   downloadMock?: "available" | "forbidden" | "processing"
-  detailOnlyItems?: MediaItem[]
-  initialDetailId?: string
-  onDetailClose?: () => void
   navigate: (path: string) => void
 }) {
   const [context, _setContext] = useState(contextKind)
@@ -246,51 +227,7 @@ function MediaBrowserContent({
   const [selected, setSelected] = useState<Set<string>>(
     initialState === "selection" ? new Set(["2", "5", "7"]) : new Set(),
   )
-  const [detail, setDetail] = useState<MediaItem | null>(
-    () => detailOnlyItems?.find((item) => item.id === initialDetailId) ?? null,
-  )
-  const closeImageDetail = () => {
-    setDetail(null)
-    onDetailClose?.()
-  }
-  useEffect(() => {
-    if (detailOnlyItems) {
-      setDetail(
-        detailOnlyItems.find((item) => item.id === initialDetailId) ?? null,
-      )
-    }
-  }, [initialDetailId, detailOnlyItems])
-
-  const {
-    detailEditor,
-    setDetailEditor,
-    detailDraft,
-    setDetailDraft,
-    shareTarget,
-    setShareTarget,
-    unshareTarget,
-    setUnshareTarget,
-    detailValues,
-    openDetailEditor,
-    saveDetailDraft,
-    addCommunityShare,
-    removeCommunityShare,
-    detailSectionsExpanded,
-    toggleDetailSection,
-  } = useImageDetailEditing(detail)
-  const {
-    prepareNavigation,
-    detailInfoOpened,
-    setDetailInfoOpened,
-    detailZoom,
-    setDetailZoom,
-    detailRotate,
-    setDetailRotate,
-    detailRotateAnimated,
-    setDetailRotateAnimated,
-    detailDirection,
-    setDetailDirection,
-  } = useImageDetailViewport()
+  const [detail, setDetail] = useState<MediaItem | null>(null)
   const [selectionDialog, setSelectionDialog] =
     useState<SelectionDialog>(initialDialog)
   const [groupTargets, setGroupTargets] = useState<string[]>([])
@@ -317,7 +254,6 @@ function MediaBrowserContent({
   // The mock has no tag metadata or Relay connection; keep the submitted filter separate.
   void appliedTags
   const stateItems =
-    detailOnlyItems ??
     (["true-empty", "filtered-empty", "loading", "error"].includes(initialState)
       ? []
       : initialState === "processing-failure"
@@ -338,7 +274,7 @@ function MediaBrowserContent({
 
   return (
     <>
-      {!detailOnlyItems && (
+      {(
         <Stack gap={0} w="100%">
           <Box
             pb="xs"
@@ -601,8 +537,6 @@ function MediaBrowserContent({
                       toggle(item.id)
                       return
                     }
-                    setDetailZoom(100)
-                    setDetailRotate(0)
                     setDetail(item)
                   }}
                 />
@@ -754,82 +688,13 @@ function MediaBrowserContent({
         </Text>
       </Dialog>
 
-      <ImageDetailViewer
-        detail={detail}
-        setDetail={setDetail}
-        closeImageDetail={closeImageDetail}
-        stateItems={stateItems}
-        compact={compact}
-        context={context}
-        downloadMock={downloadMock}
-        detailValues={detailValues}
-        detailSectionsExpanded={detailSectionsExpanded}
-        toggleDetailSection={toggleDetailSection}
-        openDetailEditor={openDetailEditor}
-        setUnshareTarget={setUnshareTarget}
-        setShareTarget={setShareTarget}
-        setDetailEditor={setDetailEditor}
-        prepareNavigation={prepareNavigation}
-        detailInfoOpened={detailInfoOpened}
-        setDetailInfoOpened={setDetailInfoOpened}
-        detailZoom={detailZoom}
-        setDetailZoom={setDetailZoom}
-        detailRotate={detailRotate}
-        setDetailRotate={setDetailRotate}
-        detailRotateAnimated={detailRotateAnimated}
-        setDetailRotateAnimated={setDetailRotateAnimated}
-        detailDirection={detailDirection}
-      />
-      <CommunityUnshareDialog
-        unshareTarget={unshareTarget}
-        setUnshareTarget={setUnshareTarget}
-        removeCommunityShare={removeCommunityShare}
-      />
-      <CommunityShareDialog
-        detailEditor={detailEditor}
-        setDetailEditor={setDetailEditor}
-        detailValues={detailValues}
-        shareTarget={shareTarget}
-        setShareTarget={setShareTarget}
-        addCommunityShare={addCommunityShare}
-      />
-      <TagsEditDialog
-        detailEditor={detailEditor}
-        setDetailEditor={setDetailEditor}
-        detailDraft={detailDraft}
-        setDetailDraft={setDetailDraft}
-        saveDetailDraft={saveDetailDraft}
-      />
-      <GroupsEditDialog
-        detailEditor={detailEditor}
-        setDetailEditor={setDetailEditor}
-        detailDraft={detailDraft}
-        setDetailDraft={setDetailDraft}
-        saveDetailDraft={saveDetailDraft}
-      />
+      {detail && <ImageDetailDialog items={stateItems} initialId={detail.id} onClose={() => setDetail(null)} contextKind={context} downloadMock={downloadMock} />}
     </>
   )
 }
 
-/** Route integration stays outside the reusable image-detail rendering path. */
-function RoutedMediaBrowser(
-  props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">,
-) {
+/** Route integration for the Media listing. */
+export function MediaBrowser(props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">) {
   const router = useRouter()
-  return (
-    <MediaBrowserContent {...props} navigate={(path) => router.push(path)} />
-  )
-}
-
-/**
- * The detail-only consumer must not require the Next.js App Router.
- * Media Browser's list actions retain their original Next.js navigation.
- */
-export function MediaBrowser(
-  props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">,
-) {
-  if (props.detailOnlyItems) {
-    return <MediaBrowserContent {...props} navigate={() => undefined} />
-  }
-  return <RoutedMediaBrowser {...props} />
+  return <MediaBrowserContent {...props} navigate={(path) => router.push(path)} />
 }
