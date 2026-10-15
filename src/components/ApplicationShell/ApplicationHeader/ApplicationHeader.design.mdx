@@ -1,0 +1,26 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Components/Application Shell/Header/Design Guide" />
+
+# ApplicationHeader
+
+## Overview
+Application Shellのヘッダー内にBrand、Navigation Trigger、Context、Accountを配置する。
+
+## Responsibilities
+- **所有する**: accentColorの上部border、leading・context・accountの配置、必要なNavigation Triggerの占有領域。
+- **所有しない**: Navigationの開閉状態、Context選択、Account操作。
+
+## Design Decisions
+- 既存のUI、文言、操作、Responsive Behaviorを維持したままComponent Directoryへ移動する。
+- Feature / Application Shellの公開APIはroot `index.ts`、Component単位の公開入口は同Directoryの`index.ts`が担当する。
+
+## Component Contract
+- 40pxの親Header領域内で既存の左右配置・Memoria表示を維持する。leadingがなければreserveNavigationSpaceに応じてhidden Triggerを配置する。
+
+## Test Design
+- BrandOnly / Composedを確認し、Navigation領域・テキスト・アクセントborderの表示を比較する。
+
+## References
+- [Application Shell仕様](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/application-shell.mdx)
+- [Web実装規約](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/web/implementation-conventions.mdx)
