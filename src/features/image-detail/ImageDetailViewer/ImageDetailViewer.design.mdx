@@ -1,0 +1,23 @@
+# ImageDetailViewer
+
+## 責務
+
+Image Detailの画像表示、前後移動、ズーム、回転、情報パネル、ダウンロード状態および共有・編集操作への入口を表示する。MediaBrowser / GroupBrowserに共通する表示責務を持つ。画像一覧の取得・画面遷移・編集状態の永続化は所有しない。
+
+## 表示・操作契約
+
+- 既存MediaBrowserの詳細Modalの表示、情報量、配置、Responsive Behaviorを維持する。
+- 前後移動は渡されたMedia一覧の順序に従い、移動時のViewport状態をリセットする。
+- 情報パネル、ズーム・回転、利用不可・処理中のダウンロード状態、共有・編集への導線を保持する。
+- Modalは従来どおり `#application-modal-root` をPortal先とする。
+
+## Story / テスト観点
+
+- 画像の表示、前後移動、先頭・末尾での操作
+- Portrait / Landscape、Compact / Desktop、情報パネルの開閉
+- ズーム、回転、ダウンロードの各状態
+- 閉じる操作、共有・編集操作の呼び出し
+
+## 実装上の未完了事項
+
+現在は抽出途中であり、MediaItem型や状態PropsにMediaBrowser由来の依存が残る。共通のImageDetailDialogへの統合と型・動作・Visual Regressionの検証はIssue #91で継続する。
