@@ -1,1 +1,0 @@
-export { ImageDetailValueList } from "./ImageDetailValueList"
