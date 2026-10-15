@@ -430,6 +430,7 @@ function MediaBrowserContent({
       [kind]: !current[kind],
     }))
   const {
+    prepareNavigation,
     detailInfoOpened,
     setDetailInfoOpened,
     detailZoom,
@@ -981,10 +982,7 @@ function MediaBrowserContent({
                           size="lg"
                           aria-label="前のMedia"
                           onClick={() => {
-                            setDetailDirection(-1)
-                            setDetailZoom(100)
-                            setDetailRotateAnimated(false)
-                            setDetailRotate(0)
+                            prepareNavigation(-1)
                             setDetail(prev)
                           }}
                         >
@@ -1054,10 +1052,7 @@ function MediaBrowserContent({
                           size="lg"
                           aria-label="次のMedia"
                           onClick={() => {
-                            setDetailDirection(1)
-                            setDetailZoom(100)
-                            setDetailRotateAnimated(false)
-                            setDetailRotate(0)
+                            prepareNavigation(1)
                             setDetail(next)
                           }}
                         >
