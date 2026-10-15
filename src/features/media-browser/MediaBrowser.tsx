@@ -781,6 +781,8 @@ function MediaBrowserContent({
         toggleDetailSection={toggleDetailSection}
         openDetailEditor={openDetailEditor}
         setUnshareTarget={setUnshareTarget}
+        setShareTarget={setShareTarget}
+        setDetailEditor={setDetailEditor}
         prepareNavigation={prepareNavigation}
         detailInfoOpened={detailInfoOpened}
         setDetailInfoOpened={setDetailInfoOpened}
