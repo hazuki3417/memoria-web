@@ -65,9 +65,39 @@ export function ImageDetailViewer(props: ImageDetailViewerProps) {
                   background: "transparent",
                 }}
               >
-                <ImageDetailPreview {...props} detail={detail} prev={prev} next={next} />
+                <ImageDetailPreview
+                  detail={detail}
+                  stateItems={stateItems}
+                  prev={prev}
+                  next={next}
+                  closeImageDetail={closeImageDetail}
+                  setDetail={props.setDetail}
+                  prepareNavigation={props.prepareNavigation}
+                  compact={compact}
+                  detailZoom={props.detailZoom}
+                  setDetailZoom={props.setDetailZoom}
+                  detailRotate={props.detailRotate}
+                  setDetailRotate={props.setDetailRotate}
+                  detailRotateAnimated={props.detailRotateAnimated}
+                  setDetailRotateAnimated={props.setDetailRotateAnimated}
+                  detailDirection={props.detailDirection}
+                  detailInfoOpened={detailInfoOpened}
+                  setDetailInfoOpened={props.setDetailInfoOpened}
+                />
 
-                <ImageDetailInfoPanel {...props} />
+                <ImageDetailInfoPanel
+                  compact={compact}
+                  detailInfoOpened={detailInfoOpened}
+                  detailValues={props.detailValues}
+                  detailSectionsExpanded={props.detailSectionsExpanded}
+                  toggleDetailSection={props.toggleDetailSection}
+                  openDetailEditor={props.openDetailEditor}
+                  setUnshareTarget={props.setUnshareTarget}
+                  setShareTarget={props.setShareTarget}
+                  setDetailEditor={props.setDetailEditor}
+                  context={props.context}
+                  downloadMock={props.downloadMock}
+                />
               </Box>
             )
           })()}
