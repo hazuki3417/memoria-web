@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
-import type { MediaItem } from "@/features/media-browser/MediaBrowser"
+import type { MediaItem } from "@/features/image-detail/types"
 import { useImageDetailEditing } from "../useImageDetailEditing"
 import { useImageDetailViewport } from "../useImageDetailViewport"
 import { ImageDetailViewer } from "./ImageDetailViewer"
