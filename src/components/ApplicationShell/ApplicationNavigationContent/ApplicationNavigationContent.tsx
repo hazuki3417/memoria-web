@@ -1,6 +1,18 @@
+import type { ComponentType } from "react"
 import { Box, Divider, ScrollArea, Stack, Text } from "@mantine/core"
 import { NavigationItem } from "@/components/NavigationItem"
-import type { ApplicationNavigationItem } from "../types"
+
+export type ApplicationNavigationItem = {
+  id: string
+  label: string
+  icon: ComponentType<{
+    size?: number
+    stroke?: number
+    "aria-hidden"?: boolean
+  }>
+  active?: boolean
+  disabled?: boolean
+}
 
 export type ApplicationNavigationContentProps = {
   items: ApplicationNavigationItem[]
