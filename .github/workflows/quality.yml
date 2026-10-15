@@ -1,0 +1,51 @@
+name: Web Quality Gate (minimal)
+
+on:
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-quality-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  static-analysis:
+    name: static-analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Biome (all configured source files)
+        run: npx biome check .
+      - name: TypeScript
+        run: npm run typecheck
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      AUTH0_SECRET: '0123456789abcdef0123456789abcdef'
+      AUTH0_BASE_URL: 'http://localhost:3000'
+      APP_BASE_URL: 'http://localhost:3000'
+      AUTH0_DOMAIN: 'example.auth0.com'
+      AUTH0_CLIENT_ID: 'ci-placeholder'
+      AUTH0_CLIENT_SECRET: 'ci-placeholder'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Next.js production build
+        run: npm run build:next
