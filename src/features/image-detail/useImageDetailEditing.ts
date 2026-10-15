@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { showNotification } from "@/components/Feedback"
-import type { MediaItem } from "@/features/media-browser/MediaBrowser"
+import type { MediaItem } from "@/features/image-detail/types"
 
 /** Image detail edit, share and section state; independent of the listing UI. */
 export function useImageDetailEditing(detail: MediaItem | null) {
