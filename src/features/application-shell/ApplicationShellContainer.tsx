@@ -14,7 +14,7 @@ import {
   getApplicationNavigation,
   getApplicationSection,
   getContextSwitchPath,
-  isApplicationChromeFeatureVisible,
+  isApplicationShellFeatureVisible,
   useApplicationNavigation,
 } from "@/components/ApplicationShell"
 
@@ -50,7 +50,7 @@ export function ApplicationShellContainer({
   const [rememberedCommunityId, setRememberedCommunityId] =
     useState("photo-club")
   const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
-  const chromeVariant =
+  const shellMode =
     pathname === "/settings/account/delete"
       ? "restricted-flow"
       : "authenticated"
@@ -161,9 +161,9 @@ export function ApplicationShellContainer({
         header={
           <ApplicationHeader
             accentColor={currentContext.accentColor}
-            reserveNavigationSpace={chromeVariant === "restricted-flow"}
+            reserveNavigationSpace={shellMode === "restricted-flow"}
             leading={
-              isApplicationChromeFeatureVisible(chromeVariant, "navigation") ? (
+              isApplicationShellFeatureVisible(shellMode, "navigation") ? (
                 <ApplicationNavigationTrigger
                   opened={navigation.opened}
                   onToggle={navigation.toggle}
@@ -171,8 +171,8 @@ export function ApplicationShellContainer({
               ) : undefined
             }
             context={
-              isApplicationChromeFeatureVisible(
-                chromeVariant,
+              isApplicationShellFeatureVisible(
+                shellMode,
                 "context-switcher",
               ) ? (
                 <ApplicationContextSwitcher
@@ -209,8 +209,8 @@ export function ApplicationShellContainer({
               ) : undefined
             }
             account={
-              isApplicationChromeFeatureVisible(
-                chromeVariant,
+              isApplicationShellFeatureVisible(
+                shellMode,
                 "account-menu",
               ) ? (
                 <ApplicationAccountMenu
@@ -226,7 +226,7 @@ export function ApplicationShellContainer({
           />
         }
         navigation={
-          isApplicationChromeFeatureVisible(chromeVariant, "navigation") ? (
+          isApplicationShellFeatureVisible(shellMode, "navigation") ? (
             <ApplicationNavigation
               opened={navigation.opened}
               onClose={navigation.close}
