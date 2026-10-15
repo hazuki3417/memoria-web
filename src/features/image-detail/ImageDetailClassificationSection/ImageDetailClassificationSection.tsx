@@ -7,12 +7,10 @@ import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailVie
 type ImageDetailClassificationSectionProps = Pick<ImageDetailViewerProps, "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor"> & { kind: "groups" | "tags" }
 
 export function ImageDetailClassificationSection({ kind, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor }: ImageDetailClassificationSectionProps) {
-  return <>
-                          {([kind] as const).map((kind) => {
-                            const values = detailValues[kind]
-                            const visible = values.slice(0, 6)
-                            return (
-                              <Box key={kind}>
+  const values = detailValues[kind]
+  const visible = values.slice(0, 6)
+  return (
+                              <Box>
                                 <Group
                                   justify="space-between"
                                   mb="sm"
@@ -129,7 +127,5 @@ export function ImageDetailClassificationSection({ kind, detailValues, detailSec
                                   />
                                 )}
                               </Box>
-                            )
-                          })}
-  </>
+  )
 }
