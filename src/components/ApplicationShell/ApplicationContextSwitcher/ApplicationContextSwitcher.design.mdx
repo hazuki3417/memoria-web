@@ -1,0 +1,26 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Components/Application Shell/Context Switcher/Design Guide" />
+
+# ApplicationContextSwitcher
+
+## Overview
+現在のContextを表示し、Context切替・Community作成を通知する。
+
+## Responsibilities
+- **所有する**: Context一覧の表示、選択状態のcheck表示、選択・作成callback。
+- **所有しない**: Context一覧の取得、実際の切替、Community作成処理。
+
+## Design Decisions
+- 既存のUI、文言、操作、Responsive Behaviorを維持したままComponent Directoryへ移動する。
+- Feature / Application Shellの公開APIはroot `index.ts`、Component単位の公開入口は同Directoryの`index.ts`が担当する。
+
+## Component Contract
+- 既存のresponsive maw、truncate、Menuのstyling、選択checkとCommunity作成項目の条件付き表示を維持する。
+
+## Test Design
+- Personal / Community / WithoutCreateCommunityを比較し、選択・作成callbackとresponsive表示を確認する。
+
+## References
+- [Application Shell仕様](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/application-shell.mdx)
+- [Web実装規約](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/web/implementation-conventions.mdx)
