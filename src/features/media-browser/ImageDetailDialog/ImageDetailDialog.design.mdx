@@ -12,13 +12,9 @@
 - 既存MediaBrowserの詳細Modal、情報量、編集・共有導線、Viewport、Responsive Behaviorを維持する。
 - 前後移動は`items`の順序に従う。先頭・末尾の操作可否と移動時のViewport初期化を維持する。
 - 閉じる操作で`onClose`を通知し、GroupBrowserの選択・Pane幅・スクロールを保持する。
-- 現在の実装はMediaBrowserのdetail-only表示を利用する移行中Wrapper。独立した共通Dialogとしての責務移管は未完了。
 
 ## Story / テスト観点
 - 初期選択、前後移動、閉じる操作、画像一覧更新時の選択同期。
 - Media / Group起点の移動範囲、Personal / Community、Desktop / Compact。
 - Group側の選択・Pane幅・スクロール保持、ModalのPortalと編集Dialogの重なり順。
 - 既存MediaBrowserを基準としたVisual / Behavioral / Responsive Regression。
-
-## 検証状態と残課題
-基本Storyのみ存在する。独立化、Feature root Public API、Feature間依存解消、実画面操作・Visual Regressionは未完了。Issue #91で継続する。
