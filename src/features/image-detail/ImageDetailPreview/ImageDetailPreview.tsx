@@ -6,7 +6,13 @@ import { AnimatePresence, motion } from "framer-motion"
 import { ZoomInput } from "../ZoomInput"
 import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
 
-export function ImageDetailPreview(props: Omit<ImageDetailViewerProps, "detail"> & { detail: NonNullable<ImageDetailViewerProps["detail"]>; prev: NonNullable<ImageDetailViewerProps["detail"]> | null; next: NonNullable<ImageDetailViewerProps["detail"]> | null }) {
+export type ImageDetailPreviewProps = Pick<ImageDetailViewerProps, "stateItems" | "closeImageDetail" | "setDetail" | "prepareNavigation" | "compact" | "detailZoom" | "setDetailZoom" | "detailRotate" | "setDetailRotate" | "detailRotateAnimated" | "setDetailRotateAnimated" | "detailDirection" | "detailInfoOpened" | "setDetailInfoOpened"> & {
+  detail: NonNullable<ImageDetailViewerProps["detail"]>
+  prev: NonNullable<ImageDetailViewerProps["detail"]> | null
+  next: NonNullable<ImageDetailViewerProps["detail"]> | null
+}
+
+export function ImageDetailPreview(props: ImageDetailPreviewProps) {
   const { detail, stateItems, prev, next, closeImageDetail, setDetail, prepareNavigation, compact, detailZoom, setDetailZoom, detailRotate, setDetailRotate, detailRotateAnimated, setDetailRotateAnimated, detailDirection, detailInfoOpened, setDetailInfoOpened } = props
   const detailIndex = stateItems.findIndex((item) => item.id === detail.id)
   return (
