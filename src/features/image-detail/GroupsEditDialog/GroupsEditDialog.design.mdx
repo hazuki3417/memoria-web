@@ -11,12 +11,8 @@
 ## 表示・操作契約
 - 呼び出し元の編集Draftを表示する。確定はDraftを反映し、キャンセルは保存しない。表示条件と編集状態は呼び出し元が所有する。
 - 既存MediaBrowserのタイトル、説明、入力候補、ボタン、ModalのzIndex・重なり順、キーボード操作、Responsive Behaviorを維持する。
-- 変更をサーバーへ永続化したように表示しない。現在は既存の画面上のモック動作を維持する。
 
 ## Story / テスト観点
 - 複数選択、追加・除外、確定、キャンセル、再オープン時の選択値。
 - 開いた状態と閉じた状態、操作時のCallback、Desktop / Compact、画像詳細Modalとの重なり順。
 - 変更前のMediaBrowserと比較した表示・操作回帰。
-
-## 検証状態
-開閉Storyは用意済みだが、StoryのCallbackは現時点で空実装。操作・状態遷移・Visual Regressionは未検証。Issue #91で継続する。
