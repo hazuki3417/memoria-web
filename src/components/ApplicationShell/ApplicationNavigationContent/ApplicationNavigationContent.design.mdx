@@ -17,7 +17,7 @@ import { Meta } from "@storybook/addon-docs/blocks"
 - 既存の`© 2026 Memoria`、Divider、spacing、ナビゲーションARIAラベルを維持する。
 
 ## Component Contract
-- `ApplicationNavigationItem`はこのComponentが定義・exportする。利用側は所有Componentから型をimportする。\n- `items`の順序を維持し、各項目のlabel/icon/active/disabledを表示する。
+- `ApplicationNavigationItem`はこのComponentが定義・exportする。利用側は所有Componentの`index.ts`を公開入口として型をimportする。\n- `items`の順序を維持し、各項目のlabel/icon/active/disabledを表示する。
 - 項目クリックで`onSelect(item.id)`を通知する。Drawerを閉じることは責務外。
 - `accentColor`を各NavigationItemに渡す。
 - 親から高さが与えられることを前提に、メニュー領域をスクロールしフッターを下部に置く。
