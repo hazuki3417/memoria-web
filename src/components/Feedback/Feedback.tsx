@@ -69,7 +69,7 @@ export function showNotification({
 }: {
   kind: FeedbackKind
   title: string
-  message: string
+  message?: string
 }) {
   const appearance = feedbackAppearance(kind)
   const Icon = icons[kind]

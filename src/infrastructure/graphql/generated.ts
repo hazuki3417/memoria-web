@@ -100,14 +100,6 @@ export type UserProfile = {
   nickname: Scalars["String"]["output"]
 }
 
-export type RegisterUserInput = {
-  nickname: string
-}
-
-export type UpdateUserProfileInput = {
-  nickname: string
-}
-
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>
 
 export type CurrentUserQuery = {
