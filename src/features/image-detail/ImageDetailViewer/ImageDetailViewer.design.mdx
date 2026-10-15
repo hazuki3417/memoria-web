@@ -5,7 +5,7 @@
 
 ## 入出力と状態
 - 選択画像と順序付き画像一覧は呼び出し元から受け取る。先頭・末尾では存在しない方向への移動操作を表示しない。
-- 選択画像の変更は`setDetail`、閉じる操作は`closeImageDetail`で通知する（現状の移行中API）。
+- 選択画像の変更は`setDetail`、閉じる操作は`closeImageDetail`で通知する。
 - ViewportとEditingの状態・操作は各Hookから渡される。表示Component自体はこれらのauthoritative stateを所有しない。
 - `compact`、`context`、`downloadMock`でレイアウト、文脈、ダウンロードの状態を切り替える。
 
@@ -21,6 +21,3 @@
 - Desktop / Compact、情報パネル開閉、ズーム境界値、回転、移動時のViewport初期化。
 - ダウンロードの3状態、共有・編集への導線、PortalとModal重なり順。
 - MediaBrowserの変更前表示と比較したVisual / Behavioral / Responsive Regression。
-
-## 検証状態と残課題
-StoryはPortrait / Landscape / Compactを用意済み。その他の状態・操作・実画面・Visual Regressionは未検証。型と状態PropsにMediaBrowser由来の依存があり、Issue #91で独立化する。
