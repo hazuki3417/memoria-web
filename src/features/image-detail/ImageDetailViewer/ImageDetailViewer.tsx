@@ -4,7 +4,7 @@ import { ActionIcon, Badge, Box, Button, Center, Collapse, Divider, Group, Image
 import { IconChevronDown, IconChevronLeft, IconChevronRight, IconDownload, IconInfoCircle, IconPhotoOff, IconPlus, IconRotate, IconRotate2, IconTrash, IconX, IconZoomIn, IconZoomOut, IconZoomReset } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import type { Dispatch, SetStateAction } from "react"
-import type { MediaItem } from "@/features/media-browser/MediaBrowser"
+import type { MediaItem } from "@/features/image-detail/types"
 import { ZoomInput } from "../ZoomInput"
 import type { useImageDetailEditing } from "@/features/image-detail/useImageDetailEditing"
 import type { useImageDetailViewport } from "@/features/image-detail/useImageDetailViewport"
