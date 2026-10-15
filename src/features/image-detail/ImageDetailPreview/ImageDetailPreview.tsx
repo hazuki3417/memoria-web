@@ -1,12 +1,12 @@
 "use client"
 
-import { ActionIcon, Badge, Box, Button, Center, Collapse, Divider, Group, Image, Modal, Slider, Stack, Text } from "@mantine/core"
-import { IconChevronDown, IconChevronLeft, IconChevronRight, IconDownload, IconInfoCircle, IconPhotoOff, IconPlus, IconRotate, IconRotate2, IconTrash, IconX, IconZoomIn, IconZoomOut, IconZoomReset } from "@tabler/icons-react"
+import { ActionIcon, Box, Center, Group, Image, Slider, Stack, Text } from "@mantine/core"
+import { IconChevronLeft, IconChevronRight, IconInfoCircle, IconPhotoOff, IconRotate, IconRotate2, IconX, IconZoomIn, IconZoomOut, IconZoomReset } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ZoomInput } from "../ZoomInput"
 import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
 
-export function ImageDetailPreview(props: ImageDetailViewerProps & { prev: NonNullable<ImageDetailViewerProps["detail"]> | null; next: NonNullable<ImageDetailViewerProps["detail"]> | null }) {
+export function ImageDetailPreview(props: Omit<ImageDetailViewerProps, "detail"> & { detail: NonNullable<ImageDetailViewerProps["detail"]>; prev: NonNullable<ImageDetailViewerProps["detail"]> | null; next: NonNullable<ImageDetailViewerProps["detail"]> | null }) {
   const { detail, prev, next, closeImageDetail, setDetail, prepareNavigation, compact, detailZoom, setDetailZoom, detailRotate, setDetailRotate, detailRotateAnimated, setDetailRotateAnimated, detailDirection, detailInfoOpened, setDetailInfoOpened } = props
   return (
     <>
