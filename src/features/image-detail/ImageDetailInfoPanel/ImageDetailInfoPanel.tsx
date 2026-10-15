@@ -3,6 +3,7 @@
 import { Badge, Box, Button, Collapse, Divider, Group, Stack, Text } from "@mantine/core"
 import { IconChevronDown, IconDownload, IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
+import { ImageDetailMetadata } from "../ImageDetailMetadata"
 import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
 
 export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind, downloadMock }: ImageDetailViewerProps) {
@@ -54,66 +55,7 @@ export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, 
                           p="md"
                           style={{ flex: 1, overflowY: "auto" }}
                         >
-                          <Stack gap="xs">
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                ファイルサイズ
-                              </Text>
-                              <Text size="xs">8.4 MB</Text>
-                            </Group>
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                サイズ
-                              </Text>
-                              <Text size="xs">4032 × 3024</Text>
-                            </Group>
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                アップロード
-                              </Text>
-                              <Text size="xs">2026/10/03 08:42</Text>
-                            </Group>
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                Uploader
-                              </Text>
-                              <Text size="xs">Hazuki</Text>
-                            </Group>
-                          </Stack>
-                          <Stack gap={4}>
-                            <Button
-                              size="xs"
-                              variant="default"
-                              fullWidth
-                              disabled={downloadMock !== "available"}
-                              leftSection={<IconDownload size={15} />}
-                              aria-describedby={
-                                downloadMock === "available"
-                                  ? undefined
-                                  : "original-download-unavailable"
-                              }
-                            >
-                              Originalをダウンロード
-                            </Button>
-                            {downloadMock !== "available" && (
-                              <Group
-                                gap={5}
-                                align="flex-start"
-                                wrap="nowrap"
-                                id="original-download-unavailable"
-                              >
-                                <IconInfoCircle
-                                  size={14}
-                                  style={{ flexShrink: 0, marginTop: 2 }}
-                                />
-                                <Text size="xs" c="dimmed">
-                                  {downloadMock === "forbidden"
-                                    ? "このMediaのOriginalをダウンロードする権限がありません。"
-                                    : "Originalを準備中です。処理完了後にダウンロードできます。"}
-                                </Text>
-                              </Group>
-                            )}
-                          </Stack>
+                          <ImageDetailMetadata downloadMock={downloadMock} />
                           <Divider
                             style={{
                               marginInline:
