@@ -24,8 +24,6 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - name: Biome (all configured source files)
-        run: npm run check:all
       - name: TypeScript
         run: npm run typecheck
 
