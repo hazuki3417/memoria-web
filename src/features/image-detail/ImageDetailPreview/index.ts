@@ -1,0 +1,1 @@
+export { ImageDetailPreview } from "./ImageDetailPreview"
