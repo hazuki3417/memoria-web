@@ -1,11 +1,11 @@
 "use client"
 
-import { ActionIcon, Badge, Box, Button, Center, Collapse, Divider, Group, Image, Modal, Slider, Stack, Text } from "@mantine/core"
-import { IconChevronDown, IconChevronLeft, IconChevronRight, IconDownload, IconInfoCircle, IconPhotoOff, IconPlus, IconRotate, IconRotate2, IconTrash, IconX, IconZoomIn, IconZoomOut, IconZoomReset } from "@tabler/icons-react"
-import { AnimatePresence, motion } from "framer-motion"
+import { Box, Modal } from "@mantine/core"
+
+
 import type { Dispatch, SetStateAction } from "react"
 import type { MediaItem } from "@/features/image-detail/types"
-import { ZoomInput } from "../ZoomInput"
+
 import { ImageDetailInfoPanel } from "../ImageDetailInfoPanel"
 import { ImageDetailPreview } from "../ImageDetailPreview"
 import type { useImageDetailEditing } from "@/features/image-detail/useImageDetailEditing"
