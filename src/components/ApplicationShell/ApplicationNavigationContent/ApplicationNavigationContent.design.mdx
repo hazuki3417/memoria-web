@@ -1,0 +1,33 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Components/Application Shell/Navigation Content/Design Guide" />
+
+# ApplicationNavigationContent
+
+## Overview
+コンテキスト内ナビゲーションのメニューとフッターを表示するDrawer非依存のComponent。
+
+## Responsibilities
+- **所有する**: 項目の表示、active/disabled/accentColorの受け渡し、縦スクロール、ナビゲーションのラベル、フッター。
+- **所有しない**: Drawer、overlay、開閉状態、ルーティング、メニュー生成、選択後にDrawerを閉じる処理。
+
+## Design Decisions
+- Drawerから内容を切り出し、固定高さのStory containerでスクロールとフッターを独立して確認できるようにする。
+- 高さは親に従い、viewportの高さをこのComponent内に固定しない。項目数が増えてもメニューだけをスクロールさせる。
+- 既存の`© 2026 Memoria`、Divider、spacing、ナビゲーションARIAラベルを維持する。
+
+## Component Contract
+- `items`の順序を維持し、各項目のlabel/icon/active/disabledを表示する。
+- 項目クリックで`onSelect(item.id)`を通知する。Drawerを閉じることは責務外。
+- `accentColor`を各NavigationItemに渡す。
+- 親から高さが与えられることを前提に、メニュー領域をスクロールしフッターを下部に置く。
+
+## Test Design
+- 標準項目、長いlabel、多数項目、active/disabledのStoryで視覚的な境界を確認する。
+- 項目選択時のID通知をInteractionで確認する。メニュー構成・順序を決める業務Logicは対象外。
+- VRTのfixtureは固定し、実際のメニュー内容に依存させない。
+
+## References
+- [Application Shell仕様](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/application-shell.mdx)
+- [テスト設計](https://github.com/hazuki3417/memoria-design/blob/develop/content/test-design.mdx)
+- [設計・検証Issue #103](https://github.com/hazuki3417/memoria-web/issues/103)
