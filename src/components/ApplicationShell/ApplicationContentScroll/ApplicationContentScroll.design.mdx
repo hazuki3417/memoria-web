@@ -1,0 +1,26 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Components/Application Shell/Content Scroll/Design Guide" />
+
+# ApplicationContentScroll
+
+## Overview
+画面・コンテンツconsumerが明示的に選択するscroll領域を提供する。
+
+## Responsibilities
+- **所有する**: ScrollAreaと上部paddingを持つchildrenのscroll container。
+- **所有しない**: ApplicationShell全体のscroll方針、Screenのコンテンツ構成。
+
+## Design Decisions
+- 既存のUI、文言、操作、Responsive Behaviorを維持したままComponent Directoryへ移動する。
+- Feature / Application Shellの公開APIはroot `index.ts`、Component単位の公開入口は同Directoryの`index.ts`が担当する。
+
+## Component Contract
+- type hover、h/w 100%、overscrollBehavior contain、Boxのpt lgを維持する。
+
+## Test Design
+- 長いchildrenを持つStoryでoverflow・スクロールと上部paddingを確認する。
+
+## References
+- [Application Shell仕様](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/application-shell.mdx)
+- [Web実装規約](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/web/implementation-conventions.mdx)
