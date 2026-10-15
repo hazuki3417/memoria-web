@@ -1,0 +1,1 @@
+export { ImageDetailMetadata } from "./ImageDetailMetadata"
