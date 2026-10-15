@@ -11,7 +11,7 @@ import type { useImageDetailViewport } from "@/features/media-browser/useImageDe
 
 type Editing = ReturnType<typeof useImageDetailEditing>
 type Viewport = ReturnType<typeof useImageDetailViewport>
-type Props = Pick<Editing, "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor" | "setUnshareTarget"> & Pick<Viewport, "prepareNavigation" | "detailInfoOpened" | "setDetailInfoOpened" | "detailZoom" | "setDetailZoom" | "detailRotate" | "setDetailRotate" | "detailRotateAnimated" | "setDetailRotateAnimated" | "detailDirection"> & {
+type Props = Pick<Editing, "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor" | "setUnshareTarget" | "setShareTarget" | "setDetailEditor"> & Pick<Viewport, "prepareNavigation" | "detailInfoOpened" | "setDetailInfoOpened" | "detailZoom" | "setDetailZoom" | "detailRotate" | "setDetailRotate" | "detailRotateAnimated" | "setDetailRotateAnimated" | "detailDirection"> & {
   detail: MediaItem | null
   setDetail: Dispatch<SetStateAction<MediaItem | null>>
   closeImageDetail: () => void
@@ -35,6 +35,8 @@ export function ImageDetailViewer({
   toggleDetailSection,
   openDetailEditor,
   setUnshareTarget,
+  setShareTarget,
+  setDetailEditor,
   prepareNavigation,
   detailInfoOpened,
   setDetailInfoOpened,
