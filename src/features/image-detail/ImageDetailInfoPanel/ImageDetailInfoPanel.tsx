@@ -8,7 +8,9 @@ import { ImageDetailClassificationSection } from "../ImageDetailClassificationSe
 import { ImageDetailCommunitySection } from "../ImageDetailCommunitySection"
 import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
 
-export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind, downloadMock }: ImageDetailViewerProps) {
+export type ImageDetailInfoPanelProps = Pick<ImageDetailViewerProps, "compact" | "detailInfoOpened" | "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor" | "setUnshareTarget" | "setShareTarget" | "setDetailEditor" | "context" | "downloadMock">
+
+export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind, downloadMock }: ImageDetailInfoPanelProps) {
   return (
     <>
                 <AnimatePresence initial={false}>
