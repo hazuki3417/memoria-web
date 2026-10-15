@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 // 既存consumerとのimport互換性を維持するための移行用entry。
-export { ApplicationNavigation } from "./ApplicationNavigation"
+export { ApplicationNavigation } from "./ApplicationNavigation/index"
 export { ApplicationNavigationTrigger } from "./ApplicationNavigationTrigger"
 
 export function useApplicationNavigation() {
