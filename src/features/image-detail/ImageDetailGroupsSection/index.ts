@@ -1,0 +1,1 @@
+export { ImageDetailGroupsSection } from "./ImageDetailGroupsSection"
