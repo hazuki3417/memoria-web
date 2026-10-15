@@ -25,32 +25,7 @@ export type ImageDetailViewerProps = Pick<Editing, "detailValues" | "detailSecti
 
 /** Original MediaBrowser detail viewport markup, preserved for visual parity. */
 export function ImageDetailViewer(props: ImageDetailViewerProps) {
-  const {
-  detail,
-  setDetail,
-  closeImageDetail,
-  stateItems,
-  compact,
-  context,
-  downloadMock,
-  detailValues,
-  detailSectionsExpanded,
-  toggleDetailSection,
-  openDetailEditor,
-  setUnshareTarget,
-  setShareTarget,
-  setDetailEditor,
-  prepareNavigation,
-  detailInfoOpened,
-  setDetailInfoOpened,
-  detailZoom,
-  setDetailZoom,
-  detailRotate,
-  setDetailRotate,
-  detailRotateAnimated,
-  setDetailRotateAnimated,
-  detailDirection,
-} = props
+  const { detail, stateItems, compact, detailInfoOpened, closeImageDetail } = props
   return (
     <>
       <Modal
