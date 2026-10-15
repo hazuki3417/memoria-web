@@ -90,7 +90,7 @@ export function ImageDetailViewer(props: ImageDetailViewerProps) {
                   background: "transparent",
                 }}
               >
-                <ImageDetailPreview {...props} prev={prev} next={next} />
+                <ImageDetailPreview {...props} detail={detail} prev={prev} next={next} />
 
                 <ImageDetailInfoPanel {...props} />
               </Box>
