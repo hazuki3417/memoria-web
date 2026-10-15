@@ -1,0 +1,23 @@
+# ImageDetailDialog
+
+## 責務
+
+画像一覧と選択画像を受け取り、Image Detailの表示・閉じる操作を提供する公開入口。MediaBrowserとGroupBrowserの双方から利用することを目標とする。
+
+## 現在の実装と契約
+
+- 現段階では `MediaBrowser` のdetail-only表示を呼び出す移行中のWrapperであり、共通Featureへの独立は未完了。
+- `items`、`initialId`、`onClose`、`contextKind` を受け取る。
+- 表示・操作・Responsive Behaviorは既存のImage Detailと同一に保つ。
+- GroupBrowserでの閉じる操作後も、元のGroup選択・スクロール・ペイン状態を保持する。
+
+## Story / テスト観点
+
+- 初期選択画像、前後移動、閉じる操作
+- Personal / Community文脈
+- GroupBrowser由来の画像順序と元画面の状態維持
+- Modalの表示・操作・Responsive Behavior
+
+## 未完了事項
+
+責務の独立、`src/features/image-detail/` への配置、Feature Public APIの整備、実画面・Visual Regression検証はIssue #91で継続する。
