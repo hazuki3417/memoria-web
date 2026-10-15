@@ -1,0 +1,18 @@
+# ImageDetailCommunitySection
+
+## 責務
+Personal文脈では共有先Communityの一覧、共有・共有解除の入口、一覧展開を表示する。Community文脈では管理情報を表示する。共有処理・Dialog・永続化は所有しない。
+
+## 入出力と状態
+- `context`でPersonal / Communityの表示を切り替える。
+- 共有先は`detailValues.communities`、展開状態は`detailSectionsExpanded.communities`から受け取る。
+- 共有入口は`setShareTarget(null)`と`setDetailEditor("communities")`、解除入口は`setUnshareTarget(value)`で通知する。
+
+## 表示・操作契約
+- Personalで0件なら「未共有」、1件以上では各Community名と共有解除ボタンを表示する。
+- 先頭3件を常時表示し、4件以上では残りをCollapseで展開する。200msのアニメーションと件数ラベルを維持する。
+- Community文脈では「管理」「Community管理」を表示し、Personal用の共有操作を表示しない。
+
+## Story / テスト観点
+- Personal / Community、0件・3件・4件以上、長いCommunity名。
+- 共有・解除・展開の通知、`aria-expanded`、Compactの折り返し。
