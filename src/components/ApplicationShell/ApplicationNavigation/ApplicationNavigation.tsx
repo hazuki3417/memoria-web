@@ -1,7 +1,7 @@
 "use client"
 
 import { Drawer } from "@mantine/core"
-import { ApplicationNavigationContent } from "../ApplicationNavigationContent/ApplicationNavigationContent"
+import { ApplicationNavigationContent } from "../ApplicationNavigationContent"
 import type { ApplicationNavigationItem } from "../ApplicationNavigationContent/ApplicationNavigationContent"
 
 export type ApplicationNavigationProps = {
