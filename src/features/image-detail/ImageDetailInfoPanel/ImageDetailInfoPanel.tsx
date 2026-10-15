@@ -4,7 +4,8 @@ import { Box, Button, Divider, Group, Stack } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ImageDetailMetadata } from "../ImageDetailMetadata"
-import { ImageDetailClassificationSection } from "../ImageDetailClassificationSection"
+import { ImageDetailGroupsSection } from "../ImageDetailGroupsSection"
+import { ImageDetailTagsSection } from "../ImageDetailTagsSection"
 import { ImageDetailCommunitySection } from "../ImageDetailCommunitySection"
 import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
 
@@ -66,8 +67,8 @@ export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, 
                                 "calc(-1 * var(--mantine-spacing-md))",
                             }}
                           />
-                          <ImageDetailClassificationSection kind="groups" detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} openDetailEditor={openDetailEditor} />
-                          <ImageDetailClassificationSection kind="tags" detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} openDetailEditor={openDetailEditor} />
+                          <ImageDetailGroupsSection detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} openDetailEditor={openDetailEditor} />
+                          <ImageDetailTagsSection detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} openDetailEditor={openDetailEditor} />
                           <Divider
                             style={{
                               marginInline:
