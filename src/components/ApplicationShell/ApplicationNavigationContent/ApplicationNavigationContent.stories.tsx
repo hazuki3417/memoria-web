@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import type { ReactNode } from "react"
 import { IconLayoutDashboard, IconPhoto, IconUsers } from "@tabler/icons-react"
 import { ApplicationNavigationContent } from "./ApplicationNavigationContent"
 
@@ -12,7 +13,7 @@ const meta = {
   title: "Components/Application Shell/Navigation Content",
   component: ApplicationNavigationContent,
   parameters: { layout: "fullscreen" },
-  decorators: [(Story: () => React.ReactNode) => (
+  decorators: [(Story: () => ReactNode) => (
     <div style={{ width: 248, height: 360 }}>
       <Story />
     </div>
