@@ -1,5 +1,3 @@
-import type { ComponentType } from "react"
-
 export type ApplicationContextOption = {
   id: string
   kind: "personal" | "community"
@@ -7,14 +5,5 @@ export type ApplicationContextOption = {
   accentColor: string
 }
 
-export type ApplicationNavigationItem = {
-  id: string
-  label: string
-  icon: ComponentType<{
-    size?: number
-    stroke?: number
-    "aria-hidden"?: boolean
-  }>
-  active?: boolean
-  disabled?: boolean
-}
+// 移行期間中の既存import互換。型の所有者はApplicationNavigationContent。
+export type { ApplicationNavigationItem } from "./ApplicationNavigationContent"
