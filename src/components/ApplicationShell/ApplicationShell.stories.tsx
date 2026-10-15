@@ -9,10 +9,8 @@ import {
 import { ApplicationAccountMenu } from "./ApplicationAccountMenu"
 import { ApplicationContextSwitcher } from "./ApplicationContextSwitcher"
 import { ApplicationHeader } from "./ApplicationHeader"
-import {
-  ApplicationNavigation,
-  ApplicationNavigationTrigger,
-} from "./ApplicationNavigation"
+import { ApplicationNavigation } from "./ApplicationNavigation/index"
+import { ApplicationNavigationTrigger } from "./ApplicationNavigationTrigger"
 import { ApplicationShell } from "./ApplicationShell"
 
 const personal = {
