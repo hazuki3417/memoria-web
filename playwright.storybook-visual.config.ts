@@ -12,7 +12,6 @@ export default defineConfig({
     deviceScaleFactor: 1,
     locale: "ja-JP",
     colorScheme: "light",
-    reducedMotion: "reduce",
     trace: "retain-on-failure",
   },
   webServer: {
