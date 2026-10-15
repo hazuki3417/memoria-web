@@ -43,9 +43,9 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Dialog } from "@/components/Dialog"
 import { showNotification } from "@/components/Feedback"
-import { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
-import { useImageDetailEditing } from "@/features/media-browser/useImageDetailEditing"
-import { ImageDetailEditingDialogs } from "@/features/media-browser/ImageDetailEditingDialogs"
+import { useImageDetailViewport } from "@/features/image-detail/useImageDetailViewport"
+import { useImageDetailEditing } from "@/features/image-detail/useImageDetailEditing"
+import { ImageDetailEditingDialogs } from "@/features/image-detail/ImageDetailEditingDialogs"
 import { ImageDetailViewer } from "@/features/image-detail/ImageDetailViewer"
 
 type MediaBrowserState =
