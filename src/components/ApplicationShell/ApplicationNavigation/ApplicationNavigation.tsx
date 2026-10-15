@@ -2,7 +2,7 @@
 
 import { Drawer } from "@mantine/core"
 import { ApplicationNavigationContent } from "../ApplicationNavigationContent/ApplicationNavigationContent"
-import type { ApplicationNavigationItem } from "../types"
+import type { ApplicationNavigationItem } from "../ApplicationNavigationContent/ApplicationNavigationContent"
 
 export type ApplicationNavigationProps = {
   opened: boolean
