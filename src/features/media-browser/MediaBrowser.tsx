@@ -46,7 +46,7 @@ import { showNotification } from "@/components/Feedback"
 import { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
 import { useImageDetailEditing } from "@/features/media-browser/useImageDetailEditing"
 import { ImageDetailEditingDialogs } from "@/features/media-browser/ImageDetailEditingDialogs"
-import { ImageDetailViewer } from "@/features/media-browser/ImageDetailViewer"
+import { ImageDetailViewer } from "@/features/image-detail/ImageDetailViewer"
 
 type MediaBrowserState =
   | "default"
