@@ -6,8 +6,8 @@ import { AnimatePresence, motion } from "framer-motion"
 import type { Dispatch, SetStateAction } from "react"
 import type { MediaItem } from "@/features/media-browser/MediaBrowser"
 import { ZoomInput } from "@/features/image-detail/ZoomInput"
-import type { useImageDetailEditing } from "@/features/media-browser/useImageDetailEditing"
-import type { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
+import type { useImageDetailEditing } from "@/features/image-detail/useImageDetailEditing"
+import type { useImageDetailViewport } from "@/features/image-detail/useImageDetailViewport"
 
 type Editing = ReturnType<typeof useImageDetailEditing>
 type Viewport = ReturnType<typeof useImageDetailViewport>
