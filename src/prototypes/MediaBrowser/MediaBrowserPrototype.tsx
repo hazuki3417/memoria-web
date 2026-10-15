@@ -61,7 +61,7 @@ import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
 import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
-import { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
+import { useImageDetailViewport } from "@/features/image-detail/useImageDetailViewport"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeState =
