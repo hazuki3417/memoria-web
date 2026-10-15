@@ -45,7 +45,10 @@ import { Dialog } from "@/components/Dialog"
 import { showNotification } from "@/components/Feedback"
 import { useImageDetailViewport } from "@/features/image-detail/useImageDetailViewport"
 import { useImageDetailEditing } from "@/features/image-detail/useImageDetailEditing"
-import { ImageDetailEditingDialogs } from "@/features/image-detail/ImageDetailEditingDialogs"
+import { CommunityUnshareDialog } from "@/features/image-detail/CommunityUnshareDialog"
+import { CommunityShareDialog } from "@/features/image-detail/CommunityShareDialog"
+import { TagsEditDialog } from "@/features/image-detail/TagsEditDialog"
+import { GroupsEditDialog } from "@/features/image-detail/GroupsEditDialog"
 import { ImageDetailViewer } from "@/features/image-detail/ImageDetailViewer"
 
 type MediaBrowserState =
@@ -777,16 +780,29 @@ function MediaBrowserContent({
         setDetailRotateAnimated={setDetailRotateAnimated}
         detailDirection={detailDirection}
       />
-      <ImageDetailEditingDialogs
+      <CommunityUnshareDialog
         unshareTarget={unshareTarget}
         setUnshareTarget={setUnshareTarget}
         removeCommunityShare={removeCommunityShare}
+      />
+      <CommunityShareDialog
         detailEditor={detailEditor}
         setDetailEditor={setDetailEditor}
         detailValues={detailValues}
         shareTarget={shareTarget}
         setShareTarget={setShareTarget}
         addCommunityShare={addCommunityShare}
+      />
+      <TagsEditDialog
+        detailEditor={detailEditor}
+        setDetailEditor={setDetailEditor}
+        detailDraft={detailDraft}
+        setDetailDraft={setDetailDraft}
+        saveDetailDraft={saveDetailDraft}
+      />
+      <GroupsEditDialog
+        detailEditor={detailEditor}
+        setDetailEditor={setDetailEditor}
         detailDraft={detailDraft}
         setDetailDraft={setDetailDraft}
         saveDetailDraft={saveDetailDraft}
