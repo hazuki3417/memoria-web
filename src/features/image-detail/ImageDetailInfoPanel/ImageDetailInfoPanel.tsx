@@ -1,7 +1,7 @@
 "use client"
 
-import { ActionIcon, Badge, Box, Button, Center, Collapse, Divider, Group, Image, Modal, Slider, Stack, Text } from "@mantine/core"
-import { IconChevronDown, IconChevronLeft, IconChevronRight, IconDownload, IconInfoCircle, IconPhotoOff, IconPlus, IconRotate, IconRotate2, IconTrash, IconX, IconZoomIn, IconZoomOut, IconZoomReset } from "@tabler/icons-react"
+import { Badge, Box, Button, Collapse, Divider, Group, Stack, Text } from "@mantine/core"
+import { IconChevronDown, IconDownload, IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
 
