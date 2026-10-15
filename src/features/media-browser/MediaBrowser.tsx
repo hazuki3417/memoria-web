@@ -38,9 +38,8 @@ import {
   IconTags,
   IconTrash,
 } from "@tabler/icons-react"
-import { AnimatePresence, motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Dialog } from "@/components/Dialog"
 import { ImageDetailDialog, type MediaItem } from "@/features/image-detail"
 import { showNotification } from "@/components/Feedback"
