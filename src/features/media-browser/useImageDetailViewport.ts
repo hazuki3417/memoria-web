@@ -12,7 +12,14 @@ export function useImageDetailViewport() {
   const [detailRotate, setDetailRotate] = useState(0)
   const [detailRotateAnimated, setDetailRotateAnimated] = useState(true)
   const [detailDirection, setDetailDirection] = useState<-1 | 1>(1)
+  const prepareNavigation = (direction: -1 | 1) => {
+    setDetailDirection(direction)
+    setDetailZoom(100)
+    setDetailRotateAnimated(false)
+    setDetailRotate(0)
+  }
   return {
+    prepareNavigation,
     detailInfoOpened,
     setDetailInfoOpened,
     detailZoom,
