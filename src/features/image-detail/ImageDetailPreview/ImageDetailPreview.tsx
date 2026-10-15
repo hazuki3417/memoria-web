@@ -7,7 +7,8 @@ import { ZoomInput } from "../ZoomInput"
 import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
 
 export function ImageDetailPreview(props: Omit<ImageDetailViewerProps, "detail"> & { detail: NonNullable<ImageDetailViewerProps["detail"]>; prev: NonNullable<ImageDetailViewerProps["detail"]> | null; next: NonNullable<ImageDetailViewerProps["detail"]> | null }) {
-  const { detail, prev, next, closeImageDetail, setDetail, prepareNavigation, compact, detailZoom, setDetailZoom, detailRotate, setDetailRotate, detailRotateAnimated, setDetailRotateAnimated, detailDirection, detailInfoOpened, setDetailInfoOpened } = props
+  const { detail, stateItems, prev, next, closeImageDetail, setDetail, prepareNavigation, compact, detailZoom, setDetailZoom, detailRotate, setDetailRotate, detailRotateAnimated, setDetailRotateAnimated, detailDirection, detailInfoOpened, setDetailInfoOpened } = props
+  const detailIndex = stateItems.findIndex((item) => item.id === detail.id)
   return (
     <>
                 <Box
