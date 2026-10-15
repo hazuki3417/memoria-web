@@ -1,23 +1,24 @@
 # ImageDetailDialog
 
 ## 責務
+画像一覧と初期選択画像を受け取り、画像詳細の表示、前後移動、閉じる操作を提供する公開入口。MediaBrowserとGroupBrowserで同じ表示・操作契約を共有する。
 
-画像一覧と選択画像を受け取り、Image Detailの表示・閉じる操作を提供する公開入口。MediaBrowserとGroupBrowserの双方から利用することを目標とする。
+## 入出力と状態
+- `items`: 前後移動の順序を決める画像一覧。Media起点はMedia一覧、Group起点は選択GroupのMedia一覧を渡す。
+- `initialId`: 開く画像の識別子。`onClose`: 閉じる操作の通知。`contextKind`: Personal / Communityの文脈。
+- 呼び出し元が元画面の選択、Pane幅、スクロール状態を保持する。Dialogは元画面の状態を初期化しない。
 
-## 現在の実装と契約
-
-- 現段階では `MediaBrowser` のdetail-only表示を呼び出す移行中のWrapperであり、共通Featureへの独立は未完了。
-- `items`、`initialId`、`onClose`、`contextKind` を受け取る。
-- 表示・操作・Responsive Behaviorは既存のImage Detailと同一に保つ。
-- GroupBrowserでの閉じる操作後も、元のGroup選択・スクロール・ペイン状態を保持する。
+## 表示・操作契約
+- 既存MediaBrowserの詳細Modal、情報量、編集・共有導線、Viewport、Responsive Behaviorを維持する。
+- 前後移動は`items`の順序に従う。先頭・末尾の操作可否と移動時のViewport初期化を維持する。
+- 閉じる操作で`onClose`を通知し、GroupBrowserの選択・Pane幅・スクロールを保持する。
+- 現在の実装はMediaBrowserのdetail-only表示を利用する移行中Wrapper。独立した共通Dialogとしての責務移管は未完了。
 
 ## Story / テスト観点
+- 初期選択、前後移動、閉じる操作、画像一覧更新時の選択同期。
+- Media / Group起点の移動範囲、Personal / Community、Desktop / Compact。
+- Group側の選択・Pane幅・スクロール保持、ModalのPortalと編集Dialogの重なり順。
+- 既存MediaBrowserを基準としたVisual / Behavioral / Responsive Regression。
 
-- 初期選択画像、前後移動、閉じる操作
-- Personal / Community文脈
-- GroupBrowser由来の画像順序と元画面の状態維持
-- Modalの表示・操作・Responsive Behavior
-
-## 未完了事項
-
-責務の独立、`src/features/image-detail/` への配置、Feature Public APIの整備、実画面・Visual Regression検証はIssue #91で継続する。
+## 検証状態と残課題
+基本Storyのみ存在する。独立化、Feature root Public API、Feature間依存解消、実画面操作・Visual Regressionは未完了。Issue #91で継続する。
