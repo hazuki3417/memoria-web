@@ -5,7 +5,7 @@ import { IconChevronDown, IconDownload, IconInfoCircle, IconPlus, IconTrash } fr
 import { AnimatePresence, motion } from "framer-motion"
 import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
 
-export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context, downloadMock, detail }: ImageDetailViewerProps) {
+export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind, downloadMock, detail }: ImageDetailViewerProps) {
   return (
     <>
                 <AnimatePresence initial={false}>
@@ -249,7 +249,7 @@ export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, 
                                 "calc(-1 * var(--mantine-spacing-md))",
                             }}
                           />
-                          {context === "personal" ? (
+                          {contextKind === "personal" ? (
                             <Box>
                               <Group
                                 justify="space-between"
