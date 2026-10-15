@@ -8,7 +8,7 @@ import { Meta } from "@storybook/addon-docs/blocks"
 コンテキスト内ナビゲーションのメニューとフッターを表示するDrawer非依存のComponent。
 
 ## Responsibilities
-- **所有する**: 項目の表示、active/disabled/accentColorの受け渡し、縦スクロール、ナビゲーションのラベル、フッター。
+- **所有する**: 項目の表示、公開型`ApplicationNavigationItem`、active/disabled/accentColorの受け渡し、縦スクロール、ナビゲーションのラベル、フッター。
 - **所有しない**: Drawer、overlay、開閉状態、ルーティング、メニュー生成、選択後にDrawerを閉じる処理。
 
 ## Design Decisions
@@ -17,7 +17,7 @@ import { Meta } from "@storybook/addon-docs/blocks"
 - 既存の`© 2026 Memoria`、Divider、spacing、ナビゲーションARIAラベルを維持する。
 
 ## Component Contract
-- `items`の順序を維持し、各項目のlabel/icon/active/disabledを表示する。
+- `ApplicationNavigationItem`はこのComponentが定義・exportする。利用側は所有Componentから型をimportする。\n- `items`の順序を維持し、各項目のlabel/icon/active/disabledを表示する。
 - 項目クリックで`onSelect(item.id)`を通知する。Drawerを閉じることは責務外。
 - `accentColor`を各NavigationItemに渡す。
 - 親から高さが与えられることを前提に、メニュー領域をスクロールしフッターを下部に置く。
