@@ -31,7 +31,7 @@ import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
-import { ImageDetailDialog } from "@/features/media-browser/ImageDetailDialog"
+import { ImageDetailDialog } from "@/features/image-detail"
 
 type GroupFixture = {
   id: string
