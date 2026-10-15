@@ -5,7 +5,7 @@ import {
   IconSettings,
 } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "./types"
-import type { ApplicationNavigationItem } from "./ApplicationNavigationContent/ApplicationNavigationContent"
+import type { ApplicationNavigationItem } from "./ApplicationNavigationContent"
 
 export type ApplicationSection =
   | "dashboard"
