@@ -2,7 +2,7 @@
 
 import { AppShell, Group, Text } from "@mantine/core"
 import type { ReactNode } from "react"
-import { ApplicationNavigationTrigger } from "./ApplicationNavigationTrigger"
+import { ApplicationNavigationTrigger } from "../ApplicationNavigationTrigger"
 
 export function ApplicationHeader({
   accentColor,

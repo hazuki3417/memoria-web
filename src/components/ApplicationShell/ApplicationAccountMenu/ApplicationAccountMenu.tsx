@@ -2,7 +2,7 @@
 
 import { Avatar, Box, Button, Group, Menu, Text } from "@mantine/core"
 import { IconLogout, IconSettings } from "@tabler/icons-react"
-import type { ApplicationContextOption } from "./types"
+import type { ApplicationContextOption } from "../types"
 
 export function ApplicationAccountMenu({
   user,

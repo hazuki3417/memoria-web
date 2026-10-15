@@ -6,11 +6,11 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react"
-import { ApplicationAccountMenu } from "./ApplicationAccountMenu"
-import { ApplicationContextSwitcher } from "./ApplicationContextSwitcher"
-import { ApplicationHeader } from "./ApplicationHeader"
-import { ApplicationNavigation } from "./ApplicationNavigation/index"
-import { ApplicationNavigationTrigger } from "./ApplicationNavigationTrigger"
+import { ApplicationAccountMenu } from "../ApplicationAccountMenu"
+import { ApplicationContextSwitcher } from "../ApplicationContextSwitcher"
+import { ApplicationHeader } from "../ApplicationHeader"
+import { ApplicationNavigation } from "../ApplicationNavigation/index"
+import { ApplicationNavigationTrigger } from "../ApplicationNavigationTrigger"
 import { ApplicationShell } from "./ApplicationShell"
 
 const personal = {

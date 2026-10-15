@@ -2,7 +2,7 @@
 
 import { Button, Group, Menu, Text } from "@mantine/core"
 import { IconCheck, IconPlus, IconUsers } from "@tabler/icons-react"
-import type { ApplicationContextOption } from "./types"
+import type { ApplicationContextOption } from "../types"
 
 const menuStyles = {
   dropdown: {

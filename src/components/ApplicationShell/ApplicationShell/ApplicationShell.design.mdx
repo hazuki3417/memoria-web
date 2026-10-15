@@ -1,0 +1,26 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Components/Application Shell/Design Guide" />
+
+# ApplicationShell
+
+## Overview
+Application Shell全体の40pxヘッダー、固定Main viewport、ナビゲーション配置、Modal rootを提供する。
+
+## Responsibilities
+- **所有する**: header・navigation・childrenの配置とviewportレイアウト、application-modal-rootの設置。
+- **所有しない**: Navigationの開閉状態、各画面のscroll制御、Context・Accountの操作。
+
+## Design Decisions
+- 既存のUI、文言、操作、Responsive Behaviorを維持したままComponent Directoryへ移動する。
+- Feature / Application Shellの公開APIはroot `index.ts`、Component単位の公開入口は同Directoryの`index.ts`が担当する。
+
+## Component Contract
+- headerの高さ40px、Mainの固定配置・overscroll抑制、Modal rootのidとz-indexを維持する。
+
+## Test Design
+- Personal / Community / Compact / WithLocalNavigationの表示とMain・Headerの位置、mobile viewportの表示を比較する。
+
+## References
+- [Application Shell仕様](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/application-shell.mdx)
+- [Web実装規約](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/web/implementation-conventions.mdx)
