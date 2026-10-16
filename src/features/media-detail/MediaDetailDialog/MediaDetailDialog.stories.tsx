@@ -10,6 +10,15 @@ const meta = {
   title: "Features/Media Detail/MediaDetailDialog",
   component: MediaDetailDialog,
   parameters: { layout: "fullscreen" },
+  // ProductionのApplicationShellが提供するPortal先をStorybookでも再現する。
+  decorators: [
+    (Story) => (
+      <>
+        <div id="application-modal-root" style={{ position: "relative", zIndex: 400 }} />
+        <Story />
+      </>
+    ),
+  ],
   args: {
     items,
     initialId: "portrait-01",
