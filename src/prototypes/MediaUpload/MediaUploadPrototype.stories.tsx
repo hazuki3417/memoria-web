@@ -4,7 +4,7 @@ import { MediaUploadPrototype } from "./MediaUploadPrototype"
 const meta = {
   title: "Design Prototypes/Media Upload",
   component: MediaUploadPrototype,
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", applicationShellOwnsPortal: true },
 } satisfies Meta<typeof MediaUploadPrototype>
 
 export default meta
