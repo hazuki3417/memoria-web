@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { TagsEditDialog } from "./TagsEditDialog"
 
 const meta = {
-  title: "Features/Image Detail/Tags編集",
+  title: "Features/Media Detail/TagsEditDialog",
   component: TagsEditDialog,
   args: {
     detailEditor: "tags",
@@ -16,7 +16,4 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Opened: Story = {}
-export const Closed: Story = {
-  args: { detailEditor: null },
-}
+export const Default: Story = {}

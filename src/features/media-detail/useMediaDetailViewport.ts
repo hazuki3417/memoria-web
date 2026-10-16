@@ -3,10 +3,10 @@
 import { useState } from "react"
 
 /**
- * Image Detail viewport state shared by the application and its visual prototype.
+ * Media Detail viewport state shared by the application and its visual prototype.
  * Keep transitions and defaults aligned with the existing Media Detail contract.
  */
-export function useImageDetailViewport() {
+export function useMediaDetailViewport() {
   const [detailInfoOpened, setDetailInfoOpened] = useState(true)
   const [detailZoom, setDetailZoom] = useState(100)
   const [detailRotate, setDetailRotate] = useState(0)

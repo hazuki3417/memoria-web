@@ -2,10 +2,10 @@
 
 import { useState } from "react"
 import { showNotification } from "@/components/Feedback"
-import type { MediaItem } from "@/features/image-detail/types"
+import type { MediaItem } from "@/features/media-detail/types"
 
 /** Image detail edit, share and section state; independent of the listing UI. */
-export function useImageDetailEditing(detail: MediaItem | null) {
+export function useMediaDetailEditing(detail: MediaItem | null) {
   const [detailEditor, setDetailEditor] = useState<
     "tags" | "groups" | "communities" | null
   >(null)

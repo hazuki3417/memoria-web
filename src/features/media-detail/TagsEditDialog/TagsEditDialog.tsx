@@ -1,9 +1,9 @@
 "use client"
 
 import { Button, Group, Modal, Stack, TagsInput, Text } from "@mantine/core"
-import type { useImageDetailEditing } from "@/features/image-detail/useImageDetailEditing"
+import type { useMediaDetailEditing } from "@/features/media-detail/useMediaDetailEditing"
 
-type Props = Pick<ReturnType<typeof useImageDetailEditing>, "detailEditor" | "setDetailEditor" | "detailDraft" | "setDetailDraft" | "saveDetailDraft">
+type Props = Pick<ReturnType<typeof useMediaDetailEditing>, "detailEditor" | "setDetailEditor" | "detailDraft" | "setDetailDraft" | "saveDetailDraft">
 
 /** One modal per component to isolate interaction and test scope. */
 export function TagsEditDialog({
