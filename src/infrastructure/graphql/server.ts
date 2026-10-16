@@ -281,3 +281,31 @@ export async function changeMemoriaCommunityMemberRole(
   return response.result.data?.changeCommunityMemberRole?.success
     ? { kind: "updated" } : { kind: "error" }
 }
+
+export type CommunityMembershipOperationResult =
+  | { kind: "updated" }
+  | { kind: "unavailable" | "forbidden" | "not_found" | "error" }
+
+async function communityMembershipMutation(
+  query: string, operationName: string, variables: Record<string, unknown>, field: "removeCommunityMember" | "leaveCommunity",
+): Promise<CommunityMembershipOperationResult> {
+  const response = await request<Record<string, { success: boolean }>>(query, operationName, variables)
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map(e => e.extensions?.code) ?? []
+  if (codes.length) return { kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("FORBIDDEN") ? "forbidden" : codes.includes("NOT_FOUND") ? "not_found" : "error" }
+  return response.result.data?.[field]?.success ? { kind: "updated" } : { kind: "error" }
+}
+
+export async function removeMemoriaCommunityMember(communityId: string, userId: string) {
+  return communityMembershipMutation(
+    "mutation RemoveCommunityMember($input: RemoveCommunityMemberInput!) { removeCommunityMember(input: $input) { success } }",
+    "RemoveCommunityMember", { input: { communityId, userId } }, "removeCommunityMember",
+  )
+}
+
+export async function leaveMemoriaCommunity(communityId: string) {
+  return communityMembershipMutation(
+    "mutation LeaveCommunity($communityId: ID!) { leaveCommunity(communityId: $communityId) { success } }",
+    "LeaveCommunity", { communityId }, "leaveCommunity",
+  )
+}
