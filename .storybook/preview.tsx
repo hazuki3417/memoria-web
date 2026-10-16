@@ -3,6 +3,16 @@ import "@mantine/notifications/styles.css";
 import type { Preview } from '@storybook/nextjs-vite';
 import { theme } from "../src//lib/theme";
 import { ThemeProvider } from "../src/providers/ThemeProvider";
+import { PrototypeApplicationShell } from "../src/prototypes/PrototypeApplicationShell";
+import type { ApplicationContextOption, ApplicationNavigationItem } from "../src/components/ApplicationShell";
+
+// Opt-in: parameters.applicationShell = { currentContext, contexts, navigationItems, ... }
+type StoryApplicationShell = {
+  currentContext: ApplicationContextOption;
+  contexts: ApplicationContextOption[];
+  navigationItems: ApplicationNavigationItem[];
+  user?: { displayName: string; avatarLabel?: string };
+};
 
 
 const preview: Preview = {
@@ -22,11 +32,24 @@ const preview: Preview = {
     }
   },
   decorators: [
-    (Story) => (
-      <ThemeProvider theme={theme}>
-        <Story />
-      </ThemeProvider>
-    )
+    (Story, context) => {
+      const applicationShell = context.parameters.applicationShell as StoryApplicationShell | undefined;
+      return (
+        <ThemeProvider theme={theme}>
+          {applicationShell ? (
+            <PrototypeApplicationShell {...applicationShell}>
+              <Story />
+            </PrototypeApplicationShell>
+          ) : (
+            <>
+              {/* ApplicationShell非使用Storyにも本番と同じModal Portal先を提供する */}
+              <div id="application-modal-root" style={{ position: "relative", zIndex: 400 }} />
+              <Story />
+            </>
+          )}
+        </ThemeProvider>
+      );
+    }
   ]
 };
 
