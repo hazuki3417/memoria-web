@@ -119,3 +119,49 @@ export async function updateMemoriaProfile(
   const user = result.data?.updateUserProfile?.user
   return user ? { kind: "updated", user } : { kind: "error" }
 }
+
+
+export type AccountPreferences = {
+  personalAccentColor: string
+  dateFormat: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
+  fileSizeUnit: "DECIMAL" | "BINARY"
+  mediaThumbnailSize: "SMALL" | "MEDIUM" | "LARGE"
+  mediaDetailNavigationWrap: boolean
+  mediaDetailInitialInfoWide: boolean
+  mediaDetailInitialInfoMedium: boolean
+}
+export type AccountPreferencesPatch = Partial<AccountPreferences>
+
+const UPDATE_PREFERENCES_MUTATION = `
+  mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
+    updateUserPreferences(input: $input) {
+      preferences {
+        personalAccentColor dateFormat fileSizeUnit mediaThumbnailSize
+        mediaDetailNavigationWrap mediaDetailInitialInfoWide mediaDetailInitialInfoMedium
+      }
+    }
+  }
+`
+
+export type UpdatePreferencesResult =
+  | { kind: "updated"; preferences: AccountPreferences }
+  | { kind: "unavailable" | "validation" | "error" }
+
+export async function updateMemoriaPreferences(
+  patch: AccountPreferencesPatch,
+): Promise<UpdatePreferencesResult> {
+  const response = await request<{
+    updateUserPreferences: { preferences: AccountPreferences }
+  }>(UPDATE_PREFERENCES_MUTATION, "SaveUserPreferences", { input: patch })
+  if (response.kind !== "ok") return { kind: response.kind }
+  const { result } = response
+  if (result.errors?.length) {
+    if (result.errors.some((error) => error.extensions?.code === "UNAUTHENTICATED"))
+      return { kind: "unavailable" }
+    if (result.errors.some((error) => error.extensions?.code === "VALIDATION"))
+      return { kind: "validation" }
+    return { kind: "error" }
+  }
+  const preferences = result.data?.updateUserPreferences?.preferences
+  return preferences ? { kind: "updated", preferences } : { kind: "error" }
+}
