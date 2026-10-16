@@ -28,6 +28,8 @@ import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import { SettingsUsage, type SettingsUsageData } from "./SettingsUsage"
+import { usePreferencesSave } from "./usePreferencesSave"
+import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
 
 type Section = "profile" | "preferences" | "usage" | "account"
 
@@ -171,15 +173,31 @@ function ProfileContent({
   )
 }
 
-function PreferencesContent({ compact }: { compact: boolean }) {
+function PreferencesContent({
+  compact,
+  initialPreferences = defaultUserPreferences,
+  onSave,
+}: {
+  compact: boolean
+  initialPreferences?: UserPreferences
+  onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+}) {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
-  const [dateFormat, setDateFormat] = useState("YYYY/MM/DD")
-  const [fileSizeUnit, setFileSizeUnit] = useState("SI")
-  const [loop, setLoop] = useState(false)
-  const [wideDetails, setWideDetails] = useState(true)
-  const [mediumDetails, setMediumDetails] = useState(false)
-  const [thumbnailSize, setThumbnailSize] = useState("medium")
-  const [accentColor, setAccentColor] = useState("#10B981")
+  const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences)
+  const [accentDraft, setAccentDraft] = useState(initialPreferences.personalAccentColor)
+  const { saveError, enqueue, retry } = usePreferencesSave(onSave)
+
+  const change = <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => {
+    if (saveError === "blocked") return
+    setPreferences((current) => ({ ...current, [key]: value }))
+    enqueue({ [key]: value } as UserPreferencesPatch)
+  }
+  const dateFormat = preferences.dateFormat
+  const fileSizeUnit = preferences.fileSizeUnit
+  const loop = preferences.mediaDetailNavigationWrap
+  const wideDetails = preferences.mediaDetailInitialInfoWide
+  const mediumDetails = preferences.mediaDetailInitialInfoMedium
+  const thumbnailSize = preferences.mediaThumbnailSize
 
   return (
     <Stack gap="xl">
@@ -187,6 +205,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
       />
+      {saveError && <FeedbackAlert kind="error" title={saveError === "blocked" ? "設定を変更できません" : "保存できませんでした"} role="alert">{saveError === "blocked" ? "画面を再読み込みして現在の状態を確認してください。" : "変更内容を保持しています。再試行すると変更内容を保存します。"}{saveError === "retryable" && <Button size="xs" onClick={retry}>再試行</Button>}</FeedbackAlert>}
       <Box>
         <SectionHeader>表示</SectionHeader>
         <Stack gap="xl">
@@ -217,8 +236,11 @@ function PreferencesContent({ compact }: { compact: boolean }) {
             <ColorInput
               aria-label="Personal Accent Color"
               format="hex"
-              value={accentColor}
-              onChange={setAccentColor}
+              value={accentDraft}
+              onChange={(value) => {
+                setAccentDraft(value)
+                if (/^#[0-9a-fA-F]{6}$/.test(value)) change("personalAccentColor", value.toUpperCase())
+              }}
             />
           </SettingRow>
           <SettingRow
@@ -229,8 +251,8 @@ function PreferencesContent({ compact }: { compact: boolean }) {
             <Select
               aria-label="日付形式"
               value={dateFormat}
-              onChange={(value) => value && setDateFormat(value)}
-              data={["YYYY/MM/DD", "MM/DD/YYYY", "DD/MM/YYYY"]}
+              onChange={(value) => value && change("dateFormat", value as UserPreferences["dateFormat"])}
+              data={[{ value: "YYYY_MM_DD", label: "YYYY/MM/DD" }, { value: "MM_DD_YYYY", label: "MM/DD/YYYY" }, { value: "DD_MM_YYYY", label: "DD/MM/YYYY" }]}
               allowDeselect={false}
             />
           </SettingRow>
@@ -242,9 +264,9 @@ function PreferencesContent({ compact }: { compact: boolean }) {
             <Select
               aria-label="ファイルサイズの単位"
               value={fileSizeUnit}
-              onChange={(value) => value && setFileSizeUnit(value)}
+              onChange={(value) => value && change("fileSizeUnit", value as UserPreferences["fileSizeUnit"])}
               data={[
-                { value: "SI", label: "SI（KB, MB, GB）" },
+                { value: "DECIMAL", label: "SI（KB, MB, GB）" },
                 { value: "BINARY", label: "2進（KiB, MiB, GiB）" },
               ]}
               allowDeselect={false}
@@ -258,11 +280,11 @@ function PreferencesContent({ compact }: { compact: boolean }) {
             <Select
               aria-label="Mediaサムネイルサイズ"
               value={thumbnailSize}
-              onChange={(value) => value && setThumbnailSize(value)}
+              onChange={(value) => value && change("mediaThumbnailSize", value as UserPreferences["mediaThumbnailSize"])}
               data={[
-                { value: "small", label: "小" },
-                { value: "medium", label: "中" },
-                { value: "large", label: "大" },
+                { value: "SMALL", label: "小" },
+                { value: "MEDIUM", label: "中" },
+                { value: "LARGE", label: "大" },
               ]}
               allowDeselect={false}
             />
@@ -279,7 +301,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
           >
             <Switch
               checked={loop}
-              onChange={(event) => setLoop(event.currentTarget.checked)}
+              onChange={(event) => change("mediaDetailNavigationWrap", event.currentTarget.checked)}
               label={loop ? "オン" : "オフ"}
             />
           </SettingRow>
@@ -290,7 +312,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
           >
             <Switch
               checked={wideDetails}
-              onChange={(event) => setWideDetails(event.currentTarget.checked)}
+              onChange={(event) => change("mediaDetailInitialInfoWide", event.currentTarget.checked)}
               label={wideDetails ? "オン" : "オフ"}
             />
           </SettingRow>
@@ -302,7 +324,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
             <Switch
               checked={mediumDetails}
               onChange={(event) =>
-                setMediumDetails(event.currentTarget.checked)
+                change("mediaDetailInitialInfoMedium", event.currentTarget.checked)
               }
               label={mediumDetails ? "オン" : "オフ"}
             />
@@ -349,10 +371,14 @@ export function Settings({
   section,
   saveProfile,
   profileNickname,
+  initialPreferences,
+  savePreferences,
 }: {
   section: Section
   saveProfile?: SaveProfile
   profileNickname?: string
+  initialPreferences?: UserPreferences
+  savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
 }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
@@ -360,7 +386,7 @@ export function Settings({
     section === "profile" ? (
       <ProfileContent onSave={saveProfile} initialNickname={profileNickname} />
     ) : section === "preferences" ? (
-      <PreferencesContent compact={compact} />
+      <PreferencesContent compact={compact} initialPreferences={initialPreferences} onSave={savePreferences} />
     ) : section === "usage" ? (
       <UsageContent />
     ) : (

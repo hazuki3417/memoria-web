@@ -1,13 +1,13 @@
 import "server-only"
 import { auth0 } from "@/lib/auth0"
 
-const ME_QUERY = "query CurrentUser { me { id profile { nickname } } }"
+const ME_QUERY = "query CurrentUser { me { id profile { nickname } preferences { personalAccentColor dateFormat fileSizeUnit mediaThumbnailSize mediaDetailNavigationWrap mediaDetailInitialInfoWide mediaDetailInitialInfoMedium } } }"
 const REGISTER_MUTATION =
-  "mutation RegisterUser($input: RegisterUserInput!) { registerUser(input: $input) { user { id profile { nickname } } } }"
+  "mutation RegisterMemoriaUser($input: RegisterUserInput!) { registerUser(input: $input) { user { id profile { nickname } } } }"
 
 type GraphQLError = { message?: string; extensions?: { code?: string } }
 type GraphQLResult<T> = { data?: T; errors?: GraphQLError[] }
-export type CurrentUser = { id: string; profile: { nickname: string } }
+export type CurrentUser = { id: string; profile: { nickname: string }; preferences: AccountPreferences }
 export type CurrentUserResult =
   | { kind: "active"; user: CurrentUser }
   | { kind: "unregistered" }
@@ -74,7 +74,7 @@ export async function registerMemoriaUser(
 ): Promise<RegistrationResult> {
   const response = await request<{ registerUser: { user: CurrentUser } }>(
     REGISTER_MUTATION,
-    "RegisterUser",
+    "RegisterMemoriaUser",
     { input: { nickname } },
   )
   if (response.kind !== "ok") return { kind: response.kind }
@@ -93,7 +93,7 @@ export async function registerMemoriaUser(
 }
 
 const UPDATE_PROFILE_MUTATION =
-  "mutation UpdateUserProfile($input: UpdateUserProfileInput!) { updateUserProfile(input: $input) { user { id profile { nickname } } } }"
+  "mutation UpdateMemoriaUserProfile($input: UpdateUserProfileInput!) { updateUserProfile(input: $input) { user { id profile { nickname } } } }"
 
 export type UpdateProfileResult =
   | { kind: "updated"; user: CurrentUser }
@@ -104,7 +104,7 @@ export async function updateMemoriaProfile(
 ): Promise<UpdateProfileResult> {
   const response = await request<{ updateUserProfile: { user: CurrentUser } }>(
     UPDATE_PROFILE_MUTATION,
-    "UpdateUserProfile",
+    "UpdateMemoriaUserProfile",
     { input: { nickname } },
   )
   if (response.kind !== "ok") return { kind: response.kind }
@@ -118,4 +118,50 @@ export async function updateMemoriaProfile(
   }
   const user = result.data?.updateUserProfile?.user
   return user ? { kind: "updated", user } : { kind: "error" }
+}
+
+
+export type AccountPreferences = {
+  personalAccentColor: string
+  dateFormat: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
+  fileSizeUnit: "DECIMAL" | "BINARY"
+  mediaThumbnailSize: "SMALL" | "MEDIUM" | "LARGE"
+  mediaDetailNavigationWrap: boolean
+  mediaDetailInitialInfoWide: boolean
+  mediaDetailInitialInfoMedium: boolean
+}
+export type AccountPreferencesPatch = Partial<AccountPreferences>
+
+const UPDATE_PREFERENCES_MUTATION = `
+  mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
+    updateUserPreferences(input: $input) {
+      preferences {
+        personalAccentColor dateFormat fileSizeUnit mediaThumbnailSize
+        mediaDetailNavigationWrap mediaDetailInitialInfoWide mediaDetailInitialInfoMedium
+      }
+    }
+  }
+`
+
+export type UpdatePreferencesResult =
+  | { kind: "updated"; preferences: AccountPreferences }
+  | { kind: "unavailable" | "validation" | "error" }
+
+export async function updateMemoriaPreferences(
+  patch: AccountPreferencesPatch,
+): Promise<UpdatePreferencesResult> {
+  const response = await request<{
+    updateUserPreferences: { preferences: AccountPreferences }
+  }>(UPDATE_PREFERENCES_MUTATION, "SaveUserPreferences", { input: patch })
+  if (response.kind !== "ok") return { kind: response.kind }
+  const { result } = response
+  if (result.errors?.length) {
+    if (result.errors.some((error) => error.extensions?.code === "UNAUTHENTICATED"))
+      return { kind: "unavailable" }
+    if (result.errors.some((error) => error.extensions?.code === "VALIDATION"))
+      return { kind: "validation" }
+    return { kind: "error" }
+  }
+  const preferences = result.data?.updateUserPreferences?.preferences
+  return preferences ? { kind: "updated", preferences } : { kind: "error" }
 }

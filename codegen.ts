@@ -5,7 +5,10 @@ const config: CodegenConfig = {
   documents: ["src/infrastructure/graphql/operations/**/*.graphql"],
   generates: {
     "src/infrastructure/graphql/generated.ts": {
-      plugins: ["typescript", "typescript-operations"],
+      plugins: [
+        "typescript",
+        { "typescript-operations": { typesPrefix: "Operation" } },
+      ],
       config: { scalars: { DateTime: "string", Int64: "number", Upload: "File" } },
     },
   },
