@@ -17,6 +17,7 @@ export type MediaDetailViewerProps = Pick<Editing, "detailValues" | "detailSecti
   detail: MediaItem | null
   setDetail: Dispatch<SetStateAction<MediaItem | null>>
   closeMediaDetail: () => void
+  onRequestDelete: () => void
   stateItems: MediaItem[]
   compact: boolean | undefined
   context: "personal" | "community"
@@ -97,6 +98,7 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
                   setDetailEditor={props.setDetailEditor}
                   context={props.context}
                   downloadMock={props.downloadMock}
+                  onRequestDelete={props.onRequestDelete}
                 />
               </Box>
             )
