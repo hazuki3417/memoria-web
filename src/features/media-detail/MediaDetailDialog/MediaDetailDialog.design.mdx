@@ -13,6 +13,8 @@
 - 前後移動は`items`の順序に従う。先頭・末尾の操作可否と移動時のViewport初期化を維持する。
 - 閉じる操作で`onClose`を通知し、GroupBrowserの選択・Pane幅・スクロールを保持する。
 
+- 削除操作はMediaDeleteDialogで対象Mediaを確認し、キャンセルなら詳細を維持する。確定時は呼び出し元の削除処理に委譲する。現時点のPrototypeは実データを削除せず、操作確認の通知と詳細のクローズを行う。
+
 ## Story / テスト観点
 - 初期選択、前後移動、閉じる操作、画像一覧更新時の選択同期。
 - Media / Group起点の移動範囲、Personal / Community、Desktop / Compact。
