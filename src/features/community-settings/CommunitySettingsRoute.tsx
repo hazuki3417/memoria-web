@@ -87,7 +87,7 @@ export function CommunitySettingsRoute({
         const result = await leaveCommunityAction(communityId)
         if (result.kind !== "updated") throw new Error("leave failed")
       }}
-      onLeaveSuccess={() => router.push("/communities")}
+      onLeaveSuccess={() => router.push("/dashboard")}
       onChangeMemberRole={async (userId, role) => {
         try {
           const result = await changeCommunityMemberRoleAction(communityId, userId, role)
