@@ -22,6 +22,7 @@ function ViewerStory({ initialId, compact = false }: { initialId: string; compac
       detail={detail}
       setDetail={setDetail}
       closeMediaDetail={() => setDetail(null)}
+      onRequestDelete={() => undefined}
       stateItems={items}
       compact={compact}
       context="personal"
