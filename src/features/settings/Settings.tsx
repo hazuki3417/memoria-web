@@ -184,6 +184,7 @@ function PreferencesContent({
 }) {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
   const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences)
+  const [accentDraft, setAccentDraft] = useState(initialPreferences.personalAccentColor)
   const [saveError, setSaveError] = useState<"retryable" | "blocked" | null>(null)
   const queue = useRef<ReturnType<typeof createPreferencesSaveQueue> | null>(null)
 
@@ -218,7 +219,6 @@ function PreferencesContent({
   const wideDetails = preferences.mediaDetailInitialInfoWide
   const mediumDetails = preferences.mediaDetailInitialInfoMedium
   const thumbnailSize = preferences.mediaThumbnailSize
-  const accentColor = preferences.personalAccentColor
 
   return (
     <Stack gap="xl">
@@ -257,8 +257,11 @@ function PreferencesContent({
             <ColorInput
               aria-label="Personal Accent Color"
               format="hex"
-              value={accentColor}
-              onChange={(value) => { if (/^#[0-9a-fA-F]{6}$/.test(value)) change("personalAccentColor", value.toUpperCase()) }}
+              value={accentDraft}
+              onChange={(value) => {
+                setAccentDraft(value)
+                if (/^#[0-9a-fA-F]{6}$/.test(value)) change("personalAccentColor", value.toUpperCase())
+              }}
             />
           </SettingRow>
           <SettingRow
