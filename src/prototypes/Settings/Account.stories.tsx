@@ -5,7 +5,7 @@ const meta = {
   title: "Design Prototypes/Settings/Account",
   component: SettingsPrototype,
   args: { initialSection: "account" },
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", applicationShellOwnsPortal: true },
 } satisfies Meta<typeof SettingsPrototype>
 
 export default meta
