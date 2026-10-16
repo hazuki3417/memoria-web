@@ -199,6 +199,12 @@ export function ApplicationShellContainer({
         header={
           <ApplicationHeader
             accentColor={currentContext.accentColor}
+            onTitleClick={() => {
+              router.push(contextKind === "community" && communityId
+                ? `/communities/${encodeURIComponent(communityId)}/dashboard`
+                : "/dashboard")
+              navigation.close()
+            }}
             reserveNavigationSpace={shellMode === "restricted-flow"}
             leading={
               isApplicationShellFeatureVisible(shellMode, "navigation") ? (
