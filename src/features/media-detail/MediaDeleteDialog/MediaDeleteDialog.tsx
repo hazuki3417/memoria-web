@@ -11,7 +11,11 @@ export type MediaDeleteDialogProps = {
 }
 
 /** Single-Media deletion confirmation. Persistence is owned by the caller. */
-export function MediaDeleteDialog({ target, onCancel, onConfirm }: MediaDeleteDialogProps) {
+export function MediaDeleteDialog({
+  target,
+  onCancel,
+  onConfirm,
+}: MediaDeleteDialogProps) {
   return (
     <Dialog
       opened={target !== null}
@@ -21,9 +25,19 @@ export function MediaDeleteDialog({ target, onCancel, onConfirm }: MediaDeleteDi
       zIndex={410}
       footer={
         <Dialog.Footer
-          secondary={<Button variant="default" onClick={onCancel}>キャンセル</Button>}
+          secondary={
+            <Button variant="default" onClick={onCancel}>
+              キャンセル
+            </Button>
+          }
           primary={
-            <Button color="red" disabled={!target} onClick={() => { if (target) onConfirm(target) }}>
+            <Button
+              color="red"
+              disabled={!target}
+              onClick={() => {
+                if (target) onConfirm(target)
+              }}
+            >
               削除
             </Button>
           }

@@ -7,7 +7,11 @@ const meta = {
   args: {
     detailEditor: "communities",
     setDetailEditor: () => undefined,
-    detailValues: { tags: ["旅行"], groups: ["旅行"], communities: ["Photo Club"] },
+    detailValues: {
+      tags: ["旅行"],
+      groups: ["旅行"],
+      communities: ["Photo Club"],
+    },
     shareTarget: null,
     setShareTarget: () => undefined,
     addCommunityShare: () => undefined,

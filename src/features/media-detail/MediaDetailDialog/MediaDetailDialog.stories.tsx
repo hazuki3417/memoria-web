@@ -2,8 +2,16 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { MediaDetailDialog } from "./MediaDetailDialog"
 
 const items = [
-  { id: "portrait-01", label: "縦長 Media 1", src: "/__dev-assets/media-browser/h-01.png" },
-  { id: "landscape-01", label: "横長 Media 1", src: "/__dev-assets/media-browser/w-01.png" },
+  {
+    id: "portrait-01",
+    label: "縦長 Media 1",
+    src: "/__dev-assets/media-browser/h-01.png",
+  },
+  {
+    id: "landscape-01",
+    label: "横長 Media 1",
+    src: "/__dev-assets/media-browser/w-01.png",
+  },
 ]
 
 const meta = {

@@ -41,8 +41,8 @@ import {
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Dialog } from "@/components/Dialog"
-import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
 import { showNotification } from "@/components/Feedback"
+import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
 
 type MediaBrowserState =
   | "default"
@@ -252,12 +252,16 @@ function MediaBrowserContent({
   const [appliedTags, setAppliedTags] = useState<string[]>(tags)
   // The mock has no tag metadata or Relay connection; keep the submitted filter separate.
   void appliedTags
-  const stateItems =
-    (["true-empty", "filtered-empty", "loading", "error"].includes(initialState)
-      ? []
-      : initialState === "processing-failure"
-        ? [...media.slice(0, 5), media[media.length - 1]]
-        : media.slice(0, 12))
+  const stateItems = [
+    "true-empty",
+    "filtered-empty",
+    "loading",
+    "error",
+  ].includes(initialState)
+    ? []
+    : initialState === "processing-failure"
+      ? [...media.slice(0, 5), media[media.length - 1]]
+      : media.slice(0, 12)
 
   const toggle = (id: string) =>
     setSelected((current) => {
@@ -273,7 +277,7 @@ function MediaBrowserContent({
 
   return (
     <>
-      {(
+      {
         <Stack gap={0} w="100%">
           <Box
             pb="xs"
@@ -566,7 +570,7 @@ function MediaBrowserContent({
             </Paper>
           )}
         </Stack>
-      )}
+      }
 
       <Dialog
         opened={selectionDialog === "group"}
@@ -687,13 +691,25 @@ function MediaBrowserContent({
         </Text>
       </Dialog>
 
-      {detail && <MediaDetailDialog items={stateItems} initialId={detail.id} onClose={() => setDetail(null)} contextKind={context} downloadMock={downloadMock} />}
+      {detail && (
+        <MediaDetailDialog
+          items={stateItems}
+          initialId={detail.id}
+          onClose={() => setDetail(null)}
+          contextKind={context}
+          downloadMock={downloadMock}
+        />
+      )}
     </>
   )
 }
 
 /** Route integration for the Media listing. */
-export function MediaBrowser(props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">) {
+export function MediaBrowser(
+  props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">,
+) {
   const router = useRouter()
-  return <MediaBrowserContent {...props} navigate={(path) => router.push(path)} />
+  return (
+    <MediaBrowserContent {...props} navigate={(path) => router.push(path)} />
+  )
 }

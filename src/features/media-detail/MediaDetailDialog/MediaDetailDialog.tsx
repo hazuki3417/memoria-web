@@ -1,17 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { useMediaQuery } from "@mantine/hooks"
+import { useEffect, useState } from "react"
 import { showNotification } from "@/components/Feedback"
+import { CommunityShareDialog } from "../CommunityShareDialog"
+import { CommunityUnshareDialog } from "../CommunityUnshareDialog"
+import { GroupsEditDialog } from "../GroupsEditDialog"
 import { MediaDeleteDialog } from "../MediaDeleteDialog"
+import { MediaDetailViewer } from "../MediaDetailViewer"
+import { TagsEditDialog } from "../TagsEditDialog"
+import type { MediaItem } from "../types"
 import { useMediaDetailEditing } from "../useMediaDetailEditing"
 import { useMediaDetailViewport } from "../useMediaDetailViewport"
-import { MediaDetailViewer } from "../MediaDetailViewer"
-import { CommunityUnshareDialog } from "../CommunityUnshareDialog"
-import { CommunityShareDialog } from "../CommunityShareDialog"
-import { TagsEditDialog } from "../TagsEditDialog"
-import { GroupsEditDialog } from "../GroupsEditDialog"
-import type { MediaItem } from "../types"
 
 export type MediaDetailDialogProps = {
   items: MediaItem[]
@@ -21,32 +21,65 @@ export type MediaDetailDialogProps = {
   downloadMock?: "available" | "forbidden" | "processing"
 }
 
-export function MediaDetailDialog({ items, initialId, onClose, contextKind = "personal", downloadMock = "available" }: MediaDetailDialogProps) {
+export function MediaDetailDialog({
+  items,
+  initialId,
+  onClose,
+  contextKind = "personal",
+  downloadMock = "available",
+}: MediaDetailDialogProps) {
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [deleteTarget, setDeleteTarget] = useState<MediaItem | null>(null)
-  const [detail, setDetail] = useState<MediaItem | null>(() => items.find(item => item.id === initialId) ?? null)
-  useEffect(() => { setDetail(items.find(item => item.id === initialId) ?? null) }, [initialId, items])
-  const closeMediaDetail = () => { setDeleteTarget(null); setDetail(null); onClose() }
+  const [detail, setDetail] = useState<MediaItem | null>(
+    () => items.find((item) => item.id === initialId) ?? null,
+  )
+  useEffect(() => {
+    setDetail(items.find((item) => item.id === initialId) ?? null)
+  }, [initialId, items])
+  const closeMediaDetail = () => {
+    setDeleteTarget(null)
+    setDetail(null)
+    onClose()
+  }
   const confirmDelete = () => {
     setDeleteTarget(null)
     closeMediaDetail()
     showNotification({
       kind: "info",
       title: "Mediaの削除",
-      message: "Mediaの削除操作を確認しました。実際のデータは削除されていません。",
+      message:
+        "Mediaの削除操作を確認しました。実際のデータは削除されていません。",
     })
   }
   const {
-    detailEditor, setDetailEditor, detailDraft, setDetailDraft,
-    shareTarget, setShareTarget, unshareTarget, setUnshareTarget,
-    detailValues, openDetailEditor, saveDetailDraft,
-    addCommunityShare, removeCommunityShare,
-    detailSectionsExpanded, toggleDetailSection,
+    detailEditor,
+    setDetailEditor,
+    detailDraft,
+    setDetailDraft,
+    shareTarget,
+    setShareTarget,
+    unshareTarget,
+    setUnshareTarget,
+    detailValues,
+    openDetailEditor,
+    saveDetailDraft,
+    addCommunityShare,
+    removeCommunityShare,
+    detailSectionsExpanded,
+    toggleDetailSection,
   } = useMediaDetailEditing(detail)
   const {
-    prepareNavigation, detailInfoOpened, setDetailInfoOpened,
-    detailZoom, setDetailZoom, detailRotate, setDetailRotate,
-    detailRotateAnimated, setDetailRotateAnimated, detailDirection, setDetailDirection,
+    prepareNavigation,
+    detailInfoOpened,
+    setDetailInfoOpened,
+    detailZoom,
+    setDetailZoom,
+    detailRotate,
+    setDetailRotate,
+    detailRotateAnimated,
+    setDetailRotateAnimated,
+    detailDirection,
+    setDetailDirection,
   } = useMediaDetailViewport()
   void setDetailDirection
   return (
@@ -55,7 +88,9 @@ export function MediaDetailDialog({ items, initialId, onClose, contextKind = "pe
         detail={detail}
         setDetail={setDetail}
         closeMediaDetail={closeMediaDetail}
-        onRequestDelete={() => { if (detail) setDeleteTarget(detail) }}
+        onRequestDelete={() => {
+          if (detail) setDeleteTarget(detail)
+        }}
         stateItems={items}
         compact={compact}
         context={contextKind}

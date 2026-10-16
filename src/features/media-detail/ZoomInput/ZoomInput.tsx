@@ -1,8 +1,7 @@
 "use client"
 
-import { Combobox, InputBase } from "@mantine/core"
+import { Combobox, InputBase, useCombobox } from "@mantine/core"
 import { useEffect, useState } from "react"
-import { useCombobox } from "@mantine/core"
 
 export function ZoomInput({
   value,
@@ -69,4 +68,3 @@ export function ZoomInput({
     </Combobox>
   )
 }
-

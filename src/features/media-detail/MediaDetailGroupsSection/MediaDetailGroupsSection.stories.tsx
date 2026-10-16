@@ -23,6 +23,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
-export const Expanded: Story = { args: { detailSectionsExpanded: { ...expanded, groups: true } } }
-export const Empty: Story = { args: { detailValues: { ...values, groups: [] } } }
-export const SixItems: Story = { args: { detailValues: { ...values, groups: values.groups.slice(0, 6) } } }
+export const Expanded: Story = {
+  args: { detailSectionsExpanded: { ...expanded, groups: true } },
+}
+export const Empty: Story = {
+  args: { detailValues: { ...values, groups: [] } },
+}
+export const SixItems: Story = {
+  args: { detailValues: { ...values, groups: values.groups.slice(0, 6) } },
+}

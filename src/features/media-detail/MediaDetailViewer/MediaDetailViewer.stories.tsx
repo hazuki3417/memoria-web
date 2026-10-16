@@ -6,11 +6,25 @@ import { useMediaDetailViewport } from "../useMediaDetailViewport"
 import { MediaDetailViewer } from "./MediaDetailViewer"
 
 const items: MediaItem[] = [
-  { id: "portrait-01", label: "縦長 Media 1", src: "/__dev-assets/media-browser/h-01.png" },
-  { id: "landscape-01", label: "横長 Media 1", src: "/__dev-assets/media-browser/w-01.png" },
+  {
+    id: "portrait-01",
+    label: "縦長 Media 1",
+    src: "/__dev-assets/media-browser/h-01.png",
+  },
+  {
+    id: "landscape-01",
+    label: "横長 Media 1",
+    src: "/__dev-assets/media-browser/w-01.png",
+  },
 ]
 
-function ViewerStory({ initialId, compact = false }: { initialId: string; compact?: boolean }) {
+function ViewerStory({
+  initialId,
+  compact = false,
+}: {
+  initialId: string
+  compact?: boolean
+}) {
   const [detail, setDetail] = useState<MediaItem | null>(
     () => items.find((item) => item.id === initialId) ?? null,
   )

@@ -8,8 +8,8 @@ import {
   Button,
   Center,
   Checkbox,
-  Combobox,
   Collapse,
+  Combobox,
   Divider,
   Group,
   Image,
@@ -29,6 +29,7 @@ import {
   useCombobox,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
+import { Notifications } from "@mantine/notifications"
 import {
   IconAlertCircle,
   IconCheckbox,
@@ -59,7 +60,6 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
 import { useMediaDetailViewport } from "@/features/media-detail/useMediaDetailViewport"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"

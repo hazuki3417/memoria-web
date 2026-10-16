@@ -8,7 +8,10 @@ export { useApplicationNavigation } from "./useApplicationNavigation"
 export { ApplicationShell } from "./ApplicationShell/index"
 export type { ApplicationShellProps } from "./ApplicationShell/index"
 export { isApplicationShellFeatureVisible } from "./applicationShellVisibility"
-export type { ApplicationShellMode, ApplicationShellFeature } from "./applicationShellVisibility"
+export type {
+  ApplicationShellMode,
+  ApplicationShellFeature,
+} from "./applicationShellVisibility"
 export * from "./applicationNavigation"
 export type { ApplicationContextOption } from "./types"
 export type { ApplicationNavigationItem } from "./ApplicationNavigationContent"

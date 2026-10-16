@@ -1,9 +1,6 @@
 "use client"
 
-import { MediaBrowserPrototype } from "@/prototypes/MediaBrowser/MediaBrowserPrototype"
-
 import {
-  ActionIcon,
   Badge,
   Box,
   Button,
@@ -21,6 +18,7 @@ import {
   UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
+import { Notifications } from "@mantine/notifications"
 import {
   IconChevronRight,
   IconEdit,
@@ -32,11 +30,11 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { GroupItem } from "@/components/GroupItem"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
-import { SplitView } from "@/components/SplitView"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
+import { GroupItem } from "@/components/GroupItem"
+import { SplitView } from "@/components/SplitView"
+import { MediaBrowserPrototype } from "@/prototypes/MediaBrowser/MediaBrowserPrototype"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeGroup = {
@@ -284,7 +282,10 @@ export function GroupBrowserPrototype() {
   const [createName, setCreateName] = useState("")
   const [createParents, setCreateParents] = useState<string[]>([])
   const [createChildren, setCreateChildren] = useState<string[]>([])
-  const allGroups = useMemo(() => [...groups, ...createdGroups], [createdGroups])
+  const allGroups = useMemo(
+    () => [...groups, ...createdGroups],
+    [createdGroups],
+  )
   const openCreate = () => {
     setCreateName("")
     setCreateParents([])

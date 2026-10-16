@@ -1,8 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { MediaDetailPreview } from "./MediaDetailPreview"
 
-const first = { id: "portrait-01", label: "縦長 Media", src: "/__dev-assets/media-browser/h-01.png" }
-const second = { id: "landscape-01", label: "横長 Media", src: "/__dev-assets/media-browser/w-01.png" }
+const first = {
+  id: "portrait-01",
+  label: "縦長 Media",
+  src: "/__dev-assets/media-browser/h-01.png",
+}
+const second = {
+  id: "landscape-01",
+  label: "横長 Media",
+  src: "/__dev-assets/media-browser/w-01.png",
+}
 const items = [first, second]
 
 const meta = {

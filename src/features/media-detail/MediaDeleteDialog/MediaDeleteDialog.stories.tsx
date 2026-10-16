@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaDeleteDialog } from "./MediaDeleteDialog"
 import type { MediaItem } from "../types"
+import { MediaDeleteDialog } from "./MediaDeleteDialog"
 
 const media: MediaItem = {
   id: "portrait-01",
