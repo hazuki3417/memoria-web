@@ -36,6 +36,15 @@ const meta = {
   title: "Features/Media Detail/MediaDetailViewer",
   component: ViewerStory,
   parameters: { layout: "fullscreen" },
+  // ProductionのApplicationShellが提供するPortal先をStorybookでも再現する。
+  decorators: [
+    (Story) => (
+      <>
+        <div id="application-modal-root" style={{ position: "relative", zIndex: 400 }} />
+        <Story />
+      </>
+    ),
+  ],
   args: { initialId: "portrait-01", compact: false },
 } satisfies Meta<typeof ViewerStory>
 
