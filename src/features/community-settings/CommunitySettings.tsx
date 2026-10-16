@@ -48,6 +48,9 @@ export function CommunitySettings({
   onSaveName,
   members,
   onChangeMemberRole,
+  onRemoveMember,
+  onLeaveCommunity,
+  onLeaveSuccess,
 }: {
   role?: Role
   communityId?: string
@@ -57,6 +60,9 @@ export function CommunitySettings({
   onSaveName?: (name: string) => Promise<boolean>
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
+  onLeaveCommunity?: () => Promise<void>
+  onLeaveSuccess?: () => void
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -321,6 +327,9 @@ export function CommunitySettings({
     <CommunityMembersContent
       members={members}
       onChangeRole={onChangeMemberRole}
+      onRemoveMember={onRemoveMember}
+      onLeave={onLeaveCommunity}
+      onLeaveSuccess={onLeaveSuccess}
     />
   )
   const communityUsage: SettingsUsageData = {
