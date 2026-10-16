@@ -13,6 +13,7 @@ export type {
   CommunityParticipant,
   CommunityMembersResult,
   CommunityRoleChangeResult,
+  CommunityMembershipOperationResult,
 } from "./server"
 export {
   getCurrentMemoriaUser,
@@ -25,4 +26,6 @@ export {
   renameMemoriaCommunity,
   getMemoriaCommunityMembers,
   changeMemoriaCommunityMemberRole,
+  removeMemoriaCommunityMember,
+  leaveMemoriaCommunity,
 } from "./server"
