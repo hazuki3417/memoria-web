@@ -40,11 +40,13 @@ export function CommunityMembersContent({
   onLeave,
   onLeaveSuccess,
   onChangeRole,
+  onRemoveMember,
 }: {
   members?: CommunityMember[]
   onLeave?: () => Promise<void>
   onLeaveSuccess?: () => void
   onChangeRole?: (userId: string, role: "admin" | "member") => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
 }) {
   const [query, setQuery] = useState("")
   const [sortKey, setSortKey] = useState<SortKey>("name")
@@ -55,6 +57,8 @@ export function CommunityMembersContent({
   const [done, setDone] = useState(false)
   const [roleTarget, setRoleTarget] = useState<CommunityMember | null>(null)
   const [roleBusy, setRoleBusy] = useState(false)
+  const [removeTarget, setRemoveTarget] = useState<CommunityMember | null>(null)
+  const [removeBusy, setRemoveBusy] = useState(false)
   const self = members.find((member) => member.isSelf)
   const adminCount = members.filter((member) => member.role === "admin").length
   const memberLimitReached = members.length >= COMMUNITY_MEMBER_LIMIT
@@ -122,6 +126,15 @@ export function CommunityMembersContent({
       if (await onChangeRole(roleTarget.id, nextRole)) setRoleTarget(null)
     } finally {
       setRoleBusy(false)
+    }
+  }
+  const confirmRemoval = async () => {
+    if (!removeTarget || !onRemoveMember || removeBusy) return
+    setRemoveBusy(true)
+    try {
+      if (await onRemoveMember(removeTarget.id)) setRemoveTarget(null)
+    } finally {
+      setRemoveBusy(false)
     }
   }
   return (
@@ -248,7 +261,11 @@ export function CommunityMembersContent({
                                   >
                                     役割を変更
                                   </Menu.Item>
-                                  <Menu.Item disabled color="red">
+                                  <Menu.Item
+                                    disabled={!onRemoveMember || (member.role === "admin" && adminCount <= 1)}
+                                    onClick={() => setRemoveTarget(member)}
+                                    color="red"
+                                  >
                                     除外
                                   </Menu.Item>
                                 </Menu.Dropdown>
@@ -304,6 +321,20 @@ export function CommunityMembersContent({
           </Group>
         </Stack>
       </Box>
+      <Modal
+        opened={removeTarget !== null}
+        onClose={() => { if (!removeBusy) setRemoveTarget(null) }}
+        title="メンバーを除外"
+        centered
+      >
+        <Stack gap="md">
+          <Text size="sm">{removeTarget?.name}をこのCommunityから除外しますか？</Text>
+          <Group justify="flex-end">
+            <Button variant="default" disabled={removeBusy} onClick={() => setRemoveTarget(null)}>キャンセル</Button>
+            <Button color="red" loading={removeBusy} onClick={() => void confirmRemoval()}>除外する</Button>
+          </Group>
+        </Stack>
+      </Modal>
       <Modal
         opened={roleTarget !== null}
         onClose={() => { if (!roleBusy) setRoleTarget(null) }}
