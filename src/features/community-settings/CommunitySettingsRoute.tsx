@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { Text } from "@mantine/core"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
-import { getCommunityDetailsAction, renameCommunityAction } from "./actions"
+import { getCommunityDetailsAction, getCommunityMembersAction, renameCommunityAction } from "./actions"
+import type { CommunityMember } from "./CommunityMembersContent"
 import {
   CommunitySettings,
   type CommunitySettingsSection,
@@ -20,6 +21,8 @@ export function CommunitySettingsRoute({
   const router = useRouter()
   const [name, setName] = useState<string | null>(null)
   const [loadError, setLoadError] = useState(false)
+  const [members, setMembers] = useState<CommunityMember[] | null>(null)
+  const [membersError, setMembersError] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -33,13 +36,38 @@ export function CommunitySettingsRoute({
     return () => { cancelled = true }
   }, [communityId])
 
+  useEffect(() => {
+    if (section !== "members") return
+    let cancelled = false
+    setMembers(null)
+    setMembersError(false)
+    void getCommunityMembersAction(communityId).then((result) => {
+      if (cancelled) return
+      if (result.kind !== "loaded") {
+        setMembersError(true)
+        return
+      }
+      setMembers(result.members.map((member) => ({
+        id: member.userId,
+        name: member.nickname,
+        role: member.role,
+        isSelf: member.userId === result.currentUserId,
+      })))
+    }).catch(() => { if (!cancelled) setMembersError(true) })
+    return () => { cancelled = true }
+  }, [communityId, section])
+
   if (loadError) return <Text c="red">Community情報を取得できませんでした。再読み込みしてください。</Text>
   if (name === null) return <Text c="dimmed">Community情報を読み込み中です。</Text>
+  if (section === "members" && membersError) return <Text c="red">メンバー一覧を取得できませんでした。再読み込みしてください。</Text>
+  if (section === "members" && members === null) return <Text c="dimmed">メンバー一覧を読み込み中です。</Text>
 
   return (
     <CommunitySettings
       communityId={communityId}
       communityName={name}
+      members={members ?? undefined}
+      role={members?.find((member) => member.isSelf)?.role ?? "admin"}
       section={section}
       onNavigate={(href) => router.push(href)}
       onSaveName={async (nextName) => {
