@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Text } from "@mantine/core"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
-import { getCommunityDetailsAction, getCommunityMembersAction, renameCommunityAction } from "./actions"
+import { getCommunityDetailsAction, getCommunityMembersAction, changeCommunityMemberRoleAction, renameCommunityAction } from "./actions"
 import type { CommunityMember } from "./CommunityMembersContent"
 import {
   CommunitySettings,
@@ -68,6 +68,21 @@ export function CommunitySettingsRoute({
       members={members ?? undefined}
       role={members.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
+      onChangeMemberRole={async (userId, role) => {
+        try {
+          const result = await changeCommunityMemberRoleAction(communityId, userId, role)
+          if (result.kind !== "updated") {
+            showNotification({kind:"error",title:"メンバーの役割を変更できませんでした"})
+            return false
+          }
+          setMembers((current) => current?.map((member) => member.id === userId ? {...member, role} : member) ?? null)
+          showNotification({kind:"success",title:"メンバーの役割を変更しました"})
+          return true
+        } catch {
+          showNotification({kind:"error",title:"メンバーの役割を変更できませんでした"})
+          return false
+        }
+      }}
       onNavigate={(href) => router.push(href)}
       onSaveName={async (nextName) => {
         try {
