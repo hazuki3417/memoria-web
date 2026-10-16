@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { CommunityUnshareDialog } from "./CommunityUnshareDialog"
 
 const meta = {
-  title: "Features/Image Detail/Community共有解除",
+  title: "Features/Media Detail/CommunityUnshareDialog",
   component: CommunityUnshareDialog,
   args: {
     unshareTarget: "Photo Club",
@@ -14,7 +14,4 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Opened: Story = {}
-export const Closed: Story = {
-  args: { unshareTarget: null },
-}
+export const Default: Story = {}

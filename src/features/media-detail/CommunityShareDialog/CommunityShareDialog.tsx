@@ -1,9 +1,9 @@
 "use client"
 
 import { Button, Group, Modal, Select, Stack, Text } from "@mantine/core"
-import type { useImageDetailEditing } from "@/features/image-detail/useImageDetailEditing"
+import type { useMediaDetailEditing } from "@/features/media-detail/useMediaDetailEditing"
 
-type Props = Pick<ReturnType<typeof useImageDetailEditing>, "detailEditor" | "setDetailEditor" | "detailValues" | "shareTarget" | "setShareTarget" | "addCommunityShare">
+type Props = Pick<ReturnType<typeof useMediaDetailEditing>, "detailEditor" | "setDetailEditor" | "detailValues" | "shareTarget" | "setShareTarget" | "addCommunityShare">
 
 /** One modal per component to isolate interaction and test scope. */
 export function CommunityShareDialog({
