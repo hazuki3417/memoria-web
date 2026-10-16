@@ -3,6 +3,7 @@
 import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect, useState } from "react"
+import { createCommunityAction, listCommunitiesAction } from "./actions"
 import {
   ApplicationAccountMenu,
   ApplicationContentScroll,
@@ -44,6 +45,8 @@ export function ApplicationShellContainer({
   const [draftName, setDraftName] = useState("")
   const [createError, setCreateError] = useState("")
   const [created, setCreated] = useState<{ id: string; label: string }[]>([])
+  const [communitiesLoaded, setCommunitiesLoaded] = useState(false)
+  const [createBusy, setCreateBusy] = useState(false)
   const [rememberedContextKind, setRememberedContextKind] = useState<
     "personal" | "community"
   >("personal")
@@ -66,7 +69,7 @@ export function ApplicationShellContainer({
     contextKind === "community"
       ? {
           ...communityContext,
-          label: currentCreated?.label ?? communityContext.label,
+          label: currentCreated?.label ?? (communitiesLoaded ? "Community" : "読み込み中"),
         }
       : personalContext
   const activeSection = getApplicationSection(pathname)
@@ -85,24 +88,51 @@ export function ApplicationShellContainer({
     }
   }, [pathname])
 
+  useEffect(() => {
+    let cancelled = false
+    void listCommunitiesAction().then((result) => {
+      if (cancelled) return
+      if (result.kind === "loaded") {
+        setCreated(result.communities.map((item) => ({ id: item.id, label: item.name })))
+        setCommunitiesLoaded(true)
+      }
+    })
+    return () => { cancelled = true }
+  }, [])
+
   const closeCreate = () => {
+    if (createBusy) return
     setCreateOpened(false)
     setDraftName("")
     setCreateError("")
   }
-  const createCommunity = () => {
+  const createCommunity = async () => {
+    if (createBusy) return
     const name = draftName.trim()
     if (!name) {
       setCreateError("Community名を入力してください。")
       return
     }
-    // Preview only: no backend mutation or persistent membership.
-    const id = `preview-${Date.now()}`
-    setCreated((items) => [...items, { id, label: name }])
-    setRememberedContextKind("community")
-    setRememberedCommunityId(id)
-    closeCreate()
-    router.push(`/communities/${encodeURIComponent(id)}/dashboard`)
+    setCreateBusy(true)
+    try {
+      const result = await createCommunityAction(name)
+      if (result.kind !== "updated") {
+        setCreateError(result.kind === "validation"
+          ? "Community名を確認してください。"
+          : "Communityを作成できませんでした。再度お試しください。")
+        return
+      }
+      const { id, name: label } = result.community
+      setCreated((items) => [...items.filter((item) => item.id !== id), { id, label }])
+      setRememberedContextKind("community")
+      setRememberedCommunityId(id)
+      setCreateOpened(false)
+      setDraftName("")
+      setCreateError("")
+      router.push(`/communities/${encodeURIComponent(id)}/dashboard`)
+    } finally {
+      setCreateBusy(false)
+    }
   }
 
   const selectNavigation = (itemId: string) => {
@@ -140,18 +170,18 @@ export function ApplicationShellContainer({
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault()
-                createCommunity()
+                void createCommunity()
               }
             }}
           />
           <Text size="xs" c="dimmed">
-            プレビュー用です。実際のCommunityは保存されません。
+            Communityを作成すると、メンバー管理と共有が利用できます。
           </Text>
           <Group justify="flex-end">
-            <Button variant="default" onClick={closeCreate}>
+            <Button variant="default" onClick={closeCreate} disabled={createBusy}>
               キャンセル
             </Button>
-            <Button disabled={!draftName.trim()} onClick={createCommunity}>
+            <Button disabled={!draftName.trim() || createBusy} loading={createBusy} onClick={() => void createCommunity()}>
               Communityを作成
             </Button>
           </Group>
@@ -179,7 +209,6 @@ export function ApplicationShellContainer({
                   currentContext={currentContext}
                   contexts={[
                     personalContext,
-                    communityContext,
                     ...created.map((item) => ({
                       ...communityContext,
                       id: item.id,
@@ -187,7 +216,7 @@ export function ApplicationShellContainer({
                     })),
                   ]}
                   onSelect={(id) => {
-                    if (id !== "personal" && id !== "community") {
+                    if (id !== "personal") {
                       router.push(
                         `/communities/${encodeURIComponent(id)}/dashboard`,
                       )
