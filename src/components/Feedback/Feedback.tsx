@@ -75,34 +75,17 @@ export function showNotification({
   const Icon = icons[kind]
 
   notifications.show({
-    message: (
-      <Alert
-        color={appearance.color}
-        title={title}
-        icon={<Icon size={18} />}
-        styles={{
-          root: {
-            backgroundColor: appearance.backgroundColor,
-            paddingRight: 40,
-          },
-          title: { fontSize: 14 },
-          message: { fontSize: 12 },
-        }}
-      >
-        {message}
-      </Alert>
-    ),
+    title,
+    message: message ?? "",
+    color: appearance.color,
+    icon: <Icon size={18} />,
     withCloseButton: true,
     styles: {
       root: {
-        padding: 0,
-        border: 0,
-        background: "var(--mantine-color-body)",
-        boxShadow: "none",
+        backgroundColor: appearance.backgroundColor,
       },
-      body: { margin: 0 },
-      description: { margin: 0 },
-      closeButton: { position: "absolute", top: 8, right: 8, zIndex: 1 },
+      title: { fontSize: 14 },
+      description: { fontSize: 12 },
     },
   })
 }
