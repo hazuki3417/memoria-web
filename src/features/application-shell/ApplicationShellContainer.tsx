@@ -106,6 +106,18 @@ export function ApplicationShellContainer({
     return () => { cancelled = true }
   }, [])
 
+  useEffect(() => {
+    const onRenamed = (event: Event) => {
+      const detail = (event as CustomEvent<{ id: string; name: string }>).detail
+      if (!detail?.id || !detail.name) return
+      setCreated((items) => items.map((item) =>
+        item.id === detail.id ? { ...item, label: detail.name } : item,
+      ))
+    }
+    window.addEventListener("memoria:community-renamed", onRenamed)
+    return () => window.removeEventListener("memoria:community-renamed", onRenamed)
+  }, [])
+
   const closeCreate = () => {
     if (createBusy) return
     setCreateOpened(false)
