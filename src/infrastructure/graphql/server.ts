@@ -1,13 +1,13 @@
 import "server-only"
 import { auth0 } from "@/lib/auth0"
 
-const ME_QUERY = "query CurrentUser { me { id profile { nickname } } }"
+const ME_QUERY = "query CurrentUser { me { id profile { nickname } preferences { personalAccentColor dateFormat fileSizeUnit mediaThumbnailSize mediaDetailNavigationWrap mediaDetailInitialInfoWide mediaDetailInitialInfoMedium } } }"
 const REGISTER_MUTATION =
   "mutation RegisterMemoriaUser($input: RegisterUserInput!) { registerUser(input: $input) { user { id profile { nickname } } } }"
 
 type GraphQLError = { message?: string; extensions?: { code?: string } }
 type GraphQLResult<T> = { data?: T; errors?: GraphQLError[] }
-export type CurrentUser = { id: string; profile: { nickname: string } }
+export type CurrentUser = { id: string; profile: { nickname: string }; preferences: AccountPreferences }
 export type CurrentUserResult =
   | { kind: "active"; user: CurrentUser }
   | { kind: "unregistered" }
