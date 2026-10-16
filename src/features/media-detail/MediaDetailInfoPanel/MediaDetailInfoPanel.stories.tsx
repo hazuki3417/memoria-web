@@ -23,6 +23,7 @@ const meta = {
     setDetailEditor: () => undefined,
     context: "personal",
     downloadMock: "available",
+    onRequestDelete: () => undefined,
   },
 } satisfies Meta<typeof MediaDetailInfoPanel>
 
