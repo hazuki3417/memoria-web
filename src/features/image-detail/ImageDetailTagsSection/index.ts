@@ -1,1 +1,0 @@
-export { ImageDetailTagsSection } from "./ImageDetailTagsSection"

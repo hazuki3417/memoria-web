@@ -2,11 +2,11 @@
 
 import { Badge, Box, Button, Collapse, Group, Text } from "@mantine/core"
 import { IconChevronDown } from "@tabler/icons-react"
-import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
+import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 
-export type ImageDetailTagsSectionProps = Pick<ImageDetailViewerProps, "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor">
+export type MediaDetailTagsSectionProps = Pick<MediaDetailViewerProps, "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor">
 
-export function ImageDetailTagsSection({ detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor }: ImageDetailTagsSectionProps) {
+export function MediaDetailTagsSection({ detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor }: MediaDetailTagsSectionProps) {
   const values = detailValues.tags
   return (
     <Box>

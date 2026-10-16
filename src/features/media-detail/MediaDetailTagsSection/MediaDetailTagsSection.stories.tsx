@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { ImageDetailTagsSection } from "./ImageDetailTagsSection"
+import { MediaDetailTagsSection } from "./MediaDetailTagsSection"
 
 const values = {
   groups: ["旅行", "お気に入り", "家族", "2026年", "北海道", "思い出", "風景"],
@@ -9,15 +9,15 @@ const values = {
 const expanded = { groups: false, tags: false, communities: false }
 
 const meta = {
-  title: "Features/Image Detail/ImageDetailTagsSection",
-  component: ImageDetailTagsSection,
+  title: "Features/Media Detail/MediaDetailTagsSection",
+  component: MediaDetailTagsSection,
   args: {
     detailValues: values,
     detailSectionsExpanded: expanded,
     toggleDetailSection: () => undefined,
     openDetailEditor: () => undefined,
   },
-} satisfies Meta<typeof ImageDetailTagsSection>
+} satisfies Meta<typeof MediaDetailTagsSection>
 
 export default meta
 type Story = StoryObj<typeof meta>

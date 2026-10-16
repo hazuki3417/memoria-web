@@ -1,0 +1,1 @@
+export { MediaDetailTagsSection } from "./MediaDetailTagsSection"

@@ -1,11 +1,11 @@
-# ImageDetailViewer
+# MediaDetailViewer
 
 ## 責務
 選択画像のフルスクリーン表示、前後移動、ズーム・回転、情報パネル、ダウンロード状態、共有・編集操作の入口を提供する。Media一覧の取得、編集内容の永続化、画面遷移は所有しない。
 
 ## 入出力と状態
 - 選択画像と順序付き画像一覧は呼び出し元から受け取る。先頭・末尾では存在しない方向への移動操作を表示しない。
-- 選択画像の変更は`setDetail`、閉じる操作は`closeImageDetail`で通知する。
+- 選択画像の変更は`setDetail`、閉じる操作は`closeMediaDetail`で通知する。
 - ViewportとEditingの状態・操作は各Hookから渡される。表示Component自体はこれらのauthoritative stateを所有しない。
 - `compact`、`context`、`downloadMock`でレイアウト、文脈、ダウンロードの状態を切り替える。
 
