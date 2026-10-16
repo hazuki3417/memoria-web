@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { CommunityMembersContent } from "./CommunityMembersContent"
+import { CommunityMembersContent, type CommunityMember } from "./CommunityMembersContent"
 import {
   SettingsUsage,
   type SettingsUsageData,
@@ -46,6 +46,7 @@ export function CommunitySettings({
   onNavigate,
   communityName,
   onSaveName,
+  members,
 }: {
   role?: Role
   communityId?: string
@@ -53,6 +54,7 @@ export function CommunitySettings({
   onNavigate?: (href: string) => void
   communityName?: string
   onSaveName?: (name: string) => Promise<boolean>
+  members?: CommunityMember[]
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -313,17 +315,9 @@ export function CommunitySettings({
     </Stack>
   )
 
-  // Prototype-only operation: replace with the Membership API when available.
-  const mockLeave = async () => {
-    await Promise.resolve()
-  }
   const membersContent = (
     <CommunityMembersContent
-      onLeave={mockLeave}
-      onLeaveSuccess={() => {
-        if (onNavigate) onNavigate("/dashboard")
-        else window.location.assign("/dashboard")
-      }}
+      members={members}
     />
   )
   const communityUsage: SettingsUsageData = {
