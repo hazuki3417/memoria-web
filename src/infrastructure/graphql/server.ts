@@ -253,3 +253,31 @@ export async function getMemoriaCommunityMembers(communityId: string): Promise<C
   const members = response.result.data?.communityMembers
   return Array.isArray(members) ? { kind: "loaded", members } : { kind: "error" }
 }
+
+export type CommunityRoleChangeResult =
+  | { kind: "updated" }
+  | { kind: "unavailable" | "validation" | "forbidden" | "not_found" | "error" }
+
+const CHANGE_COMMUNITY_MEMBER_ROLE_MUTATION =
+  "mutation ChangeCommunityMemberRole($input: ChangeCommunityMemberRoleInput!) { changeCommunityMemberRole(input: $input) { success } }"
+
+export async function changeMemoriaCommunityMemberRole(
+  communityId: string,
+  userId: string,
+  role: "admin" | "member",
+): Promise<CommunityRoleChangeResult> {
+  const response = await request<{ changeCommunityMemberRole: { success: boolean } }>(
+    CHANGE_COMMUNITY_MEMBER_ROLE_MUTATION, "ChangeCommunityMemberRole",
+    { input: { communityId, userId, role } },
+  )
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length) return {
+    kind: codes.includes("UNAUTHENTICATED") ? "unavailable"
+      : codes.includes("VALIDATION") ? "validation"
+      : codes.includes("FORBIDDEN") ? "forbidden"
+      : codes.includes("NOT_FOUND") ? "not_found" : "error",
+  }
+  return response.result.data?.changeCommunityMemberRole?.success
+    ? { kind: "updated" } : { kind: "error" }
+}
