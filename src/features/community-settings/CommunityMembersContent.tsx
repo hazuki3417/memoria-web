@@ -277,7 +277,7 @@ export function CommunityMembersContent({
             <Button
               color="red"
               variant="light"
-              disabled={blocked || done}
+              disabled={!onLeave || blocked || done}
               onClick={() => setOpened(true)}
             >
               Communityから退会する
