@@ -197,3 +197,35 @@ export async function createMemoriaCommunity(name: string): Promise<CommunityMut
   const community = response.result.data?.createCommunity?.community
   return community ? { kind: "updated", community } : { kind: "error" }
 }
+
+const COMMUNITY_QUERY = "query CommunityDetails($communityId: ID!) { community(communityId: $communityId) { id name createdAt updatedAt } }"
+const RENAME_COMMUNITY_MUTATION = "mutation RenameCommunity($input: RenameCommunityInput!) { renameCommunity(input: $input) { community { id name createdAt updatedAt } } }"
+
+export type CommunityDetailsResult =
+  | { kind: "loaded"; community: CommunityRecord }
+  | { kind: "unavailable" | "not_found" | "error" }
+
+export async function getMemoriaCommunity(communityId: string): Promise<CommunityDetailsResult> {
+  const response = await request<{ community: CommunityRecord | null }>(
+    COMMUNITY_QUERY, "CommunityDetails", { communityId },
+  )
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length) return { kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("NOT_FOUND") ? "not_found" : "error" }
+  const community = response.result.data?.community
+  return community ? { kind: "loaded", community } : { kind: "not_found" }
+}
+
+export async function renameMemoriaCommunity(communityId: string, name: string): Promise<CommunityMutationResult> {
+  const response = await request<{ renameCommunity: { community: CommunityRecord } }>(
+    RENAME_COMMUNITY_MUTATION, "RenameCommunity", { input: { communityId, name } },
+  )
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length) return {
+    kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("VALIDATION") ? "validation"
+      : codes.includes("NOT_FOUND") ? "not_found" : codes.includes("FORBIDDEN") ? "forbidden" : "error",
+  }
+  const community = response.result.data?.renameCommunity?.community
+  return community ? { kind: "updated", community } : { kind: "error" }
+}
