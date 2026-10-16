@@ -284,7 +284,7 @@ export function GroupBrowserPrototype() {
   const [createName, setCreateName] = useState("")
   const [createParents, setCreateParents] = useState<string[]>([])
   const [createChildren, setCreateChildren] = useState<string[]>([])
-  const allGroups = [...groups, ...createdGroups]
+  const allGroups = useMemo(() => [...groups, ...createdGroups], [createdGroups])
   const openCreate = () => {
     setCreateName("")
     setCreateParents([])
@@ -339,7 +339,7 @@ export function GroupBrowserPrototype() {
     return allGroups.filter((group) =>
       group.name.toLocaleLowerCase().includes(normalized),
     )
-  }, [appliedQuery])
+  }, [appliedQuery, allGroups])
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
