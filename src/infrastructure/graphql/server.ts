@@ -229,3 +229,27 @@ export async function renameMemoriaCommunity(communityId: string, name: string):
   const community = response.result.data?.renameCommunity?.community
   return community ? { kind: "updated", community } : { kind: "error" }
 }
+
+export type CommunityParticipant = {
+  userId: string
+  nickname: string
+  role: "admin" | "member"
+  joinedAt: string
+}
+export type CommunityMembersResult =
+  | { kind: "loaded"; members: CommunityParticipant[] }
+  | { kind: "unavailable" | "not_found" | "error" }
+
+const COMMUNITY_MEMBERS_QUERY =
+  "query CommunityMembers($communityId: ID!) { communityMembers(communityId: $communityId) { userId nickname role joinedAt } }"
+
+export async function getMemoriaCommunityMembers(communityId: string): Promise<CommunityMembersResult> {
+  const response = await request<{ communityMembers: CommunityParticipant[] }>(
+    COMMUNITY_MEMBERS_QUERY, "CommunityMembers", { communityId },
+  )
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map(e => e.extensions?.code) ?? []
+  if (codes.length) return { kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("NOT_FOUND") ? "not_found" : "error" }
+  const members = response.result.data?.communityMembers
+  return Array.isArray(members) ? { kind: "loaded", members } : { kind: "error" }
+}
