@@ -27,13 +27,13 @@ export function MediaDetailDialog({ items, initialId, onClose, contextKind = "pe
   const [detail, setDetail] = useState<MediaItem | null>(() => items.find(item => item.id === initialId) ?? null)
   useEffect(() => { setDetail(items.find(item => item.id === initialId) ?? null) }, [initialId, items])
   const closeMediaDetail = () => { setDeleteTarget(null); setDetail(null); onClose() }
-  const confirmDelete = (target: MediaItem) => {
+  const confirmDelete = () => {
     setDeleteTarget(null)
     closeMediaDetail()
     showNotification({
       kind: "info",
       title: "Mediaの削除",
-      message: `「${target.label}」の削除操作を確認しました。実際のデータは削除されていません。`,
+      message: "Mediaの削除操作を確認しました。実際のデータは削除されていません。",
     })
   }
   const {
