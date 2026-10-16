@@ -77,6 +77,12 @@ export function ProductionApplicationShell({
       header={
         <ApplicationHeader
           accentColor={currentContext.accentColor}
+          onTitleClick={() => {
+            router.push(currentContext.kind === "community" && communityId
+              ? `/communities/${encodeURIComponent(communityId)}/dashboard`
+              : "/dashboard")
+            navigation.close()
+          }}
           leading={
             <ApplicationNavigationTrigger
               opened={navigation.opened}
