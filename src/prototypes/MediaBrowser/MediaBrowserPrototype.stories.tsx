@@ -4,7 +4,7 @@ import { MediaBrowserPrototype } from "./MediaBrowserPrototype"
 const meta = {
   title: "Design Prototypes/Media Browser",
   component: MediaBrowserPrototype,
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", applicationShellOwnsPortal: true },
 } satisfies Meta<typeof MediaBrowserPrototype>
 
 export default meta
