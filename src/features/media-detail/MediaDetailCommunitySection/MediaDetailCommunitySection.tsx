@@ -2,11 +2,11 @@
 
 import { Box, Button, Collapse, Group, Stack, Text } from "@mantine/core"
 import { IconChevronDown, IconPlus } from "@tabler/icons-react"
-import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
+import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 
-type ImageDetailCommunitySectionProps = Pick<ImageDetailViewerProps, "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "setUnshareTarget" | "setShareTarget" | "setDetailEditor" | "context">
+type MediaDetailCommunitySectionProps = Pick<MediaDetailViewerProps, "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "setUnshareTarget" | "setShareTarget" | "setDetailEditor" | "context">
 
-export function ImageDetailCommunitySection({ detailValues, detailSectionsExpanded, toggleDetailSection, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind }: ImageDetailCommunitySectionProps) {
+export function MediaDetailCommunitySection({ detailValues, detailSectionsExpanded, toggleDetailSection, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind }: MediaDetailCommunitySectionProps) {
   return <>
                           {contextKind === "personal" ? (
                             <Box>

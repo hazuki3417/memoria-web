@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { ImageDetailCommunitySection } from "./ImageDetailCommunitySection"
+import { MediaDetailCommunitySection } from "./MediaDetailCommunitySection"
 
 const values = {
   groups: ["旅行"],
@@ -9,8 +9,8 @@ const values = {
 const expanded = { groups: false, tags: false, communities: false }
 
 const meta = {
-  title: "Features/Image Detail/ImageDetailCommunitySection",
-  component: ImageDetailCommunitySection,
+  title: "Features/Media Detail/MediaDetailCommunitySection",
+  component: MediaDetailCommunitySection,
   args: {
     context: "personal",
     detailValues: values,
@@ -20,7 +20,7 @@ const meta = {
     setShareTarget: () => undefined,
     setDetailEditor: () => undefined,
   },
-} satisfies Meta<typeof ImageDetailCommunitySection>
+} satisfies Meta<typeof MediaDetailCommunitySection>
 
 export default meta
 type Story = StoryObj<typeof meta>
