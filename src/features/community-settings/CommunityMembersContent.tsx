@@ -355,8 +355,8 @@ export function CommunityMembersContent({
           </Stack>
           <Radio.Group label="変更後の役割" value={selectedRole} onChange={(value) => setSelectedRole(value as "admin" | "member")}>
             <Stack gap="sm" mt="sm">
-              <Radio value="member" label="Member" description="Communityに参加し、許可されたMediaを利用できます。" disabled={roleTarget?.role === "admin" && adminCount <= 1} />
               <Radio value="admin" label="Administrator" description="Communityの設定やメンバーを管理できます。" disabled={roleTarget?.role !== "admin" && adminLimitReached} />
+              <Radio value="member" label="Member" description="Communityに参加し、許可されたMediaを利用できます。" disabled={roleTarget?.role === "admin" && adminCount <= 1} />
             </Stack>
           </Radio.Group>
           {roleTarget?.role === "admin" && adminCount <= 1 && (
