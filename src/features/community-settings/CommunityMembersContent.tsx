@@ -112,7 +112,6 @@ export function CommunityMembersContent({
       showNotification({
         kind: "success",
         title: "Communityから退会しました",
-        message: "退会処理が完了しました。",
       })
       onLeaveSuccess?.()
     } catch {
