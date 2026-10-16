@@ -315,7 +315,7 @@ export function GroupBrowserPrototype() {
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [imageDetailIndex, setImageDetailIndex] = useState<number | null>(null)
+  const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = Array.from({ length: 24 }, (_, index) => ({
     id: `group-media-${index + 1}`,
     label: `Media ${index + 1}`,
@@ -706,7 +706,7 @@ export function GroupBrowserPrototype() {
                       <Text fw={600}>Mediaがありません</Text>
                     </Paper>
                   ) : (
-                    <MediaGrid onOpen={setImageDetailIndex} />
+                    <MediaGrid onOpen={setMediaDetailIndex} />
                   )}
                 </Box>
               </ScrollArea>
@@ -951,7 +951,7 @@ export function GroupBrowserPrototype() {
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid onOpen={setImageDetailIndex} />
+                          <MediaGrid onOpen={setMediaDetailIndex} />
                         )}
                       </Box>
                     </ScrollArea>
@@ -969,7 +969,7 @@ export function GroupBrowserPrototype() {
             ? groupMediaItems[imageDetailIndex].id
             : undefined
         }
-        onDetailClose={() => setImageDetailIndex(null)}
+        onDetailClose={() => setMediaDetailIndex(null)}
         contextKind={personalContext.kind}
       />
     </PrototypeApplicationShell>

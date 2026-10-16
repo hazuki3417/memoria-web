@@ -41,7 +41,7 @@ import {
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Dialog } from "@/components/Dialog"
-import { ImageDetailDialog, type MediaItem } from "@/features/image-detail"
+import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
 import { showNotification } from "@/components/Feedback"
 
 type MediaBrowserState =
@@ -687,7 +687,7 @@ function MediaBrowserContent({
         </Text>
       </Dialog>
 
-      {detail && <ImageDetailDialog items={stateItems} initialId={detail.id} onClose={() => setDetail(null)} contextKind={context} downloadMock={downloadMock} />}
+      {detail && <MediaDetailDialog items={stateItems} initialId={detail.id} onClose={() => setDetail(null)} contextKind={context} downloadMock={downloadMock} />}
     </>
   )
 }

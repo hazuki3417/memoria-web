@@ -31,7 +31,7 @@ import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
-import { ImageDetailDialog } from "@/features/image-detail"
+import { MediaDetailDialog } from "@/features/media-detail"
 
 type GroupFixture = {
   id: string
@@ -375,7 +375,7 @@ export function GroupBrowser({
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [imageDetailIndex, setImageDetailIndex] = useState<number | null>(null)
+  const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = Array.from({ length: 24 }, (_, index) => ({
     id: `group-media-${index + 1}`,
     label: `Media ${index + 1}`,
@@ -760,7 +760,7 @@ export function GroupBrowser({
                       <Text fw={600}>Mediaがありません</Text>
                     </Paper>
                   ) : (
-                    <MediaGrid onOpen={setImageDetailIndex} />
+                    <MediaGrid onOpen={setMediaDetailIndex} />
                   )}
                 </Box>
               </ScrollArea>
@@ -1012,7 +1012,7 @@ export function GroupBrowser({
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid onOpen={setImageDetailIndex} />
+                          <MediaGrid onOpen={setMediaDetailIndex} />
                         )}
                       </Box>
                     </ScrollArea>
@@ -1023,14 +1023,14 @@ export function GroupBrowser({
           </SplitView.Pane>
         </SplitView.Root>
       )}
-      <ImageDetailDialog
+      <MediaDetailDialog
         items={groupMediaItems}
         initialId={
           imageDetailIndex !== null
             ? groupMediaItems[imageDetailIndex].id
             : undefined
         }
-        onClose={() => setImageDetailIndex(null)}
+        onClose={() => setMediaDetailIndex(null)}
         contextKind={contextKind}
       />
     </>
