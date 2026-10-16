@@ -21,14 +21,14 @@ import {
 } from "@tabler/icons-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import { SettingsUsage, type SettingsUsageData } from "./SettingsUsage"
-import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
+import { usePreferencesSave } from "./usePreferencesSave"
 import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
 
 type Section = "profile" | "preferences" | "usage" | "account"
@@ -185,33 +185,12 @@ function PreferencesContent({
   const { colorScheme, setColorScheme } = useMantineColorScheme()
   const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences)
   const [accentDraft, setAccentDraft] = useState(initialPreferences.personalAccentColor)
-  const [saveError, setSaveError] = useState<"retryable" | "blocked" | null>(null)
-  const queue = useRef<ReturnType<typeof createPreferencesSaveQueue> | null>(null)
-
-  useEffect(() => {
-    if (!onSave) return
-    const currentQueue = createPreferencesSaveQueue(
-      onSave,
-      () => setSaveError(null),
-      (error) => {
-        setSaveError(
-          typeof error === "object" && error !== null && "kind" in error && error.kind === "blocked"
-            ? "blocked"
-            : "retryable",
-        )
-      },
-    )
-    queue.current = currentQueue
-    return () => {
-      currentQueue.dispose()
-      queue.current = null
-    }
-  }, [onSave])
+  const { saveError, enqueue, retry } = usePreferencesSave(onSave)
 
   const change = <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => {
     if (saveError === "blocked") return
     setPreferences((current) => ({ ...current, [key]: value }))
-    queue.current?.enqueue({ [key]: value } as UserPreferencesPatch)
+    enqueue({ [key]: value } as UserPreferencesPatch)
   }
   const dateFormat = preferences.dateFormat
   const fileSizeUnit = preferences.fileSizeUnit
@@ -226,7 +205,7 @@ function PreferencesContent({
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
       />
-      {saveError && <FeedbackAlert kind="error" title={saveError === "blocked" ? "設定を変更できません" : "保存できませんでした"} role="alert">{saveError === "blocked" ? "画面を再読み込みして現在の状態を確認してください。" : "変更内容を保持しています。もう一度設定を変更すると保存を再試行します。"}</FeedbackAlert>}
+      {saveError && <FeedbackAlert kind="error" title={saveError === "blocked" ? "設定を変更できません" : "保存できませんでした"} role="alert">{saveError === "blocked" ? "画面を再読み込みして現在の状態を確認してください。" : "変更内容を保持しています。再試行すると変更内容を保存します。"}{saveError === "retryable" && <Button size="xs" onClick={retry}>再試行</Button>}</FeedbackAlert>}
       <Box>
         <SectionHeader>表示</SectionHeader>
         <Stack gap="xl">
