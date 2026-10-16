@@ -165,3 +165,35 @@ export async function updateMemoriaPreferences(
   const preferences = result.data?.updateUserPreferences?.preferences
   return preferences ? { kind: "updated", preferences } : { kind: "error" }
 }
+
+export type CommunityRecord = { id: string; name: string; createdAt: string; updatedAt: string }
+export type CommunityListResult =
+  | { kind: "loaded"; communities: CommunityRecord[] }
+  | { kind: "unavailable" | "error" }
+export type CommunityMutationResult =
+  | { kind: "updated"; community: CommunityRecord }
+  | { kind: "unavailable" | "validation" | "forbidden" | "not_found" | "error" }
+
+const MY_COMMUNITIES_QUERY = "query MyCommunities { myCommunities { id name createdAt updatedAt } }"
+const CREATE_COMMUNITY_MUTATION = "mutation CreateCommunity($input: CreateCommunityInput!) { createCommunity(input: $input) { community { id name createdAt updatedAt } } }"
+
+export async function listMyMemoriaCommunities(): Promise<CommunityListResult> {
+  const response = await request<{ myCommunities: CommunityRecord[] }>(MY_COMMUNITIES_QUERY, "MyCommunities")
+  if (response.kind !== "ok") return { kind: response.kind }
+  if (response.result.errors?.length) return {
+    kind: response.result.errors.some(e => e.extensions?.code === "UNAUTHENTICATED") ? "unavailable" : "error",
+  }
+  const communities = response.result.data?.myCommunities
+  return Array.isArray(communities) ? { kind: "loaded", communities } : { kind: "error" }
+}
+
+export async function createMemoriaCommunity(name: string): Promise<CommunityMutationResult> {
+  const response = await request<{ createCommunity: { community: CommunityRecord } }>(
+    CREATE_COMMUNITY_MUTATION, "CreateCommunity", { input: { name } },
+  )
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map(e => e.extensions?.code) ?? []
+  if (codes.length) return { kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("VALIDATION") ? "validation" : "error" }
+  const community = response.result.data?.createCommunity?.community
+  return community ? { kind: "updated", community } : { kind: "error" }
+}
