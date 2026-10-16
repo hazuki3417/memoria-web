@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { useMediaQuery } from "@mantine/hooks"
+import { showNotification } from "@/components/Feedback"
+import { MediaDeleteDialog } from "../MediaDeleteDialog"
 import { useMediaDetailEditing } from "../useMediaDetailEditing"
 import { useMediaDetailViewport } from "../useMediaDetailViewport"
 import { MediaDetailViewer } from "../MediaDetailViewer"
@@ -21,9 +23,19 @@ export type MediaDetailDialogProps = {
 
 export function MediaDetailDialog({ items, initialId, onClose, contextKind = "personal", downloadMock = "available" }: MediaDetailDialogProps) {
   const compact = useMediaQuery("(max-width: 47.99em)")
+  const [deleteTarget, setDeleteTarget] = useState<MediaItem | null>(null)
   const [detail, setDetail] = useState<MediaItem | null>(() => items.find(item => item.id === initialId) ?? null)
   useEffect(() => { setDetail(items.find(item => item.id === initialId) ?? null) }, [initialId, items])
-  const closeMediaDetail = () => { setDetail(null); onClose() }
+  const closeMediaDetail = () => { setDeleteTarget(null); setDetail(null); onClose() }
+  const confirmDelete = (target: MediaItem) => {
+    setDeleteTarget(null)
+    closeMediaDetail()
+    showNotification({
+      kind: "info",
+      title: "Mediaの削除",
+      message: `「${target.label}」の削除操作を確認しました。実際のデータは削除されていません。`,
+    })
+  }
   const {
     detailEditor, setDetailEditor, detailDraft, setDetailDraft,
     shareTarget, setShareTarget, unshareTarget, setUnshareTarget,
@@ -43,6 +55,7 @@ export function MediaDetailDialog({ items, initialId, onClose, contextKind = "pe
         detail={detail}
         setDetail={setDetail}
         closeMediaDetail={closeMediaDetail}
+        onRequestDelete={() => { if (detail) setDeleteTarget(detail) }}
         stateItems={items}
         compact={compact}
         context={contextKind}
@@ -64,6 +77,11 @@ export function MediaDetailDialog({ items, initialId, onClose, contextKind = "pe
         detailRotateAnimated={detailRotateAnimated}
         setDetailRotateAnimated={setDetailRotateAnimated}
         detailDirection={detailDirection}
+      />
+      <MediaDeleteDialog
+        target={deleteTarget}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
       />
       <CommunityUnshareDialog
         unshareTarget={unshareTarget}
