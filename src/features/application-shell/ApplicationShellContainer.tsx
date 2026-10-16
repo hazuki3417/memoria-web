@@ -46,12 +46,13 @@ export function ApplicationShellContainer({
   const [createError, setCreateError] = useState("")
   const [created, setCreated] = useState<{ id: string; label: string }[]>([])
   const [communitiesLoaded, setCommunitiesLoaded] = useState(false)
+  const [communitiesError, setCommunitiesError] = useState(false)
   const [createBusy, setCreateBusy] = useState(false)
   const [rememberedContextKind, setRememberedContextKind] = useState<
     "personal" | "community"
   >("personal")
   const [rememberedCommunityId, setRememberedCommunityId] =
-    useState("photo-club")
+    useState("")
   const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
   const shellMode =
     pathname === "/settings/account/delete"
@@ -64,11 +65,12 @@ export function ApplicationShellContainer({
       ? rememberedContextKind
       : "personal"
   const communityId = communityMatch?.[1] ?? rememberedCommunityId
-  const currentCreated = created.find((item) => item.id === communityMatch?.[1])
+  const currentCreated = created.find((item) => item.id === communityId)
   const currentContext =
     contextKind === "community"
       ? {
           ...communityContext,
+          id: communityId,
           label: currentCreated?.label ?? (communitiesLoaded ? "Community" : "読み込み中"),
         }
       : personalContext
@@ -95,8 +97,11 @@ export function ApplicationShellContainer({
       if (result.kind === "loaded") {
         setCreated(result.communities.map((item) => ({ id: item.id, label: item.name })))
         setCommunitiesLoaded(true)
+        setCommunitiesError(false)
+      } else {
+        setCommunitiesError(true)
       }
-    })
+    }).catch(() => { if (!cancelled) setCommunitiesError(true) })
     return () => { cancelled = true }
   }, [])
 
@@ -177,6 +182,7 @@ export function ApplicationShellContainer({
           <Text size="xs" c="dimmed">
             Communityを作成すると、メンバー管理と共有が利用できます。
           </Text>
+          {communitiesError && <Text size="xs" c="red">Community一覧を取得できませんでした。再読み込みしてお試しください。</Text>}
           <Group justify="flex-end">
             <Button variant="default" onClick={closeCreate} disabled={createBusy}>
               キャンセル
