@@ -47,6 +47,7 @@ export function CommunitySettings({
   communityName,
   onSaveName,
   members,
+  onChangeMemberRole,
 }: {
   role?: Role
   communityId?: string
@@ -55,6 +56,7 @@ export function CommunitySettings({
   communityName?: string
   onSaveName?: (name: string) => Promise<boolean>
   members?: CommunityMember[]
+  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -318,6 +320,7 @@ export function CommunitySettings({
   const membersContent = (
     <CommunityMembersContent
       members={members}
+      onChangeRole={onChangeMemberRole}
     />
   )
   const communityUsage: SettingsUsageData = {
