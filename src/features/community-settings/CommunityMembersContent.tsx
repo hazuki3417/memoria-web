@@ -36,6 +36,9 @@ const previewMembers: CommunityMember[] = [
   { id: "m3", name: "鈴木 太郎", role: "member" },
 ]
 type SortKey = "name" | "role"
+// Members start with a single-column, Japanese-locale name ascending sort.
+const INITIAL_SORT_KEY: SortKey = "name"
+const INITIAL_SORT_DESCENDING = false
 export function CommunityMembersContent({
   members = previewMembers,
   onLeave,
@@ -50,8 +53,8 @@ export function CommunityMembersContent({
   onRemoveMember?: (userId: string) => Promise<boolean>
 }) {
   const [query, setQuery] = useState("")
-  const [sortKey, setSortKey] = useState<SortKey>("name")
-  const [descending, setDescending] = useState(false)
+  const [sortKey, setSortKey] = useState<SortKey>(INITIAL_SORT_KEY)
+  const [descending, setDescending] = useState(INITIAL_SORT_DESCENDING)
   const [opened, setOpened] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
