@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { GroupBrowser } from "@/features/group-browser/GroupBrowser"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
-import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 const personalContext = {
   id: "personal",
@@ -13,22 +12,18 @@ const personalContext = {
 const meta = {
   title: "Design Prototypes/Group Browser",
   component: GroupBrowser,
-  parameters: { layout: "fullscreen" },
-  decorators: [
-    (Story) => (
-      <PrototypeApplicationShell
-        currentContext={personalContext}
-        contexts={[personalContext]}
-        navigationItems={getApplicationNavigation({
-          contextKind: personalContext.kind,
-          activeSection: "groups",
-        })}
-        user={{ displayName: "ユーザー" }}
-      >
-        <Story />
-      </PrototypeApplicationShell>
-    ),
-  ],
+  parameters: {
+    layout: "fullscreen",
+    applicationShell: {
+      currentContext: personalContext,
+      contexts: [personalContext],
+      navigationItems: getApplicationNavigation({
+        contextKind: personalContext.kind,
+        activeSection: "groups",
+      }),
+      user: { displayName: "ユーザー" },
+    },
+  },
 } satisfies Meta<typeof GroupBrowser>
 
 export default meta
