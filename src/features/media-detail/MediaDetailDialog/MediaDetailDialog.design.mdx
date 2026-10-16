@@ -1,0 +1,22 @@
+# MediaDetailDialog
+
+## 責務
+画像一覧と初期選択画像を受け取り、画像詳細の表示、前後移動、閉じる操作を提供する公開入口。MediaBrowserとGroupBrowserで同じ表示・操作契約を共有する。
+
+## 入出力と状態
+- `items`: 前後移動の順序を決める画像一覧。Media起点はMedia一覧、Group起点は選択GroupのMedia一覧を渡す。
+- `initialId`: 開く画像の識別子。`onClose`: 閉じる操作の通知。`contextKind`: Personal / Communityの文脈。
+- 呼び出し元が元画面の選択、Pane幅、スクロール状態を保持する。Dialogは元画面の状態を初期化しない。
+
+## 表示・操作契約
+- 既存MediaBrowserの詳細Modal、情報量、編集・共有導線、Viewport、Responsive Behaviorを維持する。
+- 前後移動は`items`の順序に従う。先頭・末尾の操作可否と移動時のViewport初期化を維持する。
+- 閉じる操作で`onClose`を通知し、GroupBrowserの選択・Pane幅・スクロールを保持する。
+
+- 削除操作はMediaDeleteDialogで対象Mediaを確認し、キャンセルなら詳細を維持する。確定時は呼び出し元の削除処理に委譲する。現時点のPrototypeは実データを削除せず、操作確認の通知と詳細のクローズを行う。
+
+## Story / テスト観点
+- 初期選択、前後移動、閉じる操作、画像一覧更新時の選択同期。
+- Media / Group起点の移動範囲、Personal / Community、Desktop / Compact。
+- Group側の選択・Pane幅・スクロール保持、ModalのPortalと編集Dialogの重なり順。
+- 既存MediaBrowserを基準としたVisual / Behavioral / Responsive Regression。

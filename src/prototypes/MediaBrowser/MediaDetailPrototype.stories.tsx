@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { MediaBrowserPrototype } from "./MediaBrowserPrototype"
 
 const meta = {
-  title: "Design Prototypes/Image Detail",
+  title: "Design Prototypes/MediaBrowserPrototype/MediaDetail",
   component: MediaBrowserPrototype,
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", applicationShellOwnsPortal: true },
 } satisfies Meta<typeof MediaBrowserPrototype>
 
 export default meta

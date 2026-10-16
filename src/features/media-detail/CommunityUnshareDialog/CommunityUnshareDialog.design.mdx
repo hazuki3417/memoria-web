@@ -1,0 +1,18 @@
+# CommunityUnshareDialog
+
+## 責務
+対象Communityへの共有解除の確認・キャンセルを担当する。画像詳細全体の選択画像、一覧、Viewport、永続化は所有しない。
+
+## 入出力と状態
+- Modalの表示条件、編集中の値、確定・キャンセルCallbackは呼び出し元が所有する。
+- このComponentは受け取った状態を表示し、利用者の操作をCallbackで通知する。
+- 他の編集Dialogの状態や画像詳細全体の状態を所有しない。
+
+## 表示・操作契約
+- 対象Community名を明示し、解除操作は危険操作として赤色で表示する。確定時に対象の共有先のみを除外し、キャンセル時は変更しない。
+- 既存MediaBrowserのタイトル、説明、入力候補、ボタン、ModalのzIndex・重なり順、キーボード操作、Responsive Behaviorを維持する。
+
+## Story / テスト観点
+- 対象名の表示、確定、キャンセル、解除後の共有先、Modal重なり順。
+- 開いた状態と閉じた状態、操作時のCallback、Desktop / Compact、画像詳細Modalとの重なり順。
+- 変更前のMediaBrowserと比較した表示・操作回帰。

@@ -8,8 +8,8 @@ import {
   Button,
   Center,
   Checkbox,
-  Combobox,
   Collapse,
+  Combobox,
   Divider,
   Group,
   Image,
@@ -29,6 +29,7 @@ import {
   useCombobox,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
+import { Notifications } from "@mantine/notifications"
 import {
   IconAlertCircle,
   IconCheckbox,
@@ -59,9 +60,8 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { Dialog } from "@/components/Dialog"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
-import { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
+import { useMediaDetailViewport } from "@/features/media-detail/useMediaDetailViewport"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeState =
@@ -326,7 +326,7 @@ export function MediaBrowserPrototype({
   const [detail, setDetail] = useState<MediaItem | null>(
     () => detailOnlyItems?.find((item) => item.id === initialDetailId) ?? null,
   )
-  const closeImageDetail = () => {
+  const closeMediaDetail = () => {
     setDetail(null)
     onDetailClose?.()
   }
@@ -479,7 +479,7 @@ export function MediaBrowserPrototype({
     setDetailRotateAnimated,
     detailDirection,
     setDetailDirection,
-  } = useImageDetailViewport()
+  } = useMediaDetailViewport()
   const [selectionDialog, setSelectionDialog] =
     useState<SelectionDialog>(initialDialog)
   const [groupTargets, setGroupTargets] = useState<string[]>([])
@@ -931,7 +931,7 @@ export function MediaBrowserPrototype({
 
       <Modal
         opened={detail !== null}
-        onClose={closeImageDetail}
+        onClose={closeMediaDetail}
         fullScreen
         portalProps={{ target: "#application-modal-root" }}
         padding={0}
@@ -984,7 +984,7 @@ export function MediaBrowserPrototype({
                       variant="subtle"
                       color="gray"
                       aria-label="閉じる"
-                      onClick={closeImageDetail}
+                      onClick={closeMediaDetail}
                     >
                       <IconX size={18} />
                     </ActionIcon>

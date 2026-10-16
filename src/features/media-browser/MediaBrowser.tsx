@@ -1,66 +1,48 @@
 "use client"
 
 import {
-  ActionIcon,
   Alert,
   Badge,
   Box,
   Button,
   Center,
   Checkbox,
-  Collapse,
-  Combobox,
   Divider,
   Group,
   Image,
-  InputBase,
   Loader,
   Menu,
-  Modal,
   MultiSelect,
   Paper,
   SegmentedControl,
   Select,
-  Slider,
   Stack,
   TagsInput,
   Text,
   ThemeIcon,
-  useCombobox,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconAlertCircle,
   IconCheckbox,
   IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
   IconCloudUpload,
-  IconDownload,
   IconEdit,
   IconEye,
   IconFolderPlus,
-  IconInfoCircle,
   IconPhoto,
   IconPhotoOff,
   IconPlus,
-  IconRotate,
-  IconRotate2,
   IconSearch,
   IconShare,
   IconTags,
   IconTrash,
-  IconX,
-  IconZoomIn,
-  IconZoomOut,
-  IconZoomReset,
 } from "@tabler/icons-react"
-import { AnimatePresence, motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Dialog } from "@/components/Dialog"
 import { showNotification } from "@/components/Feedback"
-import { useImageDetailViewport } from "@/features/media-browser/useImageDetailViewport"
+import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
 
 type MediaBrowserState =
   | "default"
@@ -75,13 +57,6 @@ type MediaBrowserState =
   | "selection"
 type ContextKind = "personal" | "community"
 type SelectionDialog = "group" | "share" | "delete" | null
-export type MediaItem = {
-  id: string
-  label: string
-  src: string
-  failed?: boolean
-}
-
 const media: MediaItem[] = [
   {
     id: "portrait-01",
@@ -230,81 +205,12 @@ function MediaTile({
   )
 }
 
-function ZoomInput({
-  value,
-  onChange,
-}: {
-  value: number
-  onChange: (value: number) => void
-}) {
-  const combobox = useCombobox({
-    onDropdownClose: () => combobox.resetSelectedOption(),
-  })
-  const [input, setInput] = useState(`${value}%`)
-  useEffect(() => setInput(`${value}%`), [value])
-  const commit = () => {
-    const parsed = Number(input.replace(/[^0-9]/g, ""))
-    const next = Math.min(
-      300,
-      Math.max(50, Number.isFinite(parsed) ? parsed : 100),
-    )
-    onChange(next)
-    setInput(`${next}%`)
-  }
-  return (
-    <Combobox
-      store={combobox}
-      onOptionSubmit={(option) => {
-        onChange(Number(option))
-        combobox.closeDropdown()
-      }}
-    >
-      <Combobox.Target>
-        <InputBase
-          size="xs"
-          w={76}
-          aria-label="拡大率"
-          value={input}
-          rightSection={<Combobox.Chevron />}
-          rightSectionPointerEvents="none"
-          onChange={(event) => {
-            setInput(
-              event.currentTarget.value.replace(/[^0-9%]/g, "").slice(0, 4),
-            )
-            combobox.openDropdown()
-          }}
-          onFocus={() => combobox.openDropdown()}
-          onClick={() => combobox.openDropdown()}
-          onBlur={commit}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") event.currentTarget.blur()
-          }}
-        />
-      </Combobox.Target>
-      <Combobox.Dropdown>
-        <Combobox.Options mah={200} style={{ overflowY: "auto" }}>
-          {Array.from({ length: 26 }, (_, index) => 50 + index * 10).map(
-            (level) => (
-              <Combobox.Option key={level} value={String(level)}>
-                {level}%
-              </Combobox.Option>
-            ),
-          )}
-        </Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>
-  )
-}
-
 function MediaBrowserContent({
   initialState = "default",
   contextKind = "personal",
   initialDialog = null,
   communityId = "photo-club",
   downloadMock = "available",
-  detailOnlyItems,
-  initialDetailId,
-  onDetailClose,
   navigate,
 }: {
   initialState?: MediaBrowserState
@@ -312,9 +218,6 @@ function MediaBrowserContent({
   initialDialog?: SelectionDialog
   communityId?: string
   downloadMock?: "available" | "forbidden" | "processing"
-  detailOnlyItems?: MediaItem[]
-  initialDetailId?: string
-  onDetailClose?: () => void
   navigate: (path: string) => void
 }) {
   const [context, _setContext] = useState(contextKind)
@@ -323,124 +226,7 @@ function MediaBrowserContent({
   const [selected, setSelected] = useState<Set<string>>(
     initialState === "selection" ? new Set(["2", "5", "7"]) : new Set(),
   )
-  const [detail, setDetail] = useState<MediaItem | null>(
-    () => detailOnlyItems?.find((item) => item.id === initialDetailId) ?? null,
-  )
-  const closeImageDetail = () => {
-    setDetail(null)
-    onDetailClose?.()
-  }
-  useEffect(() => {
-    if (detailOnlyItems) {
-      setDetail(
-        detailOnlyItems.find((item) => item.id === initialDetailId) ?? null,
-      )
-    }
-  }, [initialDetailId, detailOnlyItems])
-
-  const [detailEditor, setDetailEditor] = useState<
-    "tags" | "groups" | "communities" | null
-  >(null)
-  const [detailDraft, setDetailDraft] = useState<string[]>([])
-  const [shareTarget, setShareTarget] = useState<string | null>(null)
-  const [unshareTarget, setUnshareTarget] = useState<string | null>(null)
-  const [detailEdits, setDetailEdits] = useState<
-    Record<string, { tags: string[]; groups: string[]; communities: string[] }>
-  >({})
-  const detailValues = detailEdits[detail?.id ?? ""] ?? {
-    tags: ["旅行", "風景"],
-    groups: ["旅行", "お気に入り"],
-    communities: ["Photo Club"],
-  }
-  const openDetailEditor = (kind: "tags" | "groups" | "communities") => {
-    setDetailDraft([...detailValues[kind]])
-    setDetailEditor(kind)
-  }
-  const saveDetailDraft = () => {
-    if (!detail || !detailEditor) return
-    setDetailEdits((current) => ({
-      ...current,
-      [detail.id]: { ...detailValues, [detailEditor]: [...detailDraft] },
-    }))
-    const label =
-      detailEditor === "tags"
-        ? "Tags"
-        : detailEditor === "groups"
-          ? "Groups"
-          : "共有先Community"
-    setDetailEditor(null)
-    showNotification({
-      kind: "success",
-      title: `${label}を更新しました`,
-      message: "画面上の変更を反映しました。サーバーには保存されていません。",
-    })
-  }
-  const addCommunityShare = () => {
-    if (
-      !detail ||
-      !shareTarget ||
-      detailValues.communities.includes(shareTarget)
-    )
-      return
-    setDetailEdits((current) => ({
-      ...current,
-      [detail.id]: {
-        ...detailValues,
-        communities: [...detailValues.communities, shareTarget],
-      },
-    }))
-    setShareTarget(null)
-    setDetailEditor(null)
-    showNotification({
-      kind: "success",
-      title: "Communityへ共有しました",
-      message: "画面上の共有先に追加しました。サーバーには保存されていません。",
-    })
-  }
-  const removeCommunityShare = () => {
-    if (
-      !detail ||
-      !unshareTarget ||
-      !detailValues.communities.includes(unshareTarget)
-    )
-      return
-    setDetailEdits((current) => ({
-      ...current,
-      [detail.id]: {
-        ...detailValues,
-        communities: detailValues.communities.filter(
-          (name) => name !== unshareTarget,
-        ),
-      },
-    }))
-    setUnshareTarget(null)
-    showNotification({
-      kind: "success",
-      title: "Communityの共有を解除しました",
-      message:
-        "画面上の共有先から解除しました。サーバーには保存されていません。",
-    })
-  }
-  const [detailSectionsExpanded, setDetailSectionsExpanded] = useState<
-    Record<"groups" | "tags" | "communities", boolean>
-  >({ groups: false, tags: false, communities: false })
-  const toggleDetailSection = (kind: "groups" | "tags" | "communities") =>
-    setDetailSectionsExpanded((current) => ({
-      ...current,
-      [kind]: !current[kind],
-    }))
-  const {
-    detailInfoOpened,
-    setDetailInfoOpened,
-    detailZoom,
-    setDetailZoom,
-    detailRotate,
-    setDetailRotate,
-    detailRotateAnimated,
-    setDetailRotateAnimated,
-    detailDirection,
-    setDetailDirection,
-  } = useImageDetailViewport()
+  const [detail, setDetail] = useState<MediaItem | null>(null)
   const [selectionDialog, setSelectionDialog] =
     useState<SelectionDialog>(initialDialog)
   const [groupTargets, setGroupTargets] = useState<string[]>([])
@@ -466,13 +252,16 @@ function MediaBrowserContent({
   const [appliedTags, setAppliedTags] = useState<string[]>(tags)
   // The mock has no tag metadata or Relay connection; keep the submitted filter separate.
   void appliedTags
-  const stateItems =
-    detailOnlyItems ??
-    (["true-empty", "filtered-empty", "loading", "error"].includes(initialState)
-      ? []
-      : initialState === "processing-failure"
-        ? [...media.slice(0, 5), media[media.length - 1]]
-        : media.slice(0, 12))
+  const stateItems = [
+    "true-empty",
+    "filtered-empty",
+    "loading",
+    "error",
+  ].includes(initialState)
+    ? []
+    : initialState === "processing-failure"
+      ? [...media.slice(0, 5), media[media.length - 1]]
+      : media.slice(0, 12)
 
   const toggle = (id: string) =>
     setSelected((current) => {
@@ -488,7 +277,7 @@ function MediaBrowserContent({
 
   return (
     <>
-      {!detailOnlyItems && (
+      {
         <Stack gap={0} w="100%">
           <Box
             pb="xs"
@@ -751,8 +540,6 @@ function MediaBrowserContent({
                       toggle(item.id)
                       return
                     }
-                    setDetailZoom(100)
-                    setDetailRotate(0)
                     setDetail(item)
                   }}
                 />
@@ -783,7 +570,7 @@ function MediaBrowserContent({
             </Paper>
           )}
         </Stack>
-      )}
+      }
 
       <Dialog
         opened={selectionDialog === "group"}
@@ -904,846 +691,25 @@ function MediaBrowserContent({
         </Text>
       </Dialog>
 
-      <Modal
-        opened={detail !== null}
-        onClose={closeImageDetail}
-        fullScreen
-        portalProps={{ target: "#application-modal-root" }}
-        padding={0}
-        withCloseButton={false}
-        styles={{
-          content: { background: "transparent" },
-          body: { height: "100dvh", padding: 0, background: "transparent" },
-        }}
-      >
-        {detail &&
-          (() => {
-            const detailIndex = stateItems.findIndex(
-              (item) => item.id === detail.id,
-            )
-            const prev = detailIndex > 0 ? stateItems[detailIndex - 1] : null
-            const next =
-              detailIndex >= 0 && detailIndex < stateItems.length - 1
-                ? stateItems[detailIndex + 1]
-                : null
-            return (
-              <Box
-                h="100%"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: compact
-                    ? "minmax(0, 1fr)"
-                    : "minmax(0, 1fr) auto",
-                  gridTemplateRows:
-                    compact && detailInfoOpened
-                      ? "minmax(0, 1fr) auto"
-                      : "minmax(0, 1fr)",
-                  background: "transparent",
-                }}
-              >
-                <Box
-                  style={{
-                    minWidth: 0,
-                    minHeight: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Group
-                    h={44}
-                    px="xs"
-                    justify="flex-end"
-                    style={{ flexShrink: 0 }}
-                  >
-                    <ActionIcon
-                      variant="subtle"
-                      color="gray"
-                      aria-label="閉じる"
-                      onClick={closeImageDetail}
-                    >
-                      <IconX size={18} />
-                    </ActionIcon>
-                  </Group>
-                  <Box
-                    style={{
-                      flex: 1,
-                      minHeight: 0,
-                      display: "grid",
-                      gridTemplateColumns: "44px minmax(0, 1fr) 44px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Center>
-                      {prev && (
-                        <ActionIcon
-                          variant="subtle"
-                          color="gray"
-                          size="lg"
-                          aria-label="前のMedia"
-                          onClick={() => {
-                            setDetailDirection(-1)
-                            setDetailZoom(100)
-                            setDetailRotateAnimated(false)
-                            setDetailRotate(0)
-                            setDetail(prev)
-                          }}
-                        >
-                          <IconChevronLeft />
-                        </ActionIcon>
-                      )}
-                    </Center>
-                    <Center
-                      h="100%"
-                      style={{ minWidth: 0, overflow: "hidden" }}
-                    >
-                      <AnimatePresence
-                        mode="wait"
-                        initial={false}
-                        custom={detailDirection}
-                      >
-                        <motion.div
-                          key={detail.id}
-                          custom={detailDirection}
-                          initial={{
-                            x: detailDirection > 0 ? 32 : -32,
-                            opacity: 0,
-                          }}
-                          animate={{ x: 0, opacity: 1 }}
-                          exit={{
-                            x: detailDirection > 0 ? -32 : 32,
-                            opacity: 0,
-                          }}
-                          transition={{ duration: 0.2, ease: "easeOut" }}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {detail.failed ? (
-                            <Stack align="center" c="dimmed">
-                              <IconPhotoOff size={48} />
-                              <Text size="sm">画像を表示できません</Text>
-                            </Stack>
-                          ) : (
-                            <Image
-                              src={detail.src}
-                              alt={detail.label}
-                              w="100%"
-                              h="100%"
-                              fit="contain"
-                              style={{
-                                objectFit: "contain",
-                                transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`,
-                                transition: detailRotateAnimated
-                                  ? "transform 180ms ease"
-                                  : "none",
-                              }}
-                            />
-                          )}
-                        </motion.div>
-                      </AnimatePresence>
-                    </Center>
-                    <Center>
-                      {next && (
-                        <ActionIcon
-                          variant="subtle"
-                          color="gray"
-                          size="lg"
-                          aria-label="次のMedia"
-                          onClick={() => {
-                            setDetailDirection(1)
-                            setDetailZoom(100)
-                            setDetailRotateAnimated(false)
-                            setDetailRotate(0)
-                            setDetail(next)
-                          }}
-                        >
-                          <IconChevronRight />
-                        </ActionIcon>
-                      )}
-                    </Center>
-                  </Box>
-                  <Box
-                    h={48}
-                    px="sm"
-                    style={{
-                      flexShrink: 0,
-                      display: "grid",
-                      gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
-                      alignItems: "center",
-                      columnGap: 8,
-                    }}
-                  >
-                    <Group gap={4} wrap="nowrap" justify="flex-start">
-                      {!compact && (
-                        <>
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="回転をリセット"
-                            onClick={() => {
-                              setDetailRotateAnimated(false)
-                              setDetailRotate(0)
-                            }}
-                          >
-                            <IconRotate2 size={18} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="左へ回転"
-                            onClick={() => {
-                              setDetailRotateAnimated(true)
-                              setDetailRotate((value) => value - 90)
-                            }}
-                          >
-                            <IconRotate size={18} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="右へ回転"
-                            onClick={() => {
-                              setDetailRotateAnimated(true)
-                              setDetailRotate((value) => value + 90)
-                            }}
-                          >
-                            <IconRotate
-                              size={18}
-                              style={{ transform: "scaleX(-1)" }}
-                            />
-                          </ActionIcon>
-                        </>
-                      )}
-                    </Group>
-                    <Text
-                      size="xs"
-                      c="dimmed"
-                      ta="center"
-                      style={{ whiteSpace: "nowrap" }}
-                    >
-                      {detailIndex + 1} / {stateItems.length}
-                    </Text>
-                    <Group
-                      gap={4}
-                      wrap="nowrap"
-                      justify="flex-end"
-                      style={{ minWidth: 0 }}
-                    >
-                      {!compact && (
-                        <>
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="拡大率をリセット"
-                            onClick={() => setDetailZoom(100)}
-                          >
-                            <IconZoomReset size={18} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="縮小"
-                            disabled={detailZoom <= 50}
-                            onClick={() =>
-                              setDetailZoom((value) => Math.max(50, value - 10))
-                            }
-                          >
-                            <IconZoomOut size={18} />
-                          </ActionIcon>
-                          <Slider
-                            w={100}
-                            size="xs"
-                            min={50}
-                            max={300}
-                            step={10}
-                            value={detailZoom}
-                            onChange={setDetailZoom}
-                            label={null}
-                          />
-                          <ActionIcon
-                            variant="subtle"
-                            aria-label="拡大"
-                            disabled={detailZoom >= 300}
-                            onClick={() =>
-                              setDetailZoom((value) =>
-                                Math.min(300, value + 10),
-                              )
-                            }
-                          >
-                            <IconZoomIn size={18} />
-                          </ActionIcon>
-                          <ZoomInput
-                            value={detailZoom}
-                            onChange={setDetailZoom}
-                          />
-                        </>
-                      )}
-                      <ActionIcon
-                        variant={detailInfoOpened ? "light" : "subtle"}
-                        aria-label={
-                          detailInfoOpened ? "情報を閉じる" : "情報を開く"
-                        }
-                        onClick={() => setDetailInfoOpened((value) => !value)}
-                      >
-                        <IconInfoCircle size={18} />
-                      </ActionIcon>
-                    </Group>
-                  </Box>
-                </Box>
-
-                <AnimatePresence initial={false}>
-                  {detailInfoOpened && (
-                    <motion.div
-                      initial={
-                        compact
-                          ? { height: 0, opacity: 0 }
-                          : { width: 0, opacity: 0 }
-                      }
-                      animate={
-                        compact
-                          ? { height: "auto", opacity: 1 }
-                          : { width: 340, opacity: 1 }
-                      }
-                      exit={
-                        compact
-                          ? { height: 0, opacity: 0 }
-                          : { width: 0, opacity: 0 }
-                      }
-                      transition={{ duration: 0.3 }}
-                      style={{
-                        overflow: "hidden",
-                        minWidth: 0,
-                        gridColumn: compact ? "1" : "2",
-                        gridRow: compact ? "2" : "1",
-                      }}
-                    >
-                      <Box
-                        h="100%"
-                        bg="var(--mantine-color-body)"
-                        style={{
-                          borderLeft: compact
-                            ? undefined
-                            : "1px solid var(--mantine-color-default-border)",
-                          borderTop: compact
-                            ? "1px solid var(--mantine-color-default-border)"
-                            : undefined,
-                          display: "flex",
-                          flexDirection: "column",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <Stack
-                          gap="md"
-                          p="md"
-                          style={{ flex: 1, overflowY: "auto" }}
-                        >
-                          <Stack gap="xs">
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                ファイルサイズ
-                              </Text>
-                              <Text size="xs">8.4 MB</Text>
-                            </Group>
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                サイズ
-                              </Text>
-                              <Text size="xs">4032 × 3024</Text>
-                            </Group>
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                アップロード
-                              </Text>
-                              <Text size="xs">2026/10/03 08:42</Text>
-                            </Group>
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                Uploader
-                              </Text>
-                              <Text size="xs">Hazuki</Text>
-                            </Group>
-                          </Stack>
-                          <Stack gap={4}>
-                            <Button
-                              size="xs"
-                              variant="default"
-                              fullWidth
-                              disabled={downloadMock !== "available"}
-                              leftSection={<IconDownload size={15} />}
-                              aria-describedby={
-                                downloadMock === "available"
-                                  ? undefined
-                                  : "original-download-unavailable"
-                              }
-                            >
-                              Originalをダウンロード
-                            </Button>
-                            {downloadMock !== "available" && (
-                              <Group
-                                gap={5}
-                                align="flex-start"
-                                wrap="nowrap"
-                                id="original-download-unavailable"
-                              >
-                                <IconInfoCircle
-                                  size={14}
-                                  style={{ flexShrink: 0, marginTop: 2 }}
-                                />
-                                <Text size="xs" c="dimmed">
-                                  {downloadMock === "forbidden"
-                                    ? "このMediaのOriginalをダウンロードする権限がありません。"
-                                    : "Originalを準備中です。処理完了後にダウンロードできます。"}
-                                </Text>
-                              </Group>
-                            )}
-                          </Stack>
-                          <Divider
-                            style={{
-                              marginInline:
-                                "calc(-1 * var(--mantine-spacing-md))",
-                            }}
-                          />
-                          {(["groups", "tags"] as const).map((kind) => {
-                            const values = detailValues[kind]
-                            const visible = values.slice(0, 6)
-                            return (
-                              <Box key={kind}>
-                                <Group
-                                  justify="space-between"
-                                  mb="sm"
-                                  wrap="nowrap"
-                                >
-                                  <Group gap={6}>
-                                    <Text size="xs" c="dimmed">
-                                      {kind === "groups" ? "Groups" : "Tags"}
-                                    </Text>
-                                    <Text size="xs" c="dimmed">
-                                      ({values.length})
-                                    </Text>
-                                  </Group>
-                                  <Button
-                                    size="compact-xs"
-                                    variant="subtle"
-                                    onClick={() => openDetailEditor(kind)}
-                                  >
-                                    編集
-                                  </Button>
-                                </Group>
-                                <Group gap={6}>
-                                  {values.length === 0 ? (
-                                    <Text size="xs" c="dimmed">
-                                      未設定
-                                    </Text>
-                                  ) : (
-                                    visible.map((value) => (
-                                      <Badge
-                                        key={value}
-                                        variant={
-                                          kind === "tags" ? "light" : "outline"
-                                        }
-                                        style={{
-                                          maxWidth: "100%",
-                                          overflowWrap: "anywhere",
-                                          height: "auto",
-                                          whiteSpace: "normal",
-                                        }}
-                                      >
-                                        {value}
-                                      </Badge>
-                                    ))
-                                  )}
-                                </Group>
-                                {values.length > 6 && (
-                                  <>
-                                    <Collapse
-                                      in={detailSectionsExpanded[kind]}
-                                      transitionDuration={200}
-                                    >
-                                      <Group gap={6} mt="xs">
-                                        {values.slice(6).map((value) => (
-                                          <Badge
-                                            key={value}
-                                            variant={
-                                              kind === "tags"
-                                                ? "light"
-                                                : "outline"
-                                            }
-                                            style={{
-                                              maxWidth: "100%",
-                                              overflowWrap: "anywhere",
-                                              height: "auto",
-                                              whiteSpace: "normal",
-                                            }}
-                                          >
-                                            {value}
-                                          </Badge>
-                                        ))}
-                                      </Group>
-                                    </Collapse>
-                                    <Group justify="center" mt="xs">
-                                      <Button
-                                        size="compact-xs"
-                                        variant="subtle"
-                                        color="gray"
-                                        fw={400}
-                                        onClick={() =>
-                                          toggleDetailSection(kind)
-                                        }
-                                        aria-expanded={
-                                          detailSectionsExpanded[kind]
-                                        }
-                                        rightSection={
-                                          <IconChevronDown
-                                            size={14}
-                                            style={{
-                                              transform: detailSectionsExpanded[
-                                                kind
-                                              ]
-                                                ? "rotate(180deg)"
-                                                : "rotate(0deg)",
-                                              transition:
-                                                "transform 200ms ease",
-                                            }}
-                                          />
-                                        }
-                                      >
-                                        {detailSectionsExpanded[kind]
-                                          ? "折りたたむ"
-                                          : `ほか${values.length - 6}件を表示`}
-                                      </Button>
-                                    </Group>
-                                  </>
-                                )}
-                                {kind === "groups" && (
-                                  <Divider
-                                    mt="md"
-                                    style={{
-                                      marginInline:
-                                        "calc(-1 * var(--mantine-spacing-md))",
-                                    }}
-                                  />
-                                )}
-                              </Box>
-                            )
-                          })}
-                          <Divider
-                            style={{
-                              marginInline:
-                                "calc(-1 * var(--mantine-spacing-md))",
-                            }}
-                          />
-                          {context === "personal" ? (
-                            <Box>
-                              <Group
-                                justify="space-between"
-                                mb="sm"
-                                wrap="nowrap"
-                              >
-                                <Group gap={6}>
-                                  <Text size="xs" c="dimmed">
-                                    共有先Community
-                                  </Text>
-                                  <Text size="xs" c="dimmed">
-                                    ({detailValues.communities.length})
-                                  </Text>
-                                </Group>
-                                <Button
-                                  size="compact-xs"
-                                  variant="subtle"
-                                  leftSection={<IconPlus size={13} />}
-                                  onClick={() => {
-                                    setShareTarget(null)
-                                    setDetailEditor("communities")
-                                  }}
-                                >
-                                  共有
-                                </Button>
-                              </Group>
-                              <Stack gap="xs">
-                                {detailValues.communities.length === 0 ? (
-                                  <Text size="xs" c="dimmed">
-                                    未共有
-                                  </Text>
-                                ) : (
-                                  detailValues.communities
-                                    .slice(0, 3)
-                                    .map((value) => (
-                                      <Group
-                                        key={value}
-                                        justify="space-between"
-                                        wrap="nowrap"
-                                        mih={32}
-                                        gap="xs"
-                                      >
-                                        <Box
-                                          style={{
-                                            minWidth: 0,
-                                            flex: 1,
-                                            overflowWrap: "anywhere",
-                                          }}
-                                        >
-                                          <Text size="xs">{value}</Text>
-                                        </Box>
-                                        <Button
-                                          size="compact-xs"
-                                          variant="subtle"
-                                          color="red"
-                                          style={{ flexShrink: 0 }}
-                                          onClick={() =>
-                                            setUnshareTarget(value)
-                                          }
-                                        >
-                                          共有解除
-                                        </Button>
-                                      </Group>
-                                    ))
-                                )}
-                                {detailValues.communities.length > 3 && (
-                                  <>
-                                    <Collapse
-                                      in={detailSectionsExpanded.communities}
-                                      transitionDuration={200}
-                                    >
-                                      <Stack gap="xs">
-                                        {detailValues.communities
-                                          .slice(3)
-                                          .map((value) => (
-                                            <Group
-                                              key={value}
-                                              justify="space-between"
-                                              wrap="nowrap"
-                                              mih={32}
-                                              gap="xs"
-                                            >
-                                              <Box
-                                                style={{
-                                                  minWidth: 0,
-                                                  flex: 1,
-                                                  overflowWrap: "anywhere",
-                                                }}
-                                              >
-                                                <Text size="xs">{value}</Text>
-                                              </Box>
-                                              <Button
-                                                size="compact-xs"
-                                                variant="subtle"
-                                                color="red"
-                                                style={{ flexShrink: 0 }}
-                                                onClick={() =>
-                                                  setUnshareTarget(value)
-                                                }
-                                              >
-                                                共有解除
-                                              </Button>
-                                            </Group>
-                                          ))}
-                                      </Stack>
-                                    </Collapse>
-                                    <Group justify="center">
-                                      <Button
-                                        size="compact-xs"
-                                        variant="subtle"
-                                        color="gray"
-                                        fw={400}
-                                        onClick={() =>
-                                          toggleDetailSection("communities")
-                                        }
-                                        aria-expanded={
-                                          detailSectionsExpanded.communities
-                                        }
-                                        rightSection={
-                                          <IconChevronDown
-                                            size={14}
-                                            style={{
-                                              transform:
-                                                detailSectionsExpanded.communities
-                                                  ? "rotate(180deg)"
-                                                  : "rotate(0deg)",
-                                              transition:
-                                                "transform 200ms ease",
-                                            }}
-                                          />
-                                        }
-                                      >
-                                        {detailSectionsExpanded.communities
-                                          ? "折りたたむ"
-                                          : `ほか${detailValues.communities.length - 3}件を表示`}
-                                      </Button>
-                                    </Group>
-                                  </>
-                                )}
-                              </Stack>
-                            </Box>
-                          ) : (
-                            <Group justify="space-between">
-                              <Text size="xs" c="dimmed">
-                                管理
-                              </Text>
-                              <Text size="xs">Community管理</Text>
-                            </Group>
-                          )}
-                        </Stack>
-                        <Box
-                          p="md"
-                          style={{
-                            borderTop:
-                              "1px solid var(--mantine-color-default-border)",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <Group justify="flex-end">
-                            <Button
-                              size="xs"
-                              variant="subtle"
-                              color="red"
-                              leftSection={<IconTrash size={15} />}
-                            >
-                              削除
-                            </Button>
-                          </Group>
-                        </Box>
-                      </Box>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </Box>
-            )
-          })()}
-      </Modal>
-      <Modal
-        withCloseButton={false}
-        opened={unshareTarget !== null}
-        onClose={() => setUnshareTarget(null)}
-        title="Communityの共有を解除"
-        centered
-        zIndex={410}
-      >
-        <Stack gap="md">
-          <Text size="sm">
-            {unshareTarget} への共有を解除しますか？
-            このCommunityからMediaを閲覧できなくなります。他の共有先やMedia本体は削除されません。
-          </Text>
-
-          <Group justify="flex-end">
-            <Button variant="default" onClick={() => setUnshareTarget(null)}>
-              キャンセル
-            </Button>
-            <Button color="red" onClick={removeCommunityShare}>
-              共有解除
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <Modal
-        withCloseButton={false}
-        opened={detailEditor === "communities"}
-        onClose={() => setDetailEditor(null)}
-        title="Communityへ共有"
-        centered
-        zIndex={400}
-      >
-        <Stack gap="md">
-          <Text size="sm" c="dimmed">
-            このMediaを共有するCommunityを1つ選択します。
-          </Text>
-          <Select
-            label="共有先Community"
-            searchable
-            data={["Photo Club", "Family", "Travel"].filter(
-              (name) => !detailValues.communities.includes(name),
-            )}
-            value={shareTarget}
-            onChange={setShareTarget}
-            placeholder="Communityを選択"
-          />
-
-          <Group justify="flex-end">
-            <Button variant="default" onClick={() => setDetailEditor(null)}>
-              キャンセル
-            </Button>
-            <Button disabled={!shareTarget} onClick={addCommunityShare}>
-              共有する
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <Modal
-        withCloseButton={false}
-        opened={detailEditor === "tags"}
-        onClose={() => setDetailEditor(null)}
-        title="Tagsを編集"
-        centered
-        zIndex={400}
-      >
-        <Stack gap="md">
-          <Text size="sm" c="dimmed">
-            このMediaのTagを追加・除外できます。
-          </Text>
-          <TagsInput
-            label="Tags"
-            data={["旅行", "風景", "家族", "お気に入り"]}
-            value={detailDraft}
-            onChange={setDetailDraft}
-          />
-
-          <Group justify="flex-end">
-            <Button variant="default" onClick={() => setDetailEditor(null)}>
-              キャンセル
-            </Button>
-            <Button onClick={saveDetailDraft}>変更を反映</Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <Modal
-        withCloseButton={false}
-        opened={detailEditor === "groups"}
-        onClose={() => setDetailEditor(null)}
-        title="Groupsを編集"
-        centered
-        zIndex={400}
-      >
-        <Stack gap="md">
-          <Text size="sm" c="dimmed">
-            現在の所属Groupを追加・除外できます。
-          </Text>
-          <MultiSelect
-            label="Groups"
-            searchable
-            data={["旅行", "家族", "風景写真", "お気に入り"]}
-            value={detailDraft}
-            onChange={setDetailDraft}
-          />
-
-          <Group justify="flex-end">
-            <Button variant="default" onClick={() => setDetailEditor(null)}>
-              キャンセル
-            </Button>
-            <Button onClick={saveDetailDraft}>変更を反映</Button>
-          </Group>
-        </Stack>
-      </Modal>
+      {detail && (
+        <MediaDetailDialog
+          items={stateItems}
+          initialId={detail.id}
+          onClose={() => setDetail(null)}
+          contextKind={context}
+          downloadMock={downloadMock}
+        />
+      )}
     </>
   )
 }
 
-/** Route integration stays outside the reusable image-detail rendering path. */
-function RoutedMediaBrowser(
+/** Route integration for the Media listing. */
+export function MediaBrowser(
   props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">,
 ) {
   const router = useRouter()
   return (
     <MediaBrowserContent {...props} navigate={(path) => router.push(path)} />
   )
-}
-
-/**
- * The detail-only consumer must not require the Next.js App Router.
- * Media Browser's list actions retain their original Next.js navigation.
- */
-export function MediaBrowser(
-  props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">,
-) {
-  if (props.detailOnlyItems) {
-    return <MediaBrowserContent {...props} navigate={() => undefined} />
-  }
-  return <RoutedMediaBrowser {...props} />
 }

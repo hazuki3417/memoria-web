@@ -34,4 +34,3 @@ export function isApplicationShellFeatureVisible(
 ) {
   return visibility[variant][feature]
 }
-

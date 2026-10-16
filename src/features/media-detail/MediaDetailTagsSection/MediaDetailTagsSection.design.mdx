@@ -1,0 +1,18 @@
+# MediaDetailTagsSection
+
+## 責務
+画像に設定されたTagsの件数・値・編集入口・展開操作を提供する。Tags固有の表示契約を所有し、編集Dialogや永続化は所有しない。
+
+## 入出力と状態
+- `detailValues.tags`を表示し、`detailSectionsExpanded.tags`を展開状態として受け取る。
+- 編集操作は`openDetailEditor("tags")`、展開操作は`toggleDetailSection("tags")`で通知する。
+
+## 表示・操作契約
+- Badgeは`light`。0件は「未設定」、先頭6件を常時表示し、7件以上で残りを展開できる。
+- 展開は200msのCollapse、`aria-expanded`と「折りたたむ」/残件数表示を維持する。
+- Tagsの下部の区切り線は親の情報パネルが表示する。
+- 既存の余白、折り返し、Desktop / CompactのResponsive Behaviorを変更しない。
+
+## Story / テスト観点
+- Tags固有のBadge variant、編集・展開通知。
+- 0件、6件、7件以上、展開状態、長い文字列、区切り線。

@@ -1,0 +1,1 @@
+export { MediaDetailViewer } from "./MediaDetailViewer"

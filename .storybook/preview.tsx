@@ -3,6 +3,7 @@ import "@mantine/notifications/styles.css";
 import type { Preview } from '@storybook/nextjs-vite';
 import { theme } from "../src//lib/theme";
 import { ThemeProvider } from "../src/providers/ThemeProvider";
+import { StorybookApplicationShell } from "./StorybookApplicationShell";
 
 
 const preview: Preview = {
@@ -22,11 +23,27 @@ const preview: Preview = {
     }
   },
   decorators: [
-    (Story) => (
-      <ThemeProvider theme={theme}>
-        <Story />
-      </ThemeProvider>
-    )
+    (Story, context) => {
+      const applicationShell = context.parameters.applicationShell === true;
+      const portalOwnedByStory = context.parameters.applicationShellOwnsPortal === true;
+      return (
+        <ThemeProvider theme={theme}>
+          {applicationShell ? (
+            <StorybookApplicationShell>
+              <Story />
+            </StorybookApplicationShell>
+          ) : (
+            <>
+              {/* ApplicationShell非使用Storyにも本番と同じModal Portal先を提供する */}
+              {!portalOwnedByStory && (
+                <div id="application-modal-root" style={{ position: "relative", zIndex: 400 }} />
+              )}
+              <Story />
+            </>
+          )}
+        </ThemeProvider>
+      );
+    }
   ]
 };
 

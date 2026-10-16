@@ -4,7 +4,12 @@ import { IconLayoutDashboard, IconPhoto, IconUsers } from "@tabler/icons-react"
 import { ApplicationNavigationContent } from "./ApplicationNavigationContent"
 
 const items = [
-  { id: "dashboard", label: "ダッシュボード", icon: IconLayoutDashboard, active: true },
+  {
+    id: "dashboard",
+    label: "ダッシュボード",
+    icon: IconLayoutDashboard,
+    active: true,
+  },
   { id: "media", label: "メディア", icon: IconPhoto },
   { id: "groups", label: "グループ", icon: IconUsers },
 ]
@@ -13,11 +18,13 @@ const meta = {
   title: "Components/Application Shell/Navigation Content",
   component: ApplicationNavigationContent,
   parameters: { layout: "fullscreen" },
-  decorators: [(Story: () => ReactNode) => (
-    <div style={{ width: 248, height: 360 }}>
-      <Story />
-    </div>
-  )],
+  decorators: [
+    (Story: () => ReactNode) => (
+      <div style={{ width: 248, height: 360 }}>
+        <Story />
+      </div>
+    ),
+  ],
   args: {
     items,
     accentColor: "var(--mantine-color-blue-6)",
@@ -36,7 +43,11 @@ export const LongLabel: Story = {
   args: {
     items: [
       ...items,
-      { id: "long", label: "非常に長いナビゲーション項目のラベルを表示するケース", icon: IconPhoto },
+      {
+        id: "long",
+        label: "非常に長いナビゲーション項目のラベルを表示するケース",
+        icon: IconPhoto,
+      },
     ],
   },
 }

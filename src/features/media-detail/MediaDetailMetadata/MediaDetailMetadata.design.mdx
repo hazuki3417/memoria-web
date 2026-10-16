@@ -1,0 +1,17 @@
+# MediaDetailMetadata
+
+## 責務
+選択Mediaの基本情報とOriginalダウンロードの状態を表示する。ダウンロード処理そのものやMedia情報の取得は所有しない。
+
+## 入出力と状態
+- `downloadMock`は`available`、`forbidden`、`processing`のいずれか。
+- ファイルサイズ、画像サイズ、アップロード日時、Uploaderは現行Componentが表示する固定値を保持する。これらの値の外部入力化は別途データ契約の設計対象とする。
+
+## 表示・操作契約
+- 基本情報をファイルサイズ、サイズ、アップロード、Uploaderの順に表示する。
+- `available`ではOriginalダウンロードボタンを有効にし、それ以外では無効化して理由を説明する。
+- 無効化理由は`aria-describedby`でボタンと関連付ける。
+
+## Story / テスト観点
+- 3つのダウンロード状態と文言、disabled、アクセシビリティ関連付け。
+- 情報の順序と余白、Desktop / Compactでの表示。

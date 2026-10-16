@@ -1,0 +1,19 @@
+# MediaDetailInfoPanel
+
+## 責務
+画像詳細の情報パネルを構成し、Desktopでは横幅、Compactでは高さを用いた開閉アニメーションとスクロール領域を提供する。個々の情報ブロックの表示・操作は子Componentへ委譲する。
+
+## 入出力と状態
+- `detailInfoOpened`と`compact`が開閉状態とレイアウトを決める。状態のauthoritative ownerは呼び出し元。
+- `detailValues`、展開状態、編集・共有操作は子Componentへ渡す。
+- `downloadMock`はOriginalダウンロードの表示状態、`context`はPersonal / Community表示を決める。
+
+## 表示・操作契約
+- 上から基本情報とOriginalダウンロード、Groups、Tags、共有先CommunityまたはCommunity管理、下部の削除操作を表示する。
+- Desktopの横幅340px、Compactの高さ展開、開閉時間0.3秒、スクロール、境界線、区切り線を維持する。
+- 削除ボタンは`onRequestDelete`を呼び出す。確認・永続化はこのPanelでは所有しない。
+
+## Story / テスト観点
+- 開閉とアニメーション、Desktop / Compactの配置、長い内容のスクロール。
+- 各ブロックの順序、境界線、削除操作、Personal / Communityの表示切替。
+- MediaBrowser既存画面とのVisual / Behavioral / Responsive Regression。

@@ -209,10 +209,7 @@ export function ApplicationShellContainer({
               ) : undefined
             }
             account={
-              isApplicationShellFeatureVisible(
-                shellMode,
-                "account-menu",
-              ) ? (
+              isApplicationShellFeatureVisible(shellMode, "account-menu") ? (
                 <ApplicationAccountMenu
                   user={{ displayName: "ユーザー" }}
                   currentContext={currentContext}

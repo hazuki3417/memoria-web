@@ -1,0 +1,23 @@
+# MediaDetailViewer
+
+## 責務
+選択画像のフルスクリーン表示、前後移動、ズーム・回転、情報パネル、ダウンロード状態、共有・編集操作の入口を提供する。Media一覧の取得、編集内容の永続化、画面遷移は所有しない。
+
+## 入出力と状態
+- 選択画像と順序付き画像一覧は呼び出し元から受け取る。先頭・末尾では存在しない方向への移動操作を表示しない。
+- 選択画像の変更は`setDetail`、閉じる操作は`closeMediaDetail`で通知する。
+- ViewportとEditingの状態・操作は各Hookから渡される。表示Component自体はこれらのauthoritative stateを所有しない。
+- `compact`、`context`、`downloadMock`でレイアウト、文脈、ダウンロードの状態を切り替える。
+
+## 表示・操作契約
+- 既存MediaBrowserの画像、ヘッダー、情報、編集導線、Modal階層、レイアウトとResponsive Behaviorを維持する。
+- Modalは`#application-modal-root`へPortalする。閉じる操作は親に通知する。
+- 前後移動は渡された一覧順に従い、移動時にViewport状態を初期化する。
+- 画像処理失敗、ダウンロード可能・禁止・処理中、情報パネル開閉、Personal / Community文脈を保持する。
+- 編集Dialogは別Componentが所有し、このViewerでは入口の操作を通知する。
+
+## Story / テスト観点
+- 画像の縦長・横長・表示失敗、先頭・中間・末尾の前後移動と閉じる操作。
+- Desktop / Compact、情報パネル開閉、ズーム境界値、回転、移動時のViewport初期化。
+- ダウンロードの3状態、共有・編集への導線、PortalとModal重なり順。
+- MediaBrowserの変更前表示と比較したVisual / Behavioral / Responsive Regression。

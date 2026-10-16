@@ -20,9 +20,9 @@ describe("isApplicationShellFeatureVisible", () => {
       "context-switcher",
       "account-menu",
     ] as const) {
-      expect(
-        isApplicationShellFeatureVisible("restricted-flow", feature),
-      ).toBe(false)
+      expect(isApplicationShellFeatureVisible("restricted-flow", feature)).toBe(
+        false,
+      )
     }
   })
 

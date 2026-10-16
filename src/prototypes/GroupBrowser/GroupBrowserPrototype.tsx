@@ -1,9 +1,6 @@
 "use client"
 
-import { MediaBrowserPrototype } from "@/prototypes/MediaBrowser/MediaBrowserPrototype"
-
 import {
-  ActionIcon,
   Badge,
   Box,
   Button,
@@ -21,6 +18,7 @@ import {
   UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
+import { Notifications } from "@mantine/notifications"
 import {
   IconChevronRight,
   IconEdit,
@@ -32,11 +30,11 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
-import { GroupItem } from "@/components/GroupItem"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
-import { SplitView } from "@/components/SplitView"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
+import { GroupItem } from "@/components/GroupItem"
+import { SplitView } from "@/components/SplitView"
+import { MediaBrowserPrototype } from "@/prototypes/MediaBrowser/MediaBrowserPrototype"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type PrototypeGroup = {
@@ -284,7 +282,10 @@ export function GroupBrowserPrototype() {
   const [createName, setCreateName] = useState("")
   const [createParents, setCreateParents] = useState<string[]>([])
   const [createChildren, setCreateChildren] = useState<string[]>([])
-  const allGroups = [...groups, ...createdGroups]
+  const allGroups = useMemo(
+    () => [...groups, ...createdGroups],
+    [createdGroups],
+  )
   const openCreate = () => {
     setCreateName("")
     setCreateParents([])
@@ -315,7 +316,7 @@ export function GroupBrowserPrototype() {
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [imageDetailIndex, setImageDetailIndex] = useState<number | null>(null)
+  const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = Array.from({ length: 24 }, (_, index) => ({
     id: `group-media-${index + 1}`,
     label: `Media ${index + 1}`,
@@ -339,7 +340,7 @@ export function GroupBrowserPrototype() {
     return allGroups.filter((group) =>
       group.name.toLocaleLowerCase().includes(normalized),
     )
-  }, [appliedQuery])
+  }, [appliedQuery, allGroups])
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
@@ -706,7 +707,7 @@ export function GroupBrowserPrototype() {
                       <Text fw={600}>Mediaがありません</Text>
                     </Paper>
                   ) : (
-                    <MediaGrid onOpen={setImageDetailIndex} />
+                    <MediaGrid onOpen={setMediaDetailIndex} />
                   )}
                 </Box>
               </ScrollArea>
@@ -951,7 +952,7 @@ export function GroupBrowserPrototype() {
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid onOpen={setImageDetailIndex} />
+                          <MediaGrid onOpen={setMediaDetailIndex} />
                         )}
                       </Box>
                     </ScrollArea>
@@ -969,7 +970,7 @@ export function GroupBrowserPrototype() {
             ? groupMediaItems[imageDetailIndex].id
             : undefined
         }
-        onDetailClose={() => setImageDetailIndex(null)}
+        onDetailClose={() => setMediaDetailIndex(null)}
         contextKind={personalContext.kind}
       />
     </PrototypeApplicationShell>

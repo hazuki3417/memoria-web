@@ -5,7 +5,7 @@ import { DashboardPrototype } from "./DashboardPrototype"
 const meta = {
   title: "Design Prototypes/Dashboard",
   component: DashboardPrototype,
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", applicationShellOwnsPortal: true },
 } satisfies Meta<typeof DashboardPrototype>
 
 export default meta

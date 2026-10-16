@@ -4,7 +4,7 @@ import { MediaUpdatePrototype } from "./MediaUpdatePrototype"
 const meta = {
   title: "Design Prototypes/Media Update",
   component: MediaUpdatePrototype,
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", applicationShellOwnsPortal: true },
 } satisfies Meta<typeof MediaUpdatePrototype>
 
 export default meta
