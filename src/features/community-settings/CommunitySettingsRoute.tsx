@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Text } from "@mantine/core"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
-import { getCommunityDetailsAction, getCommunityMembersAction, changeCommunityMemberRoleAction, renameCommunityAction } from "./actions"
+import { getCommunityDetailsAction, getCommunityMembersAction, changeCommunityMemberRoleAction, removeCommunityMemberAction, leaveCommunityAction, renameCommunityAction } from "./actions"
 import type { CommunityMember } from "./CommunityMembersContent"
 import {
   CommunitySettings,
@@ -68,6 +68,26 @@ export function CommunitySettingsRoute({
       members={members ?? undefined}
       role={members.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
+      onRemoveMember={async (userId) => {
+        try {
+          const result = await removeCommunityMemberAction(communityId, userId)
+          if (result.kind !== "updated") {
+            showNotification({kind:"error",title:"メンバーを除外できませんでした"})
+            return false
+          }
+          setMembers((current) => current?.filter((member) => member.id !== userId) ?? null)
+          showNotification({kind:"success",title:"メンバーを除外しました"})
+          return true
+        } catch {
+          showNotification({kind:"error",title:"メンバーを除外できませんでした"})
+          return false
+        }
+      }}
+      onLeaveCommunity={async () => {
+        const result = await leaveCommunityAction(communityId)
+        if (result.kind !== "updated") throw new Error("leave failed")
+      }}
+      onLeaveSuccess={() => router.push("/communities")}
       onChangeMemberRole={async (userId, role) => {
         try {
           const result = await changeCommunityMemberRoleAction(communityId, userId, role)
