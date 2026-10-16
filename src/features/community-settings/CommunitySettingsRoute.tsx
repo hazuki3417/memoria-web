@@ -37,7 +37,6 @@ export function CommunitySettingsRoute({
   }, [communityId])
 
   useEffect(() => {
-    if (section !== "members") return
     let cancelled = false
     setMembers(null)
     setMembersError(false)
@@ -55,19 +54,19 @@ export function CommunitySettingsRoute({
       })))
     }).catch(() => { if (!cancelled) setMembersError(true) })
     return () => { cancelled = true }
-  }, [communityId, section])
+  }, [communityId])
 
   if (loadError) return <Text c="red">Community情報を取得できませんでした。再読み込みしてください。</Text>
   if (name === null) return <Text c="dimmed">Community情報を読み込み中です。</Text>
-  if (section === "members" && membersError) return <Text c="red">メンバー一覧を取得できませんでした。再読み込みしてください。</Text>
-  if (section === "members" && members === null) return <Text c="dimmed">メンバー一覧を読み込み中です。</Text>
+  if (membersError) return <Text c="red">メンバー一覧を取得できませんでした。再読み込みしてください。</Text>
+  if (members === null) return <Text c="dimmed">メンバー一覧を読み込み中です。</Text>
 
   return (
     <CommunitySettings
       communityId={communityId}
       communityName={name}
       members={members ?? undefined}
-      role={members?.find((member) => member.isSelf)?.role ?? "admin"}
+      role={members.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
       onNavigate={(href) => router.push(href)}
       onSaveName={async (nextName) => {
