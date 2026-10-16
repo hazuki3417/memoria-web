@@ -31,7 +31,7 @@ export function MediaDeleteDialog({ target, onCancel, onConfirm }: MediaDeleteDi
       }
     >
       <Text size="sm">
-        {target?.label}を削除します。削除したMediaは復元できません。
+        このMediaを削除します。削除したMediaは復元できません。
       </Text>
     </Dialog>
   )
