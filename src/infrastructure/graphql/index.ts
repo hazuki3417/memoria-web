@@ -9,6 +9,7 @@ export type {
   CommunityRecord,
   CommunityListResult,
   CommunityMutationResult,
+  CommunityDetailsResult,
 } from "./server"
 export {
   getCurrentMemoriaUser,
@@ -17,4 +18,6 @@ export {
   updateMemoriaPreferences,
   listMyMemoriaCommunities,
   createMemoriaCommunity,
+  getMemoriaCommunity,
+  renameMemoriaCommunity,
 } from "./server"
