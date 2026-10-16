@@ -1,19 +1,25 @@
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 
 /**
- * Serialize account preference writes so a slower response cannot overwrite
- * a later user choice. Pending edits are coalesced into the next request.
- *
- * The caller owns optimistic UI state and rollback/feedback behavior.
+ * Serializes writes, coalesces edits and debounces requests.
+ * dispose({ flush: true }) sends pending changes before a component unmounts.
+ * Keep this controller outside the component to survive navigation.
  */
 export function createPreferencesSaveQueue(
   save: (patch: UserPreferencesPatch) => Promise<UserPreferences>,
   onSaved: (preferences: UserPreferences) => void,
   onError: (error: unknown, attempted: UserPreferencesPatch) => void,
+  delayMs = 400,
 ) {
   let pending: UserPreferencesPatch = {}
   let running = false
   let stopped = false
+  let timer: ReturnType<typeof setTimeout> | undefined
+
+  function clearTimer() {
+    if (timer !== undefined) clearTimeout(timer)
+    timer = undefined
+  }
 
   async function drain() {
     if (running || stopped) return
@@ -26,7 +32,10 @@ export function createPreferencesSaveQueue(
           const saved = await save(patch)
           if (!stopped) onSaved(saved)
         } catch (error) {
+          // Preserve unsuccessful edits, without overwriting newer values.
+          pending = { ...patch, ...pending }
           if (!stopped) onError(error, patch)
+          break
         }
       }
     } finally {
@@ -34,14 +43,32 @@ export function createPreferencesSaveQueue(
     }
   }
 
+  function schedule() {
+    clearTimer()
+    timer = setTimeout(() => {
+      timer = undefined
+      void drain()
+    }, delayMs)
+  }
+
   return {
     enqueue(patch: UserPreferencesPatch) {
       if (stopped) return
       pending = { ...pending, ...patch }
-      void drain()
+      schedule()
     },
-    dispose() {
+    flush() {
+      clearTimer()
+      return drain()
+    },
+    dispose({ flush = false }: { flush?: boolean } = {}) {
+      if (flush) {
+        clearTimer()
+        void drain()
+        return
+      }
       stopped = true
+      clearTimer()
       pending = {}
     },
   }
