@@ -4,7 +4,7 @@ import { AccountDeletionImpactPrototype } from "./AccountDeletionImpactPrototype
 const meta = {
   title: "Design Prototypes/Account Deletion",
   component: AccountDeletionImpactPrototype,
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", applicationShellOwnsPortal: true },
 } satisfies Meta<typeof AccountDeletionImpactPrototype>
 
 export default meta
