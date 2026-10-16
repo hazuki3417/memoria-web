@@ -1,11 +1,11 @@
-# ImageDetailPreview
+# MediaDetailPreview
 
 ## 責務
 選択中Mediaの画像プレビューとそのViewport操作を表示する。画像の選択順序・Viewport stateのauthoritative ownerは呼び出し元とし、一覧取得や永続化を行わない。
 
 ## 入出力と状態
 - `detail`は選択中のMedia、`stateItems`は順序付きMedia一覧、`prev`・`next`は移動可能な隣接Media。
-- `setDetail`で選択変更を通知し、移動前に`prepareNavigation`を呼ぶ。`closeImageDetail`で閉じる。
+- `setDetail`で選択変更を通知し、移動前に`prepareNavigation`を呼ぶ。`closeMediaDetail`で閉じる。
 - `detailZoom`、`detailRotate`、`detailRotateAnimated`、`detailDirection`は渡されたViewport stateを表示・更新する。
 - `detailInfoOpened`と`setDetailInfoOpened`で情報パネル開閉を通知し、`compact`で操作配置を切り替える。
 

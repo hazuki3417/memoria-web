@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { ImageDetailMetadata } from "./ImageDetailMetadata"
+import { MediaDetailMetadata } from "./MediaDetailMetadata"
 
 const meta = {
-  title: "Features/Image Detail/ImageDetailMetadata",
-  component: ImageDetailMetadata,
+  title: "Features/Media Detail/MediaDetailMetadata",
+  component: MediaDetailMetadata,
   args: { downloadMock: "available" },
-} satisfies Meta<typeof ImageDetailMetadata>
+} satisfies Meta<typeof MediaDetailMetadata>
 
 export default meta
 type Story = StoryObj<typeof meta>

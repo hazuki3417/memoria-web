@@ -3,7 +3,7 @@
 import { Button, Group, Stack, Text } from "@mantine/core"
 import { IconDownload, IconInfoCircle } from "@tabler/icons-react"
 
-export function ImageDetailMetadata({ downloadMock }: { downloadMock: "available" | "forbidden" | "processing" }) {
+export function MediaDetailMetadata({ downloadMock }: { downloadMock: "available" | "forbidden" | "processing" }) {
   return <>
                           <Stack gap="xs">
                             <Group justify="space-between">

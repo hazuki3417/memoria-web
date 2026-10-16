@@ -4,16 +4,16 @@ import { ActionIcon, Box, Center, Group, Image, Slider, Stack, Text } from "@man
 import { IconChevronLeft, IconChevronRight, IconInfoCircle, IconPhotoOff, IconRotate, IconRotate2, IconX, IconZoomIn, IconZoomOut, IconZoomReset } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ZoomInput } from "../ZoomInput"
-import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
+import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 
-export type ImageDetailPreviewProps = Pick<ImageDetailViewerProps, "stateItems" | "closeImageDetail" | "setDetail" | "prepareNavigation" | "compact" | "detailZoom" | "setDetailZoom" | "detailRotate" | "setDetailRotate" | "detailRotateAnimated" | "setDetailRotateAnimated" | "detailDirection" | "detailInfoOpened" | "setDetailInfoOpened"> & {
-  detail: NonNullable<ImageDetailViewerProps["detail"]>
-  prev: NonNullable<ImageDetailViewerProps["detail"]> | null
-  next: NonNullable<ImageDetailViewerProps["detail"]> | null
+export type MediaDetailPreviewProps = Pick<MediaDetailViewerProps, "stateItems" | "closeMediaDetail" | "setDetail" | "prepareNavigation" | "compact" | "detailZoom" | "setDetailZoom" | "detailRotate" | "setDetailRotate" | "detailRotateAnimated" | "setDetailRotateAnimated" | "detailDirection" | "detailInfoOpened" | "setDetailInfoOpened"> & {
+  detail: NonNullable<MediaDetailViewerProps["detail"]>
+  prev: NonNullable<MediaDetailViewerProps["detail"]> | null
+  next: NonNullable<MediaDetailViewerProps["detail"]> | null
 }
 
-export function ImageDetailPreview(props: ImageDetailPreviewProps) {
-  const { detail, stateItems, prev, next, closeImageDetail, setDetail, prepareNavigation, compact, detailZoom, setDetailZoom, detailRotate, setDetailRotate, detailRotateAnimated, setDetailRotateAnimated, detailDirection, detailInfoOpened, setDetailInfoOpened } = props
+export function MediaDetailPreview(props: MediaDetailPreviewProps) {
+  const { detail, stateItems, prev, next, closeMediaDetail, setDetail, prepareNavigation, compact, detailZoom, setDetailZoom, detailRotate, setDetailRotate, detailRotateAnimated, setDetailRotateAnimated, detailDirection, detailInfoOpened, setDetailInfoOpened } = props
   const detailIndex = stateItems.findIndex((item) => item.id === detail.id)
   return (
     <>
@@ -35,7 +35,7 @@ export function ImageDetailPreview(props: ImageDetailPreviewProps) {
                       variant="subtle"
                       color="gray"
                       aria-label="閉じる"
-                      onClick={closeImageDetail}
+                      onClick={closeMediaDetail}
                     >
                       <IconX size={18} />
                     </ActionIcon>

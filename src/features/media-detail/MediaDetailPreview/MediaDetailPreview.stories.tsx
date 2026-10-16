@@ -1,20 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { ImageDetailPreview } from "./ImageDetailPreview"
+import { MediaDetailPreview } from "./MediaDetailPreview"
 
 const first = { id: "portrait-01", label: "縦長 Media", src: "/__dev-assets/media-browser/h-01.png" }
 const second = { id: "landscape-01", label: "横長 Media", src: "/__dev-assets/media-browser/w-01.png" }
 const items = [first, second]
 
 const meta = {
-  title: "Features/Image Detail/ImageDetailPreview",
-  component: ImageDetailPreview,
+  title: "Features/Media Detail/MediaDetailPreview",
+  component: MediaDetailPreview,
   parameters: { layout: "fullscreen" },
   args: {
     detail: first,
     stateItems: items,
     prev: null,
     next: second,
-    closeImageDetail: () => undefined,
+    closeMediaDetail: () => undefined,
     setDetail: () => undefined,
     prepareNavigation: () => undefined,
     compact: false,
@@ -28,7 +28,7 @@ const meta = {
     detailInfoOpened: true,
     setDetailInfoOpened: () => undefined,
   },
-} satisfies Meta<typeof ImageDetailPreview>
+} satisfies Meta<typeof MediaDetailPreview>
 
 export default meta
 type Story = StoryObj<typeof meta>
