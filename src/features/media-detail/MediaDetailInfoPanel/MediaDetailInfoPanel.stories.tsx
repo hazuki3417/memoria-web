@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { ImageDetailInfoPanel } from "./ImageDetailInfoPanel"
+import { MediaDetailInfoPanel } from "./MediaDetailInfoPanel"
 
 const values = {
   groups: ["旅行", "お気に入り"],
@@ -9,8 +9,8 @@ const values = {
 const expanded = { groups: false, tags: false, communities: false }
 
 const meta = {
-  title: "Features/Image Detail/ImageDetailInfoPanel",
-  component: ImageDetailInfoPanel,
+  title: "Features/Media Detail/MediaDetailInfoPanel",
+  component: MediaDetailInfoPanel,
   args: {
     compact: false,
     detailInfoOpened: true,
@@ -24,7 +24,7 @@ const meta = {
     context: "personal",
     downloadMock: "available",
   },
-} satisfies Meta<typeof ImageDetailInfoPanel>
+} satisfies Meta<typeof MediaDetailInfoPanel>
 
 export default meta
 type Story = StoryObj<typeof meta>

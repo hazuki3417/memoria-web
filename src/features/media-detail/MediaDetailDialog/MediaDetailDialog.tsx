@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react"
 import { useMediaQuery } from "@mantine/hooks"
-import { useImageDetailEditing } from "../useImageDetailEditing"
-import { useImageDetailViewport } from "../useImageDetailViewport"
-import { ImageDetailViewer } from "../ImageDetailViewer"
+import { useMediaDetailEditing } from "../useMediaDetailEditing"
+import { useMediaDetailViewport } from "../useMediaDetailViewport"
+import { MediaDetailViewer } from "../MediaDetailViewer"
 import { CommunityUnshareDialog } from "../CommunityUnshareDialog"
 import { CommunityShareDialog } from "../CommunityShareDialog"
 import { TagsEditDialog } from "../TagsEditDialog"
 import { GroupsEditDialog } from "../GroupsEditDialog"
 import type { MediaItem } from "../types"
 
-export type ImageDetailDialogProps = {
+export type MediaDetailDialogProps = {
   items: MediaItem[]
   initialId?: string
   onClose: () => void
@@ -19,30 +19,30 @@ export type ImageDetailDialogProps = {
   downloadMock?: "available" | "forbidden" | "processing"
 }
 
-export function ImageDetailDialog({ items, initialId, onClose, contextKind = "personal", downloadMock = "available" }: ImageDetailDialogProps) {
+export function MediaDetailDialog({ items, initialId, onClose, contextKind = "personal", downloadMock = "available" }: MediaDetailDialogProps) {
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [detail, setDetail] = useState<MediaItem | null>(() => items.find(item => item.id === initialId) ?? null)
   useEffect(() => { setDetail(items.find(item => item.id === initialId) ?? null) }, [initialId, items])
-  const closeImageDetail = () => { setDetail(null); onClose() }
+  const closeMediaDetail = () => { setDetail(null); onClose() }
   const {
     detailEditor, setDetailEditor, detailDraft, setDetailDraft,
     shareTarget, setShareTarget, unshareTarget, setUnshareTarget,
     detailValues, openDetailEditor, saveDetailDraft,
     addCommunityShare, removeCommunityShare,
     detailSectionsExpanded, toggleDetailSection,
-  } = useImageDetailEditing(detail)
+  } = useMediaDetailEditing(detail)
   const {
     prepareNavigation, detailInfoOpened, setDetailInfoOpened,
     detailZoom, setDetailZoom, detailRotate, setDetailRotate,
     detailRotateAnimated, setDetailRotateAnimated, detailDirection, setDetailDirection,
-  } = useImageDetailViewport()
+  } = useMediaDetailViewport()
   void setDetailDirection
   return (
     <>
-      <ImageDetailViewer
+      <MediaDetailViewer
         detail={detail}
         setDetail={setDetail}
-        closeImageDetail={closeImageDetail}
+        closeMediaDetail={closeMediaDetail}
         stateItems={items}
         compact={compact}
         context={contextKind}

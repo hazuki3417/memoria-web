@@ -3,15 +3,15 @@
 import { Box, Button, Divider, Group, Stack } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ImageDetailMetadata } from "../ImageDetailMetadata"
-import { ImageDetailGroupsSection } from "../ImageDetailGroupsSection"
-import { ImageDetailTagsSection } from "../ImageDetailTagsSection"
-import { ImageDetailCommunitySection } from "../ImageDetailCommunitySection"
-import type { ImageDetailViewerProps } from "../ImageDetailViewer/ImageDetailViewer"
+import { MediaDetailMetadata } from "../MediaDetailMetadata"
+import { MediaDetailGroupsSection } from "../MediaDetailGroupsSection"
+import { MediaDetailTagsSection } from "../MediaDetailTagsSection"
+import { MediaDetailCommunitySection } from "../MediaDetailCommunitySection"
+import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 
-export type ImageDetailInfoPanelProps = Pick<ImageDetailViewerProps, "compact" | "detailInfoOpened" | "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor" | "setUnshareTarget" | "setShareTarget" | "setDetailEditor" | "context" | "downloadMock">
+export type MediaDetailInfoPanelProps = Pick<MediaDetailViewerProps, "compact" | "detailInfoOpened" | "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor" | "setUnshareTarget" | "setShareTarget" | "setDetailEditor" | "context" | "downloadMock">
 
-export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind, downloadMock }: ImageDetailInfoPanelProps) {
+export function MediaDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind, downloadMock }: MediaDetailInfoPanelProps) {
   return (
     <>
                 <AnimatePresence initial={false}>
@@ -60,22 +60,22 @@ export function ImageDetailInfoPanel({ compact, detailInfoOpened, detailValues, 
                           p="md"
                           style={{ flex: 1, overflowY: "auto" }}
                         >
-                          <ImageDetailMetadata downloadMock={downloadMock} />
+                          <MediaDetailMetadata downloadMock={downloadMock} />
                           <Divider
                             style={{
                               marginInline:
                                 "calc(-1 * var(--mantine-spacing-md))",
                             }}
                           />
-                          <ImageDetailGroupsSection detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} openDetailEditor={openDetailEditor} />
-                          <ImageDetailTagsSection detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} openDetailEditor={openDetailEditor} />
+                          <MediaDetailGroupsSection detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} openDetailEditor={openDetailEditor} />
+                          <MediaDetailTagsSection detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} openDetailEditor={openDetailEditor} />
                           <Divider
                             style={{
                               marginInline:
                                 "calc(-1 * var(--mantine-spacing-md))",
                             }}
                           />
-                          <ImageDetailCommunitySection detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} setUnshareTarget={setUnshareTarget} setShareTarget={setShareTarget} setDetailEditor={setDetailEditor} context={contextKind} />
+                          <MediaDetailCommunitySection detailValues={detailValues} detailSectionsExpanded={detailSectionsExpanded} toggleDetailSection={toggleDetailSection} setUnshareTarget={setUnshareTarget} setShareTarget={setShareTarget} setDetailEditor={setDetailEditor} context={contextKind} />
                         </Stack>
                         <Box
                           p="md"
