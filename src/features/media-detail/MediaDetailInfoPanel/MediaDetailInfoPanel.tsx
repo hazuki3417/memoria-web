@@ -9,9 +9,9 @@ import { MediaDetailTagsSection } from "../MediaDetailTagsSection"
 import { MediaDetailCommunitySection } from "../MediaDetailCommunitySection"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 
-export type MediaDetailInfoPanelProps = Pick<MediaDetailViewerProps, "compact" | "detailInfoOpened" | "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor" | "setUnshareTarget" | "setShareTarget" | "setDetailEditor" | "context" | "downloadMock">
+export type MediaDetailInfoPanelProps = Pick<MediaDetailViewerProps, "compact" | "detailInfoOpened" | "detailValues" | "detailSectionsExpanded" | "toggleDetailSection" | "openDetailEditor" | "setUnshareTarget" | "setShareTarget" | "setDetailEditor" | "context" | "downloadMock" | "onRequestDelete">
 
-export function MediaDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind, downloadMock }: MediaDetailInfoPanelProps) {
+export function MediaDetailInfoPanel({ compact, detailInfoOpened, detailValues, detailSectionsExpanded, toggleDetailSection, openDetailEditor, setUnshareTarget, setShareTarget, setDetailEditor, context: contextKind, downloadMock, onRequestDelete }: MediaDetailInfoPanelProps) {
   return (
     <>
                 <AnimatePresence initial={false}>
@@ -91,6 +91,7 @@ export function MediaDetailInfoPanel({ compact, detailInfoOpened, detailValues, 
                               variant="subtle"
                               color="red"
                               leftSection={<IconTrash size={15} />}
+                              onClick={onRequestDelete}
                             >
                               削除
                             </Button>
