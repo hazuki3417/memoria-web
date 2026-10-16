@@ -11,7 +11,7 @@
 ## 表示・操作契約
 - 上から基本情報とOriginalダウンロード、Groups、Tags、共有先CommunityまたはCommunity管理、下部の削除操作を表示する。
 - Desktopの横幅340px、Compactの高さ展開、開閉時間0.3秒、スクロール、境界線、区切り線を維持する。
-- 削除ボタンの表示と現在の操作契約を変えず、子Componentへの移動によって動作を追加・削除しない。
+- 削除ボタンは`onRequestDelete`を呼び出す。確認・永続化はこのPanelでは所有しない。
 
 ## Story / テスト観点
 - 開閉とアニメーション、Desktop / Compactの配置、長い内容のスクロール。
