@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { CommunityMembersContent } from "./CommunityMembersContent"
 import {
   SettingsUsage,
@@ -44,11 +44,15 @@ export function CommunitySettings({
   communityId = "photo-club",
   section = "general",
   onNavigate,
+  communityName,
+  onSaveName,
 }: {
   role?: Role
   communityId?: string
   section?: CommunitySettingsSection
   onNavigate?: (href: string) => void
+  communityName?: string
+  onSaveName?: (name: string) => Promise<boolean>
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -59,8 +63,14 @@ export function CommunitySettings({
   }
   const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
-  const [name, setName] = useState("家族のアルバム")
+  const [name, setName] = useState(communityName ?? "家族のアルバム")
   const [draft, setDraft] = useState(name)
+  const [savingName, setSavingName] = useState(false)
+  useEffect(() => {
+    if (communityName === undefined) return
+    setName(communityName)
+    setDraft(communityName)
+  }, [communityName])
   const [invitation, setInvitation] = useState<InvitationState>("none")
   const [expiresAt, setExpiresAt] = useState("")
   const [generation, setGeneration] = useState(0)
@@ -156,15 +166,24 @@ export function CommunitySettings({
             <Box>
               <Button
                 size="sm"
-                disabled={!dirty || invalid}
+                disabled={!dirty || invalid || savingName}
+                loading={savingName}
                 onClick={() => {
+                  if (savingName) return
                   const updated = draft.trim()
-                  setName(updated)
-                  setDraft(updated)
-                  showNotification({
-                    kind: "success",
-                    title: "Community名を変更しました",
-                  })
+                  if (!onSaveName) {
+                    setName(updated)
+                    setDraft(updated)
+                    showNotification({ kind: "success", title: "Community名を変更しました" })
+                    return
+                  }
+                  setSavingName(true)
+                  void onSaveName(updated).then((saved) => {
+                    if (!saved) return
+                    setName(updated)
+                    setDraft(updated)
+                    showNotification({ kind: "success", title: "Community名を変更しました" })
+                  }).finally(() => setSavingName(false))
                 }}
               >
                 保存
