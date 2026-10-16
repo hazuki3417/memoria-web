@@ -4,6 +4,7 @@ import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect, useState } from "react"
 import { createCommunityAction, listCommunitiesAction } from "./actions"
+import { showNotification } from "@/components/Feedback"
 import {
   ApplicationAccountMenu,
   ApplicationContentScroll,
@@ -134,6 +135,7 @@ export function ApplicationShellContainer({
       setCreateOpened(false)
       setDraftName("")
       setCreateError("")
+      showNotification({ kind: "success", title: "Communityを作成しました", message: `${label}を作成しました。` })
       router.push(`/communities/${encodeURIComponent(id)}/dashboard`)
     } finally {
       setCreateBusy(false)
