@@ -299,11 +299,6 @@ export function CommunityMembersContent({
           <Text size="sm">
             退会すると、このCommunityへのアクセスと、自分が管理するMediaのこのCommunityへの共有・分類が解除されます。アカウントやCommunity管理Mediaは削除されません。
           </Text>
-          {blocked && (
-            <Text size="sm" c="red">
-              最後のAdministratorは退会できません。別の参加者をAdministratorに変更してから退会してください。
-            </Text>
-          )}
           {done && (
             <Text size="sm" c="green">
               退会処理が完了しました。
@@ -319,6 +314,11 @@ export function CommunityMembersContent({
               Communityから退会する
             </Button>
           </Group>
+          {blocked && (
+            <Text size="sm" c="red">
+              最後のAdministratorは退会できません。別の参加者をAdministratorに変更してから退会してください。
+            </Text>
+          )}
         </Stack>
       </Box>
       <Modal
