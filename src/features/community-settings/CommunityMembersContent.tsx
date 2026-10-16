@@ -39,10 +39,12 @@ export function CommunityMembersContent({
   members = previewMembers,
   onLeave,
   onLeaveSuccess,
+  onChangeRole,
 }: {
   members?: CommunityMember[]
   onLeave?: () => Promise<void>
   onLeaveSuccess?: () => void
+  onChangeRole?: (userId: string, role: "admin" | "member") => Promise<boolean>
 }) {
   const [query, setQuery] = useState("")
   const [sortKey, setSortKey] = useState<SortKey>("name")
@@ -51,6 +53,8 @@ export function CommunityMembersContent({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
   const [done, setDone] = useState(false)
+  const [roleTarget, setRoleTarget] = useState<CommunityMember | null>(null)
+  const [roleBusy, setRoleBusy] = useState(false)
   const self = members.find((member) => member.isSelf)
   const adminCount = members.filter((member) => member.role === "admin").length
   const memberLimitReached = members.length >= COMMUNITY_MEMBER_LIMIT
@@ -108,6 +112,16 @@ export function CommunityMembersContent({
       )
     } finally {
       setBusy(false)
+    }
+  }
+  const confirmRoleChange = async () => {
+    if (!roleTarget || !onChangeRole || roleBusy) return
+    setRoleBusy(true)
+    try {
+      const nextRole = roleTarget.role === "admin" ? "member" : "admin"
+      if (await onChangeRole(roleTarget.id, nextRole)) setRoleTarget(null)
+    } finally {
+      setRoleBusy(false)
     }
   }
   return (
@@ -228,7 +242,12 @@ export function CommunityMembersContent({
                                   </Button>
                                 </Menu.Target>
                                 <Menu.Dropdown>
-                                  <Menu.Item disabled>役割を変更</Menu.Item>
+                                  <Menu.Item
+                                    disabled={!onChangeRole || (member.role === "member" && adminLimitReached) || (member.role === "admin" && adminCount <= 1)}
+                                    onClick={() => setRoleTarget(member)}
+                                  >
+                                    役割を変更
+                                  </Menu.Item>
                                   <Menu.Item disabled color="red">
                                     除外
                                   </Menu.Item>
@@ -285,6 +304,22 @@ export function CommunityMembersContent({
           </Group>
         </Stack>
       </Box>
+      <Modal
+        opened={roleTarget !== null}
+        onClose={() => { if (!roleBusy) setRoleTarget(null) }}
+        title="役割を変更"
+        centered
+      >
+        <Stack gap="md">
+          <Text size="sm">
+            {roleTarget?.name}の役割を{roleTarget?.role === "admin" ? "Member" : "Administrator"}に変更しますか？
+          </Text>
+          <Group justify="flex-end">
+            <Button variant="default" disabled={roleBusy} onClick={() => setRoleTarget(null)}>キャンセル</Button>
+            <Button loading={roleBusy} onClick={() => void confirmRoleChange()}>変更する</Button>
+          </Group>
+        </Stack>
+      </Modal>
       <Modal
         opened={opened}
         onClose={close}
