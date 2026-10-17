@@ -63,8 +63,8 @@ export function CommunityDeletionConfirmation({
       setCompleted(true)
       showNotification({
         kind: "success",
-        title: "Communityを削除",
-        description: "Communityの削除処理が完了しました。",
+        title: "Community削除の受付",
+        description: "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
       })
       navigate("/dashboard")
     } catch {
