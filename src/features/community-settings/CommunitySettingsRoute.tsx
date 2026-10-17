@@ -72,14 +72,14 @@ export function CommunitySettingsRoute({
         try {
           const result = await removeCommunityMemberAction(communityId, userId)
           if (result.kind !== "updated") {
-            showNotification({kind:"error",title:"メンバーを除外できませんでした"})
+            showNotification({ kind: "error", title: "メンバーを除外", description: "メンバーを除外できませんでした。" })
             return false
           }
           setMembers((current) => current?.filter((member) => member.id !== userId) ?? null)
-          showNotification({kind:"success",title:"メンバーを除外しました"})
+          showNotification({ kind: "success", title: "メンバーを除外", description: "メンバーを除外しました。" })
           return true
         } catch {
-          showNotification({kind:"error",title:"メンバーを除外できませんでした"})
+          showNotification({ kind: "error", title: "メンバーを除外", description: "メンバーを除外できませんでした。" })
           return false
         }
       }}
@@ -92,14 +92,14 @@ export function CommunitySettingsRoute({
         try {
           const result = await changeCommunityMemberRoleAction(communityId, userId, role)
           if (result.kind !== "updated") {
-            showNotification({kind:"error",title:"メンバーの役割を変更できませんでした"})
+            showNotification({ kind: "error", title: "メンバーの役割を変更", description: "メンバーの役割を変更できませんでした。" })
             return false
           }
           setMembers((current) => current?.map((member) => member.id === userId ? {...member, role} : member) ?? null)
-          showNotification({kind:"success",title:"メンバーの役割を変更しました"})
+          showNotification({ kind: "success", title: "メンバーの役割を変更", description: "メンバーの役割を変更しました。" })
           return true
         } catch {
-          showNotification({kind:"error",title:"メンバーの役割を変更できませんでした"})
+          showNotification({ kind: "error", title: "メンバーの役割を変更", description: "メンバーの役割を変更できませんでした。" })
           return false
         }
       }}
