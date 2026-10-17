@@ -60,6 +60,8 @@ export function CommunitySettingsRoute({
   }
 
 
+  if (name === null || members === null) return null
+
   return (
     <CommunitySettings
       communityId={communityId}
