@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
-import { Text } from "@mantine/core"
+import { useEffect, useState } from "react"
+import { Box, Group, Skeleton, Stack, Text } from "@mantine/core"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
 import { changeCommunityMemberRoleAction, removeCommunityMemberAction, leaveCommunityAction, renameCommunityAction } from "./actions"
@@ -25,10 +25,40 @@ export function CommunitySettingsRoute({
     ensureLoaded()
   }, [ensureLoaded])
 
+  const [showPending, setShowPending] = useState(false)
+  const pending = !loadError && !membersError && (name === null || members === null)
+  useEffect(() => {
+    if (!pending) {
+      setShowPending(false)
+      return
+    }
+    const timer = window.setTimeout(() => setShowPending(true), 300)
+    return () => window.clearTimeout(timer)
+  }, [pending])
+
   if (loadError) return <Text c="red">Community情報を取得できませんでした。再読み込みしてください。</Text>
-  if (name === null) return <Text c="dimmed">Community情報を読み込み中です。</Text>
   if (membersError) return <Text c="red">メンバー一覧を取得できませんでした。再読み込みしてください。</Text>
-  if (members === null) return <Text c="dimmed">メンバー一覧を読み込み中です。</Text>
+  if (pending) {
+    if (!showPending) return null
+    return (
+      <Box maw={1120} mx="auto" w="100%" aria-busy="true" aria-label="Community設定を読み込み中">
+        <Group align="flex-start" gap={56} wrap="nowrap">
+          <Stack w={200} gap="md" visibleFrom="sm">
+            <Skeleton height={14} width={56} />
+            {Array.from({ length: 4 }, (_, index) => <Skeleton key={index} height={34} />)}
+          </Stack>
+          <Stack style={{ flex: 1 }} gap="xl">
+            <Skeleton height={28} width="55%" />
+            <Skeleton height={14} width="75%" />
+            <Skeleton height={22} width="45%" />
+            <Skeleton height={40} />
+            <Skeleton height={40} />
+          </Stack>
+        </Group>
+      </Box>
+    )
+  }
+
 
   return (
     <CommunitySettings
