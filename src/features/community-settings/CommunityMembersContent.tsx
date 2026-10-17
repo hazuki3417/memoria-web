@@ -21,12 +21,8 @@ import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { showNotification } from "@/components/Feedback"
 
-export type CommunityMember = {
-  id: string
-  name: string
-  role: "admin" | "member"
-  isSelf?: boolean
-}
+import type { CommunityMember } from "@/features/community/CommunityProvider"
+export type { CommunityMember } from "@/features/community/CommunityProvider"
 export const COMMUNITY_MEMBER_LIMIT = 30
 export const COMMUNITY_ADMIN_LIMIT = 3
 const previewMembers: CommunityMember[] = [
