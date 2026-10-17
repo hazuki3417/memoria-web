@@ -4,7 +4,8 @@ import { Text } from "@mantine/core"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
-import { changeCommunityMemberRoleAction, removeCommunityMemberAction, leaveCommunityAction, renameCommunityAction } from "./actions"
+import { changeCommunityMemberRoleAction, removeCommunityMemberAction, leaveCommunityAction } from "./actions"
+import { MyCommunitiesDocument, useRenameCommunityMutation } from "@/infrastructure/graphql/generated"
 import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
@@ -20,6 +21,7 @@ export function CommunitySettingsRoute({
 }) {
   const router = useRouter()
   const { name, members, loadError, membersError, setName, setMembers } = useCommunity()
+  const [renameCommunity] = useRenameCommunityMutation()
 
   const pending = !loadError && !membersError && (name === null || members === null)
 
@@ -73,18 +75,15 @@ export function CommunitySettingsRoute({
       onNavigate={(href) => router.push(href)}
       onSaveName={async (nextName) => {
         try {
-          const result = await renameCommunityAction(communityId, nextName)
-          if (result.kind === "updated") {
-            setName(result.community.name)
-            window.dispatchEvent(new CustomEvent("memoria:community-renamed", {
-              detail: { id: result.community.id, name: result.community.name },
-            }))
+          const result = await renameCommunity({ variables: { input: { communityId, name: nextName } }, refetchQueries: [MyCommunitiesDocument], awaitRefetchQueries: true })
+          if (result.data?.renameCommunity.community) {
+            setName(result.data.renameCommunity.community.name)
             return true
           }
           showNotification({
             kind: "error",
             title: "Community名を変更",
-            description: result.kind === "forbidden" ? "Community名を変更する権限がありません。" : "Community名を変更できませんでした。",
+            description: "Community名を変更できませんでした。",
           })
           return false
         } catch {
