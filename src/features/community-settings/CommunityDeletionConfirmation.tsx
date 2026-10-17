@@ -44,6 +44,7 @@ export function CommunityDeletionConfirmation({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
   const [completed, setCompleted] = useState(false)
+  const [outcomeUnknown, setOutcomeUnknown] = useState(false)
   const settingsPath = `/communities/${encodeURIComponent(communityId)}/settings`
   const navigate = (href: string) =>
     onNavigate ? onNavigate(href) : router.push(href)
@@ -54,7 +55,8 @@ export function CommunityDeletionConfirmation({
     confirmation === communityName &&
     !!onDelete &&
     !busy &&
-    !completed
+    !completed &&
+    !outcomeUnknown
 
   const remove = async () => {
     if (!canDelete || !onDelete) return
@@ -76,6 +78,7 @@ export function CommunityDeletionConfirmation({
         : "削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。",
       )
       if (changed) onReviewChanged?.()
+      else setOutcomeUnknown(true)
       showNotification({
         kind: "error",
         title: "Communityを削除",
@@ -240,10 +243,15 @@ export function CommunityDeletionConfirmation({
                 </FeedbackAlert>
               )}
               {error && (
-                <Text size="sm" c="red" role="alert">
-                  {error}
-                </Text>
-              )}
+                <Stack gap="xs">
+                  <Text size="sm" c="red" role="alert">{error}</Text>
+                  {outcomeUnknown && onReviewChanged && (
+                    <Button variant="default" onClick={onReviewChanged}>
+                      最新の状態を確認する
+                    </Button>
+                  )}
+                </Stack>
+              )
             </Stack>
           )}
           <Group gap="sm" justify="space-between" wrap="nowrap">
