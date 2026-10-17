@@ -4,7 +4,7 @@ import { Text } from "@mantine/core"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
-import { MyCommunitiesDocument, CommunityMembersDocument, useRenameCommunityMutation, useChangeCommunityMemberRoleMutation, useRemoveCommunityMemberMutation, useLeaveCommunityMutation } from "@/infrastructure/graphql/generated"
+import { MyCommunitiesDocument, CommunityMembersDocument, CommunityMemberRole, useRenameCommunityMutation, useChangeCommunityMemberRoleMutation, useRemoveCommunityMemberMutation, useLeaveCommunityMutation } from "@/infrastructure/graphql/generated"
 import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
@@ -60,7 +60,7 @@ export function CommunitySettingsRoute({
       onLeaveSuccess={() => router.push("/dashboard")}
       onChangeMemberRole={async (userId, role) => {
         try {
-          const result = await changeRole({ variables: { input: { communityId, userId, role } }, refetchQueries: [CommunityMembersDocument], awaitRefetchQueries: true })
+          const result = await changeRole({ variables: { input: { communityId, userId, role: role === "admin" ? CommunityMemberRole.Admin : CommunityMemberRole.Member } }, refetchQueries: [CommunityMembersDocument], awaitRefetchQueries: true })
           if (!result.data?.changeCommunityMemberRole.success) {
             showNotification({ kind: "error", title: "メンバーの役割を変更", description: "メンバーの役割を変更できませんでした。" })
             return false
