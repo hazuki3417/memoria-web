@@ -103,14 +103,14 @@ export function CommunitySettings({
         .replaceAll("-", "/"),
     )
     setBusy(false)
-    showNotification({ kind: "success", title: "招待URLを発行しました" })
+    showNotification({ kind: "success", title: "招待URLを発行", description: "招待URLを発行しました。" })
   }
 
   const changeInvitation = () => {
     if (confirm === "revoke") {
       setInvitation("revoked")
       setExpiresAt("")
-      showNotification({ kind: "success", title: "招待URLを無効化しました" })
+      showNotification({ kind: "success", title: "招待URLを無効化", description: "招待URLを無効化しました。" })
     } else {
       issue()
     }
@@ -121,9 +121,9 @@ export function CommunitySettings({
     if (!active) return
     try {
       await navigator.clipboard.writeText(invitationUrl)
-      showNotification({ kind: "success", title: "招待URLをコピーしました" })
+      showNotification({ kind: "success", title: "招待URLをコピー", description: "招待URLをコピーしました。" })
     } catch {
-      showNotification({ kind: "error", title: "コピーに失敗しました" })
+      showNotification({ kind: "error", title: "招待URLをコピー", description: "コピーに失敗しました。" })
     }
   }
 
@@ -184,7 +184,7 @@ export function CommunitySettings({
                   if (!onSaveName) {
                     setName(updated)
                     setDraft(updated)
-                    showNotification({ kind: "success", title: "Community名を変更しました" })
+                    showNotification({ kind: "success", title: "Community名を変更", description: "Community名を変更しました。" })
                     return
                   }
                   setSavingName(true)
@@ -192,7 +192,7 @@ export function CommunitySettings({
                     if (!saved) return
                     setName(updated)
                     setDraft(updated)
-                    showNotification({ kind: "success", title: "Community名を変更しました" })
+                    showNotification({ kind: "success", title: "Community名を変更", description: "Community名を変更しました。" })
                   }).finally(() => setSavingName(false))
                 }}
               >
