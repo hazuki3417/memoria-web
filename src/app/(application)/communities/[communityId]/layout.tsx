@@ -1,9 +1,9 @@
-import { CommunitySettingsDataProvider } from "@/features/community-settings/CommunitySettingsDataProvider"
+import { CommunityProvider } from "@/features/community/CommunityProvider"
 
 export default async function CommunityLayout({
   children,
   params,
 }: Readonly<{ children: React.ReactNode; params: Promise<{ communityId: string }> }>) {
   const { communityId } = await params
-  return <CommunitySettingsDataProvider key={communityId} communityId={communityId}>{children}</CommunitySettingsDataProvider>
+  return <CommunityProvider key={communityId} communityId={communityId}>{children}</CommunityProvider>
 }
