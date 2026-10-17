@@ -1,7 +1,7 @@
 "use server"
 
 import { auth0 } from "@/lib/auth0"
-import { changeMemoriaCommunityMemberRole, removeMemoriaCommunityMember, leaveMemoriaCommunity, renameMemoriaCommunity, getMemoriaCommunityDeletionSnapshot } from "@/infrastructure/graphql"
+import { changeMemoriaCommunityMemberRole, removeMemoriaCommunityMember, leaveMemoriaCommunity, renameMemoriaCommunity, getMemoriaCommunityDeletionSnapshot, acceptMemoriaCommunityDeletion } from "@/infrastructure/graphql"
 
 export async function renameCommunityAction(communityId: string, name: string) {
   if (!(await auth0.getSession())) return { kind: "unavailable" as const }
@@ -29,4 +29,10 @@ export async function leaveCommunityAction(communityId: string) {
 export async function getCommunityDeletionSnapshotAction(communityId: string) {
   if (!(await auth0.getSession())) return { kind: "unavailable" as const }
   return getMemoriaCommunityDeletionSnapshot(communityId)
+}
+
+export async function acceptCommunityDeletionAction(communityId: string, revision: string) {
+  if (!(await auth0.getSession())) return { kind: "unavailable" as const }
+  if (!communityId || !revision) return { kind: "validation" as const }
+  return acceptMemoriaCommunityDeletion(communityId, revision)
 }
