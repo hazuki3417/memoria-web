@@ -12,7 +12,9 @@ export function usePreferencesSave(onSave?: Save) {
   const [saveError, setSaveError] = useState<SaveError>(null)
   const saveRef = useRef(onSave)
   saveRef.current = onSave
-  const controllerRef = useRef<ReturnType<typeof createPreferencesSaveQueue> | null>(null)
+  const controllerRef = useRef<ReturnType<
+    typeof createPreferencesSaveQueue
+  > | null>(null)
 
   useEffect(() => {
     if (!saveRef.current) return
@@ -23,10 +25,15 @@ export function usePreferencesSave(onSave?: Save) {
         return save(patch)
       },
       () => setSaveError(null),
-      (error) => setSaveError(
-        typeof error === "object" && error !== null &&
-        "kind" in error && error.kind === "blocked" ? "blocked" : "retryable",
-      ),
+      (error) =>
+        setSaveError(
+          typeof error === "object" &&
+            error !== null &&
+            "kind" in error &&
+            error.kind === "blocked"
+            ? "blocked"
+            : "retryable",
+        ),
     )
     controllerRef.current = controller
     return () => {
@@ -39,7 +46,8 @@ export function usePreferencesSave(onSave?: Save) {
 
   return {
     saveError,
-    enqueue: (patch: UserPreferencesPatch) => controllerRef.current?.enqueue(patch),
+    enqueue: (patch: UserPreferencesPatch) =>
+      controllerRef.current?.enqueue(patch),
     retry: () => {
       setSaveError(null)
       void controllerRef.current?.flush()

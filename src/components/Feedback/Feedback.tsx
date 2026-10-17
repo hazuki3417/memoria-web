@@ -65,11 +65,11 @@ export function FeedbackAlert({
 export function showNotification({
   kind,
   title,
-  message,
+  description,
 }: {
   kind: FeedbackKind
   title: string
-  message?: string
+  description: string
 }) {
   const appearance = feedbackAppearance(kind)
   const Icon = icons[kind]
@@ -89,7 +89,7 @@ export function showNotification({
           message: { fontSize: 12 },
         }}
       >
-        {message}
+        {description}
       </Alert>
     ),
     withCloseButton: true,

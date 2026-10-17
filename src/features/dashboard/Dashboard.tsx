@@ -20,7 +20,6 @@ import {
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { Notifications } from "@mantine/notifications"
 import { showNotification } from "@/components/Feedback"
 import { recentGroups, recentMedia } from "./dashboardData"
 
@@ -314,8 +313,8 @@ export function Dashboard({
     window.sessionStorage.removeItem("memoria:registration-success")
     showNotification({
       kind: "success",
-      title: "登録しました",
-      message: "登録が完了しました。",
+      title: "User登録",
+      description: "登録が完了しました。",
     })
   }, [contextKind])
   const prefix =
@@ -325,7 +324,6 @@ export function Dashboard({
 
   return (
     <>
-      {contextKind === "personal" && <Notifications position="top-right" />}
       <Stack gap="xl" w="100%">
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="nowrap">

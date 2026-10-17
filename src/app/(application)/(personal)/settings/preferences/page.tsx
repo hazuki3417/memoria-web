@@ -18,7 +18,9 @@ export default async function Page() {
         const result = await updatePreferencesAction(patch)
         if (result.kind === "updated") return result.preferences
         if (result.kind === "blocked")
-          throw Object.assign(new Error("Preferences update blocked"), { kind: "blocked" })
+          throw Object.assign(new Error("Preferences update blocked"), {
+            kind: "blocked",
+          })
         throw new Error("Preferences update failed")
       }}
     />

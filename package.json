@@ -23,8 +23,8 @@
     "test:vrt:report": "playwright show-report ./e2e/vrt/report",
     "test:storybook-visual": "playwright test --config=playwright.storybook-visual.config.ts",
     "test:storybook-visual:update": "playwright test --config=playwright.storybook-visual.config.ts --update-snapshots",
-    "graphql:codegen": "graphql-codegen --config codegen.ts",
-    "graphql:codegen:api": "graphql-codegen --config codegen.ts"
+    "graphql:codegen": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs",
+    "graphql:codegen:api": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",

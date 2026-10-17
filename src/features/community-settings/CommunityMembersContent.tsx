@@ -8,6 +8,7 @@ import {
   Group,
   Menu,
   Modal,
+  Radio,
   ScrollArea,
   Stack,
   Table,
@@ -20,12 +21,8 @@ import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { showNotification } from "@/components/Feedback"
 
-export type CommunityMember = {
-  id: string
-  name: string
-  role: "admin" | "member"
-  isSelf?: boolean
-}
+import type { CommunityMember } from "@/features/community/CommunityProvider"
+export type { CommunityMember } from "@/features/community/CommunityProvider"
 export const COMMUNITY_MEMBER_LIMIT = 30
 export const COMMUNITY_ADMIN_LIMIT = 3
 const previewMembers: CommunityMember[] = [
@@ -35,22 +32,34 @@ const previewMembers: CommunityMember[] = [
   { id: "m3", name: "鈴木 太郎", role: "member" },
 ]
 type SortKey = "name" | "role"
+// Members start with a single-column, Japanese-locale name ascending sort.
+const INITIAL_SORT_KEY: SortKey = "name"
+const INITIAL_SORT_DESCENDING = false
 export function CommunityMembersContent({
   members = previewMembers,
   onLeave,
   onLeaveSuccess,
+  onChangeRole,
+  onRemoveMember,
 }: {
   members?: CommunityMember[]
   onLeave?: () => Promise<void>
   onLeaveSuccess?: () => void
+  onChangeRole?: (userId: string, role: "admin" | "member") => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
 }) {
   const [query, setQuery] = useState("")
-  const [sortKey, setSortKey] = useState<SortKey>("name")
-  const [descending, setDescending] = useState(false)
+  const [sortKey, setSortKey] = useState<SortKey>(INITIAL_SORT_KEY)
+  const [descending, setDescending] = useState(INITIAL_SORT_DESCENDING)
   const [opened, setOpened] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
   const [done, setDone] = useState(false)
+  const [roleTarget, setRoleTarget] = useState<CommunityMember | null>(null)
+  const [selectedRole, setSelectedRole] = useState<"admin" | "member">("member")
+  const [roleBusy, setRoleBusy] = useState(false)
+  const [removeTarget, setRemoveTarget] = useState<CommunityMember | null>(null)
+  const [removeBusy, setRemoveBusy] = useState(false)
   const self = members.find((member) => member.isSelf)
   const adminCount = members.filter((member) => member.role === "admin").length
   const memberLimitReached = members.length >= COMMUNITY_MEMBER_LIMIT
@@ -98,8 +107,8 @@ export function CommunityMembersContent({
       setOpened(false)
       showNotification({
         kind: "success",
-        title: "Communityから退会しました",
-        message: "退会処理が完了しました。",
+        title: "Communityを退会",
+        description: "Communityから退会しました。",
       })
       onLeaveSuccess?.()
     } catch {
@@ -108,6 +117,34 @@ export function CommunityMembersContent({
       )
     } finally {
       setBusy(false)
+    }
+  }
+  const confirmRoleChange = async () => {
+    if (
+      !roleTarget ||
+      !onChangeRole ||
+      roleBusy ||
+      selectedRole === roleTarget.role ||
+      (selectedRole === "admin" && adminLimitReached) ||
+      (selectedRole === "member" &&
+        roleTarget.role === "admin" &&
+        adminCount <= 1)
+    )
+      return
+    setRoleBusy(true)
+    try {
+      if (await onChangeRole(roleTarget.id, selectedRole)) setRoleTarget(null)
+    } finally {
+      setRoleBusy(false)
+    }
+  }
+  const confirmRemoval = async () => {
+    if (!removeTarget || !onRemoveMember || removeBusy) return
+    setRemoveBusy(true)
+    try {
+      if (await onRemoveMember(removeTarget.id)) setRemoveTarget(null)
+    } finally {
+      setRemoveBusy(false)
     }
   }
   return (
@@ -228,8 +265,24 @@ export function CommunityMembersContent({
                                   </Button>
                                 </Menu.Target>
                                 <Menu.Dropdown>
-                                  <Menu.Item disabled>役割を変更</Menu.Item>
-                                  <Menu.Item disabled color="red">
+                                  <Menu.Item
+                                    disabled={!onChangeRole}
+                                    onClick={() => {
+                                      setRoleTarget(member)
+                                      setSelectedRole(member.role)
+                                    }}
+                                  >
+                                    役割を変更
+                                  </Menu.Item>
+                                  <Menu.Item
+                                    disabled={
+                                      !onRemoveMember ||
+                                      (member.role === "admin" &&
+                                        adminCount <= 1)
+                                    }
+                                    onClick={() => setRemoveTarget(member)}
+                                    color="red"
+                                  >
                                     除外
                                   </Menu.Item>
                                 </Menu.Dropdown>
@@ -263,11 +316,6 @@ export function CommunityMembersContent({
           <Text size="sm">
             退会すると、このCommunityへのアクセスと、自分が管理するMediaのこのCommunityへの共有・分類が解除されます。アカウントやCommunity管理Mediaは削除されません。
           </Text>
-          {blocked && (
-            <Text size="sm" c="red">
-              最後のAdministratorは退会できません。別の参加者をAdministratorに変更してから退会してください。
-            </Text>
-          )}
           {done && (
             <Text size="sm" c="green">
               退会処理が完了しました。
@@ -277,14 +325,134 @@ export function CommunityMembersContent({
             <Button
               color="red"
               variant="light"
-              disabled={blocked || done}
+              disabled={!onLeave || blocked || done}
               onClick={() => setOpened(true)}
             >
               Communityから退会する
             </Button>
           </Group>
+          {blocked && (
+            <Text size="sm" c="red">
+              最後のAdministratorは退会できません。別の参加者をAdministratorに変更してから退会してください。
+            </Text>
+          )}
         </Stack>
       </Box>
+      <Modal
+        opened={removeTarget !== null}
+        onClose={() => {
+          if (!removeBusy) setRemoveTarget(null)
+        }}
+        title="メンバーを除外"
+        centered
+      >
+        <Stack gap="md">
+          <Text fw={600}>
+            {removeTarget?.name}をこのCommunityから除外しますか？
+          </Text>
+          <Text size="sm">
+            除外すると、このメンバーはCommunityへアクセスできなくなります。対象者が管理するMediaの、このCommunityへの共有と分類は解除されます。
+          </Text>
+          <Text size="sm">
+            対象者のアカウントやPersonal
+            Media、Communityが管理するMediaは削除されません。
+          </Text>
+          <Text size="sm" c="dimmed">
+            除外後に元の参加状態へ自動的には戻りません。
+          </Text>
+          <Group justify="flex-end">
+            <Button
+              variant="default"
+              disabled={removeBusy}
+              onClick={() => setRemoveTarget(null)}
+            >
+              キャンセル
+            </Button>
+            <Button
+              color="red"
+              loading={removeBusy}
+              onClick={() => void confirmRemoval()}
+            >
+              除外する
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+      <Modal
+        opened={roleTarget !== null}
+        onClose={() => {
+          if (!roleBusy) setRoleTarget(null)
+        }}
+        title="役割を変更"
+        centered
+      >
+        <Stack gap="md">
+          <Text size="sm">
+            {roleTarget?.name}のCommunity内の役割を変更します。
+          </Text>
+          <Stack gap={4}>
+            <Text size="sm" fw={500}>
+              現在の役割
+            </Text>
+            <Badge variant="light">
+              {roleTarget?.role === "admin" ? "Administrator" : "Member"}
+            </Badge>
+          </Stack>
+          <Radio.Group
+            label="変更後の役割"
+            value={selectedRole}
+            onChange={(value) => setSelectedRole(value as "admin" | "member")}
+          >
+            <Stack gap="sm" mt="sm">
+              <Radio
+                value="admin"
+                label="Administrator"
+                description="Communityの設定やメンバーを管理できます。"
+                disabled={roleTarget?.role !== "admin" && adminLimitReached}
+              />
+              <Radio
+                value="member"
+                label="Member"
+                description="Communityに参加し、許可されたMediaを利用できます。"
+                disabled={roleTarget?.role === "admin" && adminCount <= 1}
+              />
+            </Stack>
+          </Radio.Group>
+          {roleTarget?.role === "admin" && adminCount <= 1 && (
+            <Text size="sm" c="red">
+              最後のAdministratorはMemberに変更できません。
+            </Text>
+          )}
+          {roleTarget?.role !== "admin" && adminLimitReached && (
+            <Text size="sm" c="dimmed">
+              Administratorの上限に達しているため変更できません。
+            </Text>
+          )}
+          <Group justify="flex-end">
+            <Button
+              variant="default"
+              disabled={roleBusy}
+              onClick={() => setRoleTarget(null)}
+            >
+              キャンセル
+            </Button>
+            <Button
+              loading={roleBusy}
+              disabled={
+                !onChangeRole ||
+                selectedRole === roleTarget?.role ||
+                (selectedRole === "admin" && adminLimitReached) ||
+                (selectedRole === "member" &&
+                  roleTarget?.role === "admin" &&
+                  adminCount <= 1)
+              }
+              onClick={() => void confirmRoleChange()}
+            >
+              変更する
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
       <Modal
         opened={opened}
         onClose={close}

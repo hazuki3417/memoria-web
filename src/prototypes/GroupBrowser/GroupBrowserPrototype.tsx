@@ -309,8 +309,8 @@ export function GroupBrowserPrototype() {
     create.close()
     showNotification({
       kind: "success",
-      title: "Groupを作成しました",
-      message: `「${name}」を作成しました。`,
+      title: "Groupを作成",
+      description: `「${name}」を作成しました。`,
     })
   }
   const [query, setQuery] = useState("")

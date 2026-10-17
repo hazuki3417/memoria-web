@@ -237,7 +237,7 @@ function MediaBrowserContent({
     showNotification({
       kind: "info",
       title: kind === "group" ? "Groupへの追加" : "Mediaの削除",
-      message:
+      description:
         kind === "group"
           ? `${count}件のMediaを${groupTargets.length}件のGroup（${groupTargets.join("、")}）へ追加する操作を確認しました。実際のデータは変更されていません。`
           : `${count}件のMediaを削除する操作を確認しました。実際のデータは削除されていません。`,

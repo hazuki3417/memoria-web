@@ -60,8 +60,8 @@ export function UserProfilePrototype({
     const success = kind === "success"
     showNotification({
       kind: success ? "success" : "error",
-      title: success ? "保存しました" : "保存できませんでした",
-      message: success
+      title: "プロフィールを保存",
+      description: success
         ? "プロフィールを更新しました。"
         : "保存処理中に問題が発生しました。変更内容は保持されています。もう一度お試しください。",
     })

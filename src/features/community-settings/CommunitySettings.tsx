@@ -1,7 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { CommunityMembersContent } from "./CommunityMembersContent"
+import { useEffect, useState } from "react"
+import {
+  CommunityMembersContent,
+  type CommunityMember,
+} from "./CommunityMembersContent"
 import {
   SettingsUsage,
   type SettingsUsageData,
@@ -44,11 +47,25 @@ export function CommunitySettings({
   communityId = "photo-club",
   section = "general",
   onNavigate,
+  communityName,
+  onSaveName,
+  members,
+  onChangeMemberRole,
+  onRemoveMember,
+  onLeaveCommunity,
+  onLeaveSuccess,
 }: {
   role?: Role
   communityId?: string
   section?: CommunitySettingsSection
   onNavigate?: (href: string) => void
+  communityName?: string
+  onSaveName?: (name: string) => Promise<boolean>
+  members?: CommunityMember[]
+  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
+  onLeaveCommunity?: () => Promise<void>
+  onLeaveSuccess?: () => void
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -59,8 +76,14 @@ export function CommunitySettings({
   }
   const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
-  const [name, setName] = useState("家族のアルバム")
+  const [name, setName] = useState(communityName ?? "家族のアルバム")
   const [draft, setDraft] = useState(name)
+  const [savingName, setSavingName] = useState(false)
+  useEffect(() => {
+    if (communityName === undefined) return
+    setName(communityName)
+    setDraft(communityName)
+  }, [communityName])
   const [invitation, setInvitation] = useState<InvitationState>("none")
   const [expiresAt, setExpiresAt] = useState("")
   const [generation, setGeneration] = useState(0)
@@ -83,14 +106,22 @@ export function CommunitySettings({
         .replaceAll("-", "/"),
     )
     setBusy(false)
-    showNotification({ kind: "success", title: "招待URLを発行しました" })
+    showNotification({
+      kind: "success",
+      title: "招待URLを発行",
+      description: "招待URLを発行しました。",
+    })
   }
 
   const changeInvitation = () => {
     if (confirm === "revoke") {
       setInvitation("revoked")
       setExpiresAt("")
-      showNotification({ kind: "success", title: "招待URLを無効化しました" })
+      showNotification({
+        kind: "success",
+        title: "招待URLを無効化",
+        description: "招待URLを無効化しました。",
+      })
     } else {
       issue()
     }
@@ -101,9 +132,17 @@ export function CommunitySettings({
     if (!active) return
     try {
       await navigator.clipboard.writeText(invitationUrl)
-      showNotification({ kind: "success", title: "招待URLをコピーしました" })
+      showNotification({
+        kind: "success",
+        title: "招待URLをコピー",
+        description: "招待URLをコピーしました。",
+      })
     } catch {
-      showNotification({ kind: "error", title: "コピーに失敗しました" })
+      showNotification({
+        kind: "error",
+        title: "招待URLをコピー",
+        description: "コピーに失敗しました。",
+      })
     }
   }
 
@@ -156,15 +195,34 @@ export function CommunitySettings({
             <Box>
               <Button
                 size="sm"
-                disabled={!dirty || invalid}
+                disabled={!dirty || invalid || savingName}
+                loading={savingName}
                 onClick={() => {
+                  if (savingName) return
                   const updated = draft.trim()
-                  setName(updated)
-                  setDraft(updated)
-                  showNotification({
-                    kind: "success",
-                    title: "Community名を変更しました",
-                  })
+                  if (!onSaveName) {
+                    setName(updated)
+                    setDraft(updated)
+                    showNotification({
+                      kind: "success",
+                      title: "Community名を変更",
+                      description: "Community名を変更しました。",
+                    })
+                    return
+                  }
+                  setSavingName(true)
+                  void onSaveName(updated)
+                    .then((saved) => {
+                      if (!saved) return
+                      setName(updated)
+                      setDraft(updated)
+                      showNotification({
+                        kind: "success",
+                        title: "Community名を変更",
+                        description: "Community名を変更しました。",
+                      })
+                    })
+                    .finally(() => setSavingName(false))
                 }}
               >
                 保存
@@ -294,17 +352,13 @@ export function CommunitySettings({
     </Stack>
   )
 
-  // Prototype-only operation: replace with the Membership API when available.
-  const mockLeave = async () => {
-    await Promise.resolve()
-  }
   const membersContent = (
     <CommunityMembersContent
-      onLeave={mockLeave}
-      onLeaveSuccess={() => {
-        if (onNavigate) onNavigate("/dashboard")
-        else window.location.assign("/dashboard")
-      }}
+      members={members}
+      onChangeRole={onChangeMemberRole}
+      onRemoveMember={onRemoveMember}
+      onLeave={onLeaveCommunity}
+      onLeaveSuccess={onLeaveSuccess}
     />
   )
   const communityUsage: SettingsUsageData = {

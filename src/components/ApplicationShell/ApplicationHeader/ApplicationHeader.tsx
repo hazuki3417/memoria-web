@@ -10,12 +10,14 @@ export function ApplicationHeader({
   reserveNavigationSpace = false,
   context,
   account,
+  onTitleClick,
 }: {
   accentColor?: string
   leading?: ReactNode
   reserveNavigationSpace?: boolean
   context?: ReactNode
   account?: ReactNode
+  onTitleClick?: () => void
 }) {
   return (
     <AppShell.Header
@@ -33,9 +35,29 @@ export function ApplicationHeader({
                 hidden
               />
             ) : null)}
-          <Text fw={750} size="lg">
-            Memoria
-          </Text>
+          {onTitleClick ? (
+            <Text
+              component="button"
+              type="button"
+              fw={750}
+              size="lg"
+              onClick={onTitleClick}
+              aria-label="Memoria - Dashboardへ移動"
+              style={{
+                border: 0,
+                padding: 0,
+                background: "transparent",
+                color: "inherit",
+                cursor: "pointer",
+              }}
+            >
+              Memoria
+            </Text>
+          ) : (
+            <Text fw={750} size="lg">
+              Memoria
+            </Text>
+          )}
           {context}
         </Group>
         {account}

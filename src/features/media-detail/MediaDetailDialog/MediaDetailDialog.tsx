@@ -47,7 +47,7 @@ export function MediaDetailDialog({
     showNotification({
       kind: "info",
       title: "Mediaの削除",
-      message:
+      description:
         "Mediaの削除操作を確認しました。実際のデータは削除されていません。",
     })
   }

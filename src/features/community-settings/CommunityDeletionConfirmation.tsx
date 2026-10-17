@@ -23,6 +23,7 @@ type Props = {
   managedMediaCount: number
   isAdministrator: boolean
   onDelete?: () => Promise<void>
+  onReviewChanged?: () => void
   onNavigate?: (href: string) => void
 }
 
@@ -32,6 +33,7 @@ export function CommunityDeletionConfirmation({
   managedMediaCount,
   isAdministrator,
   onDelete,
+  onReviewChanged,
   onNavigate,
 }: Props) {
   const router = useRouter()
@@ -42,6 +44,7 @@ export function CommunityDeletionConfirmation({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
   const [completed, setCompleted] = useState(false)
+  const [outcomeUnknown, setOutcomeUnknown] = useState(false)
   const settingsPath = `/communities/${encodeURIComponent(communityId)}/settings`
   const navigate = (href: string) =>
     onNavigate ? onNavigate(href) : router.push(href)
@@ -52,7 +55,8 @@ export function CommunityDeletionConfirmation({
     confirmation === communityName &&
     !!onDelete &&
     !busy &&
-    !completed
+    !completed &&
+    !outcomeUnknown
 
   const remove = async () => {
     if (!canDelete || !onDelete) return
@@ -63,18 +67,26 @@ export function CommunityDeletionConfirmation({
       setCompleted(true)
       showNotification({
         kind: "success",
-        title: "Communityを削除しました",
-        message: "Communityの削除処理が完了しました。",
+        title: "Community削除の受付",
+        description:
+          "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
       })
       navigate("/dashboard")
-    } catch {
+    } catch (caught) {
+      const changed =
+        caught instanceof Error && caught.message === "REVIEW_CHANGED"
       setError(
-        "削除処理に失敗しました。最新の状態を確認して再試行してください。",
+        changed
+          ? "削除対象の状態が変わりました。最新の内容で確認をやり直してください。"
+          : "削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。",
       )
+      if (changed) onReviewChanged?.()
+      else setOutcomeUnknown(true)
       showNotification({
         kind: "error",
-        title: "Communityを削除できませんでした",
-        message: "現在の状態を確認して再試行してください。",
+        title: "Communityを削除",
+        description:
+          "最新の状態を確認してください。結果不明の操作を無条件に再実行しないでください。",
       })
     } finally {
       setBusy(false)
@@ -235,9 +247,16 @@ export function CommunityDeletionConfirmation({
                 </FeedbackAlert>
               )}
               {error && (
-                <Text size="sm" c="red" role="alert">
-                  {error}
-                </Text>
+                <Stack gap="xs">
+                  <Text size="sm" c="red" role="alert">
+                    {error}
+                  </Text>
+                  {outcomeUnknown && onReviewChanged && (
+                    <Button variant="default" onClick={onReviewChanged}>
+                      最新の状態を確認する
+                    </Button>
+                  )}
+                </Stack>
               )}
             </Stack>
           )}
