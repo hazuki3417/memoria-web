@@ -55,7 +55,7 @@ export function UserRegistrationPrototype({
     showNotification({
       kind: success ? "success" : "error",
       title: success ? "登録しました" : "登録できませんでした",
-      message: success
+      description: success
         ? "登録が完了しました。"
         : "入力内容は保持されています。再試行してください。",
     })
