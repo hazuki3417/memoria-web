@@ -1,8 +1,7 @@
 "use client"
 
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode, type Dispatch, type SetStateAction } from "react"
-import { getCommunityDetailsAction, getCommunityMembersAction } from "./actions"
-
+import { createContext, useContext, type ReactNode } from "react"
+import { useCommunityDetailsQuery, useCommunityMembersQuery, useCurrentUserQuery } from "@/infrastructure/graphql/generated"
 
 export type CommunityMember = {
   id: string
@@ -17,57 +16,33 @@ type CommunityData = {
   members: CommunityMember[] | null
   loadError: boolean
   membersError: boolean
-  setName: Dispatch<SetStateAction<string | null>>
-  setMembers: Dispatch<SetStateAction<CommunityMember[] | null>>
 }
 
-const Context = createContext<CommunityData | null>(null)
+// The Context provides route identity only; Apollo owns the server state.
+const Context = createContext<string | null>(null)
 
 export function CommunityProvider({ communityId, children }: { communityId: string; children: ReactNode }) {
-  const [name, setName] = useState<string | null>(null)
-  const [members, setMembers] = useState<CommunityMember[] | null>(null)
-  const [loadError, setLoadError] = useState(false)
-  const [membersError, setMembersError] = useState(false)
-  const requested = useRef(false)
-  const mounted = useRef(true)
-
-  useEffect(() => {
-    mounted.current = true
-    return () => { mounted.current = false }
-  }, [])
-
-  useEffect(() => {
-    if (requested.current) return
-    requested.current = true
-    void getCommunityDetailsAction(communityId).then((result) => {
-      if (!mounted.current) return
-      if (result.kind === "loaded") setName(result.community.name)
-      else setLoadError(true)
-    }).catch(() => { if (mounted.current) setLoadError(true) })
-    void getCommunityMembersAction(communityId).then((result) => {
-      if (!mounted.current) return
-      if (result.kind !== "loaded") {
-        setMembersError(true)
-        return
-      }
-      setMembers(result.members.map((member) => ({
-        id: member.userId,
-        name: member.nickname,
-        role: member.role,
-        isSelf: member.userId === result.currentUserId,
-      })))
-    }).catch(() => { if (mounted.current) setMembersError(true) })
-  }, [communityId])
-
-  return (
-    <Context.Provider value={{ communityId, name, members, loadError, membersError, setName, setMembers }}>
-      {children}
-    </Context.Provider>
-  )
+  return <Context.Provider value={communityId}>{children}</Context.Provider>
 }
 
-export function useCommunity() {
-  const data = useContext(Context)
-  if (!data) throw new Error("CommunityProvider is required")
-  return data
+export function useCommunity(): CommunityData {
+  const communityId = useContext(Context)
+  if (!communityId) throw new Error("CommunityProvider is required")
+  const community = useCommunityDetailsQuery({ variables: { communityId } })
+  const members = useCommunityMembersQuery({ variables: { communityId } })
+  const currentUser = useCurrentUserQuery()
+  return {
+    communityId,
+    name: community.data?.community?.name ?? null,
+    members: members.data?.communityMembers && currentUser.data
+      ? members.data.communityMembers.map((member) => ({
+          id: member.userId,
+          name: member.nickname,
+          role: member.role,
+          isSelf: member.userId === currentUser.data?.me?.id,
+        }))
+      : null,
+    loadError: Boolean(community.error) || (!community.loading && !!community.data && !community.data.community),
+    membersError: Boolean(members.error || currentUser.error),
+  }
 }
