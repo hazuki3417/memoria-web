@@ -108,8 +108,8 @@ function ProfileContent({
       setSaveState("idle")
       showNotification({
         kind: "success",
-        title: "保存しました",
-        message: "プロフィールを更新しました。",
+        title: "プロフィールを保存",
+        description: "プロフィールを更新しました。",
       })
     } catch (error) {
       setSaveState(
