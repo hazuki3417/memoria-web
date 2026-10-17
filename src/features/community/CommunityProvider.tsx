@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode, type Dispatch, type SetStateAction } from "react"
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode, type Dispatch, type SetStateAction } from "react"
 import { getCommunityDetailsAction, getCommunityMembersAction } from "./actions"
 
 
@@ -19,7 +19,6 @@ type CommunityData = {
   membersError: boolean
   setName: Dispatch<SetStateAction<string | null>>
   setMembers: Dispatch<SetStateAction<CommunityMember[] | null>>
-  ensureLoaded: () => void
 }
 
 const Context = createContext<CommunityData | null>(null)
@@ -37,7 +36,7 @@ export function CommunityProvider({ communityId, children }: { communityId: stri
     return () => { mounted.current = false }
   }, [])
 
-  const ensureLoaded = useCallback(() => {
+  useEffect(() => {
     if (requested.current) return
     requested.current = true
     void getCommunityDetailsAction(communityId).then((result) => {
@@ -61,7 +60,7 @@ export function CommunityProvider({ communityId, children }: { communityId: stri
   }, [communityId])
 
   return (
-    <Context.Provider value={{ communityId, name, members, loadError, membersError, setName, setMembers, ensureLoaded }}>
+    <Context.Provider value={{ communityId, name, members, loadError, membersError, setName, setMembers }}>
       {children}
     </Context.Provider>
   )
