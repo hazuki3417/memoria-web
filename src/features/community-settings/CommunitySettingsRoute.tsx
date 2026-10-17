@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Text } from "@mantine/core"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
-import { getCommunityDetailsAction, getCommunityMembersAction, changeCommunityMemberRoleAction, removeCommunityMemberAction, leaveCommunityAction, renameCommunityAction } from "./actions"
-import type { CommunityMember } from "./CommunityMembersContent"
+import { changeCommunityMemberRoleAction, removeCommunityMemberAction, leaveCommunityAction, renameCommunityAction } from "./actions"
+import { useCommunitySettingsData } from "./CommunitySettingsDataProvider"
 import {
   CommunitySettings,
   type CommunitySettingsSection,
@@ -19,42 +19,11 @@ export function CommunitySettingsRoute({
   section?: CommunitySettingsSection
 }) {
   const router = useRouter()
-  const [name, setName] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState(false)
-  const [members, setMembers] = useState<CommunityMember[] | null>(null)
-  const [membersError, setMembersError] = useState(false)
+  const { name, members, loadError, membersError, setName, setMembers, ensureLoaded } = useCommunitySettingsData()
 
   useEffect(() => {
-    let cancelled = false
-    setName(null)
-    setLoadError(false)
-    void getCommunityDetailsAction(communityId).then((result) => {
-      if (cancelled) return
-      if (result.kind === "loaded") setName(result.community.name)
-      else setLoadError(true)
-    }).catch(() => { if (!cancelled) setLoadError(true) })
-    return () => { cancelled = true }
-  }, [communityId])
-
-  useEffect(() => {
-    let cancelled = false
-    setMembers(null)
-    setMembersError(false)
-    void getCommunityMembersAction(communityId).then((result) => {
-      if (cancelled) return
-      if (result.kind !== "loaded") {
-        setMembersError(true)
-        return
-      }
-      setMembers(result.members.map((member) => ({
-        id: member.userId,
-        name: member.nickname,
-        role: member.role,
-        isSelf: member.userId === result.currentUserId,
-      })))
-    }).catch(() => { if (!cancelled) setMembersError(true) })
-    return () => { cancelled = true }
-  }, [communityId])
+    ensureLoaded()
+  }, [ensureLoaded])
 
   if (loadError) return <Text c="red">Community情報を取得できませんでした。再読み込みしてください。</Text>
   if (name === null) return <Text c="dimmed">Community情報を読み込み中です。</Text>
