@@ -39,7 +39,7 @@ export function useMediaDetailEditing(detail: MediaItem | null) {
     setDetailEditor(null)
     showNotification({
       kind: "success",
-      title: `${label}を更新しました`,
+      title: `${label}を更新`,
       description: "画面上の変更を反映しました。サーバーには保存されていません。",
     })
   }
