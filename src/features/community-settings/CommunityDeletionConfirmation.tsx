@@ -65,7 +65,6 @@ export function CommunityDeletionConfirmation({
     try {
       await onDelete()
       setCompleted(true)
-      window.dispatchEvent(new CustomEvent("memoria:community-deleted", { detail: { id: communityId } }))
       showNotification({
         kind: "success",
         title: "Community削除の受付",
