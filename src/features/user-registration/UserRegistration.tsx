@@ -57,7 +57,7 @@ export function UserRegistration({
     const success = kind === "success"
     showNotification({
       kind: success ? "success" : "error",
-      title: success ? "登録しました" : "登録できませんでした",
+      title: "User登録",
       description: success
         ? "登録が完了しました。"
         : "入力内容は保持されています。再試行してください。",
