@@ -1,47 +1,27 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { Alert, Button, Stack } from "@mantine/core"
 import { useParams } from "next/navigation"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { CommunityDeletionConfirmation } from "@/features/community-settings/CommunityDeletionConfirmation"
-import { getCommunityDeletionSnapshotAction, acceptCommunityDeletionAction } from "@/features/community-settings/actions"
-import type { CommunityDeletionSnapshotRecord } from "@/infrastructure/graphql"
+import { MyCommunitiesDocument, useAcceptCommunityDeletionMutation, useCommunityDeletionSnapshotQuery } from "@/infrastructure/graphql/generated"
 
 export default function CommunityDeletePage() {
   const { communityId } = useParams<{ communityId: string }>()
-  const [snapshot, setSnapshot] = useState<CommunityDeletionSnapshotRecord | null>(null)
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(true)
-  const [retry, setRetry] = useState(0)
-
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setSnapshot(null)
-    setError("")
-    void getCommunityDeletionSnapshotAction(communityId)
-      .then((result) => {
-        if (cancelled) return
-        if (result.kind === "loaded") setSnapshot(result.snapshot)
-        else setError(result.kind === "not_found" || result.kind === "forbidden"
-          ? "Community削除の確認情報を表示できません。"
-          : "削除対象の確認情報を取得できませんでした。")
-      })
-      .catch(() => {
-        if (!cancelled) setError("削除対象の確認情報を取得できませんでした。")
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => { cancelled = true }
-  }, [communityId, retry])
+  const { data, loading, error, refetch } = useCommunityDeletionSnapshotQuery({
+    variables: { communityId },
+    fetchPolicy: "network-only",
+  })
+  const [acceptDeletion] = useAcceptCommunityDeletionMutation()
+  const snapshot = data?.communityDeletionSnapshot
 
   if (loading) return <LoadingBoundary loading label="Community削除の確認情報を読み込み中">{null}</LoadingBoundary>
   if (!snapshot) return (
     <Stack gap="md">
-      <Alert color="red" title="確認情報を取得できません">{error}</Alert>
-      <Button variant="default" onClick={() => setRetry((current) => current + 1)}>再試行</Button>
+      <Alert color="red" title="確認情報を取得できません">{
+        error ? "削除対象の確認情報を取得できませんでした。" : "Community削除の確認情報を表示できません。"
+      }</Alert>
+      <Button variant="default" onClick={() => void refetch()}>再試行</Button>
     </Stack>
   )
   return (
@@ -52,12 +32,16 @@ export default function CommunityDeletePage() {
       managedMediaCount={snapshot.managedMediaCount}
       isAdministrator
       onDelete={async () => {
-        const result = await acceptCommunityDeletionAction(communityId, snapshot.revision)
-        if (result.kind === "accepted") return
-        if (result.kind === "conflict") throw new Error("REVIEW_CHANGED")
-        throw new Error("ACCEPTANCE_UNCONFIRMED")
+        try {
+          const result = await acceptDeletion({ variables: { input: { communityId, revision: snapshot.revision } }, refetchQueries: [MyCommunitiesDocument], awaitRefetchQueries: true })
+          if (!result.data?.acceptCommunityDeletion.accepted) throw new Error("ACCEPTANCE_UNCONFIRMED")
+        } catch (caught) {
+          const graphError = caught as { graphQLErrors?: Array<{ extensions?: { code?: string } }> }
+          if (graphError.graphQLErrors?.some((item) => item.extensions?.code === "CONFLICT")) throw new Error("REVIEW_CHANGED")
+          throw caught
+        }
       }}
-      onReviewChanged={() => setRetry((current) => current + 1)}
+      onReviewChanged={() => void refetch()}
     />
   )
 }
