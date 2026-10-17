@@ -309,3 +309,38 @@ export async function leaveMemoriaCommunity(communityId: string) {
     "LeaveCommunity", { communityId }, "leaveCommunity",
   )
 }
+
+export type CommunityDeletionSnapshotRecord = {
+  communityId: string
+  name: string
+  managedMediaCount: number
+  revision: string
+}
+
+export type CommunityDeletionSnapshotResult =
+  | { kind: "loaded"; snapshot: CommunityDeletionSnapshotRecord }
+  | { kind: "unavailable" | "not_found" | "forbidden" | "error" }
+
+const COMMUNITY_DELETION_SNAPSHOT_QUERY =
+  "query CommunityDeletionSnapshot($communityId: ID!) { communityDeletionSnapshot(communityId: $communityId) { communityId name managedMediaCount revision } }"
+
+export async function getMemoriaCommunityDeletionSnapshot(
+  communityId: string,
+): Promise<CommunityDeletionSnapshotResult> {
+  const response = await request<{ communityDeletionSnapshot: CommunityDeletionSnapshotRecord }>(
+    COMMUNITY_DELETION_SNAPSHOT_QUERY,
+    "CommunityDeletionSnapshot",
+    { communityId },
+  )
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length) return {
+    kind: codes.includes("UNAUTHENTICATED") ? "unavailable"
+      : codes.includes("NOT_FOUND") ? "not_found"
+      : codes.includes("FORBIDDEN") ? "forbidden" : "error",
+  }
+  const snapshot = response.result.data?.communityDeletionSnapshot
+  if (!snapshot || !snapshot.revision || !Number.isSafeInteger(snapshot.managedMediaCount))
+    return { kind: "error" }
+  return { kind: "loaded", snapshot }
+}
