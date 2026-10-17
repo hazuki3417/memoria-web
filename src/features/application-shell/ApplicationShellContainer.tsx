@@ -3,7 +3,7 @@
 import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect, useState } from "react"
-import { createCommunityAction, listCommunitiesAction } from "./actions"
+import { MyCommunitiesDocument, useMyCommunitiesQuery, useCreateCommunityMutation } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
 import {
   ApplicationAccountMenu,
@@ -45,9 +45,10 @@ export function ApplicationShellContainer({
   const [createOpened, setCreateOpened] = useState(false)
   const [draftName, setDraftName] = useState("")
   const [createError, setCreateError] = useState("")
-  const [created, setCreated] = useState<{ id: string; label: string }[]>([])
-  const [communitiesLoaded, setCommunitiesLoaded] = useState(false)
-  const [communitiesError, setCommunitiesError] = useState(false)
+  const { data: communityData, loading: communitiesLoading, error: communitiesError } = useMyCommunitiesQuery()
+  const [createMutation] = useCreateCommunityMutation()
+  const created = communityData?.myCommunities.map((item) => ({ id: item.id, label: item.name })) ?? []
+  const communitiesLoaded = !communitiesLoading && !!communityData
   const [createBusy, setCreateBusy] = useState(false)
   const [rememberedContextKind, setRememberedContextKind] = useState<
     "personal" | "community"
@@ -91,47 +92,6 @@ export function ApplicationShellContainer({
     }
   }, [pathname])
 
-  useEffect(() => {
-    let cancelled = false
-    void listCommunitiesAction().then((result) => {
-      if (cancelled) return
-      if (result.kind === "loaded") {
-        setCreated(result.communities.map((item) => ({ id: item.id, label: item.name })))
-        setCommunitiesLoaded(true)
-        setCommunitiesError(false)
-      } else {
-        setCommunitiesError(true)
-      }
-    }).catch(() => { if (!cancelled) setCommunitiesError(true) })
-    return () => { cancelled = true }
-  }, [])
-
-  useEffect(() => {
-    const onRenamed = (event: Event) => {
-      const detail = (event as CustomEvent<{ id: string; name: string }>).detail
-      if (!detail?.id || !detail.name) return
-      setCreated((items) => items.map((item) =>
-        item.id === detail.id ? { ...item, label: detail.name } : item,
-      ))
-    }
-    window.addEventListener("memoria:community-renamed", onRenamed)
-    return () => window.removeEventListener("memoria:community-renamed", onRenamed)
-  }, [])
-
-  useEffect(() => {
-    const onDeleted = (event: Event) => {
-      const detail = (event as CustomEvent<{ id: string }>).detail
-      if (!detail?.id) return
-      setCreated((items) => items.filter((item) => item.id !== detail.id))
-      setRememberedCommunityId((id) => id === detail.id ? "" : id)
-      setRememberedContextKind((kind) =>
-        rememberedCommunityId === detail.id ? "personal" : kind,
-      )
-    }
-    window.addEventListener("memoria:community-deleted", onDeleted)
-    return () => window.removeEventListener("memoria:community-deleted", onDeleted)
-  }, [rememberedCommunityId])
-
   const closeCreate = () => {
     if (createBusy) return
     setCreateOpened(false)
@@ -147,15 +107,10 @@ export function ApplicationShellContainer({
     }
     setCreateBusy(true)
     try {
-      const result = await createCommunityAction(name)
-      if (result.kind !== "updated") {
-        setCreateError(result.kind === "validation"
-          ? "Community名を確認してください。"
-          : "Communityを作成できませんでした。再度お試しください。")
-        return
-      }
-      const { id, name: label } = result.community
-      setCreated((items) => [...items.filter((item) => item.id !== id), { id, label }])
+      const result = await createMutation({ variables: { input: { name } }, refetchQueries: [MyCommunitiesDocument], awaitRefetchQueries: true })
+      const community = result.data?.createCommunity.community
+      if (!community) throw new Error("Community creation did not return a Community")
+      const { id, name: label } = community
       setRememberedContextKind("community")
       setRememberedCommunityId(id)
       setCreateOpened(false)
@@ -163,6 +118,8 @@ export function ApplicationShellContainer({
       setCreateError("")
       showNotification({ kind: "success", title: "Communityを作成", description: `${label}を作成しました。` })
       router.push(`/communities/${encodeURIComponent(id)}/dashboard`)
+    } catch {
+      setCreateError("Communityを作成できませんでした。再度お試しください。")
     } finally {
       setCreateBusy(false)
     }
