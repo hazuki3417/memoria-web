@@ -16,6 +16,7 @@ export type {
   CommunityMembershipOperationResult,
   CommunityDeletionSnapshotRecord,
   CommunityDeletionSnapshotResult,
+  CommunityDeletionAcceptanceResult,
 } from "./server"
 export {
   getCurrentMemoriaUser,
@@ -31,4 +32,5 @@ export {
   removeMemoriaCommunityMember,
   leaveMemoriaCommunity,
   getMemoriaCommunityDeletionSnapshot,
+  acceptMemoriaCommunityDeletion,
 } from "./server"
