@@ -19,11 +19,7 @@ export function CommunitySettingsRoute({
   section?: CommunitySettingsSection
 }) {
   const router = useRouter()
-  const { name, members, loadError, membersError, setName, setMembers, ensureLoaded } = useCommunity()
-
-  useEffect(() => {
-    ensureLoaded()
-  }, [ensureLoaded])
+  const { name, members, loadError, membersError, setName, setMembers } = useCommunity()
 
   const [showPending, setShowPending] = useState(false)
   const pending = !loadError && !membersError && (name === null || members === null)
