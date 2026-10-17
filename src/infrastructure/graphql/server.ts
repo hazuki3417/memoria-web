@@ -344,3 +344,29 @@ export async function getMemoriaCommunityDeletionSnapshot(
     return { kind: "error" }
   return { kind: "loaded", snapshot }
 }
+
+export type CommunityDeletionAcceptanceResult =
+  | { kind: "accepted" }
+  | { kind: "unavailable" | "validation" | "not_found" | "forbidden" | "conflict" | "error" }
+
+export async function acceptMemoriaCommunityDeletion(
+  communityId: string,
+  revision: string,
+): Promise<CommunityDeletionAcceptanceResult> {
+  const response = await request<{ acceptCommunityDeletion: { accepted: boolean } }>(
+    "mutation AcceptCommunityDeletion($input: AcceptCommunityDeletionInput!) { acceptCommunityDeletion(input: $input) { accepted } }",
+    "AcceptCommunityDeletion",
+    { input: { communityId, revision } },
+  )
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length) return {
+    kind: codes.includes("UNAUTHENTICATED") ? "unavailable"
+      : codes.includes("VALIDATION") ? "validation"
+      : codes.includes("NOT_FOUND") ? "not_found"
+      : codes.includes("FORBIDDEN") ? "forbidden"
+      : codes.includes("CONFLICT") ? "conflict" : "error",
+  }
+  return response.result.data?.acceptCommunityDeletion?.accepted
+    ? { kind: "accepted" } : { kind: "error" }
+}
