@@ -5,7 +5,7 @@ import { Text } from "@mantine/core"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
 import { changeCommunityMemberRoleAction, removeCommunityMemberAction, leaveCommunityAction, renameCommunityAction } from "./actions"
-import { useCommunitySettingsData } from "./CommunitySettingsDataProvider"
+import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
   type CommunitySettingsSection,
@@ -19,7 +19,7 @@ export function CommunitySettingsRoute({
   section?: CommunitySettingsSection
 }) {
   const router = useRouter()
-  const { name, members, loadError, membersError, setName, setMembers, ensureLoaded } = useCommunitySettingsData()
+  const { name, members, loadError, membersError, setName, setMembers, ensureLoaded } = useCommunity()
 
   useEffect(() => {
     ensureLoaded()
