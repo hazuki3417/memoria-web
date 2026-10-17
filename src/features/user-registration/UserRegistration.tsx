@@ -13,7 +13,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
-import { registerUserAction } from "@/app/register/actions"
+import { useRegisterMemoriaUserMutation } from "@/infrastructure/graphql/generated"
 import {
   ApplicationHeader,
   ApplicationShell,
@@ -37,6 +37,7 @@ export function UserRegistration({
   reviewState?: ReviewState
 }) {
   const router = useRouter()
+  const [registerMutation] = useRegisterMemoriaUserMutation()
   const [nickname, setNickname] = useState(
     reviewState === "invalid"
       ? "   "
@@ -76,20 +77,23 @@ export function UserRegistration({
     if (invalid || registering || blocking || registered) return
     setStatus("registering")
     try {
-      const result = await registerUserAction(nickname)
-      if (result.kind === "registered") {
+      const result = await registerMutation({ variables: { input: { nickname: nickname.trim() } } })
+      if (result.data?.registerUser.user) {
         setStatus("registered")
         router.replace("/dashboard")
         router.refresh()
-      } else if (result.kind === "unavailable") {
+      } else {
+        setStatus("failure")
+        showFeedback("failure")
+      }
+    } catch (error) {
+      const failure = error as { networkError?: { statusCode?: number }; graphQLErrors?: Array<{ extensions?: { code?: string } }> }
+      if (failure.networkError?.statusCode === 401 || failure.graphQLErrors?.some((item) => item.extensions?.code === "UNAUTHENTICATED")) {
         setStatus("blocking")
       } else {
         setStatus("failure")
         showFeedback("failure")
       }
-    } catch {
-      setStatus("failure")
-      showFeedback("failure")
     }
   }
 
