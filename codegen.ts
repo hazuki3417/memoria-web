@@ -8,8 +8,9 @@ const config: CodegenConfig = {
       plugins: [
         "typescript",
         { "typescript-operations": { typesPrefix: "Operation" } },
+        "typescript-react-apollo",
       ],
-      config: { scalars: { DateTime: "string", Int64: "number", Upload: "File" } },
+      config: { withHooks: true, withComponent: false, withHOC: false, scalars: { DateTime: "string", Int64: "number", Upload: "File" } },
     },
   },
 }
