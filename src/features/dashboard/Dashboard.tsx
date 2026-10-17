@@ -313,8 +313,8 @@ export function Dashboard({
     window.sessionStorage.removeItem("memoria:registration-success")
     showNotification({
       kind: "success",
-      title: "登録しました",
-      message: "登録が完了しました。",
+      title: "User登録",
+      description: "登録が完了しました。",
     })
   }, [contextKind])
   const prefix =
