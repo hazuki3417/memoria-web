@@ -251,7 +251,7 @@ export function CommunityDeletionConfirmation({
                     </Button>
                   )}
                 </Stack>
-              )
+              )}
             </Stack>
           )}
           <Group gap="sm" justify="space-between" wrap="nowrap">
