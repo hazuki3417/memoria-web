@@ -4,8 +4,7 @@ import { Text } from "@mantine/core"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
-import { changeCommunityMemberRoleAction, removeCommunityMemberAction, leaveCommunityAction } from "./actions"
-import { MyCommunitiesDocument, useRenameCommunityMutation } from "@/infrastructure/graphql/generated"
+import { MyCommunitiesDocument, CommunityMembersDocument, useRenameCommunityMutation, useChangeCommunityMemberRoleMutation, useRemoveCommunityMemberMutation, useLeaveCommunityMutation } from "@/infrastructure/graphql/generated"
 import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
@@ -20,8 +19,11 @@ export function CommunitySettingsRoute({
   section?: CommunitySettingsSection
 }) {
   const router = useRouter()
-  const { name, members, loadError, membersError, setName, setMembers } = useCommunity()
+  const { name, members, loadError, membersError } = useCommunity()
   const [renameCommunity] = useRenameCommunityMutation()
+  const [changeRole] = useChangeCommunityMemberRoleMutation()
+  const [removeMember] = useRemoveCommunityMemberMutation()
+  const [leaveCommunity] = useLeaveCommunityMutation()
 
   const pending = !loadError && !membersError && (name === null || members === null)
 
@@ -39,12 +41,11 @@ export function CommunitySettingsRoute({
       section={section}
       onRemoveMember={async (userId) => {
         try {
-          const result = await removeCommunityMemberAction(communityId, userId)
-          if (result.kind !== "updated") {
+          const result = await removeMember({ variables: { input: { communityId, userId } }, refetchQueries: [CommunityMembersDocument], awaitRefetchQueries: true })
+          if (!result.data?.removeCommunityMember.success) {
             showNotification({ kind: "error", title: "メンバーを除外", description: "メンバーを除外できませんでした。" })
             return false
           }
-          setMembers((current) => current?.filter((member) => member.id !== userId) ?? null)
           showNotification({ kind: "success", title: "メンバーを除外", description: "メンバーを除外しました。" })
           return true
         } catch {
@@ -53,18 +54,17 @@ export function CommunitySettingsRoute({
         }
       }}
       onLeaveCommunity={async () => {
-        const result = await leaveCommunityAction(communityId)
-        if (result.kind !== "updated") throw new Error("leave failed")
+        const result = await leaveCommunity({ variables: { communityId }, refetchQueries: [MyCommunitiesDocument], awaitRefetchQueries: true })
+        if (!result.data?.leaveCommunity.success) throw new Error("leave failed")
       }}
       onLeaveSuccess={() => router.push("/dashboard")}
       onChangeMemberRole={async (userId, role) => {
         try {
-          const result = await changeCommunityMemberRoleAction(communityId, userId, role)
-          if (result.kind !== "updated") {
+          const result = await changeRole({ variables: { input: { communityId, userId, role } }, refetchQueries: [CommunityMembersDocument], awaitRefetchQueries: true })
+          if (!result.data?.changeCommunityMemberRole.success) {
             showNotification({ kind: "error", title: "メンバーの役割を変更", description: "メンバーの役割を変更できませんでした。" })
             return false
           }
-          setMembers((current) => current?.map((member) => member.id === userId ? {...member, role} : member) ?? null)
           showNotification({ kind: "success", title: "メンバーの役割を変更", description: "メンバーの役割を変更しました。" })
           return true
         } catch {
@@ -77,7 +77,6 @@ export function CommunitySettingsRoute({
         try {
           const result = await renameCommunity({ variables: { input: { communityId, name: nextName } }, refetchQueries: [MyCommunitiesDocument], awaitRefetchQueries: true })
           if (result.data?.renameCommunity.community) {
-            setName(result.data.renameCommunity.community.name)
             return true
           }
           showNotification({
