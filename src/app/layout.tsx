@@ -5,6 +5,7 @@ import { Notifications } from "@mantine/notifications"
 import type { Metadata } from "next"
 import { theme } from "@/lib/theme"
 import { ThemeProvider } from "@/providers/ThemeProvider"
+import { ApolloProvider } from "@/providers/ApolloProvider"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function RootLayout({
               notification: { pointerEvents: "auto" },
             }}
           />
-          {children}
+          <ApolloProvider>{children}</ApolloProvider>
         </ThemeProvider>
       </body>
     </html>
