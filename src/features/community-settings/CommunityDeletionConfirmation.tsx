@@ -63,8 +63,8 @@ export function CommunityDeletionConfirmation({
       setCompleted(true)
       showNotification({
         kind: "success",
-        title: "Communityを削除しました",
-        message: "Communityの削除処理が完了しました。",
+        title: "Communityを削除",
+        description: "Communityの削除処理が完了しました.",
       })
       navigate("/dashboard")
     } catch {
@@ -73,8 +73,8 @@ export function CommunityDeletionConfirmation({
       )
       showNotification({
         kind: "error",
-        title: "Communityを削除できませんでした",
-        message: "現在の状態を確認して再試行してください。",
+        title: "Communityを削除",
+        description: "現在の状態を確認して再試行してください。",
       })
     } finally {
       setBusy(false)
