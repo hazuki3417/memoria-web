@@ -118,6 +118,20 @@ export function ApplicationShellContainer({
     return () => window.removeEventListener("memoria:community-renamed", onRenamed)
   }, [])
 
+  useEffect(() => {
+    const onDeleted = (event: Event) => {
+      const detail = (event as CustomEvent<{ id: string }>).detail
+      if (!detail?.id) return
+      setCreated((items) => items.filter((item) => item.id !== detail.id))
+      setRememberedCommunityId((id) => id === detail.id ? "" : id)
+      setRememberedContextKind((kind) =>
+        rememberedCommunityId === detail.id ? "personal" : kind,
+      )
+    }
+    window.addEventListener("memoria:community-deleted", onDeleted)
+    return () => window.removeEventListener("memoria:community-deleted", onDeleted)
+  }, [rememberedCommunityId])
+
   const closeCreate = () => {
     if (createBusy) return
     setCreateOpened(false)
