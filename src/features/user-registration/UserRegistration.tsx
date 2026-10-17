@@ -13,7 +13,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
-import { CurrentUserDocument, useRegisterMemoriaUserMutation } from "@/infrastructure/graphql/generated"
+import { useRegisterMemoriaUserMutation } from "@/infrastructure/graphql/generated"
 import {
   ApplicationHeader,
   ApplicationShell,
@@ -77,7 +77,7 @@ export function UserRegistration({
     if (invalid || registering || blocking || registered) return
     setStatus("registering")
     try {
-      const result = await registerMutation({ variables: { input: { nickname: nickname.trim() } }, refetchQueries: [CurrentUserDocument], awaitRefetchQueries: true })
+      const result = await registerMutation({ variables: { input: { nickname: nickname.trim() } } })
       if (result.data?.registerUser.user) {
         setStatus("registered")
         router.replace("/dashboard")
