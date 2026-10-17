@@ -147,7 +147,7 @@ export function ApplicationShellContainer({
       setCreateOpened(false)
       setDraftName("")
       setCreateError("")
-      showNotification({ kind: "success", title: "Communityを作成しました", message: `${label}を作成しました。` })
+      showNotification({ kind: "success", title: "Communityを作成", description: `${label}を作成しました。` })
       router.push(`/communities/${encodeURIComponent(id)}/dashboard`)
     } finally {
       setCreateBusy(false)
