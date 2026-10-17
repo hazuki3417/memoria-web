@@ -40,7 +40,7 @@ export function useMediaDetailEditing(detail: MediaItem | null) {
     showNotification({
       kind: "success",
       title: `${label}を更新しました`,
-      message: "画面上の変更を反映しました。サーバーには保存されていません。",
+      description: "画面上の変更を反映しました。サーバーには保存されていません。",
     })
   }
   const addCommunityShare = () => {
@@ -61,8 +61,8 @@ export function useMediaDetailEditing(detail: MediaItem | null) {
     setDetailEditor(null)
     showNotification({
       kind: "success",
-      title: "Communityへ共有しました",
-      message: "画面上の共有先に追加しました。サーバーには保存されていません。",
+      title: "Communityへ共有",
+      description: "画面上の共有先に追加しました。サーバーには保存されていません。",
     })
   }
   const removeCommunityShare = () => {
@@ -84,8 +84,8 @@ export function useMediaDetailEditing(detail: MediaItem | null) {
     setUnshareTarget(null)
     showNotification({
       kind: "success",
-      title: "Communityの共有を解除しました",
-      message:
+      title: "Communityの共有を解除",
+      description:
         "画面上の共有先から解除しました。サーバーには保存されていません。",
     })
   }
