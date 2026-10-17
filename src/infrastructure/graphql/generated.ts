@@ -500,24 +500,24 @@ export const MyCommunitiesDocument = gql`
  */
 export function useMyCommunitiesQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    MyCommunitiesQuery,
-    MyCommunitiesQueryVariables
+    OperationMyCommunitiesQuery,
+    OperationMyCommunitiesQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<MyCommunitiesQuery, MyCommunitiesQueryVariables>(
+  return Apollo.useQuery<OperationMyCommunitiesQuery, OperationMyCommunitiesQueryVariables>(
     MyCommunitiesDocument,
     options,
   )
 }
 export function useMyCommunitiesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    MyCommunitiesQuery,
-    MyCommunitiesQueryVariables
+    OperationMyCommunitiesQuery,
+    OperationMyCommunitiesQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<MyCommunitiesQuery, MyCommunitiesQueryVariables>(
+  return Apollo.useLazyQuery<OperationMyCommunitiesQuery, OperationMyCommunitiesQueryVariables>(
     MyCommunitiesDocument,
     options,
   )
@@ -525,30 +525,30 @@ export function useMyCommunitiesLazyQuery(
 // @ts-ignore
 export function useMyCommunitiesSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    MyCommunitiesQuery,
-    MyCommunitiesQueryVariables
+    OperationMyCommunitiesQuery,
+    OperationMyCommunitiesQueryVariables
   >,
 ): Apollo.UseSuspenseQueryResult<
-  MyCommunitiesQuery,
-  MyCommunitiesQueryVariables
+  OperationMyCommunitiesQuery,
+  OperationMyCommunitiesQueryVariables
 >
 export function useMyCommunitiesSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        MyCommunitiesQuery,
-        MyCommunitiesQueryVariables
+        OperationMyCommunitiesQuery,
+        OperationMyCommunitiesQueryVariables
       >,
 ): Apollo.UseSuspenseQueryResult<
-  MyCommunitiesQuery | undefined,
-  MyCommunitiesQueryVariables
+  OperationMyCommunitiesQuery | undefined,
+  OperationMyCommunitiesQueryVariables
 >
 export function useMyCommunitiesSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        MyCommunitiesQuery,
-        MyCommunitiesQueryVariables
+        OperationMyCommunitiesQuery,
+        OperationMyCommunitiesQueryVariables
       >,
 ) {
   const options =
@@ -556,8 +556,8 @@ export function useMyCommunitiesSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions }
   return Apollo.useSuspenseQuery<
-    MyCommunitiesQuery,
-    MyCommunitiesQueryVariables
+    OperationMyCommunitiesQuery,
+    OperationMyCommunitiesQueryVariables
   >(MyCommunitiesDocument, options)
 }
 export type MyCommunitiesQueryHookResult = ReturnType<
@@ -570,8 +570,8 @@ export type MyCommunitiesSuspenseQueryHookResult = ReturnType<
   typeof useMyCommunitiesSuspenseQuery
 >
 export type MyCommunitiesQueryResult = Apollo.QueryResult<
-  MyCommunitiesQuery,
-  MyCommunitiesQueryVariables
+  OperationMyCommunitiesQuery,
+  OperationMyCommunitiesQueryVariables
 >
 export const CommunityDetailsDocument = gql`
     query CommunityDetails($communityId: ID!) {
@@ -602,59 +602,59 @@ export const CommunityDetailsDocument = gql`
  */
 export function useCommunityDetailsQuery(
   baseOptions: Apollo.QueryHookOptions<
-    CommunityDetailsQuery,
-    CommunityDetailsQueryVariables
+    OperationCommunityDetailsQuery,
+    OperationCommunityDetailsQueryVariables
   > &
     (
-      | { variables: CommunityDetailsQueryVariables; skip?: boolean }
+      | { variables: OperationCommunityDetailsQueryVariables; skip?: boolean }
       | { skip: boolean }
     ),
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<CommunityDetailsQuery, CommunityDetailsQueryVariables>(
+  return Apollo.useQuery<OperationCommunityDetailsQuery, OperationCommunityDetailsQueryVariables>(
     CommunityDetailsDocument,
     options,
   )
 }
 export function useCommunityDetailsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    CommunityDetailsQuery,
-    CommunityDetailsQueryVariables
+    OperationCommunityDetailsQuery,
+    OperationCommunityDetailsQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useLazyQuery<
-    CommunityDetailsQuery,
-    CommunityDetailsQueryVariables
+    OperationCommunityDetailsQuery,
+    OperationCommunityDetailsQueryVariables
   >(CommunityDetailsDocument, options)
 }
 // @ts-ignore
 export function useCommunityDetailsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    CommunityDetailsQuery,
-    CommunityDetailsQueryVariables
+    OperationCommunityDetailsQuery,
+    OperationCommunityDetailsQueryVariables
   >,
 ): Apollo.UseSuspenseQueryResult<
-  CommunityDetailsQuery,
-  CommunityDetailsQueryVariables
+  OperationCommunityDetailsQuery,
+  OperationCommunityDetailsQueryVariables
 >
 export function useCommunityDetailsSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        CommunityDetailsQuery,
-        CommunityDetailsQueryVariables
+        OperationCommunityDetailsQuery,
+        OperationCommunityDetailsQueryVariables
       >,
 ): Apollo.UseSuspenseQueryResult<
-  CommunityDetailsQuery | undefined,
-  CommunityDetailsQueryVariables
+  OperationCommunityDetailsQuery | undefined,
+  OperationCommunityDetailsQueryVariables
 >
 export function useCommunityDetailsSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        CommunityDetailsQuery,
-        CommunityDetailsQueryVariables
+        OperationCommunityDetailsQuery,
+        OperationCommunityDetailsQueryVariables
       >,
 ) {
   const options =
@@ -662,8 +662,8 @@ export function useCommunityDetailsSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions }
   return Apollo.useSuspenseQuery<
-    CommunityDetailsQuery,
-    CommunityDetailsQueryVariables
+    OperationCommunityDetailsQuery,
+    OperationCommunityDetailsQueryVariables
   >(CommunityDetailsDocument, options)
 }
 export type CommunityDetailsQueryHookResult = ReturnType<
@@ -676,8 +676,8 @@ export type CommunityDetailsSuspenseQueryHookResult = ReturnType<
   typeof useCommunityDetailsSuspenseQuery
 >
 export type CommunityDetailsQueryResult = Apollo.QueryResult<
-  CommunityDetailsQuery,
-  CommunityDetailsQueryVariables
+  OperationCommunityDetailsQuery,
+  OperationCommunityDetailsQueryVariables
 >
 export const CommunityMembersDocument = gql`
     query CommunityMembers($communityId: ID!) {
@@ -708,59 +708,59 @@ export const CommunityMembersDocument = gql`
  */
 export function useCommunityMembersQuery(
   baseOptions: Apollo.QueryHookOptions<
-    CommunityMembersQuery,
-    CommunityMembersQueryVariables
+    OperationCommunityMembersQuery,
+    OperationCommunityMembersQueryVariables
   > &
     (
-      | { variables: CommunityMembersQueryVariables; skip?: boolean }
+      | { variables: OperationCommunityMembersQueryVariables; skip?: boolean }
       | { skip: boolean }
     ),
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<CommunityMembersQuery, CommunityMembersQueryVariables>(
+  return Apollo.useQuery<OperationCommunityMembersQuery, OperationCommunityMembersQueryVariables>(
     CommunityMembersDocument,
     options,
   )
 }
 export function useCommunityMembersLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    CommunityMembersQuery,
-    CommunityMembersQueryVariables
+    OperationCommunityMembersQuery,
+    OperationCommunityMembersQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useLazyQuery<
-    CommunityMembersQuery,
-    CommunityMembersQueryVariables
+    OperationCommunityMembersQuery,
+    OperationCommunityMembersQueryVariables
   >(CommunityMembersDocument, options)
 }
 // @ts-ignore
 export function useCommunityMembersSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    CommunityMembersQuery,
-    CommunityMembersQueryVariables
+    OperationCommunityMembersQuery,
+    OperationCommunityMembersQueryVariables
   >,
 ): Apollo.UseSuspenseQueryResult<
-  CommunityMembersQuery,
-  CommunityMembersQueryVariables
+  OperationCommunityMembersQuery,
+  OperationCommunityMembersQueryVariables
 >
 export function useCommunityMembersSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        CommunityMembersQuery,
-        CommunityMembersQueryVariables
+        OperationCommunityMembersQuery,
+        OperationCommunityMembersQueryVariables
       >,
 ): Apollo.UseSuspenseQueryResult<
-  CommunityMembersQuery | undefined,
-  CommunityMembersQueryVariables
+  OperationCommunityMembersQuery | undefined,
+  OperationCommunityMembersQueryVariables
 >
 export function useCommunityMembersSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        CommunityMembersQuery,
-        CommunityMembersQueryVariables
+        OperationCommunityMembersQuery,
+        OperationCommunityMembersQueryVariables
       >,
 ) {
   const options =
@@ -768,8 +768,8 @@ export function useCommunityMembersSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions }
   return Apollo.useSuspenseQuery<
-    CommunityMembersQuery,
-    CommunityMembersQueryVariables
+    OperationCommunityMembersQuery,
+    OperationCommunityMembersQueryVariables
   >(CommunityMembersDocument, options)
 }
 export type CommunityMembersQueryHookResult = ReturnType<
@@ -782,8 +782,8 @@ export type CommunityMembersSuspenseQueryHookResult = ReturnType<
   typeof useCommunityMembersSuspenseQuery
 >
 export type CommunityMembersQueryResult = Apollo.QueryResult<
-  CommunityMembersQuery,
-  CommunityMembersQueryVariables
+  OperationCommunityMembersQuery,
+  OperationCommunityMembersQueryVariables
 >
 export const CommunityDeletionSnapshotDocument = gql`
     query CommunityDeletionSnapshot($communityId: ID!) {
@@ -814,59 +814,59 @@ export const CommunityDeletionSnapshotDocument = gql`
  */
 export function useCommunityDeletionSnapshotQuery(
   baseOptions: Apollo.QueryHookOptions<
-    CommunityDeletionSnapshotQuery,
-    CommunityDeletionSnapshotQueryVariables
+    OperationCommunityDeletionSnapshotQuery,
+    OperationCommunityDeletionSnapshotQueryVariables
   > &
     (
-      | { variables: CommunityDeletionSnapshotQueryVariables; skip?: boolean }
+      | { variables: OperationCommunityDeletionSnapshotQueryVariables; skip?: boolean }
       | { skip: boolean }
     ),
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useQuery<
-    CommunityDeletionSnapshotQuery,
-    CommunityDeletionSnapshotQueryVariables
+    OperationCommunityDeletionSnapshotQuery,
+    OperationCommunityDeletionSnapshotQueryVariables
   >(CommunityDeletionSnapshotDocument, options)
 }
 export function useCommunityDeletionSnapshotLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    CommunityDeletionSnapshotQuery,
-    CommunityDeletionSnapshotQueryVariables
+    OperationCommunityDeletionSnapshotQuery,
+    OperationCommunityDeletionSnapshotQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useLazyQuery<
-    CommunityDeletionSnapshotQuery,
-    CommunityDeletionSnapshotQueryVariables
+    OperationCommunityDeletionSnapshotQuery,
+    OperationCommunityDeletionSnapshotQueryVariables
   >(CommunityDeletionSnapshotDocument, options)
 }
 // @ts-ignore
 export function useCommunityDeletionSnapshotSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    CommunityDeletionSnapshotQuery,
-    CommunityDeletionSnapshotQueryVariables
+    OperationCommunityDeletionSnapshotQuery,
+    OperationCommunityDeletionSnapshotQueryVariables
   >,
 ): Apollo.UseSuspenseQueryResult<
-  CommunityDeletionSnapshotQuery,
-  CommunityDeletionSnapshotQueryVariables
+  OperationCommunityDeletionSnapshotQuery,
+  OperationCommunityDeletionSnapshotQueryVariables
 >
 export function useCommunityDeletionSnapshotSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        CommunityDeletionSnapshotQuery,
-        CommunityDeletionSnapshotQueryVariables
+        OperationCommunityDeletionSnapshotQuery,
+        OperationCommunityDeletionSnapshotQueryVariables
       >,
 ): Apollo.UseSuspenseQueryResult<
-  CommunityDeletionSnapshotQuery | undefined,
-  CommunityDeletionSnapshotQueryVariables
+  OperationCommunityDeletionSnapshotQuery | undefined,
+  OperationCommunityDeletionSnapshotQueryVariables
 >
 export function useCommunityDeletionSnapshotSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        CommunityDeletionSnapshotQuery,
-        CommunityDeletionSnapshotQueryVariables
+        OperationCommunityDeletionSnapshotQuery,
+        OperationCommunityDeletionSnapshotQueryVariables
       >,
 ) {
   const options =
@@ -874,8 +874,8 @@ export function useCommunityDeletionSnapshotSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions }
   return Apollo.useSuspenseQuery<
-    CommunityDeletionSnapshotQuery,
-    CommunityDeletionSnapshotQueryVariables
+    OperationCommunityDeletionSnapshotQuery,
+    OperationCommunityDeletionSnapshotQueryVariables
   >(CommunityDeletionSnapshotDocument, options)
 }
 export type CommunityDeletionSnapshotQueryHookResult = ReturnType<
@@ -888,8 +888,8 @@ export type CommunityDeletionSnapshotSuspenseQueryHookResult = ReturnType<
   typeof useCommunityDeletionSnapshotSuspenseQuery
 >
 export type CommunityDeletionSnapshotQueryResult = Apollo.QueryResult<
-  CommunityDeletionSnapshotQuery,
-  CommunityDeletionSnapshotQueryVariables
+  OperationCommunityDeletionSnapshotQuery,
+  OperationCommunityDeletionSnapshotQueryVariables
 >
 export const CreateCommunityDocument = gql`
     mutation CreateCommunity($input: CreateCommunityInput!) {
@@ -904,8 +904,8 @@ export const CreateCommunityDocument = gql`
 }
     `
 export type CreateCommunityMutationFn = Apollo.MutationFunction<
-  CreateCommunityMutation,
-  CreateCommunityMutationVariables
+  OperationCreateCommunityMutation,
+  OperationCreateCommunityMutationVariables
 >
 
 /**
@@ -927,24 +927,24 @@ export type CreateCommunityMutationFn = Apollo.MutationFunction<
  */
 export function useCreateCommunityMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    CreateCommunityMutation,
-    CreateCommunityMutationVariables
+    OperationCreateCommunityMutation,
+    OperationCreateCommunityMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    CreateCommunityMutation,
-    CreateCommunityMutationVariables
+    OperationCreateCommunityMutation,
+    OperationCreateCommunityMutationVariables
   >(CreateCommunityDocument, options)
 }
 export type CreateCommunityMutationHookResult = ReturnType<
   typeof useCreateCommunityMutation
 >
 export type CreateCommunityMutationResult =
-  Apollo.MutationResult<CreateCommunityMutation>
+  Apollo.MutationResult<OperationCreateCommunityMutation>
 export type CreateCommunityMutationOptions = Apollo.BaseMutationOptions<
-  CreateCommunityMutation,
-  CreateCommunityMutationVariables
+  OperationCreateCommunityMutation,
+  OperationCreateCommunityMutationVariables
 >
 export const RenameCommunityDocument = gql`
     mutation RenameCommunity($input: RenameCommunityInput!) {
@@ -959,8 +959,8 @@ export const RenameCommunityDocument = gql`
 }
     `
 export type RenameCommunityMutationFn = Apollo.MutationFunction<
-  RenameCommunityMutation,
-  RenameCommunityMutationVariables
+  OperationRenameCommunityMutation,
+  OperationRenameCommunityMutationVariables
 >
 
 /**
@@ -982,24 +982,24 @@ export type RenameCommunityMutationFn = Apollo.MutationFunction<
  */
 export function useRenameCommunityMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    RenameCommunityMutation,
-    RenameCommunityMutationVariables
+    OperationRenameCommunityMutation,
+    OperationRenameCommunityMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    RenameCommunityMutation,
-    RenameCommunityMutationVariables
+    OperationRenameCommunityMutation,
+    OperationRenameCommunityMutationVariables
   >(RenameCommunityDocument, options)
 }
 export type RenameCommunityMutationHookResult = ReturnType<
   typeof useRenameCommunityMutation
 >
 export type RenameCommunityMutationResult =
-  Apollo.MutationResult<RenameCommunityMutation>
+  Apollo.MutationResult<OperationRenameCommunityMutation>
 export type RenameCommunityMutationOptions = Apollo.BaseMutationOptions<
-  RenameCommunityMutation,
-  RenameCommunityMutationVariables
+  OperationRenameCommunityMutation,
+  OperationRenameCommunityMutationVariables
 >
 export const ChangeCommunityMemberRoleDocument = gql`
     mutation ChangeCommunityMemberRole($input: ChangeCommunityMemberRoleInput!) {
@@ -1009,8 +1009,8 @@ export const ChangeCommunityMemberRoleDocument = gql`
 }
     `
 export type ChangeCommunityMemberRoleMutationFn = Apollo.MutationFunction<
-  ChangeCommunityMemberRoleMutation,
-  ChangeCommunityMemberRoleMutationVariables
+  OperationChangeCommunityMemberRoleMutation,
+  OperationChangeCommunityMemberRoleMutationVariables
 >
 
 /**
@@ -1032,25 +1032,25 @@ export type ChangeCommunityMemberRoleMutationFn = Apollo.MutationFunction<
  */
 export function useChangeCommunityMemberRoleMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    ChangeCommunityMemberRoleMutation,
-    ChangeCommunityMemberRoleMutationVariables
+    OperationChangeCommunityMemberRoleMutation,
+    OperationChangeCommunityMemberRoleMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    ChangeCommunityMemberRoleMutation,
-    ChangeCommunityMemberRoleMutationVariables
+    OperationChangeCommunityMemberRoleMutation,
+    OperationChangeCommunityMemberRoleMutationVariables
   >(ChangeCommunityMemberRoleDocument, options)
 }
 export type ChangeCommunityMemberRoleMutationHookResult = ReturnType<
   typeof useChangeCommunityMemberRoleMutation
 >
 export type ChangeCommunityMemberRoleMutationResult =
-  Apollo.MutationResult<ChangeCommunityMemberRoleMutation>
+  Apollo.MutationResult<OperationChangeCommunityMemberRoleMutation>
 export type ChangeCommunityMemberRoleMutationOptions =
   Apollo.BaseMutationOptions<
-    ChangeCommunityMemberRoleMutation,
-    ChangeCommunityMemberRoleMutationVariables
+    OperationChangeCommunityMemberRoleMutation,
+    OperationChangeCommunityMemberRoleMutationVariables
   >
 export const RemoveCommunityMemberDocument = gql`
     mutation RemoveCommunityMember($input: RemoveCommunityMemberInput!) {
@@ -1060,8 +1060,8 @@ export const RemoveCommunityMemberDocument = gql`
 }
     `
 export type RemoveCommunityMemberMutationFn = Apollo.MutationFunction<
-  RemoveCommunityMemberMutation,
-  RemoveCommunityMemberMutationVariables
+  OperationRemoveCommunityMemberMutation,
+  OperationRemoveCommunityMemberMutationVariables
 >
 
 /**
@@ -1083,24 +1083,24 @@ export type RemoveCommunityMemberMutationFn = Apollo.MutationFunction<
  */
 export function useRemoveCommunityMemberMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    RemoveCommunityMemberMutation,
-    RemoveCommunityMemberMutationVariables
+    OperationRemoveCommunityMemberMutation,
+    OperationRemoveCommunityMemberMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    RemoveCommunityMemberMutation,
-    RemoveCommunityMemberMutationVariables
+    OperationRemoveCommunityMemberMutation,
+    OperationRemoveCommunityMemberMutationVariables
   >(RemoveCommunityMemberDocument, options)
 }
 export type RemoveCommunityMemberMutationHookResult = ReturnType<
   typeof useRemoveCommunityMemberMutation
 >
 export type RemoveCommunityMemberMutationResult =
-  Apollo.MutationResult<RemoveCommunityMemberMutation>
+  Apollo.MutationResult<OperationRemoveCommunityMemberMutation>
 export type RemoveCommunityMemberMutationOptions = Apollo.BaseMutationOptions<
-  RemoveCommunityMemberMutation,
-  RemoveCommunityMemberMutationVariables
+  OperationRemoveCommunityMemberMutation,
+  OperationRemoveCommunityMemberMutationVariables
 >
 export const LeaveCommunityDocument = gql`
     mutation LeaveCommunity($communityId: ID!) {
@@ -1110,8 +1110,8 @@ export const LeaveCommunityDocument = gql`
 }
     `
 export type LeaveCommunityMutationFn = Apollo.MutationFunction<
-  LeaveCommunityMutation,
-  LeaveCommunityMutationVariables
+  OperationLeaveCommunityMutation,
+  OperationLeaveCommunityMutationVariables
 >
 
 /**
@@ -1133,24 +1133,24 @@ export type LeaveCommunityMutationFn = Apollo.MutationFunction<
  */
 export function useLeaveCommunityMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    LeaveCommunityMutation,
-    LeaveCommunityMutationVariables
+    OperationLeaveCommunityMutation,
+    OperationLeaveCommunityMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    LeaveCommunityMutation,
-    LeaveCommunityMutationVariables
+    OperationLeaveCommunityMutation,
+    OperationLeaveCommunityMutationVariables
   >(LeaveCommunityDocument, options)
 }
 export type LeaveCommunityMutationHookResult = ReturnType<
   typeof useLeaveCommunityMutation
 >
 export type LeaveCommunityMutationResult =
-  Apollo.MutationResult<LeaveCommunityMutation>
+  Apollo.MutationResult<OperationLeaveCommunityMutation>
 export type LeaveCommunityMutationOptions = Apollo.BaseMutationOptions<
-  LeaveCommunityMutation,
-  LeaveCommunityMutationVariables
+  OperationLeaveCommunityMutation,
+  OperationLeaveCommunityMutationVariables
 >
 export const AcceptCommunityDeletionDocument = gql`
     mutation AcceptCommunityDeletion($input: AcceptCommunityDeletionInput!) {
@@ -1160,8 +1160,8 @@ export const AcceptCommunityDeletionDocument = gql`
 }
     `
 export type AcceptCommunityDeletionMutationFn = Apollo.MutationFunction<
-  AcceptCommunityDeletionMutation,
-  AcceptCommunityDeletionMutationVariables
+  OperationAcceptCommunityDeletionMutation,
+  OperationAcceptCommunityDeletionMutationVariables
 >
 
 /**
@@ -1183,24 +1183,24 @@ export type AcceptCommunityDeletionMutationFn = Apollo.MutationFunction<
  */
 export function useAcceptCommunityDeletionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    AcceptCommunityDeletionMutation,
-    AcceptCommunityDeletionMutationVariables
+    OperationAcceptCommunityDeletionMutation,
+    OperationAcceptCommunityDeletionMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    AcceptCommunityDeletionMutation,
-    AcceptCommunityDeletionMutationVariables
+    OperationAcceptCommunityDeletionMutation,
+    OperationAcceptCommunityDeletionMutationVariables
   >(AcceptCommunityDeletionDocument, options)
 }
 export type AcceptCommunityDeletionMutationHookResult = ReturnType<
   typeof useAcceptCommunityDeletionMutation
 >
 export type AcceptCommunityDeletionMutationResult =
-  Apollo.MutationResult<AcceptCommunityDeletionMutation>
+  Apollo.MutationResult<OperationAcceptCommunityDeletionMutation>
 export type AcceptCommunityDeletionMutationOptions = Apollo.BaseMutationOptions<
-  AcceptCommunityDeletionMutation,
-  AcceptCommunityDeletionMutationVariables
+  OperationAcceptCommunityDeletionMutation,
+  OperationAcceptCommunityDeletionMutationVariables
 >
 export const CurrentUserDocument = gql`
     query CurrentUser {
@@ -1239,24 +1239,24 @@ export const CurrentUserDocument = gql`
  */
 export function useCurrentUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
+    OperationCurrentUserQuery,
+    OperationCurrentUserQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+  return Apollo.useQuery<OperationCurrentUserQuery, OperationCurrentUserQueryVariables>(
     CurrentUserDocument,
     options,
   )
 }
 export function useCurrentUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
+    OperationCurrentUserQuery,
+    OperationCurrentUserQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+  return Apollo.useLazyQuery<OperationCurrentUserQuery, OperationCurrentUserQueryVariables>(
     CurrentUserDocument,
     options,
   )
@@ -1264,34 +1264,34 @@ export function useCurrentUserLazyQuery(
 // @ts-ignore
 export function useCurrentUserSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
+    OperationCurrentUserQuery,
+    OperationCurrentUserQueryVariables
   >,
-): Apollo.UseSuspenseQueryResult<CurrentUserQuery, CurrentUserQueryVariables>
+): Apollo.UseSuspenseQueryResult<OperationCurrentUserQuery, OperationCurrentUserQueryVariables>
 export function useCurrentUserSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        CurrentUserQuery,
-        CurrentUserQueryVariables
+        OperationCurrentUserQuery,
+        OperationCurrentUserQueryVariables
       >,
 ): Apollo.UseSuspenseQueryResult<
-  CurrentUserQuery | undefined,
-  CurrentUserQueryVariables
+  OperationCurrentUserQuery | undefined,
+  OperationCurrentUserQueryVariables
 >
 export function useCurrentUserSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        CurrentUserQuery,
-        CurrentUserQueryVariables
+        OperationCurrentUserQuery,
+        OperationCurrentUserQueryVariables
       >,
 ) {
   const options =
     baseOptions === Apollo.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions }
-  return Apollo.useSuspenseQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+  return Apollo.useSuspenseQuery<OperationCurrentUserQuery, OperationCurrentUserQueryVariables>(
     CurrentUserDocument,
     options,
   )
@@ -1304,8 +1304,8 @@ export type CurrentUserSuspenseQueryHookResult = ReturnType<
   typeof useCurrentUserSuspenseQuery
 >
 export type CurrentUserQueryResult = Apollo.QueryResult<
-  CurrentUserQuery,
-  CurrentUserQueryVariables
+  OperationCurrentUserQuery,
+  OperationCurrentUserQueryVariables
 >
 export const RegisterMemoriaUserDocument = gql`
     mutation RegisterMemoriaUser($input: RegisterUserInput!) {
@@ -1320,8 +1320,8 @@ export const RegisterMemoriaUserDocument = gql`
 }
     `
 export type RegisterMemoriaUserMutationFn = Apollo.MutationFunction<
-  RegisterMemoriaUserMutation,
-  RegisterMemoriaUserMutationVariables
+  OperationRegisterMemoriaUserMutation,
+  OperationRegisterMemoriaUserMutationVariables
 >
 
 /**
@@ -1343,24 +1343,24 @@ export type RegisterMemoriaUserMutationFn = Apollo.MutationFunction<
  */
 export function useRegisterMemoriaUserMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    RegisterMemoriaUserMutation,
-    RegisterMemoriaUserMutationVariables
+    OperationRegisterMemoriaUserMutation,
+    OperationRegisterMemoriaUserMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    RegisterMemoriaUserMutation,
-    RegisterMemoriaUserMutationVariables
+    OperationRegisterMemoriaUserMutation,
+    OperationRegisterMemoriaUserMutationVariables
   >(RegisterMemoriaUserDocument, options)
 }
 export type RegisterMemoriaUserMutationHookResult = ReturnType<
   typeof useRegisterMemoriaUserMutation
 >
 export type RegisterMemoriaUserMutationResult =
-  Apollo.MutationResult<RegisterMemoriaUserMutation>
+  Apollo.MutationResult<OperationRegisterMemoriaUserMutation>
 export type RegisterMemoriaUserMutationOptions = Apollo.BaseMutationOptions<
-  RegisterMemoriaUserMutation,
-  RegisterMemoriaUserMutationVariables
+  OperationRegisterMemoriaUserMutation,
+  OperationRegisterMemoriaUserMutationVariables
 >
 export const UpdateMemoriaUserProfileDocument = gql`
     mutation UpdateMemoriaUserProfile($input: UpdateUserProfileInput!) {
@@ -1375,8 +1375,8 @@ export const UpdateMemoriaUserProfileDocument = gql`
 }
     `
 export type UpdateMemoriaUserProfileMutationFn = Apollo.MutationFunction<
-  UpdateMemoriaUserProfileMutation,
-  UpdateMemoriaUserProfileMutationVariables
+  OperationUpdateMemoriaUserProfileMutation,
+  OperationUpdateMemoriaUserProfileMutationVariables
 >
 
 /**
@@ -1398,25 +1398,25 @@ export type UpdateMemoriaUserProfileMutationFn = Apollo.MutationFunction<
  */
 export function useUpdateMemoriaUserProfileMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    UpdateMemoriaUserProfileMutation,
-    UpdateMemoriaUserProfileMutationVariables
+    OperationUpdateMemoriaUserProfileMutation,
+    OperationUpdateMemoriaUserProfileMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    UpdateMemoriaUserProfileMutation,
-    UpdateMemoriaUserProfileMutationVariables
+    OperationUpdateMemoriaUserProfileMutation,
+    OperationUpdateMemoriaUserProfileMutationVariables
   >(UpdateMemoriaUserProfileDocument, options)
 }
 export type UpdateMemoriaUserProfileMutationHookResult = ReturnType<
   typeof useUpdateMemoriaUserProfileMutation
 >
 export type UpdateMemoriaUserProfileMutationResult =
-  Apollo.MutationResult<UpdateMemoriaUserProfileMutation>
+  Apollo.MutationResult<OperationUpdateMemoriaUserProfileMutation>
 export type UpdateMemoriaUserProfileMutationOptions =
   Apollo.BaseMutationOptions<
-    UpdateMemoriaUserProfileMutation,
-    UpdateMemoriaUserProfileMutationVariables
+    OperationUpdateMemoriaUserProfileMutation,
+    OperationUpdateMemoriaUserProfileMutationVariables
   >
 export const SaveUserPreferencesDocument = gql`
     mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
@@ -1434,8 +1434,8 @@ export const SaveUserPreferencesDocument = gql`
 }
     `
 export type SaveUserPreferencesMutationFn = Apollo.MutationFunction<
-  SaveUserPreferencesMutation,
-  SaveUserPreferencesMutationVariables
+  OperationSaveUserPreferencesMutation,
+  OperationSaveUserPreferencesMutationVariables
 >
 
 /**
@@ -1457,22 +1457,22 @@ export type SaveUserPreferencesMutationFn = Apollo.MutationFunction<
  */
 export function useSaveUserPreferencesMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    SaveUserPreferencesMutation,
-    SaveUserPreferencesMutationVariables
+    OperationSaveUserPreferencesMutation,
+    OperationSaveUserPreferencesMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useMutation<
-    SaveUserPreferencesMutation,
-    SaveUserPreferencesMutationVariables
+    OperationSaveUserPreferencesMutation,
+    OperationSaveUserPreferencesMutationVariables
   >(SaveUserPreferencesDocument, options)
 }
 export type SaveUserPreferencesMutationHookResult = ReturnType<
   typeof useSaveUserPreferencesMutation
 >
 export type SaveUserPreferencesMutationResult =
-  Apollo.MutationResult<SaveUserPreferencesMutation>
+  Apollo.MutationResult<OperationSaveUserPreferencesMutation>
 export type SaveUserPreferencesMutationOptions = Apollo.BaseMutationOptions<
-  SaveUserPreferencesMutation,
-  SaveUserPreferencesMutationVariables
+  OperationSaveUserPreferencesMutation,
+  OperationSaveUserPreferencesMutationVariables
 >
