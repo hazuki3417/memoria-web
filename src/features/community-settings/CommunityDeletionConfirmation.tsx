@@ -23,6 +23,7 @@ type Props = {
   managedMediaCount: number
   isAdministrator: boolean
   onDelete?: () => Promise<void>
+  onReviewChanged?: () => void
   onNavigate?: (href: string) => void
 }
 
@@ -32,6 +33,7 @@ export function CommunityDeletionConfirmation({
   managedMediaCount,
   isAdministrator,
   onDelete,
+  onReviewChanged,
   onNavigate,
 }: Props) {
   const router = useRouter()
@@ -67,14 +69,17 @@ export function CommunityDeletionConfirmation({
         description: "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
       })
       navigate("/dashboard")
-    } catch {
-      setError(
-        "削除処理に失敗しました。最新の状態を確認して再試行してください。",
+    } catch (caught) {
+      const changed = caught instanceof Error && caught.message === "REVIEW_CHANGED"
+      setError(changed
+        ? "削除対象の状態が変わりました。最新の内容で確認をやり直してください。"
+        : "削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。",
       )
+      if (changed) onReviewChanged?.()
       showNotification({
         kind: "error",
         title: "Communityを削除",
-        description: "現在の状態を確認して再試行してください。",
+        description: "最新の状態を確認してください。結果不明の操作を無条件に再実行しないでください。",
       })
     } finally {
       setBusy(false)
