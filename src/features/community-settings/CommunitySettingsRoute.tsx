@@ -116,11 +116,12 @@ export function CommunitySettingsRoute({
           }
           showNotification({
             kind: "error",
-            title: result.kind === "forbidden" ? "Community名を変更する権限がありません" : "Community名を変更できませんでした",
+            title: "Community名を変更",
+            description: result.kind === "forbidden" ? "Community名を変更する権限がありません。" : "Community名を変更できませんでした。",
           })
           return false
         } catch {
-          showNotification({ kind: "error", title: "Community名を変更できませんでした" })
+          showNotification({ kind: "error", title: "Community名を変更", description: "Community名を変更できませんでした。" })
           return false
         }
       }}
