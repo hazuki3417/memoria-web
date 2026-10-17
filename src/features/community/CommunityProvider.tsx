@@ -69,6 +69,6 @@ export function CommunityProvider({ communityId, children }: { communityId: stri
 
 export function useCommunity() {
   const data = useContext(Context)
-  if (!data) throw new Error("CommunitySettingsDataProvider is required")
+  if (!data) throw new Error("CommunityProvider is required")
   return data
 }
