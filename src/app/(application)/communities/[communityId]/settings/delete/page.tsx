@@ -5,7 +5,7 @@ import { Alert, Button, Stack } from "@mantine/core"
 import { useParams } from "next/navigation"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { CommunityDeletionConfirmation } from "@/features/community-settings/CommunityDeletionConfirmation"
-import { getCommunityDeletionSnapshotAction } from "@/features/community-settings/actions"
+import { getCommunityDeletionSnapshotAction, acceptCommunityDeletionAction } from "@/features/community-settings/actions"
 import type { CommunityDeletionSnapshotRecord } from "@/infrastructure/graphql"
 
 export default function CommunityDeletePage() {
@@ -44,8 +44,6 @@ export default function CommunityDeletePage() {
       <Button variant="default" onClick={() => setRetry((current) => current + 1)}>再試行</Button>
     </Stack>
   )
-  // The deletion mutation is intentionally unavailable until the
-  // transaction and durable Media cleanup pipeline are implemented.
   return (
     <CommunityDeletionConfirmation
       key={snapshot.revision}
@@ -53,6 +51,13 @@ export default function CommunityDeletePage() {
       communityName={snapshot.name}
       managedMediaCount={snapshot.managedMediaCount}
       isAdministrator
+      onDelete={async () => {
+        const result = await acceptCommunityDeletionAction(communityId, snapshot.revision)
+        if (result.kind === "accepted") return
+        if (result.kind === "conflict") throw new Error("REVIEW_CHANGED")
+        throw new Error("ACCEPTANCE_UNCONFIRMED")
+      }}
+      onReviewChanged={() => setRetry((current) => current + 1)}
     />
   )
 }
