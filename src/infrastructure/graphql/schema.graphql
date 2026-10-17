@@ -43,3 +43,93 @@ input UpdateUserPreferencesInput {
  mediaDetailInitialInfoMedium: Boolean
 }
 type UpdateUserPreferencesPayload { preferences: UserPreferences! }
+
+# Synchronized Community schema from memoria-api/schemas/graphql/community.graphql.
+input RenameCommunityInput {
+  communityId: ID!
+  name: String!
+}
+
+type RenameCommunityPayload {
+  community: Community!
+}
+
+extend type Query {
+  myCommunities: [Community!]!
+  community(communityId: ID!): Community
+}
+
+extend type Mutation {
+  renameCommunity(input: RenameCommunityInput!): RenameCommunityPayload!
+}
+
+enum CommunityMemberRole {
+  admin
+  member
+}
+
+type CommunityMember {
+  userId: ID!
+  nickname: String!
+  role: CommunityMemberRole!
+  joinedAt: DateTime!
+}
+
+extend type Query {
+  communityMembers(communityId: ID!): [CommunityMember!]!
+}
+
+input ChangeCommunityMemberRoleInput {
+  communityId: ID!
+  userId: ID!
+  role: CommunityMemberRole!
+}
+
+type ChangeCommunityMemberRolePayload {
+  success: Boolean!
+}
+
+extend type Mutation {
+  changeCommunityMemberRole(input: ChangeCommunityMemberRoleInput!): ChangeCommunityMemberRolePayload!
+}
+
+input RemoveCommunityMemberInput {
+  communityId: ID!
+  userId: ID!
+}
+
+type CommunityMembershipMutationPayload {
+  success: Boolean!
+}
+
+extend type Mutation {
+  removeCommunityMember(input: RemoveCommunityMemberInput!): CommunityMembershipMutationPayload!
+  leaveCommunity(communityId: ID!): CommunityMembershipMutationPayload!
+}
+
+# Read-only review for an irreversible Community deletion.
+# The revision includes the exact Community-managed Media ID set and name.
+type CommunityDeletionSnapshot {
+  communityId: ID!
+  name: String!
+  managedMediaCount: Int!
+  revision: String!
+}
+
+extend type Query {
+  communityDeletionSnapshot(communityId: ID!): CommunityDeletionSnapshot!
+}
+
+# Accepts logical deletion; physical Media cleanup is handled asynchronously.
+input AcceptCommunityDeletionInput {
+  communityId: ID!
+  revision: String!
+}
+
+type AcceptCommunityDeletionPayload {
+  accepted: Boolean!
+}
+
+extend type Mutation {
+  acceptCommunityDeletion(input: AcceptCommunityDeletionInput!): AcceptCommunityDeletionPayload!
+}
