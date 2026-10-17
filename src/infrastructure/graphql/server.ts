@@ -1,13 +1,18 @@
 import "server-only"
 import { auth0 } from "@/lib/auth0"
 
-const ME_QUERY = "query CurrentUser { me { id profile { nickname } preferences { personalAccentColor dateFormat fileSizeUnit mediaThumbnailSize mediaDetailNavigationWrap mediaDetailInitialInfoWide mediaDetailInitialInfoMedium } } }"
+const ME_QUERY =
+  "query CurrentUser { me { id profile { nickname } preferences { personalAccentColor dateFormat fileSizeUnit mediaThumbnailSize mediaDetailNavigationWrap mediaDetailInitialInfoWide mediaDetailInitialInfoMedium } } }"
 const REGISTER_MUTATION =
   "mutation RegisterMemoriaUser($input: RegisterUserInput!) { registerUser(input: $input) { user { id profile { nickname } } } }"
 
 type GraphQLError = { message?: string; extensions?: { code?: string } }
 type GraphQLResult<T> = { data?: T; errors?: GraphQLError[] }
-export type CurrentUser = { id: string; profile: { nickname: string }; preferences: AccountPreferences }
+export type CurrentUser = {
+  id: string
+  profile: { nickname: string }
+  preferences: AccountPreferences
+}
 export type CurrentUserResult =
   | { kind: "active"; user: CurrentUser }
   | { kind: "unregistered" }
@@ -120,7 +125,6 @@ export async function updateMemoriaProfile(
   return user ? { kind: "updated", user } : { kind: "error" }
 }
 
-
 export type AccountPreferences = {
   personalAccentColor: string
   dateFormat: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
@@ -156,7 +160,11 @@ export async function updateMemoriaPreferences(
   if (response.kind !== "ok") return { kind: response.kind }
   const { result } = response
   if (result.errors?.length) {
-    if (result.errors.some((error) => error.extensions?.code === "UNAUTHENTICATED"))
+    if (
+      result.errors.some(
+        (error) => error.extensions?.code === "UNAUTHENTICATED",
+      )
+    )
       return { kind: "unavailable" }
     if (result.errors.some((error) => error.extensions?.code === "VALIDATION"))
       return { kind: "validation" }
@@ -166,7 +174,12 @@ export async function updateMemoriaPreferences(
   return preferences ? { kind: "updated", preferences } : { kind: "error" }
 }
 
-export type CommunityRecord = { id: string; name: string; createdAt: string; updatedAt: string }
+export type CommunityRecord = {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
 export type CommunityListResult =
   | { kind: "loaded"; communities: CommunityRecord[] }
   | { kind: "unavailable" | "error" }
@@ -174,58 +187,107 @@ export type CommunityMutationResult =
   | { kind: "updated"; community: CommunityRecord }
   | { kind: "unavailable" | "validation" | "forbidden" | "not_found" | "error" }
 
-const MY_COMMUNITIES_QUERY = "query MyCommunities { myCommunities { id name createdAt updatedAt } }"
-const CREATE_COMMUNITY_MUTATION = "mutation CreateCommunity($input: CreateCommunityInput!) { createCommunity(input: $input) { community { id name createdAt updatedAt } } }"
+const MY_COMMUNITIES_QUERY =
+  "query MyCommunities { myCommunities { id name createdAt updatedAt } }"
+const CREATE_COMMUNITY_MUTATION =
+  "mutation CreateCommunity($input: CreateCommunityInput!) { createCommunity(input: $input) { community { id name createdAt updatedAt } } }"
 
 export async function listMyMemoriaCommunities(): Promise<CommunityListResult> {
-  const response = await request<{ myCommunities: CommunityRecord[] }>(MY_COMMUNITIES_QUERY, "MyCommunities")
-  if (response.kind !== "ok") return { kind: response.kind }
-  if (response.result.errors?.length) return {
-    kind: response.result.errors.some(e => e.extensions?.code === "UNAUTHENTICATED") ? "unavailable" : "error",
-  }
-  const communities = response.result.data?.myCommunities
-  return Array.isArray(communities) ? { kind: "loaded", communities } : { kind: "error" }
-}
-
-export async function createMemoriaCommunity(name: string): Promise<CommunityMutationResult> {
-  const response = await request<{ createCommunity: { community: CommunityRecord } }>(
-    CREATE_COMMUNITY_MUTATION, "CreateCommunity", { input: { name } },
+  const response = await request<{ myCommunities: CommunityRecord[] }>(
+    MY_COMMUNITIES_QUERY,
+    "MyCommunities",
   )
   if (response.kind !== "ok") return { kind: response.kind }
-  const codes = response.result.errors?.map(e => e.extensions?.code) ?? []
-  if (codes.length) return { kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("VALIDATION") ? "validation" : "error" }
+  if (response.result.errors?.length)
+    return {
+      kind: response.result.errors.some(
+        (e) => e.extensions?.code === "UNAUTHENTICATED",
+      )
+        ? "unavailable"
+        : "error",
+    }
+  const communities = response.result.data?.myCommunities
+  return Array.isArray(communities)
+    ? { kind: "loaded", communities }
+    : { kind: "error" }
+}
+
+export async function createMemoriaCommunity(
+  name: string,
+): Promise<CommunityMutationResult> {
+  const response = await request<{
+    createCommunity: { community: CommunityRecord }
+  }>(CREATE_COMMUNITY_MUTATION, "CreateCommunity", { input: { name } })
+  if (response.kind !== "ok") return { kind: response.kind }
+  const codes = response.result.errors?.map((e) => e.extensions?.code) ?? []
+  if (codes.length)
+    return {
+      kind: codes.includes("UNAUTHENTICATED")
+        ? "unavailable"
+        : codes.includes("VALIDATION")
+          ? "validation"
+          : "error",
+    }
   const community = response.result.data?.createCommunity?.community
   return community ? { kind: "updated", community } : { kind: "error" }
 }
 
-const COMMUNITY_QUERY = "query CommunityDetails($communityId: ID!) { community(communityId: $communityId) { id name createdAt updatedAt } }"
-const RENAME_COMMUNITY_MUTATION = "mutation RenameCommunity($input: RenameCommunityInput!) { renameCommunity(input: $input) { community { id name createdAt updatedAt } } }"
+const COMMUNITY_QUERY =
+  "query CommunityDetails($communityId: ID!) { community(communityId: $communityId) { id name createdAt updatedAt } }"
+const RENAME_COMMUNITY_MUTATION =
+  "mutation RenameCommunity($input: RenameCommunityInput!) { renameCommunity(input: $input) { community { id name createdAt updatedAt } } }"
 
 export type CommunityDetailsResult =
   | { kind: "loaded"; community: CommunityRecord }
   | { kind: "unavailable" | "not_found" | "error" }
 
-export async function getMemoriaCommunity(communityId: string): Promise<CommunityDetailsResult> {
+export async function getMemoriaCommunity(
+  communityId: string,
+): Promise<CommunityDetailsResult> {
   const response = await request<{ community: CommunityRecord | null }>(
-    COMMUNITY_QUERY, "CommunityDetails", { communityId },
+    COMMUNITY_QUERY,
+    "CommunityDetails",
+    { communityId },
   )
   if (response.kind !== "ok") return { kind: response.kind }
-  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
-  if (codes.length) return { kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("NOT_FOUND") ? "not_found" : "error" }
+  const codes =
+    response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length)
+    return {
+      kind: codes.includes("UNAUTHENTICATED")
+        ? "unavailable"
+        : codes.includes("NOT_FOUND")
+          ? "not_found"
+          : "error",
+    }
   const community = response.result.data?.community
   return community ? { kind: "loaded", community } : { kind: "not_found" }
 }
 
-export async function renameMemoriaCommunity(communityId: string, name: string): Promise<CommunityMutationResult> {
-  const response = await request<{ renameCommunity: { community: CommunityRecord } }>(
-    RENAME_COMMUNITY_MUTATION, "RenameCommunity", { input: { communityId, name } },
-  )
+export async function renameMemoriaCommunity(
+  communityId: string,
+  name: string,
+): Promise<CommunityMutationResult> {
+  const response = await request<{
+    renameCommunity: { community: CommunityRecord }
+  }>(RENAME_COMMUNITY_MUTATION, "RenameCommunity", {
+    input: { communityId, name },
+  })
   if (response.kind !== "ok") return { kind: response.kind }
-  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
-  if (codes.length) return {
-    kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("VALIDATION") ? "validation"
-      : codes.includes("NOT_FOUND") ? "not_found" : codes.includes("FORBIDDEN") ? "forbidden" : "error",
-  }
+  const codes =
+    response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length)
+    return {
+      kind: codes.includes("UNAUTHENTICATED")
+        ? "unavailable"
+        : codes.includes("VALIDATION")
+          ? "validation"
+          : codes.includes("NOT_FOUND")
+            ? "not_found"
+            : codes.includes("FORBIDDEN")
+              ? "forbidden"
+              : "error",
+    }
   const community = response.result.data?.renameCommunity?.community
   return community ? { kind: "updated", community } : { kind: "error" }
 }
@@ -243,15 +305,28 @@ export type CommunityMembersResult =
 const COMMUNITY_MEMBERS_QUERY =
   "query CommunityMembers($communityId: ID!) { communityMembers(communityId: $communityId) { userId nickname role joinedAt } }"
 
-export async function getMemoriaCommunityMembers(communityId: string): Promise<CommunityMembersResult> {
+export async function getMemoriaCommunityMembers(
+  communityId: string,
+): Promise<CommunityMembersResult> {
   const response = await request<{ communityMembers: CommunityParticipant[] }>(
-    COMMUNITY_MEMBERS_QUERY, "CommunityMembers", { communityId },
+    COMMUNITY_MEMBERS_QUERY,
+    "CommunityMembers",
+    { communityId },
   )
   if (response.kind !== "ok") return { kind: response.kind }
-  const codes = response.result.errors?.map(e => e.extensions?.code) ?? []
-  if (codes.length) return { kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("NOT_FOUND") ? "not_found" : "error" }
+  const codes = response.result.errors?.map((e) => e.extensions?.code) ?? []
+  if (codes.length)
+    return {
+      kind: codes.includes("UNAUTHENTICATED")
+        ? "unavailable"
+        : codes.includes("NOT_FOUND")
+          ? "not_found"
+          : "error",
+    }
   const members = response.result.data?.communityMembers
-  return Array.isArray(members) ? { kind: "loaded", members } : { kind: "error" }
+  return Array.isArray(members)
+    ? { kind: "loaded", members }
+    : { kind: "error" }
 }
 
 export type CommunityRoleChangeResult =
@@ -266,20 +341,29 @@ export async function changeMemoriaCommunityMemberRole(
   userId: string,
   role: "admin" | "member",
 ): Promise<CommunityRoleChangeResult> {
-  const response = await request<{ changeCommunityMemberRole: { success: boolean } }>(
-    CHANGE_COMMUNITY_MEMBER_ROLE_MUTATION, "ChangeCommunityMemberRole",
-    { input: { communityId, userId, role } },
-  )
+  const response = await request<{
+    changeCommunityMemberRole: { success: boolean }
+  }>(CHANGE_COMMUNITY_MEMBER_ROLE_MUTATION, "ChangeCommunityMemberRole", {
+    input: { communityId, userId, role },
+  })
   if (response.kind !== "ok") return { kind: response.kind }
-  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
-  if (codes.length) return {
-    kind: codes.includes("UNAUTHENTICATED") ? "unavailable"
-      : codes.includes("VALIDATION") ? "validation"
-      : codes.includes("FORBIDDEN") ? "forbidden"
-      : codes.includes("NOT_FOUND") ? "not_found" : "error",
-  }
+  const codes =
+    response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length)
+    return {
+      kind: codes.includes("UNAUTHENTICATED")
+        ? "unavailable"
+        : codes.includes("VALIDATION")
+          ? "validation"
+          : codes.includes("FORBIDDEN")
+            ? "forbidden"
+            : codes.includes("NOT_FOUND")
+              ? "not_found"
+              : "error",
+    }
   return response.result.data?.changeCommunityMemberRole?.success
-    ? { kind: "updated" } : { kind: "error" }
+    ? { kind: "updated" }
+    : { kind: "error" }
 }
 
 export type CommunityMembershipOperationResult =
@@ -287,26 +371,51 @@ export type CommunityMembershipOperationResult =
   | { kind: "unavailable" | "forbidden" | "not_found" | "error" }
 
 async function communityMembershipMutation(
-  query: string, operationName: string, variables: Record<string, unknown>, field: "removeCommunityMember" | "leaveCommunity",
+  query: string,
+  operationName: string,
+  variables: Record<string, unknown>,
+  field: "removeCommunityMember" | "leaveCommunity",
 ): Promise<CommunityMembershipOperationResult> {
-  const response = await request<Record<string, { success: boolean }>>(query, operationName, variables)
+  const response = await request<Record<string, { success: boolean }>>(
+    query,
+    operationName,
+    variables,
+  )
   if (response.kind !== "ok") return { kind: response.kind }
-  const codes = response.result.errors?.map(e => e.extensions?.code) ?? []
-  if (codes.length) return { kind: codes.includes("UNAUTHENTICATED") ? "unavailable" : codes.includes("FORBIDDEN") ? "forbidden" : codes.includes("NOT_FOUND") ? "not_found" : "error" }
-  return response.result.data?.[field]?.success ? { kind: "updated" } : { kind: "error" }
+  const codes = response.result.errors?.map((e) => e.extensions?.code) ?? []
+  if (codes.length)
+    return {
+      kind: codes.includes("UNAUTHENTICATED")
+        ? "unavailable"
+        : codes.includes("FORBIDDEN")
+          ? "forbidden"
+          : codes.includes("NOT_FOUND")
+            ? "not_found"
+            : "error",
+    }
+  return response.result.data?.[field]?.success
+    ? { kind: "updated" }
+    : { kind: "error" }
 }
 
-export async function removeMemoriaCommunityMember(communityId: string, userId: string) {
+export async function removeMemoriaCommunityMember(
+  communityId: string,
+  userId: string,
+) {
   return communityMembershipMutation(
     "mutation RemoveCommunityMember($input: RemoveCommunityMemberInput!) { removeCommunityMember(input: $input) { success } }",
-    "RemoveCommunityMember", { input: { communityId, userId } }, "removeCommunityMember",
+    "RemoveCommunityMember",
+    { input: { communityId, userId } },
+    "removeCommunityMember",
   )
 }
 
 export async function leaveMemoriaCommunity(communityId: string) {
   return communityMembershipMutation(
     "mutation LeaveCommunity($communityId: ID!) { leaveCommunity(communityId: $communityId) { success } }",
-    "LeaveCommunity", { communityId }, "leaveCommunity",
+    "LeaveCommunity",
+    { communityId },
+    "leaveCommunity",
   )
 }
 
@@ -327,46 +436,75 @@ const COMMUNITY_DELETION_SNAPSHOT_QUERY =
 export async function getMemoriaCommunityDeletionSnapshot(
   communityId: string,
 ): Promise<CommunityDeletionSnapshotResult> {
-  const response = await request<{ communityDeletionSnapshot: CommunityDeletionSnapshotRecord }>(
-    COMMUNITY_DELETION_SNAPSHOT_QUERY,
-    "CommunityDeletionSnapshot",
-    { communityId },
-  )
+  const response = await request<{
+    communityDeletionSnapshot: CommunityDeletionSnapshotRecord
+  }>(COMMUNITY_DELETION_SNAPSHOT_QUERY, "CommunityDeletionSnapshot", {
+    communityId,
+  })
   if (response.kind !== "ok") return { kind: response.kind }
-  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
-  if (codes.length) return {
-    kind: codes.includes("UNAUTHENTICATED") ? "unavailable"
-      : codes.includes("NOT_FOUND") ? "not_found"
-      : codes.includes("FORBIDDEN") ? "forbidden" : "error",
-  }
+  const codes =
+    response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length)
+    return {
+      kind: codes.includes("UNAUTHENTICATED")
+        ? "unavailable"
+        : codes.includes("NOT_FOUND")
+          ? "not_found"
+          : codes.includes("FORBIDDEN")
+            ? "forbidden"
+            : "error",
+    }
   const snapshot = response.result.data?.communityDeletionSnapshot
-  if (!snapshot || !snapshot.revision || !Number.isSafeInteger(snapshot.managedMediaCount))
+  if (
+    !snapshot ||
+    !snapshot.revision ||
+    !Number.isSafeInteger(snapshot.managedMediaCount)
+  )
     return { kind: "error" }
   return { kind: "loaded", snapshot }
 }
 
 export type CommunityDeletionAcceptanceResult =
   | { kind: "accepted" }
-  | { kind: "unavailable" | "validation" | "not_found" | "forbidden" | "conflict" | "error" }
+  | {
+      kind:
+        | "unavailable"
+        | "validation"
+        | "not_found"
+        | "forbidden"
+        | "conflict"
+        | "error"
+    }
 
 export async function acceptMemoriaCommunityDeletion(
   communityId: string,
   revision: string,
 ): Promise<CommunityDeletionAcceptanceResult> {
-  const response = await request<{ acceptCommunityDeletion: { accepted: boolean } }>(
+  const response = await request<{
+    acceptCommunityDeletion: { accepted: boolean }
+  }>(
     "mutation AcceptCommunityDeletion($input: AcceptCommunityDeletionInput!) { acceptCommunityDeletion(input: $input) { accepted } }",
     "AcceptCommunityDeletion",
     { input: { communityId, revision } },
   )
   if (response.kind !== "ok") return { kind: response.kind }
-  const codes = response.result.errors?.map((error) => error.extensions?.code) ?? []
-  if (codes.length) return {
-    kind: codes.includes("UNAUTHENTICATED") ? "unavailable"
-      : codes.includes("VALIDATION") ? "validation"
-      : codes.includes("NOT_FOUND") ? "not_found"
-      : codes.includes("FORBIDDEN") ? "forbidden"
-      : codes.includes("CONFLICT") ? "conflict" : "error",
-  }
+  const codes =
+    response.result.errors?.map((error) => error.extensions?.code) ?? []
+  if (codes.length)
+    return {
+      kind: codes.includes("UNAUTHENTICATED")
+        ? "unavailable"
+        : codes.includes("VALIDATION")
+          ? "validation"
+          : codes.includes("NOT_FOUND")
+            ? "not_found"
+            : codes.includes("FORBIDDEN")
+              ? "forbidden"
+              : codes.includes("CONFLICT")
+                ? "conflict"
+                : "error",
+    }
   return response.result.data?.acceptCommunityDeletion?.accepted
-    ? { kind: "accepted" } : { kind: "error" }
+    ? { kind: "accepted" }
+    : { kind: "error" }
 }

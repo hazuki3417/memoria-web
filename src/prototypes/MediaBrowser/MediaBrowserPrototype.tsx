@@ -411,7 +411,8 @@ export function MediaBrowserPrototype({
     showNotification({
       kind: "success",
       title: `${label}を更新`,
-      description: "画面上の変更を反映しました。サーバーには保存されていません。",
+      description:
+        "画面上の変更を反映しました。サーバーには保存されていません。",
     })
   }
   const addCommunityShare = () => {
@@ -433,7 +434,8 @@ export function MediaBrowserPrototype({
     showNotification({
       kind: "success",
       title: "Communityへ共有",
-      description: "画面上の共有先に追加しました。サーバーには保存されていません。",
+      description:
+        "画面上の共有先に追加しました。サーバーには保存されていません。",
     })
   }
   const removeCommunityShare = () => {

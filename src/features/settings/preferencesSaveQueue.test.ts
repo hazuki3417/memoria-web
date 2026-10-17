@@ -33,7 +33,9 @@ describe("preferences save queue", () => {
 
   it("retains failed edits for explicit retry", async () => {
     vi.useFakeTimers()
-    const save = vi.fn().mockRejectedValueOnce(new Error("network"))
+    const save = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("network"))
       .mockResolvedValue(defaultUserPreferences)
     const onError = vi.fn()
     const queue = createPreferencesSaveQueue(save, vi.fn(), onError)

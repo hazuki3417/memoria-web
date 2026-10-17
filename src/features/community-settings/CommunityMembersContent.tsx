@@ -107,7 +107,8 @@ export function CommunityMembersContent({
       setOpened(false)
       showNotification({
         kind: "success",
-        title: "Communityを退会", description: "Communityから退会しました。",
+        title: "Communityを退会",
+        description: "Communityから退会しました。",
       })
       onLeaveSuccess?.()
     } catch {
@@ -119,9 +120,17 @@ export function CommunityMembersContent({
     }
   }
   const confirmRoleChange = async () => {
-    if (!roleTarget || !onChangeRole || roleBusy || selectedRole === roleTarget.role ||
+    if (
+      !roleTarget ||
+      !onChangeRole ||
+      roleBusy ||
+      selectedRole === roleTarget.role ||
       (selectedRole === "admin" && adminLimitReached) ||
-      (selectedRole === "member" && roleTarget.role === "admin" && adminCount <= 1)) return
+      (selectedRole === "member" &&
+        roleTarget.role === "admin" &&
+        adminCount <= 1)
+    )
+      return
     setRoleBusy(true)
     try {
       if (await onChangeRole(roleTarget.id, selectedRole)) setRoleTarget(null)
@@ -258,12 +267,19 @@ export function CommunityMembersContent({
                                 <Menu.Dropdown>
                                   <Menu.Item
                                     disabled={!onChangeRole}
-                                    onClick={() => { setRoleTarget(member); setSelectedRole(member.role) }}
+                                    onClick={() => {
+                                      setRoleTarget(member)
+                                      setSelectedRole(member.role)
+                                    }}
                                   >
                                     役割を変更
                                   </Menu.Item>
                                   <Menu.Item
-                                    disabled={!onRemoveMember || (member.role === "admin" && adminCount <= 1)}
+                                    disabled={
+                                      !onRemoveMember ||
+                                      (member.role === "admin" &&
+                                        adminCount <= 1)
+                                    }
                                     onClick={() => setRemoveTarget(member)}
                                     color="red"
                                   >
@@ -324,51 +340,116 @@ export function CommunityMembersContent({
       </Box>
       <Modal
         opened={removeTarget !== null}
-        onClose={() => { if (!removeBusy) setRemoveTarget(null) }}
+        onClose={() => {
+          if (!removeBusy) setRemoveTarget(null)
+        }}
         title="メンバーを除外"
         centered
       >
         <Stack gap="md">
-          <Text fw={600}>{removeTarget?.name}をこのCommunityから除外しますか？</Text>
-          <Text size="sm">除外すると、このメンバーはCommunityへアクセスできなくなります。対象者が管理するMediaの、このCommunityへの共有と分類は解除されます。</Text>
-          <Text size="sm">対象者のアカウントやPersonal Media、Communityが管理するMediaは削除されません。</Text>
-          <Text size="sm" c="dimmed">除外後に元の参加状態へ自動的には戻りません。</Text>
+          <Text fw={600}>
+            {removeTarget?.name}をこのCommunityから除外しますか？
+          </Text>
+          <Text size="sm">
+            除外すると、このメンバーはCommunityへアクセスできなくなります。対象者が管理するMediaの、このCommunityへの共有と分類は解除されます。
+          </Text>
+          <Text size="sm">
+            対象者のアカウントやPersonal
+            Media、Communityが管理するMediaは削除されません。
+          </Text>
+          <Text size="sm" c="dimmed">
+            除外後に元の参加状態へ自動的には戻りません。
+          </Text>
           <Group justify="flex-end">
-            <Button variant="default" disabled={removeBusy} onClick={() => setRemoveTarget(null)}>キャンセル</Button>
-            <Button color="red" loading={removeBusy} onClick={() => void confirmRemoval()}>除外する</Button>
+            <Button
+              variant="default"
+              disabled={removeBusy}
+              onClick={() => setRemoveTarget(null)}
+            >
+              キャンセル
+            </Button>
+            <Button
+              color="red"
+              loading={removeBusy}
+              onClick={() => void confirmRemoval()}
+            >
+              除外する
+            </Button>
           </Group>
         </Stack>
       </Modal>
       <Modal
         opened={roleTarget !== null}
-        onClose={() => { if (!roleBusy) setRoleTarget(null) }}
+        onClose={() => {
+          if (!roleBusy) setRoleTarget(null)
+        }}
         title="役割を変更"
         centered
       >
         <Stack gap="md">
-          <Text size="sm">{roleTarget?.name}のCommunity内の役割を変更します。</Text>
+          <Text size="sm">
+            {roleTarget?.name}のCommunity内の役割を変更します。
+          </Text>
           <Stack gap={4}>
-            <Text size="sm" fw={500}>現在の役割</Text>
-            <Badge variant="light">{roleTarget?.role === "admin" ? "Administrator" : "Member"}</Badge>
+            <Text size="sm" fw={500}>
+              現在の役割
+            </Text>
+            <Badge variant="light">
+              {roleTarget?.role === "admin" ? "Administrator" : "Member"}
+            </Badge>
           </Stack>
-          <Radio.Group label="変更後の役割" value={selectedRole} onChange={(value) => setSelectedRole(value as "admin" | "member")}>
+          <Radio.Group
+            label="変更後の役割"
+            value={selectedRole}
+            onChange={(value) => setSelectedRole(value as "admin" | "member")}
+          >
             <Stack gap="sm" mt="sm">
-              <Radio value="admin" label="Administrator" description="Communityの設定やメンバーを管理できます。" disabled={roleTarget?.role !== "admin" && adminLimitReached} />
-              <Radio value="member" label="Member" description="Communityに参加し、許可されたMediaを利用できます。" disabled={roleTarget?.role === "admin" && adminCount <= 1} />
+              <Radio
+                value="admin"
+                label="Administrator"
+                description="Communityの設定やメンバーを管理できます。"
+                disabled={roleTarget?.role !== "admin" && adminLimitReached}
+              />
+              <Radio
+                value="member"
+                label="Member"
+                description="Communityに参加し、許可されたMediaを利用できます。"
+                disabled={roleTarget?.role === "admin" && adminCount <= 1}
+              />
             </Stack>
           </Radio.Group>
           {roleTarget?.role === "admin" && adminCount <= 1 && (
-            <Text size="sm" c="red">最後のAdministratorはMemberに変更できません。</Text>
+            <Text size="sm" c="red">
+              最後のAdministratorはMemberに変更できません。
+            </Text>
           )}
           {roleTarget?.role !== "admin" && adminLimitReached && (
-            <Text size="sm" c="dimmed">Administratorの上限に達しているため変更できません。</Text>
+            <Text size="sm" c="dimmed">
+              Administratorの上限に達しているため変更できません。
+            </Text>
           )}
           <Group justify="flex-end">
-            <Button variant="default" disabled={roleBusy} onClick={() => setRoleTarget(null)}>キャンセル</Button>
-            <Button loading={roleBusy} disabled={!onChangeRole || selectedRole === roleTarget?.role ||
-              (selectedRole === "admin" && adminLimitReached) ||
-              (selectedRole === "member" && roleTarget?.role === "admin" && adminCount <= 1)}
-              onClick={() => void confirmRoleChange()}>変更する</Button>
+            <Button
+              variant="default"
+              disabled={roleBusy}
+              onClick={() => setRoleTarget(null)}
+            >
+              キャンセル
+            </Button>
+            <Button
+              loading={roleBusy}
+              disabled={
+                !onChangeRole ||
+                selectedRole === roleTarget?.role ||
+                (selectedRole === "admin" && adminLimitReached) ||
+                (selectedRole === "member" &&
+                  roleTarget?.role === "admin" &&
+                  adminCount <= 1)
+              }
+              onClick={() => void confirmRoleChange()}
+            >
+              変更する
+            </Button>
           </Group>
         </Stack>
       </Modal>

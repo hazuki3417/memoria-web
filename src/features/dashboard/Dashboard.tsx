@@ -324,7 +324,6 @@ export function Dashboard({
 
   return (
     <>
-      
       <Stack gap="xl" w="100%">
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="nowrap">

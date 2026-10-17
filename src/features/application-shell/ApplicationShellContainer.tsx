@@ -3,7 +3,11 @@
 import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect, useState } from "react"
-import { MyCommunitiesDocument, useMyCommunitiesQuery, useCreateCommunityMutation } from "@/infrastructure/graphql/generated"
+import {
+  MyCommunitiesDocument,
+  useMyCommunitiesQuery,
+  useCreateCommunityMutation,
+} from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
 import {
   ApplicationAccountMenu,
@@ -45,16 +49,23 @@ export function ApplicationShellContainer({
   const [createOpened, setCreateOpened] = useState(false)
   const [draftName, setDraftName] = useState("")
   const [createError, setCreateError] = useState("")
-  const { data: communityData, loading: communitiesLoading, error: communitiesError } = useMyCommunitiesQuery()
+  const {
+    data: communityData,
+    loading: communitiesLoading,
+    error: communitiesError,
+  } = useMyCommunitiesQuery()
   const [createMutation] = useCreateCommunityMutation()
-  const created = communityData?.myCommunities.map((item) => ({ id: item.id, label: item.name })) ?? []
+  const created =
+    communityData?.myCommunities.map((item) => ({
+      id: item.id,
+      label: item.name,
+    })) ?? []
   const communitiesLoaded = !communitiesLoading && !!communityData
   const [createBusy, setCreateBusy] = useState(false)
   const [rememberedContextKind, setRememberedContextKind] = useState<
     "personal" | "community"
   >("personal")
-  const [rememberedCommunityId, setRememberedCommunityId] =
-    useState("")
+  const [rememberedCommunityId, setRememberedCommunityId] = useState("")
   const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
   const shellMode =
     pathname === "/settings/account/delete"
@@ -73,7 +84,9 @@ export function ApplicationShellContainer({
       ? {
           ...communityContext,
           id: communityId,
-          label: currentCreated?.label ?? (communitiesLoaded ? "Community" : "読み込み中"),
+          label:
+            currentCreated?.label ??
+            (communitiesLoaded ? "Community" : "読み込み中"),
         }
       : personalContext
   const activeSection = getApplicationSection(pathname)
@@ -107,16 +120,25 @@ export function ApplicationShellContainer({
     }
     setCreateBusy(true)
     try {
-      const result = await createMutation({ variables: { input: { name } }, refetchQueries: [MyCommunitiesDocument], awaitRefetchQueries: true })
+      const result = await createMutation({
+        variables: { input: { name } },
+        refetchQueries: [MyCommunitiesDocument],
+        awaitRefetchQueries: true,
+      })
       const community = result.data?.createCommunity.community
-      if (!community) throw new Error("Community creation did not return a Community")
+      if (!community)
+        throw new Error("Community creation did not return a Community")
       const { id, name: label } = community
       setRememberedContextKind("community")
       setRememberedCommunityId(id)
       setCreateOpened(false)
       setDraftName("")
       setCreateError("")
-      showNotification({ kind: "success", title: "Communityを作成", description: `${label}を作成しました。` })
+      showNotification({
+        kind: "success",
+        title: "Communityを作成",
+        description: `${label}を作成しました。`,
+      })
       router.push(`/communities/${encodeURIComponent(id)}/dashboard`)
     } catch {
       setCreateError("Communityを作成できませんでした。再度お試しください。")
@@ -167,12 +189,24 @@ export function ApplicationShellContainer({
           <Text size="xs" c="dimmed">
             Communityを作成すると、メンバー管理と共有が利用できます。
           </Text>
-          {communitiesError && <Text size="xs" c="red">Community一覧を取得できませんでした。再読み込みしてお試しください。</Text>}
+          {communitiesError && (
+            <Text size="xs" c="red">
+              Community一覧を取得できませんでした。再読み込みしてお試しください。
+            </Text>
+          )}
           <Group justify="flex-end">
-            <Button variant="default" onClick={closeCreate} disabled={createBusy}>
+            <Button
+              variant="default"
+              onClick={closeCreate}
+              disabled={createBusy}
+            >
               キャンセル
             </Button>
-            <Button disabled={!draftName.trim() || createBusy} loading={createBusy} onClick={() => void createCommunity()}>
+            <Button
+              disabled={!draftName.trim() || createBusy}
+              loading={createBusy}
+              onClick={() => void createCommunity()}
+            >
               Communityを作成
             </Button>
           </Group>
@@ -183,9 +217,11 @@ export function ApplicationShellContainer({
           <ApplicationHeader
             accentColor={currentContext.accentColor}
             onTitleClick={() => {
-              router.push(contextKind === "community" && communityId
-                ? `/communities/${encodeURIComponent(communityId)}/dashboard`
-                : "/dashboard")
+              router.push(
+                contextKind === "community" && communityId
+                  ? `/communities/${encodeURIComponent(communityId)}/dashboard`
+                  : "/dashboard",
+              )
               navigation.close()
             }}
             reserveNavigationSpace={shellMode === "restricted-flow"}

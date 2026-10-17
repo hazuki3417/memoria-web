@@ -68,21 +68,25 @@ export function CommunityDeletionConfirmation({
       showNotification({
         kind: "success",
         title: "Community削除の受付",
-        description: "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
+        description:
+          "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
       })
       navigate("/dashboard")
     } catch (caught) {
-      const changed = caught instanceof Error && caught.message === "REVIEW_CHANGED"
-      setError(changed
-        ? "削除対象の状態が変わりました。最新の内容で確認をやり直してください。"
-        : "削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。",
+      const changed =
+        caught instanceof Error && caught.message === "REVIEW_CHANGED"
+      setError(
+        changed
+          ? "削除対象の状態が変わりました。最新の内容で確認をやり直してください。"
+          : "削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。",
       )
       if (changed) onReviewChanged?.()
       else setOutcomeUnknown(true)
       showNotification({
         kind: "error",
         title: "Communityを削除",
-        description: "最新の状態を確認してください。結果不明の操作を無条件に再実行しないでください。",
+        description:
+          "最新の状態を確認してください。結果不明の操作を無条件に再実行しないでください。",
       })
     } finally {
       setBusy(false)
@@ -244,7 +248,9 @@ export function CommunityDeletionConfirmation({
               )}
               {error && (
                 <Stack gap="xs">
-                  <Text size="sm" c="red" role="alert">{error}</Text>
+                  <Text size="sm" c="red" role="alert">
+                    {error}
+                  </Text>
                   {outcomeUnknown && onReviewChanged && (
                     <Button variant="default" onClick={onReviewChanged}>
                       最新の状態を確認する
