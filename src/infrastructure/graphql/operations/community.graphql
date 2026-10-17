@@ -1,0 +1,39 @@
+query MyCommunities {
+  myCommunities { id name createdAt updatedAt }
+}
+
+query CommunityDetails($communityId: ID!) {
+  community(communityId: $communityId) { id name createdAt updatedAt }
+}
+
+query CommunityMembers($communityId: ID!) {
+  communityMembers(communityId: $communityId) { userId nickname role joinedAt }
+}
+
+query CommunityDeletionSnapshot($communityId: ID!) {
+  communityDeletionSnapshot(communityId: $communityId) { communityId name managedMediaCount revision }
+}
+
+mutation CreateCommunity($input: CreateCommunityInput!) {
+  createCommunity(input: $input) { community { id name createdAt updatedAt } }
+}
+
+mutation RenameCommunity($input: RenameCommunityInput!) {
+  renameCommunity(input: $input) { community { id name createdAt updatedAt } }
+}
+
+mutation ChangeCommunityMemberRole($input: ChangeCommunityMemberRoleInput!) {
+  changeCommunityMemberRole(input: $input) { success }
+}
+
+mutation RemoveCommunityMember($input: RemoveCommunityMemberInput!) {
+  removeCommunityMember(input: $input) { success }
+}
+
+mutation LeaveCommunity($communityId: ID!) {
+  leaveCommunity(communityId: $communityId) { success }
+}
+
+mutation AcceptCommunityDeletion($input: AcceptCommunityDeletionInput!) {
+  acceptCommunityDeletion(input: $input) { accepted }
+}
