@@ -5,7 +5,13 @@ import { showNotification } from "@/components/Feedback"
 import type { MediaItem } from "@/features/media-detail/types"
 
 /** Image detail edit, share and section state; independent of the listing UI. */
-export function useMediaDetailEditing(detail: MediaItem | null) {
+export function useMediaDetailEditing(
+  detail: MediaItem | null,
+  remoteGroups?: {
+    memberships: Record<string, string[]>
+    onSave: (mediaId: string, groupNames: string[]) => Promise<void>
+  },
+) {
   const [detailEditor, setDetailEditor] = useState<
     "tags" | "groups" | "communities" | null
   >(null)
@@ -15,17 +21,31 @@ export function useMediaDetailEditing(detail: MediaItem | null) {
   const [detailEdits, setDetailEdits] = useState<
     Record<string, { tags: string[]; groups: string[]; communities: string[] }>
   >({})
-  const detailValues = detailEdits[detail?.id ?? ""] ?? {
+  const localValues = detailEdits[detail?.id ?? ""] ?? {
     tags: ["旅行", "風景"],
     groups: ["旅行", "お気に入り"],
     communities: ["Photo Club"],
   }
+  const detailValues = remoteGroups
+    ? { ...localValues, groups: remoteGroups.memberships[detail?.id ?? ""] ?? [] }
+    : localValues
   const openDetailEditor = (kind: "tags" | "groups" | "communities") => {
     setDetailDraft([...detailValues[kind]])
     setDetailEditor(kind)
   }
-  const saveDetailDraft = () => {
+  const saveDetailDraft = async () => {
     if (!detail || !detailEditor) return
+    if (detailEditor === "groups" && remoteGroups) {
+      try {
+        await remoteGroups.onSave(detail.id, detailDraft)
+      } catch {
+        showNotification({ kind: "error", title: "Groupsの変更を保存できませんでした" })
+        return
+      }
+      setDetailEditor(null)
+      showNotification({ kind: "success", title: "Groupsを更新" })
+      return
+    }
     setDetailEdits((current) => ({
       ...current,
       [detail.id]: { ...detailValues, [detailEditor]: [...detailDraft] },
