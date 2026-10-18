@@ -6,6 +6,7 @@ import {
   ScopeType,
   useBrowseGroupsQuery,
   useBrowseGroupDetailQuery,
+  useBrowseGroupRelationCandidatesQuery,
   useCreateBrowserGroupMutation,
   useUpdateBrowserGroupMutation,
   useDeleteBrowserGroupMutation,
@@ -37,6 +38,10 @@ export function GroupBrowserContainer({
   })
   const detail = useBrowseGroupDetailQuery({
     variables: { id: selectedId ?? "" },
+    skip: !selectedId,
+  })
+  const candidateQuery = useBrowseGroupRelationCandidatesQuery({
+    variables: { groupId: selectedId ?? "", first: 100 },
     skip: !selectedId,
   })
   const [createGroup] = useCreateBrowserGroupMutation()
@@ -86,6 +91,27 @@ export function GroupBrowserContainer({
       }
     })
   }, [listing.data, detail.data])
+
+  const relationAvailability = useMemo(() => {
+    const result: Record<string, {
+      parent: { canAdd: boolean; reason?: string }
+      child: { canAdd: boolean; reason?: string }
+    }> = {}
+    for (const edge of candidateQuery.data?.mediaGroupRelationCandidates.edges ?? []) {
+      const candidate = edge.node
+      result[candidate.group.name] = {
+        parent: {
+          canAdd: candidate.addAsParent.canAdd,
+          reason: candidate.addAsParent.unavailableReason ?? undefined,
+        },
+        child: {
+          canAdd: candidate.addAsChild.canAdd,
+          reason: candidate.addAsChild.unavailableReason ?? undefined,
+        },
+      }
+    }
+    return result
+  }, [candidateQuery.data])
 
   const nameToId = useMemo(
     () => new Map(allGroups.map((group) => [group.name, group.id])),
@@ -149,6 +175,7 @@ export function GroupBrowserContainer({
         src: node.image?.variants[0]?.url ?? null,
       })) ?? []}
       relationCandidates={allGroups.map((group) => group.name)}
+      relationAvailability={relationAvailability}
       onSelectGroup={setSelectedId}
       onCreateGroup={onCreateGroup}
       onUpdateGroup={onUpdateGroup}
