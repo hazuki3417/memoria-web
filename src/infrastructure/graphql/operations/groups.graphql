@@ -1,0 +1,51 @@
+fragment GroupBrowserGroup on MediaGroup {
+  id
+  name
+  createdAt
+}
+query BrowseGroups($scope: ScopeInput!, $search: String, $sort: MediaGroupSort! = NAME_ASC, $first: Int, $after: String) {
+  mediaGroups(scope: $scope, search: $search, sort: $sort, first: $first, after: $after) {
+    edges { cursor node { ...GroupBrowserGroup } }
+    pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+  }
+}
+query BrowseGroupDetail($id: ID!) {
+  mediaGroup(id: $id) {
+    ...GroupBrowserGroup
+    parents(first: 100) { edges { node { id name } } pageInfo { hasNextPage endCursor } }
+    children(first: 100) { edges { node { id name } } pageInfo { hasNextPage endCursor } }
+    aggregateMedia(first: 100) {
+      edges { cursor node { id mediaType status originalFileName createdAt } }
+      pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+    }
+  }
+}
+query BrowseGroupRelationCandidates($groupId: ID!, $search: String, $first: Int, $after: String) {
+  mediaGroupRelationCandidates(groupId: $groupId, search: $search, first: $first, after: $after) {
+    edges { cursor node {
+      group { id name }
+      isParent isChild
+      addAsParent { canAdd unavailableReason }
+      addAsChild { canAdd unavailableReason }
+    } }
+    pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+  }
+}
+mutation CreateBrowserGroup($input: CreateMediaGroupInput!) {
+  createMediaGroup(input: $input) { group { ...GroupBrowserGroup } }
+}
+mutation UpdateBrowserGroup($input: UpdateMediaGroupInput!) {
+  updateMediaGroup(input: $input) {
+    group { ...GroupBrowserGroup }
+    relationResults { groupId direction action status errorCode unavailableReason }
+  }
+}
+mutation DeleteBrowserGroup($input: DeleteMediaGroupInput!) {
+  deleteMediaGroup(input: $input) { groupId }
+}
+mutation AddBrowserMediaToGroup($input: ChangeMediaGroupClassificationInput!) {
+  addMediaToGroup(input: $input) { results { mediaId status errorCode } }
+}
+mutation RemoveBrowserMediaFromGroup($input: ChangeMediaGroupClassificationInput!) {
+  removeMediaFromGroup(input: $input) { results { mediaId status errorCode } }
+}
