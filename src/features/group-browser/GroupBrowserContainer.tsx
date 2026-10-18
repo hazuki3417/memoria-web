@@ -200,14 +200,27 @@ export function GroupBrowserContainer({
     const id = created.data?.createMediaGroup.group.id
     if (!id) throw new Error("Group creation returned no ID")
     if (parents.length || children.length) {
-      const relationChanges = groupRelationChanges({ parents, children }, { parents: [], children: [] }, nameToId)
-      const result = await updateGroup({
-        variables: { input: { groupId: id, relationChanges } },
-      })
-      if (!result.data || result.data.updateMediaGroup.relationResults.some((item) => item.status === "FAILED")) {
+      try {
+        const relationChanges = groupRelationChanges(
+          { parents, children },
+          { parents: [], children: [] },
+          nameToId,
+        )
+        const result = await updateGroup({
+          variables: { input: { groupId: id, relationChanges } },
+        })
+        if (!result.data || result.data.updateMediaGroup.relationResults.some(
+          (item) => item.status === "FAILED",
+        )) {
+          showNotification({
+            kind: "error",
+            title: "Groupは作成されましたが、一部の関係を設定できませんでした",
+          })
+        }
+      } catch {
         showNotification({
           kind: "error",
-          title: "Groupを作成しましたが、一部の関係を設定できませんでした",
+          title: "Groupは作成されましたが、関係の設定結果を確認できませんでした",
         })
       }
     }
