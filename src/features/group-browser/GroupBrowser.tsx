@@ -32,6 +32,7 @@ import { useGroupRef } from "react-resizable-panels"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
+import { countGroupNameGraphemes, validGroupName } from "./groupName"
 
 export type GroupBrowserGroup = {
   id: string
@@ -426,7 +427,7 @@ export function GroupBrowser({
   }
   const submitCreate = async () => {
     const name = createName.trim()
-    if (!name || Array.from(name).length > 100) return
+    if (!validGroupName(name)) return
     const result = await runAction(async () => {
       if (onCreateGroup) {
         await onCreateGroup(name, createParents, createChildren)
@@ -586,14 +587,14 @@ export function GroupBrowser({
                 名前
               </Text>
               <Text component="span" size="xs" c="dimmed">
-                {Array.from(createName).length} / 100
+                {countGroupNameGraphemes(createName)} / 100
               </Text>
             </Group>
           }
           value={createName}
           onChange={(event) => {
             const value = event.currentTarget.value
-            if (Array.from(value).length <= 100) setCreateName(value)
+            if (countGroupNameGraphemes(value) <= 100) setCreateName(value)
           }}
           placeholder="Group名"
           styles={{ label: { display: "block", width: "100%" } }}
@@ -623,7 +624,7 @@ export function GroupBrowser({
           <Button variant="default" onClick={create.close}>
             キャンセル
           </Button>
-          <Button onClick={submitCreate} disabled={!canManage || !createName.trim() || saving}>
+          <Button onClick={submitCreate} disabled={!canManage || !validGroupName(createName) || saving}>
             作成
           </Button>
         </Group>
@@ -648,14 +649,14 @@ export function GroupBrowser({
                 名前
               </Text>
               <Text component="span" size="xs" c="dimmed">
-                {Array.from(draftName).length} / 100
+                {countGroupNameGraphemes(draftName)} / 100
               </Text>
             </Group>
           }
           value={draftName}
           onChange={(event) => {
             const value = event.currentTarget.value
-            if (Array.from(value).length <= 100) setDraftName(value)
+            if (countGroupNameGraphemes(value) <= 100) setDraftName(value)
           }}
           placeholder="Group名"
           styles={{ label: { display: "block", width: "100%" } }}
@@ -708,7 +709,7 @@ export function GroupBrowser({
               }
               if (result === "ok") edit.close()
             }}
-            disabled={!canManage || !draftName.trim() || saving}
+            disabled={!canManage || !validGroupName(draftName) || saving}
             style={{ position: "absolute", right: 0 }}
           >
             保存
