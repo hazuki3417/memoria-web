@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { Alert, Center, Loader } from "@mantine/core"
 import {
   MediaGroupSort,
   ScopeType,
@@ -189,16 +190,19 @@ export function GroupBrowserContainer({
     await listing.refetch()
   }, [deleteGroup, listing.refetch])
 
+  if (listing.error) return <Alert color="red" title="Group一覧を取得できませんでした">再読み込みしてお試しください。</Alert>
+  if (listing.loading && !listing.data) return <Center mih={240}><Loader /></Center>
+
   return (
     <GroupBrowser
       contextKind={contextKind}
       communityId={communityId}
       groupsData={allGroups}
-      mediaItemsData={detail.data?.mediaGroup?.aggregateMedia.edges.map(({ node }) => ({
+      mediaItemsData={detail.data?.mediaGroup?.id === selectedId ? detail.data.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
         id: node.id,
         label: node.originalFileName,
         src: node.image?.variants[0]?.url ?? null,
-      })) ?? []}
+      })) : []}
       relationCandidates={allGroups.map((group) => group.name)}
       relationAvailability={relationAvailability}
       onSelectGroup={setSelectedId}
