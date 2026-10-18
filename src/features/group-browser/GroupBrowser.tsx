@@ -50,6 +50,7 @@ export type GroupBrowserProps = {
   onCreateGroup?: (name: string, parents: string[], children: string[]) => Promise<void>
   onUpdateGroup?: (id: string, name: string, parents: string[], children: string[]) => Promise<void>
   onDeleteGroup?: (id: string) => Promise<void>
+  onSelectGroup?: (id: string | null) => void
 }
 
 type GroupFixture = {
@@ -358,6 +359,7 @@ export function GroupBrowser({
   onCreateGroup,
   onUpdateGroup,
   onDeleteGroup,
+  onSelectGroup,
 }: GroupBrowserProps) {
   const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
   const [createOpened, create] = useDisclosure(false)
@@ -459,6 +461,7 @@ export function GroupBrowser({
 
   const openDetail = (id: string) => {
     setSelectedId(id)
+    onSelectGroup?.(id)
     if (compact) {
       setCompactView("detail")
       return
@@ -471,6 +474,7 @@ export function GroupBrowser({
 
   const closeDetail = () => {
     setSelectedId(null)
+    onSelectGroup?.(null)
     if (compact) {
       setCompactView("groups")
     }
