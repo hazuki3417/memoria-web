@@ -140,6 +140,11 @@ export function GroupBrowserContainer({
       contextKind={contextKind}
       communityId={communityId}
       groupsData={allGroups}
+      mediaItemsData={detail.data?.mediaGroup?.aggregateMedia.edges.map(({ node }) => ({
+        id: node.id,
+        label: node.originalFileName,
+        src: node.image?.variants[0]?.url ?? null,
+      })) ?? []}
       relationCandidates={allGroups.map((group) => group.name)}
       onSelectGroup={setSelectedId}
       onCreateGroup={onCreateGroup}
