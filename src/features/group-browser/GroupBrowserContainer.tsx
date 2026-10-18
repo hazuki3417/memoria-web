@@ -185,6 +185,17 @@ export function GroupBrowserContainer({
     [detail.data, selectedId],
   )
 
+  const mediaItemsData = useMemo(
+    () => (detail.data?.mediaGroup?.id === selectedId
+      ? detail.data.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
+          id: node.id,
+          label: node.originalFileName,
+          src: node.image?.variants[0]?.url ?? null,
+        }))
+      : []),
+    [detail.data, selectedId],
+  )
+
   const nameToId = useMemo(
     () => new Map(allGroups.map((group) => [group.name, group.id])),
     [allGroups],
@@ -283,11 +294,7 @@ export function GroupBrowserContainer({
       contextKind={contextKind}
       communityId={communityId}
       groupsData={allGroups}
-      mediaItemsData={detail.data?.mediaGroup?.id === selectedId ? detail.data.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
-        id: node.id,
-        label: node.originalFileName,
-        src: node.image?.variants[0]?.url ?? null,
-      })) : []}
+      mediaItemsData={mediaItemsData}
       relationCandidates={allGroups.map((group) => group.name)}
       relationAvailability={relationAvailability}
       groupMemberships={groupMemberships}
