@@ -214,7 +214,7 @@ function PreviewGrid({ count, remote = false, sources = [] }: { count: number; r
                 : {}),
             }}
           >
-            {media && remote && !sources[index] && <Box w="100%" h="100%" bg="var(--mantine-color-default-hover)" />}
+            {media && remote && !sources[index] && <Box w="100%" h="100%" bg="var(--mantine-color-default-hover)" style={{ position: "absolute", inset: 0 }} />}
             {!media && (remote ? <Box w="100%" h="100%" bg="var(--mantine-color-default-hover)" /> : <GroupVisual startIndex={groupVisualStart} />)}
             {continuation && (
               <Box
