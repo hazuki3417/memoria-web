@@ -42,12 +42,18 @@ export type GroupBrowserGroup = {
   childNames: string[]
 }
 
+export type GroupRelationAvailability = Record<string, {
+  parent: { canAdd: boolean; reason?: string }
+  child: { canAdd: boolean; reason?: string }
+}>
+
 export type GroupBrowserProps = {
   contextKind?: "personal" | "community"
   communityId?: string
   groupsData?: GroupBrowserGroup[]
   mediaItemsData?: Array<{ id: string; label: string; src: string | null }>
   relationCandidates?: string[]
+  relationAvailability?: GroupRelationAvailability
   onCreateGroup?: (name: string, parents: string[], children: string[]) => Promise<void>
   onUpdateGroup?: (id: string, name: string, parents: string[], children: string[]) => Promise<void>
   onDeleteGroup?: (id: string) => Promise<void>
@@ -249,6 +255,7 @@ function RelationEditor({
   onChange,
   currentGroupName,
   candidates = relationCandidateNames,
+  availability,
 }: {
   label: string
   names: string[]
@@ -256,12 +263,16 @@ function RelationEditor({
   onChange: (names: string[]) => void
   currentGroupName: string
   candidates?: string[]
+  availability?: GroupRelationAvailability
 }) {
   const sortTags = (values: string[]) => [...values].sort()
   const data = candidates.map((name) => ({
     value: name,
     label: name,
-    disabled: name === currentGroupName || oppositeNames.includes(name),
+    disabled:
+      name === currentGroupName ||
+      oppositeNames.includes(name) ||
+      (availability?.[name]?.[label === "Parents" ? "parent" : "child"].canAdd === false && !names.includes(name)),
   }))
 
   return (
@@ -306,7 +317,7 @@ function RelationEditor({
                   : "Parentに指定されています"
                 : checked
                   ? "選択済み"
-                  : ""
+                  : (availability?.[option.value]?.[label === "Parents" ? "parent" : "child"].reason ?? "")
           return (
             <Group justify="space-between" wrap="nowrap" w="100%">
               <Text size="sm">{option.label}</Text>
@@ -369,6 +380,7 @@ export function GroupBrowser({
   groupsData,
   mediaItemsData,
   relationCandidates: candidates,
+  relationAvailability,
   onCreateGroup,
   onUpdateGroup,
   onDeleteGroup,
@@ -557,6 +569,7 @@ export function GroupBrowser({
             onChange={setCreateParents}
             currentGroupName={createName.trim()}
             candidates={candidates}
+            availability={relationAvailability}
           />
           <RelationEditor
             label="Children"
@@ -565,6 +578,7 @@ export function GroupBrowser({
             onChange={setCreateChildren}
             currentGroupName={createName.trim()}
             candidates={candidates}
+            availability={relationAvailability}
           />
         </SimpleGrid>
         <Group justify="flex-end">
@@ -616,6 +630,7 @@ export function GroupBrowser({
             onChange={setDraftParents}
             currentGroupName={selected?.name ?? ""}
             candidates={candidates}
+            availability={relationAvailability}
           />
           <RelationEditor
             label="Children"
@@ -624,6 +639,7 @@ export function GroupBrowser({
             onChange={setDraftChildren}
             currentGroupName={selected?.name ?? ""}
             candidates={candidates}
+            availability={relationAvailability}
           />
         </SimpleGrid>
         <Divider />
