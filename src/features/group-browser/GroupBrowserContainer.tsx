@@ -206,6 +206,7 @@ export function GroupBrowserContainer({
       relationCandidates={allGroups.map((group) => group.name)}
       relationAvailability={relationAvailability}
       onSelectGroup={setSelectedId}
+      detailsReady={!selectedId || (!detail.loading && !detail.error && detail.data?.mediaGroup?.id === selectedId)}
       onCreateGroup={onCreateGroup}
       onUpdateGroup={onUpdateGroup}
       onDeleteGroup={onDeleteGroup}
