@@ -70,6 +70,36 @@ export function GroupBrowserContainer({
     })
   }, [candidateCursor, candidateQuery.loading, candidateQuery.fetchMore])
 
+  const mediaCursor = detail.data?.mediaGroup?.id === selectedId &&
+    detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
+      ? detail.data.mediaGroup.aggregateMedia.pageInfo.endCursor
+      : null
+  useEffect(() => {
+    if (!mediaCursor || !selectedId || detail.loading) return
+    void detail.fetchMore({
+      variables: { id: selectedId, mediaAfter: mediaCursor },
+      updateQuery: (previous, { fetchMoreResult }) => {
+        if (!previous.mediaGroup || !fetchMoreResult?.mediaGroup ||
+            previous.mediaGroup.id !== fetchMoreResult.mediaGroup.id) return previous
+        const incoming = fetchMoreResult.mediaGroup.aggregateMedia
+        const seen = new Set(previous.mediaGroup.aggregateMedia.edges.map((edge) => edge.cursor))
+        return {
+          ...previous,
+          mediaGroup: {
+            ...fetchMoreResult.mediaGroup,
+            aggregateMedia: {
+              ...incoming,
+              edges: [
+                ...previous.mediaGroup.aggregateMedia.edges,
+                ...incoming.edges.filter((edge) => !seen.has(edge.cursor)),
+              ],
+            },
+          },
+        }
+      },
+    })
+  }, [mediaCursor, selectedId, detail.loading, detail.fetchMore])
+
   const [createGroup] = useCreateBrowserGroupMutation()
   const [updateGroup] = useUpdateBrowserGroupMutation()
   const [deleteGroup] = useDeleteBrowserGroupMutation()
