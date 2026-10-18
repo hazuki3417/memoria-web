@@ -304,7 +304,9 @@ export function GroupBrowserContainer({
   }, [deleteGroup, listing.refetch])
 
   if (listing.error) return <Alert color="red" title="Group一覧を取得できませんでした">再読み込みしてお試しください。</Alert>
-  if (listing.loading && !listing.data) return <Center mih={240}><Loader /></Center>
+  if ((listing.loading && !listing.data) || listing.data?.mediaGroups.pageInfo.hasNextPage) {
+    return <Center mih={240}><Loader /></Center>
+  }
 
   return (
     <GroupBrowser
@@ -317,7 +319,7 @@ export function GroupBrowserContainer({
       groupMemberships={groupMemberships}
       onSaveMediaGroups={onSaveMediaGroups}
       onSelectGroup={setSelectedId}
-      detailsReady={!selectedId || (!detail.loading && !detail.error && detail.data?.mediaGroup?.id === selectedId)}
+      detailsReady={!selectedId || (!detail.loading && !detail.error && !candidateQuery.error && !candidateQuery.loading && !candidateQuery.data?.mediaGroupRelationCandidates.pageInfo.hasNextPage && detail.data?.mediaGroup?.id === selectedId)}
       canManage={canManage}
       onCreateGroup={onCreateGroup}
       onUpdateGroup={onUpdateGroup}
