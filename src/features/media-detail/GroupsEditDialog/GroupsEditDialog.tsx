@@ -3,7 +3,7 @@
 import { Button, Group, Modal, MultiSelect, Stack, Text } from "@mantine/core"
 import type { useMediaDetailEditing } from "@/features/media-detail/useMediaDetailEditing"
 
-type Props = Pick<
+type Props = { groupOptions?: string[] } & Pick<
   ReturnType<typeof useMediaDetailEditing>,
   | "detailEditor"
   | "setDetailEditor"
@@ -14,6 +14,7 @@ type Props = Pick<
 
 /** One modal per component to isolate interaction and test scope. */
 export function GroupsEditDialog({
+  groupOptions,
   detailEditor,
   setDetailEditor,
   detailDraft,
@@ -36,7 +37,7 @@ export function GroupsEditDialog({
         <MultiSelect
           label="Groups"
           searchable
-          data={["旅行", "家族", "風景写真", "お気に入り"]}
+          data={groupOptions ?? ["旅行", "家族", "風景写真", "お気に入り"]}
           value={detailDraft}
           onChange={setDetailDraft}
         />
