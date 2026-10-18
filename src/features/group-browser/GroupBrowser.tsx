@@ -459,13 +459,21 @@ export function GroupBrowser({
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
-  const groupMediaItems = mediaItemsData
-    ? mediaItemsData.map((item) => ({ ...item, src: item.src ?? "", failed: !item.src }))
-    : Array.from({ length: 24 }, (_, index) => ({
-        id: `group-media-${index + 1}`,
-        label: `Media ${index + 1}`,
-        src: previewImages[index % previewImages.length],
-      }))
+  const groupMediaItems = useMemo(
+    () => mediaItemsData
+      ? mediaItemsData.map((item) => ({
+          ...item,
+          src: item.src ?? "",
+          failed: !item.src,
+        }))
+      : Array.from({ length: 24 }, (_, index) => ({
+          id: `group-media-${index + 1}`,
+          label: `Media ${index + 1}`,
+          src: previewImages[index % previewImages.length],
+        })),
+    [mediaItemsData],
+  )
+
   const openMediaAt = (index: number) => {
     if (!mediaItemsData) {
       setMediaDetailIndex(index)
