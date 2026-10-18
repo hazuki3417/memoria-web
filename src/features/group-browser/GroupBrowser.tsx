@@ -61,6 +61,7 @@ export type GroupBrowserProps = {
   onDeleteGroup?: (id: string) => Promise<void>
   onSelectGroup?: (id: string | null) => void
   detailsReady?: boolean
+  canManage?: boolean
 }
 
 type GroupFixture = {
@@ -390,6 +391,7 @@ export function GroupBrowser({
   onDeleteGroup,
   onSelectGroup,
   detailsReady = true,
+  canManage = true,
 }: GroupBrowserProps) {
   const busyRef = useRef(false)
   const [saving, setSaving] = useState(false)
@@ -508,7 +510,7 @@ export function GroupBrowser({
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
   const openEdit = () => {
-    if (!selected || !detailsReady) return
+    if (!selected || !detailsReady || !canManage) return
     setDraftName(selected.name)
     setDraftParents(selected.parentNames)
     setDraftChildren(selected.childNames)
@@ -621,7 +623,7 @@ export function GroupBrowser({
           <Button variant="default" onClick={create.close}>
             キャンセル
           </Button>
-          <Button onClick={submitCreate} disabled={!createName.trim() || saving}>
+          <Button onClick={submitCreate} disabled={!canManage || !createName.trim() || saving}>
             作成
           </Button>
         </Group>
@@ -706,7 +708,7 @@ export function GroupBrowser({
               }
               if (result === "ok") edit.close()
             }}
-            disabled={!draftName.trim() || saving}
+            disabled={!canManage || !draftName.trim() || saving}
             style={{ position: "absolute", right: 0 }}
           >
             保存
@@ -735,7 +737,7 @@ export function GroupBrowser({
           </Button>
           <Button
             color="red"
-            disabled={saving}
+            disabled={!canManage || saving}
             onClick={async () => {
               if (!selected) return
               const result = await runAction(async () => {
@@ -820,6 +822,7 @@ export function GroupBrowser({
                     size="xs"
                     leftSection={<IconFolderPlus size={16} />}
                     onClick={openCreate}
+                    disabled={!canManage}
                   >
                     Groupを作成
                   </Button>
@@ -968,6 +971,7 @@ export function GroupBrowser({
                     size="xs"
                     leftSection={<IconFolderPlus size={16} />}
                     onClick={openCreate}
+                    disabled={!canManage}
                   >
                     Groupを作成
                   </Button>
@@ -1078,7 +1082,7 @@ export function GroupBrowser({
                           variant="default"
                           leftSection={<IconEdit size={16} />}
                           onClick={openEdit}
-                          disabled={!detailsReady}
+                          disabled={!canManage || !detailsReady}
                         >
                           編集
                         </Button>
