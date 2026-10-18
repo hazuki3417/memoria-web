@@ -357,8 +357,7 @@ function MediaGrid({
       {mediaItems.map(({ id, label, src }, index) => (
         <UnstyledButton
           key={id}
-          aria-label={src ? `${label}の詳細を開く` : `${label}（プレビュー未提供）`}
-          disabled={!src}
+          aria-label={src ? `${label}の詳細を開く` : `${label}の詳細を開く（画像プレビューなし）`}
           onClick={() => onOpen(index)}
           bdrs="sm"
           style={{
@@ -440,7 +439,7 @@ export function GroupBrowser({
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = mediaItemsData
-    ? mediaItemsData.flatMap((item) => item.src ? [{ ...item, src: item.src }] : [])
+    ? mediaItemsData.map((item) => ({ ...item, src: item.src ?? "", failed: !item.src }))
     : Array.from({ length: 24 }, (_, index) => ({
         id: `group-media-${index + 1}`,
         label: `Media ${index + 1}`,
