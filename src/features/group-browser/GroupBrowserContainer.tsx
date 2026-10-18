@@ -11,6 +11,8 @@ import {
   useCreateBrowserGroupMutation,
   useUpdateBrowserGroupMutation,
   useDeleteBrowserGroupMutation,
+  useAddBrowserMediaToGroupMutation,
+  useRemoveBrowserMediaFromGroupMutation,
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 import { groupRelationChanges } from "./groupRelationChanges"
@@ -38,7 +40,7 @@ export function GroupBrowserContainer({
     skip: contextKind === "community" && !communityId,
   })
   const detail = useBrowseGroupDetailQuery({
-    variables: { id: selectedId ?? "" },
+    variables: { id: selectedId ?? "", scope },
     skip: !selectedId,
   })
   const candidateQuery = useBrowseGroupRelationCandidatesQuery({
@@ -77,7 +79,7 @@ export function GroupBrowserContainer({
   useEffect(() => {
     if (!mediaCursor || !selectedId || detail.loading) return
     void detail.fetchMore({
-      variables: { id: selectedId, mediaAfter: mediaCursor },
+      variables: { id: selectedId, scope, mediaAfter: mediaCursor },
       updateQuery: (previous, { fetchMoreResult }) => {
         if (!previous.mediaGroup || !fetchMoreResult?.mediaGroup ||
             previous.mediaGroup.id !== fetchMoreResult.mediaGroup.id) return previous
@@ -103,6 +105,8 @@ export function GroupBrowserContainer({
   const [createGroup] = useCreateBrowserGroupMutation()
   const [updateGroup] = useUpdateBrowserGroupMutation()
   const [deleteGroup] = useDeleteBrowserGroupMutation()
+  const [addToGroup] = useAddBrowserMediaToGroupMutation()
+  const [removeFromGroup] = useRemoveBrowserMediaFromGroupMutation()
 
   const page = listing.data?.mediaGroups
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
@@ -169,6 +173,18 @@ export function GroupBrowserContainer({
     return result
   }, [candidateQuery.data])
 
+  const groupMemberships = useMemo<Record<string, string[]>>(
+    () => Object.fromEntries(
+      (detail.data?.mediaGroup?.id === selectedId
+        ? detail.data.mediaGroup.aggregateMedia.edges
+        : []).map(({ node }) => [
+          node.id,
+          node.groups.edges.map(({ node: group }) => group.name),
+        ]),
+    ),
+    [detail.data, selectedId],
+  )
+
   const nameToId = useMemo(
     () => new Map(allGroups.map((group) => [group.name, group.id])),
     [allGroups],
@@ -214,6 +230,32 @@ export function GroupBrowserContainer({
     await refetch()
   }, [allGroups, nameToId, updateGroup, refetch])
 
+  const onSaveMediaGroups = useCallback(async (mediaId: string, groupNames: string[]) => {
+    const previous = groupMemberships[mediaId]
+    if (!previous) throw new Error("Media memberships are not loaded")
+    const add = groupNames.filter((name) => !previous.includes(name))
+    const remove = previous.filter((name) => !groupNames.includes(name))
+    const mutate = async (name: string, adding: boolean) => {
+      const groupId = nameToId.get(name)
+      if (!groupId) throw new Error("Group is no longer available in scope")
+      const input = { groupId, mediaIds: [mediaId] }
+      const result = adding
+        ? (await addToGroup({ variables: { input } })).data?.addMediaToGroup.results
+        : (await removeFromGroup({ variables: { input } })).data?.removeMediaFromGroup.results
+      if (!result || result.some((item) => item.status === "FAILED")) {
+        throw new Error("Group classification failed")
+      }
+    }
+    try {
+      for (const name of remove) await mutate(name, false)
+      for (const name of add) await mutate(name, true)
+    } finally {
+      // A partial success or ambiguous network result must be reconciled
+      // against the API; never blindly retry the entire mutation sequence.
+      await refetch()
+    }
+  }, [groupMemberships, nameToId, addToGroup, removeFromGroup, refetch])
+
   const onDeleteGroup = useCallback(async (id: string) => {
     await deleteGroup({ variables: { input: { groupId: id } } })
     setSelectedId(null)
@@ -235,6 +277,8 @@ export function GroupBrowserContainer({
       })) : []}
       relationCandidates={allGroups.map((group) => group.name)}
       relationAvailability={relationAvailability}
+      groupMemberships={groupMemberships}
+      onSaveMediaGroups={onSaveMediaGroups}
       onSelectGroup={setSelectedId}
       detailsReady={!selectedId || (!detail.loading && !detail.error && detail.data?.mediaGroup?.id === selectedId)}
       onCreateGroup={onCreateGroup}
