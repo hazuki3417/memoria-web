@@ -12,6 +12,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 import { groupRelationChanges } from "./groupRelationChanges"
+import { showNotification } from "@/components/Feedback"
 
 type GroupBrowserContainerProps = {
   contextKind: "personal" | "community"
@@ -105,9 +106,11 @@ export function GroupBrowserContainer({
       const result = await updateGroup({
         variables: { input: { groupId: id, relationChanges } },
       })
-      if (result.data?.updateMediaGroup.relationResults.some((item) => item.status === "FAILED")) {
-        await refetch()
-        throw new Error("Some Group relations could not be created")
+      if (!result.data || result.data.updateMediaGroup.relationResults.some((item) => item.status === "FAILED")) {
+        showNotification({
+          kind: "error",
+          title: "Groupを作成しましたが、一部の関係を設定できませんでした",
+        })
       }
     }
     await refetch()
