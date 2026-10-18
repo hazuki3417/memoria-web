@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import {
-  MediaGroupRelationChangeAction,
-  MediaGroupRelationDirection,
   MediaGroupSort,
   ScopeType,
   useBrowseGroupsQuery,
@@ -13,6 +11,7 @@ import {
   useDeleteBrowserGroupMutation,
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
+import { groupRelationChanges } from "./groupRelationChanges"
 
 type GroupBrowserContainerProps = {
   contextKind: "personal" | "community"
@@ -96,39 +95,13 @@ export function GroupBrowserContainer({
     if (selectedId) await detail.refetch()
   }, [listing.refetch, detail.refetch, selectedId])
 
-  const changes = useCallback(
-    (parents: string[], children: string[], previousParents: string[], previousChildren: string[]) => {
-      const result: Array<{
-        groupId: string
-        direction: MediaGroupRelationDirection
-        action: MediaGroupRelationChangeAction
-      }> = []
-      for (const [direction, desired, previous] of [
-        [MediaGroupRelationDirection.Parent, parents, previousParents],
-        [MediaGroupRelationDirection.Child, children, previousChildren],
-      ] as const) {
-        for (const name of desired.filter((item) => !previous.includes(item))) {
-          const groupId = nameToId.get(name)
-          if (!groupId) throw new Error("Relation candidate is not in the current scope")
-          result.push({ groupId, direction, action: MediaGroupRelationChangeAction.Add })
-        }
-        for (const name of previous.filter((item) => !desired.includes(item))) {
-          const groupId = nameToId.get(name)
-          if (!groupId) throw new Error("Existing relation group is unavailable")
-          result.push({ groupId, direction, action: MediaGroupRelationChangeAction.Remove })
-        }
-      }
-      return result
-    },
-    [nameToId],
-  )
 
   const onCreateGroup = useCallback(async (name: string, parents: string[], children: string[]) => {
     const created = await createGroup({ variables: { input: { scope, name } } })
     const id = created.data?.createMediaGroup.group.id
     if (!id) throw new Error("Group creation returned no ID")
     if (parents.length || children.length) {
-      const relationChanges = changes(parents, children, [], [])
+      const relationChanges = groupRelationChanges({ parents, children }, { parents: [], children: [] }, nameToId)
       const result = await updateGroup({
         variables: { input: { groupId: id, relationChanges } },
       })
@@ -138,14 +111,14 @@ export function GroupBrowserContainer({
       }
     }
     await refetch()
-  }, [scope, createGroup, updateGroup, changes, refetch])
+  }, [scope, createGroup, updateGroup, nameToId, refetch])
 
   const onUpdateGroup = useCallback(async (
     id: string, name: string, parents: string[], children: string[],
   ) => {
     const old = allGroups.find((group) => group.id === id)
     if (!old) throw new Error("Group is no longer available")
-    const relationChanges = changes(parents, children, old.parentNames, old.childNames)
+    const relationChanges = groupRelationChanges({ parents, children }, { parents: old.parentNames, children: old.childNames }, nameToId)
     const updated = await updateGroup({
       variables: { input: { groupId: id, name, relationChanges } },
     })
@@ -154,7 +127,7 @@ export function GroupBrowserContainer({
       throw new Error("Some Group changes could not be applied")
     }
     await refetch()
-  }, [allGroups, changes, updateGroup, refetch])
+  }, [allGroups, nameToId, updateGroup, refetch])
 
   const onDeleteGroup = useCallback(async (id: string) => {
     await deleteGroup({ variables: { input: { groupId: id } } })
