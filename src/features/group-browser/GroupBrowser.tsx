@@ -33,6 +33,25 @@ import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
 
+export type GroupBrowserGroup = {
+  id: string
+  name: string
+  mediaCount: number
+  previewCount: number
+  parentNames: string[]
+  childNames: string[]
+}
+
+export type GroupBrowserProps = {
+  contextKind?: "personal" | "community"
+  communityId?: string
+  groupsData?: GroupBrowserGroup[]
+  relationCandidates?: string[]
+  onCreateGroup?: (name: string, parents: string[], children: string[]) => Promise<void>
+  onUpdateGroup?: (id: string, name: string, parents: string[], children: string[]) => Promise<void>
+  onDeleteGroup?: (id: string) => Promise<void>
+}
+
 type GroupFixture = {
   id: string
   name: string
@@ -227,15 +246,17 @@ function RelationEditor({
   oppositeNames,
   onChange,
   currentGroupName,
+  candidates = relationCandidateNames,
 }: {
   label: string
   names: string[]
   oppositeNames: string[]
   onChange: (names: string[]) => void
   currentGroupName: string
+  candidates?: string[]
 }) {
   const sortTags = (values: string[]) => [...values].sort()
-  const data = relationCandidateNames.map((name) => ({
+  const data = candidates.map((name) => ({
     value: name,
     label: name,
     disabled: name === currentGroupName || oppositeNames.includes(name),
@@ -332,18 +353,20 @@ function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
 
 export function GroupBrowser({
   contextKind = "personal",
-}: {
-  contextKind?: "personal" | "community"
-  communityId?: string
-}) {
+  groupsData,
+  relationCandidates: candidates,
+  onCreateGroup,
+  onUpdateGroup,
+  onDeleteGroup,
+}: GroupBrowserProps) {
   const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
   const [createOpened, create] = useDisclosure(false)
   const [createName, setCreateName] = useState("")
   const [createParents, setCreateParents] = useState<string[]>([])
   const [createChildren, setCreateChildren] = useState<string[]>([])
   const allGroups = useMemo(
-    () => [...groups, ...createdGroups],
-    [createdGroups],
+    () => [...(groupsData ?? groups), ...createdGroups],
+    [groupsData, createdGroups],
   )
   const openCreate = () => {
     setCreateName("")
@@ -351,10 +374,17 @@ export function GroupBrowser({
     setCreateChildren([])
     create.open()
   }
-  const submitCreate = () => {
+  const submitCreate = async () => {
     const name = createName.trim()
     if (!name || Array.from(name).length > 100) return
-    setCreatedGroups((current) => [
+    if (onCreateGroup) {
+      try {
+        await onCreateGroup(name, createParents, createChildren)
+      } catch {
+        showNotification({ kind: "error", title: "Groupを作成できませんでした" })
+        return
+      }
+    } else setCreatedGroups((current) => [
       ...current,
       {
         id: `created-${Date.now()}-${current.length}`,
@@ -498,6 +528,7 @@ export function GroupBrowser({
             oppositeNames={createChildren}
             onChange={setCreateParents}
             currentGroupName={createName.trim()}
+            candidates={candidates}
           />
           <RelationEditor
             label="Children"
@@ -505,6 +536,7 @@ export function GroupBrowser({
             oppositeNames={createParents}
             onChange={setCreateChildren}
             currentGroupName={createName.trim()}
+            candidates={candidates}
           />
         </SimpleGrid>
         <Group justify="flex-end">
@@ -555,6 +587,7 @@ export function GroupBrowser({
             oppositeNames={draftChildren}
             onChange={setDraftParents}
             currentGroupName={selected?.name ?? ""}
+            candidates={candidates}
           />
           <RelationEditor
             label="Children"
@@ -562,6 +595,7 @@ export function GroupBrowser({
             oppositeNames={draftParents}
             onChange={setDraftChildren}
             currentGroupName={selected?.name ?? ""}
+            candidates={candidates}
           />
         </SimpleGrid>
         <Divider />
@@ -581,7 +615,18 @@ export function GroupBrowser({
             キャンセル
           </Button>
           <Button
-            onClick={edit.close}
+            onClick={async () => {
+              if (!selected) return
+              if (onUpdateGroup) {
+                try {
+                  await onUpdateGroup(selected.id, draftName.trim(), draftParents, draftChildren)
+                } catch {
+                  showNotification({ kind: "error", title: "Groupを更新できませんでした" })
+                  return
+                }
+              }
+              edit.close()
+            }}
             disabled={!draftName.trim()}
             style={{ position: "absolute", right: 0 }}
           >
@@ -611,9 +656,18 @@ export function GroupBrowser({
           </Button>
           <Button
             color="red"
-            onClick={() => {
+            onClick={async () => {
+              if (selected && onDeleteGroup) {
+                try {
+                  await onDeleteGroup(selected.id)
+                } catch {
+                  showNotification({ kind: "error", title: "Groupを削除できませんでした" })
+                  return
+                }
+              }
               deletion.close()
               edit.close()
+              closeDetail()
             }}
           >
             削除
