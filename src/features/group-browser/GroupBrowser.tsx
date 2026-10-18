@@ -52,6 +52,8 @@ export type GroupBrowserProps = {
   communityId?: string
   groupsData?: GroupBrowserGroup[]
   mediaItemsData?: Array<{ id: string; label: string; src: string | null }>
+  groupMemberships?: Record<string, string[]>
+  onSaveMediaGroups?: (mediaId: string, groupNames: string[]) => Promise<void>
   relationCandidates?: string[]
   relationAvailability?: GroupRelationAvailability
   onCreateGroup?: (name: string, parents: string[], children: string[]) => Promise<void>
@@ -380,6 +382,8 @@ export function GroupBrowser({
   contextKind = "personal",
   groupsData,
   mediaItemsData,
+  groupMemberships,
+  onSaveMediaGroups,
   relationCandidates: candidates,
   relationAvailability,
   onCreateGroup,
@@ -1128,6 +1132,9 @@ export function GroupBrowser({
       )}
       <MediaDetailDialog
         items={groupMediaItems}
+        groupOptions={candidates}
+        groupMemberships={groupMemberships}
+        onSaveGroups={onSaveMediaGroups}
         initialId={
           imageDetailIndex !== null
             ? groupMediaItems[imageDetailIndex]?.id
