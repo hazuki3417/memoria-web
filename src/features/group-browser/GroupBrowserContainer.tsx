@@ -4,6 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { Alert, Center, Loader } from "@mantine/core"
 import {
   MediaGroupSort,
+  CommunityMemberRole,
+  useCommunityMembersQuery,
+  useCurrentUserQuery,
   ScopeType,
   useBrowseGroupsQuery,
   useBrowseGroupDetailQuery,
@@ -35,6 +38,17 @@ export function GroupBrowserContainer({
     [contextKind, communityId],
   )
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const communityMembers = useCommunityMembersQuery({
+    variables: { communityId: communityId ?? "" },
+    skip: contextKind !== "community" || !communityId,
+  })
+  const currentUser = useCurrentUserQuery({ skip: contextKind !== "community" })
+  const canManage = contextKind === "personal" ||
+    Boolean(communityMembers.data?.communityMembers.some(
+      (member) => member.userId === currentUser.data?.me?.id &&
+        member.role === CommunityMemberRole.Admin,
+    ))
+
   const listing = useBrowseGroupsQuery({
     variables: { scope, sort: MediaGroupSort.NameAsc, first: 100 },
     skip: contextKind === "community" && !communityId,
@@ -301,6 +315,7 @@ export function GroupBrowserContainer({
       onSaveMediaGroups={onSaveMediaGroups}
       onSelectGroup={setSelectedId}
       detailsReady={!selectedId || (!detail.loading && !detail.error && detail.data?.mediaGroup?.id === selectedId)}
+      canManage={canManage}
       onCreateGroup={onCreateGroup}
       onUpdateGroup={onUpdateGroup}
       onDeleteGroup={onDeleteGroup}
