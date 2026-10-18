@@ -159,7 +159,7 @@ export function GroupBrowserContainer({
         // Until Media thumbnails are available, preserve the existing
         // presentational contract without inventing Media counts.
         mediaCount: matching?.aggregateMedia.edges.length ?? 0,
-        previewCount: 0,
+        previewCount: matching?.aggregateMedia.edges.length ?? 0,
         parentNames: matching?.parents.edges.map(({ node: parent }) => parent.name) ?? [],
         childNames: matching?.children.edges.map(({ node: child }) => child.name) ?? [],
       }
