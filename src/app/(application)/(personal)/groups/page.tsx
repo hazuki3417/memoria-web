@@ -1,5 +1,5 @@
-import { GroupBrowser } from "@/features/group-browser/GroupBrowser"
+import { GroupBrowserContainer } from "@/features/group-browser"
 
 export default function Page() {
-  return <GroupBrowser />
+  return <GroupBrowserContainer contextKind="personal" />
 }
