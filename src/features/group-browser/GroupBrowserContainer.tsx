@@ -216,8 +216,11 @@ export function GroupBrowserContainer({
   )
   const refetch = useCallback(async () => {
     await listing.refetch()
-    if (selectedId) await detail.refetch()
-  }, [listing.refetch, detail.refetch, selectedId])
+    if (selectedId) await Promise.all([
+      detail.refetch(),
+      candidateQuery.refetch(),
+    ])
+  }, [listing.refetch, detail.refetch, candidateQuery.refetch, selectedId])
 
 
   const onCreateGroup = useCallback(async (name: string, parents: string[], children: string[]) => {
