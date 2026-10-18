@@ -26,7 +26,7 @@ import {
   IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
 import { showNotification } from "@/components/Feedback"
@@ -391,6 +391,22 @@ export function GroupBrowser({
   onSelectGroup,
   detailsReady = true,
 }: GroupBrowserProps) {
+  const busyRef = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const runAction = async (action: () => Promise<void>): Promise<"ok" | "busy" | "error"> => {
+    if (busyRef.current) return "busy"
+    busyRef.current = true
+    setSaving(true)
+    try {
+      await action()
+      return "ok"
+    } catch {
+      return "error"
+    } finally {
+      busyRef.current = false
+      setSaving(false)
+    }
+  }
   const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
   const [createOpened, create] = useDisclosure(false)
   const [createName, setCreateName] = useState("")
@@ -409,24 +425,28 @@ export function GroupBrowser({
   const submitCreate = async () => {
     const name = createName.trim()
     if (!name || Array.from(name).length > 100) return
-    if (onCreateGroup) {
-      try {
+    const result = await runAction(async () => {
+      if (onCreateGroup) {
         await onCreateGroup(name, createParents, createChildren)
-      } catch {
-        showNotification({ kind: "error", title: "Groupを作成できませんでした" })
-        return
+      } else {
+        setCreatedGroups((current) => [
+          ...current,
+          {
+            id: `created-${Date.now()}-${current.length}`,
+            name,
+            mediaCount: 0,
+            previewCount: 0,
+            parentNames: createParents,
+            childNames: createChildren,
+          },
+        ])
       }
-    } else setCreatedGroups((current) => [
-      ...current,
-      {
-        id: `created-${Date.now()}-${current.length}`,
-        name,
-        mediaCount: 0,
-        previewCount: 0,
-        parentNames: createParents,
-        childNames: createChildren,
-      },
-    ])
+    })
+    if (result === "error") {
+      showNotification({ kind: "error", title: "Groupを作成できませんでした" })
+      return
+    }
+    if (result !== "ok") return
     create.close()
     showNotification({
       kind: "success",
@@ -434,6 +454,7 @@ export function GroupBrowser({
       description: `「${name}」を作成しました。`,
     })
   }
+
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -592,7 +613,7 @@ export function GroupBrowser({
           <Button variant="default" onClick={create.close}>
             キャンセル
           </Button>
-          <Button onClick={submitCreate} disabled={!createName.trim()}>
+          <Button onClick={submitCreate} disabled={!createName.trim() || saving}>
             作成
           </Button>
         </Group>
@@ -668,17 +689,16 @@ export function GroupBrowser({
           <Button
             onClick={async () => {
               if (!selected) return
-              if (onUpdateGroup) {
-                try {
-                  await onUpdateGroup(selected.id, draftName.trim(), draftParents, draftChildren)
-                } catch {
-                  showNotification({ kind: "error", title: "Groupを更新できませんでした" })
-                  return
-                }
+              const result = await runAction(async () => {
+                await onUpdateGroup?.(selected.id, draftName.trim(), draftParents, draftChildren)
+              })
+              if (result === "error") {
+                showNotification({ kind: "error", title: "Groupを更新できませんでした" })
+                return
               }
-              edit.close()
+              if (result === "ok") edit.close()
             }}
-            disabled={!draftName.trim()}
+            disabled={!draftName.trim() || saving}
             style={{ position: "absolute", right: 0 }}
           >
             保存
@@ -707,15 +727,17 @@ export function GroupBrowser({
           </Button>
           <Button
             color="red"
+            disabled={saving}
             onClick={async () => {
-              if (selected && onDeleteGroup) {
-                try {
-                  await onDeleteGroup(selected.id)
-                } catch {
-                  showNotification({ kind: "error", title: "Groupを削除できませんでした" })
-                  return
-                }
+              if (!selected) return
+              const result = await runAction(async () => {
+                await onDeleteGroup?.(selected.id)
+              })
+              if (result === "error") {
+                showNotification({ kind: "error", title: "Groupを削除できませんでした" })
+                return
               }
+              if (result !== "ok") return
               deletion.close()
               edit.close()
               closeDetail()
