@@ -184,7 +184,7 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
   )
 }
 
-function PreviewGrid({ count, remote = false }: { count: number; remote?: boolean }) {
+function PreviewGrid({ count, remote = false, sources = [] }: { count: number; remote?: boolean; sources?: string[] }) {
   const previewCellIds = ["preview-1", "preview-2", "preview-3", "preview-4"]
   let groupVisualIndex = 0
   return (
@@ -207,13 +207,14 @@ function PreviewGrid({ count, remote = false }: { count: number; remote?: boolea
               overflow: "hidden",
               ...(media
                 ? {
-                    backgroundImage: `url("${previewImages[index % previewImages.length]}")`,
+                    backgroundImage: remote ? (sources[index] ? `url("${sources[index]}")` : undefined) : `url("${previewImages[index % previewImages.length]}")`,
                     backgroundPosition: "center",
                     backgroundSize: "cover",
                   }
                 : {}),
             }}
           >
+            {media && remote && !sources[index] && <Box w="100%" h="100%" bg="var(--mantine-color-default-hover" />}
             {!media && (remote ? <Box w="100%" h="100%" bg="var(--mantine-color-default-hover)" /> : <GroupVisual startIndex={groupVisualStart} />)}
             {continuation && (
               <Box
@@ -856,7 +857,7 @@ export function GroupBrowser({
                         >
                           {group.name}
                         </Text>
-                        <PreviewGrid count={group.previewCount} remote={groupsData !== undefined} />
+                        <PreviewGrid count={group.previewCount} remote={groupsData !== undefined} sources={group.id === selectedId ? (mediaItemsData ?? []).flatMap((item) => item.src ? [item.src] : []) : []} />
                       </Stack>
                     </UnstyledButton>
                   ))}
