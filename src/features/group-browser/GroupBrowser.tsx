@@ -58,6 +58,7 @@ export type GroupBrowserProps = {
   onUpdateGroup?: (id: string, name: string, parents: string[], children: string[]) => Promise<void>
   onDeleteGroup?: (id: string) => Promise<void>
   onSelectGroup?: (id: string | null) => void
+  detailsReady?: boolean
 }
 
 type GroupFixture = {
@@ -385,6 +386,7 @@ export function GroupBrowser({
   onUpdateGroup,
   onDeleteGroup,
   onSelectGroup,
+  detailsReady = true,
 }: GroupBrowserProps) {
   const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
   const [createOpened, create] = useDisclosure(false)
@@ -462,17 +464,19 @@ export function GroupBrowser({
   const [draftChildren, setDraftChildren] = useState<string[]>([])
 
   const visibleGroups = useMemo(() => {
-    const normalized = appliedQuery.trim().toLocaleLowerCase()
+    const normalized = appliedQuery.trim()
     if (!normalized) return allGroups
     return allGroups.filter((group) =>
-      group.name.toLocaleLowerCase().includes(normalized),
+      groupsData !== undefined
+        ? group.name.includes(normalized)
+        : group.name.toLocaleLowerCase().includes(normalized.toLocaleLowerCase()),
     )
-  }, [appliedQuery, allGroups])
+  }, [appliedQuery, allGroups, groupsData])
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
   const openEdit = () => {
-    if (!selected) return
+    if (!selected || !detailsReady) return
     setDraftName(selected.name)
     setDraftParents(selected.parentNames)
     setDraftChildren(selected.childNames)
@@ -1041,6 +1045,7 @@ export function GroupBrowser({
                           variant="default"
                           leftSection={<IconEdit size={16} />}
                           onClick={openEdit}
+                          disabled={!detailsReady}
                         >
                           編集
                         </Button>
