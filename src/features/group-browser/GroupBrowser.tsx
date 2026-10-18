@@ -46,6 +46,7 @@ export type GroupBrowserProps = {
   contextKind?: "personal" | "community"
   communityId?: string
   groupsData?: GroupBrowserGroup[]
+  mediaItemsData?: Array<{ id: string; label: string; src: string | null }>
   relationCandidates?: string[]
   onCreateGroup?: (name: string, parents: string[], children: string[]) => Promise<void>
   onUpdateGroup?: (id: string, name: string, parents: string[], children: string[]) => Promise<void>
@@ -172,7 +173,7 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
   )
 }
 
-function PreviewGrid({ count }: { count: number }) {
+function PreviewGrid({ count, remote = false }: { count: number; remote?: boolean }) {
   const previewCellIds = ["preview-1", "preview-2", "preview-3", "preview-4"]
   let groupVisualIndex = 0
   return (
@@ -202,7 +203,7 @@ function PreviewGrid({ count }: { count: number }) {
                 : {}),
             }}
           >
-            {!media && <GroupVisual startIndex={groupVisualStart} />}
+            {!media && (remote ? <Box w="100%" h="100%" bg="var(--mantine-color-default-hover)" /> : <GroupVisual startIndex={groupVisualStart} />)}
             {continuation && (
               <Box
                 pos="absolute"
@@ -324,29 +325,40 @@ function RelationEditor({
     </Stack>
   )
 }
-function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
+function MediaGrid({
+  onOpen,
+  items,
+}: {
+  onOpen: (index: number) => void
+  items?: Array<{ id: string; label: string; src: string | null }>
+}) {
   // Local dummy thumbnails; actual Group media will be supplied by the Connection.
-  const mediaItems = Array.from({ length: 24 }, (_, index) => ({
+  const mediaItems = items ?? Array.from({ length: 24 }, (_, index) => ({
     id: `media-${index + 1}`,
+    label: `Media ${index + 1}`,
     src: previewImages[index % previewImages.length],
   }))
   return (
     <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
-      {mediaItems.map(({ id, src }, index) => (
+      {mediaItems.map(({ id, label, src }, index) => (
         <UnstyledButton
           key={id}
-          aria-label={`Media ${index + 1}の詳細を開く`}
+          aria-label={src ? `${label}の詳細を開く` : `${label}（プレビュー未提供）`}
+          disabled={!src}
           onClick={() => onOpen(index)}
           bdrs="sm"
           style={{
             display: "block",
             aspectRatio: "1 / 1",
             border: "1px solid var(--mantine-color-default-border)",
-            backgroundImage: `url("${src}")`,
+            backgroundImage: src ? `url("${src}")` : undefined,
+            backgroundColor: "var(--mantine-color-default-hover)",
             backgroundPosition: "center",
             backgroundSize: "cover",
           }}
-        />
+        >
+          {!src && <Text size="xs" c="dimmed" ta="center">{label}</Text>}
+        </UnstyledButton>
       ))}
     </SimpleGrid>
   )
@@ -355,6 +367,7 @@ function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
 export function GroupBrowser({
   contextKind = "personal",
   groupsData,
+  mediaItemsData,
   relationCandidates: candidates,
   onCreateGroup,
   onUpdateGroup,
@@ -408,11 +421,22 @@ export function GroupBrowser({
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
-  const groupMediaItems = Array.from({ length: 24 }, (_, index) => ({
-    id: `group-media-${index + 1}`,
-    label: `Media ${index + 1}`,
-    src: previewImages[index % previewImages.length],
-  }))
+  const groupMediaItems = mediaItemsData
+    ? mediaItemsData.flatMap((item) => item.src ? [{ ...item, src: item.src }] : [])
+    : Array.from({ length: 24 }, (_, index) => ({
+        id: `group-media-${index + 1}`,
+        label: `Media ${index + 1}`,
+        src: previewImages[index % previewImages.length],
+      }))
+  const openMediaAt = (index: number) => {
+    if (!mediaItemsData) {
+      setMediaDetailIndex(index)
+      return
+    }
+    const id = mediaItemsData[index]?.id
+    const availableIndex = groupMediaItems.findIndex((item) => item.id === id)
+    if (availableIndex >= 0) setMediaDetailIndex(availableIndex)
+  }
 
   const splitViewRef = useGroupRef()
   const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
@@ -775,7 +799,7 @@ export function GroupBrowser({
                         >
                           {group.name}
                         </Text>
-                        <PreviewGrid count={group.previewCount} />
+                        <PreviewGrid count={group.previewCount} remote={groupsData !== undefined} />
                       </Stack>
                     </UnstyledButton>
                   ))}
@@ -818,7 +842,7 @@ export function GroupBrowser({
                       <Text fw={600}>Mediaがありません</Text>
                     </Paper>
                   ) : (
-                    <MediaGrid onOpen={setMediaDetailIndex} />
+                    <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
                   )}
                 </Box>
               </ScrollArea>
@@ -936,7 +960,7 @@ export function GroupBrowser({
                           >
                             {group.name}
                           </Text>
-                          <PreviewGrid count={group.previewCount} />
+                          <PreviewGrid count={group.previewCount} remote={groupsData !== undefined} />
                         </Stack>
                       </UnstyledButton>
                     )
@@ -1070,7 +1094,7 @@ export function GroupBrowser({
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid onOpen={setMediaDetailIndex} />
+                          <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
                         )}
                       </Box>
                     </ScrollArea>
@@ -1085,7 +1109,7 @@ export function GroupBrowser({
         items={groupMediaItems}
         initialId={
           imageDetailIndex !== null
-            ? groupMediaItems[imageDetailIndex].id
+            ? groupMediaItems[imageDetailIndex]?.id
             : undefined
         }
         onClose={() => setMediaDetailIndex(null)}
