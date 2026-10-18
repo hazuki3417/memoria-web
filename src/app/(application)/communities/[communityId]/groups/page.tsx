@@ -1,4 +1,4 @@
-import { GroupBrowser } from "@/features/group-browser/GroupBrowser"
+import { GroupBrowserContainer } from "@/features/group-browser"
 
 export default async function Page({
   params,
@@ -6,5 +6,5 @@ export default async function Page({
   params: Promise<{ communityId: string }>
 }) {
   const { communityId } = await params
-  return <GroupBrowser contextKind="community" communityId={communityId} />
+  return <GroupBrowserContainer contextKind="community" communityId={communityId} />
 }
