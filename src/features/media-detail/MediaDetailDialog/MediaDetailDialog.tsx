@@ -75,7 +75,9 @@ export function MediaDetailDialog({
     toggleDetailSection,
   } = useMediaDetailEditing(
     detail,
-    onSaveGroups ? { memberships: groupMemberships ?? {}, onSave: onSaveGroups } : undefined,
+    onSaveGroups
+      ? { memberships: groupMemberships ?? {}, onSave: onSaveGroups }
+      : undefined,
   )
   const {
     prepareNavigation,

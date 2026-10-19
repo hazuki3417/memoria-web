@@ -35,7 +35,8 @@ export function groupRelationChanges(
   ]) {
     for (const name of next.filter((value) => !current.includes(value))) {
       const id = nameToId.get(name)
-      if (!id) throw new Error("Relation candidate is not available in this scope")
+      if (!id)
+        throw new Error("Relation candidate is not available in this scope")
       result.push({
         groupId: id,
         direction,

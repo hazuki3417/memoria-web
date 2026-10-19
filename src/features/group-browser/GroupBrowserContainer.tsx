@@ -43,11 +43,15 @@ export function GroupBrowserContainer({
     skip: contextKind !== "community" || !communityId,
   })
   const currentUser = useCurrentUserQuery({ skip: contextKind !== "community" })
-  const canManage = contextKind === "personal" ||
-    Boolean(communityMembers.data?.communityMembers.some(
-      (member) => member.userId === currentUser.data?.me?.id &&
-        member.role === CommunityMemberRole.Admin,
-    ))
+  const canManage =
+    contextKind === "personal" ||
+    Boolean(
+      communityMembers.data?.communityMembers.some(
+        (member) =>
+          member.userId === currentUser.data?.me?.id &&
+          member.role === CommunityMemberRole.Admin,
+      ),
+    )
 
   const listing = useBrowseGroupsQuery({
     variables: { scope, sort: MediaGroupSort.NameAsc, first: 100 },
@@ -61,7 +65,8 @@ export function GroupBrowserContainer({
     variables: { groupId: selectedId ?? "", first: 100 },
     skip: !selectedId,
   })
-  const candidateCursor = candidateQuery.data?.mediaGroupRelationCandidates.pageInfo.hasNextPage
+  const candidateCursor = candidateQuery.data?.mediaGroupRelationCandidates
+    .pageInfo.hasNextPage
     ? candidateQuery.data.mediaGroupRelationCandidates.pageInfo.endCursor
     : null
   useEffect(() => {
@@ -71,7 +76,11 @@ export function GroupBrowserContainer({
       updateQuery: (previous, { fetchMoreResult }) => {
         if (!fetchMoreResult) return previous
         const incoming = fetchMoreResult.mediaGroupRelationCandidates
-        const seen = new Set(previous.mediaGroupRelationCandidates.edges.map((edge) => edge.cursor))
+        const seen = new Set(
+          previous.mediaGroupRelationCandidates.edges.map(
+            (edge) => edge.cursor,
+          ),
+        )
         return {
           ...previous,
           mediaGroupRelationCandidates: {
@@ -86,7 +95,8 @@ export function GroupBrowserContainer({
     })
   }, [candidateCursor, candidateQuery.loading, candidateQuery.fetchMore])
 
-  const mediaCursor = detail.data?.mediaGroup?.id === selectedId &&
+  const mediaCursor =
+    detail.data?.mediaGroup?.id === selectedId &&
     detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
       ? detail.data.mediaGroup.aggregateMedia.pageInfo.endCursor
       : null
@@ -95,10 +105,16 @@ export function GroupBrowserContainer({
     void detail.fetchMore({
       variables: { id: selectedId, scope, mediaAfter: mediaCursor },
       updateQuery: (previous, { fetchMoreResult }) => {
-        if (!previous.mediaGroup || !fetchMoreResult?.mediaGroup ||
-            previous.mediaGroup.id !== fetchMoreResult.mediaGroup.id) return previous
+        if (
+          !previous.mediaGroup ||
+          !fetchMoreResult?.mediaGroup ||
+          previous.mediaGroup.id !== fetchMoreResult.mediaGroup.id
+        )
+          return previous
         const incoming = fetchMoreResult.mediaGroup.aggregateMedia
-        const seen = new Set(previous.mediaGroup.aggregateMedia.edges.map((edge) => edge.cursor))
+        const seen = new Set(
+          previous.mediaGroup.aggregateMedia.edges.map((edge) => edge.cursor),
+        )
         return {
           ...previous,
           mediaGroup: {
@@ -134,7 +150,9 @@ export function GroupBrowserContainer({
       updateQuery: (previous, { fetchMoreResult }) => {
         const incoming = fetchMoreResult?.mediaGroups
         if (!incoming) return previous
-        const seen = new Set(previous.mediaGroups.edges.map((edge) => edge.cursor))
+        const seen = new Set(
+          previous.mediaGroups.edges.map((edge) => edge.cursor),
+        )
         return {
           ...previous,
           mediaGroups: {
@@ -160,18 +178,24 @@ export function GroupBrowserContainer({
         // presentational contract without inventing Media counts.
         mediaCount: matching?.aggregateMedia.edges.length ?? 0,
         previewCount: matching?.aggregateMedia.edges.length ?? 0,
-        parentNames: matching?.parents.edges.map(({ node: parent }) => parent.name) ?? [],
-        childNames: matching?.children.edges.map(({ node: child }) => child.name) ?? [],
+        parentNames:
+          matching?.parents.edges.map(({ node: parent }) => parent.name) ?? [],
+        childNames:
+          matching?.children.edges.map(({ node: child }) => child.name) ?? [],
       }
     })
   }, [listing.data, detail.data])
 
   const relationAvailability = useMemo(() => {
-    const result: Record<string, {
-      parent: { canAdd: boolean; reason?: string }
-      child: { canAdd: boolean; reason?: string }
-    }> = {}
-    for (const edge of candidateQuery.data?.mediaGroupRelationCandidates.edges ?? []) {
+    const result: Record<
+      string,
+      {
+        parent: { canAdd: boolean; reason?: string }
+        child: { canAdd: boolean; reason?: string }
+      }
+    > = {}
+    for (const edge of candidateQuery.data?.mediaGroupRelationCandidates
+      .edges ?? []) {
       const candidate = edge.node
       result[candidate.group.name] = {
         parent: {
@@ -188,25 +212,28 @@ export function GroupBrowserContainer({
   }, [candidateQuery.data])
 
   const groupMemberships = useMemo<Record<string, string[]>>(
-    () => Object.fromEntries(
-      (detail.data?.mediaGroup?.id === selectedId
-        ? detail.data.mediaGroup.aggregateMedia.edges
-        : []).map(({ node }) => [
+    () =>
+      Object.fromEntries(
+        (detail.data?.mediaGroup?.id === selectedId
+          ? detail.data.mediaGroup.aggregateMedia.edges
+          : []
+        ).map(({ node }) => [
           node.id,
           node.groups.edges.map(({ node: group }) => group.name),
         ]),
-    ),
+      ),
     [detail.data, selectedId],
   )
 
   const mediaItemsData = useMemo(
-    () => (detail.data?.mediaGroup?.id === selectedId
-      ? detail.data.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
-          id: node.id,
-          label: node.originalFileName,
-          src: node.image?.variants[0]?.url ?? null,
-        }))
-      : []),
+    () =>
+      detail.data?.mediaGroup?.id === selectedId
+        ? detail.data.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
+            id: node.id,
+            label: node.originalFileName,
+            src: node.image?.variants[0]?.url ?? null,
+          }))
+        : [],
     [detail.data, selectedId],
   )
 
@@ -216,98 +243,136 @@ export function GroupBrowserContainer({
   )
   const refetch = useCallback(async () => {
     await listing.refetch()
-    if (selectedId) await Promise.all([
-      detail.refetch(),
-      candidateQuery.refetch(),
-    ])
+    if (selectedId)
+      await Promise.all([detail.refetch(), candidateQuery.refetch()])
   }, [listing.refetch, detail.refetch, candidateQuery.refetch, selectedId])
 
-
-  const onCreateGroup = useCallback(async (name: string, parents: string[], children: string[]) => {
-    const created = await createGroup({ variables: { input: { scope, name } } })
-    const id = created.data?.createMediaGroup.group.id
-    if (!id) throw new Error("Group creation returned no ID")
-    if (parents.length || children.length) {
-      try {
-        const relationChanges = groupRelationChanges(
-          { parents, children },
-          { parents: [], children: [] },
-          nameToId,
-        )
-        const result = await updateGroup({
-          variables: { input: { groupId: id, relationChanges } },
-        })
-        if (!result.data || result.data.updateMediaGroup.relationResults.some(
-          (item) => item.status === "FAILED",
-        )) {
+  const onCreateGroup = useCallback(
+    async (name: string, parents: string[], children: string[]) => {
+      const created = await createGroup({
+        variables: { input: { scope, name } },
+      })
+      const id = created.data?.createMediaGroup.group.id
+      if (!id) throw new Error("Group creation returned no ID")
+      if (parents.length || children.length) {
+        try {
+          const relationChanges = groupRelationChanges(
+            { parents, children },
+            { parents: [], children: [] },
+            nameToId,
+          )
+          const result = await updateGroup({
+            variables: { input: { groupId: id, relationChanges } },
+          })
+          if (
+            !result.data ||
+            result.data.updateMediaGroup.relationResults.some(
+              (item) => item.status === "FAILED",
+            )
+          ) {
+            showNotification({
+              kind: "error",
+              title:
+                "Groupは作成されましたが、一部の関係を設定できませんでした",
+              description:
+                "Group自体は保存されています。関係の最新状態を確認してください。",
+            })
+          }
+        } catch {
           showNotification({
             kind: "error",
-            title: "Groupは作成されましたが、一部の関係を設定できませんでした",
-            description: "Group自体は保存されています。関係の最新状態を確認してください。", 
+            title:
+              "Groupは作成されましたが、関係の設定結果を確認できませんでした",
+            description: "Groupを再作成せず、最新の関係を確認してください。",
           })
         }
-      } catch {
-        showNotification({
-          kind: "error",
-          title: "Groupは作成されましたが、関係の設定結果を確認できませんでした",
-          description: "Groupを再作成せず、最新の関係を確認してください。",
-        })
       }
-    }
-    await refetch()
-  }, [scope, createGroup, updateGroup, nameToId, refetch])
-
-  const onUpdateGroup = useCallback(async (
-    id: string, name: string, parents: string[], children: string[],
-  ) => {
-    const old = allGroups.find((group) => group.id === id)
-    if (!old) throw new Error("Group is no longer available")
-    const relationChanges = groupRelationChanges({ parents, children }, { parents: old.parentNames, children: old.childNames }, nameToId)
-    const updated = await updateGroup({
-      variables: { input: { groupId: id, name, relationChanges } },
-    })
-    if (!updated.data || updated.data.updateMediaGroup.relationResults.some((item) => item.status === "FAILED")) {
       await refetch()
-      throw new Error("Some Group changes could not be applied")
-    }
-    await refetch()
-  }, [allGroups, nameToId, updateGroup, refetch])
+    },
+    [scope, createGroup, updateGroup, nameToId, refetch],
+  )
 
-  const onSaveMediaGroups = useCallback(async (mediaId: string, groupNames: string[]) => {
-    const previous = groupMemberships[mediaId]
-    if (!previous) throw new Error("Media memberships are not loaded")
-    const add = groupNames.filter((name) => !previous.includes(name))
-    const remove = previous.filter((name) => !groupNames.includes(name))
-    const mutate = async (name: string, adding: boolean) => {
-      const groupId = nameToId.get(name)
-      if (!groupId) throw new Error("Group is no longer available in scope")
-      const input = { groupId, mediaIds: [mediaId] }
-      const result = adding
-        ? (await addToGroup({ variables: { input } })).data?.addMediaToGroup.results
-        : (await removeFromGroup({ variables: { input } })).data?.removeMediaFromGroup.results
-      if (!result || result.some((item) => item.status === "FAILED")) {
-        throw new Error("Group classification failed")
+  const onUpdateGroup = useCallback(
+    async (id: string, name: string, parents: string[], children: string[]) => {
+      const old = allGroups.find((group) => group.id === id)
+      if (!old) throw new Error("Group is no longer available")
+      const relationChanges = groupRelationChanges(
+        { parents, children },
+        { parents: old.parentNames, children: old.childNames },
+        nameToId,
+      )
+      const updated = await updateGroup({
+        variables: { input: { groupId: id, name, relationChanges } },
+      })
+      if (
+        !updated.data ||
+        updated.data.updateMediaGroup.relationResults.some(
+          (item) => item.status === "FAILED",
+        )
+      ) {
+        await refetch()
+        throw new Error("Some Group changes could not be applied")
       }
-    }
-    try {
-      for (const name of remove) await mutate(name, false)
-      for (const name of add) await mutate(name, true)
-    } finally {
-      // A partial success or ambiguous network result must be reconciled
-      // against the API; never blindly retry the entire mutation sequence.
       await refetch()
-    }
-  }, [groupMemberships, nameToId, addToGroup, removeFromGroup, refetch])
+    },
+    [allGroups, nameToId, updateGroup, refetch],
+  )
 
-  const onDeleteGroup = useCallback(async (id: string) => {
-    await deleteGroup({ variables: { input: { groupId: id } } })
-    setSelectedId(null)
-    await listing.refetch()
-  }, [deleteGroup, listing.refetch])
+  const onSaveMediaGroups = useCallback(
+    async (mediaId: string, groupNames: string[]) => {
+      const previous = groupMemberships[mediaId]
+      if (!previous) throw new Error("Media memberships are not loaded")
+      const add = groupNames.filter((name) => !previous.includes(name))
+      const remove = previous.filter((name) => !groupNames.includes(name))
+      const mutate = async (name: string, adding: boolean) => {
+        const groupId = nameToId.get(name)
+        if (!groupId) throw new Error("Group is no longer available in scope")
+        const input = { groupId, mediaIds: [mediaId] }
+        const result = adding
+          ? (await addToGroup({ variables: { input } })).data?.addMediaToGroup
+              .results
+          : (await removeFromGroup({ variables: { input } })).data
+              ?.removeMediaFromGroup.results
+        if (!result || result.some((item) => item.status === "FAILED")) {
+          throw new Error("Group classification failed")
+        }
+      }
+      try {
+        for (const name of remove) await mutate(name, false)
+        for (const name of add) await mutate(name, true)
+      } finally {
+        // A partial success or ambiguous network result must be reconciled
+        // against the API; never blindly retry the entire mutation sequence.
+        await refetch()
+      }
+    },
+    [groupMemberships, nameToId, addToGroup, removeFromGroup, refetch],
+  )
 
-  if (listing.error) return <Alert color="red" title="Group一覧を取得できませんでした">再読み込みしてお試しください。</Alert>
-  if ((listing.loading && !listing.data) || listing.data?.mediaGroups.pageInfo.hasNextPage) {
-    return <Center mih={240}><Loader /></Center>
+  const onDeleteGroup = useCallback(
+    async (id: string) => {
+      await deleteGroup({ variables: { input: { groupId: id } } })
+      setSelectedId(null)
+      await listing.refetch()
+    },
+    [deleteGroup, listing.refetch],
+  )
+
+  if (listing.error)
+    return (
+      <Alert color="red" title="Group一覧を取得できませんでした">
+        再読み込みしてお試しください。
+      </Alert>
+    )
+  if (
+    (listing.loading && !listing.data) ||
+    listing.data?.mediaGroups.pageInfo.hasNextPage
+  ) {
+    return (
+      <Center mih={240}>
+        <Loader />
+      </Center>
+    )
   }
 
   return (
@@ -321,7 +386,16 @@ export function GroupBrowserContainer({
       groupMemberships={groupMemberships}
       onSaveMediaGroups={onSaveMediaGroups}
       onSelectGroup={setSelectedId}
-      detailsReady={!selectedId || (!detail.loading && !detail.error && !candidateQuery.error && !candidateQuery.loading && !candidateQuery.data?.mediaGroupRelationCandidates.pageInfo.hasNextPage && detail.data?.mediaGroup?.id === selectedId)}
+      detailsReady={
+        !selectedId ||
+        (!detail.loading &&
+          !detail.error &&
+          !candidateQuery.error &&
+          !candidateQuery.loading &&
+          !candidateQuery.data?.mediaGroupRelationCandidates.pageInfo
+            .hasNextPage &&
+          detail.data?.mediaGroup?.id === selectedId)
+      }
       canManage={canManage}
       onCreateGroup={onCreateGroup}
       onUpdateGroup={onUpdateGroup}

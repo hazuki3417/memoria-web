@@ -27,7 +27,10 @@ export function useMediaDetailEditing(
     communities: ["Photo Club"],
   }
   const detailValues = remoteGroups
-    ? { ...localValues, groups: remoteGroups.memberships[detail?.id ?? ""] ?? [] }
+    ? {
+        ...localValues,
+        groups: remoteGroups.memberships[detail?.id ?? ""] ?? [],
+      }
     : localValues
   const openDetailEditor = (kind: "tags" | "groups" | "communities") => {
     setDetailDraft([...detailValues[kind]])
@@ -39,11 +42,19 @@ export function useMediaDetailEditing(
       try {
         await remoteGroups.onSave(detail.id, detailDraft)
       } catch {
-        showNotification({ kind: "error", title: "Groupsの変更を保存できませんでした", description: "最新の分類状態を確認してから、再度お試しください。" })
+        showNotification({
+          kind: "error",
+          title: "Groupsの変更を保存できませんでした",
+          description: "最新の分類状態を確認してから、再度お試しください。",
+        })
         return
       }
       setDetailEditor(null)
-      showNotification({ kind: "success", title: "Groupsを更新", description: "MediaのGroup分類を保存しました。" })
+      showNotification({
+        kind: "success",
+        title: "Groupsを更新",
+        description: "MediaのGroup分類を保存しました。",
+      })
       return
     }
     setDetailEdits((current) => ({
