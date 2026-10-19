@@ -33,6 +33,12 @@ export type AcceptCommunityDeletionPayload = {
   accepted: Scalars["Boolean"]["output"]
 }
 
+export enum BulkItemStatus {
+  AlreadyApplied = "ALREADY_APPLIED",
+  Failed = "FAILED",
+  Succeeded = "SUCCEEDED",
+}
+
 export type ChangeCommunityMemberRoleInput = {
   communityId: Scalars["ID"]["input"]
   role: CommunityMemberRole
@@ -42,6 +48,16 @@ export type ChangeCommunityMemberRoleInput = {
 export type ChangeCommunityMemberRolePayload = {
   __typename?: "ChangeCommunityMemberRolePayload"
   success: Scalars["Boolean"]["output"]
+}
+
+export type ChangeMediaGroupClassificationInput = {
+  groupId: Scalars["ID"]["input"]
+  mediaIds: Array<Scalars["ID"]["input"]>
+}
+
+export type ChangeMediaGroupClassificationPayload = {
+  __typename?: "ChangeMediaGroupClassificationPayload"
+  results: Array<MediaGroupClassificationItemResult>
 }
 
 export type Community = {
@@ -87,15 +103,261 @@ export type CreateCommunityPayload = {
   community: Community
 }
 
+export type CreateMediaGroupInput = {
+  name: Scalars["String"]["input"]
+  scope: ScopeInput
+}
+
 export enum DateFormat {
   DdMmYyyy = "DD_MM_YYYY",
   MmDdYyyy = "MM_DD_YYYY",
   YyyyMmDd = "YYYY_MM_DD",
 }
 
+export type DeleteMediaGroupInput = {
+  groupId: Scalars["ID"]["input"]
+}
+
+export type DeleteMediaGroupPayload = {
+  __typename?: "DeleteMediaGroupPayload"
+  groupId: Scalars["ID"]["output"]
+}
+
 export enum FileSizeUnit {
   Binary = "BINARY",
   Decimal = "DECIMAL",
+}
+
+export type Image = {
+  __typename?: "Image"
+  height: Scalars["Int"]["output"]
+  variants: Array<ImageVariant>
+  width: Scalars["Int"]["output"]
+}
+
+export type ImageVariant = {
+  __typename?: "ImageVariant"
+  format: Scalars["String"]["output"]
+  height: Scalars["Int"]["output"]
+  id: Scalars["ID"]["output"]
+  sizeBytes: Scalars["Int"]["output"]
+  url: Scalars["String"]["output"]
+  width: Scalars["Int"]["output"]
+}
+
+export type Media = {
+  __typename?: "Media"
+  createdAt: Scalars["DateTime"]["output"]
+  fileSize: Scalars["Int"]["output"]
+  groups: MediaGroupConnection
+  id: Scalars["ID"]["output"]
+  image?: Maybe<Image>
+  mediaType: MediaType
+  mimeType: Scalars["String"]["output"]
+  originalFileName: Scalars["String"]["output"]
+  processing?: Maybe<MediaProcessing>
+  status: MediaStatus
+  tags: MediaTagConnection
+  updatedAt: Scalars["DateTime"]["output"]
+  uploadedAt: Scalars["DateTime"]["output"]
+  uploadedBy?: Maybe<MediaUploader>
+}
+
+export type MediaGroupsArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  last?: InputMaybe<Scalars["Int"]["input"]>
+  scope: ScopeInput
+}
+
+export type MediaTagsArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  last?: InputMaybe<Scalars["Int"]["input"]>
+  scope: ScopeInput
+}
+
+export type MediaConnection = {
+  __typename?: "MediaConnection"
+  edges: Array<MediaEdge>
+  pageInfo: PageInfo
+}
+
+export type MediaEdge = {
+  __typename?: "MediaEdge"
+  cursor: Scalars["String"]["output"]
+  node: Media
+}
+
+export type MediaFilterInput = {
+  tagIds?: InputMaybe<Array<Scalars["ID"]["input"]>>
+}
+
+export type MediaGroup = {
+  __typename?: "MediaGroup"
+  aggregateMedia: MediaConnection
+  children: MediaGroupConnection
+  createdAt: Scalars["DateTime"]["output"]
+  id: Scalars["ID"]["output"]
+  media: MediaConnection
+  name: Scalars["String"]["output"]
+  parents: MediaGroupConnection
+}
+
+export type MediaGroupAggregateMediaArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  last?: InputMaybe<Scalars["Int"]["input"]>
+}
+
+export type MediaGroupChildrenArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  last?: InputMaybe<Scalars["Int"]["input"]>
+}
+
+export type MediaGroupMediaArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  last?: InputMaybe<Scalars["Int"]["input"]>
+}
+
+export type MediaGroupParentsArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  last?: InputMaybe<Scalars["Int"]["input"]>
+}
+
+export type MediaGroupClassificationItemResult = {
+  __typename?: "MediaGroupClassificationItemResult"
+  errorCode?: Maybe<Scalars["String"]["output"]>
+  mediaId: Scalars["ID"]["output"]
+  status: BulkItemStatus
+}
+
+export type MediaGroupConnection = {
+  __typename?: "MediaGroupConnection"
+  edges: Array<MediaGroupEdge>
+  pageInfo: PageInfo
+}
+
+export type MediaGroupEdge = {
+  __typename?: "MediaGroupEdge"
+  cursor: Scalars["String"]["output"]
+  node: MediaGroup
+}
+
+export type MediaGroupPayload = {
+  __typename?: "MediaGroupPayload"
+  group: MediaGroup
+}
+
+export type MediaGroupRelationActionAvailability = {
+  __typename?: "MediaGroupRelationActionAvailability"
+  canAdd: Scalars["Boolean"]["output"]
+  unavailableReason?: Maybe<MediaGroupRelationUnavailableReason>
+}
+
+export type MediaGroupRelationCandidate = {
+  __typename?: "MediaGroupRelationCandidate"
+  addAsChild: MediaGroupRelationActionAvailability
+  addAsParent: MediaGroupRelationActionAvailability
+  group: MediaGroup
+  isChild: Scalars["Boolean"]["output"]
+  isParent: Scalars["Boolean"]["output"]
+}
+
+export type MediaGroupRelationCandidateConnection = {
+  __typename?: "MediaGroupRelationCandidateConnection"
+  edges: Array<MediaGroupRelationCandidateEdge>
+  pageInfo: PageInfo
+}
+
+export type MediaGroupRelationCandidateEdge = {
+  __typename?: "MediaGroupRelationCandidateEdge"
+  cursor: Scalars["String"]["output"]
+  node: MediaGroupRelationCandidate
+}
+
+export enum MediaGroupRelationChangeAction {
+  Add = "ADD",
+  Remove = "REMOVE",
+}
+
+export type MediaGroupRelationChangeInput = {
+  action: MediaGroupRelationChangeAction
+  direction: MediaGroupRelationDirection
+  groupId: Scalars["ID"]["input"]
+}
+
+export type MediaGroupRelationChangeResult = {
+  __typename?: "MediaGroupRelationChangeResult"
+  action: MediaGroupRelationChangeAction
+  direction: MediaGroupRelationDirection
+  errorCode?: Maybe<Scalars["String"]["output"]>
+  groupId: Scalars["ID"]["output"]
+  status: MediaGroupRelationChangeStatus
+  unavailableReason?: Maybe<MediaGroupRelationUnavailableReason>
+}
+
+export enum MediaGroupRelationChangeStatus {
+  AlreadyApplied = "ALREADY_APPLIED",
+  Failed = "FAILED",
+  Succeeded = "SUCCEEDED",
+}
+
+export enum MediaGroupRelationDirection {
+  Child = "CHILD",
+  Parent = "PARENT",
+}
+
+export enum MediaGroupRelationUnavailableReason {
+  AlreadyRelated = "ALREADY_RELATED",
+  ChildLimit = "CHILD_LIMIT",
+  Cycle = "CYCLE",
+  DepthLimit = "DEPTH_LIMIT",
+  OppositeRelation = "OPPOSITE_RELATION",
+  ParentLimit = "PARENT_LIMIT",
+  Self = "SELF",
+}
+
+export enum MediaGroupSort {
+  CreatedAtDesc = "CREATED_AT_DESC",
+  NameAsc = "NAME_ASC",
+}
+
+export type MediaProcessing = {
+  __typename?: "MediaProcessing"
+  status: ProcessingStatus
+}
+
+export enum MediaStatus {
+  Active = "ACTIVE",
+  Deleting = "DELETING",
+}
+
+export type MediaTag = {
+  __typename?: "MediaTag"
+  id: Scalars["ID"]["output"]
+  name: Scalars["String"]["output"]
+}
+
+export type MediaTagConnection = {
+  __typename?: "MediaTagConnection"
+  edges: Array<MediaTagEdge>
+  pageInfo: PageInfo
+}
+
+export type MediaTagEdge = {
+  __typename?: "MediaTagEdge"
+  cursor: Scalars["String"]["output"]
+  node: MediaTag
 }
 
 export enum MediaThumbnailSize {
@@ -104,15 +366,32 @@ export enum MediaThumbnailSize {
   Small = "SMALL",
 }
 
+export enum MediaType {
+  Image = "IMAGE",
+  Video = "VIDEO",
+}
+
+export type MediaUploader = {
+  __typename?: "MediaUploader"
+  deleted: Scalars["Boolean"]["output"]
+  nickname?: Maybe<Scalars["String"]["output"]>
+  userId?: Maybe<Scalars["ID"]["output"]>
+}
+
 export type Mutation = {
   __typename?: "Mutation"
   acceptCommunityDeletion: AcceptCommunityDeletionPayload
+  addMediaToGroup: ChangeMediaGroupClassificationPayload
   changeCommunityMemberRole: ChangeCommunityMemberRolePayload
   createCommunity: CreateCommunityPayload
+  createMediaGroup: MediaGroupPayload
+  deleteMediaGroup: DeleteMediaGroupPayload
   leaveCommunity: CommunityMembershipMutationPayload
   registerUser: RegisterUserPayload
   removeCommunityMember: CommunityMembershipMutationPayload
+  removeMediaFromGroup: ChangeMediaGroupClassificationPayload
   renameCommunity: RenameCommunityPayload
+  updateMediaGroup: UpdateMediaGroupPayload
   updateUserPreferences: UpdateUserPreferencesPayload
   updateUserProfile: UpdateUserProfilePayload
 }
@@ -121,12 +400,24 @@ export type MutationAcceptCommunityDeletionArgs = {
   input: AcceptCommunityDeletionInput
 }
 
+export type MutationAddMediaToGroupArgs = {
+  input: ChangeMediaGroupClassificationInput
+}
+
 export type MutationChangeCommunityMemberRoleArgs = {
   input: ChangeCommunityMemberRoleInput
 }
 
 export type MutationCreateCommunityArgs = {
   input: CreateCommunityInput
+}
+
+export type MutationCreateMediaGroupArgs = {
+  input: CreateMediaGroupInput
+}
+
+export type MutationDeleteMediaGroupArgs = {
+  input: DeleteMediaGroupInput
 }
 
 export type MutationLeaveCommunityArgs = {
@@ -141,8 +432,16 @@ export type MutationRemoveCommunityMemberArgs = {
   input: RemoveCommunityMemberInput
 }
 
+export type MutationRemoveMediaFromGroupArgs = {
+  input: ChangeMediaGroupClassificationInput
+}
+
 export type MutationRenameCommunityArgs = {
   input: RenameCommunityInput
+}
+
+export type MutationUpdateMediaGroupArgs = {
+  input: UpdateMediaGroupInput
 }
 
 export type MutationUpdateUserPreferencesArgs = {
@@ -157,8 +456,14 @@ export type PageInfo = {
   __typename?: "PageInfo"
   endCursor?: Maybe<Scalars["String"]["output"]>
   hasNextPage: Scalars["Boolean"]["output"]
-  hasPrevPage: Scalars["Boolean"]["output"]
+  hasPreviousPage: Scalars["Boolean"]["output"]
   startCursor?: Maybe<Scalars["String"]["output"]>
+}
+
+export enum ProcessingStatus {
+  Failed = "FAILED",
+  Processing = "PROCESSING",
+  Ready = "READY",
 }
 
 export type Query = {
@@ -167,6 +472,11 @@ export type Query = {
   communityDeletionSnapshot: CommunityDeletionSnapshot
   communityMembers: Array<CommunityMember>
   me?: Maybe<User>
+  media?: Maybe<Media>
+  mediaGroup?: Maybe<MediaGroup>
+  mediaGroupRelationCandidates: MediaGroupRelationCandidateConnection
+  mediaGroups: MediaGroupConnection
+  mediaList: MediaConnection
   myCommunities: Array<Community>
 }
 
@@ -180,6 +490,42 @@ export type QueryCommunityDeletionSnapshotArgs = {
 
 export type QueryCommunityMembersArgs = {
   communityId: Scalars["ID"]["input"]
+}
+
+export type QueryMediaArgs = {
+  id: Scalars["ID"]["input"]
+}
+
+export type QueryMediaGroupArgs = {
+  id: Scalars["ID"]["input"]
+}
+
+export type QueryMediaGroupRelationCandidatesArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  groupId: Scalars["ID"]["input"]
+  last?: InputMaybe<Scalars["Int"]["input"]>
+  search?: InputMaybe<Scalars["String"]["input"]>
+}
+
+export type QueryMediaGroupsArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  last?: InputMaybe<Scalars["Int"]["input"]>
+  scope: ScopeInput
+  search?: InputMaybe<Scalars["String"]["input"]>
+  sort?: MediaGroupSort
+}
+
+export type QueryMediaListArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>
+  before?: InputMaybe<Scalars["String"]["input"]>
+  filter?: InputMaybe<MediaFilterInput>
+  first?: InputMaybe<Scalars["Int"]["input"]>
+  last?: InputMaybe<Scalars["Int"]["input"]>
+  scope: ScopeInput
 }
 
 export type RegisterUserInput = {
@@ -204,6 +550,28 @@ export type RenameCommunityInput = {
 export type RenameCommunityPayload = {
   __typename?: "RenameCommunityPayload"
   community: Community
+}
+
+export type ScopeInput = {
+  communityId?: InputMaybe<Scalars["ID"]["input"]>
+  type: ScopeType
+}
+
+export enum ScopeType {
+  Community = "COMMUNITY",
+  Personal = "PERSONAL",
+}
+
+export type UpdateMediaGroupInput = {
+  groupId: Scalars["ID"]["input"]
+  name?: InputMaybe<Scalars["String"]["input"]>
+  relationChanges?: InputMaybe<Array<MediaGroupRelationChangeInput>>
+}
+
+export type UpdateMediaGroupPayload = {
+  __typename?: "UpdateMediaGroupPayload"
+  group: MediaGroup
+  relationResults: Array<MediaGroupRelationChangeResult>
 }
 
 export type UpdateUserPreferencesInput = {
@@ -260,10 +628,17 @@ export type OperationAcceptCommunityDeletionInput = {
   revision: string
 }
 
+export type OperationBulkItemStatus = "ALREADY_APPLIED" | "FAILED" | "SUCCEEDED"
+
 export type OperationChangeCommunityMemberRoleInput = {
   communityId: string | number
   role: OperationCommunityMemberRole
   userId: string | number
+}
+
+export type OperationChangeMediaGroupClassificationInput = {
+  groupId: string | number
+  mediaIds: Array<string | number>
 }
 
 export type OperationCommunityMemberRole = "admin" | "member"
@@ -272,11 +647,50 @@ export type OperationCreateCommunityInput = {
   name: string
 }
 
+export type OperationCreateMediaGroupInput = {
+  name: string
+  scope: OperationScopeInput
+}
+
 export type OperationDateFormat = "DD_MM_YYYY" | "MM_DD_YYYY" | "YYYY_MM_DD"
+
+export type OperationDeleteMediaGroupInput = {
+  groupId: string | number
+}
 
 export type OperationFileSizeUnit = "BINARY" | "DECIMAL"
 
+export type OperationMediaGroupRelationChangeAction = "ADD" | "REMOVE"
+
+export type OperationMediaGroupRelationChangeInput = {
+  action: OperationMediaGroupRelationChangeAction
+  direction: OperationMediaGroupRelationDirection
+  groupId: string | number
+}
+
+export type OperationMediaGroupRelationChangeStatus =
+  | "ALREADY_APPLIED"
+  | "FAILED"
+  | "SUCCEEDED"
+
+export type OperationMediaGroupRelationDirection = "CHILD" | "PARENT"
+
+export type OperationMediaGroupRelationUnavailableReason =
+  | "ALREADY_RELATED"
+  | "CHILD_LIMIT"
+  | "CYCLE"
+  | "DEPTH_LIMIT"
+  | "OPPOSITE_RELATION"
+  | "PARENT_LIMIT"
+  | "SELF"
+
+export type OperationMediaGroupSort = "CREATED_AT_DESC" | "NAME_ASC"
+
+export type OperationMediaStatus = "ACTIVE" | "DELETING"
+
 export type OperationMediaThumbnailSize = "LARGE" | "MEDIUM" | "SMALL"
+
+export type OperationMediaType = "IMAGE" | "VIDEO"
 
 export type OperationRegisterUserInput = {
   nickname: string
@@ -290,6 +704,22 @@ export type OperationRemoveCommunityMemberInput = {
 export type OperationRenameCommunityInput = {
   communityId: string | number
   name: string
+}
+
+export type OperationScopeInput = {
+  communityId?: string | number | null | undefined
+  type: OperationScopeType
+}
+
+export type OperationScopeType = "COMMUNITY" | "PERSONAL"
+
+export type OperationUpdateMediaGroupInput = {
+  groupId: string | number
+  name?: string | null | undefined
+  relationChanges?:
+    | Array<OperationMediaGroupRelationChangeInput>
+    | null
+    | undefined
 }
 
 export type OperationUpdateUserPreferencesInput = {
@@ -420,6 +850,176 @@ export type OperationAcceptCommunityDeletionMutation = {
   acceptCommunityDeletion: { accepted: boolean }
 }
 
+export type OperationGroupBrowserGroupFragment = {
+  id: string
+  name: string
+  createdAt: string
+}
+
+export type OperationBrowseGroupsQueryVariables = Exact<{
+  scope: OperationScopeInput
+  search?: string | null | undefined
+  sort?: OperationMediaGroupSort
+  first?: number | null | undefined
+  after?: string | null | undefined
+}>
+
+export type OperationBrowseGroupsQuery = {
+  mediaGroups: {
+    edges: Array<{
+      cursor: string
+      node: { id: string; name: string; createdAt: string }
+    }>
+    pageInfo: {
+      hasNextPage: boolean
+      hasPreviousPage: boolean
+      startCursor: string | null
+      endCursor: string | null
+    }
+  }
+}
+
+export type OperationBrowseGroupDetailQueryVariables = Exact<{
+  id: string | number
+  scope: OperationScopeInput
+  mediaAfter?: string | null | undefined
+}>
+
+export type OperationBrowseGroupDetailQuery = {
+  mediaGroup: {
+    id: string
+    name: string
+    createdAt: string
+    parents: {
+      edges: Array<{ node: { id: string; name: string } }>
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
+    }
+    children: {
+      edges: Array<{ node: { id: string; name: string } }>
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
+    }
+    aggregateMedia: {
+      edges: Array<{
+        cursor: string
+        node: {
+          id: string
+          mediaType: OperationMediaType
+          status: OperationMediaStatus
+          originalFileName: string
+          createdAt: string
+          image: { variants: Array<{ url: string }> } | null
+          groups: {
+            edges: Array<{ node: { id: string; name: string } }>
+            pageInfo: { hasNextPage: boolean; endCursor: string | null }
+          }
+        }
+      }>
+      pageInfo: {
+        hasNextPage: boolean
+        hasPreviousPage: boolean
+        startCursor: string | null
+        endCursor: string | null
+      }
+    }
+  } | null
+}
+
+export type OperationBrowseGroupRelationCandidatesQueryVariables = Exact<{
+  groupId: string | number
+  search?: string | null | undefined
+  first?: number | null | undefined
+  after?: string | null | undefined
+}>
+
+export type OperationBrowseGroupRelationCandidatesQuery = {
+  mediaGroupRelationCandidates: {
+    edges: Array<{
+      cursor: string
+      node: {
+        isParent: boolean
+        isChild: boolean
+        group: { id: string; name: string }
+        addAsParent: {
+          canAdd: boolean
+          unavailableReason: OperationMediaGroupRelationUnavailableReason | null
+        }
+        addAsChild: {
+          canAdd: boolean
+          unavailableReason: OperationMediaGroupRelationUnavailableReason | null
+        }
+      }
+    }>
+    pageInfo: {
+      hasNextPage: boolean
+      hasPreviousPage: boolean
+      startCursor: string | null
+      endCursor: string | null
+    }
+  }
+}
+
+export type OperationCreateBrowserGroupMutationVariables = Exact<{
+  input: OperationCreateMediaGroupInput
+}>
+
+export type OperationCreateBrowserGroupMutation = {
+  createMediaGroup: { group: { id: string; name: string; createdAt: string } }
+}
+
+export type OperationUpdateBrowserGroupMutationVariables = Exact<{
+  input: OperationUpdateMediaGroupInput
+}>
+
+export type OperationUpdateBrowserGroupMutation = {
+  updateMediaGroup: {
+    group: { id: string; name: string; createdAt: string }
+    relationResults: Array<{
+      groupId: string
+      direction: OperationMediaGroupRelationDirection
+      action: OperationMediaGroupRelationChangeAction
+      status: OperationMediaGroupRelationChangeStatus
+      errorCode: string | null
+      unavailableReason: OperationMediaGroupRelationUnavailableReason | null
+    }>
+  }
+}
+
+export type OperationDeleteBrowserGroupMutationVariables = Exact<{
+  input: OperationDeleteMediaGroupInput
+}>
+
+export type OperationDeleteBrowserGroupMutation = {
+  deleteMediaGroup: { groupId: string }
+}
+
+export type OperationAddBrowserMediaToGroupMutationVariables = Exact<{
+  input: OperationChangeMediaGroupClassificationInput
+}>
+
+export type OperationAddBrowserMediaToGroupMutation = {
+  addMediaToGroup: {
+    results: Array<{
+      mediaId: string
+      status: OperationBulkItemStatus
+      errorCode: string | null
+    }>
+  }
+}
+
+export type OperationRemoveBrowserMediaFromGroupMutationVariables = Exact<{
+  input: OperationChangeMediaGroupClassificationInput
+}>
+
+export type OperationRemoveBrowserMediaFromGroupMutation = {
+  removeMediaFromGroup: {
+    results: Array<{
+      mediaId: string
+      status: OperationBulkItemStatus
+      errorCode: string | null
+    }>
+  }
+}
+
 export type OperationCurrentUserQueryVariables = Exact<{ [key: string]: never }>
 
 export type OperationCurrentUserQuery = {
@@ -472,6 +1072,13 @@ export type OperationSaveUserPreferencesMutation = {
   }
 }
 
+export const GroupBrowserGroupFragmentDoc = gql`
+    fragment GroupBrowserGroup on MediaGroup {
+  id
+  name
+  createdAt
+}
+    `
 export const MyCommunitiesDocument = gql`
     query MyCommunities {
   myCommunities {
@@ -505,10 +1112,10 @@ export function useMyCommunitiesQuery(
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<OperationMyCommunitiesQuery, OperationMyCommunitiesQueryVariables>(
-    MyCommunitiesDocument,
-    options,
-  )
+  return Apollo.useQuery<
+    OperationMyCommunitiesQuery,
+    OperationMyCommunitiesQueryVariables
+  >(MyCommunitiesDocument, options)
 }
 export function useMyCommunitiesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -517,10 +1124,10 @@ export function useMyCommunitiesLazyQuery(
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<OperationMyCommunitiesQuery, OperationMyCommunitiesQueryVariables>(
-    MyCommunitiesDocument,
-    options,
-  )
+  return Apollo.useLazyQuery<
+    OperationMyCommunitiesQuery,
+    OperationMyCommunitiesQueryVariables
+  >(MyCommunitiesDocument, options)
 }
 // @ts-ignore
 export function useMyCommunitiesSuspenseQuery(
@@ -611,10 +1218,10 @@ export function useCommunityDetailsQuery(
     ),
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<OperationCommunityDetailsQuery, OperationCommunityDetailsQueryVariables>(
-    CommunityDetailsDocument,
-    options,
-  )
+  return Apollo.useQuery<
+    OperationCommunityDetailsQuery,
+    OperationCommunityDetailsQueryVariables
+  >(CommunityDetailsDocument, options)
 }
 export function useCommunityDetailsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -717,10 +1324,10 @@ export function useCommunityMembersQuery(
     ),
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<OperationCommunityMembersQuery, OperationCommunityMembersQueryVariables>(
-    CommunityMembersDocument,
-    options,
-  )
+  return Apollo.useQuery<
+    OperationCommunityMembersQuery,
+    OperationCommunityMembersQueryVariables
+  >(CommunityMembersDocument, options)
 }
 export function useCommunityMembersLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -818,7 +1425,10 @@ export function useCommunityDeletionSnapshotQuery(
     OperationCommunityDeletionSnapshotQueryVariables
   > &
     (
-      | { variables: OperationCommunityDeletionSnapshotQueryVariables; skip?: boolean }
+      | {
+          variables: OperationCommunityDeletionSnapshotQueryVariables
+          skip?: boolean
+        }
       | { skip: boolean }
     ),
 ) {
@@ -1202,6 +1812,703 @@ export type AcceptCommunityDeletionMutationOptions = Apollo.BaseMutationOptions<
   OperationAcceptCommunityDeletionMutation,
   OperationAcceptCommunityDeletionMutationVariables
 >
+export const BrowseGroupsDocument = gql`
+    query BrowseGroups($scope: ScopeInput!, $search: String, $sort: MediaGroupSort! = NAME_ASC, $first: Int, $after: String) {
+  mediaGroups(
+    scope: $scope
+    search: $search
+    sort: $sort
+    first: $first
+    after: $after
+  ) {
+    edges {
+      cursor
+      node {
+        ...GroupBrowserGroup
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+    ${GroupBrowserGroupFragmentDoc}`
+
+/**
+ * __useBrowseGroupsQuery__
+ *
+ * To run a query within a React component, call `useBrowseGroupsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBrowseGroupsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBrowseGroupsQuery({
+ *   variables: {
+ *      scope: // value for 'scope'
+ *      search: // value for 'search'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useBrowseGroupsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OperationBrowseGroupsQuery,
+    OperationBrowseGroupsQueryVariables
+  > &
+    (
+      | { variables: OperationBrowseGroupsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationBrowseGroupsQuery,
+    OperationBrowseGroupsQueryVariables
+  >(BrowseGroupsDocument, options)
+}
+export function useBrowseGroupsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationBrowseGroupsQuery,
+    OperationBrowseGroupsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationBrowseGroupsQuery,
+    OperationBrowseGroupsQueryVariables
+  >(BrowseGroupsDocument, options)
+}
+// @ts-ignore
+export function useBrowseGroupsSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationBrowseGroupsQuery,
+    OperationBrowseGroupsQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationBrowseGroupsQuery,
+  OperationBrowseGroupsQueryVariables
+>
+export function useBrowseGroupsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationBrowseGroupsQuery,
+        OperationBrowseGroupsQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationBrowseGroupsQuery | undefined,
+  OperationBrowseGroupsQueryVariables
+>
+export function useBrowseGroupsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationBrowseGroupsQuery,
+        OperationBrowseGroupsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationBrowseGroupsQuery,
+    OperationBrowseGroupsQueryVariables
+  >(BrowseGroupsDocument, options)
+}
+export type BrowseGroupsQueryHookResult = ReturnType<
+  typeof useBrowseGroupsQuery
+>
+export type BrowseGroupsLazyQueryHookResult = ReturnType<
+  typeof useBrowseGroupsLazyQuery
+>
+export type BrowseGroupsSuspenseQueryHookResult = ReturnType<
+  typeof useBrowseGroupsSuspenseQuery
+>
+export type BrowseGroupsQueryResult = Apollo.QueryResult<
+  OperationBrowseGroupsQuery,
+  OperationBrowseGroupsQueryVariables
+>
+export const BrowseGroupDetailDocument = gql`
+    query BrowseGroupDetail($id: ID!, $scope: ScopeInput!, $mediaAfter: String) {
+  mediaGroup(id: $id) {
+    ...GroupBrowserGroup
+    parents(first: 100) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+    children(first: 100) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+    aggregateMedia(first: 100, after: $mediaAfter) {
+      edges {
+        cursor
+        node {
+          id
+          mediaType
+          status
+          originalFileName
+          createdAt
+          image {
+            variants {
+              url
+            }
+          }
+          groups(scope: $scope, first: 100) {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+}
+    ${GroupBrowserGroupFragmentDoc}`
+
+/**
+ * __useBrowseGroupDetailQuery__
+ *
+ * To run a query within a React component, call `useBrowseGroupDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBrowseGroupDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBrowseGroupDetailQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      scope: // value for 'scope'
+ *      mediaAfter: // value for 'mediaAfter'
+ *   },
+ * });
+ */
+export function useBrowseGroupDetailQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OperationBrowseGroupDetailQuery,
+    OperationBrowseGroupDetailQueryVariables
+  > &
+    (
+      | { variables: OperationBrowseGroupDetailQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationBrowseGroupDetailQuery,
+    OperationBrowseGroupDetailQueryVariables
+  >(BrowseGroupDetailDocument, options)
+}
+export function useBrowseGroupDetailLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationBrowseGroupDetailQuery,
+    OperationBrowseGroupDetailQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationBrowseGroupDetailQuery,
+    OperationBrowseGroupDetailQueryVariables
+  >(BrowseGroupDetailDocument, options)
+}
+// @ts-ignore
+export function useBrowseGroupDetailSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationBrowseGroupDetailQuery,
+    OperationBrowseGroupDetailQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationBrowseGroupDetailQuery,
+  OperationBrowseGroupDetailQueryVariables
+>
+export function useBrowseGroupDetailSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationBrowseGroupDetailQuery,
+        OperationBrowseGroupDetailQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationBrowseGroupDetailQuery | undefined,
+  OperationBrowseGroupDetailQueryVariables
+>
+export function useBrowseGroupDetailSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationBrowseGroupDetailQuery,
+        OperationBrowseGroupDetailQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationBrowseGroupDetailQuery,
+    OperationBrowseGroupDetailQueryVariables
+  >(BrowseGroupDetailDocument, options)
+}
+export type BrowseGroupDetailQueryHookResult = ReturnType<
+  typeof useBrowseGroupDetailQuery
+>
+export type BrowseGroupDetailLazyQueryHookResult = ReturnType<
+  typeof useBrowseGroupDetailLazyQuery
+>
+export type BrowseGroupDetailSuspenseQueryHookResult = ReturnType<
+  typeof useBrowseGroupDetailSuspenseQuery
+>
+export type BrowseGroupDetailQueryResult = Apollo.QueryResult<
+  OperationBrowseGroupDetailQuery,
+  OperationBrowseGroupDetailQueryVariables
+>
+export const BrowseGroupRelationCandidatesDocument = gql`
+    query BrowseGroupRelationCandidates($groupId: ID!, $search: String, $first: Int, $after: String) {
+  mediaGroupRelationCandidates(
+    groupId: $groupId
+    search: $search
+    first: $first
+    after: $after
+  ) {
+    edges {
+      cursor
+      node {
+        group {
+          id
+          name
+        }
+        isParent
+        isChild
+        addAsParent {
+          canAdd
+          unavailableReason
+        }
+        addAsChild {
+          canAdd
+          unavailableReason
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+    `
+
+/**
+ * __useBrowseGroupRelationCandidatesQuery__
+ *
+ * To run a query within a React component, call `useBrowseGroupRelationCandidatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBrowseGroupRelationCandidatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBrowseGroupRelationCandidatesQuery({
+ *   variables: {
+ *      groupId: // value for 'groupId'
+ *      search: // value for 'search'
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useBrowseGroupRelationCandidatesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OperationBrowseGroupRelationCandidatesQuery,
+    OperationBrowseGroupRelationCandidatesQueryVariables
+  > &
+    (
+      | {
+          variables: OperationBrowseGroupRelationCandidatesQueryVariables
+          skip?: boolean
+        }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationBrowseGroupRelationCandidatesQuery,
+    OperationBrowseGroupRelationCandidatesQueryVariables
+  >(BrowseGroupRelationCandidatesDocument, options)
+}
+export function useBrowseGroupRelationCandidatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationBrowseGroupRelationCandidatesQuery,
+    OperationBrowseGroupRelationCandidatesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationBrowseGroupRelationCandidatesQuery,
+    OperationBrowseGroupRelationCandidatesQueryVariables
+  >(BrowseGroupRelationCandidatesDocument, options)
+}
+// @ts-ignore
+export function useBrowseGroupRelationCandidatesSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationBrowseGroupRelationCandidatesQuery,
+    OperationBrowseGroupRelationCandidatesQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationBrowseGroupRelationCandidatesQuery,
+  OperationBrowseGroupRelationCandidatesQueryVariables
+>
+export function useBrowseGroupRelationCandidatesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationBrowseGroupRelationCandidatesQuery,
+        OperationBrowseGroupRelationCandidatesQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationBrowseGroupRelationCandidatesQuery | undefined,
+  OperationBrowseGroupRelationCandidatesQueryVariables
+>
+export function useBrowseGroupRelationCandidatesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationBrowseGroupRelationCandidatesQuery,
+        OperationBrowseGroupRelationCandidatesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationBrowseGroupRelationCandidatesQuery,
+    OperationBrowseGroupRelationCandidatesQueryVariables
+  >(BrowseGroupRelationCandidatesDocument, options)
+}
+export type BrowseGroupRelationCandidatesQueryHookResult = ReturnType<
+  typeof useBrowseGroupRelationCandidatesQuery
+>
+export type BrowseGroupRelationCandidatesLazyQueryHookResult = ReturnType<
+  typeof useBrowseGroupRelationCandidatesLazyQuery
+>
+export type BrowseGroupRelationCandidatesSuspenseQueryHookResult = ReturnType<
+  typeof useBrowseGroupRelationCandidatesSuspenseQuery
+>
+export type BrowseGroupRelationCandidatesQueryResult = Apollo.QueryResult<
+  OperationBrowseGroupRelationCandidatesQuery,
+  OperationBrowseGroupRelationCandidatesQueryVariables
+>
+export const CreateBrowserGroupDocument = gql`
+    mutation CreateBrowserGroup($input: CreateMediaGroupInput!) {
+  createMediaGroup(input: $input) {
+    group {
+      ...GroupBrowserGroup
+    }
+  }
+}
+    ${GroupBrowserGroupFragmentDoc}`
+export type CreateBrowserGroupMutationFn = Apollo.MutationFunction<
+  OperationCreateBrowserGroupMutation,
+  OperationCreateBrowserGroupMutationVariables
+>
+
+/**
+ * __useCreateBrowserGroupMutation__
+ *
+ * To run a mutation, you first call `useCreateBrowserGroupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBrowserGroupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBrowserGroupMutation, { data, loading, error }] = useCreateBrowserGroupMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateBrowserGroupMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OperationCreateBrowserGroupMutation,
+    OperationCreateBrowserGroupMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    OperationCreateBrowserGroupMutation,
+    OperationCreateBrowserGroupMutationVariables
+  >(CreateBrowserGroupDocument, options)
+}
+export type CreateBrowserGroupMutationHookResult = ReturnType<
+  typeof useCreateBrowserGroupMutation
+>
+export type CreateBrowserGroupMutationResult =
+  Apollo.MutationResult<OperationCreateBrowserGroupMutation>
+export type CreateBrowserGroupMutationOptions = Apollo.BaseMutationOptions<
+  OperationCreateBrowserGroupMutation,
+  OperationCreateBrowserGroupMutationVariables
+>
+export const UpdateBrowserGroupDocument = gql`
+    mutation UpdateBrowserGroup($input: UpdateMediaGroupInput!) {
+  updateMediaGroup(input: $input) {
+    group {
+      ...GroupBrowserGroup
+    }
+    relationResults {
+      groupId
+      direction
+      action
+      status
+      errorCode
+      unavailableReason
+    }
+  }
+}
+    ${GroupBrowserGroupFragmentDoc}`
+export type UpdateBrowserGroupMutationFn = Apollo.MutationFunction<
+  OperationUpdateBrowserGroupMutation,
+  OperationUpdateBrowserGroupMutationVariables
+>
+
+/**
+ * __useUpdateBrowserGroupMutation__
+ *
+ * To run a mutation, you first call `useUpdateBrowserGroupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateBrowserGroupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateBrowserGroupMutation, { data, loading, error }] = useUpdateBrowserGroupMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateBrowserGroupMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OperationUpdateBrowserGroupMutation,
+    OperationUpdateBrowserGroupMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    OperationUpdateBrowserGroupMutation,
+    OperationUpdateBrowserGroupMutationVariables
+  >(UpdateBrowserGroupDocument, options)
+}
+export type UpdateBrowserGroupMutationHookResult = ReturnType<
+  typeof useUpdateBrowserGroupMutation
+>
+export type UpdateBrowserGroupMutationResult =
+  Apollo.MutationResult<OperationUpdateBrowserGroupMutation>
+export type UpdateBrowserGroupMutationOptions = Apollo.BaseMutationOptions<
+  OperationUpdateBrowserGroupMutation,
+  OperationUpdateBrowserGroupMutationVariables
+>
+export const DeleteBrowserGroupDocument = gql`
+    mutation DeleteBrowserGroup($input: DeleteMediaGroupInput!) {
+  deleteMediaGroup(input: $input) {
+    groupId
+  }
+}
+    `
+export type DeleteBrowserGroupMutationFn = Apollo.MutationFunction<
+  OperationDeleteBrowserGroupMutation,
+  OperationDeleteBrowserGroupMutationVariables
+>
+
+/**
+ * __useDeleteBrowserGroupMutation__
+ *
+ * To run a mutation, you first call `useDeleteBrowserGroupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteBrowserGroupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteBrowserGroupMutation, { data, loading, error }] = useDeleteBrowserGroupMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteBrowserGroupMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OperationDeleteBrowserGroupMutation,
+    OperationDeleteBrowserGroupMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    OperationDeleteBrowserGroupMutation,
+    OperationDeleteBrowserGroupMutationVariables
+  >(DeleteBrowserGroupDocument, options)
+}
+export type DeleteBrowserGroupMutationHookResult = ReturnType<
+  typeof useDeleteBrowserGroupMutation
+>
+export type DeleteBrowserGroupMutationResult =
+  Apollo.MutationResult<OperationDeleteBrowserGroupMutation>
+export type DeleteBrowserGroupMutationOptions = Apollo.BaseMutationOptions<
+  OperationDeleteBrowserGroupMutation,
+  OperationDeleteBrowserGroupMutationVariables
+>
+export const AddBrowserMediaToGroupDocument = gql`
+    mutation AddBrowserMediaToGroup($input: ChangeMediaGroupClassificationInput!) {
+  addMediaToGroup(input: $input) {
+    results {
+      mediaId
+      status
+      errorCode
+    }
+  }
+}
+    `
+export type AddBrowserMediaToGroupMutationFn = Apollo.MutationFunction<
+  OperationAddBrowserMediaToGroupMutation,
+  OperationAddBrowserMediaToGroupMutationVariables
+>
+
+/**
+ * __useAddBrowserMediaToGroupMutation__
+ *
+ * To run a mutation, you first call `useAddBrowserMediaToGroupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddBrowserMediaToGroupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addBrowserMediaToGroupMutation, { data, loading, error }] = useAddBrowserMediaToGroupMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddBrowserMediaToGroupMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OperationAddBrowserMediaToGroupMutation,
+    OperationAddBrowserMediaToGroupMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    OperationAddBrowserMediaToGroupMutation,
+    OperationAddBrowserMediaToGroupMutationVariables
+  >(AddBrowserMediaToGroupDocument, options)
+}
+export type AddBrowserMediaToGroupMutationHookResult = ReturnType<
+  typeof useAddBrowserMediaToGroupMutation
+>
+export type AddBrowserMediaToGroupMutationResult =
+  Apollo.MutationResult<OperationAddBrowserMediaToGroupMutation>
+export type AddBrowserMediaToGroupMutationOptions = Apollo.BaseMutationOptions<
+  OperationAddBrowserMediaToGroupMutation,
+  OperationAddBrowserMediaToGroupMutationVariables
+>
+export const RemoveBrowserMediaFromGroupDocument = gql`
+    mutation RemoveBrowserMediaFromGroup($input: ChangeMediaGroupClassificationInput!) {
+  removeMediaFromGroup(input: $input) {
+    results {
+      mediaId
+      status
+      errorCode
+    }
+  }
+}
+    `
+export type RemoveBrowserMediaFromGroupMutationFn = Apollo.MutationFunction<
+  OperationRemoveBrowserMediaFromGroupMutation,
+  OperationRemoveBrowserMediaFromGroupMutationVariables
+>
+
+/**
+ * __useRemoveBrowserMediaFromGroupMutation__
+ *
+ * To run a mutation, you first call `useRemoveBrowserMediaFromGroupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveBrowserMediaFromGroupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeBrowserMediaFromGroupMutation, { data, loading, error }] = useRemoveBrowserMediaFromGroupMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRemoveBrowserMediaFromGroupMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OperationRemoveBrowserMediaFromGroupMutation,
+    OperationRemoveBrowserMediaFromGroupMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    OperationRemoveBrowserMediaFromGroupMutation,
+    OperationRemoveBrowserMediaFromGroupMutationVariables
+  >(RemoveBrowserMediaFromGroupDocument, options)
+}
+export type RemoveBrowserMediaFromGroupMutationHookResult = ReturnType<
+  typeof useRemoveBrowserMediaFromGroupMutation
+>
+export type RemoveBrowserMediaFromGroupMutationResult =
+  Apollo.MutationResult<OperationRemoveBrowserMediaFromGroupMutation>
+export type RemoveBrowserMediaFromGroupMutationOptions =
+  Apollo.BaseMutationOptions<
+    OperationRemoveBrowserMediaFromGroupMutation,
+    OperationRemoveBrowserMediaFromGroupMutationVariables
+  >
 export const CurrentUserDocument = gql`
     query CurrentUser {
   me {
@@ -1244,10 +2551,10 @@ export function useCurrentUserQuery(
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<OperationCurrentUserQuery, OperationCurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options,
-  )
+  return Apollo.useQuery<
+    OperationCurrentUserQuery,
+    OperationCurrentUserQueryVariables
+  >(CurrentUserDocument, options)
 }
 export function useCurrentUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -1256,10 +2563,10 @@ export function useCurrentUserLazyQuery(
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<OperationCurrentUserQuery, OperationCurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options,
-  )
+  return Apollo.useLazyQuery<
+    OperationCurrentUserQuery,
+    OperationCurrentUserQueryVariables
+  >(CurrentUserDocument, options)
 }
 // @ts-ignore
 export function useCurrentUserSuspenseQuery(
@@ -1267,7 +2574,10 @@ export function useCurrentUserSuspenseQuery(
     OperationCurrentUserQuery,
     OperationCurrentUserQueryVariables
   >,
-): Apollo.UseSuspenseQueryResult<OperationCurrentUserQuery, OperationCurrentUserQueryVariables>
+): Apollo.UseSuspenseQueryResult<
+  OperationCurrentUserQuery,
+  OperationCurrentUserQueryVariables
+>
 export function useCurrentUserSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
@@ -1291,10 +2601,10 @@ export function useCurrentUserSuspenseQuery(
     baseOptions === Apollo.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions }
-  return Apollo.useSuspenseQuery<OperationCurrentUserQuery, OperationCurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options,
-  )
+  return Apollo.useSuspenseQuery<
+    OperationCurrentUserQuery,
+    OperationCurrentUserQueryVariables
+  >(CurrentUserDocument, options)
 }
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>
 export type CurrentUserLazyQueryHookResult = ReturnType<

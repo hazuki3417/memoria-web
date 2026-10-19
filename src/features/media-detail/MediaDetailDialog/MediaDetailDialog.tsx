@@ -19,6 +19,9 @@ export type MediaDetailDialogProps = {
   onClose: () => void
   contextKind?: "personal" | "community"
   downloadMock?: "available" | "forbidden" | "processing"
+  groupOptions?: string[]
+  groupMemberships?: Record<string, string[]>
+  onSaveGroups?: (mediaId: string, groupNames: string[]) => Promise<void>
 }
 
 export function MediaDetailDialog({
@@ -27,6 +30,9 @@ export function MediaDetailDialog({
   onClose,
   contextKind = "personal",
   downloadMock = "available",
+  groupOptions,
+  groupMemberships,
+  onSaveGroups,
 }: MediaDetailDialogProps) {
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [deleteTarget, setDeleteTarget] = useState<MediaItem | null>(null)
@@ -67,7 +73,12 @@ export function MediaDetailDialog({
     removeCommunityShare,
     detailSectionsExpanded,
     toggleDetailSection,
-  } = useMediaDetailEditing(detail)
+  } = useMediaDetailEditing(
+    detail,
+    onSaveGroups
+      ? { memberships: groupMemberships ?? {}, onSave: onSaveGroups }
+      : undefined,
+  )
   const {
     prepareNavigation,
     detailInfoOpened,
@@ -139,6 +150,7 @@ export function MediaDetailDialog({
         saveDetailDraft={saveDetailDraft}
       />
       <GroupsEditDialog
+        groupOptions={groupOptions}
         detailEditor={detailEditor}
         setDetailEditor={setDetailEditor}
         detailDraft={detailDraft}

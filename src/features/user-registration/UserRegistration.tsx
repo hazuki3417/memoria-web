@@ -77,7 +77,9 @@ export function UserRegistration({
     if (invalid || registering || blocking || registered) return
     setStatus("registering")
     try {
-      const result = await registerMutation({ variables: { input: { nickname: nickname.trim() } } })
+      const result = await registerMutation({
+        variables: { input: { nickname: nickname.trim() } },
+      })
       if (result.data?.registerUser.user) {
         setStatus("registered")
         router.replace("/dashboard")
@@ -87,8 +89,16 @@ export function UserRegistration({
         showFeedback("failure")
       }
     } catch (error) {
-      const failure = error as { networkError?: { statusCode?: number }; graphQLErrors?: Array<{ extensions?: { code?: string } }> }
-      if (failure.networkError?.statusCode === 401 || failure.graphQLErrors?.some((item) => item.extensions?.code === "UNAUTHENTICATED")) {
+      const failure = error as {
+        networkError?: { statusCode?: number }
+        graphQLErrors?: Array<{ extensions?: { code?: string } }>
+      }
+      if (
+        failure.networkError?.statusCode === 401 ||
+        failure.graphQLErrors?.some(
+          (item) => item.extensions?.code === "UNAUTHENTICATED",
+        )
+      ) {
         setStatus("blocking")
       } else {
         setStatus("failure")

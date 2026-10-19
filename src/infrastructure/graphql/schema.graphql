@@ -19,7 +19,7 @@ type UpdateUserProfilePayload { user: User! }
 type Community { id: ID! name: String! createdAt: DateTime! updatedAt: DateTime! }
 input CreateCommunityInput { name: String! }
 type CreateCommunityPayload { community: Community! }
-type PageInfo { hasNextPage: Boolean! hasPrevPage: Boolean! startCursor: String endCursor: String }
+type PageInfo { hasNextPage: Boolean! hasPreviousPage: Boolean! startCursor: String endCursor: String }
 
 enum DateFormat { YYYY_MM_DD MM_DD_YYYY DD_MM_YYYY }
 enum FileSizeUnit { DECIMAL BINARY }
@@ -132,4 +132,211 @@ type AcceptCommunityDeletionPayload {
 
 extend type Mutation {
   acceptCommunityDeletion(input: AcceptCommunityDeletionInput!): AcceptCommunityDeletionPayload!
+}
+
+# Group / Media schema snapshot synchronized from memoria-api executable SDL.
+# Shared Media contract from memoria-design/content/system/api/graphql.mdx.
+# Group.media is direct membership; Group.aggregateMedia includes descendants.
+enum MediaType { IMAGE VIDEO }
+enum MediaStatus { ACTIVE DELETING }
+enum ProcessingStatus { PROCESSING READY FAILED }
+enum BulkItemStatus { SUCCEEDED ALREADY_APPLIED FAILED }
+
+type Media {
+  id: ID!
+  mediaType: MediaType!
+  status: MediaStatus!
+  originalFileName: String!
+  fileSize: Int!
+  mimeType: String!
+  uploadedBy: MediaUploader
+  uploadedAt: DateTime!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  image: Image
+  processing: MediaProcessing
+  groups(scope: ScopeInput!, first: Int, after: String, last: Int, before: String): MediaGroupConnection!
+  tags(scope: ScopeInput!, first: Int, after: String, last: Int, before: String): MediaTagConnection!
+}
+type MediaUploader {
+  userId: ID
+  nickname: String
+  deleted: Boolean!
+}
+type Image { width: Int! height: Int! variants: [ImageVariant!]! }
+type ImageVariant {
+  id: ID!
+  format: String!
+  width: Int!
+  height: Int!
+  sizeBytes: Int!
+  url: String!
+}
+type MediaProcessing { status: ProcessingStatus! }
+type MediaEdge { cursor: String! node: Media! }
+type MediaConnection { edges: [MediaEdge!]! pageInfo: PageInfo! }
+input MediaFilterInput { tagIds: [ID!] }
+extend type Query {
+  media(id: ID!): Media
+  mediaList(scope: ScopeInput!, filter: MediaFilterInput, first: Int, after: String, last: Int, before: String): MediaConnection!
+}
+type MediaTag { id: ID! name: String! }
+type MediaTagEdge { cursor: String! node: MediaTag! }
+type MediaTagConnection { edges: [MediaTagEdge!]! pageInfo: PageInfo! }
+
+# Source of Truth: memoria-design/content/system/api/graphql.mdx#group
+type MediaGroup {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  parents(first: Int, after: String, last: Int, before: String): MediaGroupConnection!
+  children(first: Int, after: String, last: Int, before: String): MediaGroupConnection!
+  media(first: Int, after: String, last: Int, before: String): MediaConnection!
+  aggregateMedia(first: Int, after: String, last: Int, before: String): MediaConnection!
+}
+
+type MediaGroupEdge {
+  cursor: String!
+  node: MediaGroup!
+}
+
+type MediaGroupConnection {
+  edges: [MediaGroupEdge!]!
+  pageInfo: PageInfo!
+}
+
+enum ScopeType {
+  PERSONAL
+  COMMUNITY
+}
+
+input ScopeInput {
+  type: ScopeType!
+  communityId: ID
+}
+
+enum MediaGroupRelationUnavailableReason {
+  SELF
+  ALREADY_RELATED
+  OPPOSITE_RELATION
+  CYCLE
+  DEPTH_LIMIT
+  PARENT_LIMIT
+  CHILD_LIMIT
+}
+
+type MediaGroupRelationActionAvailability {
+  canAdd: Boolean!
+  unavailableReason: MediaGroupRelationUnavailableReason
+}
+
+type MediaGroupRelationCandidate {
+  group: MediaGroup!
+  isParent: Boolean!
+  isChild: Boolean!
+  addAsParent: MediaGroupRelationActionAvailability!
+  addAsChild: MediaGroupRelationActionAvailability!
+}
+
+type MediaGroupRelationCandidateEdge {
+  cursor: String!
+  node: MediaGroupRelationCandidate!
+}
+
+type MediaGroupRelationCandidateConnection {
+  edges: [MediaGroupRelationCandidateEdge!]!
+  pageInfo: PageInfo!
+}
+
+enum MediaGroupSort {
+  NAME_ASC
+  CREATED_AT_DESC
+}
+
+extend type Query {
+  mediaGroups(scope: ScopeInput!, search: String, sort: MediaGroupSort! = NAME_ASC, first: Int, after: String, last: Int, before: String): MediaGroupConnection!
+  mediaGroup(id: ID!): MediaGroup
+  mediaGroupRelationCandidates(groupId: ID!, search: String, first: Int, after: String, last: Int, before: String): MediaGroupRelationCandidateConnection!
+}
+
+input CreateMediaGroupInput {
+  scope: ScopeInput!
+  name: String!
+}
+
+input DeleteMediaGroupInput {
+  groupId: ID!
+}
+
+input MediaGroupRelationChangeInput {
+  groupId: ID!
+  direction: MediaGroupRelationDirection!
+  action: MediaGroupRelationChangeAction!
+}
+
+enum MediaGroupRelationDirection {
+  PARENT
+  CHILD
+}
+
+enum MediaGroupRelationChangeAction {
+  ADD
+  REMOVE
+}
+
+enum MediaGroupRelationChangeStatus {
+  SUCCEEDED
+  ALREADY_APPLIED
+  FAILED
+}
+
+type MediaGroupRelationChangeResult {
+  groupId: ID!
+  direction: MediaGroupRelationDirection!
+  action: MediaGroupRelationChangeAction!
+  status: MediaGroupRelationChangeStatus!
+  errorCode: String
+  unavailableReason: MediaGroupRelationUnavailableReason
+}
+
+input UpdateMediaGroupInput {
+  groupId: ID!
+  name: String
+  relationChanges: [MediaGroupRelationChangeInput!]
+}
+
+type UpdateMediaGroupPayload {
+  group: MediaGroup!
+  relationResults: [MediaGroupRelationChangeResult!]!
+}
+
+input ChangeMediaGroupClassificationInput {
+  groupId: ID!
+  mediaIds: [ID!]!
+}
+
+type MediaGroupPayload {
+  group: MediaGroup!
+}
+
+type DeleteMediaGroupPayload {
+  groupId: ID!
+}
+
+type MediaGroupClassificationItemResult {
+  mediaId: ID!
+  status: BulkItemStatus!
+  errorCode: String
+}
+
+type ChangeMediaGroupClassificationPayload {
+  results: [MediaGroupClassificationItemResult!]!
+}
+
+extend type Mutation {
+  createMediaGroup(input: CreateMediaGroupInput!): MediaGroupPayload!
+  updateMediaGroup(input: UpdateMediaGroupInput!): UpdateMediaGroupPayload!
+  deleteMediaGroup(input: DeleteMediaGroupInput!): DeleteMediaGroupPayload!
+  addMediaToGroup(input: ChangeMediaGroupClassificationInput!): ChangeMediaGroupClassificationPayload!
+  removeMediaFromGroup(input: ChangeMediaGroupClassificationInput!): ChangeMediaGroupClassificationPayload!
 }

@@ -26,12 +26,56 @@ import {
   IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
 import { useGroupRef } from "react-resizable-panels"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
+import { countGroupNameGraphemes, validGroupName } from "./groupName"
+
+export type GroupBrowserGroup = {
+  id: string
+  name: string
+  mediaCount: number
+  previewCount: number
+  parentNames: string[]
+  childNames: string[]
+}
+
+export type GroupRelationAvailability = Record<
+  string,
+  {
+    parent: { canAdd: boolean; reason?: string }
+    child: { canAdd: boolean; reason?: string }
+  }
+>
+
+export type GroupBrowserProps = {
+  contextKind?: "personal" | "community"
+  communityId?: string
+  groupsData?: GroupBrowserGroup[]
+  mediaItemsData?: Array<{ id: string; label: string; src: string | null }>
+  groupMemberships?: Record<string, string[]>
+  onSaveMediaGroups?: (mediaId: string, groupNames: string[]) => Promise<void>
+  relationCandidates?: string[]
+  relationAvailability?: GroupRelationAvailability
+  onCreateGroup?: (
+    name: string,
+    parents: string[],
+    children: string[],
+  ) => Promise<void>
+  onUpdateGroup?: (
+    id: string,
+    name: string,
+    parents: string[],
+    children: string[],
+  ) => Promise<void>
+  onDeleteGroup?: (id: string) => Promise<void>
+  onSelectGroup?: (id: string | null) => void
+  detailsReady?: boolean
+  canManage?: boolean
+}
 
 type GroupFixture = {
   id: string
@@ -152,7 +196,15 @@ function GroupVisual({ startIndex }: { startIndex: number }) {
   )
 }
 
-function PreviewGrid({ count }: { count: number }) {
+function PreviewGrid({
+  count,
+  remote = false,
+  sources = [],
+}: {
+  count: number
+  remote?: boolean
+  sources?: string[]
+}) {
   const previewCellIds = ["preview-1", "preview-2", "preview-3", "preview-4"]
   let groupVisualIndex = 0
   return (
@@ -175,14 +227,35 @@ function PreviewGrid({ count }: { count: number }) {
               overflow: "hidden",
               ...(media
                 ? {
-                    backgroundImage: `url("${previewImages[index % previewImages.length]}")`,
+                    backgroundImage: remote
+                      ? sources[index]
+                        ? `url("${sources[index]}")`
+                        : undefined
+                      : `url("${previewImages[index % previewImages.length]}")`,
                     backgroundPosition: "center",
                     backgroundSize: "cover",
                   }
                 : {}),
             }}
           >
-            {!media && <GroupVisual startIndex={groupVisualStart} />}
+            {media && remote && !sources[index] && (
+              <Box
+                w="100%"
+                h="100%"
+                bg="var(--mantine-color-default-hover)"
+                style={{ position: "absolute", inset: 0 }}
+              />
+            )}
+            {!media &&
+              (remote ? (
+                <Box
+                  w="100%"
+                  h="100%"
+                  bg="var(--mantine-color-default-hover)"
+                />
+              ) : (
+                <GroupVisual startIndex={groupVisualStart} />
+              ))}
             {continuation && (
               <Box
                 pos="absolute"
@@ -227,18 +300,27 @@ function RelationEditor({
   oppositeNames,
   onChange,
   currentGroupName,
+  candidates = relationCandidateNames,
+  availability,
 }: {
   label: string
   names: string[]
   oppositeNames: string[]
   onChange: (names: string[]) => void
   currentGroupName: string
+  candidates?: string[]
+  availability?: GroupRelationAvailability
 }) {
   const sortTags = (values: string[]) => [...values].sort()
-  const data = relationCandidateNames.map((name) => ({
+  const data = candidates.map((name) => ({
     value: name,
     label: name,
-    disabled: name === currentGroupName || oppositeNames.includes(name),
+    disabled:
+      name === currentGroupName ||
+      oppositeNames.includes(name) ||
+      (availability?.[name]?.[label === "Parents" ? "parent" : "child"]
+        .canAdd === false &&
+        !names.includes(name)),
   }))
 
   return (
@@ -283,7 +365,9 @@ function RelationEditor({
                   : "Parentに指定されています"
                 : checked
                   ? "選択済み"
-                  : ""
+                  : (availability?.[option.value]?.[
+                      label === "Parents" ? "parent" : "child"
+                    ].reason ?? "")
           return (
             <Group justify="space-between" wrap="nowrap" w="100%">
               <Text size="sm">{option.label}</Text>
@@ -302,29 +386,49 @@ function RelationEditor({
     </Stack>
   )
 }
-function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
+function MediaGrid({
+  onOpen,
+  items,
+}: {
+  onOpen: (index: number) => void
+  items?: Array<{ id: string; label: string; src: string | null }>
+}) {
   // Local dummy thumbnails; actual Group media will be supplied by the Connection.
-  const mediaItems = Array.from({ length: 24 }, (_, index) => ({
-    id: `media-${index + 1}`,
-    src: previewImages[index % previewImages.length],
-  }))
+  const mediaItems =
+    items ??
+    Array.from({ length: 24 }, (_, index) => ({
+      id: `media-${index + 1}`,
+      label: `Media ${index + 1}`,
+      src: previewImages[index % previewImages.length],
+    }))
   return (
     <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
-      {mediaItems.map(({ id, src }, index) => (
+      {mediaItems.map(({ id, label, src }, index) => (
         <UnstyledButton
           key={id}
-          aria-label={`Media ${index + 1}の詳細を開く`}
+          aria-label={
+            src
+              ? `${label}の詳細を開く`
+              : `${label}の詳細を開く（画像プレビューなし）`
+          }
           onClick={() => onOpen(index)}
           bdrs="sm"
           style={{
             display: "block",
             aspectRatio: "1 / 1",
             border: "1px solid var(--mantine-color-default-border)",
-            backgroundImage: `url("${src}")`,
+            backgroundImage: src ? `url("${src}")` : undefined,
+            backgroundColor: "var(--mantine-color-default-hover)",
             backgroundPosition: "center",
             backgroundSize: "cover",
           }}
-        />
+        >
+          {!src && (
+            <Text size="xs" c="dimmed" ta="center">
+              {label}
+            </Text>
+          )}
+        </UnstyledButton>
       ))}
     </SimpleGrid>
   )
@@ -332,18 +436,45 @@ function MediaGrid({ onOpen }: { onOpen: (index: number) => void }) {
 
 export function GroupBrowser({
   contextKind = "personal",
-}: {
-  contextKind?: "personal" | "community"
-  communityId?: string
-}) {
+  groupsData,
+  mediaItemsData,
+  groupMemberships,
+  onSaveMediaGroups,
+  relationCandidates: candidates,
+  relationAvailability,
+  onCreateGroup,
+  onUpdateGroup,
+  onDeleteGroup,
+  onSelectGroup,
+  detailsReady = true,
+  canManage = true,
+}: GroupBrowserProps) {
+  const busyRef = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const runAction = async (
+    action: () => Promise<void>,
+  ): Promise<"ok" | "busy" | "error"> => {
+    if (busyRef.current) return "busy"
+    busyRef.current = true
+    setSaving(true)
+    try {
+      await action()
+      return "ok"
+    } catch {
+      return "error"
+    } finally {
+      busyRef.current = false
+      setSaving(false)
+    }
+  }
   const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
   const [createOpened, create] = useDisclosure(false)
   const [createName, setCreateName] = useState("")
   const [createParents, setCreateParents] = useState<string[]>([])
   const [createChildren, setCreateChildren] = useState<string[]>([])
   const allGroups = useMemo(
-    () => [...groups, ...createdGroups],
-    [createdGroups],
+    () => [...(groupsData ?? groups), ...createdGroups],
+    [groupsData, createdGroups],
   )
   const openCreate = () => {
     setCreateName("")
@@ -351,20 +482,35 @@ export function GroupBrowser({
     setCreateChildren([])
     create.open()
   }
-  const submitCreate = () => {
+  const submitCreate = async () => {
     const name = createName.trim()
-    if (!name || Array.from(name).length > 100) return
-    setCreatedGroups((current) => [
-      ...current,
-      {
-        id: `created-${Date.now()}-${current.length}`,
-        name,
-        mediaCount: 0,
-        previewCount: 0,
-        parentNames: createParents,
-        childNames: createChildren,
-      },
-    ])
+    if (!validGroupName(name)) return
+    const result = await runAction(async () => {
+      if (onCreateGroup) {
+        await onCreateGroup(name, createParents, createChildren)
+      } else {
+        setCreatedGroups((current) => [
+          ...current,
+          {
+            id: `created-${Date.now()}-${current.length}`,
+            name,
+            mediaCount: 0,
+            previewCount: 0,
+            parentNames: createParents,
+            childNames: createChildren,
+          },
+        ])
+      }
+    })
+    if (result === "error") {
+      showNotification({
+        kind: "error",
+        title: "Groupを作成できませんでした",
+        description: "入力内容と通信状態を確認して、もう一度お試しください。",
+      })
+      return
+    }
+    if (result !== "ok") return
     create.close()
     showNotification({
       kind: "success",
@@ -372,15 +518,36 @@ export function GroupBrowser({
       description: `「${name}」を作成しました。`,
     })
   }
+
   const [query, setQuery] = useState("")
   const [appliedQuery, setAppliedQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
-  const groupMediaItems = Array.from({ length: 24 }, (_, index) => ({
-    id: `group-media-${index + 1}`,
-    label: `Media ${index + 1}`,
-    src: previewImages[index % previewImages.length],
-  }))
+  const groupMediaItems = useMemo(
+    () =>
+      mediaItemsData
+        ? mediaItemsData.map((item) => ({
+            ...item,
+            src: item.src ?? "",
+            failed: !item.src,
+          }))
+        : Array.from({ length: 24 }, (_, index) => ({
+            id: `group-media-${index + 1}`,
+            label: `Media ${index + 1}`,
+            src: previewImages[index % previewImages.length],
+          })),
+    [mediaItemsData],
+  )
+
+  const openMediaAt = (index: number) => {
+    if (!mediaItemsData) {
+      setMediaDetailIndex(index)
+      return
+    }
+    const id = mediaItemsData[index]?.id
+    const availableIndex = groupMediaItems.findIndex((item) => item.id === id)
+    if (availableIndex >= 0) setMediaDetailIndex(availableIndex)
+  }
 
   const splitViewRef = useGroupRef()
   const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
@@ -394,17 +561,21 @@ export function GroupBrowser({
   const [draftChildren, setDraftChildren] = useState<string[]>([])
 
   const visibleGroups = useMemo(() => {
-    const normalized = appliedQuery.trim().toLocaleLowerCase()
+    const normalized = appliedQuery.trim()
     if (!normalized) return allGroups
     return allGroups.filter((group) =>
-      group.name.toLocaleLowerCase().includes(normalized),
+      groupsData !== undefined
+        ? group.name.includes(normalized)
+        : group.name
+            .toLocaleLowerCase()
+            .includes(normalized.toLocaleLowerCase()),
     )
-  }, [appliedQuery, allGroups])
+  }, [appliedQuery, allGroups, groupsData])
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
   const openEdit = () => {
-    if (!selected) return
+    if (!selected || !detailsReady || !canManage) return
     setDraftName(selected.name)
     setDraftParents(selected.parentNames)
     setDraftChildren(selected.childNames)
@@ -429,6 +600,7 @@ export function GroupBrowser({
 
   const openDetail = (id: string) => {
     setSelectedId(id)
+    onSelectGroup?.(id)
     if (compact) {
       setCompactView("detail")
       return
@@ -441,6 +613,7 @@ export function GroupBrowser({
 
   const closeDetail = () => {
     setSelectedId(null)
+    onSelectGroup?.(null)
     if (compact) {
       setCompactView("groups")
     }
@@ -478,14 +651,14 @@ export function GroupBrowser({
                 名前
               </Text>
               <Text component="span" size="xs" c="dimmed">
-                {Array.from(createName).length} / 100
+                {countGroupNameGraphemes(createName)} / 100
               </Text>
             </Group>
           }
           value={createName}
           onChange={(event) => {
             const value = event.currentTarget.value
-            if (Array.from(value).length <= 100) setCreateName(value)
+            if (countGroupNameGraphemes(value) <= 100) setCreateName(value)
           }}
           placeholder="Group名"
           styles={{ label: { display: "block", width: "100%" } }}
@@ -498,6 +671,8 @@ export function GroupBrowser({
             oppositeNames={createChildren}
             onChange={setCreateParents}
             currentGroupName={createName.trim()}
+            candidates={candidates}
+            availability={relationAvailability}
           />
           <RelationEditor
             label="Children"
@@ -505,13 +680,18 @@ export function GroupBrowser({
             oppositeNames={createParents}
             onChange={setCreateChildren}
             currentGroupName={createName.trim()}
+            candidates={candidates}
+            availability={relationAvailability}
           />
         </SimpleGrid>
         <Group justify="flex-end">
           <Button variant="default" onClick={create.close}>
             キャンセル
           </Button>
-          <Button onClick={submitCreate} disabled={!createName.trim()}>
+          <Button
+            onClick={submitCreate}
+            disabled={!canManage || !validGroupName(createName) || saving}
+          >
             作成
           </Button>
         </Group>
@@ -536,14 +716,14 @@ export function GroupBrowser({
                 名前
               </Text>
               <Text component="span" size="xs" c="dimmed">
-                {Array.from(draftName).length} / 100
+                {countGroupNameGraphemes(draftName)} / 100
               </Text>
             </Group>
           }
           value={draftName}
           onChange={(event) => {
             const value = event.currentTarget.value
-            if (Array.from(value).length <= 100) setDraftName(value)
+            if (countGroupNameGraphemes(value) <= 100) setDraftName(value)
           }}
           placeholder="Group名"
           styles={{ label: { display: "block", width: "100%" } }}
@@ -555,6 +735,8 @@ export function GroupBrowser({
             oppositeNames={draftChildren}
             onChange={setDraftParents}
             currentGroupName={selected?.name ?? ""}
+            candidates={candidates}
+            availability={relationAvailability}
           />
           <RelationEditor
             label="Children"
@@ -562,6 +744,8 @@ export function GroupBrowser({
             oppositeNames={draftParents}
             onChange={setDraftChildren}
             currentGroupName={selected?.name ?? ""}
+            candidates={candidates}
+            availability={relationAvailability}
           />
         </SimpleGrid>
         <Divider />
@@ -581,8 +765,28 @@ export function GroupBrowser({
             キャンセル
           </Button>
           <Button
-            onClick={edit.close}
-            disabled={!draftName.trim()}
+            onClick={async () => {
+              if (!selected) return
+              const result = await runAction(async () => {
+                await onUpdateGroup?.(
+                  selected.id,
+                  draftName.trim(),
+                  draftParents,
+                  draftChildren,
+                )
+              })
+              if (result === "error") {
+                showNotification({
+                  kind: "error",
+                  title: "Groupを更新できませんでした",
+                  description:
+                    "最新のGroup情報を確認してから、再度お試しください。",
+                })
+                return
+              }
+              if (result === "ok") edit.close()
+            }}
+            disabled={!canManage || !validGroupName(draftName) || saving}
             style={{ position: "absolute", right: 0 }}
           >
             保存
@@ -611,9 +815,25 @@ export function GroupBrowser({
           </Button>
           <Button
             color="red"
-            onClick={() => {
+            disabled={!canManage || saving}
+            onClick={async () => {
+              if (!selected) return
+              const result = await runAction(async () => {
+                await onDeleteGroup?.(selected.id)
+              })
+              if (result === "error") {
+                showNotification({
+                  kind: "error",
+                  title: "Groupを削除できませんでした",
+                  description:
+                    "Groupが残っているか確認し、必要であれば再度お試しください。",
+                })
+                return
+              }
+              if (result !== "ok") return
               deletion.close()
               edit.close()
+              closeDetail()
             }}
           >
             削除
@@ -685,6 +905,7 @@ export function GroupBrowser({
                     size="xs"
                     leftSection={<IconFolderPlus size={16} />}
                     onClick={openCreate}
+                    disabled={!canManage}
                   >
                     Groupを作成
                   </Button>
@@ -717,7 +938,17 @@ export function GroupBrowser({
                         >
                           {group.name}
                         </Text>
-                        <PreviewGrid count={group.previewCount} />
+                        <PreviewGrid
+                          count={group.previewCount}
+                          remote={groupsData !== undefined}
+                          sources={
+                            group.id === selectedId
+                              ? (mediaItemsData ?? []).flatMap((item) =>
+                                  item.src ? [item.src] : [],
+                                )
+                              : []
+                          }
+                        />
                       </Stack>
                     </UnstyledButton>
                   ))}
@@ -760,7 +991,7 @@ export function GroupBrowser({
                       <Text fw={600}>Mediaがありません</Text>
                     </Paper>
                   ) : (
-                    <MediaGrid onOpen={setMediaDetailIndex} />
+                    <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
                   )}
                 </Box>
               </ScrollArea>
@@ -833,6 +1064,7 @@ export function GroupBrowser({
                     size="xs"
                     leftSection={<IconFolderPlus size={16} />}
                     onClick={openCreate}
+                    disabled={!canManage}
                   >
                     Groupを作成
                   </Button>
@@ -878,7 +1110,10 @@ export function GroupBrowser({
                           >
                             {group.name}
                           </Text>
-                          <PreviewGrid count={group.previewCount} />
+                          <PreviewGrid
+                            count={group.previewCount}
+                            remote={groupsData !== undefined}
+                          />
                         </Stack>
                       </UnstyledButton>
                     )
@@ -943,6 +1178,7 @@ export function GroupBrowser({
                           variant="default"
                           leftSection={<IconEdit size={16} />}
                           onClick={openEdit}
+                          disabled={!canManage || !detailsReady}
                         >
                           編集
                         </Button>
@@ -1012,7 +1248,10 @@ export function GroupBrowser({
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid onOpen={setMediaDetailIndex} />
+                          <MediaGrid
+                            onOpen={openMediaAt}
+                            items={mediaItemsData}
+                          />
                         )}
                       </Box>
                     </ScrollArea>
@@ -1025,9 +1264,12 @@ export function GroupBrowser({
       )}
       <MediaDetailDialog
         items={groupMediaItems}
+        groupOptions={candidates}
+        groupMemberships={groupMemberships}
+        onSaveGroups={onSaveMediaGroups}
         initialId={
           imageDetailIndex !== null
-            ? groupMediaItems[imageDetailIndex].id
+            ? groupMediaItems[imageDetailIndex]?.id
             : undefined
         }
         onClose={() => setMediaDetailIndex(null)}
