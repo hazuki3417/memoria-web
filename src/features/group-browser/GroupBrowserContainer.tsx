@@ -243,12 +243,14 @@ export function GroupBrowserContainer({
           showNotification({
             kind: "error",
             title: "Groupは作成されましたが、一部の関係を設定できませんでした",
+            description: "Group自体は保存されています。関係の最新状態を確認してください。", 
           })
         }
       } catch {
         showNotification({
           kind: "error",
           title: "Groupは作成されましたが、関係の設定結果を確認できませんでした",
+          description: "Groupを再作成せず、最新の関係を確認してください。",
         })
       }
     }
