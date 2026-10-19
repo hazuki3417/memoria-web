@@ -447,7 +447,7 @@ export function GroupBrowser({
       }
     })
     if (result === "error") {
-      showNotification({ kind: "error", title: "Groupを作成できませんでした" })
+      showNotification({ kind: "error", title: "Groupを作成できませんでした", description: "入力内容と通信状態を確認して、もう一度お試しください。" })
       return
     }
     if (result !== "ok") return
@@ -705,7 +705,7 @@ export function GroupBrowser({
                 await onUpdateGroup?.(selected.id, draftName.trim(), draftParents, draftChildren)
               })
               if (result === "error") {
-                showNotification({ kind: "error", title: "Groupを更新できませんでした" })
+                showNotification({ kind: "error", title: "Groupを更新できませんでした", description: "最新のGroup情報を確認してから、再度お試しください。" })
                 return
               }
               if (result === "ok") edit.close()
@@ -746,7 +746,7 @@ export function GroupBrowser({
                 await onDeleteGroup?.(selected.id)
               })
               if (result === "error") {
-                showNotification({ kind: "error", title: "Groupを削除できませんでした" })
+                showNotification({ kind: "error", title: "Groupを削除できませんでした", description: "Groupが残っているか確認し、必要であれば再度お試しください。" })
                 return
               }
               if (result !== "ok") return
