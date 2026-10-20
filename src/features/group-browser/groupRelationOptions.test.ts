@@ -93,4 +93,15 @@ describe("Group relation selector rules (GB-048, GB-050)", () => {
     expect(groupRelationOptionReason({ ...base, name: "選択", checked: true }))
       .toBe("選択済み")
   })
+  it("treats an omitted checked flag as not selected", () => {
+    expect(
+      groupRelationOptionReason({
+        name: "候補",
+        oppositeNames: [],
+        currentGroupName: "現在",
+        direction: "parent",
+      }),
+    ).toBe("")
+  })
+
 })
