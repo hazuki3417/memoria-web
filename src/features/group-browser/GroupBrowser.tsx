@@ -33,6 +33,11 @@ import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
 import { countGroupNameGraphemes, validGroupName } from "./groupName"
+import {
+  groupRelationOptionReason,
+  groupRelationOptions,
+  sortGroupRelationNames,
+} from "./groupRelationOptions"
 
 export type GroupBrowserGroup = {
   id: string
@@ -311,17 +316,15 @@ function RelationEditor({
   candidates?: string[]
   availability?: GroupRelationAvailability
 }) {
-  const sortTags = (values: string[]) => [...values].sort()
-  const data = candidates.map((name) => ({
-    value: name,
-    label: name,
-    disabled:
-      name === currentGroupName ||
-      oppositeNames.includes(name) ||
-      (availability?.[name]?.[label === "Parents" ? "parent" : "child"]
-        .canAdd === false &&
-        !names.includes(name)),
-  }))
+  const direction = label === "Parents" ? "parent" : "child"
+  const data = groupRelationOptions({
+    candidates,
+    names,
+    oppositeNames,
+    currentGroupName,
+    direction,
+    availability,
+  })
 
   return (
     <Stack gap="xs">
@@ -336,7 +339,7 @@ function RelationEditor({
       <MultiSelect
         data={data}
         value={names}
-        onChange={(values) => onChange(sortTags(values))}
+        onChange={(values) => onChange(sortGroupRelationNames(values))}
         searchable
         placeholder="Groupを検索"
         rightSection={null}
@@ -356,18 +359,14 @@ function RelationEditor({
           },
         }}
         renderOption={({ option, checked }) => {
-          const reason =
-            option.value === currentGroupName
-              ? "現在のGroup"
-              : oppositeNames.includes(option.value)
-                ? label === "Parents"
-                  ? "Childに指定されています"
-                  : "Parentに指定されています"
-                : checked
-                  ? "選択済み"
-                  : (availability?.[option.value]?.[
-                      label === "Parents" ? "parent" : "child"
-                    ].reason ?? "")
+          const reason = groupRelationOptionReason({
+            name: option.value,
+            checked,
+            oppositeNames,
+            currentGroupName,
+            direction,
+            availability,
+          })
           return (
             <Group justify="space-between" wrap="nowrap" w="100%">
               <Text size="sm">{option.label}</Text>
