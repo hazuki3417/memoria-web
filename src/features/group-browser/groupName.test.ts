@@ -15,7 +15,7 @@ describe("Group name grapheme validation", () => {
   })
 
   it("accepts exactly 100 graphemes and rejects 101 (GB-037)", () => {
-    for (const character of ["あ", "e\\u0301", "👨‍👩‍👧‍👦"]) {
+    for (const character of ["あ", "e\u0301", "👨‍👩‍👧‍👦"]) {
       expect(canEnterGroupName(character.repeat(100))).toBe(true)
       expect(canEnterGroupName(character.repeat(101))).toBe(false)
       expect(validGroupName(character.repeat(100))).toBe(true)
@@ -27,7 +27,7 @@ describe("Group name grapheme validation", () => {
     expect(canEnterGroupName("")).toBe(true)
     expect(canEnterGroupName(" ".repeat(101))).toBe(false)
     expect(validGroupName("")).toBe(false)
-    expect(validGroupName("　\\t ")).toBe(false)
+    expect(validGroupName("　\t ")).toBe(false)
     expect(validGroupName("  卒業式  ")).toBe(true)
     expect(validGroupName(" ".repeat(50) + "卒業式" + " ".repeat(50))).toBe(true)
   })
