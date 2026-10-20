@@ -562,6 +562,11 @@ export function GroupBrowser({
   const [relationsOpened, relations] = useDisclosure(false)
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [compactView, setCompactView] = useState<"groups" | "detail">("groups")
+  const compactDetailHeadingRef = useRef<HTMLParagraphElement>(null)
+  const compactSearchRef = useRef<HTMLInputElement>(null)
+  const compactGroupItemRefs = useRef(new Map<string, HTMLButtonElement>())
+  const compactReturnGroupIdRef = useRef<string | null>(null)
+  const compactFocusIntentRef = useRef<"detail" | "groups" | null>(null)
   const [editOpened, edit] = useDisclosure(false)
   const [deleteOpened, deletion] = useDisclosure(false)
   const [draftName, setDraftName] = useState("")
@@ -606,10 +611,25 @@ export function GroupBrowser({
     }
   }, [])
 
+  // Explicit Compact navigation must not leave focus on an unmounted element.
+  useEffect(() => {
+    if (!compact || compactFocusIntentRef.current !== compactView) return
+    compactFocusIntentRef.current = null
+    if (compactView === "detail") {
+      compactDetailHeadingRef.current?.focus()
+    } else {
+      const origin = compactReturnGroupIdRef.current
+      const item = origin ? compactGroupItemRefs.current.get(origin) : null
+      ;(item ?? compactSearchRef.current)?.focus()
+    }
+  }, [compact, compactView])
+
   const openDetail = (id: string) => {
     setSelectedId(id)
     onSelectGroup?.(id)
     if (compact) {
+      compactReturnGroupIdRef.current = id
+      compactFocusIntentRef.current = "detail"
       setCompactView("detail")
       return
     }
@@ -623,6 +643,7 @@ export function GroupBrowser({
     setSelectedId(null)
     onSelectGroup?.(null)
     if (compact) {
+      compactFocusIntentRef.current = "groups"
       setCompactView("groups")
     }
   }
@@ -916,6 +937,7 @@ export function GroupBrowser({
               if (result !== "ok") return
               deletion.close()
               edit.close()
+              compactReturnGroupIdRef.current = null
               closeDetail()
               showNotification({
                 kind: "success",
@@ -969,6 +991,7 @@ export function GroupBrowser({
                       w={compact ? "100%" : 280}
                       maw="100%"
                       size="xs"
+                      ref={compactSearchRef}
                       value={query}
                       onChange={(event) => setQuery(event.currentTarget.value)}
                       placeholder="Groupを検索"
@@ -1009,6 +1032,10 @@ export function GroupBrowser({
                   {visibleGroups.map((group) => (
                     <UnstyledButton
                       key={group.id}
+                      ref={(element) => {
+                        if (element) compactGroupItemRefs.current.set(group.id, element)
+                        else compactGroupItemRefs.current.delete(group.id)
+                      }}
                       onClick={() => openDetail(group.id)}
                       p="xs"
                       bdrs="sm"
@@ -1052,7 +1079,12 @@ export function GroupBrowser({
                 }}
               >
                 <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
-                  <Text fw={700} truncate="end">
+                  <Text
+                    fw={700}
+                    truncate="end"
+                    ref={compactDetailHeadingRef}
+                    tabIndex={-1}
+                  >
                     {selected?.name ?? ""}
                   </Text>
                 </Group>
