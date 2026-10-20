@@ -2,6 +2,7 @@
 
 import {
   Badge,
+  Alert,
   Box,
   Button,
   Collapse,
@@ -79,6 +80,8 @@ export type GroupBrowserProps = {
   onDeleteGroup?: (id: string) => Promise<void>
   onSelectGroup?: (id: string | null) => void
   detailsReady?: boolean
+  relationCandidateState?: "ready" | "loading" | "error"
+  onRetryRelationCandidates?: () => Promise<void>
   canManage?: boolean
 }
 
@@ -446,6 +449,8 @@ export function GroupBrowser({
   onDeleteGroup,
   onSelectGroup,
   detailsReady = true,
+  relationCandidateState = "ready",
+  onRetryRelationCandidates,
   canManage = true,
 }: GroupBrowserProps) {
   const busyRef = useRef(false)
@@ -632,6 +637,30 @@ export function GroupBrowser({
       JSON.stringify(next),
     )
   }
+
+  const relationCandidateFeedback =
+    canManage && selected && relationCandidateState !== "ready" ? (
+      <Box px="sm" py="xs">
+        {relationCandidateState === "error" ? (
+          <Alert color="red" title="Groupの関係候補を取得できませんでした">
+            <Stack gap="xs">
+              <Text size="sm">
+                関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。
+              </Text>
+              <Group justify="flex-start">
+                <Button size="xs" variant="light" onClick={() => void onRetryRelationCandidates?.()}>
+                  再試行
+                </Button>
+              </Group>
+            </Stack>
+          </Alert>
+        ) : (
+          <Text size="xs" c="dimmed" role="status">
+            関係の編集候補を取得しています
+          </Text>
+        )}
+      </Box>
+    ) : null
 
   const createDialog = (
     <Modal
@@ -986,6 +1015,7 @@ export function GroupBrowser({
                 </Button>
               </Box>
               <Divider />
+              {relationCandidateFeedback}
               <ScrollArea flex={1}>
                 <Box p="sm">
                   {(selected?.mediaCount ?? 0) === 0 ? (
@@ -1185,6 +1215,7 @@ export function GroupBrowser({
                       </Group>
                     </Box>
                     <Divider />
+                    {relationCandidateFeedback}
 
                     <UnstyledButton
                       onClick={relations.toggle}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Alert, Center, Loader } from "@mantine/core"
 import {
   MediaGroupSort,
@@ -66,12 +66,39 @@ export function GroupBrowserContainer({
     variables: { groupId: selectedId ?? "", first: 100 },
     skip: !selectedId,
   })
+  const [candidateLoadFailureId, setCandidateLoadFailureId] = useState<string | null>(null)
+  const [candidateRetryingId, setCandidateRetryingId] = useState<string | null>(null)
+  const candidatePageInFlight = useRef<string | null>(null)
+  const retryRelationCandidates = useCallback(async () => {
+    if (!selectedId || candidateRetryingId === selectedId) return
+    setCandidateRetryingId(selectedId)
+    try {
+      // Restart at page one, rather than keeping an incomplete candidate set.
+      await candidateQuery.refetch()
+      setCandidateLoadFailureId(null)
+    } catch {
+      setCandidateLoadFailureId(selectedId)
+    } finally {
+      setCandidateRetryingId(null)
+    }
+  }, [selectedId, candidateRetryingId, candidateQuery.refetch])
+
   const candidateCursor = candidateQuery.data?.mediaGroupRelationCandidates
     .pageInfo.hasNextPage
     ? candidateQuery.data.mediaGroupRelationCandidates.pageInfo.endCursor
     : null
   useEffect(() => {
-    if (!candidateCursor || candidateQuery.loading) return
+    if (
+      !selectedId ||
+      !candidateCursor ||
+      candidateQuery.loading ||
+      candidateQuery.error ||
+      candidateLoadFailureId === selectedId ||
+      candidateRetryingId === selectedId
+    ) return
+    const requestKey = selectedId + ":" + candidateCursor
+    if (candidatePageInFlight.current === requestKey) return
+    candidatePageInFlight.current = requestKey
     void candidateQuery.fetchMore({
       variables: { after: candidateCursor },
       updateQuery: (previous, { fetchMoreResult }) => {
@@ -94,7 +121,17 @@ export function GroupBrowserContainer({
         }
       },
     })
-  }, [candidateCursor, candidateQuery.loading, candidateQuery.fetchMore])
+    .catch(() => {
+      // Stop automatic pagination after an error; retry is an explicit action.
+      setCandidateLoadFailureId(selectedId)
+    })
+    .finally(() => {
+      if (candidatePageInFlight.current === requestKey) {
+        candidatePageInFlight.current = null
+      }
+    })
+  }, [candidateCursor, candidateQuery.loading, candidateQuery.error,
+      candidateQuery.fetchMore, candidateLoadFailureId, candidateRetryingId, selectedId])
 
   const mediaCursor =
     detail.data?.mediaGroup?.id === selectedId &&
@@ -385,8 +422,24 @@ export function GroupBrowserContainer({
     )
   }
 
+  const candidateFailure = Boolean(selectedId && (
+    candidateQuery.error || candidateLoadFailureId === selectedId
+  ))
+  const candidateLoading = Boolean(selectedId && (
+    candidateRetryingId === selectedId ||
+    candidateQuery.loading ||
+    (!candidateQuery.data && !candidateFailure) ||
+    candidateQuery.data?.mediaGroupRelationCandidates.pageInfo.hasNextPage
+  ))
+
   return (
     <GroupBrowser
+      relationCandidateState={
+        candidateRetryingId === selectedId ? "loading" :
+        candidateFailure ? "error" :
+        candidateLoading ? "loading" : "ready"
+      }
+      onRetryRelationCandidates={retryRelationCandidates}
       contextKind={contextKind}
       communityId={communityId}
       groupsData={allGroups}
@@ -401,6 +454,9 @@ export function GroupBrowserContainer({
         (!detail.loading &&
           !detail.error &&
           !candidateQuery.error &&
+          Boolean(candidateQuery.data) &&
+          candidateLoadFailureId !== selectedId &&
+          candidateRetryingId !== selectedId &&
           !candidateQuery.loading &&
           !candidateQuery.data?.mediaGroupRelationCandidates.pageInfo
             .hasNextPage &&
