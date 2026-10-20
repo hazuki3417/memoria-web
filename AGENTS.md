@@ -78,16 +78,13 @@ npm run dev:next
 
 Storybookは`npm run dev:storybook`で起動します。シークレット、ローカル環境ファイル、Playwrightレポート、build生成物をコミットしません。
 
-### Storybook Docsブロックのimport規則
+### Storybook・画面設計の正本
 
-- Storybook 10系のMDXでは、Docsブロック（`Meta`、`Canvas`、`Controls`等）を`@storybook/addon-docs/blocks`からimportします。
-- 旧パッケージ`@storybook/blocks`からのimportおよび新規依存追加は禁止します。
-- Storybook関連パッケージを追加・更新する際は、Storybook本体とのpeer dependencyの互換性を確認し、`--force`や`--legacy-peer-deps`によって不整合を回避しません。
-- Storybookのメジャーバージョンを更新する際は、Docs API、MDX import先、および依存関係の互換性を再確認します。
-
-```mdx
-import { Meta } from '@storybook/addon-docs/blocks';
-```
+- **画面・Componentの設計MDXは新規作成しません（例外なし）。** 画面の振る舞い、採用されたVisual / Interaction / Responsive設計と理由は `memoria-design` のScreen Specification、画面固有の関連Design、Design Systemを正本にします。
+- Storybookは製品本体と同じReact Componentを用いた画面状態・操作の実行可能な確認環境です。`.stories.tsx`などのStory、Fixture、Adapter、Interaction Test、VRTは引き続き使用し、別のUI実装や設計MDXを作成しません。
+- Prototype前は画面の目的・条件・重要状態から設計を開始し、Visual Reviewで採用された配置・操作感などはDesignへ反映します。Componentの初期分割を設計文書やテスト設計の単位として固定しません。
+- テスト設計はDesignを参照して期待結果、検証階層、Fixture、外部境界を整理し、実行するStoryやテストコードはWebで管理します。テストから製品仕様を推測して確定しません。
+- Storybook関連パッケージを追加・更新する際は、本体とのpeer dependency互換性を確認し、`--force`や`--legacy-peer-deps`で不整合を回避しません。
 
 
 ## 検証
