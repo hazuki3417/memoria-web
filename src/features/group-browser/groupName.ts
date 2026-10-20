@@ -5,6 +5,11 @@ export function countGroupNameGraphemes(value: string): number {
   return Array.from(segmenter.segment(value)).length
 }
 
+/** Whether a new input value fits the existing Group name field limit. */
+export function canEnterGroupName(value: string): boolean {
+  return countGroupNameGraphemes(value) <= 100
+}
+
 export function validGroupName(value: string): boolean {
   const trimmed = value.trim()
   const length = countGroupNameGraphemes(trimmed)
