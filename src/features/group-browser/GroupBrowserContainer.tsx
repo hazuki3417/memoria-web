@@ -449,6 +449,15 @@ export function GroupBrowserContainer({
       groupMemberships={groupMemberships}
       onSaveMediaGroups={onSaveMediaGroups}
       onSelectGroup={setSelectedId}
+      mediaDetailState={
+        !selectedId ? "ready" :
+        detail.error ? "error" :
+        detail.loading ||
+        detail.data?.mediaGroup?.id !== selectedId ||
+        (detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage &&
+          detail.data.mediaGroup.aggregateMedia.edges.length === 0)
+          ? "loading" : "ready"
+      }
       detailsReady={
         !selectedId ||
         (!detail.loading &&
