@@ -32,7 +32,7 @@ import { useGroupRef } from "react-resizable-panels"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
-import { countGroupNameGraphemes, validGroupName } from "./groupName"
+import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./groupName"
 import {
   groupRelationOptionReason,
   groupRelationOptions,
@@ -657,7 +657,7 @@ export function GroupBrowser({
           value={createName}
           onChange={(event) => {
             const value = event.currentTarget.value
-            if (countGroupNameGraphemes(value) <= 100) setCreateName(value)
+            if (canEnterGroupName(value)) setCreateName(value)
           }}
           placeholder="Group名"
           styles={{ label: { display: "block", width: "100%" } }}
@@ -722,7 +722,7 @@ export function GroupBrowser({
           value={draftName}
           onChange={(event) => {
             const value = event.currentTarget.value
-            if (countGroupNameGraphemes(value) <= 100) setDraftName(value)
+            if (canEnterGroupName(value)) setDraftName(value)
           }}
           placeholder="Group名"
           styles={{ label: { display: "block", width: "100%" } }}
