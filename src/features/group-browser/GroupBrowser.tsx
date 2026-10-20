@@ -10,6 +10,8 @@ import {
   Group,
   Modal,
   MultiSelect,
+  Center,
+  Loader,
   Paper,
   ScrollArea,
   SimpleGrid,
@@ -80,6 +82,7 @@ export type GroupBrowserProps = {
   onDeleteGroup?: (id: string) => Promise<void>
   onSelectGroup?: (id: string | null) => void
   detailsReady?: boolean
+  mediaDetailState?: "ready" | "loading" | "error"
   relationCandidateState?: "ready" | "loading" | "error"
   onRetryRelationCandidates?: () => Promise<void>
   canManage?: boolean
@@ -449,6 +452,7 @@ export function GroupBrowser({
   onDeleteGroup,
   onSelectGroup,
   detailsReady = true,
+  mediaDetailState = "ready",
   relationCandidateState = "ready",
   onRetryRelationCandidates,
   canManage = true,
@@ -661,6 +665,53 @@ export function GroupBrowser({
         )}
       </Box>
     ) : null
+
+  const relationDetailSection = (
+    <>
+      <UnstyledButton
+        onClick={relations.toggle}
+        px="sm"
+        py={6}
+        aria-expanded={relationsOpened}
+        aria-label="このGroupとの関係を開閉"
+      >
+        <Group gap="xs" wrap="nowrap">
+          <IconChevronRight
+            size={16}
+            style={{
+              transform: relationsOpened
+                ? "rotate(90deg)"
+                : "rotate(0deg)",
+              transition: "transform 200ms ease",
+            }}
+          />
+          <Text size="xs" c="dimmed">
+            このGroupとの関係
+          </Text>
+        </Group>
+      </UnstyledButton>
+      <Collapse in={relationsOpened} transitionDuration={200}>
+        <Box px="lg" pb="sm">
+          <SimpleGrid cols={2} spacing="lg">
+            <Stack gap={4}>
+              <Text size="xs" c="dimmed">
+                Parents
+              </Text>
+              <RelationItems
+                names={selected?.parentNames ?? []}
+              />
+            </Stack>
+            <Stack gap={4}>
+              <Text size="xs" c="dimmed">
+                Children
+              </Text>
+              <RelationItems names={selected?.childNames ?? []} />
+            </Stack>
+          </SimpleGrid>
+        </Box>
+      </Collapse>
+    </>
+  )
 
   const createDialog = (
     <Modal
@@ -1016,11 +1067,22 @@ export function GroupBrowser({
               </Box>
               <Divider />
               {relationCandidateFeedback}
+              {relationDetailSection}
+              <Divider />
               <ScrollArea flex={1}>
                 <Box p="sm">
-                  {(selected?.mediaCount ?? 0) === 0 ? (
+                  {mediaDetailState === "loading" ? (
+                    <Center mih={180}><Loader /></Center>
+                  ) : mediaDetailState === "error" ? (
+                    <Alert color="red" title="GroupのMediaを取得できませんでした">
+                      最新のGroup情報を確認してから再度お試しください。
+                    </Alert>
+                  ) : (selected?.mediaCount ?? 0) === 0 ? (
                     <Paper withBorder p="xl" ta="center">
                       <Text fw={600}>Mediaがありません</Text>
+                      <Text size="sm" c="dimmed" mt={4}>
+                        このGroupまたはその下位Groupに分類されたMediaはありません。
+                      </Text>
                     </Paper>
                   ) : (
                     <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
@@ -1217,53 +1279,18 @@ export function GroupBrowser({
                     <Divider />
                     {relationCandidateFeedback}
 
-                    <UnstyledButton
-                      onClick={relations.toggle}
-                      px="sm"
-                      py={6}
-                      aria-expanded={relationsOpened}
-                      aria-label="このGroupとの関係を開閉"
-                    >
-                      <Group gap="xs" wrap="nowrap">
-                        <IconChevronRight
-                          size={16}
-                          style={{
-                            transform: relationsOpened
-                              ? "rotate(90deg)"
-                              : "rotate(0deg)",
-                            transition: "transform 200ms ease",
-                          }}
-                        />
-                        <Text size="xs" c="dimmed">
-                          このGroupとの関係
-                        </Text>
-                      </Group>
-                    </UnstyledButton>
-                    <Collapse in={relationsOpened} transitionDuration={200}>
-                      <Box px="lg" pb="sm">
-                        <SimpleGrid cols={2} spacing="lg">
-                          <Stack gap={4}>
-                            <Text size="xs" c="dimmed">
-                              Parents
-                            </Text>
-                            <RelationItems
-                              names={selected?.parentNames ?? []}
-                            />
-                          </Stack>
-                          <Stack gap={4}>
-                            <Text size="xs" c="dimmed">
-                              Children
-                            </Text>
-                            <RelationItems names={selected?.childNames ?? []} />
-                          </Stack>
-                        </SimpleGrid>
-                      </Box>
-                    </Collapse>
+                    {relationDetailSection}
                     <Divider />
 
                     <ScrollArea flex={1}>
                       <Box p="sm">
-                        {(selected?.mediaCount ?? 0) === 0 ? (
+                        {mediaDetailState === "loading" ? (
+                          <Center mih={180}><Loader /></Center>
+                        ) : mediaDetailState === "error" ? (
+                          <Alert color="red" title="GroupのMediaを取得できませんでした">
+                            最新のGroup情報を確認してから再度お試しください。
+                          </Alert>
+                        ) : (selected?.mediaCount ?? 0) === 0 ? (
                           <Paper withBorder p="xl" ta="center">
                             <Text fw={600}>Mediaがありません</Text>
                             <Text size="sm" c="dimmed" mt={4}>
