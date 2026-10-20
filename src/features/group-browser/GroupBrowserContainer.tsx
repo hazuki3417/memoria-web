@@ -454,6 +454,7 @@ export function GroupBrowserContainer({
         (!detail.loading &&
           !detail.error &&
           !candidateQuery.error &&
+          Boolean(candidateQuery.data) &&
           candidateLoadFailureId !== selectedId &&
           candidateRetryingId !== selectedId &&
           !candidateQuery.loading &&
