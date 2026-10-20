@@ -37,4 +37,28 @@ describe("Group name grapheme validation", () => {
     expect(countGroupNameGraphemes("🇯🇵")).toBe(1)
   })
 
+
+  it("rejects forbidden Cc before trim, whether leading, internal, or trailing (GB-038)", () => {
+    for (const control of ["\n", "\t", "\u0000", "\u0001", "\u007f"]) {
+      expect(validGroupName(control + "Group")).toBe(false)
+      expect(validGroupName("Group" + control)).toBe(false)
+      expect(validGroupName("Gr" + control + "oup")).toBe(false)
+    }
+  })
+
+  it("rejects Unicode line and paragraph separators even when trim would remove them (GB-038)", () => {
+    for (const separator of ["\u2028", "\u2029"]) {
+      expect(validGroupName(separator + "Group")).toBe(false)
+      expect(validGroupName("Group" + separator)).toBe(false)
+      expect(validGroupName("Gr" + separator + "oup")).toBe(false)
+    }
+  })
+
+  it("preserves permitted whitespace and format characters (GB-038)", () => {
+    expect(validGroupName("  Group  ")).toBe(true)
+    expect(validGroupName("Group Name")).toBe(true)
+    expect(validGroupName("👨‍👩‍👧‍👦")).toBe(true)
+    expect(validGroupName("e\u0301")).toBe(true)
+  })
+
 })

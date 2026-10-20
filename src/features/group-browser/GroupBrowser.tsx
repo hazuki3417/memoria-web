@@ -483,7 +483,7 @@ export function GroupBrowser({
   }
   const submitCreate = async () => {
     const name = createName.trim()
-    if (!validGroupName(name)) return
+    if (!validGroupName(createName)) return
     const result = await runAction(async () => {
       if (onCreateGroup) {
         await onCreateGroup(name, createParents, createChildren)
@@ -765,7 +765,7 @@ export function GroupBrowser({
           </Button>
           <Button
             onClick={async () => {
-              if (!selected) return
+              if (!selected || !validGroupName(draftName)) return
               const result = await runAction(async () => {
                 await onUpdateGroup?.(
                   selected.id,
