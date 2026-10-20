@@ -61,7 +61,7 @@ export function groupRelationOptionReason({
   "oppositeNames" | "currentGroupName" | "direction" | "availability"
 > & {
   name: string
-  checked: boolean
+  checked?: boolean
 }): string {
   if (name === currentGroupName) return "現在のGroup"
   if (oppositeNames.includes(name)) {
