@@ -19,6 +19,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 import { groupRelationChanges } from "./groupRelationChanges"
+import { deleteGroupThenRefresh } from "./groupDeleteFlow"
 import { showNotification } from "@/components/Feedback"
 
 type GroupBrowserContainerProps = {
@@ -351,9 +352,18 @@ export function GroupBrowserContainer({
 
   const onDeleteGroup = useCallback(
     async (id: string) => {
-      await deleteGroup({ variables: { input: { groupId: id } } })
-      setSelectedId(null)
-      await listing.refetch()
+      await deleteGroupThenRefresh({
+        deleteGroup: async () => {
+          const result = await deleteGroup({
+            variables: { input: { groupId: id } },
+          })
+          if (result.data?.deleteMediaGroup.groupId !== id) {
+            throw new Error("Group deletion result could not be confirmed")
+          }
+        },
+        onDeleted: () => setSelectedId(null),
+        refreshGroups: () => listing.refetch(),
+      })
     },
     [deleteGroup, listing.refetch],
   )
