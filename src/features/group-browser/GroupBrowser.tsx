@@ -798,7 +798,11 @@ export function GroupBrowser({
   const deleteDialog = (
     <Modal
       opened={deleteOpened}
-      onClose={deletion.close}
+      onClose={() => {
+        if (!saving) deletion.close()
+      }}
+      closeOnEscape={!saving}
+      closeOnClickOutside={!saving}
       title="Groupを削除"
       centered
       withCloseButton={false}
@@ -809,7 +813,7 @@ export function GroupBrowser({
           」を削除します。このGroupによるMedia分類とGroup間の関係は削除されますが、Media本体と他のGroupは削除されません。
         </Text>
         <Group justify="flex-end">
-          <Button variant="default" onClick={deletion.close}>
+          <Button variant="default" onClick={deletion.close} disabled={saving}>
             キャンセル
           </Button>
           <Button
@@ -823,9 +827,9 @@ export function GroupBrowser({
               if (result === "error") {
                 showNotification({
                   kind: "error",
-                  title: "Groupを削除できませんでした",
+                  title: "Groupの削除結果を確認できませんでした",
                   description:
-                    "Groupが残っているか確認し、必要であれば再度お試しください。",
+                    "最新のGroup状態を確認してから、再実行を判断してください。",
                 })
                 return
               }
@@ -833,6 +837,11 @@ export function GroupBrowser({
               deletion.close()
               edit.close()
               closeDetail()
+              showNotification({
+                kind: "success",
+                title: "Groupを削除",
+                description: "Groupを削除しました。",
+              })
             }}
           >
             削除
