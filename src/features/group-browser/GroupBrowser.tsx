@@ -898,9 +898,6 @@ export function GroupBrowser({
                     <Button size="xs" type="submit">
                       検索
                     </Button>
-                    <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
-                      {visibleGroups.length}件
-                    </Text>
                   </Group>
                 </Box>
                 <Group
@@ -978,9 +975,6 @@ export function GroupBrowser({
                   <Text fw={700} truncate="end">
                     {selected?.name ?? ""}
                   </Text>
-                  <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
-                    {selected?.mediaCount ?? 0}件のMedia
-                  </Text>
                 </Group>
                 <Button
                   size="xs"
@@ -1057,9 +1051,6 @@ export function GroupBrowser({
                     <Button size="xs" type="submit">
                       検索
                     </Button>
-                    <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
-                      {visibleGroups.length}件
-                    </Text>
                   </Group>
                 </Box>
                 <Group
@@ -1171,13 +1162,6 @@ export function GroupBrowser({
                       <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
                         <Text fw={700} truncate="end">
                           {selected?.name ?? ""}
-                        </Text>
-                        <Text
-                          size="xs"
-                          c="dimmed"
-                          style={{ whiteSpace: "nowrap" }}
-                        >
-                          {selected?.mediaCount ?? 0}件のMedia
                         </Text>
                       </Group>
                       <Group gap="xs" wrap="nowrap" justify="flex-end">
