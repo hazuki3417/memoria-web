@@ -61,4 +61,12 @@ describe("Group name grapheme validation", () => {
     expect(validGroupName("e\u0301")).toBe(true)
   })
 
+  it("does not normalize case, width or permitted interior spacing (GB-040)", () => {
+    for (const value of ["Group", "group", "Ｇｒｏｕｐ", "Group Name", "Group  Name"]) {
+      expect(validGroupName(value)).toBe(true)
+    }
+    expect(countGroupNameGraphemes("e\\u0301")).toBe(1)
+    expect(countGroupNameGraphemes("é")).toBe(1)
+  })
+
 })
