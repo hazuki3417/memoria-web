@@ -314,48 +314,29 @@ export function GroupBrowserContainer({
 
   const onCreateGroup = useCallback(
     async (name: string, parents: string[], children: string[]) => {
-      const created = await createGroup({
-        variables: { input: { scope, name } },
+      const ids = (names: string[]) => names.map((value) => {
+        const groupId = nameToId.get(value)
+        if (!groupId) throw new Error("Unknown relation candidate")
+        return groupId
       })
-      const id = created.data?.createMediaGroup.group.id
-      if (!id) throw new Error("Group creation returned no ID")
-      if (parents.length || children.length) {
-        try {
-          const ids = (names: string[]) => names.map((value) => {
-            const groupId = nameToId.get(value)
-            if (!groupId) throw new Error("Unknown relation candidate")
-            return groupId
-          })
-          const result = await updateGroup({
-            variables: { input: {
-              groupId: id,
-              expectedStateToken: created.data?.createMediaGroup.group.stateToken ?? "",
-              name,
-              parentGroupIds: ids(parents),
-              childGroupIds: ids(children),
-            } },
-          })
-          if (!result.data) {
-            showNotification({
-              kind: "error",
-              title:
-                "Groupは作成されましたが、一部の関係を設定できませんでした",
-              description:
-                "Group自体は保存されています。関係の最新状態を確認してください。",
-            })
-          }
-        } catch {
-          showNotification({
-            kind: "error",
-            title:
-              "Groupは作成されましたが、関係の設定結果を確認できませんでした",
-            description: "Groupを再作成せず、最新の関係を確認してください。",
-          })
-        }
+      // The Group and all relations are created in one server transaction.
+      // No follow-up Update mutation or automatic retry is allowed.
+      const created = await createGroup({
+        variables: {
+          input: {
+            scope,
+            name,
+            parentGroupIds: ids(parents),
+            childGroupIds: ids(children),
+          },
+        },
+      })
+      if (!created.data?.createMediaGroup.group.id) {
+        throw new Error("Group creation result could not be confirmed")
       }
       await refetch()
     },
-    [scope, createGroup, updateGroup, nameToId, refetch],
+    [scope, createGroup, nameToId, refetch],
   )
 
   const onUpdateGroup = useCallback(
