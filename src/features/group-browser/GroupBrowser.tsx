@@ -17,7 +17,6 @@ import {
   Stack,
   Text,
   TextInput,
-  UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
@@ -36,6 +35,7 @@ import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
 import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./groupName"
 import { RelationEditor } from "./RelationEditor"
+import { MediaGrid } from "./MediaGrid"
 
 export type GroupBrowserGroup = {
   id: string
@@ -301,54 +301,6 @@ function RelationItems({ names }: { names: string[] }) {
         </Badge>
       ))}
     </Group>
-  )
-}
-
-function MediaGrid({
-  onOpen,
-  items,
-}: {
-  onOpen: (index: number) => void
-  items?: Array<{ id: string; label: string; src: string | null }>
-}) {
-  // Local dummy thumbnails; actual Group media will be supplied by the Connection.
-  const mediaItems =
-    items ??
-    Array.from({ length: 24 }, (_, index) => ({
-      id: `media-${index + 1}`,
-      label: `Media ${index + 1}`,
-      src: previewImages[index % previewImages.length],
-    }))
-  return (
-    <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
-      {mediaItems.map(({ id, label, src }, index) => (
-        <UnstyledButton
-          key={id}
-          aria-label={
-            src
-              ? `${label}の詳細を開く`
-              : `${label}の詳細を開く（画像プレビューなし）`
-          }
-          onClick={() => onOpen(index)}
-          bdrs="sm"
-          style={{
-            display: "block",
-            aspectRatio: "1 / 1",
-            border: "1px solid var(--mantine-color-default-border)",
-            backgroundImage: src ? `url("${src}")` : undefined,
-            backgroundColor: "var(--mantine-color-default-hover)",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        >
-          {!src && (
-            <Text size="xs" c="dimmed" ta="center">
-              {label}
-            </Text>
-          )}
-        </UnstyledButton>
-      ))}
-    </SimpleGrid>
   )
 }
 
