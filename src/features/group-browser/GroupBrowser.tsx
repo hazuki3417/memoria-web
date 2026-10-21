@@ -83,6 +83,8 @@ export type GroupBrowserProps = {
   onSelectGroup?: (id: string | null) => void
   detailsReady?: boolean
   mediaDetailState?: "ready" | "loading" | "error"
+  mediaPageState?: "idle" | "loading" | "error"
+  onRetryMediaPage?: () => void
   onRetryGroupMedia?: () => Promise<void>
   relationCandidateState?: "ready" | "loading" | "error"
   onRetryRelationCandidates?: () => Promise<void>
@@ -454,6 +456,8 @@ export function GroupBrowser({
   onSelectGroup,
   detailsReady = true,
   mediaDetailState = "ready",
+  mediaPageState = "idle",
+  onRetryMediaPage,
   onRetryGroupMedia,
   relationCandidateState = "ready",
   onRetryRelationCandidates,
@@ -735,6 +739,21 @@ export function GroupBrowser({
       </Collapse>
     </>
   )
+
+  const mediaPageFeedback = mediaPageState === "error" ? (
+    <Alert color="red" title="追加のMediaを取得できませんでした" mt="sm">
+      <Stack gap="xs" align="flex-start">
+        <Text size="sm">取得済みのMediaは引き続き閲覧できます。</Text>
+        <Button size="xs" variant="light" onClick={onRetryMediaPage}>
+          再試行
+        </Button>
+      </Stack>
+    </Alert>
+  ) : mediaPageState === "loading" ? (
+    <Text size="xs" c="dimmed" mt="sm" role="status">
+      追加のMediaを取得しています
+    </Text>
+  ) : null
 
   const createDialog = (
     <Modal
@@ -1124,7 +1143,10 @@ export function GroupBrowser({
                       </Text>
                     </Paper>
                   ) : (
-                    <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
+                    <>
+                      <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
+                      {mediaPageFeedback}
+                    </>
                   )}
                 </Box>
               </ScrollArea>
@@ -1342,10 +1364,13 @@ export function GroupBrowser({
                             </Text>
                           </Paper>
                         ) : (
-                          <MediaGrid
-                            onOpen={openMediaAt}
-                            items={mediaItemsData}
-                          />
+                          <>
+                            <MediaGrid
+                              onOpen={openMediaAt}
+                              items={mediaItemsData}
+                            />
+                            {mediaPageFeedback}
+                          </>
                         )}
                       </Box>
                     </ScrollArea>

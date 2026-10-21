@@ -138,8 +138,25 @@ export function GroupBrowserContainer({
     detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
       ? detail.data.mediaGroup.aggregateMedia.pageInfo.endCursor
       : null
+  const mediaPageKey = selectedId && mediaCursor ? selectedId + ":" + mediaCursor : null
+  const [mediaPageFailedKey, setMediaPageFailedKey] = useState<string | null>(null)
+  const mediaPageInFlight = useRef<string | null>(null)
+
+  // Retry the failed cursor explicitly while preserving already loaded Media.
+  const retryMediaPage = useCallback(() => {
+    if (mediaPageKey && mediaPageFailedKey === mediaPageKey) {
+      setMediaPageFailedKey(null)
+    }
+  }, [mediaPageKey, mediaPageFailedKey])
+
   useEffect(() => {
-    if (!mediaCursor || !selectedId || detail.loading) return
+    if (
+      !mediaPageKey || !mediaCursor || !selectedId ||
+      detail.loading ||
+      mediaPageFailedKey === mediaPageKey ||
+      mediaPageInFlight.current === mediaPageKey
+    ) return
+    mediaPageInFlight.current = mediaPageKey
     void detail.fetchMore({
       variables: { id: selectedId, scope, mediaAfter: mediaCursor },
       updateQuery: (previous, { fetchMoreResult }) => {
@@ -168,7 +185,17 @@ export function GroupBrowserContainer({
         }
       },
     })
-  }, [mediaCursor, selectedId, detail.loading, detail.fetchMore])
+    .catch(() => {
+      // Avoid an automatic retry loop; allow a deliberate retry instead.
+      setMediaPageFailedKey(mediaPageKey)
+    })
+    .finally(() => {
+      if (mediaPageInFlight.current === mediaPageKey) {
+        mediaPageInFlight.current = null
+      }
+    })
+  }, [mediaPageKey, mediaCursor, selectedId, detail.loading,
+      detail.fetchMore, mediaPageFailedKey])
 
   const [createGroup] = useCreateBrowserGroupMutation()
   const [updateGroup] = useUpdateBrowserGroupMutation()
@@ -468,17 +495,25 @@ export function GroupBrowserContainer({
         if (!selectedId || detail.loading) return
         try {
           await detail.refetch()
+          setMediaPageFailedKey(null)
         } catch {
           // Query error remains visible; retry does not alter the selected Group.
         }
       }}
+      mediaPageState={
+        !mediaPageKey || !detail.data?.mediaGroup?.aggregateMedia.edges.length
+          ? "idle"
+          : mediaPageFailedKey === mediaPageKey
+            ? "error"
+            : "loading"
+      }
+      onRetryMediaPage={retryMediaPage}
       mediaDetailState={
         !selectedId ? "ready" :
-        detail.error ? "error" :
-        detail.loading ||
-        detail.data?.mediaGroup?.id !== selectedId ||
-        (detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage &&
-          detail.data.mediaGroup.aggregateMedia.edges.length === 0)
+        detail.data?.mediaGroup?.id !== selectedId ? "loading" :
+        detail.data.mediaGroup.aggregateMedia.edges.length > 0 ? "ready" :
+        mediaPageFailedKey === mediaPageKey || detail.error ? "error" :
+        detail.loading || detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
           ? "loading" : "ready"
       }
       detailsReady={
