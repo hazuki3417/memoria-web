@@ -1,0 +1,88 @@
+name: code-generation
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: web-code-generation-runner
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: ${{ github.event.issue.number == 137 && !github.event.issue.pull_request && github.event.comment.user.login == 'hazuki3417' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Validate request
+        id: request
+        env:
+          REQUEST_BODY: ${{ github.event.comment.body }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+
+          try:
+              request = json.loads(os.environ["REQUEST_BODY"])
+          except (ValueError, TypeError) as exc:
+              raise SystemExit(f"Invalid JSON request: {exc}")
+          if not isinstance(request, dict) or set(request) != {"task", "branch"}:
+              raise SystemExit("Only task and branch are accepted")
+          task, branch = request["task"], request["branch"]
+          if task != "graphql":
+              raise SystemExit("Unsupported task")
+          if not isinstance(branch, str) or not re.fullmatch(
+              r"(?:feature|fix|docs|refactor|chore|hotfix)/[a-z0-9][a-z0-9/_-]*", branch
+          ) or ".." in branch or "//" in branch or branch.endswith(("/", ".", ".lock")):
+              raise SystemExit("Invalid work branch")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"branch={branch}\n")
+          PY
+
+      - name: Check out requested branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.request.outputs.branch }}
+          persist-credentials: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate GraphQL client
+        run: npm run graphql:codegen
+
+      - name: Verify generated changes and quality
+        shell: bash
+        run: |
+          if git status --porcelain --untracked-files=all | awk '{print $2}' | grep -Ev '^src/infrastructure/graphql/generated.ts$'; then
+            echo "::error::Generation touched files outside generated.ts"
+            exit 1
+          fi
+          npm run check:type
+          npm run test:unit
+
+      - name: Commit and push generated code
+        env:
+          TARGET_BRANCH: ${{ steps.request.outputs.branch }}
+        shell: bash
+        run: |
+          git add -- src/infrastructure/graphql/generated.ts
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit"
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "chore: regenerate GraphQL client"
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
