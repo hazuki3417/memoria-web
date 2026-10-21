@@ -18,7 +18,6 @@ import {
   useRemoveBrowserMediaFromGroupMutation,
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
-import { groupRelationChanges } from "./groupRelationChanges"
 import { deleteGroupThenRefresh } from "./groupDeleteFlow"
 import { showNotification } from "@/components/Feedback"
 
@@ -321,20 +320,21 @@ export function GroupBrowserContainer({
       if (!id) throw new Error("Group creation returned no ID")
       if (parents.length || children.length) {
         try {
-          const relationChanges = groupRelationChanges(
-            { parents, children },
-            { parents: [], children: [] },
-            nameToId,
-          )
-          const result = await updateGroup({
-            variables: { input: { groupId: id, relationChanges } },
+          const ids = (names: string[]) => names.map((value) => {
+            const groupId = nameToId.get(value)
+            if (!groupId) throw new Error("Unknown relation candidate")
+            return groupId
           })
-          if (
-            !result.data ||
-            result.data.updateMediaGroup.relationResults.some(
-              (item) => item.status === "FAILED",
-            )
-          ) {
+          const result = await updateGroup({
+            variables: { input: {
+              groupId: id,
+              expectedStateToken: created.data?.createMediaGroup.group.stateToken ?? "",
+              name,
+              parentGroupIds: ids(parents),
+              childGroupIds: ids(children),
+            } },
+          })
+          if (!result.data) {
             showNotification({
               kind: "error",
               title:
@@ -361,26 +361,32 @@ export function GroupBrowserContainer({
     async (id: string, name: string, parents: string[], children: string[]) => {
       const old = allGroups.find((group) => group.id === id)
       if (!old) throw new Error("Group is no longer available")
-      const relationChanges = groupRelationChanges(
-        { parents, children },
-        { parents: old.parentNames, children: old.childNames },
-        nameToId,
-      )
-      const updated = await updateGroup({
-        variables: { input: { groupId: id, name, relationChanges } },
+      const currentDetail = detail.data?.mediaGroup
+      if (!currentDetail || currentDetail.id !== id ||
+          currentDetail.parents.pageInfo.hasNextPage ||
+          currentDetail.children.pageInfo.hasNextPage) {
+        throw new Error("Complete Group relation state is not loaded")
+      }
+      const resolveIds = (names: string[]) => names.map((value) => {
+        const groupId = nameToId.get(value)
+        if (!groupId) throw new Error("Unknown relation candidate")
+        return groupId
       })
-      if (
-        !updated.data ||
-        updated.data.updateMediaGroup.relationResults.some(
-          (item) => item.status === "FAILED",
-        )
-      ) {
-        await refetch()
-        throw new Error("Some Group changes could not be applied")
+      const updated = await updateGroup({
+        variables: { input: {
+          groupId: id,
+          expectedStateToken: currentDetail.stateToken,
+          name,
+          parentGroupIds: resolveIds(parents),
+          childGroupIds: resolveIds(children),
+        } },
+      })
+      if (!updated.data) {
+        throw new Error("Group update result is unavailable")
       }
       await refetch()
     },
-    [allGroups, nameToId, updateGroup, refetch],
+    [allGroups, detail.data, nameToId, updateGroup, refetch],
   )
 
   const onSaveMediaGroups = useCallback(
@@ -527,7 +533,9 @@ export function GroupBrowserContainer({
           !candidateQuery.loading &&
           !candidateQuery.data?.mediaGroupRelationCandidates.pageInfo
             .hasNextPage &&
-          detail.data?.mediaGroup?.id === selectedId)
+          detail.data?.mediaGroup?.id === selectedId &&
+          !detail.data.mediaGroup.parents.pageInfo.hasNextPage &&
+          !detail.data.mediaGroup.children.pageInfo.hasNextPage)
       }
       hideManagementActions={
         contextKind === "community" &&
