@@ -19,7 +19,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 import { deleteGroupThenRefresh } from "./groupDeleteFlow"
-import { isGroupStateConflict, isGroupUpdateOutcomeUnknown } from "./groupStateConflict"
+import { isGroupCreateOutcomeUnknown, isGroupStateConflict, isGroupUpdateOutcomeUnknown } from "./groupStateConflict"
 import { showNotification } from "@/components/Feedback"
 
 type GroupBrowserContainerProps = {
@@ -334,7 +334,7 @@ export function GroupBrowserContainer({
           },
         })
       } catch (error) {
-        if (isGroupUpdateOutcomeUnknown(error) || (error && typeof error === "object" && "graphQLErrors" in error && Array.isArray(error.graphQLErrors) && error.graphQLErrors.some((item: { extensions?: { code?: string } }) => item?.extensions?.code === "UNKNOWN_OUTCOME"))) {
+        if (isGroupCreateOutcomeUnknown(error)) {
           // The transaction may already have committed; never retry automatically.
           return "unknown" as const
         }

@@ -21,3 +21,16 @@ export function isGroupUpdateOutcomeUnknown(error: unknown): boolean {
       error.graphQLErrors.length > 0) return false
   return error instanceof Error
 }
+
+/** Create may have committed even when its response could not be confirmed. */
+export function isGroupCreateOutcomeUnknown(error: unknown): boolean {
+  if (isGroupUpdateOutcomeUnknown(error)) return true
+  if (!error || typeof error !== "object" || !("graphQLErrors" in error)) return false
+  const graphQLErrors = error.graphQLErrors
+  return Array.isArray(graphQLErrors) && graphQLErrors.some(
+    (item: unknown) => item !== null && typeof item === "object" &&
+      "extensions" in item && item.extensions !== null &&
+      typeof item.extensions === "object" &&
+      "code" in item.extensions && item.extensions.code === "UNKNOWN_OUTCOME",
+  )
+}
