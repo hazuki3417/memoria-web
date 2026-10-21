@@ -133,13 +133,44 @@ export function GroupBrowserContainer({
   }, [candidateCursor, candidateQuery.loading, candidateQuery.error,
       candidateQuery.fetchMore, candidateLoadFailureId, candidateRetryingId, selectedId])
 
+  // Track pagination errors separately from the initial detail query.
+  // A failed cursor is retried only by an explicit user action.
+  const [mediaPageFailureId, setMediaPageFailureId] = useState<string | null>(null)
+  const [mediaRetryingId, setMediaRetryingId] = useState<string | null>(null)
+  const mediaPageInFlight = useRef<string | null>(null)
+  const retryGroupMedia = useCallback(async () => {
+    if (!selectedId || mediaRetryingId === selectedId) return
+    const groupId = selectedId
+    setMediaRetryingId(groupId)
+    try {
+      // Restart from the initial page to avoid keeping an incomplete cursor chain.
+      await detail.refetch()
+      setMediaPageFailureId((current) => current === groupId ? null : current)
+    } catch {
+      setMediaPageFailureId(groupId)
+    } finally {
+      setMediaRetryingId((current) => current === groupId ? null : current)
+    }
+  }, [selectedId, mediaRetryingId, detail.refetch])
+
   const mediaCursor =
     detail.data?.mediaGroup?.id === selectedId &&
     detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
       ? detail.data.mediaGroup.aggregateMedia.pageInfo.endCursor
       : null
   useEffect(() => {
-    if (!mediaCursor || !selectedId || detail.loading) return
+    if (
+      !mediaCursor ||
+      !selectedId ||
+      detail.loading ||
+      detail.error ||
+      mediaPageFailureId === selectedId ||
+      mediaRetryingId === selectedId
+    ) return
+    const groupId = selectedId
+    const requestKey = groupId + ":" + mediaCursor
+    if (mediaPageInFlight.current === requestKey) return
+    mediaPageInFlight.current = requestKey
     void detail.fetchMore({
       variables: { id: selectedId, scope, mediaAfter: mediaCursor },
       updateQuery: (previous, { fetchMoreResult }) => {
@@ -168,7 +199,19 @@ export function GroupBrowserContainer({
         }
       },
     })
-  }, [mediaCursor, selectedId, detail.loading, detail.fetchMore])
+    .catch(() => {
+      // Keep the selected Group; do not auto-retry a failing cursor forever.
+      setMediaPageFailureId(groupId)
+    })
+    .finally(() => {
+      if (mediaPageInFlight.current === requestKey) {
+        mediaPageInFlight.current = null
+      }
+    })
+  }, [
+    mediaCursor, selectedId, detail.loading, detail.error, detail.fetchMore,
+    mediaPageFailureId, mediaRetryingId, scope,
+  ])
 
   const [createGroup] = useCreateBrowserGroupMutation()
   const [updateGroup] = useUpdateBrowserGroupMutation()
@@ -464,18 +507,11 @@ export function GroupBrowserContainer({
       groupMemberships={groupMemberships}
       onSaveMediaGroups={onSaveMediaGroups}
       onSelectGroup={setSelectedId}
-      onRetryGroupMedia={async () => {
-        if (!selectedId || detail.loading) return
-        try {
-          await detail.refetch()
-        } catch {
-          // Query error remains visible; retry does not alter the selected Group.
-        }
-      }}
+      onRetryGroupMedia={retryGroupMedia}
       mediaDetailState={
         !selectedId ? "ready" :
-        detail.error ? "error" :
-        detail.loading ||
+        detail.error || mediaPageFailureId === selectedId ? "error" :
+        mediaRetryingId === selectedId || detail.loading ||
         detail.data?.mediaGroup?.id !== selectedId ||
         (detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage &&
           detail.data.mediaGroup.aggregateMedia.edges.length === 0)
