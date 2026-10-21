@@ -343,7 +343,15 @@ export function GroupBrowserContainer({
       if (!created.data?.createMediaGroup.group.id) {
         return "unknown" as const
       }
-      await refetch()
+      // A refresh failure does not undo a confirmed successful creation.
+      // Never tell users that the create failed once the server returned success.
+      void refetch().catch(() => {
+        showNotification({
+          kind: "error",
+          title: "Groupは作成されました",
+          description: "一覧の更新に失敗しました。画面を再読み込みして確認してください。",
+        })
+      })
     },
     [scope, createGroup, nameToId, refetch],
   )
