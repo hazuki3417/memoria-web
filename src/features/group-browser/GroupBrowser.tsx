@@ -89,6 +89,7 @@ export type GroupBrowserProps = {
   relationCandidateState?: "ready" | "loading" | "error"
   onRetryRelationCandidates?: () => Promise<void>
   canManage?: boolean
+  hideManagementActions?: boolean
 }
 
 type GroupFixture = {
@@ -462,6 +463,7 @@ export function GroupBrowser({
   relationCandidateState = "ready",
   onRetryRelationCandidates,
   canManage = true,
+  hideManagementActions = false,
 }: GroupBrowserProps) {
   const busyRef = useRef(false)
   const [saving, setSaving] = useState(false)
@@ -1030,6 +1032,7 @@ export function GroupBrowser({
                   justify="flex-end"
                   style={{ gridColumn: compact ? "1" : undefined }}
                 >
+                  {!hideManagementActions && (
                   <Button
                     size="xs"
                     leftSection={<IconFolderPlus size={16} />}
@@ -1038,6 +1041,7 @@ export function GroupBrowser({
                   >
                     Groupを作成
                   </Button>
+                  )}
                 </Group>
               </Box>
               <Divider />
@@ -1212,6 +1216,7 @@ export function GroupBrowser({
                   justify="flex-end"
                   style={{ gridColumn: compact ? "1" : undefined }}
                 >
+                  {!hideManagementActions && (
                   <Button
                     size="xs"
                     leftSection={<IconFolderPlus size={16} />}
@@ -1220,6 +1225,7 @@ export function GroupBrowser({
                   >
                     Groupを作成
                   </Button>
+                  )}
                 </Group>
               </Box>
               <Divider />
@@ -1318,6 +1324,7 @@ export function GroupBrowser({
                         </Text>
                       </Group>
                       <Group gap="xs" wrap="nowrap" justify="flex-end">
+                        {!hideManagementActions && (
                         <Button
                           size="xs"
                           variant="default"
@@ -1327,6 +1334,7 @@ export function GroupBrowser({
                         >
                           編集
                         </Button>
+                        )}
                         <Button
                           size="xs"
                           variant="default"
