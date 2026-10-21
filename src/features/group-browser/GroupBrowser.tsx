@@ -72,7 +72,7 @@ export type GroupBrowserProps = {
     name: string,
     parents: string[],
     children: string[],
-  ) => Promise<void>
+  ) => Promise<"unknown" | void>
   onUpdateGroup?: (
     id: string,
     name: string,
@@ -501,9 +501,11 @@ export function GroupBrowser({
   const submitCreate = async () => {
     const name = createName.trim()
     if (!validGroupName(createName)) return
+    let outcomeUnknown = false
     const result = await runAction(async () => {
       if (onCreateGroup) {
-        await onCreateGroup(name, createParents, createChildren)
+        const outcome = await onCreateGroup(name, createParents, createChildren)
+        if (outcome === "unknown") outcomeUnknown = true
       } else {
         setCreatedGroups((current) => [
           ...current,
@@ -523,6 +525,14 @@ export function GroupBrowser({
         kind: "error",
         title: "Groupを作成できませんでした",
         description: "入力内容と通信状態を確認して、もう一度お試しください。",
+      })
+      return
+    }
+    if (outcomeUnknown) {
+      showNotification({
+        kind: "error",
+        title: "Groupの作成結果を確認できませんでした",
+        description: "通信状態が不明です。入力内容は保持されています。必要であればご自身で再試行してください。",
       })
       return
     }
