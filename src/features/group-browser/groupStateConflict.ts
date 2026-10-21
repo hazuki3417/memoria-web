@@ -12,3 +12,12 @@ export function isGroupStateConflict(error: unknown): boolean {
       item.extensions.code === "CONFLICT",
   )
 }
+
+/** A transport failure cannot prove whether the mutation committed. */
+export function isGroupUpdateOutcomeUnknown(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false
+  if ("networkError" in error && error.networkError != null) return true
+  if ("graphQLErrors" in error && Array.isArray(error.graphQLErrors) &&
+      error.graphQLErrors.length > 0) return false
+  return error instanceof Error
+}
