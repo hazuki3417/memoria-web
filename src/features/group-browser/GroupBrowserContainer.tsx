@@ -321,18 +321,27 @@ export function GroupBrowserContainer({
       })
       // The Group and all relations are created in one server transaction.
       // No follow-up Update mutation or automatic retry is allowed.
-      const created = await createGroup({
-        variables: {
-          input: {
-            scope,
-            name,
-            parentGroupIds: ids(parents),
-            childGroupIds: ids(children),
+      let created
+      try {
+        created = await createGroup({
+          variables: {
+            input: {
+              scope,
+              name,
+              parentGroupIds: ids(parents),
+              childGroupIds: ids(children),
+            },
           },
-        },
-      })
+        })
+      } catch (error) {
+        if (isGroupUpdateOutcomeUnknown(error)) {
+          // The transaction may already have committed; never retry automatically.
+          return "unknown" as const
+        }
+        throw error
+      }
       if (!created.data?.createMediaGroup.group.id) {
-        throw new Error("Group creation result could not be confirmed")
+        return "unknown" as const
       }
       await refetch()
     },
