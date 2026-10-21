@@ -495,6 +495,7 @@ export function GroupBrowserContainer({
         if (!selectedId || detail.loading) return
         try {
           await detail.refetch()
+          setMediaPageFailedKey(null)
         } catch {
           // Query error remains visible; retry does not alter the selected Group.
         }
