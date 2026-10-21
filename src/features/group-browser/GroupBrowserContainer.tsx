@@ -464,6 +464,14 @@ export function GroupBrowserContainer({
       groupMemberships={groupMemberships}
       onSaveMediaGroups={onSaveMediaGroups}
       onSelectGroup={setSelectedId}
+      onRetryGroupMedia={async () => {
+        if (!selectedId || detail.loading) return
+        try {
+          await detail.refetch()
+        } catch {
+          // Query error remains visible; retry does not alter the selected Group.
+        }
+      }}
       mediaDetailState={
         !selectedId ? "ready" :
         detail.error ? "error" :
