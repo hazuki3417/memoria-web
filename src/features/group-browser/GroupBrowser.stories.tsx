@@ -48,7 +48,7 @@ export const CreateDialogCancel: Story = {
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "新しいアルバム")
     await expect(create).toBeEnabled()
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
-    await expect(within(document.body).queryByRole("dialog", { name: "Groupを作成" })).not.toBeInTheDocument()
+    await expect(within(document.body).queryByRole("dialog", { name: "Groupを作成" })).not.toBeVisible()
     await expect(args.onCreateGroup).not.toHaveBeenCalled()
   },
 }
