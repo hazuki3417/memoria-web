@@ -397,6 +397,7 @@ export function GroupBrowserContainer({
             description: "編集中の内容は保持されています。最新の関係を確認してから保存してください。",
           })
           await Promise.allSettled([detail.refetch(), candidateQuery.refetch()])
+          return "conflict" as const
         }
         throw error
       }
