@@ -40,8 +40,10 @@ export const OppositeSelectionDisabled: Story = {
     const input = canvas.getByPlaceholderText("Groupを検索")
     await userEvent.click(input)
     await userEvent.type(input, "Child")
-    const option = await within(document.body).findByRole("option", { name: /Child/ })
-    await expect(option).toHaveAttribute("aria-disabled", "true")
+    await within(document.body).findByRole("option", { name: /Child/ })
+    // 利用者の確定操作を試みても、反対方向のGroupは選択されない。
+    await userEvent.keyboard("{Enter}")
     await expect(canvas.getByText("0 / 10")).toBeVisible()
+    await expect(canvas.queryByText("Child")).not.toBeInTheDocument()
   },
 }
