@@ -19,6 +19,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 import { deleteGroupThenRefresh } from "./groupDeleteFlow"
+import { isGroupStateConflict } from "./groupStateConflict"
 import { showNotification } from "@/components/Feedback"
 
 type GroupBrowserContainerProps = {
@@ -372,21 +373,35 @@ export function GroupBrowserContainer({
         if (!groupId) throw new Error("Unknown relation candidate")
         return groupId
       })
-      const updated = await updateGroup({
-        variables: { input: {
-          groupId: id,
-          expectedStateToken: currentDetail.stateToken,
-          name,
-          parentGroupIds: resolveIds(parents),
-          childGroupIds: resolveIds(children),
-        } },
-      })
-      if (!updated.data) {
-        throw new Error("Group update result is unavailable")
+      try {
+        const updated = await updateGroup({
+          variables: { input: {
+            groupId: id,
+            expectedStateToken: currentDetail.stateToken,
+            name,
+            parentGroupIds: resolveIds(parents),
+            childGroupIds: resolveIds(children),
+          } },
+        })
+        if (!updated.data) {
+          throw new Error("Group update result is unavailable")
+        }
+        await refetch()
+      } catch (error) {
+        if (isGroupStateConflict(error)) {
+          // Keep the editor's draft intact. Refresh the persisted snapshot,
+          // and require the user to review it before explicitly saving again.
+          showNotification({
+            kind: "error",
+            title: "ほかの操作によってGroupが更新されました",
+            description: "編集中の内容は保持されています。最新の関係を確認してから保存してください。",
+          })
+          await Promise.allSettled([detail.refetch(), candidateQuery.refetch()])
+        }
+        throw error
       }
-      await refetch()
     },
-    [allGroups, detail.data, nameToId, updateGroup, refetch],
+    [allGroups, detail.data, detail.refetch, candidateQuery.refetch, nameToId, updateGroup, refetch],
   )
 
   const onSaveMediaGroups = useCallback(
