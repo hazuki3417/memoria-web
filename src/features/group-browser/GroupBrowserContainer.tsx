@@ -238,7 +238,7 @@ export function GroupBrowserContainer({
       const matching = currentDetail?.id === node.id ? currentDetail : null
       return {
         id: node.id,
-        name: node.name,
+        name: matching?.name ?? node.name,
         // Until Media thumbnails are available, preserve the existing
         // presentational contract without inventing Media counts.
         mediaCount: matching?.aggregateMedia.edges.length ?? 0,
@@ -396,13 +396,13 @@ export function GroupBrowserContainer({
             title: "ほかの操作によってGroupが更新されました",
             description: "編集中の内容は保持されています。最新の関係を確認してから保存してください。",
           })
-          await Promise.allSettled([detail.refetch(), candidateQuery.refetch()])
+          await Promise.allSettled([detail.refetch(), candidateQuery.refetch(), listing.refetch()])
           return "conflict" as const
         }
         throw error
       }
     },
-    [allGroups, detail.data, detail.refetch, candidateQuery.refetch, nameToId, updateGroup, refetch],
+    [allGroups, detail.data, detail.refetch, candidateQuery.refetch, listing.refetch, nameToId, updateGroup, refetch],
   )
 
   const onSaveMediaGroups = useCallback(
