@@ -1,6 +1,7 @@
 fragment GroupBrowserGroup on MediaGroup {
   id
   name
+  stateToken
   createdAt
 }
 query BrowseGroups($scope: ScopeInput!, $search: String, $sort: MediaGroupSort! = NAME_ASC, $first: Int, $after: String) {
@@ -37,7 +38,6 @@ mutation CreateBrowserGroup($input: CreateMediaGroupInput!) {
 mutation UpdateBrowserGroup($input: UpdateMediaGroupInput!) {
   updateMediaGroup(input: $input) {
     group { ...GroupBrowserGroup }
-    relationResults { groupId direction action status errorCode unavailableReason }
   }
 }
 mutation DeleteBrowserGroup($input: DeleteMediaGroupInput!) {

@@ -78,7 +78,7 @@ export type GroupBrowserProps = {
     name: string,
     parents: string[],
     children: string[],
-  ) => Promise<void>
+  ) => Promise<"conflict" | "unknown" | void>
   onDeleteGroup?: (id: string) => Promise<void>
   onSelectGroup?: (id: string | null) => void
   detailsReady?: boolean
@@ -580,6 +580,7 @@ export function GroupBrowser({
   const [draftName, setDraftName] = useState("")
   const [draftParents, setDraftParents] = useState<string[]>([])
   const [draftChildren, setDraftChildren] = useState<string[]>([])
+  const [conflictNeedsReview, setConflictNeedsReview] = useState(false)
 
   const visibleGroups = useMemo(() => {
     const normalized = appliedQuery.trim()
@@ -597,6 +598,7 @@ export function GroupBrowser({
 
   const openEdit = () => {
     if (!selected || !detailsReady || !canManage) return
+    setConflictNeedsReview(false)
     setDraftName(selected.name)
     setDraftParents(selected.parentNames)
     setDraftChildren(selected.childNames)
@@ -767,6 +769,20 @@ export function GroupBrowser({
       withCloseButton={false}
     >
       <Stack gap="lg">
+        {conflictNeedsReview && (
+          <Alert color="yellow" title="Groupの最新状態を確認してください">
+            他の操作によってGroupが変更されました。入力内容は保持しています。
+            最新の保存済み状態を確認し、入力内容を適用する場合は
+            「確認して再保存」を選択してください。
+            <Text size="sm" mt="sm">最新の名前: {selected?.name ?? "取得中"}</Text>
+            <Text size="sm">最新のParent: {selected?.parentNames.join("、") || "なし"}</Text>
+            <Text size="sm">最新のChild: {selected?.childNames.join("、") || "なし"}</Text>
+            <Button mt="sm" variant="light" onClick={() => setConflictNeedsReview(false)}
+              disabled={!detailsReady || saving}>
+              確認して再保存
+            </Button>
+          </Alert>
+        )}
         <TextInput
           label={
             <Group justify="space-between" wrap="nowrap">
@@ -890,14 +906,30 @@ export function GroupBrowser({
           <Button
             onClick={async () => {
               if (!selected || !validGroupName(draftName)) return
+              if (conflictNeedsReview || !detailsReady) return
+              let conflict = false
+              let uncertain = false
               const result = await runAction(async () => {
-                await onUpdateGroup?.(
+                const outcome = await onUpdateGroup?.(
                   selected.id,
                   draftName.trim(),
                   draftParents,
                   draftChildren,
                 )
+                if (outcome === "conflict") conflict = true
+                if (outcome === "unknown") uncertain = true
               })
+              if (conflict || uncertain) {
+                setConflictNeedsReview(true)
+                if (uncertain) {
+                  showNotification({
+                    kind: "error",
+                    title: "保存結果を確認できませんでした",
+                    description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
+                  })
+                }
+                return
+              }
               if (result === "error") {
                 showNotification({
                   kind: "error",
@@ -909,7 +941,7 @@ export function GroupBrowser({
               }
               if (result === "ok") edit.close()
             }}
-            disabled={!canManage || !validGroupName(draftName) || saving}
+            disabled={!canManage || !detailsReady || conflictNeedsReview || !validGroupName(draftName) || saving}
             style={{ position: "absolute", right: 0 }}
           >
             保存

@@ -188,6 +188,7 @@ type MediaTagConnection { edges: [MediaTagEdge!]! pageInfo: PageInfo! }
 type MediaGroup {
   id: ID!
   name: String!
+  stateToken: String!
   createdAt: DateTime!
   parents(first: Int, after: String, last: Int, before: String): MediaGroupConnection!
   children(first: Int, after: String, last: Int, before: String): MediaGroupConnection!
@@ -301,13 +302,14 @@ type MediaGroupRelationChangeResult {
 
 input UpdateMediaGroupInput {
   groupId: ID!
-  name: String
-  relationChanges: [MediaGroupRelationChangeInput!]
+  expectedStateToken: String!
+  name: String!
+  parentGroupIds: [ID!]!
+  childGroupIds: [ID!]!
 }
 
 type UpdateMediaGroupPayload {
   group: MediaGroup!
-  relationResults: [MediaGroupRelationChangeResult!]!
 }
 
 input ChangeMediaGroupClassificationInput {
