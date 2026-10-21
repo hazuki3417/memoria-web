@@ -147,7 +147,7 @@ const groups: GroupFixture[] = [
   },
 ]
 
-export const relationCandidateNames = [
+const relationCandidateNames = [
   ...groups.map((group) => group.name),
   "北海道",
   "東北",
@@ -739,7 +739,6 @@ export function GroupBrowser({
             oppositeNames={createChildren}
             onChange={setCreateParents}
             currentGroupName={createName.trim()}
-            candidates={candidates}
           />
           <RelationEditor
             candidates={candidates ?? relationCandidateNames}
@@ -748,7 +747,6 @@ export function GroupBrowser({
             oppositeNames={createParents}
             onChange={setCreateChildren}
             currentGroupName={createName.trim()}
-            candidates={candidates}
           />
         </SimpleGrid>
         <Group justify="flex-end">
@@ -803,7 +801,6 @@ export function GroupBrowser({
             oppositeNames={draftChildren}
             onChange={setDraftParents}
             currentGroupName={selected?.name ?? ""}
-            candidates={candidates}
             availability={relationAvailability}
           />
           <RelationEditor
@@ -813,7 +810,6 @@ export function GroupBrowser({
             oppositeNames={draftParents}
             onChange={setDraftChildren}
             currentGroupName={selected?.name ?? ""}
-            candidates={candidates}
             availability={relationAvailability}
           />
         </SimpleGrid>
