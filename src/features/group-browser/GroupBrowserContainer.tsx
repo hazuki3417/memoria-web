@@ -334,7 +334,7 @@ export function GroupBrowserContainer({
           },
         })
       } catch (error) {
-        if (isGroupUpdateOutcomeUnknown(error)) {
+        if (isGroupUpdateOutcomeUnknown(error) || (error && typeof error === "object" && "graphQLErrors" in error && Array.isArray(error.graphQLErrors) && error.graphQLErrors.some((item: { extensions?: { code?: string } }) => item?.extensions?.code === "UNKNOWN_OUTCOME"))) {
           // The transaction may already have committed; never retry automatically.
           return "unknown" as const
         }
