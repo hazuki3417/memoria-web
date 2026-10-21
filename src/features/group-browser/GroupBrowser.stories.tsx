@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 
 const fixtures: GroupBrowserGroup[] = [
@@ -48,7 +48,9 @@ export const CreateDialogCancel: Story = {
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "新しいアルバム")
     await expect(create).toBeEnabled()
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
-    await expect(within(document.body).queryByRole("dialog", { name: "Groupを作成" })).not.toBeVisible()
+    await waitFor(() => {
+      expect(within(document.body).queryByRole("dialog", { name: "Groupを作成" })).not.toBeInTheDocument()
+    })
     await expect(args.onCreateGroup).not.toHaveBeenCalled()
   },
 }
