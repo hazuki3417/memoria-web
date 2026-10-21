@@ -19,7 +19,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 import { deleteGroupThenRefresh } from "./groupDeleteFlow"
-import { isGroupStateConflict } from "./groupStateConflict"
+import { isGroupStateConflict, isGroupUpdateOutcomeUnknown } from "./groupStateConflict"
 import { showNotification } from "@/components/Feedback"
 
 type GroupBrowserContainerProps = {
@@ -398,6 +398,11 @@ export function GroupBrowserContainer({
           })
           await Promise.allSettled([detail.refetch(), candidateQuery.refetch(), listing.refetch()])
           return "conflict" as const
+        }
+        if (isGroupUpdateOutcomeUnknown(error)) {
+          // A timeout may have committed. Do not issue another mutation.
+          await Promise.allSettled([detail.refetch(), candidateQuery.refetch(), listing.refetch()])
+          return "unknown" as const
         }
         throw error
       }
