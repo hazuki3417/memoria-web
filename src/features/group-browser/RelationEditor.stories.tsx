@@ -71,3 +71,49 @@ export const RemoveOneSelectedRelation: Story = {
     await expect(canvas.getByText("候補")).toBeVisible()
   },
 }
+
+/** GB-047: 名前検索に一致する候補がない場合の空状態。 */
+export const NoMatchingCandidates: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByPlaceholderText("Groupを検索")
+    await userEvent.click(input)
+    await userEvent.type(input, "存在しない候補")
+    await expect(
+      await within(document.body).findByText("候補がありません"),
+    ).toBeVisible()
+    await expect(canvas.getByText("0 / 10")).toBeVisible()
+  },
+}
+
+/** GB-047: 現在のGroup自身はParentに選べない。 */
+export const CurrentGroupCannotBeParent: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByPlaceholderText("Groupを検索")
+    await userEvent.click(input)
+    await userEvent.type(input, "現在")
+    await within(document.body).findByRole("option", { name: /現在/ })
+    await userEvent.keyboard("{Enter}")
+    await expect(canvas.getByText("0 / 10")).toBeVisible()
+  },
+}
+
+/** GB-049: 10件選択済みでも上限の案内が表示される。 */
+export const SelectionLimit: Story = {
+  args: {
+    names: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
+    candidates: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"],
+    oppositeNames: [],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("10 / 10")).toBeVisible()
+    await expect(canvas.getByText("追加できるGroupは10件までです")).toBeVisible()
+    const input = canvas.getByPlaceholderText("Groupを検索")
+    await userEvent.click(input)
+    await userEvent.type(input, "K")
+    await userEvent.keyboard("{Enter}")
+    await expect(canvas.getByText("10 / 10")).toBeVisible()
+  },
+}
