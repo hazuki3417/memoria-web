@@ -152,7 +152,7 @@ export function GroupBrowserContainer({
   useEffect(() => {
     if (
       !mediaPageKey || !mediaCursor || !selectedId ||
-      detail.loading || detail.error ||
+      detail.loading ||
       mediaPageFailedKey === mediaPageKey ||
       mediaPageInFlight.current === mediaPageKey
     ) return
@@ -194,7 +194,7 @@ export function GroupBrowserContainer({
         mediaPageInFlight.current = null
       }
     })
-  }, [mediaPageKey, mediaCursor, selectedId, detail.loading, detail.error,
+  }, [mediaPageKey, mediaCursor, selectedId, detail.loading,
       detail.fetchMore, mediaPageFailedKey])
 
   const [createGroup] = useCreateBrowserGroupMutation()
