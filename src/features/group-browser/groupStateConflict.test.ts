@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { isGroupStateConflict } from "./groupStateConflict"
+import { isGroupStateConflict, isGroupUpdateOutcomeUnknown } from "./groupStateConflict"
 
 describe("isGroupStateConflict", () => {
   it("recognizes GraphQL CONFLICT without relying on message text", () => {
@@ -10,5 +10,13 @@ describe("isGroupStateConflict", () => {
     expect(isGroupStateConflict(new Error("conflict"))).toBe(false)
     expect(isGroupStateConflict(null)).toBe(false)
     expect(isGroupStateConflict({ graphQLErrors: [] })).toBe(false)
+  })
+})
+
+describe("isGroupUpdateOutcomeUnknown", () => {
+  it("classifies a network error as ambiguous and not a definitive GraphQL rejection", () => {
+    expect(isGroupUpdateOutcomeUnknown({ networkError: new Error("timeout"), graphQLErrors: [] })).toBe(true)
+    expect(isGroupUpdateOutcomeUnknown({ graphQLErrors: [{ extensions: { code: "VALIDATION" } }] })).toBe(false)
+    expect(isGroupUpdateOutcomeUnknown({ graphQLErrors: [{ extensions: { code: "CONFLICT" } }] })).toBe(false)
   })
 })
