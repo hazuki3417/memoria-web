@@ -315,9 +315,6 @@ function MediaBrowserContent({
                     <Button size="xs" type="submit" style={{ flexShrink: 0 }}>
                       検索
                     </Button>
-                    <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
-                      {stateItems.length}件
-                    </Text>
                   </Group>
                 </Box>
               ) : (
