@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { Alert, Center, Loader } from "@mantine/core"
+import { Alert, Button, Center, Loader, Stack, Text } from "@mantine/core"
 import {
   MediaGroupSort,
   CommunityMemberRole,
@@ -408,7 +408,22 @@ export function GroupBrowserContainer({
   if (listing.error)
     return (
       <Alert color="red" title="Group一覧を取得できませんでした">
-        再読み込みしてお試しください。
+        <Stack gap="xs" align="flex-start">
+          <Text size="sm">Group一覧の取得に失敗しました。再試行できます。</Text>
+          <Button
+            size="xs"
+            variant="light"
+            disabled={listing.loading}
+            loading={listing.loading}
+            onClick={() => {
+              void listing.refetch().catch(() => {
+                // A failed retry stays in the discovery error state.
+              })
+            }}
+          >
+            再試行
+          </Button>
+        </Stack>
       </Alert>
     )
   if (
