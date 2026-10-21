@@ -263,6 +263,8 @@ extend type Query {
 input CreateMediaGroupInput {
   scope: ScopeInput!
   name: String!
+  parentGroupIds: [ID!]!
+  childGroupIds: [ID!]!
 }
 
 input DeleteMediaGroupInput {
