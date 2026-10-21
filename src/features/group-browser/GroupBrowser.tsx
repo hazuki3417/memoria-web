@@ -807,7 +807,6 @@ export function GroupBrowser({
             onChange={setCreateParents}
             currentGroupName={createName.trim()}
             candidates={candidates}
-            availability={relationAvailability}
           />
           <RelationEditor
             label="Children"
@@ -816,7 +815,6 @@ export function GroupBrowser({
             onChange={setCreateChildren}
             currentGroupName={createName.trim()}
             candidates={candidates}
-            availability={relationAvailability}
           />
         </SimpleGrid>
         <Group justify="flex-end">
