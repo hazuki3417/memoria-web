@@ -65,7 +65,7 @@ describe("Group name grapheme validation", () => {
     for (const value of ["Group", "group", "Ｇｒｏｕｐ", "Group Name", "Group  Name"]) {
       expect(validGroupName(value)).toBe(true)
     }
-    expect(countGroupNameGraphemes("e\\u0301")).toBe(1)
+    expect(countGroupNameGraphemes("e\u0301")).toBe(1)
     expect(countGroupNameGraphemes("é")).toBe(1)
   })
 
