@@ -529,6 +529,11 @@ export function GroupBrowserContainer({
             .hasNextPage &&
           detail.data?.mediaGroup?.id === selectedId)
       }
+      hideManagementActions={
+        contextKind === "community" &&
+        Boolean(communityMembers.data && currentUser.data?.me) &&
+        !canManage
+      }
       canManage={canManage}
       onCreateGroup={onCreateGroup}
       onUpdateGroup={onUpdateGroup}
