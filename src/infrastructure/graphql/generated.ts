@@ -100,7 +100,9 @@ export type CreateCommunityPayload = {
 };
 
 export type CreateMediaGroupInput = {
+  childGroupIds: Array<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
+  parentGroupIds: Array<Scalars['ID']['input']>;
   scope: ScopeInput;
 };
 
@@ -679,7 +681,9 @@ export type OperationCreateCommunityInput = {
 };
 
 export type OperationCreateMediaGroupInput = {
+  childGroupIds: Array<string | number>;
   name: string;
+  parentGroupIds: Array<string | number>;
   scope: OperationScopeInput;
 };
 

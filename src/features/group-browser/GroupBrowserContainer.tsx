@@ -314,48 +314,46 @@ export function GroupBrowserContainer({
 
   const onCreateGroup = useCallback(
     async (name: string, parents: string[], children: string[]) => {
-      const created = await createGroup({
-        variables: { input: { scope, name } },
+      const ids = (names: string[]) => names.map((value) => {
+        const groupId = nameToId.get(value)
+        if (!groupId) throw new Error("Unknown relation candidate")
+        return groupId
       })
-      const id = created.data?.createMediaGroup.group.id
-      if (!id) throw new Error("Group creation returned no ID")
-      if (parents.length || children.length) {
-        try {
-          const ids = (names: string[]) => names.map((value) => {
-            const groupId = nameToId.get(value)
-            if (!groupId) throw new Error("Unknown relation candidate")
-            return groupId
-          })
-          const result = await updateGroup({
-            variables: { input: {
-              groupId: id,
-              expectedStateToken: created.data?.createMediaGroup.group.stateToken ?? "",
+      // The Group and all relations are created in one server transaction.
+      // No follow-up Update mutation or automatic retry is allowed.
+      let created
+      try {
+        created = await createGroup({
+          variables: {
+            input: {
+              scope,
               name,
               parentGroupIds: ids(parents),
               childGroupIds: ids(children),
-            } },
-          })
-          if (!result.data) {
-            showNotification({
-              kind: "error",
-              title:
-                "Groupは作成されましたが、一部の関係を設定できませんでした",
-              description:
-                "Group自体は保存されています。関係の最新状態を確認してください。",
-            })
-          }
-        } catch {
-          showNotification({
-            kind: "error",
-            title:
-              "Groupは作成されましたが、関係の設定結果を確認できませんでした",
-            description: "Groupを再作成せず、最新の関係を確認してください。",
-          })
+            },
+          },
+        })
+      } catch (error) {
+        if (isGroupUpdateOutcomeUnknown(error) || (error && typeof error === "object" && "graphQLErrors" in error && Array.isArray(error.graphQLErrors) && error.graphQLErrors.some((item: { extensions?: { code?: string } }) => item?.extensions?.code === "UNKNOWN_OUTCOME"))) {
+          // The transaction may already have committed; never retry automatically.
+          return "unknown" as const
         }
+        throw error
       }
-      await refetch()
+      if (!created.data?.createMediaGroup.group.id) {
+        return "unknown" as const
+      }
+      // A refresh failure does not undo a confirmed successful creation.
+      // Never tell users that the create failed once the server returned success.
+      void refetch().catch(() => {
+        showNotification({
+          kind: "error",
+          title: "Groupは作成されました",
+          description: "一覧の更新に失敗しました。画面を再読み込みして確認してください。",
+        })
+      })
     },
-    [scope, createGroup, updateGroup, nameToId, refetch],
+    [scope, createGroup, nameToId, refetch],
   )
 
   const onUpdateGroup = useCallback(
