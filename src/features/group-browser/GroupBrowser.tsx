@@ -772,8 +772,11 @@ export function GroupBrowser({
         {conflictNeedsReview && (
           <Alert color="yellow" title="Groupの最新状態を確認してください">
             他の操作によってGroupが変更されました。入力内容は保持しています。
-            最新のGroup名とParent・Childの関係を確認し、変更を適用する場合は
+            最新の保存済み状態を確認し、入力内容を適用する場合は
             「確認して再保存」を選択してください。
+            <Text size="sm" mt="sm">最新の名前: {selected?.name ?? "取得中"}</Text>
+            <Text size="sm">最新のParent: {selected?.parentNames.join("、") || "なし"}</Text>
+            <Text size="sm">最新のChild: {selected?.childNames.join("、") || "なし"}</Text>
             <Button mt="sm" variant="light" onClick={() => setConflictNeedsReview(false)}
               disabled={!detailsReady || saving}>
               確認して再保存
