@@ -47,3 +47,27 @@ export const OppositeSelectionDisabled: Story = {
     await expect(canvas.queryByText("Child")).not.toBeInTheDocument()
   },
 }
+
+/**
+ * GB-049: 選択済みRelationを個別解除しても、他の選択は保持される。
+ * 一括Clearボタンは表示しない。
+ */
+export const RemoveOneSelectedRelation: Story = {
+  args: {
+    names: ["Parent", "候補"],
+    oppositeNames: [],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("2 / 10")).toBeVisible()
+
+    const input = canvas.getByPlaceholderText("Groupを検索")
+    await userEvent.click(input)
+    await userEvent.type(input, "Parent")
+    const option = await within(document.body).findByRole("option", { name: /Parent/ })
+    await userEvent.click(option)
+
+    await expect(canvas.getByText("1 / 10")).toBeVisible()
+    await expect(canvas.getByText("候補")).toBeVisible()
+  },
+}
