@@ -78,7 +78,7 @@ export type GroupBrowserProps = {
     name: string,
     parents: string[],
     children: string[],
-  ) => Promise<"conflict" | void>
+  ) => Promise<"conflict" | "unknown" | void>
   onDeleteGroup?: (id: string) => Promise<void>
   onSelectGroup?: (id: string | null) => void
   detailsReady?: boolean
@@ -908,6 +908,7 @@ export function GroupBrowser({
               if (!selected || !validGroupName(draftName)) return
               if (conflictNeedsReview || !detailsReady) return
               let conflict = false
+              let uncertain = false
               const result = await runAction(async () => {
                 const outcome = await onUpdateGroup?.(
                   selected.id,
@@ -916,9 +917,17 @@ export function GroupBrowser({
                   draftChildren,
                 )
                 if (outcome === "conflict") conflict = true
+                if (outcome === "unknown") uncertain = true
               })
-              if (conflict) {
+              if (conflict || uncertain) {
                 setConflictNeedsReview(true)
+                if (uncertain) {
+                  showNotification({
+                    kind: "error",
+                    title: "保存結果を確認できませんでした",
+                    description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
+                  })
+                }
                 return
               }
               if (result === "error") {
