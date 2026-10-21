@@ -19,7 +19,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 import { deleteGroupThenRefresh } from "./groupDeleteFlow"
-import { isGroupStateConflict, isGroupUpdateOutcomeUnknown } from "./groupStateConflict"
+import { isGroupCreateOutcomeUnknown, isGroupStateConflict, isGroupUpdateOutcomeUnknown } from "./groupStateConflict"
 import { showNotification } from "@/components/Feedback"
 
 type GroupBrowserContainerProps = {
