@@ -83,6 +83,7 @@ export type GroupBrowserProps = {
   onSelectGroup?: (id: string | null) => void
   detailsReady?: boolean
   mediaDetailState?: "ready" | "loading" | "error"
+  onRetryGroupMedia?: () => Promise<void>
   relationCandidateState?: "ready" | "loading" | "error"
   onRetryRelationCandidates?: () => Promise<void>
   canManage?: boolean
@@ -453,6 +454,7 @@ export function GroupBrowser({
   onSelectGroup,
   detailsReady = true,
   mediaDetailState = "ready",
+  onRetryGroupMedia,
   relationCandidateState = "ready",
   onRetryRelationCandidates,
   canManage = true,
@@ -1107,7 +1109,12 @@ export function GroupBrowser({
                     <Center mih={180}><Loader /></Center>
                   ) : mediaDetailState === "error" ? (
                     <Alert color="red" title="GroupのMediaを取得できませんでした">
-                      最新のGroup情報を確認してから再度お試しください。
+                      <Stack gap="xs" align="flex-start">
+                        <Text size="sm">最新のGroup情報を確認するため、再取得してください。</Text>
+                        <Button size="xs" variant="light" onClick={() => void onRetryGroupMedia?.()}>
+                          再試行
+                        </Button>
+                      </Stack>
                     </Alert>
                   ) : (selected?.mediaCount ?? 0) === 0 ? (
                     <Paper withBorder p="xl" ta="center">
@@ -1320,7 +1327,12 @@ export function GroupBrowser({
                           <Center mih={180}><Loader /></Center>
                         ) : mediaDetailState === "error" ? (
                           <Alert color="red" title="GroupのMediaを取得できませんでした">
-                            最新のGroup情報を確認してから再度お試しください。
+                            <Stack gap="xs" align="flex-start">
+                              <Text size="sm">最新のGroup情報を確認するため、再取得してください。</Text>
+                              <Button size="xs" variant="light" onClick={() => void onRetryGroupMedia?.()}>
+                                再試行
+                              </Button>
+                            </Stack>
                           </Alert>
                         ) : (selected?.mediaCount ?? 0) === 0 ? (
                           <Paper withBorder p="xl" ta="center">
