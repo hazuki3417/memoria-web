@@ -594,3 +594,90 @@ export const EditEscapeDiscardsDraft: Story = {
     await expect(args.onUpdateGroup).not.toHaveBeenCalled()
   },
 }
+
+
+/** GB-011: Group 0件の確定状態でも作成入口を利用できる。 */
+export const EmptyScopeKeepsCreateEntry: Story = {
+  name: "Interaction · Empty Scope Keeps Create Entry",
+  tags: ["interaction"],
+  args: { groupsData: [] },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeEnabled()
+    await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
+    await expect(await within(document.body).findByRole("dialog", { name: "Groupを作成" })).toBeVisible()
+  },
+}
+
+/** GB-036: Whitespaceだけでは作成を確定できない。 */
+export const WhitespaceNameCannotBeCreated: Story = {
+  name: "Interaction · Whitespace Name Cannot Be Created",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    await userEvent.type(dialog.getByPlaceholderText("Group名"), "   ")
+    await expect(dialog.getByRole("button", { name: "作成" })).toBeDisabled()
+    await expect(args.onCreateGroup).not.toHaveBeenCalled()
+  },
+}
+
+/** GB-039: 重複名が拒否された場合はDraftを維持し、成功扱いしない。 */
+export const DuplicateNameRejected: Story = {
+  name: "Interaction · Duplicate Name Rejected",
+  tags: ["interaction"],
+  args: {
+    onCreateGroup: fn(async () => {
+      throw { graphQLErrors: [{ extensions: { reason: "DUPLICATE_NAME" } }] }
+    }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    await userEvent.type(dialog.getByPlaceholderText("Group名"), "アルバムA")
+    await userEvent.click(dialog.getByRole("button", { name: "作成" }))
+    await expect(args.onCreateGroup).toHaveBeenCalledTimes(1)
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("アルバムA")
+  },
+}
+
+/** GB-105: 未作成Groupでも関係候補を選び、作成までMutationしない。 */
+export const NewGroupRelationDraftIsLocal: Story = {
+  name: "Interaction · New Group Relation Draft Is Local",
+  tags: ["interaction"],
+  args: { relationCandidates: ["親候補"] },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const parents = dialog.getAllByPlaceholderText("Groupを検索")[0]
+    await userEvent.click(parents)
+    await userEvent.type(parents, "親候補")
+    await userEvent.click(await within(document.body).findByRole("option", { name: /親候補/ }))
+    await expect(args.onCreateGroup).not.toHaveBeenCalled()
+    await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
+    await expect(args.onCreateGroup).not.toHaveBeenCalled()
+  },
+}
+
+/** GB-044/045: 編集中の候補選択は保存までLocal Draftにとどまる。 */
+export const EditRelationsRemainDraftUntilSave: Story = {
+  name: "Interaction · Edit Relations Remain Draft Until Save",
+  tags: ["interaction"],
+  args: { relationCandidates: ["親候補"] },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const parentInput = dialog.getAllByPlaceholderText("Groupを検索")[0]
+    await userEvent.click(parentInput)
+    await userEvent.type(parentInput, "親候補")
+    await userEvent.click(await within(document.body).findByRole("option", { name: /親候補/ }))
+    await expect(args.onUpdateGroup).not.toHaveBeenCalled()
+    await userEvent.click(dialog.getByRole("button", { name: "保存" }))
+    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith("a", "アルバムA", ["親候補"], [])
+  },
+}
