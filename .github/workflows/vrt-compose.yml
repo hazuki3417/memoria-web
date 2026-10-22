@@ -1,0 +1,62 @@
+name: VRT Docker Compose smoke test
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - "compose.yaml"
+      - "e2e/storybook-visual/**"
+      - "playwright.storybook-visual.config.ts"
+      - ".github/workflows/vrt-compose.yml"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "compare: check approved baselines / generate: create unapproved review images"
+        required: true
+        type: choice
+        default: compare
+        options:
+          - compare
+          - generate
+
+permissions:
+  contents: read
+
+jobs:
+  vrt-compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify Compose configuration
+        run: docker compose --profile vrt config --quiet
+      - name: Inspect image runtime and fonts
+        run: |
+          docker compose --profile vrt run --rm --entrypoint /bin/bash vrt -euc '
+            node --version
+            fc-list | head -n 10 || true
+          '
+      - name: Compare approved VRT baselines
+        if: github.event_name != 'workflow_dispatch' || inputs.mode == 'compare'
+        run: docker compose --profile vrt run --rm vrt
+      - name: Generate candidate baselines (manual only)
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'generate'
+        run: docker compose --profile vrt run --rm -e VRT_UPDATE=1 vrt
+      - name: Upload Playwright diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-compose-diagnostics
+          path: |
+            e2e/storybook-visual/report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Upload candidate baselines for review (not approved)
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'generate'
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-candidate-baselines-unapproved
+          path: e2e/storybook-visual/__screenshots__/
+          if-no-files-found: error
+          retention-days: 14
