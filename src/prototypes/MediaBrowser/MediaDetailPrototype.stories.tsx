@@ -11,6 +11,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Detail: Story = {
+  name: "Visual · Detail",
+  tags: ["visual"],
   args: { initialState: "default", contextKind: "personal" },
   play: async ({ canvasElement }) => {
     const button = canvasElement.querySelector<HTMLButtonElement>(
@@ -21,6 +23,8 @@ export const Detail: Story = {
 }
 
 export const PortraitDetail: Story = {
+  name: "Visual · Portrait Detail",
+  tags: ["visual"],
   args: { initialState: "default", contextKind: "personal" },
   play: async ({ canvasElement }) => {
     canvasElement
@@ -32,6 +36,8 @@ export const PortraitDetail: Story = {
 }
 
 export const LandscapeDetail: Story = {
+  name: "Visual · Landscape Detail",
+  tags: ["visual"],
   args: { initialState: "default", contextKind: "personal" },
   play: async ({ canvasElement }) => {
     canvasElement
@@ -43,6 +49,8 @@ export const LandscapeDetail: Story = {
 }
 
 export const CommunityDetail: Story = {
+  name: "Visual · Community Detail",
+  tags: ["visual"],
   args: { initialState: "default", contextKind: "community" },
   play: async ({ canvasElement }) => {
     canvasElement
@@ -54,6 +62,8 @@ export const CommunityDetail: Story = {
 }
 
 export const ManyAssociations: Story = {
+  name: "Visual · Many Associations",
+  tags: ["visual"],
   args: {
     initialState: "default",
     contextKind: "personal",
@@ -68,6 +78,8 @@ export const ManyAssociations: Story = {
   },
 }
 export const CompactManyAssociations: Story = {
+  name: "Visual · Compact Many Associations",
+  tags: ["visual"],
   args: {
     initialState: "default",
     contextKind: "personal",
@@ -84,6 +96,8 @@ export const CompactManyAssociations: Story = {
 }
 
 export const DownloadUnavailable: Story = {
+  name: "Visual · Download Unavailable",
+  tags: ["visual"],
   args: {
     initialState: "default",
     contextKind: "personal",
@@ -99,6 +113,8 @@ export const DownloadUnavailable: Story = {
 }
 
 export const DownloadProcessing: Story = {
+  name: "Visual · Download Processing",
+  tags: ["visual"],
   args: {
     initialState: "default",
     contextKind: "personal",
@@ -114,6 +130,8 @@ export const DownloadProcessing: Story = {
 }
 
 export const CompactDownloadUnavailable: Story = {
+  name: "Visual · Compact Download Unavailable",
+  tags: ["visual"],
   args: {
     initialState: "default",
     contextKind: "personal",
