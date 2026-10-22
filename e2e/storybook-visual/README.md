@@ -7,8 +7,8 @@ StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較�
 ```bash
 npm ci
 npx playwright install chromium
-npm run test:storybook-visual:update
-npm run test:storybook-visual
+npm run test:visual:update
+npm run test:visual
 ```
 
 Storybookはテスト起動時に自動起動します。基準画像は `e2e/storybook-visual/__screenshots__` に保存し、表示変更の意図を確認したうえでコミットしてください。
@@ -24,20 +24,20 @@ Storybookはテスト起動時に自動起動します。基準画像は `e2e/st
 Baselineの生成・更新と、通常の比較実行は**異なる操作**です。通常比較でBaselineを自動更新してはいけません。
 
 1. `vrt`タグ付きStoryを選定し、表示状態・Viewport・Fixtureが再現可能であることを確認する。
-2. 固定した実行環境で `npm run test:storybook-visual:update` を**明示的に**実行し、新規Baselineを生成する（既存分も再生成され得るためGit差分を必ず確認する）。
+2. 固定した実行環境で `npm run test:visual:update` を**明示的に**実行し、新規Baselineを生成する（既存分も再生成され得るためGit差分を必ず確認する）。
 3. Gitの画像差分と画面設計を照合し、意図した表示であることをレビューする。生成できただけでは承認済みにならない。
-4. 承認したBaselineをGitへ登録し、`npm run test:storybook-visual` で通常比較を行う。
+4. 承認したBaselineをGitへ登録し、`npm run test:visual` で通常比較を行う。
 5. 通常の画面変更では比較のみを行い、差分が意図したものと確認された場合に限ってBaselineを明示的に再生成・レビュー・更新する。
 
 ```bash
 npm ci
 npx playwright install chromium
 # 新規導入・意図した画面変更時だけ明示的に実行
-npm run test:storybook-visual:update
+npm run test:visual:update
 # 通常比較（Baselineを変更しない）
-npm run test:storybook-visual
+npm run test:visual
 # 失敗時のHTML reportを開く
-npm run test:storybook-visual:report
+npm run test:visual:report
 ```
 
 **共通撮影環境**: Playwright / Chromium、OS、フォント、DPR、Locale、Viewportを揃える。現状のPlaywright設定はDesktop Chrome、DPR=1、ja-JP、light、1440×900 / 375×812を指定しているが、OS・フォントの固定コンテナは未導入である。異なる環境で撮影したBaselineの差分をUI回帰と断定しない。基準画像生成および実行成功は未検証であり、安定化と共通実行環境の検証はPhase 1の未完了作業とする。
