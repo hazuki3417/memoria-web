@@ -24,6 +24,7 @@
     "test:vrt:report": "playwright show-report ./e2e/vrt/report",
     "test:storybook-visual": "playwright test --config=playwright.storybook-visual.config.ts",
     "test:storybook-visual:update": "playwright test --config=playwright.storybook-visual.config.ts --update-snapshots",
+    "test:storybook-visual:report": "playwright show-report ./e2e/storybook-visual/report",
     "graphql:codegen": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs",
     "graphql:codegen:api": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs"
   },
