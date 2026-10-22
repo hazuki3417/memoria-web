@@ -1,8 +1,8 @@
 "use client"
 
 import type { ReactNode, Ref } from "react"
-import { Alert, Box, Button, Center, Divider, Group, Loader, Paper, ScrollArea, Stack, Text } from "@mantine/core"
-import { IconEdit, IconX } from "@tabler/icons-react"
+import { Alert, Box, Button, Center, Divider, Group, Loader, ScrollArea, Stack, Text, ThemeIcon } from "@mantine/core"
+import { IconEdit, IconPhoto, IconX } from "@tabler/icons-react"
 import { MediaGrid } from "./MediaGrid"
 
 export type GroupDetailPaneProps = {
@@ -67,7 +67,12 @@ export function GroupDetailPane({
               <ScrollArea flex={1}>
                 <Box p="sm">
                   {mediaDetailState === "loading" ? (
-                    <Center mih={180}><Loader /></Center>
+                    <Center mih={360}>
+                      <Stack align="center">
+                        <Loader />
+                        <Text size="sm" c="dimmed">Mediaを読み込んでいます</Text>
+                      </Stack>
+                    </Center>
                   ) : mediaDetailState === "error" ? (
                     <Alert color="red" title="GroupのMediaを取得できませんでした">
                       <Stack gap="xs" align="flex-start">
@@ -78,12 +83,17 @@ export function GroupDetailPane({
                       </Stack>
                     </Alert>
                   ) : (selected?.mediaCount ?? 0) === 0 ? (
-                    <Paper withBorder p="xl" ta="center">
-                      <Text fw={600}>Mediaがありません</Text>
-                      <Text size="sm" c="dimmed" mt={4}>
-                        このGroupまたはその下位Groupに分類されたMediaはありません。
-                      </Text>
-                    </Paper>
+                    <Center mih={360}>
+                      <Stack align="center" maw={420}>
+                        <ThemeIcon size={48} radius="xl" variant="light">
+                          <IconPhoto size={24} />
+                        </ThemeIcon>
+                        <Text fw={700} size="lg">Mediaがありません</Text>
+                        <Text size="sm" c="dimmed" ta="center">
+                          このGroupまたはその下位Groupに分類されたMediaはありません。
+                        </Text>
+                      </Stack>
+                    </Center>
                   ) : (
                     <>
                       <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
@@ -148,7 +158,12 @@ export function GroupDetailPane({
                     <ScrollArea flex={1}>
                       <Box p="sm">
                         {mediaDetailState === "loading" ? (
-                          <Center mih={180}><Loader /></Center>
+                          <Center mih={360}>
+                      <Stack align="center">
+                        <Loader />
+                        <Text size="sm" c="dimmed">Mediaを読み込んでいます</Text>
+                      </Stack>
+                    </Center>
                         ) : mediaDetailState === "error" ? (
                           <Alert color="red" title="GroupのMediaを取得できませんでした">
                             <Stack gap="xs" align="flex-start">
@@ -159,12 +174,17 @@ export function GroupDetailPane({
                             </Stack>
                           </Alert>
                         ) : (selected?.mediaCount ?? 0) === 0 ? (
-                          <Paper withBorder p="xl" ta="center">
-                            <Text fw={600}>Mediaがありません</Text>
-                            <Text size="sm" c="dimmed" mt={4}>
-                              このGroupまたはその下位Groupに分類されたMediaはありません。
-                            </Text>
-                          </Paper>
+                          <Center mih={360}>
+                            <Stack align="center" maw={420}>
+                              <ThemeIcon size={48} radius="xl" variant="light">
+                                <IconPhoto size={24} />
+                              </ThemeIcon>
+                              <Text fw={700} size="lg">Mediaがありません</Text>
+                              <Text size="sm" c="dimmed" ta="center">
+                                このGroupまたはその下位Groupに分類されたMediaはありません。
+                              </Text>
+                            </Stack>
+                          </Center>
                         ) : (
                           <>
                             <MediaGrid
