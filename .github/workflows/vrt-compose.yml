@@ -4,7 +4,14 @@ on:
   pull_request:
     branches: [develop]
     paths:
-      - "src/**"
+      - "src/components/**"
+      - "src/features/**"
+      - "src/prototypes/**"
+      - "src/lib/**"
+      - "src/providers/**"
+      - "src/infrastructure/**"
+      - "src/app/globals.css"
+      - "src/app/layout.tsx"
       - ".storybook/**"
       - "storybook-assets/**"
       - "public/**"
