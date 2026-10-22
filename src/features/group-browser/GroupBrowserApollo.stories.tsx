@@ -331,6 +331,7 @@ export const ListingLoading: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getByPlaceholderText("Groupを検索")).toBeVisible()
     await expect(canvas.getByRole("button", { name: "検索" })).toBeVisible()
+    await expect(canvas.getByText("Groupを読み込んでいます")).toBeVisible()
     await expect(canvas.queryByText("まだGroupがありません")).not.toBeInTheDocument()
   },
 }
