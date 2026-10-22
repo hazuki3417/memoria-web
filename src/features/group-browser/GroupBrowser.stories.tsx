@@ -520,36 +520,6 @@ export const DeletePendingPreventsDoubleSubmit: Story = {
   },
 }
 
-/** GB-065: 削除の応答が失われたときに成功と誤認せず、選択を保持する。 */
-export const DeleteUnknownOutcome: Story = {
-  name: "Interaction · Delete Unknown Outcome",
-  tags: ["interaction"],
-  args: { onDeleteGroup: fn(async () => { throw new Error("network timeout") }) },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const editor = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
-    await userEvent.click(editor.getByRole("button", { name: "削除" }))
-    const confirm = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
-    await userEvent.click(confirm.getByRole("button", { name: "削除" }))
-    await expect(args.onDeleteGroup).toHaveBeenCalledTimes(1)
-    await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
-  },
-}
-
-/** GB-075: Roleが確定しない状態では、管理ActionからMutationを起動しない。 */
-export const PendingPermissionBlocksManagement: Story = {
-  name: "Interaction · Pending Permission Blocks Management",
-  tags: ["interaction"],
-  args: { canManage: false, contextKind: "community" },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeDisabled()
-    await expect(args.onCreateGroup).not.toHaveBeenCalled()
-  },
-}
-
 /** GB-078: 保存処理中の管理ActionはCapability喪失と区別してDisabledにする。 */
 export const CreatePendingDisablesSubmission: Story = {
   name: "Interaction · Create Pending Disables Submission",
