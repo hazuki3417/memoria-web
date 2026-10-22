@@ -1,7 +1,7 @@
 "use client"
 
 import { Box, Center, Loader, Stack, Text } from "@mantine/core"
-import { IconAlertCircle, IconFolder, IconFolders } from "@tabler/icons-react"
+import { IconAlertCircle, IconLayersIntersect, IconRefresh } from "@tabler/icons-react"
 import type { ReactNode } from "react"
 
 export type MediaGroupTileState =
@@ -10,23 +10,73 @@ export type MediaGroupTileState =
   | { status: "processing" }
   | { status: "error" }
 
-function GroupStateMessage({ icon, message }: { icon: ReactNode; message: string }) {
+/**
+ * Group identity is a mosaic of Media-sized cells, rather than a single image.
+ * The same silhouette remains visible for empty artwork and every feedback state.
+ */
+function GroupIdentity({ children }: { children?: ReactNode }) {
   return (
     <Center w="100%" h="100%" style={{ gridColumn: "1 / -1", gridRow: "1 / -1" }}>
-      <Stack align="center" gap={8} p="xs" c="dimmed">
-        {icon}
-        <Text size="xs" fw={600} ta="center">{message}</Text>
-      </Stack>
+      <Box w="66%" maw={124} style={{ position: "relative", aspectRatio: "1 / 1" }}>
+        <Box
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: "9% 0 0 9%",
+            display: "grid",
+            gridTemplateColumns: "2fr 1fr",
+            gridTemplateRows: "1fr 1fr",
+            gap: 3,
+            transform: "rotate(-7deg)",
+          }}
+        >
+          {[0, 1, 2].map((cell) => (
+            <Box
+              key={cell}
+              bdrs="xs"
+              style={{
+                gridRow: cell === 0 ? "1 / 3" : undefined,
+                backgroundColor: "var(--mantine-color-default-border)",
+                border: "1px solid var(--mantine-color-default-border)",
+              }}
+            />
+          ))}
+        </Box>
+        <Center
+          style={{
+            position: "absolute",
+            inset: "17% 8% 8% 17%",
+            background: "var(--mantine-color-body)",
+            border: "1px solid var(--mantine-color-default-border)",
+            borderRadius: "var(--mantine-radius-md)",
+            boxShadow: "var(--mantine-shadow-xs)",
+          }}
+        >
+          {children ?? <IconLayersIntersect size={34} stroke={1.5} color="var(--mantine-color-text)" />}
+        </Center>
+      </Box>
     </Center>
   )
 }
 
-/** Group artwork is decorative; its thumbnail images do not signify direct Media membership. */
+function GroupStatus({ icon, label }: { icon: ReactNode; label: string }) {
+  return (
+    <Box style={{ gridColumn: "1 / -1", gridRow: "1 / -1", position: "relative" }}>
+      <Stack align="center" justify="center" h="100%" gap={6} p="xs">
+        <Box w="100%" style={{ flex: "0 1 66%", minHeight: 0 }}>
+          <GroupIdentity>{icon}</GroupIdentity>
+        </Box>
+        <Text size="xs" fw={600} c="dimmed" ta="center">{label}</Text>
+      </Stack>
+    </Box>
+  )
+}
+
+/** Decorative artwork is not a list of direct Media memberships. */
 export function MediaGroupTile({
   sources = [],
   state,
 }: {
-  /** Retained for consumers that already supply decorative artwork. */
   sources?: string[]
   state?: MediaGroupTileState
 }) {
@@ -44,7 +94,7 @@ export function MediaGroupTile({
         overflow: "hidden",
       }}
     >
-      {resolved.status === "ready" ? (
+      {resolved.status === "ready" && resolved.sources.length > 0 ? (
         resolved.sources.slice(0, 3).map((source, index) => (
           <Box
             key={index}
@@ -56,12 +106,14 @@ export function MediaGroupTile({
             }}
           />
         ))
+      ) : resolved.status === "ready" ? (
+        <GroupIdentity />
       ) : resolved.status === "loading" ? (
-        <GroupStateMessage icon={<Stack align="center" gap={4}><IconFolder size={28} stroke={1.5} /><Loader size="xs" color="var(--mantine-color-text)" /></Stack>} message="Groupを読み込んでいます" />
+        <GroupStatus icon={<Loader size="sm" color="var(--mantine-color-text)" />} label="Groupを読み込んでいます" />
       ) : resolved.status === "processing" ? (
-        <GroupStateMessage icon={<IconFolders size={30} stroke={1.5} />} message="Groupを準備しています" />
+        <GroupStatus icon={<IconRefresh size={28} stroke={1.5} color="var(--mantine-color-text)" />} label="Groupを準備しています" />
       ) : (
-        <GroupStateMessage icon={<IconAlertCircle size={28} stroke={1.5} />} message="Groupを表示できません" />
+        <GroupStatus icon={<IconAlertCircle size={28} stroke={1.5} color="var(--mantine-color-text)" />} label="Groupを表示できません" />
       )}
     </Box>
   )
