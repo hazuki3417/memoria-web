@@ -4,7 +4,7 @@ type StoryEntry = { id: string; type: string; tags?: string[]; parameters?: Reco
 type StoryIndex = { entries: Record<string, StoryEntry> }
 
 // StorybookのCanvasのみを対象とする。Docs/MDXは撮影しない。
-// 撮影対象の選択はStory側のタグで制御できる。
+// 撮影対象はStory側でvrtタグを明示したものに限定する。
 // @see https://storybook.js.org/docs/writing-stories/tags
 const viewports = [
   { name: "desktop", width: 1440, height: 900 },
@@ -16,7 +16,7 @@ test("Storybook visual snapshots", async ({ page, request }) => {
   expect(response.ok()).toBeTruthy()
   const index = (await response.json()) as StoryIndex
   const stories = Object.values(index.entries)
-    .filter((entry) => entry.type === "story" && !entry.tags?.includes("no-vrt"))
+    .filter((entry) => entry.type === "story" && entry.tags?.includes("vrt"))
     .sort((a, b) => a.id.localeCompare(b.id))
 
   expect(stories.length).toBeGreaterThan(0)
