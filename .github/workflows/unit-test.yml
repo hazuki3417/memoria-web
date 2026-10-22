@@ -4,7 +4,12 @@ on:
   pull_request:
     branches: [develop]
     paths:
-      - 'src/**'
+      - 'src/components/**'
+      - 'src/features/**'
+      - 'src/lib/**'
+      - 'src/providers/**'
+      - 'src/infrastructure/**'
+      - '!src/**/*.stories.*'
       - 'package.json'
       - 'package-lock.json'
       - 'devbox.json'
