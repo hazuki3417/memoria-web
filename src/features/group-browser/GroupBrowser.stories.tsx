@@ -427,6 +427,7 @@ export const MediaPageErrorRetry: Story = {
   tags: ["interaction"],
   args: {
     mediaPageState: "error",
+    mediaItemsData: [{ id: "m1", label: "写真A", src: null }],
     onRetryMediaPage: fn(),
   },
   play: async ({ canvasElement, args }) => {
@@ -605,7 +606,8 @@ export const EmptyScopeKeepsCreateEntry: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeEnabled()
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    await expect(await within(document.body).findByRole("dialog", { name: "Groupを作成" })).toBeVisible()
+    const dialog = await within(document.body).findByRole("dialog", { name: "Groupを作成" })
+    await waitFor(() => expect(dialog).toBeVisible())
   },
 }
 
