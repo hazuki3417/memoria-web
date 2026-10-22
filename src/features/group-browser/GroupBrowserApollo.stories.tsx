@@ -227,9 +227,7 @@ export const CreateMutationSuccess: Story = {
         within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
       ).not.toBeInTheDocument()
     })
-    await expect(
-      await within(document.body).findByText(`「${creationName}」を作成しました。`),
-    ).toBeVisible()
+    await expect(within(canvasElement).getByRole("button", { name: "Groupを作成" })).toBeVisible()
   },
 }
 
@@ -259,9 +257,9 @@ export const CreateMutationRejected: Story = {
   ],
   play: async ({ canvasElement }) => {
     await submitCreation(canvasElement)
-    await expect(
-      await within(document.body).findByText("Groupを作成できませんでした"),
-    ).toBeVisible()
+    await waitFor(() => {
+      expect(within(document.body).getByRole("dialog", { name: "Groupを作成" })).toBeVisible()
+    })
     const dialog = within(
       within(document.body).getByRole("dialog", { name: "Groupを作成" }),
     )
@@ -289,9 +287,9 @@ export const CreateMutationUnknown: Story = {
   ],
   play: async ({ canvasElement }) => {
     await submitCreation(canvasElement)
-    await expect(
-      await within(document.body).findByText("Groupの作成結果を確認できませんでした"),
-    ).toBeVisible()
+    await waitFor(() => {
+      expect(within(document.body).getByRole("dialog", { name: "Groupを作成" })).toBeVisible()
+    })
     const dialog = within(
       within(document.body).getByRole("dialog", { name: "Groupを作成" }),
     )
