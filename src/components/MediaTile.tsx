@@ -1,16 +1,14 @@
 "use client"
 
 import { Box, Center, Loader, Stack, Text } from "@mantine/core"
-import { IconAlertCircle, IconPhotoOff, IconRefresh } from "@tabler/icons-react"
+import { IconPhotoOff, IconRefresh } from "@tabler/icons-react"
 import { useState, type ReactNode } from "react"
 
 export type MediaTileState =
   | { status: "ready"; src: string }
   | { status: "loading" }
   | { status: "processing" }
-  | { status: "processing-error" }
-  | { status: "source-unavailable" }
-  | { status: "image-error" }
+  | { status: "error" }
 
 function TileMessage({ icon, title, description }: {
   icon: ReactNode
@@ -41,7 +39,7 @@ export function MediaTile({
   children?: ReactNode
 }) {
   const resolved: MediaTileState = state ?? (
-    src ? { status: "ready", src } : { status: "source-unavailable" }
+    src ? { status: "ready", src } : { status: "error" }
   )
   const [failedSrc, setFailedSrc] = useState<string | null>(null)
   const imageSrc = resolved.status === "ready" ? resolved.src : null
@@ -68,12 +66,8 @@ export function MediaTile({
         <TileMessage icon={<Loader size="sm" color="var(--mantine-color-text)" />} title="読み込み中" />
       ) : resolved.status === "processing" ? (
         <TileMessage icon={<IconRefresh size={28} stroke={1.5} />} title="変換しています" />
-      ) : resolved.status === "processing-error" ? (
-        <TileMessage icon={<IconPhotoOff size={30} stroke={1.5} />} title="画像を表示できません" description="処理に失敗しました" />
-      ) : resolved.status === "source-unavailable" ? (
-        <TileMessage icon={<IconPhotoOff size={28} stroke={1.5} />} title="画像を取得できません" />
       ) : (
-        <TileMessage icon={<IconAlertCircle size={28} stroke={1.5} />} title="画像を表示できません" />
+        <TileMessage icon={<IconPhotoOff size={28} stroke={1.5} />} title="画像を表示できません" />
       )}
       {children}
     </Box>
