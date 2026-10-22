@@ -39,7 +39,7 @@ export function MediaGrid({
             display: "block",
             aspectRatio: "1 / 1",
             border: "1px solid var(--mantine-color-default-border)",
-                      }}
+          }}
         >
           <MediaTile src={src} label={label} />
         </UnstyledButton>
