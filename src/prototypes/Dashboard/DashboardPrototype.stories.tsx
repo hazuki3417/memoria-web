@@ -12,12 +12,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
-  name: "Visual · Personal",
+  name: "Personal",
   tags: ["vrt", "visual"],
   args: { initialContext: "personal", initialState: "default" },
 }
 export const Community: Story = {
-  name: "Visual · Community",
+  name: "Community",
   tags: ["visual"],
   args: {
     initialContext: "community",
@@ -26,12 +26,12 @@ export const Community: Story = {
   },
 }
 export const Empty: Story = {
-  name: "Visual · Empty",
+  name: "Empty",
   tags: ["vrt", "visual"],
   args: { initialContext: "personal", initialState: "empty" },
 }
 export const CommunityEmpty: Story = {
-  name: "Visual · Community Empty",
+  name: "Community Empty",
   tags: ["visual"],
   args: {
     initialContext: "community",
@@ -40,26 +40,26 @@ export const CommunityEmpty: Story = {
   },
 }
 export const Compact: Story = {
-  name: "Visual · Compact",
+  name: "Compact",
   tags: ["visual"],
   args: { initialContext: "personal", initialState: "default" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 export const CompactEmpty: Story = {
-  name: "Visual · Compact Empty",
+  name: "Compact Empty",
   tags: ["visual"],
   args: { initialContext: "personal", initialState: "empty" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 export const Medium: Story = {
-  name: "Visual · Medium",
+  name: "Medium",
   tags: ["visual"],
   args: { initialContext: "personal", initialState: "default" },
   parameters: { viewport: { defaultViewport: "tablet" } },
 }
 
 export const MiddlePage: Story = {
-  name: "Visual · Middle Page",
+  name: "Middle Page",
   tags: ["visual"],
   args: { initialContext: "personal", initialState: "default" },
   play: async ({ canvasElement }) => {
@@ -70,7 +70,7 @@ export const MiddlePage: Story = {
 }
 
 export const LastPage: Story = {
-  name: "Visual · Last Page",
+  name: "Last Page",
   tags: ["visual"],
   args: { initialContext: "personal", initialState: "default" },
   play: async ({ canvasElement }) => {
