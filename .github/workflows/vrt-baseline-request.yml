@@ -1,4 +1,4 @@
-name: VRT baseline candidate PR
+name: Automation / VRT Baseline Candidates
 
 on:
   issue_comment:
