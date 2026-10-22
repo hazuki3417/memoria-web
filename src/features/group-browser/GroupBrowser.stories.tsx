@@ -397,7 +397,7 @@ export const RelationCandidateErrorRetry: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    await expect(canvas.getByText("関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。")).toBeVisible()
+    await waitFor(() => expect(canvas.getByText("関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。")).toBeVisible())
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(args.onRetryRelationCandidates).toHaveBeenCalledTimes(1)
   },
@@ -414,7 +414,7 @@ export const DetailLoadErrorRetry: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    await expect(canvas.getByText("最新のGroup情報を確認するため、再取得してください。")).toBeVisible()
+    await waitFor(() => expect(canvas.getByText("最新のGroup情報を確認するため、再取得してください。")).toBeVisible())
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(args.onRetryGroupMedia).toHaveBeenCalledTimes(1)
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
@@ -427,13 +427,17 @@ export const MediaPageErrorRetry: Story = {
   tags: ["interaction"],
   args: {
     mediaPageState: "error",
+    groupsData: [
+      { id: "a", name: "アルバムA", mediaCount: 1, previewCount: 1, parentNames: [], childNames: [] },
+      { id: "b", name: "アルバムB", mediaCount: 0, previewCount: 0, parentNames: [], childNames: [] },
+    ],
     mediaItemsData: [{ id: "m1", label: "写真A", src: null }],
     onRetryMediaPage: fn(),
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    await expect(canvas.getByText("取得済みのMediaは引き続き閲覧できます。")).toBeVisible()
+    await waitFor(() => expect(canvas.getByText("取得済みのMediaは引き続き閲覧できます。")).toBeVisible())
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(args.onRetryMediaPage).toHaveBeenCalledTimes(1)
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
