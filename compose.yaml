@@ -5,7 +5,6 @@ services:
     init: true
     ipc: host
     working_dir: /workspace
-    user: "${VRT_UID:-1000}:${VRT_GID:-1000}"
     environment:
       CI: "1"
       HOME: /tmp
@@ -17,6 +16,7 @@ services:
       - |
         node -e 'if (Number(process.versions.node.split(".")[0]) !== 24) { console.error("VRT requires Node.js 24; got " + process.version); process.exit(1) }'
         node -e 'const lock = require("./package-lock.json"); if (lock.packages["node_modules/playwright"].version !== "1.62.1") { console.error("VRT requires Playwright 1.62.1"); process.exit(1) }'
+        # Named volumes are initialized as root. The official Playwright image runs as root by default.
         npm ci
         npm run "test:visual$${VRT_UPDATE:+:update}"
 
