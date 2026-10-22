@@ -32,6 +32,7 @@ import { MediaDetailDialog } from "@/features/media-detail"
 import { validGroupName } from "./groupName"
 import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
+import { GroupDetailPane } from "./GroupDetailPane"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
 import { GroupDeleteDialog } from "./GroupDeleteDialog"
@@ -574,68 +575,11 @@ export function GroupBrowser({
               </ScrollArea>
             </Box>
           ) : (
-            <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
-              <Box
-                pb="xs"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "minmax(0, 1fr) auto",
-                  alignItems: "center",
-                  gap: "var(--mantine-spacing-xs)",
-                }}
-              >
-                <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
-                  <Text
-                    fw={700}
-                    truncate="end"
-                    ref={compactDetailHeadingRef}
-                    tabIndex={-1}
-                  >
-                    {selected?.name ?? ""}
-                  </Text>
-                </Group>
-                <Button
-                  size="xs"
-                  variant="default"
-                  leftSection={<IconX size={16} />}
-                  onClick={closeDetail}
-                >
-                  一覧に戻る
-                </Button>
-              </Box>
-              <Divider />
-              {relationCandidateFeedback}
-              {relationDetailSection}
-              <Divider />
-              <ScrollArea flex={1}>
-                <Box p="sm">
-                  {mediaDetailState === "loading" ? (
-                    <Center mih={180}><Loader /></Center>
-                  ) : mediaDetailState === "error" ? (
-                    <Alert color="red" title="GroupのMediaを取得できませんでした">
-                      <Stack gap="xs" align="flex-start">
-                        <Text size="sm">最新のGroup情報を確認するため、再取得してください。</Text>
-                        <Button size="xs" variant="light" onClick={() => void onRetryGroupMedia?.()}>
-                          再試行
-                        </Button>
-                      </Stack>
-                    </Alert>
-                  ) : (selected?.mediaCount ?? 0) === 0 ? (
-                    <Paper withBorder p="xl" ta="center">
-                      <Text fw={600}>Mediaがありません</Text>
-                      <Text size="sm" c="dimmed" mt={4}>
-                        このGroupまたはその下位Groupに分類されたMediaはありません。
-                      </Text>
-                    </Paper>
-                  ) : (
-                    <>
-                      <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
-                      {mediaPageFeedback}
-                    </>
-                  )}
-                </Box>
-              </ScrollArea>
-            </Box>
+            <GroupDetailPane compact selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData}
+                onRetryGroupMedia={onRetryGroupMedia} onOpenMedia={openMediaAt}
+                mediaPageFeedback={mediaPageFeedback} relationCandidateFeedback={relationCandidateFeedback}
+                relationDetailSection={relationDetailSection} hideManagementActions={hideManagementActions}
+                canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} headingRef={compactDetailHeadingRef} />
           )}
         </Box>
       ) : (
@@ -784,89 +728,11 @@ export function GroupBrowser({
                   exit={{ opacity: 0, x: 100 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Box
-                    style={{
-                      display: selectedId ? "flex" : "none",
-                      flexDirection: "column",
-                      minWidth: 0,
-                      minHeight: 0,
-                      height: "100%",
-                    }}
-                  >
-                    <Box
-                      pb="xs"
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "minmax(0, 1fr) auto",
-                        alignItems: "center",
-                        gap: "var(--mantine-spacing-xs)",
-                      }}
-                    >
-                      <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
-                        <Text fw={700} truncate="end">
-                          {selected?.name ?? ""}
-                        </Text>
-                      </Group>
-                      <Group gap="xs" wrap="nowrap" justify="flex-end">
-                        {!hideManagementActions && (
-                        <Button
-                          size="xs"
-                          variant="default"
-                          leftSection={<IconEdit size={16} />}
-                          onClick={openEdit}
-                          disabled={!canManage || !detailsReady}
-                        >
-                          編集
-                        </Button>
-                        )}
-                        <Button
-                          size="xs"
-                          variant="default"
-                          leftSection={<IconX size={16} />}
-                          onClick={closeDetail}
-                        >
-                          閉じる
-                        </Button>
-                      </Group>
-                    </Box>
-                    <Divider />
-                    {relationCandidateFeedback}
-
-                    {relationDetailSection}
-                    <Divider />
-
-                    <ScrollArea flex={1}>
-                      <Box p="sm">
-                        {mediaDetailState === "loading" ? (
-                          <Center mih={180}><Loader /></Center>
-                        ) : mediaDetailState === "error" ? (
-                          <Alert color="red" title="GroupのMediaを取得できませんでした">
-                            <Stack gap="xs" align="flex-start">
-                              <Text size="sm">最新のGroup情報を確認するため、再取得してください。</Text>
-                              <Button size="xs" variant="light" onClick={() => void onRetryGroupMedia?.()}>
-                                再試行
-                              </Button>
-                            </Stack>
-                          </Alert>
-                        ) : (selected?.mediaCount ?? 0) === 0 ? (
-                          <Paper withBorder p="xl" ta="center">
-                            <Text fw={600}>Mediaがありません</Text>
-                            <Text size="sm" c="dimmed" mt={4}>
-                              このGroupまたはその下位Groupに分類されたMediaはありません。
-                            </Text>
-                          </Paper>
-                        ) : (
-                          <>
-                            <MediaGrid
-                              onOpen={openMediaAt}
-                              items={mediaItemsData}
-                            />
-                            {mediaPageFeedback}
-                          </>
-                        )}
-                      </Box>
-                    </ScrollArea>
-                  </Box>
+                  <GroupDetailPane selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData}
+                onRetryGroupMedia={onRetryGroupMedia} onOpenMedia={openMediaAt}
+                mediaPageFeedback={mediaPageFeedback} relationCandidateFeedback={relationCandidateFeedback}
+                relationDetailSection={relationDetailSection} hideManagementActions={hideManagementActions}
+                canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} />
                 </motion.div>
               )}
             </AnimatePresence>
