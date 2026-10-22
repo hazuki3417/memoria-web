@@ -14,16 +14,6 @@ on:
       - '!src/**/*.stories.*'
       - 'package.json'
       - 'package-lock.json'
-      - 'devbox.json'
-      - 'devbox.lock'
-      - 'scripts/**'
-      - 'tsconfig.json'
-      - 'next-env.d.ts'
-      - 'biome.json'
-      - 'next.config.mjs'
-      - 'public/**'
-      - 'codegen.ts'
-      - '.github/workflows/build.yml'
   workflow_dispatch:
 
 permissions:
