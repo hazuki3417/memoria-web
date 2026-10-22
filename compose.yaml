@@ -1,0 +1,24 @@
+services:
+  vrt:
+    image: ${MEMORIA_VRT_IMAGE:-mcr.microsoft.com/playwright:v1.62.1-noble}
+    profiles: [vrt]
+    init: true
+    ipc: host
+    working_dir: /workspace
+    user: "${VRT_UID:-1000}:${VRT_GID:-1000}"
+    environment:
+      CI: "1"
+      HOME: /tmp
+    volumes:
+      - .:/workspace
+      - vrt-node-modules:/workspace/node_modules
+    entrypoint: ["/bin/bash", "-euc"]
+    command:
+      - |
+        node -e 'if (Number(process.versions.node.split(".")[0]) !== 24) { console.error("VRT requires Node.js 24; got " + process.version); process.exit(1) }'
+        node -e 'const lock = require("./package-lock.json"); if (lock.packages["node_modules/playwright"].version !== "1.62.1") { console.error("VRT requires Playwright 1.62.1"); process.exit(1) }'
+        npm ci
+        npm run "test:visual${VRT_UPDATE:+:update}"
+
+volumes:
+  vrt-node-modules:
