@@ -65,7 +65,7 @@ export function MediaTile({
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />
       ) : resolved.status === "loading" ? (
-        <TileMessage icon={<Loader size="sm" />} title="読み込み中" />
+        <TileMessage icon={<Loader size="sm" color="var(--mantine-color-text)" />} title="読み込み中" />
       ) : resolved.status === "processing" ? (
         <TileMessage icon={<IconRefresh size={28} stroke={1.5} />} title="変換しています" />
       ) : resolved.status === "processing-error" ? (
