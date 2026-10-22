@@ -11,16 +11,19 @@ on:
         type: string
 
 permissions:
-  contents: write
-  pull-requests: write
-  issues: write
+  contents: read
 
 concurrency:
   group: vrt-baseline-request-${{ github.event.issue.number || inputs.target_branch }}
   cancel-in-progress: false
 
 jobs:
-  candidate:
+  generate:
+    outputs:
+      target: ${{ steps.request.outputs.target }}
+      candidate: ${{ steps.request.outputs.candidate }}
+    permissions:
+      contents: read
     if: >-
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'issue_comment' &&
@@ -60,7 +63,7 @@ jobs:
           echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
         with:
-          persist-credentials: true
+          persist-credentials: false
           fetch-depth: 0
       - name: Fetch exact target branch
         env:
@@ -82,17 +85,48 @@ jobs:
           path: e2e/storybook-visual/__screenshots__/
           if-no-files-found: error
           retention-days: 14
-      - name: Create or update candidate PR
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-generation-diagnostics
+          path: |
+            e2e/storybook-visual/report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 7
+
+  publish:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Download candidate screenshots
+        uses: actions/download-artifact@v4
+        with:
+          name: vrt-candidate-baselines-unapproved
+          path: e2e/storybook-visual/__screenshots__/
+      - name: Publish candidate branch and PR
         id: publish
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TARGET: ${{ steps.request.outputs.target }}
-          CANDIDATE: ${{ steps.request.outputs.candidate }}
+          TARGET: ${{ needs.generate.outputs.target }}
+          CANDIDATE: ${{ needs.generate.outputs.candidate }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
         run: |
           set -euo pipefail
+          git ls-remote --exit-code --heads origin "refs/heads/$TARGET" >/dev/null
+          git fetch origin "+refs/heads/$TARGET:refs/remotes/origin/$TARGET"
+          git switch --detach "refs/remotes/origin/$TARGET"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A -- e2e/storybook-visual/__screenshots__/
@@ -105,37 +139,27 @@ jobs:
           git commit -m "test(vrt): generate baseline candidates for $TARGET"
           remote_sha="$(git ls-remote --heads origin "refs/heads/$CANDIDATE" | cut -f1)"
           if [[ -n "$remote_sha" ]]; then
-            git push --force-with-lease="refs/heads/$CANDIDATE:$remote_sha" origin "HEAD:refs/heads/$CANDIDATE"
+            git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push --force-with-lease="refs/heads/$CANDIDATE:$remote_sha" origin "HEAD:refs/heads/$CANDIDATE"
           else
-            git push origin "HEAD:refs/heads/$CANDIDATE"
+            git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push origin "HEAD:refs/heads/$CANDIDATE"
           fi
           pr="$(gh pr list --repo "$GH_REPO" --state open --head "$CANDIDATE" --base "$TARGET" --json number --jq '.[0].number // empty')"
           if [[ -z "$pr" ]]; then
             gh pr create --repo "$GH_REPO" --head "$CANDIDATE" --base "$TARGET" \
               --title "test(vrt): review baseline candidates for $TARGET" \
-              --body "Unapproved VRT baseline candidates generated from \`$TARGET\`. Review each changed screenshot against the intended UI before manually merging. Re-running the request updates this PR. No automatic approval or merge. Source run: $RUN_URL"
+              --body "Unapproved VRT baseline candidates generated from \`$TARGET\`. Review changed screenshots before manually merging. Re-running updates this PR. No automatic approval or merge. Source run: $RUN_URL"
           else
             echo "Updated existing candidate PR #$pr"
           fi
           echo "status=published" >> "$GITHUB_OUTPUT"
-      - name: Record request result on Issue
-        if: success() && github.event_name == 'issue_comment'
+      - name: Record result on request Issue
+        if: github.event_name == 'issue_comment'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           ISSUE: ${{ github.event.issue.number }}
           STATUS: ${{ steps.publish.outputs.status }}
-          TARGET: ${{ steps.request.outputs.target }}
+          TARGET: ${{ needs.generate.outputs.target }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          gh issue comment "$ISSUE" --repo "$GH_REPO" --body "VRT baseline request for \`$TARGET\`: $STATUS. See $RUN_URL. Candidate changes require separate PR review and manual merge."
-      - name: Upload failure diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: vrt-generation-diagnostics
-          path: |
-            e2e/storybook-visual/report/
-            test-results/
-          if-no-files-found: warn
-          retention-days: 7
+          gh issue comment "$ISSUE" --repo "$GH_REPO" --body "VRT baseline request for \`$TARGET\`: $STATUS. See $RUN_URL. Candidate images require separate PR review and manual merge."
