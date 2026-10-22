@@ -38,6 +38,14 @@ npm run test:visual:report
 
 Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-node-modules`へ分離する。one-shot起動ごとに`npm ci`を実行し、依存状態をlockfileに合わせる。公式Playwrightイメージのデフォルトユーザー（root）で実行し、初期状態でroot所有のnamed volumeへ`npm ci`を書き込めるようにする。これは初回CIで発生した`EACCES`への暫定対応であり、bind mount先に生成されるBaselineやレポートがroot所有になる可能性がある。実運用前にファイル所有権と非root化を検討する。Linux/WSL2での動作、フォント・画像一致、Baselineの再現性、実際のテスト成功はいずれも未検証。PR上の動作確認専用Workflow（`.github/workflows/vrt-compose.yml`）を追加する。これはCompose設定・実行環境と通常比較を検証し、Baselineを更新・コミットしない。承認済みBaselineが存在しない間、比較は失敗する可能性があるため、環境構築の失敗とBaseline未登録を区別する。通常のQuality Gateへの統合・必須チェック化は後続Phaseで判断する。
 
+## GitHub Actionsで候補Baselineを生成する
+
+`.github/workflows/vrt-compose.yml`はPR時に**比較のみ**を行う。Baselineの初回生成・明示更新は`workflow_dispatch`の`mode: generate`を選択して手動実行する。このモードも同じComposeサービスを使い、`VRT_UPDATE=1`で候補画像を生成する。候補画像は**`vrt-candidate-baselines-unapproved` Artifact**（14日間保持）として提供し、Gitへの自動コミットやBaselineの自動承認は行わない。通常比較・候補生成とも診断情報は`vrt-compose-diagnostics`に保存する。
+
+GitHubの「Actions」→「VRT Docker Compose smoke test」→「Run workflow」で対象branchを選び、`mode: generate`を選択する。**GitHubの手動実行UIはworkflow定義がデフォルトブランチに存在する必要がある**ため、このPRが未マージの間は手動実行を利用できない場合がある。PRの自動実行は比較のみであり、Baseline未登録の失敗は想定どおりとする。
+
+生成Artifactを取得して4枚の表示を設計と照合し、レビューを通過した画像だけを`e2e/storybook-visual/__screenshots__/`に登録する。その後`mode: compare`またはPR比較で成功を確認する。Artifactの取得だけではBaseline承認やGit反映は完了しない。**候補画像を自動的にコミットしない。**
+
 ## Baseline作成・比較・承認フロー（Phase 1）
 
 Baselineの生成・更新と、通常の比較実行は**異なる操作**です。通常比較でBaselineを自動更新してはいけません。
