@@ -1,6 +1,6 @@
 import { MockedProvider, type MockedResponse } from "@apollo/client/testing"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, userEvent, waitFor, within } from "storybook/test"
 import {
   BrowseGroupsDocument,
   MediaGroupSort,
@@ -123,7 +123,10 @@ export const RetryFailsThenRecovers: Story = {
     const message = "Group一覧の取得に失敗しました。再試行できます。"
     await canvas.findByText(message)
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByText(message)).toBeVisible()
+    await waitFor(() => {
+      expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
+      expect(canvas.getByText(message)).toBeVisible()
+    })
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(await canvas.findByRole("button", { name: "Groupを作成" })).toBeVisible()
     await expect(canvas.queryByText(message)).not.toBeInTheDocument()
@@ -149,9 +152,11 @@ export const EmptyScopeCreateCancel: Story = {
     )
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "未保存のGroup")
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
-    await expect(
-      within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
-    ).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
+      ).not.toBeInTheDocument()
+    })
     await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeVisible()
   },
 }
