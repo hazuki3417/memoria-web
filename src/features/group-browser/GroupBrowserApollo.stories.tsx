@@ -86,6 +86,8 @@ export const ListingError: Story = {
       await canvas.findByText("Group一覧の取得に失敗しました。再試行できます。"),
     ).toBeVisible()
     await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
+    await expect(canvas.getByPlaceholderText("Groupを検索")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "検索" })).toBeVisible()
   },
 }
 
@@ -105,5 +107,24 @@ export const RetryAfterError: Story = {
     await canvas.findByText("Group一覧の取得に失敗しました。再試行できます。")
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(await canvas.findByRole("button", { name: "Groupを作成" })).toBeVisible()
+  },
+}
+
+/** 初回取得中も検索とGroup作成の操作パネルを表示する。 */
+export const ListingLoading: Story = {
+  name: "Integration · Listing Loading",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[{ ...emptyReply, delay: 3000 }]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByPlaceholderText("Groupを検索")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "検索" })).toBeVisible()
+    await expect(canvas.queryByText("まだGroupがありません")).not.toBeInTheDocument()
   },
 }
