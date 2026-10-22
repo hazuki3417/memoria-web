@@ -1,4 +1,4 @@
-name: VRT Docker Compose smoke test
+name: CI / Visual Regression
 
 on:
   pull_request:
