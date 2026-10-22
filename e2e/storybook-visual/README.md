@@ -44,7 +44,7 @@ npm run test:visual:report
 
 **失敗時**はPlaywrightのHTML ReportとExpected / Actual / Diff画像を確認し、原因を調査する。Baseline欠落は未登録として扱い、通常比較から更新処理を呼ばない。 `play`付きStoryの撮影同期は未実装のため、対象に追加する前に完了待機・描画安定を検証する。
 
-**CI / Quality Gate**: このPhaseでは導入・変更しない。旧`test:vrt`系列は別実装であり、本手順の対象外。将来の統合・廃止は別途判断する。
+**CI / Quality Gate**: このPhaseでは導入・変更しない。旧VRT実装のnpmコマンドは削除済み。旧VRTテスト・設定ファイル自体の整理は別途判断する。
 
 ## VRT対象Storyの指定
 
