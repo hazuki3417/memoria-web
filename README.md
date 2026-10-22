@@ -49,7 +49,7 @@ npm run typecheck
 npm run test:unit
 npm run build
 npm run build:storybook
-npm run test:vrt
+npm run test:visual
 ```
 
 snapshotは表示差分を確認してから更新します。
