@@ -12,15 +12,6 @@ on:
       - '!src/**/*.stories.*'
       - 'package.json'
       - 'package-lock.json'
-      - 'devbox.json'
-      - 'devbox.lock'
-      - 'scripts/**'
-      - 'tsconfig.json'
-      - 'next-env.d.ts'
-      - 'biome.json'
-      - 'vitest.config.ts'
-      - 'vitest.shims.d.ts'
-      - '.github/workflows/unit-test.yml'
   workflow_dispatch:
 
 permissions:
