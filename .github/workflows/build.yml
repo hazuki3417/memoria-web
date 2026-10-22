@@ -1,4 +1,4 @@
-name: Next.js Build
+name: CI / Next.js Build
 
 on:
   pull_request:
