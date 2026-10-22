@@ -14,18 +14,6 @@ on:
       - 'src/app/layout.tsx'
       - 'package.json'
       - 'package-lock.json'
-      - 'devbox.json'
-      - 'devbox.lock'
-      - 'scripts/**'
-      - 'tsconfig.json'
-      - 'next-env.d.ts'
-      - 'biome.json'
-      - '.storybook/**'
-      - 'storybook-assets/**'
-      - 'public/**'
-      - 'vitest.storybook.config.ts'
-      - 'vitest.shims.d.ts'
-      - '.github/workflows/interaction.yml'
   workflow_dispatch:
 
 permissions:
