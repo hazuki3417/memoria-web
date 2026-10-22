@@ -457,38 +457,6 @@ export function GroupBrowserContainer({
     [deleteGroup, listing.refetch],
   )
 
-  if (listing.error)
-    return (
-      <Alert color="red" title="Group一覧を取得できませんでした">
-        <Stack gap="xs" align="flex-start">
-          <Text size="sm">Group一覧の取得に失敗しました。再試行できます。</Text>
-          <Button
-            size="xs"
-            variant="light"
-            disabled={listing.loading}
-            loading={listing.loading}
-            onClick={() => {
-              void listing.refetch().catch(() => {
-                // A failed retry stays in the discovery error state.
-              })
-            }}
-          >
-            再試行
-          </Button>
-        </Stack>
-      </Alert>
-    )
-  if (
-    (listing.loading && !listing.data) ||
-    listing.data?.mediaGroups.pageInfo.hasNextPage
-  ) {
-    return (
-      <Center mih={240}>
-        <Loader />
-      </Center>
-    )
-  }
-
   const candidateFailure = Boolean(selectedId && (
     candidateQuery.error || candidateLoadFailureId === selectedId
   ))
@@ -501,6 +469,12 @@ export function GroupBrowserContainer({
 
   return (
     <GroupBrowser
+      discoveryState={listing.error ? "error" : (listing.loading && !listing.data) || listing.data?.mediaGroups.pageInfo.hasNextPage ? "loading" : "ready"}
+      onRetryDiscovery={() => {
+        void listing.refetch().catch(() => {
+          // Keep the discovery error state until a successful response.
+        })
+      }}
       relationCandidateState={
         candidateRetryingId === selectedId ? "loading" :
         candidateFailure ? "error" :
