@@ -19,6 +19,23 @@ Storybookはテスト起動時に自動起動します。基準画像は `e2e/st
 
 **現時点では基準画像の生成と実行成功は未検証です。** 基準画像がない状態では比較テストは成功しません。
 
+## Dockerでの撮影（Phase 1）
+
+ローカルでは公式Playwright Dockerイメージ `mcr.microsoft.com/playwright:v1.62.1-noble` を使用する。リポジトリの依存LockはPlaywright `1.62.1`。撮影画像はDockerのbind mountによりホストのGit作業ツリーに保存する。
+
+```bash
+# 初回Baseline作成／承認済みのUI変更時に限定
+bash scripts/test-visual-docker.sh update
+# 通常の比較（Baselineを更新しない）
+bash scripts/test-visual-docker.sh compare
+# 失敗レポートはホストで確認
+npm run test:visual:report
+```
+
+`MEMORIA_VRT_IMAGE` でイメージ指定を上書きできる（検証・digest固定用途）。デフォルトのタグ自体はdigest未固定のため、継続運用前に検証済みdigestへ固定する。**Baseline生成と比較では必ず同じイメージを指定する。** Dockerランナーは `node -v` 相当のNode.js 24検査とLockfile内のPlaywrightバージョン検査を行い、一致しない場合は `npm ci` や撮影の前に失敗する。公式イメージにNode.js 24が含まれることは未確認であり、失敗した場合はBaselineを生成せず、専用イメージ化等の方針を再検討する。
+
+依存インストールはコンテナ内で `npm ci` を実行し、作業ツリーにマウントされた `node_modules` を更新する。Windows/macOS由来の `node_modules` を共有しないこと。Linux/WSL2で動作確認するまで、実行成功・フォント一致・Baseline再現性は未検証と扱う。Dockerデーモンへの接続とDockerイメージの取得にはネットワークが必要。CIへの組み込みは後続Phaseで扱う。
+
 ## Baseline作成・比較・承認フロー（Phase 1）
 
 Baselineの生成・更新と、通常の比較実行は**異なる操作**です。通常比較でBaselineを自動更新してはいけません。
