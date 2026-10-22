@@ -92,6 +92,8 @@ export type GroupBrowserProps = {
   onRetryRelationCandidates?: () => Promise<void>
   canManage?: boolean
   hideManagementActions?: boolean
+  discoveryState?: "ready" | "loading" | "error"
+  onRetryDiscovery?: () => void
 }
 
 type GroupFixture = {
@@ -194,6 +196,8 @@ export function GroupBrowser({
   onRetryRelationCandidates,
   canManage = true,
   hideManagementActions = false,
+  discoveryState = "ready",
+  onRetryDiscovery,
 }: GroupBrowserProps) {
   const { saving, runAction } = useGroupMutationAction()
   const {
@@ -252,7 +256,7 @@ export function GroupBrowser({
     [allGroups, appliedQuery, groupsData],
   )
 
-  const emptyGroupState = allGroups.length === 0 && !appliedQuery.trim() ? (
+  const emptyGroupState = discoveryState === "ready" && allGroups.length === 0 && !appliedQuery.trim() ? (
     <Center mih={360}>
       <Stack align="center" maw={420}>
         <ThemeIcon size={48} radius="xl" variant="light">
@@ -267,6 +271,33 @@ export function GroupBrowser({
             Groupを作成
           </Button>
         )}
+      </Stack>
+    </Center>
+  ) : null
+
+  const discoveryFeedback = discoveryState === "loading" ? (
+    <Center mih={240}><Loader /></Center>
+  ) : discoveryState === "error" ? (
+    <Box p="sm">
+      <Alert color="red" title="Group一覧を取得できませんでした">
+        <Stack gap="xs" align="flex-start">
+          <Text size="sm">Group一覧の取得に失敗しました。再試行できます。</Text>
+          <Button size="xs" variant="light" onClick={onRetryDiscovery}>再試行</Button>
+        </Stack>
+      </Alert>
+    </Box>
+  ) : null
+  const searchEmptyState = discoveryState === "ready" && allGroups.length > 0 && visibleGroups.length === 0 && appliedQuery.trim() ? (
+    <Center mih={360}>
+      <Stack align="center" maw={420}>
+        <ThemeIcon size={48} radius="xl" variant="light" color="gray">
+          <IconSearch size={24} />
+        </ThemeIcon>
+        <Text fw={700} size="lg">一致するGroupがありません</Text>
+        <Text size="sm" c="dimmed" ta="center">検索条件を変更するか、検索を解除してください。</Text>
+        <Button variant="default" onClick={() => { setQuery(""); setAppliedQuery("") }}>
+          検索を解除
+        </Button>
       </Stack>
     </Center>
   ) : null
@@ -488,7 +519,9 @@ export function GroupBrowser({
               </Box>
               <Divider />
               <ScrollArea flex={1}>
+                {discoveryFeedback}
                 {emptyGroupState}
+                {searchEmptyState}
                 <Box
                   p="sm"
                   style={{
@@ -497,7 +530,7 @@ export function GroupBrowser({
                     gap: "var(--mantine-spacing-sm)",
                   }}
                 >
-                  {visibleGroups.map((group) => (
+                  {(discoveryState === "ready" ? visibleGroups : []).map((group) => (
                     <UnstyledButton
                       key={group.id}
                       ref={(element) => {
@@ -673,7 +706,9 @@ export function GroupBrowser({
               </Box>
               <Divider />
               <ScrollArea flex={1}>
+                {discoveryFeedback}
                 {emptyGroupState}
+                {searchEmptyState}
                 <Box
                   p="sm"
                   style={{
@@ -682,7 +717,7 @@ export function GroupBrowser({
                     gap: "var(--mantine-spacing-sm)",
                   }}
                 >
-                  {visibleGroups.map((group) => {
+                  {(discoveryState === "ready" ? visibleGroups : []).map((group) => {
                     const selectedItem = group.id === selectedId
                     return (
                       <UnstyledButton
