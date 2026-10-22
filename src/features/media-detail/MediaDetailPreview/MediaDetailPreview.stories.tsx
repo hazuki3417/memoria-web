@@ -41,7 +41,15 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const First: Story = {}
-export const Last: Story = { args: { detail: second, prev: first, next: null } }
-export const Compact: Story = { args: { compact: true } }
-export const Zoomed: Story = { args: { detailZoom: 200 } }
+export const First: Story = {
+  name: "Visual · First",
+  tags: ["visual"],}
+export const Last: Story = {
+  name: "Visual · Last",
+  tags: ["visual"], args: { detail: second, prev: first, next: null } }
+export const Compact: Story = {
+  name: "Visual · Compact",
+  tags: ["visual"], args: { compact: true } }
+export const Zoomed: Story = {
+  name: "Visual · Zoomed",
+  tags: ["visual"], args: { detailZoom: 200 } }
