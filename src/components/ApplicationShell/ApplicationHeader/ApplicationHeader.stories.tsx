@@ -19,8 +19,12 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const BrandOnly: Story = {}
+export const BrandOnly: Story = {
+  name: "Visual · Brand Only",
+  tags: ["visual"],}
 export const Composed: Story = {
+  name: "Visual · Composed",
+  tags: ["visual"],
   args: {
     leading: <Text size="sm">Navigation</Text>,
     context: <Text size="sm">Context</Text>,
