@@ -4,6 +4,18 @@ on:
   pull_request:
     branches: [develop]
     paths:
+      - "src/**"
+      - ".storybook/**"
+      - "storybook-assets/**"
+      - "public/**"
+      - "package.json"
+      - "package-lock.json"
+      - "devbox.json"
+      - "devbox.lock"
+      - "scripts/**"
+      - "tsconfig.json"
+      - "vitest.storybook.config.ts"
+      - "playwright.vrt.config.ts"
       - "compose.yaml"
       - "e2e/storybook-visual/**"
       - "playwright.storybook-visual.config.ts"
