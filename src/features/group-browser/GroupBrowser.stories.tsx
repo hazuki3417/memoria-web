@@ -384,3 +384,57 @@ export const DeleteFailureKeepsSelection: Story = {
     await expect(confirmation.getByRole("button", { name: "削除" })).toBeEnabled()
   },
 }
+
+
+/** GB-043: 関係候補の取得失敗では編集を開始せず、閲覧と再試行を維持。 */
+export const RelationCandidateErrorRetry: Story = {
+  name: "Interaction · Relation Candidate Error Retry",
+  tags: ["interaction"],
+  args: {
+    relationCandidateState: "error",
+    onRetryRelationCandidates: fn(async () => undefined),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await expect(canvas.getByText("関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(args.onRetryRelationCandidates).toHaveBeenCalledTimes(1)
+  },
+}
+
+/** GB-070/071: Media詳細取得失敗でも選択Groupを失わず再試行できる。 */
+export const DetailLoadErrorRetry: Story = {
+  name: "Interaction · Detail Load Error Retry",
+  tags: ["interaction"],
+  args: {
+    mediaDetailState: "error",
+    onRetryGroupMedia: fn(async () => undefined),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await expect(canvas.getByText("最新のGroup情報を確認するため、再取得してください。")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(args.onRetryGroupMedia).toHaveBeenCalledTimes(1)
+    await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
+  },
+}
+
+/** GB-069: 追加Media取得失敗の再試行は選択を解除しない。 */
+export const MediaPageErrorRetry: Story = {
+  name: "Interaction · Media Page Error Retry",
+  tags: ["interaction"],
+  args: {
+    mediaPageState: "error",
+    onRetryMediaPage: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await expect(canvas.getByText("取得済みのMediaは引き続き閲覧できます。")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(args.onRetryMediaPage).toHaveBeenCalledTimes(1)
+    await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
+  },
+}
