@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { Alert, Button, Center, Loader, Stack, Text } from "@mantine/core"
 import {
   MediaGroupSort,
   CommunityMemberRole,
