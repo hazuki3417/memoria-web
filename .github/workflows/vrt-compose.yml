@@ -12,21 +12,8 @@ on:
       - "src/infrastructure/**"
       - "src/app/globals.css"
       - "src/app/layout.tsx"
-      - ".storybook/**"
-      - "storybook-assets/**"
-      - "public/**"
       - "package.json"
       - "package-lock.json"
-      - "devbox.json"
-      - "devbox.lock"
-      - "scripts/**"
-      - "tsconfig.json"
-      - "vitest.storybook.config.ts"
-      - "playwright.vrt.config.ts"
-      - "compose.yaml"
-      - "e2e/storybook-visual/**"
-      - "playwright.storybook-visual.config.ts"
-      - ".github/workflows/vrt-compose.yml"
   workflow_dispatch:
     inputs:
       mode:
