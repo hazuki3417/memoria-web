@@ -22,7 +22,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = {
+  name: "Visual · Default",
+  tags: ["visual"],}
 export const WithAvatarLabel: Story = {
+  name: "Visual · With Avatar Label",
+  tags: ["visual"],
   args: { user: { displayName: "ユーザー", avatarLabel: "M" } },
 }

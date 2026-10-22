@@ -30,7 +30,15 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Personal: Story = {}
-export const Community: Story = { args: { context: "community" } }
-export const Compact: Story = { args: { compact: true } }
-export const ForbiddenDownload: Story = { args: { downloadMock: "forbidden" } }
+export const Personal: Story = {
+  name: "Visual · Personal",
+  tags: ["visual"],}
+export const Community: Story = {
+  name: "Visual · Community",
+  tags: ["visual"], args: { context: "community" } }
+export const Compact: Story = {
+  name: "Visual · Compact",
+  tags: ["visual"], args: { compact: true } }
+export const ForbiddenDownload: Story = {
+  name: "Visual · Forbidden Download",
+  tags: ["visual"], args: { downloadMock: "forbidden" } }

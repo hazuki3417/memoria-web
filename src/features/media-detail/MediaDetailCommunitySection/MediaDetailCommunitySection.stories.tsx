@@ -25,11 +25,19 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Personal: Story = {}
+export const Personal: Story = {
+  name: "Visual · Personal",
+  tags: ["visual"],}
 export const Expanded: Story = {
+  name: "Visual · Expanded",
+  tags: ["visual"],
   args: { detailSectionsExpanded: { ...expanded, communities: true } },
 }
 export const Empty: Story = {
+  name: "Visual · Empty",
+  tags: ["visual"],
   args: { detailValues: { ...values, communities: [] } },
 }
-export const Community: Story = { args: { context: "community" } }
+export const Community: Story = {
+  name: "Visual · Community",
+  tags: ["visual"], args: { context: "community" } }

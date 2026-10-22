@@ -13,6 +13,12 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Closed: Story = {}
-export const Opened: Story = { args: { opened: true } }
-export const Hidden: Story = { args: { hidden: true } }
+export const Closed: Story = {
+  name: "Visual · Closed",
+  tags: ["visual"],}
+export const Opened: Story = {
+  name: "Visual · Opened",
+  tags: ["visual"], args: { opened: true } }
+export const Hidden: Story = {
+  name: "Visual · Hidden",
+  tags: ["visual"], args: { hidden: true } }

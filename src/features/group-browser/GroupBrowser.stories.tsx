@@ -8,7 +8,7 @@ const fixtures: GroupBrowserGroup[] = [
 ]
 
 const meta = {
-  title: "Group Browser/Screen Interaction",
+  title: "Features/Group Browser/Screen Interaction",
   component: GroupBrowser,
   parameters: { layout: "fullscreen" },
   args: {
@@ -26,6 +26,8 @@ type Story = StoryObj<typeof meta>
 
 /** GB-005: 入力途中では一覧を切り替えず、検索確定後に結果を更新する。 */
 export const SearchOnlyAfterSubmit: Story = {
+  name: "Interaction · Search Only After Submit",
+  tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const search = canvas.getByPlaceholderText("Groupを検索")
@@ -39,6 +41,8 @@ export const SearchOnlyAfterSubmit: Story = {
 
 /** 作成操作の検証: 名前を入力するまで確定できず、CancelではMutationを通知しない。 */
 export const CreateDialogCancel: Story = {
+  name: "Interaction · Create Dialog Cancel",
+  tags: ["interaction"],
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
@@ -57,6 +61,8 @@ export const CreateDialogCancel: Story = {
 
 /** 作成操作の検証: 確定時にUIの入力値をComponent境界へ通知する。 */
 export const CreateGroupSubmitsName: Story = {
+  name: "Interaction · Create Group Submits Name",
+  tags: ["interaction"],
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))

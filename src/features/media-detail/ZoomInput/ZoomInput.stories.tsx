@@ -8,5 +8,9 @@ const meta = {
 } satisfies Meta<typeof ZoomInput>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = {}
-export const Enlarged: Story = { args: { value: 200 } }
+export const Default: Story = {
+  name: "Visual · Default",
+  tags: ["visual"],}
+export const Enlarged: Story = {
+  name: "Visual · Enlarged",
+  tags: ["visual"], args: { value: 200 } }

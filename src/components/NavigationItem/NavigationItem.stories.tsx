@@ -14,9 +14,13 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = {
+  name: "Visual · Default",
+  tags: ["visual"],}
 
 export const Active: Story = {
+  name: "Visual · Active",
+  tags: ["visual"],
   args: {
     active: true,
     accentColor: "var(--mantine-color-blue-6)",
@@ -24,12 +28,16 @@ export const Active: Story = {
 }
 
 export const Disabled: Story = {
+  name: "Visual · Disabled",
+  tags: ["visual"],
   args: {
     disabled: true,
   },
 }
 
 export const CommunityAccent: Story = {
+  name: "Visual · Community Accent",
+  tags: ["visual"],
   args: {
     active: true,
     accentColor: "var(--mantine-color-violet-6)",

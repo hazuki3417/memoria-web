@@ -22,11 +22,19 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = {
+  name: "Visual · Default",
+  tags: ["visual"],}
 export const Expanded: Story = {
+  name: "Visual · Expanded",
+  tags: ["visual"],
   args: { detailSectionsExpanded: { ...expanded, tags: true } },
 }
-export const Empty: Story = { args: { detailValues: { ...values, tags: [] } } }
+export const Empty: Story = {
+  name: "Visual · Empty",
+  tags: ["visual"], args: { detailValues: { ...values, tags: [] } } }
 export const SixItems: Story = {
+  name: "Visual · Six Items",
+  tags: ["visual"],
   args: { detailValues: { ...values, tags: values.tags.slice(0, 6) } },
 }

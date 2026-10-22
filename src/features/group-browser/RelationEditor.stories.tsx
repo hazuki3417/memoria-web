@@ -4,7 +4,7 @@ import { expect, userEvent, within } from "storybook/test"
 import { RelationEditor } from "./RelationEditor"
 
 const meta = {
-  title: "Group Browser/Relation Editor",
+  title: "Features/Group Browser/Relation Editor",
   component: RelationEditor,
   args: {
     label: "Parents",
@@ -22,6 +22,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const ParentSelection: Story = {
+  name: "Interaction · Parent Selection",
+  tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText("Groupを検索")
@@ -35,6 +37,8 @@ export const ParentSelection: Story = {
 }
 
 export const OppositeSelectionDisabled: Story = {
+  name: "Interaction · Opposite Selection Disabled",
+  tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText("Groupを検索")
@@ -53,6 +57,8 @@ export const OppositeSelectionDisabled: Story = {
  * 一括Clearボタンは表示しない。
  */
 export const RemoveOneSelectedRelation: Story = {
+  name: "Interaction · Remove One Selected Relation",
+  tags: ["interaction"],
   args: {
     names: ["Parent", "候補"],
     oppositeNames: [],
@@ -74,6 +80,8 @@ export const RemoveOneSelectedRelation: Story = {
 
 /** GB-047: 名前検索に一致する候補がない場合の空状態。 */
 export const NoMatchingCandidates: Story = {
+  name: "Interaction · No Matching Candidates",
+  tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText("Groupを検索")
@@ -88,6 +96,8 @@ export const NoMatchingCandidates: Story = {
 
 /** GB-047: 現在のGroup自身はParentに選べない。 */
 export const CurrentGroupCannotBeParent: Story = {
+  name: "Interaction · Current Group Cannot Be Parent",
+  tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText("Groupを検索")
@@ -101,6 +111,8 @@ export const CurrentGroupCannotBeParent: Story = {
 
 /** GB-049: 10件選択済みでも上限の案内が表示される。 */
 export const SelectionLimit: Story = {
+  name: "Interaction · Selection Limit",
+  tags: ["interaction"],
   args: {
     names: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
     candidates: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"],

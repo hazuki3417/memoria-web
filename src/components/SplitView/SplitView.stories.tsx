@@ -41,8 +41,12 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = {
+  name: "Visual · Default",
+  tags: ["visual"],}
 
 export const Equal: Story = {
+  name: "Visual · Equal",
+  tags: ["visual"],
   args: { defaultLayout: { primary: 50, secondary: 50 } },
 }

@@ -29,7 +29,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Opened: Story = {}
+export const Opened: Story = {
+  name: "Visual · Opened",
+  tags: ["visual"],}
 export const CommunityAccent: Story = {
+  name: "Visual · Community Accent",
+  tags: ["visual"],
   args: { accentColor: "var(--mantine-color-teal-6)" },
 }

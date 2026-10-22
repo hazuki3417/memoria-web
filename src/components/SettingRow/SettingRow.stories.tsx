@@ -23,15 +23,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Wide: Story = {}
+export const Wide: Story = {
+  name: "Visual · Wide",
+  tags: ["visual"],}
 
 export const Compact: Story = {
+  name: "Visual · Compact",
+  tags: ["visual"],
   args: {
     compact: true,
   },
 }
 
 export const SwitchControl: Story = {
+  name: "Visual · Switch Control",
+  tags: ["visual"],
   args: {
     label: "繰り返し表示",
     description: "最後まで進んだら最初のMediaに戻ります。",

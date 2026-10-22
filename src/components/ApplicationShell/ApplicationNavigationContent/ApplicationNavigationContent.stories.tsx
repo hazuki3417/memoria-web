@@ -35,11 +35,17 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = {
+  name: "Visual · Default",
+  tags: ["visual"],}
 export const CommunityAccent: Story = {
+  name: "Visual · Community Accent",
+  tags: ["visual"],
   args: { accentColor: "var(--mantine-color-teal-6)" },
 }
 export const LongLabel: Story = {
+  name: "Visual · Long Label",
+  tags: ["visual"],
   args: {
     items: [
       ...items,
@@ -52,6 +58,8 @@ export const LongLabel: Story = {
   },
 }
 export const ManyItems: Story = {
+  name: "Visual · Many Items",
+  tags: ["visual"],
   args: {
     items: Array.from({ length: 20 }, (_, index) => ({
       id: `item-${index}`,
@@ -63,6 +71,8 @@ export const ManyItems: Story = {
   },
 }
 export const Disabled: Story = {
+  name: "Visual · Disabled",
+  tags: ["visual"],
   args: {
     items: [
       ...items,

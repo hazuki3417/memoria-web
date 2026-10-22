@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from "storybook/test"
 import { MediaGrid } from "./MediaGrid"
 
 const meta = {
-  title: "Group Browser/Media Grid",
+  title: "Features/Group Browser/Media Grid",
   component: MediaGrid,
   args: {
     onOpen: fn(),
@@ -18,6 +18,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const OpensSelectedMedia: Story = {
+  name: "Interaction · Opens Selected Media",
+  tags: ["interaction"],
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const media = canvas.getByRole("button", { name: "写真Cの詳細を開く" })
@@ -27,6 +29,8 @@ export const OpensSelectedMedia: Story = {
 }
 
 export const MissingPreviewStillOpens: Story = {
+  name: "Interaction · Missing Preview Still Opens",
+  tags: ["interaction"],
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const media = canvas.getByRole("button", {
@@ -39,6 +43,8 @@ export const MissingPreviewStillOpens: Story = {
 }
 
 export const KeyboardOpensMedia: Story = {
+  name: "Interaction · Keyboard Opens Media",
+  tags: ["interaction"],
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const media = canvas.getByRole("button", { name: "写真Aの詳細を開く" })
@@ -50,6 +56,8 @@ export const KeyboardOpensMedia: Story = {
 }
 
 export const EmptyMedia: Story = {
+  name: "Interaction · Empty Media",
+  tags: ["interaction"],
   args: { items: [] },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
