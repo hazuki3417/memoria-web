@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { userEvent, within } from "storybook/test"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 
-// Reviewable screen states. Intentionally no VRT (visual) or interaction tags.
+// Reviewable screen states. Visual stories are intentionally excluded from VRT until approved (`vrt` tag absent).
 // All states render the production Feature; no alternate screen markup is introduced.
 const sampleGroups: GroupBrowserGroup[] = [
   { id: "photos", name: "旅行の写真", mediaCount: 12, previewCount: 4, parentNames: [], childNames: ["風景"] },
@@ -14,6 +14,7 @@ const meta = {
   title: "Features/Group Browser/Screen States",
   component: GroupBrowser,
   parameters: { layout: "fullscreen" },
+  tags: ["visual"],
   args: {
     groupsData: sampleGroups,
     mediaItemsData: [],
@@ -25,16 +26,16 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  name: "Discovery · With Groups",
+  name: "Visual · Discovery · With Groups",
 }
 
 export const Empty: Story = {
-  name: "Discovery · No Groups",
+  name: "Visual · Discovery · No Groups",
   args: { groupsData: [], relationCandidates: [] },
 }
 
 export const EmptyCommunityMember: Story = {
-  name: "Discovery · No Groups · Read Only",
+  name: "Visual · Discovery · No Groups · Read Only",
   args: {
     contextKind: "community",
     groupsData: [],
@@ -45,7 +46,7 @@ export const EmptyCommunityMember: Story = {
 }
 
 export const SearchEmpty: Story = {
-  name: "Discovery · Search No Results",
+  name: "Visual · Discovery · Search No Results",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.type(canvas.getByPlaceholderText("Groupを検索"), "一致しない検索語{Enter}")
@@ -54,28 +55,28 @@ export const SearchEmpty: Story = {
 }
 
 export const Loading: Story = {
-  name: "Discovery · Initial Loading",
+  name: "Visual · Discovery · Initial Loading",
   args: { groupsData: [], discoveryState: "loading" },
 }
 
 export const Error: Story = {
-  name: "Discovery · Load Error",
+  name: "Visual · Discovery · Load Error",
   args: { groupsData: [], discoveryState: "error", onRetryDiscovery: () => {} },
 }
 
 export const CompactDefault: Story = {
-  name: "Compact · Discovery With Groups",
+  name: "Visual · Compact · Discovery With Groups",
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
 export const CompactEmpty: Story = {
-  name: "Compact · Discovery No Groups",
+  name: "Visual · Compact · Discovery No Groups",
   args: { groupsData: [], relationCandidates: [] },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
 export const CompactSearchEmpty: Story = {
-  name: "Compact · Discovery Search No Results",
+  name: "Visual · Compact · Discovery Search No Results",
   parameters: { viewport: { defaultViewport: "mobile1" } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -85,13 +86,13 @@ export const CompactSearchEmpty: Story = {
 }
 
 export const CompactLoading: Story = {
-  name: "Compact · Discovery Initial Loading",
+  name: "Visual · Compact · Discovery Initial Loading",
   args: { groupsData: [], discoveryState: "loading" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
 export const CompactError: Story = {
-  name: "Compact · Discovery Load Error",
+  name: "Visual · Compact · Discovery Load Error",
   args: { groupsData: [], discoveryState: "error", onRetryDiscovery: () => {} },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
