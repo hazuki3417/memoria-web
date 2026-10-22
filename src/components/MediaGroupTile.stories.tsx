@@ -16,5 +16,18 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
-export const Artwork: Story = { name: "Visual · Decorative Media Artwork" }
+export const Artwork: Story = { name: "Visual · Ready Artwork" }
 export const NoArtwork: Story = { name: "Visual · No Artwork", args: { sources: [] } }
+
+export const Loading: Story = {
+  name: "Visual · Loading",
+  args: { state: { status: "loading" } },
+}
+export const Processing: Story = {
+  name: "Visual · Processing",
+  args: { state: { status: "processing" } },
+}
+export const Error: Story = {
+  name: "Visual · Error",
+  args: { state: { status: "error" } },
+}
