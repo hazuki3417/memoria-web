@@ -276,7 +276,12 @@ export function GroupBrowser({
   ) : null
 
   const discoveryFeedback = discoveryState === "loading" ? (
-    <Center mih={240}><Loader /></Center>
+    <Center mih={360}>
+      <Stack align="center">
+        <Loader />
+        <Text size="sm" c="dimmed">Groupを読み込んでいます</Text>
+      </Stack>
+    </Center>
   ) : discoveryState === "error" ? (
     <Box p="sm">
       <Alert color="red" title="Group一覧を取得できませんでした">
