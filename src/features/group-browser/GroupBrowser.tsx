@@ -1,11 +1,9 @@
 "use client"
 
 import {
-  Badge,
   Alert,
   Box,
   Button,
-  Collapse,
   Divider,
   Group,
   Modal,
@@ -21,7 +19,6 @@ import {
 } from "@mantine/core"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import {
-  IconChevronRight,
   IconEdit,
   IconFolderPlus,
   IconSearch,
