@@ -11,20 +11,30 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = {
+  name: "Visual · Default",
+  tags: ["visual"],}
 
 export const Compact: Story = {
+  name: "Visual · Compact",
+  tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
 export const Saving: Story = {
+  name: "Visual · Saving",
+  tags: ["visual"],
   args: { initialProfileSaveState: "saving" },
 }
 
 export const RetryableFailure: Story = {
+  name: "Visual · Retryable Failure",
+  tags: ["visual"],
   args: { initialProfileSaveState: "retryable-error" },
 }
 
 export const BlockingError: Story = {
+  name: "Visual · Blocking Error",
+  tags: ["visual"],
   args: { initialProfileSaveState: "blocked" },
 }
