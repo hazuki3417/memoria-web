@@ -8,7 +8,6 @@ import {
   Group,
   Center,
   Loader,
-  Paper,
   ScrollArea,
   SimpleGrid,
   Stack,
@@ -19,10 +18,8 @@ import {
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
-  IconEdit,
   IconFolderPlus,
   IconSearch,
-  IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useMemo, useState } from "react"
