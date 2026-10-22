@@ -681,3 +681,54 @@ export const EditRelationsRemainDraftUntilSave: Story = {
     await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith("a", "アルバムA", ["親候補"], [])
   },
 }
+
+
+/** GB-032: relationの確定拒否を成功扱いせず、全Draftを保持する。Backend Rollbackの保証は別途必要。 */
+export const CreateRelationFailureKeepsDraft: Story = {
+  name: "Interaction · Create Relation Failure Keeps Draft",
+  tags: ["interaction"],
+  args: {
+    relationCandidates: ["親候補"],
+    onCreateGroup: fn(async () => {
+      throw { graphQLErrors: [{ extensions: { reason: "CYCLE" } }] }
+    }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    await userEvent.type(dialog.getByPlaceholderText("Group名"), "作成希望Group")
+    const parentInput = dialog.getAllByPlaceholderText("Groupを検索")[0]
+    await userEvent.click(parentInput)
+    await userEvent.type(parentInput, "親候補")
+    await userEvent.click(await within(document.body).findByRole("option", { name: /親候補/ }))
+    await userEvent.click(dialog.getByRole("button", { name: "作成" }))
+    await expect(args.onCreateGroup).toHaveBeenCalledExactlyOnceWith("作成希望Group", ["親候補"], [])
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("作成希望Group")
+    await expect(dialog.getByText("親候補")).toBeVisible()
+  },
+}
+
+/** GB-052: 編集成功時は名前と希望する最終relation状態を1要求で送る。 */
+export const EditNameAndRelationsTogether: Story = {
+  name: "Interaction · Edit Name And Relations Together",
+  tags: ["interaction"],
+  args: { relationCandidates: ["親候補"] },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const name = dialog.getByPlaceholderText("Group名")
+    await userEvent.clear(name)
+    await userEvent.type(name, "変更後Group")
+    const parentInput = dialog.getAllByPlaceholderText("Groupを検索")[0]
+    await userEvent.click(parentInput)
+    await userEvent.type(parentInput, "親候補")
+    await userEvent.click(await within(document.body).findByRole("option", { name: /親候補/ }))
+    await expect(args.onUpdateGroup).not.toHaveBeenCalled()
+    await userEvent.click(dialog.getByRole("button", { name: "保存" }))
+    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith("a", "変更後Group", ["親候補"], [])
+    await waitFor(() => expect(within(document.body).queryByRole("dialog", { name: "Groupを編集" })).not.toBeInTheDocument())
+  },
+}
