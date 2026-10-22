@@ -35,6 +35,7 @@ import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./gr
 import { RelationEditor } from "./RelationEditor"
 import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
+import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
 
@@ -446,20 +447,9 @@ export function GroupBrowser({
     />
   )
 
-  const mediaPageFeedback = mediaPageState === "error" ? (
-    <Alert color="red" title="追加のMediaを取得できませんでした" mt="sm">
-      <Stack gap="xs" align="flex-start">
-        <Text size="sm">取得済みのMediaは引き続き閲覧できます。</Text>
-        <Button size="xs" variant="light" onClick={onRetryMediaPage}>
-          再試行
-        </Button>
-      </Stack>
-    </Alert>
-  ) : mediaPageState === "loading" ? (
-    <Text size="xs" c="dimmed" mt="sm" role="status">
-      追加のMediaを取得しています
-    </Text>
-  ) : null
+  const mediaPageFeedback = (
+    <GroupMediaPageFeedback state={mediaPageState} onRetry={onRetryMediaPage} />
+  )
 
   const createDialog = (
     <Modal
