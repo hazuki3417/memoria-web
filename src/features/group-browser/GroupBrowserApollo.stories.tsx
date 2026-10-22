@@ -1,7 +1,7 @@
 import { MockedProvider, type MockedResponse } from "@apollo/client/testing"
 import type { Meta, StoryObj } from "@storybook/react"
 import { GraphQLError } from "graphql"
-import { expect, userEvent, waitFor, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import {
   BrowseGroupsDocument,
   CreateBrowserGroupDocument,
@@ -188,6 +188,19 @@ const createdGroup: OperationCreateBrowserGroupMutation = {
   },
 }
 
+// Invoked only after Apollo's MockLink matches the operation and its variables.
+const createSuccessReply = fn(() => ({ data: createdGroup }))
+const createRejectedReply = fn(() => ({
+  errors: [new GraphQLError("同名のGroupが存在します", {
+    extensions: { code: "DUPLICATE_NAME" },
+  })],
+}))
+const createUnknownReply = fn(() => ({
+  errors: [new GraphQLError("作成結果を確認できません", {
+    extensions: { code: "UNKNOWN_OUTCOME" },
+  })],
+}))
+
 async function submitCreation(canvasElement: HTMLElement) {
   const canvas = within(canvasElement)
   await userEvent.click(await canvas.findByRole("button", { name: "Groupを作成" }))
@@ -210,7 +223,7 @@ export const CreateMutationSuccess: Story = {
           emptyReply,
           {
             request: createRequest,
-            result: { data: createdGroup },
+            result: createSuccessReply,
           } satisfies MockedResponse<OperationCreateBrowserGroupMutation>,
           emptyReply,
         ]}
@@ -221,8 +234,10 @@ export const CreateMutationSuccess: Story = {
     ),
   ],
   play: async ({ canvasElement }) => {
+    createSuccessReply.mockClear()
     await submitCreation(canvasElement)
     await waitFor(() => {
+      expect(createSuccessReply).toHaveBeenCalledTimes(1)
       expect(
         within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
       ).not.toBeInTheDocument()
@@ -242,11 +257,7 @@ export const CreateMutationRejected: Story = {
           emptyReply,
           {
             request: createRequest,
-            result: {
-              errors: [new GraphQLError("同名のGroupが存在します", {
-                extensions: { code: "DUPLICATE_NAME" },
-              })],
-            },
+            result: createRejectedReply,
           },
         ]}
         addTypename={false}
@@ -256,8 +267,10 @@ export const CreateMutationRejected: Story = {
     ),
   ],
   play: async ({ canvasElement }) => {
+    createRejectedReply.mockClear()
     await submitCreation(canvasElement)
     await waitFor(() => {
+      expect(createRejectedReply).toHaveBeenCalledTimes(1)
       expect(within(document.body).getByRole("dialog", { name: "Groupを作成" })).toBeVisible()
     })
     const dialog = within(
@@ -277,7 +290,7 @@ export const CreateMutationUnknown: Story = {
       <MockedProvider
         mocks={[
           emptyReply,
-          { request: createRequest, error: new Error("Failed to fetch") },
+          { request: createRequest, result: createUnknownReply },
         ]}
         addTypename={false}
       >
@@ -286,8 +299,10 @@ export const CreateMutationUnknown: Story = {
     ),
   ],
   play: async ({ canvasElement }) => {
+    createUnknownReply.mockClear()
     await submitCreation(canvasElement)
     await waitFor(() => {
+      expect(createUnknownReply).toHaveBeenCalledTimes(1)
       expect(within(document.body).getByRole("dialog", { name: "Groupを作成" })).toBeVisible()
     })
     const dialog = within(
