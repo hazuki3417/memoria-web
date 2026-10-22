@@ -587,3 +587,40 @@ export const RelationsAreMetadata: Story = {
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
   },
 }
+
+
+/** GB-092/093: Compactで選択後はDetail見出しへ、戻ると起点ItemへFocusを復帰する。 */
+export const CompactSelectionRestoresFocus: Story = {
+  name: "Interaction · Compact Selection Restores Focus",
+  tags: ["interaction"],
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const origin = canvas.getByRole("button", { name: /アルバムA/ })
+    origin.focus()
+    await expect(origin).toHaveFocus()
+    await userEvent.keyboard("{Enter}")
+    await expect(args.onSelectGroup).toHaveBeenLastCalledWith("a")
+    const back = await canvas.findByRole("button", { name: "一覧に戻る" })
+    await expect(canvas.getByText("アルバムA")).toHaveFocus()
+    await userEvent.click(back)
+    await expect(await canvas.findByRole("button", { name: /アルバムA/ })).toHaveFocus()
+    await expect(args.onSelectGroup).toHaveBeenLastCalledWith(null)
+  },
+}
+
+/** GB-095: Escapeで編集を閉じても保存Mutationは実行しない。 */
+export const EditEscapeDiscardsDraft: Story = {
+  name: "Interaction · Edit Escape Discards Draft",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    await userEvent.type(dialog.getByPlaceholderText("Group名"), "変更")
+    await userEvent.keyboard("{Escape}")
+    await waitFor(() => expect(within(document.body).queryByRole("dialog", { name: "Groupを編集" })).not.toBeInTheDocument())
+    await expect(args.onUpdateGroup).not.toHaveBeenCalled()
+  },
+}
