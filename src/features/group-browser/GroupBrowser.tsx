@@ -6,7 +6,6 @@ import {
   Button,
   Divider,
   Group,
-  Modal,
   Center,
   Loader,
   Paper,
@@ -31,8 +30,7 @@ import { useGroupRef } from "react-resizable-panels"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
-import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./groupName"
-import { RelationEditor } from "./RelationEditor"
+import { validGroupName } from "./groupName"
 import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
@@ -443,7 +441,7 @@ export function GroupBrowser({
   )
 
   const submitEdit = async () => {
-  if (!selected || !validGroupName(draftName)) return
+    if (!selected || !validGroupName(draftName)) return
   if (conflictNeedsReview || !detailsReady) return
   let conflict = false
   let uncertain = false
@@ -478,7 +476,7 @@ export function GroupBrowser({
     return
   }
   if (result === "ok") edit.close()
-            }
+  }
 
   const editDialog = (
     <GroupEditDialog
