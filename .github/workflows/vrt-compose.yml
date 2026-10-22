@@ -4,10 +4,16 @@ on:
   pull_request:
     branches: [develop]
     paths:
-      - "compose.yaml"
-      - "e2e/storybook-visual/**"
-      - "playwright.storybook-visual.config.ts"
-      - ".github/workflows/vrt-compose.yml"
+      - "src/components/**"
+      - "src/features/**"
+      - "src/prototypes/**"
+      - "src/lib/**"
+      - "src/providers/**"
+      - "src/infrastructure/**"
+      - "src/app/globals.css"
+      - "src/app/layout.tsx"
+      - "package.json"
+      - "package-lock.json"
   workflow_dispatch:
     inputs:
       mode:
