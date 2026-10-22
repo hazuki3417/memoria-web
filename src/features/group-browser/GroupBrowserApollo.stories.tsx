@@ -105,3 +105,53 @@ export const RetryAfterError: Story = {
     await expect(await canvas.findByRole("button", { name: "Groupを作成" })).toBeVisible()
   },
 }
+
+
+/** GB-010: 再試行が再び失敗してもError表示を維持し、次の明示的なRetryで回復する。 */
+export const RetryFailsThenRecovers: Story = {
+  name: "Integration · Retry Fails Then Recovers",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[failedReply, failedReply, emptyReply]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const message = "Group一覧の取得に失敗しました。再試行できます。"
+    await canvas.findByText(message)
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(await canvas.findByText(message)).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(await canvas.findByRole("button", { name: "Groupを作成" })).toBeVisible()
+    await expect(canvas.queryByText(message)).not.toBeInTheDocument()
+  },
+}
+
+/** GB-011: Apollo Queryが空のScopeでも作成Dialogを開閉でき、Cancel後は一覧の空状態へ戻る。 */
+export const EmptyScopeCreateCancel: Story = {
+  name: "Integration · Empty Scope Create Cancel",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[emptyReply]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(await canvas.findByRole("button", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
+    await userEvent.type(dialog.getByPlaceholderText("Group名"), "未保存のGroup")
+    await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
+    await expect(
+      within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
+    ).not.toBeInTheDocument()
+    await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeVisible()
+  },
+}
