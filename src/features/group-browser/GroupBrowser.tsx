@@ -37,6 +37,7 @@ import { MediaDetailDialog } from "@/features/media-detail"
 import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./groupName"
 import { RelationEditor } from "./RelationEditor"
 import { MediaGrid } from "./MediaGrid"
+import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
 
 export type GroupBrowserGroup = {
@@ -167,25 +168,6 @@ const relationCandidateNames = [
   "アーカイブ",
   "未整理",
 ]
-
-function RelationItems({ names }: { names: string[] }) {
-  if (names.length === 0) {
-    return (
-      <Text size="sm" c="dimmed">
-        なし
-      </Text>
-    )
-  }
-  return (
-    <Group gap={6}>
-      {[...names].sort().map((name) => (
-        <Badge key={name} variant="light">
-          {name}
-        </Badge>
-      ))}
-    </Group>
-  )
-}
 
 export function GroupBrowser({
   contextKind = "personal",
@@ -475,50 +457,12 @@ export function GroupBrowser({
     ) : null
 
   const relationDetailSection = (
-    <>
-      <UnstyledButton
-        onClick={relations.toggle}
-        px="sm"
-        py={6}
-        aria-expanded={relationsOpened}
-        aria-label="このGroupとの関係を開閉"
-      >
-        <Group gap="xs" wrap="nowrap">
-          <IconChevronRight
-            size={16}
-            style={{
-              transform: relationsOpened
-                ? "rotate(90deg)"
-                : "rotate(0deg)",
-              transition: "transform 200ms ease",
-            }}
-          />
-          <Text size="xs" c="dimmed">
-            このGroupとの関係
-          </Text>
-        </Group>
-      </UnstyledButton>
-      <Collapse in={relationsOpened} transitionDuration={200}>
-        <Box px="lg" pb="sm">
-          <SimpleGrid cols={2} spacing="lg">
-            <Stack gap={4}>
-              <Text size="xs" c="dimmed">
-                Parents
-              </Text>
-              <RelationItems
-                names={selected?.parentNames ?? []}
-              />
-            </Stack>
-            <Stack gap={4}>
-              <Text size="xs" c="dimmed">
-                Children
-              </Text>
-              <RelationItems names={selected?.childNames ?? []} />
-            </Stack>
-          </SimpleGrid>
-        </Box>
-      </Collapse>
-    </>
+    <GroupRelationSection
+      opened={relationsOpened}
+      onToggle={relations.toggle}
+      parentNames={selected?.parentNames ?? []}
+      childNames={selected?.childNames ?? []}
+    />
   )
 
   const mediaPageFeedback = mediaPageState === "error" ? (
