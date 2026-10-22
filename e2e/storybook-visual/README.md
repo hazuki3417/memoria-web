@@ -36,7 +36,7 @@ npm run test:visual:report
 
 公式Playwright Dockerイメージ`mcr.microsoft.com/playwright:v1.62.1-noble`を共通利用する。環境変数`MEMORIA_VRT_IMAGE`でイメージを上書きできるが、生成と比較では同一イメージを指定する。タグはまだdigest未固定であり、実機検証後に固定する。Playwrightはlockfileの`1.62.1`を要求し、Node.js 24との互換性を撮影前に検査する。公式イメージのNode.js 24対応は未確認であり、不一致の場合は**撮影を開始せず失敗する**。専用イメージの必要性は結果を踏まえ再協議する。
 
-Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-node-modules`へ分離する。one-shot起動ごとに`npm ci`を実行し、依存状態をlockfileに合わせる。実行ユーザーは既定でUID/GID 1000。必要なら`VRT_UID`と`VRT_GID`をホストに合わせて指定する。Volumeへの書き込み権限、Linux/WSL2での動作、フォント・画像一致、Baselineの再現性、実際のテスト成功はいずれも未検証。PR上の動作確認専用Workflow（`.github/workflows/vrt-compose.yml`）を追加する。これはCompose設定・実行環境と通常比較を検証し、Baselineを更新・コミットしない。承認済みBaselineが存在しない間、比較は失敗する可能性があるため、環境構築の失敗とBaseline未登録を区別する。通常のQuality Gateへの統合・必須チェック化は後続Phaseで判断する。
+Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-node-modules`へ分離する。one-shot起動ごとに`npm ci`を実行し、依存状態をlockfileに合わせる。公式Playwrightイメージのデフォルトユーザー（root）で実行し、初期状態でroot所有のnamed volumeへ`npm ci`を書き込めるようにする。これは初回CIで発生した`EACCES`への暫定対応であり、bind mount先に生成されるBaselineやレポートがroot所有になる可能性がある。実運用前にファイル所有権と非root化を検討する。Linux/WSL2での動作、フォント・画像一致、Baselineの再現性、実際のテスト成功はいずれも未検証。PR上の動作確認専用Workflow（`.github/workflows/vrt-compose.yml`）を追加する。これはCompose設定・実行環境と通常比較を検証し、Baselineを更新・コミットしない。承認済みBaselineが存在しない間、比較は失敗する可能性があるため、環境構築の失敗とBaseline未登録を区別する。通常のQuality Gateへの統合・必須チェック化は後続Phaseで判断する。
 
 ## Baseline作成・比較・承認フロー（Phase 1）
 
