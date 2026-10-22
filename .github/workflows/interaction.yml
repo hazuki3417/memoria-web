@@ -1,4 +1,4 @@
-name: Storybook Interaction
+name: CI / Storybook Interaction
 
 on:
   pull_request:
