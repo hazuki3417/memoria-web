@@ -40,6 +40,8 @@ import { GroupCreateDialog } from "./GroupCreateDialog"
 import { GroupEditDialog } from "./GroupEditDialog"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { creationFailureDescription } from "./groupCreationFailureDescription"
+import { filterVisibleGroups } from "./groupSearch"
+import { useGroupSearchState } from "./useGroupSearchState"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
 
 export type GroupBrowserGroup = {
@@ -263,8 +265,7 @@ export function GroupBrowser({
     })
   }
 
-  const [query, setQuery] = useState("")
-  const [appliedQuery, setAppliedQuery] = useState("")
+  const { query, setQuery, appliedQuery, setAppliedQuery } = useGroupSearchState()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = useMemo(
@@ -310,17 +311,10 @@ export function GroupBrowser({
   const [draftChildren, setDraftChildren] = useState<string[]>([])
   const [conflictNeedsReview, setConflictNeedsReview] = useState(false)
 
-  const visibleGroups = useMemo(() => {
-    const normalized = appliedQuery.trim()
-    if (!normalized) return allGroups
-    return allGroups.filter((group) =>
-      groupsData !== undefined
-        ? group.name.includes(normalized)
-        : group.name
-            .toLocaleLowerCase()
-            .includes(normalized.toLocaleLowerCase()),
-    )
-  }, [appliedQuery, allGroups, groupsData])
+  const visibleGroups = useMemo(
+    () => filterVisibleGroups(allGroups, appliedQuery, groupsData !== undefined),
+    [allGroups, appliedQuery, groupsData],
+  )
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
@@ -476,7 +470,7 @@ export function GroupBrowser({
       return
     }
     if (result === "ok") edit.close()
-    }
+  }
 
   const editDialog = (
     <GroupEditDialog
