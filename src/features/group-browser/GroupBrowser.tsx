@@ -38,6 +38,7 @@ import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
 import { GroupDeleteDialog } from "./GroupDeleteDialog"
+import { GroupCreateDialog } from "./GroupCreateDialog"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { creationFailureDescription } from "./groupCreationFailureDescription"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
@@ -424,66 +425,20 @@ export function GroupBrowser({
   )
 
   const createDialog = (
-    <Modal
+    <GroupCreateDialog
       opened={createOpened}
+      name={createName}
+      parents={createParents}
+      children={createChildren}
+      candidates={candidates ?? relationCandidateNames}
+      canManage={canManage}
+      saving={saving}
+      onNameChange={setCreateName}
+      onParentsChange={setCreateParents}
+      onChildrenChange={setCreateChildren}
       onClose={create.close}
-      title="Groupを作成"
-      size="lg"
-      centered
-      withCloseButton={false}
-    >
-      <Stack gap="lg">
-        <TextInput
-          label={
-            <Group justify="space-between" wrap="nowrap">
-              <Text component="span" size="sm" fw={500}>
-                名前
-              </Text>
-              <Text component="span" size="xs" c="dimmed">
-                {countGroupNameGraphemes(createName)} / 100
-              </Text>
-            </Group>
-          }
-          value={createName}
-          onChange={(event) => {
-            const value = event.currentTarget.value
-            if (canEnterGroupName(value)) setCreateName(value)
-          }}
-          placeholder="Group名"
-          styles={{ label: { display: "block", width: "100%" } }}
-          required
-        />
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-          <RelationEditor
-            candidates={candidates ?? relationCandidateNames}
-            label="Parents"
-            names={createParents}
-            oppositeNames={createChildren}
-            onChange={setCreateParents}
-            currentGroupName={createName.trim()}
-          />
-          <RelationEditor
-            candidates={candidates ?? relationCandidateNames}
-            label="Children"
-            names={createChildren}
-            oppositeNames={createParents}
-            onChange={setCreateChildren}
-            currentGroupName={createName.trim()}
-          />
-        </SimpleGrid>
-        <Group justify="flex-end">
-          <Button variant="default" onClick={create.close}>
-            キャンセル
-          </Button>
-          <Button
-            onClick={submitCreate}
-            disabled={!canManage || !validGroupName(createName) || saving}
-          >
-            作成
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+      onSubmit={submitCreate}
+    />
   )
 
   const editDialog = (
