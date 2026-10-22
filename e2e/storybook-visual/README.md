@@ -19,22 +19,24 @@ Storybookはテスト起動時に自動起動します。基準画像は `e2e/st
 
 **現時点では基準画像の生成と実行成功は未検証です。** 基準画像がない状態では比較テストは成功しません。
 
-## Dockerでの撮影（Phase 1）
+## Docker Composeでの撮影（Phase 1）
 
-ローカルでは公式Playwright Dockerイメージ `mcr.microsoft.com/playwright:v1.62.1-noble` を使用する。リポジトリの依存LockはPlaywright `1.62.1`。撮影画像はDockerのbind mountによりホストのGit作業ツリーに保存する。
+`compose.yaml`の`vrt`サービスは`profiles: [vrt]`により通常の`docker compose up`では起動しない。**常駐サービスではなくone-shot**として`docker compose run --rm`で実行し、終了時にコンテナを削除する。Storybookの起動・停止はPlaywright設定のwebServerが担当する。
 
 ```bash
-# 初回Baseline作成／承認済みのUI変更時に限定
-bash scripts/test-visual-docker.sh update
-# 通常の比較（Baselineを更新しない）
-bash scripts/test-visual-docker.sh compare
-# 失敗レポートはホストで確認
+# 通常比較（Baselineを変更しない）
+docker compose --profile vrt run --rm vrt
+
+# Baseline初回生成・意図した変更時の明示更新
+docker compose --profile vrt run --rm -e VRT_UPDATE=1 vrt
+
+# HTML Reportの確認
 npm run test:visual:report
 ```
 
-`MEMORIA_VRT_IMAGE` でイメージ指定を上書きできる（検証・digest固定用途）。デフォルトのタグ自体はdigest未固定のため、継続運用前に検証済みdigestへ固定する。**Baseline生成と比較では必ず同じイメージを指定する。** Dockerランナーは `node -v` 相当のNode.js 24検査とLockfile内のPlaywrightバージョン検査を行い、一致しない場合は `npm ci` や撮影の前に失敗する。公式イメージにNode.js 24が含まれることは未確認であり、失敗した場合はBaselineを生成せず、専用イメージ化等の方針を再検討する。
+公式Playwright Dockerイメージ`mcr.microsoft.com/playwright:v1.62.1-noble`を共通利用する。環境変数`MEMORIA_VRT_IMAGE`でイメージを上書きできるが、生成と比較では同一イメージを指定する。タグはまだdigest未固定であり、実機検証後に固定する。Playwrightはlockfileの`1.62.1`を要求し、Node.js 24との互換性を撮影前に検査する。公式イメージのNode.js 24対応は未確認であり、不一致の場合は**撮影を開始せず失敗する**。専用イメージの必要性は結果を踏まえ再協議する。
 
-依存インストールはコンテナ内で `npm ci` を実行し、作業ツリーにマウントされた `node_modules` を更新する。Windows/macOS由来の `node_modules` を共有しないこと。Linux/WSL2で動作確認するまで、実行成功・フォント一致・Baseline再現性は未検証と扱う。Dockerデーモンへの接続とDockerイメージの取得にはネットワークが必要。CIへの組み込みは後続Phaseで扱う。
+Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-node-modules`へ分離する。one-shot起動ごとに`npm ci`を実行し、依存状態をlockfileに合わせる。実行ユーザーは既定でUID/GID 1000。必要なら`VRT_UID`と`VRT_GID`をホストに合わせて指定する。Volumeへの書き込み権限、Linux/WSL2での動作、フォント・画像一致、Baselineの再現性、実際のテスト成功はいずれも未検証。CIへの自動導入は後続Phaseで判断する。
 
 ## Baseline作成・比較・承認フロー（Phase 1）
 
