@@ -442,41 +442,41 @@ export function GroupBrowser({
 
   const submitEdit = async () => {
     if (!selected || !validGroupName(draftName)) return
-  if (conflictNeedsReview || !detailsReady) return
-  let conflict = false
-  let uncertain = false
-  const result = await runAction(async () => {
-    const outcome = await onUpdateGroup?.(
-      selected.id,
-      draftName.trim(),
-      draftParents,
-      draftChildren,
-    )
-    if (outcome === "conflict") conflict = true
-    if (outcome === "unknown") uncertain = true
-  })
-  if (conflict || uncertain) {
-    setConflictNeedsReview(true)
-    if (uncertain) {
+    if (conflictNeedsReview || !detailsReady) return
+    let conflict = false
+    let uncertain = false
+    const result = await runAction(async () => {
+      const outcome = await onUpdateGroup?.(
+        selected.id,
+        draftName.trim(),
+        draftParents,
+        draftChildren,
+      )
+      if (outcome === "conflict") conflict = true
+      if (outcome === "unknown") uncertain = true
+    })
+    if (conflict || uncertain) {
+      setConflictNeedsReview(true)
+      if (uncertain) {
+        showNotification({
+          kind: "error",
+          title: "保存結果を確認できませんでした",
+          description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
+        })
+      }
+      return
+    }
+    if (result === "error") {
       showNotification({
         kind: "error",
-        title: "保存結果を確認できませんでした",
-        description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
+        title: "Groupを更新できませんでした",
+        description:
+          "最新のGroup情報を確認してから、再度お試しください。",
       })
+      return
     }
-    return
-  }
-  if (result === "error") {
-    showNotification({
-      kind: "error",
-      title: "Groupを更新できませんでした",
-      description:
-        "最新のGroup情報を確認してから、再度お試しください。",
-    })
-    return
-  }
-  if (result === "ok") edit.close()
-  }
+    if (result === "ok") edit.close()
+    }
 
   const editDialog = (
     <GroupEditDialog
