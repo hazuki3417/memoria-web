@@ -140,7 +140,9 @@ jobs:
           fi
           git switch -c "$CANDIDATE"
           git commit -m "test(vrt): generate baseline candidates for $TARGET"
-          remote_sha="$(gh api "repos/$GH_REPO/git/ref/heads/$CANDIDATE" --jq '.object.sha' 2>/dev/null || true)"
+          # ls-remote returns success with empty output when the ref is absent.
+          # Authentication/network errors fail rather than being mistaken for a missing ref.
+          remote_sha="$(git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" ls-remote --heads origin "refs/heads/$CANDIDATE" | cut -f1)"
           if [[ -n "$remote_sha" ]]; then
             git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push --force-with-lease="refs/heads/$CANDIDATE:$remote_sha" origin "HEAD:refs/heads/$CANDIDATE"
           else
