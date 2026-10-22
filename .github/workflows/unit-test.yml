@@ -31,14 +31,6 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - name: Restore installed dependencies
-        id: dependency-cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node24-modules-${{ hashFiles('package-lock.json') }}
-      - name: Install dependencies on cache miss
-        if: steps.dependency-cache.outputs.cache-hit != 'true'
-        run: npm ci
+      - run: npm ci
       - name: Vitest unit tests
         run: npm run test:unit
