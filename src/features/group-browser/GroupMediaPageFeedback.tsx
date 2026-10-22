@@ -20,9 +20,9 @@ export function GroupMediaPageFeedback({
     </Alert>
   ) : state === "loading" ? (
     <Center py="md" role="status">
-      <Stack align="center">
-        <Loader />
-        <Text size="sm" c="dimmed">追加のMediaを取得しています</Text>
+      <Stack align="center" gap="xs">
+        <Loader size="sm" />
+        <Text size="xs" c="dimmed">追加のMediaを取得しています</Text>
       </Stack>
     </Center>
   ) : null
