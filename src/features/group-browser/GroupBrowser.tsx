@@ -14,6 +14,7 @@ import {
   Stack,
   Text,
   TextInput,
+  ThemeIcon,
   UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
@@ -251,6 +252,25 @@ export function GroupBrowser({
     [allGroups, appliedQuery, groupsData],
   )
 
+  const emptyGroupState = allGroups.length === 0 && !appliedQuery.trim() ? (
+    <Center mih={360}>
+      <Stack align="center" maw={420}>
+        <ThemeIcon size={48} radius="xl" variant="light">
+          <IconFolderPlus size={24} />
+        </ThemeIcon>
+        <Text fw={700} size="lg">まだGroupがありません</Text>
+        <Text size="sm" c="dimmed" ta="center">
+          最初のGroupを作成すると、ここからMediaを整理できます。
+        </Text>
+        {!hideManagementActions && (
+          <Button leftSection={<IconFolderPlus size={16} />} onClick={openCreate} disabled={!canManage}>
+            Groupを作成
+          </Button>
+        )}
+      </Stack>
+    </Center>
+  ) : null
+
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
   const openEdit = () => {
@@ -468,6 +488,7 @@ export function GroupBrowser({
               </Box>
               <Divider />
               <ScrollArea flex={1}>
+                {emptyGroupState}
                 <Box
                   p="sm"
                   style={{
@@ -652,6 +673,7 @@ export function GroupBrowser({
               </Box>
               <Divider />
               <ScrollArea flex={1}>
+                {emptyGroupState}
                 <Box
                   p="sm"
                   style={{
