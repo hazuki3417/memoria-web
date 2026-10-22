@@ -64,16 +64,9 @@ jobs:
           echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
         with:
+          ref: ${{ steps.request.outputs.target }}
           persist-credentials: false
           fetch-depth: 0
-      - name: Fetch exact target branch
-        env:
-          TARGET: ${{ steps.request.outputs.target }}
-        run: |
-          set -euo pipefail
-          git ls-remote --exit-code --heads origin "refs/heads/$TARGET" >/dev/null
-          git fetch origin "+refs/heads/$TARGET:refs/remotes/origin/$TARGET"
-          git switch --detach "refs/remotes/origin/$TARGET"
       - name: Capture source commit
         id: source
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -110,20 +103,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ needs.generate.outputs.target }}
           persist-credentials: false
           fetch-depth: 0
-      - name: Prepare exact generated target
+      - name: Verify exact generated target
         env:
-          TARGET: ${{ needs.generate.outputs.target }}
           SOURCE_SHA: ${{ needs.generate.outputs.source_sha }}
         run: |
-          set -euo pipefail
-          git fetch origin "+refs/heads/$TARGET:refs/remotes/origin/$TARGET"
-          if [[ "$(git rev-parse "refs/remotes/origin/$TARGET")" != "$SOURCE_SHA" ]]; then
+          if [[ "$(git rev-parse HEAD)" != "$SOURCE_SHA" ]]; then
             echo "Target branch changed since screenshot generation. Please retry." >&2
             exit 1
           fi
-          git switch --detach "$SOURCE_SHA"
       - name: Download candidate screenshots
         uses: actions/download-artifact@v4
         with:
