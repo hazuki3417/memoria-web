@@ -39,6 +39,7 @@ import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
 import { GroupDeleteDialog } from "./GroupDeleteDialog"
 import { GroupCreateDialog } from "./GroupCreateDialog"
+import { GroupEditDialog } from "./GroupEditDialog"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { creationFailureDescription } from "./groupCreationFailureDescription"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
@@ -441,117 +442,64 @@ export function GroupBrowser({
     />
   )
 
+  const submitEdit = async () => {
+  if (!selected || !validGroupName(draftName)) return
+  if (conflictNeedsReview || !detailsReady) return
+  let conflict = false
+  let uncertain = false
+  const result = await runAction(async () => {
+    const outcome = await onUpdateGroup?.(
+      selected.id,
+      draftName.trim(),
+      draftParents,
+      draftChildren,
+    )
+    if (outcome === "conflict") conflict = true
+    if (outcome === "unknown") uncertain = true
+  })
+  if (conflict || uncertain) {
+    setConflictNeedsReview(true)
+    if (uncertain) {
+      showNotification({
+        kind: "error",
+        title: "保存結果を確認できませんでした",
+        description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
+      })
+    }
+    return
+  }
+  if (result === "error") {
+    showNotification({
+      kind: "error",
+      title: "Groupを更新できませんでした",
+      description:
+        "最新のGroup情報を確認してから、再度お試しください。",
+    })
+    return
+  }
+  if (result === "ok") edit.close()
+            }
+
   const editDialog = (
-    <Modal
+    <GroupEditDialog
       opened={editOpened}
+      name={draftName}
+      parents={draftParents}
+      children={draftChildren}
+      candidates={candidates ?? relationCandidateNames}
+      currentGroupName={selected?.name ?? ""}
+      availability={relationAvailability}
+      canManage={canManage}
+      detailsReady={detailsReady}
+      conflictNeedsReview={conflictNeedsReview}
+      saving={saving}
+      onNameChange={setDraftName}
+      onParentsChange={setDraftParents}
+      onChildrenChange={setDraftChildren}
+      onDelete={deletion.open}
       onClose={edit.close}
-      title="Groupを編集"
-      size="lg"
-      centered
-      withCloseButton={false}
-    >
-      <Stack gap="lg">
-        <TextInput
-          label={
-            <Group justify="space-between" wrap="nowrap">
-              <Text component="span" size="sm" fw={500}>
-                名前
-              </Text>
-              <Text component="span" size="xs" c="dimmed">
-                {countGroupNameGraphemes(draftName)} / 100
-              </Text>
-            </Group>
-          }
-          value={draftName}
-          onChange={(event) => {
-            const value = event.currentTarget.value
-            if (canEnterGroupName(value)) setDraftName(value)
-          }}
-          placeholder="Group名"
-          styles={{ label: { display: "block", width: "100%" } }}
-        />
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-          <RelationEditor
-            candidates={candidates ?? relationCandidateNames}
-            label="Parents"
-            names={draftParents}
-            oppositeNames={draftChildren}
-            onChange={setDraftParents}
-            currentGroupName={selected?.name ?? ""}
-            availability={relationAvailability}
-          />
-          <RelationEditor
-            candidates={candidates ?? relationCandidateNames}
-            label="Children"
-            names={draftChildren}
-            oppositeNames={draftParents}
-            onChange={setDraftChildren}
-            currentGroupName={selected?.name ?? ""}
-            availability={relationAvailability}
-          />
-        </SimpleGrid>
-        <Divider />
-        <Box pos="relative">
-          <Button variant="subtle" color="red" onClick={deletion.open}>
-            削除
-          </Button>
-          <Button
-            variant="default"
-            onClick={edit.close}
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-            }}
-          >
-            キャンセル
-          </Button>
-          <Button
-            onClick={async () => {
-              if (!selected || !validGroupName(draftName)) return
-              if (conflictNeedsReview || !detailsReady) return
-              let conflict = false
-              let uncertain = false
-              const result = await runAction(async () => {
-                const outcome = await onUpdateGroup?.(
-                  selected.id,
-                  draftName.trim(),
-                  draftParents,
-                  draftChildren,
-                )
-                if (outcome === "conflict") conflict = true
-                if (outcome === "unknown") uncertain = true
-              })
-              if (conflict || uncertain) {
-                setConflictNeedsReview(true)
-                if (uncertain) {
-                  showNotification({
-                    kind: "error",
-                    title: "保存結果を確認できませんでした",
-                    description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
-                  })
-                }
-                return
-              }
-              if (result === "error") {
-                showNotification({
-                  kind: "error",
-                  title: "Groupを更新できませんでした",
-                  description:
-                    "最新のGroup情報を確認してから、再度お試しください。",
-                })
-                return
-              }
-              if (result === "ok") edit.close()
-            }}
-            disabled={!canManage || !detailsReady || conflictNeedsReview || !validGroupName(draftName) || saving}
-            style={{ position: "absolute", right: 0 }}
-          >
-            保存
-          </Button>
-        </Box>
-      </Stack>
-    </Modal>
+      onSubmit={submitEdit}
+    />
   )
 
   const confirmDelete = async () => {
