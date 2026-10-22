@@ -1,7 +1,7 @@
 "use client"
 
 import { Box, Center, Loader, Stack, Text } from "@mantine/core"
-import { IconAlertCircle, IconPhoto, IconPhotoOff, IconRefresh } from "@tabler/icons-react"
+import { IconAlertCircle, IconPhotoOff, IconRefresh } from "@tabler/icons-react"
 import { useState, type ReactNode } from "react"
 
 export type MediaTileState =
@@ -65,7 +65,7 @@ export function MediaTile({
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />
       ) : resolved.status === "loading" ? (
-        <TileMessage icon={<Stack align="center" gap={6}><IconPhoto size={28} stroke={1.5} /><Loader size="xs" /></Stack>} title="読み込み中" />
+        <TileMessage icon={<Loader size="sm" />} title="読み込み中" />
       ) : resolved.status === "processing" ? (
         <TileMessage icon={<IconRefresh size={28} stroke={1.5} />} title="変換しています" />
       ) : resolved.status === "processing-error" ? (
