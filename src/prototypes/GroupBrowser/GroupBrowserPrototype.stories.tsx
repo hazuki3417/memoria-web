@@ -11,11 +11,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Wide: Story = {
-  name: "Visual · Wide",
+  name: "Wide",
   tags: ["visual"],}
 
 export const Compact: Story = {
-  name: "Visual · Compact",
+  name: "Compact",
   tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
