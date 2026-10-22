@@ -1,0 +1,45 @@
+name: Storybook Interaction
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'devbox.json'
+      - 'devbox.lock'
+      - 'scripts/**'
+      - 'tsconfig.json'
+      - 'next-env.d.ts'
+      - 'biome.json'
+      - '.storybook/**'
+      - 'storybook-assets/**'
+      - 'public/**'
+      - 'vitest.storybook.config.ts'
+      - 'vitest.shims.d.ts'
+      - '.github/workflows/interaction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  interaction-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Chromiumをインストール
+        run: npx playwright install --with-deps chromium
+      - name: Storybook Interaction Test
+        run: npm run test:interaction
