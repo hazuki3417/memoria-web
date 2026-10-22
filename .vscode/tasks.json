@@ -54,11 +54,11 @@
       }
     },
     {
-      "label": "test:vrt",
+      "label": "test:visual",
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"npm run test:vrt\"",
+      "command": "devbox run bash -c \"npm run test:visual\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -67,11 +67,11 @@
       }
     },
     {
-      "label": "test:vrt:update",
+      "label": "test:visual:update",
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"npm run test:vrt:update\"",
+      "command": "devbox run bash -c \"npm run test:visual:update\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
@@ -80,11 +80,11 @@
       }
     },
     {
-      "label": "test:vrt:report",
+      "label": "test:visual:report",
       "type": "shell",
       "isBackground": false,
       "problemMatcher": [],
-      "command": "devbox run bash -c \"npm run test:vrt:report\"",
+      "command": "devbox run bash -c \"npm run test:visual:report\"",
       "presentation": {
         "reveal": "silent",
         "panel": "dedicated",
