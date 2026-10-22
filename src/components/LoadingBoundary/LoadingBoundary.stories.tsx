@@ -16,8 +16,12 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Loading: Story = {}
+export const Loading: Story = {
+  name: "Visual · Loading",
+  tags: ["visual"],}
 
 export const Ready: Story = {
+  name: "Visual · Ready",
+  tags: ["visual"],
   args: { loading: false },
 }
