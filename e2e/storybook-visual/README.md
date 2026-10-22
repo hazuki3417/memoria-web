@@ -46,6 +46,20 @@ GitHubの「Actions」→「VRT Docker Compose smoke test」→「Run workflow�
 
 生成Artifactを取得して4枚の表示を設計と照合し、レビューを通過した画像だけを`e2e/storybook-visual/__screenshots__/`に登録する。その後`mode: compare`またはPR比較で成功を確認する。Artifactの取得だけではBaseline承認やGit反映は完了しない。**候補画像を自動的にコミットしない。**
 
+## Issue・GitHubプラグインからのBaseline生成PR依頼
+
+[Issue #147](https://github.com/hazuki3417/memoria-web/issues/147)に、リポジトリのOWNER/MEMBER/COLLABORATORが次の形式で**新規コメント**を投稿すると、Baseline候補PR生成Workflowを起動する。
+
+```text
+/vrt baseline feature/group-browser
+```
+
+GitHubプラグイン経由でも、明示された対象ブランチを用いて同じIssueへコメントすれば依頼できる。Workflow（`.github/workflows/vrt-baseline-request.yml`）はGitHub Actionsの`issue_comment`を利用するため、**Workflowがデフォルトブランチにマージされるまではコメントで起動できない**。手動の`workflow_dispatch`には`target_branch`を指定する。
+
+対象ブランチの最新コミットを読み取り専用ジョブでDocker撮影し、候補画像をArtifactへ保存。別の書き込み権限付きジョブが**画像だけ**を`chore/vrt-baseline-<branch-hash>`へコミットし、対象ブランチ宛てのPRを作成・更新する。撮影時点から対象ブランチが変わった場合はエラーにして再依頼する。同一対象への再実行では既存の未マージPRを使用し、自動生成専用ブランチを`--force-with-lease`で安全に置き換える（レビュー済み画像に差分が再発するため再レビュー必須）。差分がなければ新規コミットを作らない。PR承認・マージは**人間のみ**が実行する。
+
+このPR方式は既存のArtifactによる手動候補生成モードと区別する。Issueコメントへの依頼は任意のIssueではなく#147だけに限定する。GitHub Actionsのリポジトリ権限設定により`GITHUB_TOKEN`からPRを作成できない場合は、設定を確認するまで成功扱いしない。`GITHUB_TOKEN`で作成・更新したPRは通常のPRイベントWorkflowを自動起動しない場合があるので、必要なテストは別途確認する。
+
 ## Baseline作成・比較・承認フロー（Phase 1）
 
 Baselineの生成・更新と、通常の比較実行は**異なる操作**です。通常比較でBaselineを自動更新してはいけません。
