@@ -1,6 +1,6 @@
 # Storybook VRT
 
-StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較します。MDXのDocsは対象外です。既存のVRTとは独立した環境で、Quality GateやCIは追加しません。
+StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較します。MDXのDocsは対象外です。既存のVRTとは独立した環境で、既存Quality Gateには組み込まず、Phase 1では独立したCompose動作確認用のGitHub Actionsを利用します。
 
 ## 実行
 
@@ -36,7 +36,7 @@ npm run test:visual:report
 
 公式Playwright Dockerイメージ`mcr.microsoft.com/playwright:v1.62.1-noble`を共通利用する。環境変数`MEMORIA_VRT_IMAGE`でイメージを上書きできるが、生成と比較では同一イメージを指定する。タグはまだdigest未固定であり、実機検証後に固定する。Playwrightはlockfileの`1.62.1`を要求し、Node.js 24との互換性を撮影前に検査する。公式イメージのNode.js 24対応は未確認であり、不一致の場合は**撮影を開始せず失敗する**。専用イメージの必要性は結果を踏まえ再協議する。
 
-Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-node-modules`へ分離する。one-shot起動ごとに`npm ci`を実行し、依存状態をlockfileに合わせる。実行ユーザーは既定でUID/GID 1000。必要なら`VRT_UID`と`VRT_GID`をホストに合わせて指定する。Volumeへの書き込み権限、Linux/WSL2での動作、フォント・画像一致、Baselineの再現性、実際のテスト成功はいずれも未検証。CIへの自動導入は後続Phaseで判断する。
+Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-node-modules`へ分離する。one-shot起動ごとに`npm ci`を実行し、依存状態をlockfileに合わせる。実行ユーザーは既定でUID/GID 1000。必要なら`VRT_UID`と`VRT_GID`をホストに合わせて指定する。Volumeへの書き込み権限、Linux/WSL2での動作、フォント・画像一致、Baselineの再現性、実際のテスト成功はいずれも未検証。PR上の動作確認専用Workflow（`.github/workflows/vrt-compose.yml`）を追加する。これはCompose設定・実行環境と通常比較を検証し、Baselineを更新・コミットしない。承認済みBaselineが存在しない間、比較は失敗する可能性があるため、環境構築の失敗とBaseline未登録を区別する。通常のQuality Gateへの統合・必須チェック化は後続Phaseで判断する。
 
 ## Baseline作成・比較・承認フロー（Phase 1）
 
@@ -65,7 +65,7 @@ npm run test:visual:report
 
 **失敗時**はPlaywrightのHTML ReportとExpected / Actual / Diff画像を確認し、原因を調査する。Baseline欠落は未登録として扱い、通常比較から更新処理を呼ばない。 `play`付きStoryの撮影同期は未実装のため、対象に追加する前に完了待機・描画安定を検証する。
 
-**CI / Quality Gate**: このPhaseでは導入・変更しない。旧VRT実装のnpmコマンドは削除済み。旧VRTテスト・設定ファイル自体の整理は別途判断する。
+**CI / Quality Gate**: Compose検証用Workflowだけを追加し、既存Quality Gateには組み込まない。旧VRT実装のnpmコマンドは削除済み。旧VRTテスト・設定ファイル自体の整理は別途判断する。
 
 ## VRT対象Storyの指定
 
