@@ -18,7 +18,7 @@ services:
         node -e 'if (Number(process.versions.node.split(".")[0]) !== 24) { console.error("VRT requires Node.js 24; got " + process.version); process.exit(1) }'
         node -e 'const lock = require("./package-lock.json"); if (lock.packages["node_modules/playwright"].version !== "1.62.1") { console.error("VRT requires Playwright 1.62.1"); process.exit(1) }'
         npm ci
-        npm run "test:visual${VRT_UPDATE:+:update}"
+        npm run "test:visual$${VRT_UPDATE:+:update}"
 
 volumes:
   vrt-node-modules:
