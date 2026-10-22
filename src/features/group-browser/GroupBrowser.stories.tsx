@@ -468,9 +468,7 @@ export const EditPendingPreventsDoubleSubmit: Story = {
   name: "Interaction · Edit Pending Prevents Double Submit",
   tags: ["interaction"],
   args: {
-    onUpdateGroup: fn(() => new Promise<void>((resolve) => {
-      window.setTimeout(resolve, 300)
-    })),
+    onUpdateGroup: fn(() => new Promise<void>(() => undefined)),
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
@@ -506,9 +504,7 @@ export const DeletePendingPreventsDoubleSubmit: Story = {
   name: "Interaction · Delete Pending Prevents Double Submit",
   tags: ["interaction"],
   args: {
-    onDeleteGroup: fn(() => new Promise<void>((resolve) => {
-      window.setTimeout(resolve, 300)
-    })),
+    onDeleteGroup: fn(() => new Promise<void>(() => undefined)),
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
@@ -559,9 +555,7 @@ export const CreatePendingDisablesSubmission: Story = {
   name: "Interaction · Create Pending Disables Submission",
   tags: ["interaction"],
   args: {
-    onCreateGroup: fn(() => new Promise<void>((resolve) => {
-      window.setTimeout(resolve, 300)
-    })),
+    onCreateGroup: fn(() => new Promise<void>(() => undefined)),
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
