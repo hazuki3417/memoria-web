@@ -109,7 +109,7 @@ export const RetryAfterError: Story = {
     const canvas = within(canvasElement)
     await canvas.findByText("Group一覧の取得に失敗しました。再試行できます。")
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByRole("button", { name: "Groupを作成" })).toBeVisible()
+    await expect((await canvas.findAllByRole("button", { name: "Groupを作成" }))[0]).toBeVisible()
   },
 }
 
@@ -135,7 +135,7 @@ export const RetryFailsThenRecovers: Story = {
       expect(canvas.getByText(message)).toBeVisible()
     })
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByRole("button", { name: "Groupを作成" })).toBeVisible()
+    await expect((await canvas.findAllByRole("button", { name: "Groupを作成" }))[0]).toBeVisible()
     await expect(canvas.queryByText(message)).not.toBeInTheDocument()
   },
 }
@@ -153,7 +153,7 @@ export const EmptyScopeCreateCancel: Story = {
   ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole("button", { name: "Groupを作成" }))
+    await userEvent.click((await canvas.findAllByRole("button", { name: "Groupを作成" }))[0])
     const dialog = within(
       await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
     )
@@ -164,7 +164,7 @@ export const EmptyScopeCreateCancel: Story = {
         within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
       ).not.toBeInTheDocument()
     })
-    await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeVisible()
+    await expect(canvas.getAllByRole("button", { name: "Groupを作成" })[0]).toBeVisible()
   },
 }
 
@@ -206,7 +206,7 @@ const createUnknownReply = fn(() => ({
 
 async function submitCreation(canvasElement: HTMLElement) {
   const canvas = within(canvasElement)
-  await userEvent.click(await canvas.findByRole("button", { name: "Groupを作成" }))
+  await userEvent.click((await canvas.findAllByRole("button", { name: "Groupを作成" }))[0])
   const dialog = within(
     await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
   )
