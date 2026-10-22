@@ -18,6 +18,7 @@
     "check:lint": "next lint",
     "check:type": "tsc --noEmit",
     "test:unit": "vitest run",
+    "test:interaction": "vitest run --config vitest.storybook.config.ts",
     "test:vrt": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts",
     "test:vrt:update": "npm run build:storybook && playwright test --config=playwright.vrt.config.ts --update-snapshots",
     "test:vrt:report": "playwright show-report ./e2e/vrt/report",

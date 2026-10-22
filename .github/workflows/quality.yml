@@ -61,3 +61,19 @@ jobs:
       - run: npm ci
       - name: Next.js production build
         run: npm run build:next
+
+  interaction-test:
+    name: interaction-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Chromiumをインストール
+        run: npx playwright install --with-deps chromium
+      - name: Storybook Interaction Test
+        run: npm run test:interaction

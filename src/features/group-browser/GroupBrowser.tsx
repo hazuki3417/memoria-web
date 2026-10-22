@@ -9,7 +9,6 @@ import {
   Divider,
   Group,
   Modal,
-  MultiSelect,
   Center,
   Loader,
   Paper,
@@ -36,11 +35,8 @@ import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
 import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./groupName"
-import {
-  groupRelationOptionReason,
-  groupRelationOptions,
-  sortGroupRelationNames,
-} from "./groupRelationOptions"
+import { RelationEditor } from "./RelationEditor"
+import { MediaGrid } from "./MediaGrid"
 
 export type GroupBrowserGroup = {
   id: string
@@ -306,140 +302,6 @@ function RelationItems({ names }: { names: string[] }) {
         </Badge>
       ))}
     </Group>
-  )
-}
-
-function RelationEditor({
-  label,
-  names,
-  oppositeNames,
-  onChange,
-  currentGroupName,
-  candidates = relationCandidateNames,
-  availability,
-}: {
-  label: string
-  names: string[]
-  oppositeNames: string[]
-  onChange: (names: string[]) => void
-  currentGroupName: string
-  candidates?: string[]
-  availability?: GroupRelationAvailability
-}) {
-  const direction = label === "Parents" ? "parent" : "child"
-  const data = groupRelationOptions({
-    candidates,
-    names,
-    oppositeNames,
-    currentGroupName,
-    direction,
-    availability,
-  })
-
-  return (
-    <Stack gap="xs">
-      <Group justify="space-between">
-        <Text fw={600} size="sm">
-          {label}
-        </Text>
-        <Text size="xs" c="dimmed">
-          {names.length} / 10
-        </Text>
-      </Group>
-      <MultiSelect
-        data={data}
-        value={names}
-        onChange={(values) => onChange(sortGroupRelationNames(values))}
-        searchable
-        placeholder="Groupを検索"
-        rightSection={null}
-        maxValues={10}
-        hidePickedOptions={false}
-        nothingFoundMessage="候補がありません"
-        styles={{
-          input: {
-            height: 120,
-            overflow: "hidden",
-            alignItems: "flex-start",
-          },
-          pillsList: {
-            height: "100%",
-            overflowY: "auto",
-            alignContent: "flex-start",
-          },
-        }}
-        renderOption={({ option, checked }) => {
-          const reason = groupRelationOptionReason({
-            name: option.value,
-            checked,
-            oppositeNames,
-            currentGroupName,
-            direction,
-            availability,
-          })
-          return (
-            <Group justify="space-between" wrap="nowrap" w="100%">
-              <Text size="sm">{option.label}</Text>
-              <Text size="xs" c="dimmed">
-                {reason}
-              </Text>
-            </Group>
-          )
-        }}
-      />
-      {names.length >= 10 && (
-        <Text size="xs" c="dimmed">
-          追加できるGroupは10件までです
-        </Text>
-      )}
-    </Stack>
-  )
-}
-function MediaGrid({
-  onOpen,
-  items,
-}: {
-  onOpen: (index: number) => void
-  items?: Array<{ id: string; label: string; src: string | null }>
-}) {
-  // Local dummy thumbnails; actual Group media will be supplied by the Connection.
-  const mediaItems =
-    items ??
-    Array.from({ length: 24 }, (_, index) => ({
-      id: `media-${index + 1}`,
-      label: `Media ${index + 1}`,
-      src: previewImages[index % previewImages.length],
-    }))
-  return (
-    <SimpleGrid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} spacing="sm">
-      {mediaItems.map(({ id, label, src }, index) => (
-        <UnstyledButton
-          key={id}
-          aria-label={
-            src
-              ? `${label}の詳細を開く`
-              : `${label}の詳細を開く（画像プレビューなし）`
-          }
-          onClick={() => onOpen(index)}
-          bdrs="sm"
-          style={{
-            display: "block",
-            aspectRatio: "1 / 1",
-            border: "1px solid var(--mantine-color-default-border)",
-            backgroundImage: src ? `url("${src}")` : undefined,
-            backgroundColor: "var(--mantine-color-default-hover)",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        >
-          {!src && (
-            <Text size="xs" c="dimmed" ta="center">
-              {label}
-            </Text>
-          )}
-        </UnstyledButton>
-      ))}
-    </SimpleGrid>
   )
 }
 
@@ -824,20 +686,20 @@ export function GroupBrowser({
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
           <RelationEditor
+            candidates={candidates ?? relationCandidateNames}
             label="Parents"
             names={createParents}
             oppositeNames={createChildren}
             onChange={setCreateParents}
             currentGroupName={createName.trim()}
-            candidates={candidates}
           />
           <RelationEditor
+            candidates={candidates ?? relationCandidateNames}
             label="Children"
             names={createChildren}
             oppositeNames={createParents}
             onChange={setCreateChildren}
             currentGroupName={createName.trim()}
-            candidates={candidates}
           />
         </SimpleGrid>
         <Group justify="flex-end">
@@ -886,21 +748,21 @@ export function GroupBrowser({
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
           <RelationEditor
+            candidates={candidates ?? relationCandidateNames}
             label="Parents"
             names={draftParents}
             oppositeNames={draftChildren}
             onChange={setDraftParents}
             currentGroupName={selected?.name ?? ""}
-            candidates={candidates}
             availability={relationAvailability}
           />
           <RelationEditor
+            candidates={candidates ?? relationCandidateNames}
             label="Children"
             names={draftChildren}
             oppositeNames={draftParents}
             onChange={setDraftChildren}
             currentGroupName={selected?.name ?? ""}
-            candidates={candidates}
             availability={relationAvailability}
           />
         </SimpleGrid>
