@@ -97,7 +97,7 @@ npm run typecheck
 npm run test:unit
 npm run build
 npm run build:storybook
-npm run test:vrt
+npm run test:visual
 ```
 
 GraphQLクライアントとApplication E2Eは再実装に合わせて整備します。表示差分を確認せずに、テストを通す目的だけでVisual Regression Testのsnapshotを更新しません。
