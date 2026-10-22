@@ -36,6 +36,7 @@ import { RelationEditor } from "./RelationEditor"
 import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
+import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
 
@@ -414,29 +415,14 @@ export function GroupBrowser({
     )
   }
 
-  const relationCandidateFeedback =
-    canManage && selected && relationCandidateState !== "ready" ? (
-      <Box px="sm" py="xs">
-        {relationCandidateState === "error" ? (
-          <Alert color="red" title="Groupの関係候補を取得できませんでした">
-            <Stack gap="xs">
-              <Text size="sm">
-                関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。
-              </Text>
-              <Group justify="flex-start">
-                <Button size="xs" variant="light" onClick={() => void onRetryRelationCandidates?.()}>
-                  再試行
-                </Button>
-              </Group>
-            </Stack>
-          </Alert>
-        ) : (
-          <Text size="xs" c="dimmed" role="status">
-            関係の編集候補を取得しています
-          </Text>
-        )}
-      </Box>
-    ) : null
+  const relationCandidateFeedback = (
+    <GroupRelationCandidateFeedback
+      canManage={canManage}
+      hasSelection={Boolean(selected)}
+      state={relationCandidateState}
+      onRetry={onRetryRelationCandidates}
+    />
+  )
 
   const relationDetailSection = (
     <GroupRelationSection
