@@ -37,6 +37,7 @@ import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
+import { GroupDeleteDialog } from "./GroupDeleteDialog"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { creationFailureDescription } from "./groupCreationFailureDescription"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
@@ -598,61 +599,41 @@ export function GroupBrowser({
     </Modal>
   )
 
+  const confirmDelete = async () => {
+    if (!selected) return
+    const result = await runAction(async () => {
+      await onDeleteGroup?.(selected.id)
+    })
+    if (result === "error") {
+      showNotification({
+        kind: "error",
+        title: "Groupの削除結果を確認できませんでした",
+        description:
+          "最新のGroup状態を確認してから、再実行を判断してください。",
+      })
+      return
+    }
+    if (result !== "ok") return
+    deletion.close()
+    edit.close()
+    compactReturnGroupIdRef.current = null
+    closeDetail()
+    showNotification({
+      kind: "success",
+      title: "Groupを削除",
+      description: "Groupを削除しました。",
+    })
+  }
+
   const deleteDialog = (
-    <Modal
+    <GroupDeleteDialog
       opened={deleteOpened}
-      onClose={() => {
-        if (!saving) deletion.close()
-      }}
-      closeOnEscape={!saving}
-      closeOnClickOutside={!saving}
-      title="Groupを削除"
-      centered
-      withCloseButton={false}
-    >
-      <Stack>
-        <Text size="sm">
-          「{selected?.name ?? ""}
-          」を削除します。このGroupによるMedia分類とGroup間の関係は削除されますが、Media本体と他のGroupは削除されません。
-        </Text>
-        <Group justify="flex-end">
-          <Button variant="default" onClick={deletion.close} disabled={saving}>
-            キャンセル
-          </Button>
-          <Button
-            color="red"
-            disabled={!canManage || saving}
-            onClick={async () => {
-              if (!selected) return
-              const result = await runAction(async () => {
-                await onDeleteGroup?.(selected.id)
-              })
-              if (result === "error") {
-                showNotification({
-                  kind: "error",
-                  title: "Groupの削除結果を確認できませんでした",
-                  description:
-                    "最新のGroup状態を確認してから、再実行を判断してください。",
-                })
-                return
-              }
-              if (result !== "ok") return
-              deletion.close()
-              edit.close()
-              compactReturnGroupIdRef.current = null
-              closeDetail()
-              showNotification({
-                kind: "success",
-                title: "Groupを削除",
-                description: "Groupを削除しました。",
-              })
-            }}
-          >
-            削除
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+      name={selected?.name ?? ""}
+      saving={saving}
+      canManage={canManage}
+      onClose={deletion.close}
+      onConfirm={confirmDelete}
+    />
   )
 
   return (
