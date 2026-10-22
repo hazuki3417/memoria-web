@@ -1,0 +1,141 @@
+name: VRT baseline candidate PR
+
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch to generate baseline candidates for"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: vrt-baseline-request-${{ github.event.issue.number || inputs.target_branch }}
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    if: >-
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.number == 147 &&
+       !github.event.issue.pull_request &&
+       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association) &&
+       startsWith(github.event.comment.body, '/vrt baseline '))
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Resolve and validate request
+        id: request
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          COMMENT_BODY: ${{ github.event.comment.body || '' }}
+          TARGET_INPUT: ${{ inputs.target_branch || '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == issue_comment ]]; then
+            if [[ ! "$COMMENT_BODY" =~ ^/vrt[[:space:]]baseline[[:space:]]([A-Za-z0-9._/-]+)[[:space:]]*$ ]]; then
+              echo "Expected: /vrt baseline <target-branch>" >&2
+              exit 1
+            fi
+            target="${BASH_REMATCH[1]}"
+          else
+            target="$TARGET_INPUT"
+          fi
+          git check-ref-format --branch "$target"
+          if [[ "$target" == "HEAD" || "$target" == -* || "$target" == refs/* ]]; then
+            echo "Unsupported target branch" >&2
+            exit 1
+          fi
+          hash="$(printf %s "$target" | sha256sum | cut -c1-14)"
+          candidate="chore/vrt-baseline-$hash"
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+          echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Fetch exact target branch
+        env:
+          TARGET: ${{ steps.request.outputs.target }}
+        run: |
+          set -euo pipefail
+          git ls-remote --exit-code --heads origin "refs/heads/$TARGET" >/dev/null
+          git fetch origin "+refs/heads/$TARGET:refs/remotes/origin/$TARGET"
+          git switch --detach "refs/remotes/origin/$TARGET"
+      - name: Verify Compose configuration
+        run: docker compose --profile vrt config --quiet
+      - name: Generate candidate screenshots
+        run: docker compose --profile vrt run --rm -e VRT_UPDATE=1 vrt
+      - name: Upload candidate images for inspection
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-candidate-baselines-unapproved
+          path: e2e/storybook-visual/__screenshots__/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Create or update candidate PR
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TARGET: ${{ steps.request.outputs.target }}
+          CANDIDATE: ${{ steps.request.outputs.candidate }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- e2e/storybook-visual/__screenshots__/
+          if git diff --cached --quiet; then
+            echo "No baseline changes against the target branch."
+            echo "status=unchanged" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git switch -c "$CANDIDATE"
+          git commit -m "test(vrt): generate baseline candidates for $TARGET"
+          remote_sha="$(git ls-remote --heads origin "refs/heads/$CANDIDATE" | cut -f1)"
+          if [[ -n "$remote_sha" ]]; then
+            git push --force-with-lease="refs/heads/$CANDIDATE:$remote_sha" origin "HEAD:refs/heads/$CANDIDATE"
+          else
+            git push origin "HEAD:refs/heads/$CANDIDATE"
+          fi
+          pr="$(gh pr list --repo "$GH_REPO" --state open --head "$CANDIDATE" --base "$TARGET" --json number --jq '.[0].number // empty')"
+          if [[ -z "$pr" ]]; then
+            gh pr create --repo "$GH_REPO" --head "$CANDIDATE" --base "$TARGET" \
+              --title "test(vrt): review baseline candidates for $TARGET" \
+              --body "Unapproved VRT baseline candidates generated from \`$TARGET\`. Review each changed screenshot against the intended UI before manually merging. Re-running the request updates this PR. No automatic approval or merge. Source run: $RUN_URL"
+          else
+            echo "Updated existing candidate PR #$pr"
+          fi
+          echo "status=published" >> "$GITHUB_OUTPUT"
+      - name: Record request result on Issue
+        if: success() && github.event_name == 'issue_comment'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE: ${{ github.event.issue.number }}
+          STATUS: ${{ steps.publish.outputs.status }}
+          TARGET: ${{ steps.request.outputs.target }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$ISSUE" --repo "$GH_REPO" --body "VRT baseline request for \`$TARGET\`: $STATUS. See $RUN_URL. Candidate changes require separate PR review and manual merge."
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-generation-diagnostics
+          path: |
+            e2e/storybook-visual/report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 7
