@@ -95,3 +95,113 @@ export const CompactError: Story = {
   args: { groupsData: [], discoveryState: "error", onRetryDiscovery: () => {} },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
+
+/** Render the real selected-Group view. The play function sets only the selected item. */
+const selectedGroupPlay = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement)
+  await userEvent.click(canvas.getByRole("button", { name: /旅行の写真/ }))
+}
+const emptyMediaGroupPlay = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement)
+  await userEvent.click(canvas.getByRole("button", { name: /まだMediaのないGroup/ }))
+}
+
+const selectedMedia = [
+  { id: "media-1", label: "旅先の風景", src: "/__dev-assets/group-browser/group-media-01.jpg" },
+  { id: "media-2", label: "街並み", src: "/__dev-assets/group-browser/group-media-02.jpg" },
+  { id: "media-3", label: "海岸", src: "/__dev-assets/group-browser/group-media-03.jpg" },
+]
+
+export const SelectedGroup: Story = {
+  name: "Selected · With Media",
+  args: { mediaItemsData: selectedMedia },
+  play: selectedGroupPlay,
+}
+
+export const SelectedEmptyMedia: Story = {
+  name: "Selected · No Media",
+  play: emptyMediaGroupPlay,
+}
+
+export const SelectedMediaLoading: Story = {
+  name: "Selected · Media Loading",
+  args: { mediaDetailState: "loading", mediaItemsData: [] },
+  play: selectedGroupPlay,
+}
+
+export const SelectedMediaError: Story = {
+  name: "Selected · Media Error / Retry",
+  args: { mediaDetailState: "error", mediaItemsData: [], onRetryGroupMedia: async () => {} },
+  play: selectedGroupPlay,
+}
+
+export const SelectedMediaPageLoading: Story = {
+  name: "Selected · More Media Loading",
+  args: { mediaItemsData: selectedMedia, mediaPageState: "loading" },
+  play: selectedGroupPlay,
+}
+
+export const SelectedMediaPageError: Story = {
+  name: "Selected · More Media Error / Retry",
+  args: { mediaItemsData: selectedMedia, mediaPageState: "error", onRetryMediaPage: () => {} },
+  play: selectedGroupPlay,
+}
+
+export const SelectedRelationLoading: Story = {
+  name: "Selected · Relation Loading",
+  args: { mediaItemsData: selectedMedia, relationCandidateState: "loading", detailsReady: false },
+  play: selectedGroupPlay,
+}
+
+export const SelectedRelationError: Story = {
+  name: "Selected · Relation Error / Retry",
+  args: { mediaItemsData: selectedMedia, relationCandidateState: "error", detailsReady: false, onRetryRelationCandidates: async () => {} },
+  play: selectedGroupPlay,
+}
+
+export const SelectedCommunityMember: Story = {
+  name: "Selected · Community Member",
+  args: { contextKind: "community", canManage: false, hideManagementActions: true, mediaItemsData: selectedMedia },
+  play: selectedGroupPlay,
+}
+
+export const CompactSelectedGroup: Story = {
+  name: "Compact · Selected With Media",
+  args: { mediaItemsData: selectedMedia },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: selectedGroupPlay,
+}
+
+export const CompactSelectedEmptyMedia: Story = {
+  name: "Compact · Selected No Media",
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: emptyMediaGroupPlay,
+}
+
+export const CompactSelectedMediaLoading: Story = {
+  name: "Compact · Selected Media Loading",
+  args: { mediaDetailState: "loading", mediaItemsData: [] },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: selectedGroupPlay,
+}
+
+export const CompactSelectedMediaError: Story = {
+  name: "Compact · Selected Media Error / Retry",
+  args: { mediaDetailState: "error", mediaItemsData: [], onRetryGroupMedia: async () => {} },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: selectedGroupPlay,
+}
+
+export const CompactSelectedRelationError: Story = {
+  name: "Compact · Selected Relation Error / Retry",
+  args: { mediaItemsData: selectedMedia, relationCandidateState: "error", detailsReady: false, onRetryRelationCandidates: async () => {} },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: selectedGroupPlay,
+}
+
+export const CompactSelectedCommunityMember: Story = {
+  name: "Compact · Selected Community Member",
+  args: { contextKind: "community", canManage: false, hideManagementActions: true, mediaItemsData: selectedMedia },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: selectedGroupPlay,
+}
