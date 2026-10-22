@@ -17,6 +17,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Confirmation: Story = {
+  name: "Visual · Confirmation",
+  tags: ["visual"],
   args: {
     footer: (
       <Dialog.Footer
@@ -28,6 +30,8 @@ export const Confirmation: Story = {
 }
 
 export const Destructive: Story = {
+  name: "Visual · Destructive",
+  tags: ["visual"],
   args: {
     title: "削除しますか？",
     footer: (
@@ -40,6 +44,8 @@ export const Destructive: Story = {
 }
 
 export const ThreeRegionFooter: Story = {
+  name: "Visual · Three Region Footer",
+  tags: ["visual"],
   args: {
     title: "編集",
     footer: (
@@ -57,6 +63,8 @@ export const ThreeRegionFooter: Story = {
 }
 
 export const CompactThreeRegionFooter: Story = {
+  name: "Visual · Compact Three Region Footer",
+  tags: ["visual"],
   args: ThreeRegionFooter.args,
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }

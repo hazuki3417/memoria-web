@@ -14,9 +14,13 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Info: Story = {}
+export const Info: Story = {
+  name: "Visual · Info",
+  tags: ["visual"],}
 
 export const Success: Story = {
+  name: "Visual · Success",
+  tags: ["visual"],
   args: {
     kind: "success",
     title: "保存しました",
@@ -25,6 +29,8 @@ export const Success: Story = {
 }
 
 export const Warning: Story = {
+  name: "Visual · Warning",
+  tags: ["visual"],
   args: {
     kind: "warning",
     title: "確認してください",
@@ -33,6 +39,8 @@ export const Warning: Story = {
 }
 
 export const ErrorState: Story = {
+  name: "Visual · Error State",
+  tags: ["visual"],
   args: {
     kind: "error",
     title: "処理を続けられません",
