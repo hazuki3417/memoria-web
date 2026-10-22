@@ -203,3 +203,184 @@ export const MemberManagementActionHidden: Story = {
     await expect(canvas.queryByRole("button", { name: "Groupを作成" })).not.toBeInTheDocument()
   },
 }
+
+
+/** GB-009/015: Groupを選ぶと同一画面で選択が切り替わる。 */
+export const SelectAnotherGroup: Story = {
+  name: "Interaction · Select Another Group",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await expect(args.onSelectGroup).toHaveBeenLastCalledWith("a")
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムB/ }))
+    await expect(args.onSelectGroup).toHaveBeenLastCalledWith("b")
+  },
+}
+
+/** GB-008: 選択対象が検索結果から外れても、Groupの選択は維持する。 */
+export const SearchKeepsSelectedGroup: Story = {
+  name: "Interaction · Search Keeps Selected Group",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    const search = canvas.getByPlaceholderText("Groupを検索")
+    await userEvent.type(search, "アルバムB{Enter}")
+    await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
+    await expect(canvas.getByRole("button", { name: /アルバムB/ })).toBeVisible()
+  },
+}
+
+/** GB-027/088: 関係Disclosureを開閉するとARIA状態も連動する。 */
+export const RelationDisclosureToggle: Story = {
+  name: "Interaction · Relation Disclosure Toggle",
+  tags: ["interaction"],
+  args: {
+    groupsData: [
+      { id: "a", name: "アルバムA", mediaCount: 0, previewCount: 0, parentNames: ["親"], childNames: ["子"] },
+      { id: "b", name: "アルバムB", mediaCount: 0, previewCount: 0, parentNames: [], childNames: [] },
+    ],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    const disclosure = canvas.getByRole("button", { name: "このGroupとの関係を開閉" })
+    await expect(disclosure).toHaveAttribute("aria-expanded", "false")
+    await userEvent.click(disclosure)
+    await expect(disclosure).toHaveAttribute("aria-expanded", "true")
+    await userEvent.click(disclosure)
+    await expect(disclosure).toHaveAttribute("aria-expanded", "false")
+  },
+}
+
+/** GB-041/046: 編集CancelではDraftを破棄し、保存を通知しない。 */
+export const EditCancelDiscardsDraft: Story = {
+  name: "Interaction · Edit Cancel Discards Draft",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const name = dialog.getByPlaceholderText("Group名")
+    await userEvent.clear(name)
+    await userEvent.type(name, "保存しない名前")
+    await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
+    await waitFor(() => expect(within(document.body).queryByRole("dialog", { name: "Groupを編集" })).not.toBeInTheDocument())
+    await expect(args.onUpdateGroup).not.toHaveBeenCalled()
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const reopened = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    await expect(reopened.getByPlaceholderText("Group名")).toHaveValue("アルバムA")
+  },
+}
+
+/** GB-051/057: renameはGroup IDと最終的なrelation集合を一要求で通知する。 */
+export const RenamePreservesRelations: Story = {
+  name: "Interaction · Rename Preserves Relations",
+  tags: ["interaction"],
+  args: {
+    groupsData: [
+      { id: "a", name: "アルバムA", mediaCount: 0, previewCount: 0, parentNames: ["親"], childNames: ["子"] },
+    ],
+    relationCandidates: ["親", "子"],
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    await userEvent.clear(dialog.getByPlaceholderText("Group名"))
+    await userEvent.type(dialog.getByPlaceholderText("Group名"), "改名したアルバム")
+    await expect(args.onUpdateGroup).not.toHaveBeenCalled()
+    await userEvent.click(dialog.getByRole("button", { name: "保存" }))
+    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith("a", "改名したアルバム", ["親"], ["子"])
+  },
+}
+
+/** GB-053: 保存失敗でも編集Draftを失わず、Dialogを閉じない。 */
+export const EditFailurePreservesDraft: Story = {
+  name: "Interaction · Edit Failure Preserves Draft",
+  tags: ["interaction"],
+  args: { onUpdateGroup: fn(async () => { throw new Error("rejected") }) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    await userEvent.clear(dialog.getByPlaceholderText("Group名"))
+    await userEvent.type(dialog.getByPlaceholderText("Group名"), "再試行する名前")
+    await userEvent.click(dialog.getByRole("button", { name: "保存" }))
+    await expect(args.onUpdateGroup).toHaveBeenCalledTimes(1)
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("再試行する名前")
+  },
+}
+
+/** GB-054: Conflictを返した場合はDialogを維持して無条件再送しない。 */
+export const EditConflictBlocksResubmit: Story = {
+  name: "Interaction · Edit Conflict Blocks Resubmit",
+  tags: ["interaction"],
+  args: { onUpdateGroup: fn(async () => "conflict" as const) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    await userEvent.click(dialog.getByRole("button", { name: "保存" }))
+    await expect(args.onUpdateGroup).toHaveBeenCalledTimes(1)
+    await expect(dialog.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+/** GB-060: 削除のCancelではMutationせず、現在の選択を保持する。 */
+export const DeleteCancelKeepsSelection: Story = {
+  name: "Interaction · Delete Cancel Keeps Selection",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const editor = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    await userEvent.click(editor.getByRole("button", { name: "削除" }))
+    const confirmation = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
+    await userEvent.click(confirmation.getByRole("button", { name: "キャンセル" }))
+    await expect(args.onDeleteGroup).not.toHaveBeenCalled()
+    await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
+  },
+}
+
+/** GB-061: 削除の確定成功では対象IDを一度だけ通知し、選択を解除する。 */
+export const DeleteSuccessClearsSelection: Story = {
+  name: "Interaction · Delete Success Clears Selection",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const editor = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    await userEvent.click(editor.getByRole("button", { name: "削除" }))
+    const confirmation = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
+    await userEvent.click(confirmation.getByRole("button", { name: "削除" }))
+    await expect(args.onDeleteGroup).toHaveBeenCalledExactlyOnceWith("a")
+    await expect(args.onSelectGroup).toHaveBeenLastCalledWith(null)
+  },
+}
+
+/** GB-064: 削除失敗を成功にせず、Dialogと選択を保持する。 */
+export const DeleteFailureKeepsSelection: Story = {
+  name: "Interaction · Delete Failure Keeps Selection",
+  tags: ["interaction"],
+  args: { onDeleteGroup: fn(async () => { throw new Error("delete rejected") }) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
+    await userEvent.click(canvas.getByRole("button", { name: "編集" }))
+    const editor = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    await userEvent.click(editor.getByRole("button", { name: "削除" }))
+    const confirmation = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
+    await userEvent.click(confirmation.getByRole("button", { name: "削除" }))
+    await expect(args.onDeleteGroup).toHaveBeenCalledTimes(1)
+    await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
+    await expect(confirmation.getByRole("button", { name: "削除" })).toBeEnabled()
+  },
+}
