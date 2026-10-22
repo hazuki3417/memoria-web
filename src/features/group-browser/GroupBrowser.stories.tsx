@@ -115,6 +115,11 @@ export const SearchNoMatches: Story = {
     await userEvent.type(canvas.getByPlaceholderText("Groupを検索"), "存在しないGroup{Enter}")
     await expect(canvas.queryByText("アルバムA")).not.toBeInTheDocument()
     await expect(canvas.queryByText("アルバムB")).not.toBeInTheDocument()
+    await expect(canvas.getByText("一致するGroupがありません")).toBeVisible()
+    await expect(canvas.getByPlaceholderText("Groupを検索")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "検索を解除" }))
+    await expect(canvas.getByText("アルバムA")).toBeVisible()
+    await expect(canvas.getByText("アルバムB")).toBeVisible()
   },
 }
 
