@@ -12,8 +12,29 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
-export const Thumbnail: Story = { name: "Visual · Thumbnail" }
+export const Thumbnail: Story = { name: "Visual · Ready Thumbnail" }
 export const MissingThumbnail: Story = {
   name: "Visual · Missing Thumbnail",
-  args: { src: null },
+  args: { src: null, state: { status: "source-unavailable" } },
+}
+
+export const Loading: Story = {
+  name: "Visual · Loading",
+  args: { state: { status: "loading" } },
+}
+export const Processing: Story = {
+  name: "Visual · Processing",
+  args: { state: { status: "processing" } },
+}
+export const ProcessingError: Story = {
+  name: "Visual · Processing Error",
+  args: { state: { status: "processing-error" } },
+}
+export const SourceUnavailable: Story = {
+  name: "Visual · Source Unavailable",
+  args: { state: { status: "source-unavailable" } },
+}
+export const ImageError: Story = {
+  name: "Visual · Image Error",
+  args: { state: { status: "image-error" } },
 }
