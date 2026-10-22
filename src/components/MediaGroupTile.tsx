@@ -1,7 +1,7 @@
 "use client"
 
 import { Box, Center, Loader, Stack, Text } from "@mantine/core"
-import { IconAlertCircle, IconFolders } from "@tabler/icons-react"
+import { IconAlertCircle, IconFolder, IconFolders } from "@tabler/icons-react"
 import type { ReactNode } from "react"
 
 export type MediaGroupTileState =
@@ -57,7 +57,7 @@ export function MediaGroupTile({
           />
         ))
       ) : resolved.status === "loading" ? (
-        <GroupStateMessage icon={<Loader size="sm" color="var(--mantine-color-text)" />} message="Groupを読み込んでいます" />
+        <GroupStateMessage icon={<Stack align="center" gap={4}><IconFolder size={28} stroke={1.5} /><Loader size="xs" color="var(--mantine-color-text)" /></Stack>} message="Groupを読み込んでいます" />
       ) : resolved.status === "processing" ? (
         <GroupStateMessage icon={<IconFolders size={30} stroke={1.5} />} message="Groupを準備しています" />
       ) : (
