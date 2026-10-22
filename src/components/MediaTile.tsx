@@ -2,7 +2,7 @@
 
 import { Box, Center, Loader, Stack, Text } from "@mantine/core"
 import { IconAlertCircle, IconPhotoOff, IconRefresh } from "@tabler/icons-react"
-import { useEffect, useState, type ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 
 export type MediaTileState =
   | { status: "ready"; src: string }
@@ -45,7 +45,6 @@ export function MediaTile({
   )
   const [failedSrc, setFailedSrc] = useState<string | null>(null)
   const imageSrc = resolved.status === "ready" ? resolved.src : null
-  useEffect(() => { setFailedSrc(null) }, [imageSrc])
   const imageFailed = imageSrc !== null && failedSrc === imageSrc
 
   return (
@@ -54,7 +53,9 @@ export function MediaTile({
       overflow: "hidden",
       backgroundColor: "var(--mantine-color-default-hover)",
     }}>
-      {resolved.status === "ready" && !imageFailed ? (
+      {!state && !src ? (
+        <Text size="xs" c="dimmed" ta="center">{label}</Text>
+      ) : resolved.status === "ready" && !imageFailed ? (
         <img
           key={resolved.src}
           src={resolved.src}
