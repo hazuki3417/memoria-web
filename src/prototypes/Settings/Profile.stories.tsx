@@ -12,29 +12,29 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  name: "Visual · Default",
+  name: "Default",
   tags: ["visual"],}
 
 export const Compact: Story = {
-  name: "Visual · Compact",
+  name: "Compact",
   tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
 export const Saving: Story = {
-  name: "Visual · Saving",
+  name: "Saving",
   tags: ["visual"],
   args: { initialProfileSaveState: "saving" },
 }
 
 export const RetryableFailure: Story = {
-  name: "Visual · Retryable Failure",
+  name: "Retryable Failure",
   tags: ["visual"],
   args: { initialProfileSaveState: "retryable-error" },
 }
 
 export const BlockingError: Story = {
-  name: "Visual · Blocking Error",
+  name: "Blocking Error",
   tags: ["visual"],
   args: { initialProfileSaveState: "blocked" },
 }
