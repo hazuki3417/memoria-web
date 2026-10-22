@@ -35,6 +35,7 @@ import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./gr
 import { RelationEditor } from "./RelationEditor"
 import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
+import { useGroupMutationAction } from "./useGroupMutationAction"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
 
 export type GroupBrowserGroup = {
@@ -188,24 +189,7 @@ export function GroupBrowser({
   canManage = true,
   hideManagementActions = false,
 }: GroupBrowserProps) {
-  const busyRef = useRef(false)
-  const [saving, setSaving] = useState(false)
-  const runAction = async (
-    action: () => Promise<void>,
-  ): Promise<"ok" | "busy" | "error"> => {
-    if (busyRef.current) return "busy"
-    busyRef.current = true
-    setSaving(true)
-    try {
-      await action()
-      return "ok"
-    } catch {
-      return "error"
-    } finally {
-      busyRef.current = false
-      setSaving(false)
-    }
-  }
+  const { saving, runAction } = useGroupMutationAction()
   const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
   const [createOpened, create] = useDisclosure(false)
   const [createName, setCreateName] = useState("")
