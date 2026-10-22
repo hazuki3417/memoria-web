@@ -129,3 +129,46 @@ export const SelectionLimit: Story = {
     await expect(canvas.getByText("10 / 10")).toBeVisible()
   },
 }
+
+
+/** GB-048: Childに選択済みのGroupをParentへ重複追加できない。 */
+export const PreventParentChildOverlap: Story = {
+  name: "Interaction · Prevent Parent Child Overlap",
+  tags: ["interaction"],
+  args: {
+    names: ["Parent"],
+    oppositeNames: ["Child"],
+    candidates: ["Parent", "Child", "候補"],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("1 / 10")).toBeVisible()
+    const input = canvas.getByPlaceholderText("Groupを検索")
+    await userEvent.click(input)
+    await userEvent.type(input, "Child")
+    await within(document.body).findByRole("option", { name: /Child/ })
+    await userEvent.keyboard("{Enter}")
+    await expect(canvas.getByText("1 / 10")).toBeVisible()
+    await expect(canvas.getByText("Parent")).toBeVisible()
+  },
+}
+
+/** GB-047: 候補検索で既存選択と未選択候補を区別し、他の選択を消さない。 */
+export const SearchDoesNotClearSelection: Story = {
+  name: "Interaction · Search Does Not Clear Selection",
+  tags: ["interaction"],
+  args: {
+    names: ["Parent"],
+    oppositeNames: [],
+    candidates: ["Parent", "候補", "他の候補"],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByPlaceholderText("Groupを検索")
+    await userEvent.click(input)
+    await userEvent.type(input, "候補")
+    await expect(canvas.getByText("1 / 10")).toBeVisible()
+    await expect(canvas.getByText("Parent")).toBeVisible()
+    await expect(await within(document.body).findByRole("option", { name: /^候補/ })).toBeVisible()
+  },
+}
