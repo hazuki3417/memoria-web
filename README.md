@@ -52,6 +52,8 @@ npm run build:storybook
 npm run test:visual
 ```
 
+VRTのBaseline生成・比較には公式Playwright Dockerイメージを使う手順を推奨します。Docker版の実行方法と検証前提は[e2e/storybook-visual/README.md](./e2e/storybook-visual/README.md)を参照してください。Node.js 24との互換性と実際の撮影成功は検証前です。
+
 snapshotは表示差分を確認してから更新します。
 
 ## GraphQL
