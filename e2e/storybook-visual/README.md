@@ -40,6 +40,8 @@ npm run test:visual
 npm run test:visual:report
 ```
 
+**Dockerイメージ方針（合意済み）**: Phase 1ではMemoria専用イメージ・GHCR配布を導入せず、Microsoft公式Playwright DockerイメージをBaseline生成・比較で共通利用する。将来のCIでも同じイメージを使用する。特定のPlaywrightバージョンに対応する固定タグと、検証後はdigestでの固定を基本とする。リポジトリのNode.js 24要求を満たすか、コンテナ内の日本語フォント・Chromium・権限・描画が一致するかは**未検証**であり、適合確認前に公式イメージをそのまま利用可能と断定しない。もし満たせなければ、専用イメージ化の必要性を再協議する。イメージ更新時には既存Baselineでの比較・差分確認を行い、Baseline更新とは別にレビューする。
+
 **共通撮影環境**: Playwright / Chromium、OS、フォント、DPR、Locale、Viewportを揃える。現状のPlaywright設定はDesktop Chrome、DPR=1、ja-JP、light、1440×900 / 375×812を指定しているが、OS・フォントの固定コンテナは未導入である。異なる環境で撮影したBaselineの差分をUI回帰と断定しない。基準画像生成および実行成功は未検証であり、安定化と共通実行環境の検証はPhase 1の未完了作業とする。
 
 **失敗時**はPlaywrightのHTML ReportとExpected / Actual / Diff画像を確認し、原因を調査する。Baseline欠落は未登録として扱い、通常比較から更新処理を呼ばない。 `play`付きStoryの撮影同期は未実装のため、対象に追加する前に完了待機・描画安定を検証する。
