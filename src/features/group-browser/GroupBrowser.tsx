@@ -1,14 +1,11 @@
 "use client"
 
 import {
-  Badge,
   Alert,
   Box,
   Button,
-  Collapse,
   Divider,
   Group,
-  Modal,
   Center,
   Loader,
   Paper,
@@ -19,24 +16,31 @@ import {
   TextInput,
   UnstyledButton,
 } from "@mantine/core"
-import { useDisclosure, useMediaQuery } from "@mantine/hooks"
+import { useDisclosure } from "@mantine/hooks"
 import {
-  IconChevronRight,
   IconEdit,
   IconFolderPlus,
   IconSearch,
   IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useEffect, useMemo, useRef, useState } from "react"
-import type { Layout, LayoutChangedMeta } from "react-resizable-panels"
-import { useGroupRef } from "react-resizable-panels"
+import { useMemo, useState } from "react"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
-import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./groupName"
-import { RelationEditor } from "./RelationEditor"
+import { validGroupName } from "./groupName"
 import { MediaGrid } from "./MediaGrid"
+import { GroupRelationSection } from "./GroupRelationSection"
+import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
+import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
+import { GroupDeleteDialog } from "./GroupDeleteDialog"
+import { GroupCreateDialog } from "./GroupCreateDialog"
+import { GroupEditDialog } from "./GroupEditDialog"
+import { useGroupMutationAction } from "./useGroupMutationAction"
+import { filterVisibleGroups } from "./groupSearch"
+import { useGroupSearchState } from "./useGroupSearchState"
+import { useGroupNavigation } from "./useGroupNavigation"
+import { useGroupCreateController } from "./useGroupCreateController"
 import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
 
 export type GroupBrowserGroup = {
@@ -168,25 +172,6 @@ const relationCandidateNames = [
   "未整理",
 ]
 
-function RelationItems({ names }: { names: string[] }) {
-  if (names.length === 0) {
-    return (
-      <Text size="sm" c="dimmed">
-        なし
-      </Text>
-    )
-  }
-  return (
-    <Group gap={6}>
-      {[...names].sort().map((name) => (
-        <Badge key={name} variant="light">
-          {name}
-        </Badge>
-      ))}
-    </Group>
-  )
-}
-
 export function GroupBrowser({
   contextKind = "personal",
   groupsData,
@@ -209,112 +194,23 @@ export function GroupBrowser({
   canManage = true,
   hideManagementActions = false,
 }: GroupBrowserProps) {
-  const busyRef = useRef(false)
-  const [saving, setSaving] = useState(false)
-  const runAction = async (
-    action: () => Promise<void>,
-  ): Promise<"ok" | "busy" | "error"> => {
-    if (busyRef.current) return "busy"
-    busyRef.current = true
-    setSaving(true)
-    try {
-      await action()
-      return "ok"
-    } catch {
-      return "error"
-    } finally {
-      busyRef.current = false
-      setSaving(false)
-    }
-  }
-  const [createdGroups, setCreatedGroups] = useState<typeof groups>([])
-  const [createOpened, create] = useDisclosure(false)
-  const [createName, setCreateName] = useState("")
-  const [createParents, setCreateParents] = useState<string[]>([])
-  const [createChildren, setCreateChildren] = useState<string[]>([])
+  const { saving, runAction } = useGroupMutationAction()
+  const {
+    createdGroups, createOpened, createName, createParents, createChildren,
+    setCreateName, setCreateParents, setCreateChildren, openCreate, submitCreate,
+    closeCreate,
+  } = useGroupCreateController({ onCreateGroup, runAction })
   const allGroups = useMemo(
     () => [...(groupsData ?? groups), ...createdGroups],
     [groupsData, createdGroups],
   )
-  const openCreate = () => {
-    setCreateName("")
-    setCreateParents([])
-    setCreateChildren([])
-    create.open()
-  }
-  const creationFailureDescription = (error: unknown) => {
-    if (error && typeof error === "object" && "graphQLErrors" in error &&
-        Array.isArray(error.graphQLErrors)) {
-      for (const item of error.graphQLErrors) {
-        const extensions = item?.extensions
-        if (extensions?.reason === "DUPLICATE_NAME") return "同じ名前のGroupが既にあります。名前を変更してください。"
-        if (extensions?.reason === "SCOPE_LIMIT") return "この範囲で作成できるGroup数の上限に達しました。"
-        if (extensions?.reason === "CYCLE") return "指定した関係によって循環が発生します。"
-        if (extensions?.reason === "DEPTH_LIMIT") return "指定した関係ではGroup階層の深さが上限を超えます。"
-        if (extensions?.reason === "PARENT_LIMIT" || extensions?.reason === "CHILD_LIMIT") return "指定した関係では直接のParentまたはChildの件数上限を超えます。"
-        if (extensions?.code === "FORBIDDEN") return "この範囲のGroupを作成する権限がありません。"
-        if (extensions?.code === "VALIDATION") return "入力した名前またはParent・Childの関係を確認してください。"
-      }
-    }
-    return "入力内容と通信状態を確認して、もう一度お試しください。"
-  }
-  const submitCreate = async () => {
-    const name = createName.trim()
-    if (!validGroupName(createName)) return
-    let outcomeUnknown = false
-    let failureDescription = "入力内容と通信状態を確認して、もう一度お試しください。"
-    const result = await runAction(async () => {
-      if (onCreateGroup) {
-        let outcome
-        try {
-          outcome = await onCreateGroup(name, createParents, createChildren)
-        } catch (error) {
-          failureDescription = creationFailureDescription(error)
-          throw error
-        }
-        if (outcome === "unknown") outcomeUnknown = true
-      } else {
-        setCreatedGroups((current) => [
-          ...current,
-          {
-            id: `created-${Date.now()}-${current.length}`,
-            name,
-            mediaCount: 0,
-            previewCount: 0,
-            parentNames: createParents,
-            childNames: createChildren,
-          },
-        ])
-      }
-    })
-    if (result === "error") {
-      showNotification({
-        kind: "error",
-        title: "Groupを作成できませんでした",
-        description: failureDescription,
-      })
-      return
-    }
-    if (outcomeUnknown) {
-      showNotification({
-        kind: "error",
-        title: "Groupの作成結果を確認できませんでした",
-        description: "通信状態が不明です。入力内容は保持されています。必要であればご自身で再試行してください。",
-      })
-      return
-    }
-    if (result !== "ok") return
-    create.close()
-    showNotification({
-      kind: "success",
-      title: "Groupを作成",
-      description: `「${name}」を作成しました。`,
-    })
-  }
-
-  const [query, setQuery] = useState("")
-  const [appliedQuery, setAppliedQuery] = useState("")
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const { query, setQuery, appliedQuery, setAppliedQuery } = useGroupSearchState()
+  const {
+    selectedId, compact, compactView, splitViewRef, savedLayout,
+    compactDetailHeadingRef, compactSearchRef, compactGroupItemRefs,
+    compactReturnGroupIdRef, openDetail, closeDetail,
+    handleDetailExitComplete, handleLayoutChanged,
+  } = useGroupNavigation(onSelectGroup)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = useMemo(
     () =>
@@ -342,16 +238,7 @@ export function GroupBrowser({
     if (availableIndex >= 0) setMediaDetailIndex(availableIndex)
   }
 
-  const splitViewRef = useGroupRef()
-  const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
   const [relationsOpened, relations] = useDisclosure(false)
-  const compact = useMediaQuery("(max-width: 47.99em)")
-  const [compactView, setCompactView] = useState<"groups" | "detail">("groups")
-  const compactDetailHeadingRef = useRef<HTMLParagraphElement>(null)
-  const compactSearchRef = useRef<HTMLInputElement>(null)
-  const compactGroupItemRefs = useRef(new Map<string, HTMLButtonElement>())
-  const compactReturnGroupIdRef = useRef<string | null>(null)
-  const compactFocusIntentRef = useRef<"detail" | "groups" | null>(null)
   const [editOpened, edit] = useDisclosure(false)
   const [deleteOpened, deletion] = useDisclosure(false)
   const [draftName, setDraftName] = useState("")
@@ -359,17 +246,10 @@ export function GroupBrowser({
   const [draftChildren, setDraftChildren] = useState<string[]>([])
   const [conflictNeedsReview, setConflictNeedsReview] = useState(false)
 
-  const visibleGroups = useMemo(() => {
-    const normalized = appliedQuery.trim()
-    if (!normalized) return allGroups
-    return allGroups.filter((group) =>
-      groupsData !== undefined
-        ? group.name.includes(normalized)
-        : group.name
-            .toLocaleLowerCase()
-            .includes(normalized.toLocaleLowerCase()),
-    )
-  }, [appliedQuery, allGroups, groupsData])
+  const visibleGroups = useMemo(
+    () => filterVisibleGroups(allGroups, appliedQuery, groupsData !== undefined),
+    [allGroups, appliedQuery, groupsData],
+  )
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
@@ -382,391 +262,140 @@ export function GroupBrowser({
     edit.open()
   }
 
-  useEffect(() => {
-    const stored = window.localStorage.getItem("memoria-group-browser-layout")
-    if (!stored) return
-    try {
-      const layout = JSON.parse(stored) as { groups?: number; detail?: number }
-      if (
-        typeof layout.groups === "number" &&
-        typeof layout.detail === "number"
-      ) {
-        setSavedLayout({ groups: layout.groups, detail: layout.detail })
-      }
-    } catch {
-      window.localStorage.removeItem("memoria-group-browser-layout")
-    }
-  }, [])
-
-  // Explicit Compact navigation must not leave focus on an unmounted element.
-  useEffect(() => {
-    if (!compact || compactFocusIntentRef.current !== compactView) return
-    compactFocusIntentRef.current = null
-    if (compactView === "detail") {
-      compactDetailHeadingRef.current?.focus()
-    } else {
-      const origin = compactReturnGroupIdRef.current
-      const item = origin ? compactGroupItemRefs.current.get(origin) : null
-      ;(item ?? compactSearchRef.current)?.focus()
-    }
-  }, [compact, compactView])
-
-  const openDetail = (id: string) => {
-    setSelectedId(id)
-    onSelectGroup?.(id)
-    if (compact) {
-      compactReturnGroupIdRef.current = id
-      compactFocusIntentRef.current = "detail"
-      setCompactView("detail")
-      return
-    }
-    const layout = splitViewRef.current?.getLayout()
-    if (layout?.detail === 0) {
-      splitViewRef.current?.setLayout(savedLayout)
-    }
-  }
-
-  const closeDetail = () => {
-    setSelectedId(null)
-    onSelectGroup?.(null)
-    if (compact) {
-      compactFocusIntentRef.current = "groups"
-      setCompactView("groups")
-    }
-  }
-
-  const handleDetailExitComplete = () => {
-    if (compact || selectedId) return
-    splitViewRef.current?.setLayout({ groups: 100, detail: 0 })
-  }
-
-  const handleLayoutChanged = (layout: Layout, _meta: LayoutChangedMeta) => {
-    if (!selectedId || layout.detail === 0) return
-    const next = { groups: layout.groups, detail: layout.detail }
-    setSavedLayout(next)
-    window.localStorage.setItem(
-      "memoria-group-browser-layout",
-      JSON.stringify(next),
-    )
-  }
-
-  const relationCandidateFeedback =
-    canManage && selected && relationCandidateState !== "ready" ? (
-      <Box px="sm" py="xs">
-        {relationCandidateState === "error" ? (
-          <Alert color="red" title="Groupの関係候補を取得できませんでした">
-            <Stack gap="xs">
-              <Text size="sm">
-                関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。
-              </Text>
-              <Group justify="flex-start">
-                <Button size="xs" variant="light" onClick={() => void onRetryRelationCandidates?.()}>
-                  再試行
-                </Button>
-              </Group>
-            </Stack>
-          </Alert>
-        ) : (
-          <Text size="xs" c="dimmed" role="status">
-            関係の編集候補を取得しています
-          </Text>
-        )}
-      </Box>
-    ) : null
+  const relationCandidateFeedback = (
+    <GroupRelationCandidateFeedback
+      canManage={canManage}
+      hasSelection={Boolean(selected)}
+      state={relationCandidateState}
+      onRetry={onRetryRelationCandidates}
+    />
+  )
 
   const relationDetailSection = (
-    <>
-      <UnstyledButton
-        onClick={relations.toggle}
-        px="sm"
-        py={6}
-        aria-expanded={relationsOpened}
-        aria-label="このGroupとの関係を開閉"
-      >
-        <Group gap="xs" wrap="nowrap">
-          <IconChevronRight
-            size={16}
-            style={{
-              transform: relationsOpened
-                ? "rotate(90deg)"
-                : "rotate(0deg)",
-              transition: "transform 200ms ease",
-            }}
-          />
-          <Text size="xs" c="dimmed">
-            このGroupとの関係
-          </Text>
-        </Group>
-      </UnstyledButton>
-      <Collapse in={relationsOpened} transitionDuration={200}>
-        <Box px="lg" pb="sm">
-          <SimpleGrid cols={2} spacing="lg">
-            <Stack gap={4}>
-              <Text size="xs" c="dimmed">
-                Parents
-              </Text>
-              <RelationItems
-                names={selected?.parentNames ?? []}
-              />
-            </Stack>
-            <Stack gap={4}>
-              <Text size="xs" c="dimmed">
-                Children
-              </Text>
-              <RelationItems names={selected?.childNames ?? []} />
-            </Stack>
-          </SimpleGrid>
-        </Box>
-      </Collapse>
-    </>
+    <GroupRelationSection
+      opened={relationsOpened}
+      onToggle={relations.toggle}
+      parentNames={selected?.parentNames ?? []}
+      childNames={selected?.childNames ?? []}
+    />
   )
 
-  const mediaPageFeedback = mediaPageState === "error" ? (
-    <Alert color="red" title="追加のMediaを取得できませんでした" mt="sm">
-      <Stack gap="xs" align="flex-start">
-        <Text size="sm">取得済みのMediaは引き続き閲覧できます。</Text>
-        <Button size="xs" variant="light" onClick={onRetryMediaPage}>
-          再試行
-        </Button>
-      </Stack>
-    </Alert>
-  ) : mediaPageState === "loading" ? (
-    <Text size="xs" c="dimmed" mt="sm" role="status">
-      追加のMediaを取得しています
-    </Text>
-  ) : null
+  const mediaPageFeedback = (
+    <GroupMediaPageFeedback state={mediaPageState} onRetry={onRetryMediaPage} />
+  )
 
   const createDialog = (
-    <Modal
+    <GroupCreateDialog
       opened={createOpened}
-      onClose={create.close}
-      title="Groupを作成"
-      size="lg"
-      centered
-      withCloseButton={false}
-    >
-      <Stack gap="lg">
-        <TextInput
-          label={
-            <Group justify="space-between" wrap="nowrap">
-              <Text component="span" size="sm" fw={500}>
-                名前
-              </Text>
-              <Text component="span" size="xs" c="dimmed">
-                {countGroupNameGraphemes(createName)} / 100
-              </Text>
-            </Group>
-          }
-          value={createName}
-          onChange={(event) => {
-            const value = event.currentTarget.value
-            if (canEnterGroupName(value)) setCreateName(value)
-          }}
-          placeholder="Group名"
-          styles={{ label: { display: "block", width: "100%" } }}
-          required
-        />
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-          <RelationEditor
-            candidates={candidates ?? relationCandidateNames}
-            label="Parents"
-            names={createParents}
-            oppositeNames={createChildren}
-            onChange={setCreateParents}
-            currentGroupName={createName.trim()}
-          />
-          <RelationEditor
-            candidates={candidates ?? relationCandidateNames}
-            label="Children"
-            names={createChildren}
-            oppositeNames={createParents}
-            onChange={setCreateChildren}
-            currentGroupName={createName.trim()}
-          />
-        </SimpleGrid>
-        <Group justify="flex-end">
-          <Button variant="default" onClick={create.close}>
-            キャンセル
-          </Button>
-          <Button
-            onClick={submitCreate}
-            disabled={!canManage || !validGroupName(createName) || saving}
-          >
-            作成
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+      name={createName}
+      parents={createParents}
+      children={createChildren}
+      candidates={candidates ?? relationCandidateNames}
+      canManage={canManage}
+      saving={saving}
+      onNameChange={setCreateName}
+      onParentsChange={setCreateParents}
+      onChildrenChange={setCreateChildren}
+      onClose={closeCreate}
+      onSubmit={submitCreate}
+    />
   )
+
+  const submitEdit = async () => {
+    if (!selected || !validGroupName(draftName)) return
+    if (conflictNeedsReview || !detailsReady) return
+    let conflict = false
+    let uncertain = false
+    const result = await runAction(async () => {
+      const outcome = await onUpdateGroup?.(
+        selected.id,
+        draftName.trim(),
+        draftParents,
+        draftChildren,
+      )
+      if (outcome === "conflict") conflict = true
+      if (outcome === "unknown") uncertain = true
+    })
+    if (conflict || uncertain) {
+      setConflictNeedsReview(true)
+      if (uncertain) {
+        showNotification({
+          kind: "error",
+          title: "保存結果を確認できませんでした",
+          description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
+        })
+      }
+      return
+    }
+    if (result === "error") {
+      showNotification({
+        kind: "error",
+        title: "Groupを更新できませんでした",
+        description:
+          "最新のGroup情報を確認してから、再度お試しください。",
+      })
+      return
+    }
+    if (result === "ok") edit.close()
+  }
 
   const editDialog = (
-    <Modal
+    <GroupEditDialog
       opened={editOpened}
+      name={draftName}
+      parents={draftParents}
+      children={draftChildren}
+      candidates={candidates ?? relationCandidateNames}
+      currentGroupName={selected?.name ?? ""}
+      availability={relationAvailability}
+      canManage={canManage}
+      detailsReady={detailsReady}
+      conflictNeedsReview={conflictNeedsReview}
+      saving={saving}
+      onNameChange={setDraftName}
+      onParentsChange={setDraftParents}
+      onChildrenChange={setDraftChildren}
+      onDelete={deletion.open}
       onClose={edit.close}
-      title="Groupを編集"
-      size="lg"
-      centered
-      withCloseButton={false}
-    >
-      <Stack gap="lg">
-        <TextInput
-          label={
-            <Group justify="space-between" wrap="nowrap">
-              <Text component="span" size="sm" fw={500}>
-                名前
-              </Text>
-              <Text component="span" size="xs" c="dimmed">
-                {countGroupNameGraphemes(draftName)} / 100
-              </Text>
-            </Group>
-          }
-          value={draftName}
-          onChange={(event) => {
-            const value = event.currentTarget.value
-            if (canEnterGroupName(value)) setDraftName(value)
-          }}
-          placeholder="Group名"
-          styles={{ label: { display: "block", width: "100%" } }}
-        />
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-          <RelationEditor
-            candidates={candidates ?? relationCandidateNames}
-            label="Parents"
-            names={draftParents}
-            oppositeNames={draftChildren}
-            onChange={setDraftParents}
-            currentGroupName={selected?.name ?? ""}
-            availability={relationAvailability}
-          />
-          <RelationEditor
-            candidates={candidates ?? relationCandidateNames}
-            label="Children"
-            names={draftChildren}
-            oppositeNames={draftParents}
-            onChange={setDraftChildren}
-            currentGroupName={selected?.name ?? ""}
-            availability={relationAvailability}
-          />
-        </SimpleGrid>
-        <Divider />
-        <Box pos="relative">
-          <Button variant="subtle" color="red" onClick={deletion.open}>
-            削除
-          </Button>
-          <Button
-            variant="default"
-            onClick={edit.close}
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-            }}
-          >
-            キャンセル
-          </Button>
-          <Button
-            onClick={async () => {
-              if (!selected || !validGroupName(draftName)) return
-              if (conflictNeedsReview || !detailsReady) return
-              let conflict = false
-              let uncertain = false
-              const result = await runAction(async () => {
-                const outcome = await onUpdateGroup?.(
-                  selected.id,
-                  draftName.trim(),
-                  draftParents,
-                  draftChildren,
-                )
-                if (outcome === "conflict") conflict = true
-                if (outcome === "unknown") uncertain = true
-              })
-              if (conflict || uncertain) {
-                setConflictNeedsReview(true)
-                if (uncertain) {
-                  showNotification({
-                    kind: "error",
-                    title: "保存結果を確認できませんでした",
-                    description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
-                  })
-                }
-                return
-              }
-              if (result === "error") {
-                showNotification({
-                  kind: "error",
-                  title: "Groupを更新できませんでした",
-                  description:
-                    "最新のGroup情報を確認してから、再度お試しください。",
-                })
-                return
-              }
-              if (result === "ok") edit.close()
-            }}
-            disabled={!canManage || !detailsReady || conflictNeedsReview || !validGroupName(draftName) || saving}
-            style={{ position: "absolute", right: 0 }}
-          >
-            保存
-          </Button>
-        </Box>
-      </Stack>
-    </Modal>
+      onSubmit={submitEdit}
+    />
   )
 
+  const confirmDelete = async () => {
+    if (!selected) return
+    const result = await runAction(async () => {
+      await onDeleteGroup?.(selected.id)
+    })
+    if (result === "error") {
+      showNotification({
+        kind: "error",
+        title: "Groupの削除結果を確認できませんでした",
+        description:
+          "最新のGroup状態を確認してから、再実行を判断してください。",
+      })
+      return
+    }
+    if (result !== "ok") return
+    deletion.close()
+    edit.close()
+    compactReturnGroupIdRef.current = null
+    closeDetail()
+    showNotification({
+      kind: "success",
+      title: "Groupを削除",
+      description: "Groupを削除しました。",
+    })
+  }
+
   const deleteDialog = (
-    <Modal
+    <GroupDeleteDialog
       opened={deleteOpened}
-      onClose={() => {
-        if (!saving) deletion.close()
-      }}
-      closeOnEscape={!saving}
-      closeOnClickOutside={!saving}
-      title="Groupを削除"
-      centered
-      withCloseButton={false}
-    >
-      <Stack>
-        <Text size="sm">
-          「{selected?.name ?? ""}
-          」を削除します。このGroupによるMedia分類とGroup間の関係は削除されますが、Media本体と他のGroupは削除されません。
-        </Text>
-        <Group justify="flex-end">
-          <Button variant="default" onClick={deletion.close} disabled={saving}>
-            キャンセル
-          </Button>
-          <Button
-            color="red"
-            disabled={!canManage || saving}
-            onClick={async () => {
-              if (!selected) return
-              const result = await runAction(async () => {
-                await onDeleteGroup?.(selected.id)
-              })
-              if (result === "error") {
-                showNotification({
-                  kind: "error",
-                  title: "Groupの削除結果を確認できませんでした",
-                  description:
-                    "最新のGroup状態を確認してから、再実行を判断してください。",
-                })
-                return
-              }
-              if (result !== "ok") return
-              deletion.close()
-              edit.close()
-              compactReturnGroupIdRef.current = null
-              closeDetail()
-              showNotification({
-                kind: "success",
-                title: "Groupを削除",
-                description: "Groupを削除しました。",
-              })
-            }}
-          >
-            削除
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+      name={selected?.name ?? ""}
+      saving={saving}
+      canManage={canManage}
+      onClose={deletion.close}
+      onConfirm={confirmDelete}
+    />
   )
 
   return (
