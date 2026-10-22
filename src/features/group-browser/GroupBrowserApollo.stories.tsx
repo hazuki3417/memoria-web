@@ -63,7 +63,9 @@ export const EmptyScope: Story = {
   ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByRole("button", { name: "Groupを作成" })).toBeVisible()
+    await expect(await canvas.findByText("まだGroupがありません")).toBeVisible()
+    await expect(canvas.getByText("最初のGroupを作成すると、ここからMediaを整理できます。")).toBeVisible()
+    await expect(canvas.getAllByRole("button", { name: "Groupを作成" })[0]).toBeEnabled()
   },
 }
 
