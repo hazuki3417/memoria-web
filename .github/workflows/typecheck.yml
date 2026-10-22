@@ -7,16 +7,6 @@ on:
       - 'src/**'
       - 'package.json'
       - 'package-lock.json'
-      - 'devbox.json'
-      - 'devbox.lock'
-      - 'scripts/**'
-      - 'tsconfig.json'
-      - 'next-env.d.ts'
-      - 'biome.json'
-      - '.storybook/**'
-      - 'codegen.ts'
-      - 'vitest*.ts'
-      - '.github/workflows/typecheck.yml'
   workflow_dispatch:
 
 permissions:
