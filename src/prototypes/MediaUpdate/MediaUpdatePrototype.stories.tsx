@@ -11,25 +11,25 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Editing: Story = {
-  name: "Visual · Editing",
+  name: "Editing",
   tags: ["visual"],}
 export const Community: Story = {
-  name: "Visual · Community",
+  name: "Community",
   tags: ["visual"], args: { context: "community" } }
 export const Saving: Story = {
-  name: "Visual · Saving",
+  name: "Saving",
   tags: ["visual"], args: { scenario: "saving" } }
 export const Saved: Story = {
-  name: "Visual · Saved",
+  name: "Saved",
   tags: ["visual"], args: { scenario: "saved" } }
 export const PartialFailure: Story = {
-  name: "Visual · Partial Failure",
+  name: "Partial Failure",
   tags: ["visual"], args: { scenario: "partial-failure" } }
 export const LoadFailure: Story = {
-  name: "Visual · Load Failure",
+  name: "Load Failure",
   tags: ["visual"], args: { scenario: "load-failure" } }
 export const LeaveConfirmation: Story = {
-  name: "Visual · Leave Confirmation",
+  name: "Leave Confirmation",
   tags: ["visual"],
   args: { scenario: "leave-confirmation" },
 }

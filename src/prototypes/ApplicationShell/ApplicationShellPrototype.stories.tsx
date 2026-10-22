@@ -11,13 +11,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
-  name: "Visual · Personal",
+  name: "Personal",
   tags: ["visual"], args: { initialContext: "personal" } }
 export const Community: Story = {
-  name: "Visual · Community",
+  name: "Community",
   tags: ["visual"], args: { initialContext: "community" } }
 export const Compact: Story = {
-  name: "Visual · Compact",
+  name: "Compact",
   tags: ["visual"],
   args: { initialContext: "personal" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
