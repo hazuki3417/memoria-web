@@ -34,15 +34,27 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Administrator: Story = { args: { role: "admin" } }
-export const Member: Story = { args: { role: "member" } }
+export const Administrator: Story = {
+  name: "Visual · Administrator",
+  tags: ["visual"], args: { role: "admin" } }
+export const Member: Story = {
+  name: "Visual · Member",
+  tags: ["visual"], args: { role: "member" } }
 export const Compact: Story = {
+  name: "Visual · Compact",
+  tags: ["visual"],
   args: { role: "admin" },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
-export const Members: Story = { args: { role: "admin", section: "members" } }
-export const Usage: Story = { args: { role: "member", section: "usage" } }
+export const Members: Story = {
+  name: "Visual · Members",
+  tags: ["visual"], args: { role: "admin", section: "members" } }
+export const Usage: Story = {
+  name: "Visual · Usage",
+  tags: ["visual"], args: { role: "member", section: "usage" } }
 export const Preferences: Story = {
+  name: "Visual · Preferences",
+  tags: ["visual"],
   args: { role: "member", section: "preferences" },
 }
