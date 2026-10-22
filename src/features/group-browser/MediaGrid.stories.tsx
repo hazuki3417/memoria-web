@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from "storybook/test"
 import { MediaGrid } from "./MediaGrid"
 
 const meta = {
-  title: "Group Browser/Media Grid",
+  title: "Features/Group Browser/Media Grid",
   component: MediaGrid,
   args: {
     onOpen: fn(),

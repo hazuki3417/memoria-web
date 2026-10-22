@@ -4,7 +4,7 @@ import { expect, userEvent, within } from "storybook/test"
 import { RelationEditor } from "./RelationEditor"
 
 const meta = {
-  title: "Group Browser/Relation Editor",
+  title: "Features/Group Browser/Relation Editor",
   component: RelationEditor,
   args: {
     label: "Parents",

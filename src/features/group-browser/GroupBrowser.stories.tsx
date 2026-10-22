@@ -8,7 +8,7 @@ const fixtures: GroupBrowserGroup[] = [
 ]
 
 const meta = {
-  title: "Group Browser/Screen Interaction",
+  title: "Features/Group Browser/Screen Interaction",
   component: GroupBrowser,
   parameters: { layout: "fullscreen" },
   args: {
