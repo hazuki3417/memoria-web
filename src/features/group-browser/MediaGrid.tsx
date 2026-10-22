@@ -1,6 +1,7 @@
 "use client"
 
-import { SimpleGrid, Text, UnstyledButton } from "@mantine/core"
+import { SimpleGrid, UnstyledButton } from "@mantine/core"
+import { MediaTile } from "@/components/MediaTile"
 
 const previewImages = Array.from(
   { length: 9 },
@@ -38,17 +39,9 @@ export function MediaGrid({
             display: "block",
             aspectRatio: "1 / 1",
             border: "1px solid var(--mantine-color-default-border)",
-            backgroundImage: src ? `url("${src}")` : undefined,
-            backgroundColor: "var(--mantine-color-default-hover)",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
+                      }}
         >
-          {!src && (
-            <Text size="xs" c="dimmed" ta="center">
-              {label}
-            </Text>
-          )}
+          <MediaTile src={src} label={label} />
         </UnstyledButton>
       ))}
     </SimpleGrid>
