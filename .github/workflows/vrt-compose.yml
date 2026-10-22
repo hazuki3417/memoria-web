@@ -1,0 +1,42 @@
+name: VRT Docker Compose smoke test
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - "compose.yaml"
+      - "e2e/storybook-visual/**"
+      - "playwright.storybook-visual.config.ts"
+      - ".github/workflows/vrt-compose.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vrt-compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify Compose configuration
+        run: docker compose --profile vrt config --quiet
+      - name: Inspect image runtime and fonts
+        run: |
+          docker compose --profile vrt run --rm --entrypoint /bin/bash vrt -euc '
+            node --version
+            fc-list | head -n 10 || true
+          '
+      - name: Compare approved VRT baselines
+        run: docker compose --profile vrt run --rm vrt
+      - name: Upload Playwright diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-compose-diagnostics
+          path: |
+            e2e/storybook-visual/report/
+            e2e/storybook-visual/test-results/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 7
