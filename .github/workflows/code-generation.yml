@@ -1,4 +1,4 @@
-name: code-generation
+name: Automation / GraphQL Code Generation
 
 on:
   issue_comment:
