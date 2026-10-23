@@ -14,6 +14,7 @@ import {
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
+import { formatUsageBytes, usagePercent, type FileSizeUnit } from "./usageSize"
 import { SectionHeader } from "@/components/SectionHeader"
 import {
   sortUsageFormats,
@@ -23,10 +24,8 @@ import {
 } from "./sortUsageFormats"
 
 export type SettingsUsageData = {
-  usedStorageLabel: string
-  effectiveLimitLabel: string
-  availableStorageLabel: string
-  storageUsagePercent: number
+  usedBytes: number
+  limitBytes: number
   mediaCount: number
   formatBreakdown?: UsageFormatItem[]
 }
@@ -43,9 +42,11 @@ type UsageStatus = "ready" | "loading" | "error"
 function UsageStorageSection({
   usage,
   status,
+  fileSizeUnit,
 }: {
   usage: SettingsUsageData
   status: UsageStatus
+  fileSizeUnit: FileSizeUnit
 }) {
   return (
     <Box>
@@ -57,7 +58,7 @@ function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              {usage.usedStorageLabel}{` ( ${usage.storageUsagePercent} % )`}
+              {formatUsageBytes(usage.usedBytes, fileSizeUnit)}{` ( ${usagePercent(usage.usedBytes, usage.limitBytes)} % )`}
             </Text>
           )}
         </Group>
@@ -67,7 +68,7 @@ function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              {usage.availableStorageLabel}{` ( ${Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} % )`}
+              {formatUsageBytes(Math.max(0, usage.limitBytes - usage.usedBytes), fileSizeUnit)}{` ( ${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "")} % )`}
             </Text>
           )}
         </Group>
@@ -76,18 +77,18 @@ function UsageStorageSection({
         ) : (
           <Progress.Root
             size="md"
-            aria-label={`ストレージ使用率 ${usage.storageUsagePercent}%、ファイル形式別内訳`}
+            aria-label={`ストレージ使用率 ${usagePercent(usage.usedBytes, usage.limitBytes)}%、ファイル形式別内訳`}
           >
             {usage.formatBreakdown?.map((item) => (
               <Progress.Section
                 key={item.format}
-                value={item.capacityPercent}
+                value={usagePercent(item.sizeBytes, usage.limitBytes)}
                 color={formatColors[item.format] ?? "gray"}
-                aria-label={`${item.format} ${item.capacityPercent}%`}
+                aria-label={`${item.format} ${usagePercent(item.sizeBytes, usage.limitBytes)}%`}
               />
             )) ?? (
               <Progress.Section
-                value={usage.storageUsagePercent}
+                value={usagePercent(usage.usedBytes, usage.limitBytes)}
                 color="blue"
               />
             )}
@@ -99,7 +100,7 @@ function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              {usage.effectiveLimitLabel} ( 100 % )
+              {formatUsageBytes(usage.limitBytes, fileSizeUnit)} ( 100 % )
             </Text>
           )}
         </Group>
@@ -113,11 +114,13 @@ function UsageFormatBreakdownSection({
   status,
   sort,
   onSort,
+  fileSizeUnit,
 }: {
   usage: SettingsUsageData
   status: UsageStatus
   sort: UsageSort
   onSort: (key: UsageSortKey) => void
+  fileSizeUnit: FileSizeUnit
 }) {
   const sortedBreakdown = useMemo(
     () => sortUsageFormats(usage.formatBreakdown ?? [], sort),
@@ -234,8 +237,8 @@ function UsageFormatBreakdownSection({
                   <Table.Td ta="right">
                     {item.count.toLocaleString("ja-JP")} 件
                   </Table.Td>
-                  <Table.Td ta="right">{item.sizeLabel}</Table.Td>
-                  <Table.Td ta="right">{item.capacityPercent} %</Table.Td>
+                  <Table.Td ta="right">{formatUsageBytes(item.sizeBytes, fileSizeUnit)}</Table.Td>
+                  <Table.Td ta="right">{usagePercent(item.sizeBytes, usage.limitBytes)} %</Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -250,8 +253,8 @@ function UsageFormatBreakdownSection({
                   <Table.Th ta="right">
                   {usage.mediaCount.toLocaleString("ja-JP")} 件
                   </Table.Th>
-                  <Table.Th ta="right">{usage.usedStorageLabel}</Table.Th>
-                  <Table.Th ta="right">{usage.storageUsagePercent} %</Table.Th>
+                  <Table.Th ta="right">{formatUsageBytes(usage.usedBytes, fileSizeUnit)}</Table.Th>
+                  <Table.Th ta="right">{usagePercent(usage.usedBytes, usage.limitBytes)} %</Table.Th>
                 </Table.Tr>
               </Table.Tfoot>
             )}
@@ -288,11 +291,13 @@ export function SettingsUsage({
   scope = "personal",
   status = "ready",
   onRetry,
+  fileSizeUnit = "DECIMAL",
 }: {
   usage: SettingsUsageData
   scope?: "personal" | "community"
   status?: UsageStatus
   onRetry?: () => void
+  fileSizeUnit?: FileSizeUnit
 }) {
   const [sort, setSort] = useState<UsageSort>(null)
   const toggleSort = (key: UsageSortKey) => {
@@ -321,12 +326,13 @@ export function SettingsUsage({
             role={status === "loading" ? "status" : undefined}
             aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
           >
-            <UsageStorageSection usage={usage} status={status} />
+            <UsageStorageSection usage={usage} status={status} fileSizeUnit={fileSizeUnit} />
             <UsageFormatBreakdownSection
               usage={usage}
               status={status}
               sort={sort}
               onSort={toggleSort}
+              fileSizeUnit={fileSizeUnit}
             />
           </Stack>
         )}
