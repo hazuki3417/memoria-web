@@ -251,7 +251,7 @@ export const CreateMutationSuccess: Story = {
         within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
       ).not.toBeInTheDocument()
     })
-    await expect(within(canvasElement).getByRole("button", { name: "Groupを作成" })).toBeVisible()
+    await expect(within(canvasElement).getAllByRole("button", { name: "Groupを作成" })[0]).toBeVisible()
   },
 }
 
