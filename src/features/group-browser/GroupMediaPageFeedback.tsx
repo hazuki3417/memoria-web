@@ -1,6 +1,6 @@
 "use client"
 
-import { Alert, Button, Stack, Text } from "@mantine/core"
+import { Alert, Button, Center, Loader, Stack, Text } from "@mantine/core"
 
 export function GroupMediaPageFeedback({
   state,
@@ -19,8 +19,11 @@ export function GroupMediaPageFeedback({
       </Stack>
     </Alert>
   ) : state === "loading" ? (
-    <Text size="xs" c="dimmed" mt="sm" role="status">
-      追加のMediaを取得しています
-    </Text>
+    <Center py="md" role="status">
+      <Stack align="center" gap="xs">
+        <Loader size="sm" />
+        <Text size="xs" c="dimmed">追加のMediaを取得しています</Text>
+      </Stack>
+    </Center>
   ) : null
 }

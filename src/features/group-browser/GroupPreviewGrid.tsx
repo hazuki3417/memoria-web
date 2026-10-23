@@ -1,46 +1,13 @@
 "use client"
 
 import { Box, SimpleGrid, Text } from "@mantine/core"
+import { MediaGroupTile } from "@/components/MediaGroupTile"
 
 export const previewImages = Array.from(
   { length: 9 },
   (_, index) =>
     `/__dev-assets/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
 )
-
-function GroupVisual({ startIndex }: { startIndex: number }) {
-  const mediaIndexes = Array.from(
-    { length: 3 },
-    (_, index) => startIndex + index,
-  )
-
-  return (
-    <Box
-      w="100%"
-      h="100%"
-      bg="var(--mantine-color-default-hover)"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "2fr 1fr",
-        gridTemplateRows: "1fr 1fr",
-        gap: 2,
-        overflow: "hidden",
-      }}
-    >
-      {mediaIndexes.map((mediaIndex, index) => (
-        <Box
-          key={mediaIndex}
-          style={{
-            gridRow: index === 0 ? "1 / 3" : undefined,
-            backgroundImage: `url("${previewImages[mediaIndex % previewImages.length]}")`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        />
-      ))}
-    </Box>
-  )
-}
 
 export function GroupPreviewGrid({
   count,
@@ -100,7 +67,7 @@ export function GroupPreviewGrid({
                   bg="var(--mantine-color-default-hover)"
                 />
               ) : (
-                <GroupVisual startIndex={groupVisualStart} />
+                <MediaGroupTile sources={Array.from({ length: 3 }, (_, offset) => previewImages[(groupVisualStart + offset) % previewImages.length])} />
               ))}
             {continuation && (
               <Box

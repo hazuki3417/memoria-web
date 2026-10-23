@@ -8,20 +8,18 @@ import {
   Group,
   Center,
   Loader,
-  Paper,
   ScrollArea,
   SimpleGrid,
   Stack,
   Text,
   TextInput,
+  ThemeIcon,
   UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
-  IconEdit,
   IconFolderPlus,
   IconSearch,
-  IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useMemo, useState } from "react"
@@ -31,7 +29,9 @@ import { MediaDetailDialog } from "@/features/media-detail"
 import { validGroupName } from "./groupName"
 import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
+import { GroupDetailPane } from "./GroupDetailPane"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
+import { LoadMoreSentinel } from "./LoadMoreSentinel"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
 import { GroupDeleteDialog } from "./GroupDeleteDialog"
 import { GroupCreateDialog } from "./GroupCreateDialog"
@@ -41,7 +41,7 @@ import { filterVisibleGroups } from "./groupSearch"
 import { useGroupSearchState } from "./useGroupSearchState"
 import { useGroupNavigation } from "./useGroupNavigation"
 import { useGroupCreateController } from "./useGroupCreateController"
-import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
+import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
 
 export type GroupBrowserGroup = {
   id: string
@@ -91,86 +91,13 @@ export type GroupBrowserProps = {
   onRetryRelationCandidates?: () => Promise<void>
   canManage?: boolean
   hideManagementActions?: boolean
+  discoveryState?: "ready" | "loading" | "error"
+  onRetryDiscovery?: () => void
+  discoveryPageState?: "idle" | "loading" | "error"
+  onRetryDiscoveryPage?: () => void
+  onDiscoveryEndVisible?: () => void
+  onMediaEndVisible?: () => void
 }
-
-type GroupFixture = {
-  id: string
-  name: string
-  mediaCount: number
-  previewCount: number
-  parentNames: string[]
-  childNames: string[]
-}
-
-const groups: GroupFixture[] = [
-  {
-    id: "travel",
-    name: "旅行",
-    mediaCount: 128,
-    previewCount: 7,
-    parentNames: ["2026"],
-    childNames: ["北海道", "東北", "関東"],
-  },
-  {
-    id: "family",
-    name: "家族",
-    mediaCount: 84,
-    previewCount: 4,
-    parentNames: [],
-    childNames: ["イベント"],
-  },
-  {
-    id: "food",
-    name: "料理",
-    mediaCount: 42,
-    previewCount: 3,
-    parentNames: ["日常"],
-    childNames: [],
-  },
-  {
-    id: "landscape",
-    name: "風景写真",
-    mediaCount: 31,
-    previewCount: 1,
-    parentNames: ["旅行", "お気に入り"],
-    childNames: ["山", "海", "夕景"],
-  },
-  {
-    id: "archive",
-    name: "あとで整理する写真と動画をまとめた非常に長い名前のGroup",
-    mediaCount: 18,
-    previewCount: 2,
-    parentNames: ["アーカイブ"],
-    childNames: ["未整理"],
-  },
-  {
-    id: "empty",
-    name: "新しいGroup",
-    mediaCount: 3,
-    previewCount: 0,
-    parentNames: [],
-    childNames: [],
-  },
-]
-
-const relationCandidateNames = [
-  ...groups.map((group) => group.name),
-  "北海道",
-  "東北",
-  "関東",
-  "関西",
-  "九州",
-  "イベント",
-  "日常",
-  "お気に入り",
-  "山",
-  "海",
-  "夕景",
-  "夜景",
-  "ポートレート",
-  "アーカイブ",
-  "未整理",
-]
 
 export function GroupBrowser({
   contextKind = "personal",
@@ -193,17 +120,20 @@ export function GroupBrowser({
   onRetryRelationCandidates,
   canManage = true,
   hideManagementActions = false,
+  discoveryState = "ready",
+  onRetryDiscovery,
+  discoveryPageState = "idle",
+  onRetryDiscoveryPage,
+  onDiscoveryEndVisible,
+  onMediaEndVisible,
 }: GroupBrowserProps) {
   const { saving, runAction } = useGroupMutationAction()
   const {
-    createdGroups, createOpened, createName, createParents, createChildren,
+    createOpened, createName, createParents, createChildren,
     setCreateName, setCreateParents, setCreateChildren, openCreate, submitCreate,
     closeCreate,
   } = useGroupCreateController({ onCreateGroup, runAction })
-  const allGroups = useMemo(
-    () => [...(groupsData ?? groups), ...createdGroups],
-    [groupsData, createdGroups],
-  )
+  const allGroups = groupsData ?? []
   const { query, setQuery, appliedQuery, setAppliedQuery } = useGroupSearchState()
   const {
     selectedId, compact, compactView, splitViewRef, savedLayout,
@@ -213,27 +143,16 @@ export function GroupBrowser({
   } = useGroupNavigation(onSelectGroup)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = useMemo(
-    () =>
-      mediaItemsData
-        ? mediaItemsData.map((item) => ({
-            ...item,
-            src: item.src ?? "",
-            failed: !item.src,
-          }))
-        : Array.from({ length: 24 }, (_, index) => ({
-            id: `group-media-${index + 1}`,
-            label: `Media ${index + 1}`,
-            src: previewImages[index % previewImages.length],
-          })),
+    () => (mediaItemsData ?? []).map((item) => ({
+      ...item,
+      src: item.src ?? "",
+      failed: !item.src,
+    })),
     [mediaItemsData],
   )
 
   const openMediaAt = (index: number) => {
-    if (!mediaItemsData) {
-      setMediaDetailIndex(index)
-      return
-    }
-    const id = mediaItemsData[index]?.id
+    const id = mediaItemsData?.[index]?.id
     const availableIndex = groupMediaItems.findIndex((item) => item.id === id)
     if (availableIndex >= 0) setMediaDetailIndex(availableIndex)
   }
@@ -250,6 +169,62 @@ export function GroupBrowser({
     () => filterVisibleGroups(allGroups, appliedQuery, groupsData !== undefined),
     [allGroups, appliedQuery, groupsData],
   )
+
+  const emptyGroupState = discoveryState === "ready" && allGroups.length === 0 && !appliedQuery.trim() ? (
+    <Center mih={360}>
+      <Stack align="center" maw={420}>
+        <ThemeIcon size={48} radius="xl" variant="light">
+          <IconFolderPlus size={24} />
+        </ThemeIcon>
+        <Text fw={700} size="lg">まだGroupがありません</Text>
+        <Text size="sm" c="dimmed" ta="center">
+          最初のGroupを作成すると、ここからMediaを整理できます。
+        </Text>
+        {!hideManagementActions && (
+          <Button leftSection={<IconFolderPlus size={16} />} onClick={openCreate} disabled={!canManage}>
+            Groupを作成
+          </Button>
+        )}
+      </Stack>
+    </Center>
+  ) : null
+
+  const discoveryFeedback = discoveryState === "loading" ? (
+    <Center mih={360}>
+      <Stack align="center">
+        <Loader />
+        <Text size="sm" c="dimmed">Groupを読み込んでいます</Text>
+      </Stack>
+    </Center>
+  ) : discoveryState === "error" ? (
+    <Box p="sm">
+      <Alert color="red" title="Group一覧を取得できませんでした">
+        <Stack gap="xs" align="flex-start">
+          <Text size="sm">Group一覧の取得に失敗しました。再試行できます。</Text>
+          <Button size="xs" variant="light" onClick={onRetryDiscovery}>再試行</Button>
+        </Stack>
+      </Alert>
+    </Box>
+  ) : null
+  const discoveryPageFeedback = discoveryPageState === "loading" ? (
+    <Center py="lg"><Stack align="center" gap={6}><Loader size="sm" /><Text size="xs" c="dimmed">追加のGroupを取得しています</Text></Stack></Center>
+  ) : discoveryPageState === "error" ? (
+    <Box p="sm"><Alert color="red" title="追加のGroupを取得できませんでした"><Button size="xs" variant="light" mt="xs" onClick={onRetryDiscoveryPage}>再試行</Button></Alert></Box>
+  ) : null
+  const searchEmptyState = discoveryState === "ready" && allGroups.length > 0 && visibleGroups.length === 0 && appliedQuery.trim() ? (
+    <Center mih={360}>
+      <Stack align="center" maw={420}>
+        <ThemeIcon size={48} radius="xl" variant="light" color="gray">
+          <IconSearch size={24} />
+        </ThemeIcon>
+        <Text fw={700} size="lg">一致するGroupがありません</Text>
+        <Text size="sm" c="dimmed" ta="center">検索条件を変更するか、検索を解除してください。</Text>
+        <Button variant="default" onClick={() => { setQuery(""); setAppliedQuery("") }}>
+          検索を解除
+        </Button>
+      </Stack>
+    </Center>
+  ) : null
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
@@ -290,7 +265,7 @@ export function GroupBrowser({
       name={createName}
       parents={createParents}
       children={createChildren}
-      candidates={candidates ?? relationCandidateNames}
+      candidates={candidates ?? []}
       canManage={canManage}
       saving={saving}
       onNameChange={setCreateName}
@@ -345,7 +320,7 @@ export function GroupBrowser({
       name={draftName}
       parents={draftParents}
       children={draftChildren}
-      candidates={candidates ?? relationCandidateNames}
+      candidates={candidates ?? []}
       currentGroupName={selected?.name ?? ""}
       availability={relationAvailability}
       canManage={canManage}
@@ -468,6 +443,9 @@ export function GroupBrowser({
               </Box>
               <Divider />
               <ScrollArea flex={1}>
+                {discoveryFeedback}
+                {emptyGroupState}
+                {searchEmptyState}
                 <Box
                   p="sm"
                   style={{
@@ -476,7 +454,7 @@ export function GroupBrowser({
                     gap: "var(--mantine-spacing-sm)",
                   }}
                 >
-                  {visibleGroups.map((group) => (
+                  {(discoveryState === "ready" ? visibleGroups : []).map((group) => (
                     <UnstyledButton
                       key={group.id}
                       ref={(element) => {
@@ -512,71 +490,16 @@ export function GroupBrowser({
                     </UnstyledButton>
                   ))}
                 </Box>
+                {discoveryPageFeedback}
+                {onDiscoveryEndVisible && discoveryPageState !== "error" && <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />}
               </ScrollArea>
             </Box>
           ) : (
-            <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
-              <Box
-                pb="xs"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "minmax(0, 1fr) auto",
-                  alignItems: "center",
-                  gap: "var(--mantine-spacing-xs)",
-                }}
-              >
-                <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
-                  <Text
-                    fw={700}
-                    truncate="end"
-                    ref={compactDetailHeadingRef}
-                    tabIndex={-1}
-                  >
-                    {selected?.name ?? ""}
-                  </Text>
-                </Group>
-                <Button
-                  size="xs"
-                  variant="default"
-                  leftSection={<IconX size={16} />}
-                  onClick={closeDetail}
-                >
-                  一覧に戻る
-                </Button>
-              </Box>
-              <Divider />
-              {relationCandidateFeedback}
-              {relationDetailSection}
-              <Divider />
-              <ScrollArea flex={1}>
-                <Box p="sm">
-                  {mediaDetailState === "loading" ? (
-                    <Center mih={180}><Loader /></Center>
-                  ) : mediaDetailState === "error" ? (
-                    <Alert color="red" title="GroupのMediaを取得できませんでした">
-                      <Stack gap="xs" align="flex-start">
-                        <Text size="sm">最新のGroup情報を確認するため、再取得してください。</Text>
-                        <Button size="xs" variant="light" onClick={() => void onRetryGroupMedia?.()}>
-                          再試行
-                        </Button>
-                      </Stack>
-                    </Alert>
-                  ) : (selected?.mediaCount ?? 0) === 0 ? (
-                    <Paper withBorder p="xl" ta="center">
-                      <Text fw={600}>Mediaがありません</Text>
-                      <Text size="sm" c="dimmed" mt={4}>
-                        このGroupまたはその下位Groupに分類されたMediaはありません。
-                      </Text>
-                    </Paper>
-                  ) : (
-                    <>
-                      <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
-                      {mediaPageFeedback}
-                    </>
-                  )}
-                </Box>
-              </ScrollArea>
-            </Box>
+            <GroupDetailPane compact selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData}
+                onRetryGroupMedia={onRetryGroupMedia} onMediaEndVisible={onMediaEndVisible} onOpenMedia={openMediaAt}
+                mediaPageFeedback={mediaPageFeedback} relationCandidateFeedback={relationCandidateFeedback}
+                relationDetailSection={relationDetailSection} hideManagementActions={hideManagementActions}
+                canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} headingRef={compactDetailHeadingRef} />
           )}
         </Box>
       ) : (
@@ -652,6 +575,9 @@ export function GroupBrowser({
               </Box>
               <Divider />
               <ScrollArea flex={1}>
+                {discoveryFeedback}
+                {emptyGroupState}
+                {searchEmptyState}
                 <Box
                   p="sm"
                   style={{
@@ -660,7 +586,7 @@ export function GroupBrowser({
                     gap: "var(--mantine-spacing-sm)",
                   }}
                 >
-                  {visibleGroups.map((group) => {
+                  {(discoveryState === "ready" ? visibleGroups : []).map((group) => {
                     const selectedItem = group.id === selectedId
                     return (
                       <UnstyledButton
@@ -699,6 +625,8 @@ export function GroupBrowser({
                     )
                   })}
                 </Box>
+                {discoveryPageFeedback}
+                {onDiscoveryEndVisible && discoveryPageState !== "error" && <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />}
               </ScrollArea>
             </Box>
           </SplitView.Pane>
@@ -722,89 +650,11 @@ export function GroupBrowser({
                   exit={{ opacity: 0, x: 100 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Box
-                    style={{
-                      display: selectedId ? "flex" : "none",
-                      flexDirection: "column",
-                      minWidth: 0,
-                      minHeight: 0,
-                      height: "100%",
-                    }}
-                  >
-                    <Box
-                      pb="xs"
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "minmax(0, 1fr) auto",
-                        alignItems: "center",
-                        gap: "var(--mantine-spacing-xs)",
-                      }}
-                    >
-                      <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
-                        <Text fw={700} truncate="end">
-                          {selected?.name ?? ""}
-                        </Text>
-                      </Group>
-                      <Group gap="xs" wrap="nowrap" justify="flex-end">
-                        {!hideManagementActions && (
-                        <Button
-                          size="xs"
-                          variant="default"
-                          leftSection={<IconEdit size={16} />}
-                          onClick={openEdit}
-                          disabled={!canManage || !detailsReady}
-                        >
-                          編集
-                        </Button>
-                        )}
-                        <Button
-                          size="xs"
-                          variant="default"
-                          leftSection={<IconX size={16} />}
-                          onClick={closeDetail}
-                        >
-                          閉じる
-                        </Button>
-                      </Group>
-                    </Box>
-                    <Divider />
-                    {relationCandidateFeedback}
-
-                    {relationDetailSection}
-                    <Divider />
-
-                    <ScrollArea flex={1}>
-                      <Box p="sm">
-                        {mediaDetailState === "loading" ? (
-                          <Center mih={180}><Loader /></Center>
-                        ) : mediaDetailState === "error" ? (
-                          <Alert color="red" title="GroupのMediaを取得できませんでした">
-                            <Stack gap="xs" align="flex-start">
-                              <Text size="sm">最新のGroup情報を確認するため、再取得してください。</Text>
-                              <Button size="xs" variant="light" onClick={() => void onRetryGroupMedia?.()}>
-                                再試行
-                              </Button>
-                            </Stack>
-                          </Alert>
-                        ) : (selected?.mediaCount ?? 0) === 0 ? (
-                          <Paper withBorder p="xl" ta="center">
-                            <Text fw={600}>Mediaがありません</Text>
-                            <Text size="sm" c="dimmed" mt={4}>
-                              このGroupまたはその下位Groupに分類されたMediaはありません。
-                            </Text>
-                          </Paper>
-                        ) : (
-                          <>
-                            <MediaGrid
-                              onOpen={openMediaAt}
-                              items={mediaItemsData}
-                            />
-                            {mediaPageFeedback}
-                          </>
-                        )}
-                      </Box>
-                    </ScrollArea>
-                  </Box>
+                  <GroupDetailPane selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData}
+                onRetryGroupMedia={onRetryGroupMedia} onMediaEndVisible={onMediaEndVisible} onOpenMedia={openMediaAt}
+                mediaPageFeedback={mediaPageFeedback} relationCandidateFeedback={relationCandidateFeedback}
+                relationDetailSection={relationDetailSection} hideManagementActions={hideManagementActions}
+                canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} />
                 </motion.div>
               )}
             </AnimatePresence>

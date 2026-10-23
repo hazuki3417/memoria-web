@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { Alert, Button, Center, Loader, Stack, Text } from "@mantine/core"
 import {
   MediaGroupSort,
   CommunityMemberRole,
@@ -62,6 +61,9 @@ export function GroupBrowserContainer({
     variables: { id: selectedId ?? "", scope },
     skip: !selectedId,
   })
+  // Apollo exposes its previous query result during a fetchMore transition;
+  // this is a read from Apollo, not a second Server State store.
+  const detailData = detail.data ?? detail.previousData
   const candidateQuery = useBrowseGroupRelationCandidatesQuery({
     variables: { groupId: selectedId ?? "", first: 100 },
     skip: !selectedId,
@@ -133,43 +135,30 @@ export function GroupBrowserContainer({
   }, [candidateCursor, candidateQuery.loading, candidateQuery.error,
       candidateQuery.fetchMore, candidateLoadFailureId, candidateRetryingId, selectedId])
 
-  const mediaCursor =
-    detail.data?.mediaGroup?.id === selectedId &&
-    detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
-      ? detail.data.mediaGroup.aggregateMedia.pageInfo.endCursor
-      : null
+  const mediaCursor = detailData?.mediaGroup?.id === selectedId &&
+    detailData.mediaGroup.aggregateMedia.pageInfo.hasNextPage
+    ? detailData.mediaGroup.aggregateMedia.pageInfo.endCursor : null
   const mediaPageKey = selectedId && mediaCursor ? selectedId + ":" + mediaCursor : null
   const [mediaPageFailedKey, setMediaPageFailedKey] = useState<string | null>(null)
+  const [mediaPageLoadingKey, setMediaPageLoadingKey] = useState<string | null>(null)
   const mediaPageInFlight = useRef<string | null>(null)
+  const mediaPageCompleted = useRef<string | null>(null)
 
-  // Retry the failed cursor explicitly while preserving already loaded Media.
-  const retryMediaPage = useCallback(() => {
-    if (mediaPageKey && mediaPageFailedKey === mediaPageKey) {
-      setMediaPageFailedKey(null)
-    }
-  }, [mediaPageKey, mediaPageFailedKey])
-
-  useEffect(() => {
-    if (
-      !mediaPageKey || !mediaCursor || !selectedId ||
-      detail.loading ||
-      mediaPageFailedKey === mediaPageKey ||
-      mediaPageInFlight.current === mediaPageKey
-    ) return
+  const fetchMediaPage = useCallback((retry = false) => {
+    if (!mediaPageKey || !mediaCursor || !selectedId || detail.loading ||
+        mediaPageInFlight.current === mediaPageKey ||
+        mediaPageCompleted.current === mediaPageKey ||
+        (!retry && mediaPageFailedKey === mediaPageKey)) return
     mediaPageInFlight.current = mediaPageKey
+    if (retry) setMediaPageFailedKey(null)
+    setMediaPageLoadingKey(mediaPageKey)
     void detail.fetchMore({
       variables: { id: selectedId, scope, mediaAfter: mediaCursor },
       updateQuery: (previous, { fetchMoreResult }) => {
-        if (
-          !previous.mediaGroup ||
-          !fetchMoreResult?.mediaGroup ||
-          previous.mediaGroup.id !== fetchMoreResult.mediaGroup.id
-        )
-          return previous
+        if (!previous.mediaGroup || !fetchMoreResult?.mediaGroup ||
+            previous.mediaGroup.id !== fetchMoreResult.mediaGroup.id) return previous
         const incoming = fetchMoreResult.mediaGroup.aggregateMedia
-        const seen = new Set(
-          previous.mediaGroup.aggregateMedia.edges.map((edge) => edge.cursor),
-        )
+        const seen = new Set(previous.mediaGroup.aggregateMedia.edges.map(edge => edge.cursor))
         return {
           ...previous,
           mediaGroup: {
@@ -178,24 +167,23 @@ export function GroupBrowserContainer({
               ...incoming,
               edges: [
                 ...previous.mediaGroup.aggregateMedia.edges,
-                ...incoming.edges.filter((edge) => !seen.has(edge.cursor)),
+                ...incoming.edges.filter(edge => !seen.has(edge.cursor)),
               ],
             },
           },
         }
       },
-    })
-    .catch(() => {
-      // Avoid an automatic retry loop; allow a deliberate retry instead.
+    }).then(() => {
+      mediaPageCompleted.current = mediaPageKey
+    }).catch(() => {
       setMediaPageFailedKey(mediaPageKey)
+    }).finally(() => {
+      if (mediaPageInFlight.current === mediaPageKey) mediaPageInFlight.current = null
+      setMediaPageLoadingKey(current => current === mediaPageKey ? null : current)
     })
-    .finally(() => {
-      if (mediaPageInFlight.current === mediaPageKey) {
-        mediaPageInFlight.current = null
-      }
-    })
-  }, [mediaPageKey, mediaCursor, selectedId, detail.loading,
-      detail.fetchMore, mediaPageFailedKey])
+  }, [mediaPageKey, mediaCursor, selectedId, detail.loading, detail.fetchMore, mediaPageFailedKey, scope])
+  const requestMediaPage = useCallback(() => fetchMediaPage(), [fetchMediaPage])
+  const retryMediaPage = useCallback(() => fetchMediaPage(true), [fetchMediaPage])
 
   const [createGroup] = useCreateBrowserGroupMutation()
   const [updateGroup] = useUpdateBrowserGroupMutation()
@@ -203,38 +191,71 @@ export function GroupBrowserContainer({
   const [addToGroup] = useAddBrowserMediaToGroupMutation()
   const [removeFromGroup] = useRemoveBrowserMediaFromGroupMutation()
 
-  const page = listing.data?.mediaGroups
+  const listingSnapshot = listing.data ?? listing.previousData
+  const page = listingSnapshot?.mediaGroups
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
 
-  // The backend bounds individual pages; continue fetching until the scope's
-  // complete group set is available for name-based relation selection.
-  useEffect(() => {
-    if (!nextCursor || listing.loading) return
+  const listingPageKey = nextCursor
+  const [listingPageFailedCursor, setListingPageFailedCursor] = useState<string | null>(null)
+  const [listingPageLoadingCursor, setListingPageLoadingCursor] = useState<string | null>(null)
+  const listingPageInFlight = useRef<string | null>(null)
+  const listingPageCompleted = useRef<string | null>(null)
+
+  const fetchListingPage = useCallback((retry = false) => {
+    if (!nextCursor || listing.loading || listingPageInFlight.current === nextCursor ||
+        listingPageCompleted.current === nextCursor ||
+        (!retry && listingPageFailedCursor === nextCursor)) return
+    // Capture the current Apollo connection for cache reconciliation after fetchMore.
+    const previousEdges = listingSnapshot?.mediaGroups.edges ?? []
+    listingPageInFlight.current = nextCursor
+    if (retry) setListingPageFailedCursor(null)
+    setListingPageLoadingCursor(nextCursor)
     void listing.fetchMore({
       variables: { after: nextCursor },
       updateQuery: (previous, { fetchMoreResult }) => {
         const incoming = fetchMoreResult?.mediaGroups
         if (!incoming) return previous
-        const seen = new Set(
-          previous.mediaGroups.edges.map((edge) => edge.cursor),
-        )
+        const seen = new Set(previous.mediaGroups.edges.map(edge => edge.cursor))
         return {
           ...previous,
           mediaGroups: {
             ...incoming,
             edges: [
               ...previous.mediaGroups.edges,
-              ...incoming.edges.filter((edge) => !seen.has(edge.cursor)),
+              ...incoming.edges.filter(edge => !seen.has(edge.cursor)),
             ],
           },
         }
       },
+    }).then(() => {
+      // Reconcile against the original Apollo page after fetchMore has settled:
+      // some cache configurations momentarily expose only the incoming page.
+      listing.updateQuery(previous => {
+        if (!previous.mediaGroups) return previous
+        const incomingEdges = previous.mediaGroups.edges
+        const seen = new Set(previousEdges.map(edge => edge.cursor))
+        return {
+          ...previous,
+          mediaGroups: {
+            ...previous.mediaGroups,
+            edges: [...previousEdges, ...incomingEdges.filter(edge => !seen.has(edge.cursor))],
+          },
+        }
+      })
+      listingPageCompleted.current = nextCursor
+    }).catch(() => {
+      setListingPageFailedCursor(nextCursor)
+    }).finally(() => {
+      if (listingPageInFlight.current === nextCursor) listingPageInFlight.current = null
+      setListingPageLoadingCursor(current => current === nextCursor ? null : current)
     })
-  }, [nextCursor, listing.loading, listing.fetchMore])
+  }, [nextCursor, listing.loading, listing.fetchMore, listingPageFailedCursor, listingSnapshot, listing.updateQuery])
+  const requestListingPage = useCallback(() => fetchListingPage(), [fetchListingPage])
+  const retryListingPage = useCallback(() => fetchListingPage(true), [fetchListingPage])
 
   const allGroups = useMemo<GroupBrowserGroup[]>(() => {
-    const currentDetail = detail.data?.mediaGroup
-    return (listing.data?.mediaGroups.edges ?? []).map(({ node }) => {
+    const currentDetail = detailData?.mediaGroup
+    return (listingSnapshot?.mediaGroups.edges ?? []).map(({ node }) => {
       const matching = currentDetail?.id === node.id ? currentDetail : null
       return {
         id: node.id,
@@ -249,7 +270,7 @@ export function GroupBrowserContainer({
           matching?.children.edges.map(({ node: child }) => child.name) ?? [],
       }
     })
-  }, [listing.data, detail.data])
+  }, [listingSnapshot, detailData])
 
   const relationAvailability = useMemo(() => {
     const result: Record<
@@ -279,27 +300,27 @@ export function GroupBrowserContainer({
   const groupMemberships = useMemo<Record<string, string[]>>(
     () =>
       Object.fromEntries(
-        (detail.data?.mediaGroup?.id === selectedId
-          ? detail.data.mediaGroup.aggregateMedia.edges
+        (detailData?.mediaGroup?.id === selectedId
+          ? detailData.mediaGroup.aggregateMedia.edges
           : []
         ).map(({ node }) => [
           node.id,
           node.groups.edges.map(({ node: group }) => group.name),
         ]),
       ),
-    [detail.data, selectedId],
+    [detailData, selectedId],
   )
 
   const mediaItemsData = useMemo(
     () =>
-      detail.data?.mediaGroup?.id === selectedId
-        ? detail.data.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
+      detailData?.mediaGroup?.id === selectedId
+        ? detailData.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
             id: node.id,
             label: node.originalFileName,
             src: node.image?.variants[0]?.url ?? null,
           }))
         : [],
-    [detail.data, selectedId],
+    [detailData, selectedId],
   )
 
   const nameToId = useMemo(
@@ -360,7 +381,7 @@ export function GroupBrowserContainer({
     async (id: string, name: string, parents: string[], children: string[]) => {
       const old = allGroups.find((group) => group.id === id)
       if (!old) throw new Error("Group is no longer available")
-      const currentDetail = detail.data?.mediaGroup
+      const currentDetail = detailData?.mediaGroup
       if (!currentDetail || currentDetail.id !== id ||
           currentDetail.parents.pageInfo.hasNextPage ||
           currentDetail.children.pageInfo.hasNextPage) {
@@ -405,7 +426,7 @@ export function GroupBrowserContainer({
         throw error
       }
     },
-    [allGroups, detail.data, detail.refetch, candidateQuery.refetch, listing.refetch, nameToId, updateGroup, refetch],
+    [allGroups, detailData, detail.refetch, candidateQuery.refetch, listing.refetch, nameToId, updateGroup, refetch],
   )
 
   const onSaveMediaGroups = useCallback(
@@ -457,38 +478,6 @@ export function GroupBrowserContainer({
     [deleteGroup, listing.refetch],
   )
 
-  if (listing.error)
-    return (
-      <Alert color="red" title="Group一覧を取得できませんでした">
-        <Stack gap="xs" align="flex-start">
-          <Text size="sm">Group一覧の取得に失敗しました。再試行できます。</Text>
-          <Button
-            size="xs"
-            variant="light"
-            disabled={listing.loading}
-            loading={listing.loading}
-            onClick={() => {
-              void listing.refetch().catch(() => {
-                // A failed retry stays in the discovery error state.
-              })
-            }}
-          >
-            再試行
-          </Button>
-        </Stack>
-      </Alert>
-    )
-  if (
-    (listing.loading && !listing.data) ||
-    listing.data?.mediaGroups.pageInfo.hasNextPage
-  ) {
-    return (
-      <Center mih={240}>
-        <Loader />
-      </Center>
-    )
-  }
-
   const candidateFailure = Boolean(selectedId && (
     candidateQuery.error || candidateLoadFailureId === selectedId
   ))
@@ -501,6 +490,15 @@ export function GroupBrowserContainer({
 
   return (
     <GroupBrowser
+      discoveryState={listing.error && !listingSnapshot ? "error" : !listingSnapshot ? "loading" : "ready"}
+      discoveryPageState={listingPageKey && listingPageFailedCursor === listingPageKey ? "error" : listingPageKey && listingPageLoadingCursor === listingPageKey ? "loading" : "idle"}
+      onRetryDiscoveryPage={retryListingPage}
+      onDiscoveryEndVisible={requestListingPage}
+      onRetryDiscovery={() => {
+        void listing.refetch().catch(() => {
+          // Keep the discovery error state until a successful response.
+        })
+      }}
       relationCandidateState={
         candidateRetryingId === selectedId ? "loading" :
         candidateFailure ? "error" :
@@ -526,19 +524,20 @@ export function GroupBrowserContainer({
         }
       }}
       mediaPageState={
-        !mediaPageKey || !detail.data?.mediaGroup?.aggregateMedia.edges.length
+        !mediaPageKey || !detailData?.mediaGroup?.aggregateMedia.edges.length
           ? "idle"
           : mediaPageFailedKey === mediaPageKey
             ? "error"
-            : "loading"
+            : mediaPageLoadingKey === mediaPageKey ? "loading" : "idle"
       }
       onRetryMediaPage={retryMediaPage}
+      onMediaEndVisible={requestMediaPage}
       mediaDetailState={
         !selectedId ? "ready" :
-        detail.data?.mediaGroup?.id !== selectedId ? "loading" :
-        detail.data.mediaGroup.aggregateMedia.edges.length > 0 ? "ready" :
+        detailData?.mediaGroup?.id !== selectedId ? "loading" :
+        detailData.mediaGroup.aggregateMedia.edges.length > 0 ? "ready" :
         mediaPageFailedKey === mediaPageKey || detail.error ? "error" :
-        detail.loading || detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
+        detail.loading || detailData.mediaGroup.aggregateMedia.pageInfo.hasNextPage
           ? "loading" : "ready"
       }
       detailsReady={
@@ -552,9 +551,9 @@ export function GroupBrowserContainer({
           !candidateQuery.loading &&
           !candidateQuery.data?.mediaGroupRelationCandidates.pageInfo
             .hasNextPage &&
-          detail.data?.mediaGroup?.id === selectedId &&
-          !detail.data.mediaGroup.parents.pageInfo.hasNextPage &&
-          !detail.data.mediaGroup.children.pageInfo.hasNextPage)
+          detailData?.mediaGroup?.id === selectedId &&
+          !detailData.mediaGroup.parents.pageInfo.hasNextPage &&
+          !detailData.mediaGroup.children.pageInfo.hasNextPage)
       }
       hideManagementActions={
         contextKind === "community" &&

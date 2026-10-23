@@ -115,6 +115,11 @@ export const SearchNoMatches: Story = {
     await userEvent.type(canvas.getByPlaceholderText("Groupを検索"), "存在しないGroup{Enter}")
     await expect(canvas.queryByText("アルバムA")).not.toBeInTheDocument()
     await expect(canvas.queryByText("アルバムB")).not.toBeInTheDocument()
+    await expect(canvas.getByText("一致するGroupがありません")).toBeVisible()
+    await expect(canvas.getByPlaceholderText("Groupを検索")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "検索を解除" }))
+    await expect(canvas.getByText("アルバムA")).toBeVisible()
+    await expect(canvas.getByText("アルバムB")).toBeVisible()
   },
 }
 
@@ -608,8 +613,8 @@ export const EmptyScopeKeepsCreateEntry: Story = {
   args: { groupsData: [] },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeEnabled()
-    await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
+    await expect(canvas.getAllByRole("button", { name: "Groupを作成" })[0]).toBeEnabled()
+    await userEvent.click(canvas.getAllByRole("button", { name: "Groupを作成" })[0])
     const dialog = await within(document.body).findByRole("dialog", { name: "Groupを作成" })
     await waitFor(() => expect(dialog).toBeVisible())
   },

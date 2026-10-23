@@ -1,0 +1,73 @@
+import type { GroupBrowserGroup } from "./GroupBrowser"
+
+export const prototypeGroups: GroupBrowserGroup[] = [
+  {
+    id: "travel",
+    name: "旅行",
+    mediaCount: 128,
+    previewCount: 7,
+    parentNames: ["2026"],
+    childNames: ["北海道", "東北", "関東"],
+  },
+  {
+    id: "family",
+    name: "家族",
+    mediaCount: 84,
+    previewCount: 4,
+    parentNames: [],
+    childNames: ["イベント"],
+  },
+  {
+    id: "food",
+    name: "料理",
+    mediaCount: 42,
+    previewCount: 3,
+    parentNames: ["日常"],
+    childNames: [],
+  },
+  {
+    id: "landscape",
+    name: "風景写真",
+    mediaCount: 31,
+    previewCount: 1,
+    parentNames: ["旅行", "お気に入り"],
+    childNames: ["山", "海", "夕景"],
+  },
+  {
+    id: "archive",
+    name: "あとで整理する写真と動画をまとめた非常に長い名前のGroup",
+    mediaCount: 18,
+    previewCount: 2,
+    parentNames: ["アーカイブ"],
+    childNames: ["未整理"],
+  },
+  {
+    id: "empty",
+    name: "新しいGroup",
+    mediaCount: 3,
+    previewCount: 0,
+    parentNames: [],
+    childNames: [],
+  },
+]
+
+
+export const prototypeRelationCandidateNames = [
+  ...prototypeGroups.map((group) => group.name),
+  "北海道",
+  "東北",
+  "関東",
+  "関西",
+  "九州",
+  "イベント",
+  "日常",
+  "お気に入り",
+  "山",
+  "海",
+  "夕景",
+  "夜景",
+  "ポートレート",
+  "アーカイブ",
+  "未整理",
+]
+
