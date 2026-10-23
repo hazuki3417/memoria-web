@@ -15,7 +15,7 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   DateTime: { input: string; output: string; }
-  Int64: { input: number; output: number; }
+  Int64: { input: string; output: string; }
   Upload: { input: File; output: File; }
 };
 
@@ -88,6 +88,13 @@ export enum CommunityMemberRole {
 export type CommunityMembershipMutationPayload = {
   __typename?: 'CommunityMembershipMutationPayload';
   success: Scalars['Boolean']['output'];
+};
+
+export type CommunityUsage = {
+  __typename?: 'CommunityUsage';
+  formatBreakdown: Array<MediaFormatUsage>;
+  mediaCount: Scalars['Int']['output'];
+  storage: StorageUsage;
 };
 
 export type CreateCommunityInput = {
@@ -193,6 +200,13 @@ export type MediaEdge = {
 
 export type MediaFilterInput = {
   tagIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type MediaFormatUsage = {
+  __typename?: 'MediaFormatUsage';
+  format: OriginalImageFormat;
+  mediaCount: Scalars['Int']['output'];
+  usedBytes: Scalars['Int64']['output'];
 };
 
 export type MediaGroup = {
@@ -471,6 +485,13 @@ export type MutationUpdateUserProfileArgs = {
   input: UpdateUserProfileInput;
 };
 
+export enum OriginalImageFormat {
+  Heif = 'HEIF',
+  Jpeg = 'JPEG',
+  Png = 'PNG',
+  Webp = 'WEBP'
+}
+
 export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor?: Maybe<Scalars['String']['output']>;
@@ -490,6 +511,7 @@ export type Query = {
   community?: Maybe<Community>;
   communityDeletionSnapshot: CommunityDeletionSnapshot;
   communityMembers: Array<CommunityMember>;
+  communityUsage: CommunityUsage;
   me?: Maybe<User>;
   media?: Maybe<Media>;
   mediaGroup?: Maybe<MediaGroup>;
@@ -511,6 +533,11 @@ export type QueryCommunityDeletionSnapshotArgs = {
 
 
 export type QueryCommunityMembersArgs = {
+  communityId: Scalars['ID']['input'];
+};
+
+
+export type QueryCommunityUsageArgs = {
   communityId: Scalars['ID']['input'];
 };
 
@@ -589,6 +616,12 @@ export enum ScopeType {
   Personal = 'PERSONAL'
 }
 
+export type StorageUsage = {
+  __typename?: 'StorageUsage';
+  effectiveLimitBytes: Scalars['Int64']['output'];
+  usedBytes: Scalars['Int64']['output'];
+};
+
 export type UpdateMediaGroupInput = {
   childGroupIds: Array<Scalars['ID']['input']>;
   expectedStateToken: Scalars['String']['input'];
@@ -633,6 +666,7 @@ export type User = {
   preferences: UserPreferences;
   profile: UserProfile;
   updatedAt: Scalars['DateTime']['output'];
+  usage: UserUsage;
 };
 
 export type UserPreferences = {
@@ -649,6 +683,13 @@ export type UserPreferences = {
 export type UserProfile = {
   __typename?: 'UserProfile';
   nickname: Scalars['String']['output'];
+};
+
+export type UserUsage = {
+  __typename?: 'UserUsage';
+  formatBreakdown: Array<MediaFormatUsage>;
+  mediaCount: Scalars['Int']['output'];
+  storage: StorageUsage;
 };
 
 export type OperationAcceptCommunityDeletionInput = {
@@ -725,6 +766,12 @@ export type OperationMediaThumbnailSize =
 export type OperationMediaType =
   | 'IMAGE'
   | 'VIDEO';
+
+export type OperationOriginalImageFormat =
+  | 'HEIF'
+  | 'JPEG'
+  | 'PNG'
+  | 'WEBP';
 
 export type OperationRegisterUserInput = {
   nickname: string;
@@ -839,6 +886,13 @@ export type OperationAcceptCommunityDeletionMutationVariables = Exact<{
 
 export type OperationAcceptCommunityDeletionMutation = { acceptCommunityDeletion: { accepted: boolean } };
 
+export type OperationCommunityUsageQueryVariables = Exact<{
+  communityId: string | number;
+}>;
+
+
+export type OperationCommunityUsageQuery = { communityUsage: { mediaCount: number, storage: { usedBytes: string, effectiveLimitBytes: string }, formatBreakdown: Array<{ format: OperationOriginalImageFormat, mediaCount: number, usedBytes: string }> } };
+
 export type OperationGroupBrowserGroupFragment = { id: string, name: string, stateToken: string, createdAt: string };
 
 export type OperationBrowseGroupsQueryVariables = Exact<{
@@ -931,6 +985,11 @@ export type OperationSaveUserPreferencesMutationVariables = Exact<{
 
 
 export type OperationSaveUserPreferencesMutation = { updateUserPreferences: { preferences: { personalAccentColor: string, dateFormat: OperationDateFormat, fileSizeUnit: OperationFileSizeUnit, mediaThumbnailSize: OperationMediaThumbnailSize, mediaDetailNavigationWrap: boolean, mediaDetailInitialInfoWide: boolean, mediaDetailInitialInfoMedium: boolean } } };
+
+export type OperationPersonalUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OperationPersonalUsageQuery = { me: { usage: { mediaCount: number, storage: { usedBytes: string, effectiveLimitBytes: string }, formatBreakdown: Array<{ format: OperationOriginalImageFormat, mediaCount: number, usedBytes: string }> } } | null };
 
 export const GroupBrowserGroupFragmentDoc = gql`
     fragment GroupBrowserGroup on MediaGroup {
@@ -1331,6 +1390,58 @@ export function useAcceptCommunityDeletionMutation(baseOptions?: Apollo.Mutation
 export type AcceptCommunityDeletionMutationHookResult = ReturnType<typeof useAcceptCommunityDeletionMutation>;
 export type AcceptCommunityDeletionMutationResult = Apollo.MutationResult<OperationAcceptCommunityDeletionMutation>;
 export type AcceptCommunityDeletionMutationOptions = Apollo.BaseMutationOptions<OperationAcceptCommunityDeletionMutation, OperationAcceptCommunityDeletionMutationVariables>;
+export const CommunityUsageDocument = gql`
+    query CommunityUsage($communityId: ID!) {
+  communityUsage(communityId: $communityId) {
+    mediaCount
+    storage {
+      usedBytes
+      effectiveLimitBytes
+    }
+    formatBreakdown {
+      format
+      mediaCount
+      usedBytes
+    }
+  }
+}
+    `;
+
+/**
+ * __useCommunityUsageQuery__
+ *
+ * To run a query within a React component, call `useCommunityUsageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommunityUsageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommunityUsageQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useCommunityUsageQuery(baseOptions: Apollo.QueryHookOptions<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables> & ({ variables: OperationCommunityUsageQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>(CommunityUsageDocument, options);
+      }
+export function useCommunityUsageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>(CommunityUsageDocument, options);
+        }
+// @ts-ignore
+export function useCommunityUsageSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>): Apollo.UseSuspenseQueryResult<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>;
+export function useCommunityUsageSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>): Apollo.UseSuspenseQueryResult<OperationCommunityUsageQuery | undefined, OperationCommunityUsageQueryVariables>;
+export function useCommunityUsageSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>(CommunityUsageDocument, options);
+        }
+export type CommunityUsageQueryHookResult = ReturnType<typeof useCommunityUsageQuery>;
+export type CommunityUsageLazyQueryHookResult = ReturnType<typeof useCommunityUsageLazyQuery>;
+export type CommunityUsageSuspenseQueryHookResult = ReturnType<typeof useCommunityUsageSuspenseQuery>;
+export type CommunityUsageQueryResult = Apollo.QueryResult<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>;
 export const BrowseGroupsDocument = gql`
     query BrowseGroups($scope: ScopeInput!, $search: String, $sort: MediaGroupSort! = NAME_ASC, $first: Int, $after: String) {
   mediaGroups(
@@ -1922,3 +2033,56 @@ export function useSaveUserPreferencesMutation(baseOptions?: Apollo.MutationHook
 export type SaveUserPreferencesMutationHookResult = ReturnType<typeof useSaveUserPreferencesMutation>;
 export type SaveUserPreferencesMutationResult = Apollo.MutationResult<OperationSaveUserPreferencesMutation>;
 export type SaveUserPreferencesMutationOptions = Apollo.BaseMutationOptions<OperationSaveUserPreferencesMutation, OperationSaveUserPreferencesMutationVariables>;
+export const PersonalUsageDocument = gql`
+    query PersonalUsage {
+  me {
+    usage {
+      mediaCount
+      storage {
+        usedBytes
+        effectiveLimitBytes
+      }
+      formatBreakdown {
+        format
+        mediaCount
+        usedBytes
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __usePersonalUsageQuery__
+ *
+ * To run a query within a React component, call `usePersonalUsageQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePersonalUsageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePersonalUsageQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePersonalUsageQuery(baseOptions?: Apollo.QueryHookOptions<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>(PersonalUsageDocument, options);
+      }
+export function usePersonalUsageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>(PersonalUsageDocument, options);
+        }
+// @ts-ignore
+export function usePersonalUsageSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>): Apollo.UseSuspenseQueryResult<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>;
+export function usePersonalUsageSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>): Apollo.UseSuspenseQueryResult<OperationPersonalUsageQuery | undefined, OperationPersonalUsageQueryVariables>;
+export function usePersonalUsageSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>(PersonalUsageDocument, options);
+        }
+export type PersonalUsageQueryHookResult = ReturnType<typeof usePersonalUsageQuery>;
+export type PersonalUsageLazyQueryHookResult = ReturnType<typeof usePersonalUsageLazyQuery>;
+export type PersonalUsageSuspenseQueryHookResult = ReturnType<typeof usePersonalUsageSuspenseQuery>;
+export type PersonalUsageQueryResult = Apollo.QueryResult<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>;
