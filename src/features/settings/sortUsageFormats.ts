@@ -20,14 +20,20 @@ export function sortUsageFormats(
 
   const collator = new Intl.Collator("ja-JP", { numeric: true })
   return sorted.sort((a, b) => {
-    const result =
-      sort.key === "format"
-        ? collator.compare(a.format, b.format)
-        : sort.key === "count"
-          ? a.count - b.count
-          : sort.key === "size"
-            ? a.sizeBytes - b.sizeBytes
-            : a.sizeBytes - b.sizeBytes
+    let result: number
+    switch (sort.key) {
+      case "format":
+        result = collator.compare(a.format, b.format)
+        break
+      case "count":
+        result = a.count - b.count
+        break
+      case "size":
+      case "percent":
+        // 同一上限に対する割合はsizeBytesと同じ順序になる。
+        result = a.sizeBytes - b.sizeBytes
+        break
+    }
 
     return (
       (sort.direction === "asc" ? 1 : -1) *
