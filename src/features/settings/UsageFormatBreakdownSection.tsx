@@ -4,7 +4,9 @@ import { useMemo } from "react"
 import { Box, Group, Skeleton, Table, Text, UnstyledButton } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { sortUsageFormats, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
-import { formatUsageBytes, usagePercent, type FileSizeUnit } from "./usageSize"
+import type { FileSizeUnit } from "./formatFileSize"
+import { UsageFileSize } from "./UsageFileSize"
+import { usagePercent } from "./usagePercent"
 import { usageFormatColors as formatColors } from "./usageFormatColors"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
 
@@ -136,7 +138,7 @@ export function UsageFormatBreakdownSection({
                   <Table.Td ta="right">
                     {item.count.toLocaleString("ja-JP")} 件
                   </Table.Td>
-                  <Table.Td ta="right">{formatUsageBytes(item.sizeBytes, fileSizeUnit)}</Table.Td>
+                  <Table.Td ta="right"><UsageFileSize bytes={item.sizeBytes} fileSizeUnit={fileSizeUnit} /></Table.Td>
                   <Table.Td ta="right">{usagePercent(item.sizeBytes, usage.limitBytes)} %</Table.Td>
                 </Table.Tr>
               ))}
@@ -152,7 +154,7 @@ export function UsageFormatBreakdownSection({
                   <Table.Th ta="right">
                   {usage.mediaCount.toLocaleString("ja-JP")} 件
                   </Table.Th>
-                  <Table.Th ta="right">{formatUsageBytes(usage.usedBytes, fileSizeUnit)}</Table.Th>
+                  <Table.Th ta="right"><UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} /></Table.Th>
                   <Table.Th ta="right">{usagePercent(usage.usedBytes, usage.limitBytes)} %</Table.Th>
                 </Table.Tr>
               </Table.Tfoot>
