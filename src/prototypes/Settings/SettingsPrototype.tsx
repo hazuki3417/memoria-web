@@ -65,6 +65,7 @@ const MOCK_USAGE: SettingsUsageData = {
 type UsageScenario =
   | "default"
   | "loading"
+  | "retrying"
   | "error"
   | "error-no-retry"
   | "retry-error"
