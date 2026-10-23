@@ -2,21 +2,20 @@ import { describe, expect, it } from "vitest"
 import { sortUsageFormats, type UsageFormatItem } from "./sortUsageFormats"
 
 const items: UsageFormatItem[] = [
-  { format: "JPEG", count: 900, sizeLabel: "0.90 GB", capacityPercent: 18 },
-  { format: "PNG", count: 200, sizeLabel: "0.20 GB", capacityPercent: 4 },
-  { format: "WebP", count: 100, sizeLabel: "0.10 GB", capacityPercent: 2 },
-  { format: "HEIC / HEIF", count: 48, sizeLabel: "0.04 GB", capacityPercent: 0.8 },
+  { format: "JPEG", count: 900, sizeBytes: 900_000_000 },
+  { format: "PNG", count: 200, sizeBytes: 200_000_000 },
+  { format: "WebP", count: 100, sizeBytes: 100_000_000 },
+  { format: "HEIC / HEIF", count: 48, sizeBytes: 40_000_000 },
 ]
-
 const names = (rows: UsageFormatItem[]) => rows.map((row) => row.format)
 
 describe("sortUsageFormats", () => {
-  it("preserves the API order with no sort and never mutates the input", () => {
-    const source = [...items]
-    const result = sortUsageFormats(source, null)
-    expect(names(result)).toEqual(names(items))
-    expect(result).not.toBe(source)
-    expect(source).toEqual(items)
+  it("keeps the original order when no sort is selected, without mutating input", () => {
+    const input = [...items]
+    const output = sortUsageFormats(input, null)
+    expect(names(output)).toEqual(names(items))
+    expect(output).not.toBe(input)
+    expect(input).toEqual(items)
   })
 
   it.each([
@@ -28,39 +27,29 @@ describe("sortUsageFormats", () => {
     ["size", "desc", ["JPEG", "PNG", "WebP", "HEIC / HEIF"]],
     ["percent", "asc", ["HEIC / HEIF", "WebP", "PNG", "JPEG"]],
     ["percent", "desc", ["JPEG", "PNG", "WebP", "HEIC / HEIF"]],
-  ] as const)("sorts by %s %s", (key, direction, expected) => {
+  ] as const)("sorts %s %s from canonical data", (key, direction, expected) => {
     expect(names(sortUsageFormats(items, { key, direction }))).toEqual(expected)
   })
 
-  it("compares sizes numerically across units instead of lexically", () => {
-    const mixed = [
-      { format: "C", count: 1, sizeLabel: "1.2 GB", capacityPercent: 1 },
-      { format: "A", count: 1, sizeLabel: "800 MB", capacityPercent: 1 },
-      { format: "B", count: 1, sizeLabel: "1,024 KB", capacityPercent: 1 },
+  it("uses precise bytes for sizes which round to the same display label", () => {
+    const near = [
+      { format: "C", count: 1, sizeBytes: 1_200_000_001 },
+      { format: "A", count: 1, sizeBytes: 1_200_000_000 },
+      { format: "B", count: 1, sizeBytes: 800_000_000 },
     ]
-    expect(names(sortUsageFormats(mixed, { key: "size", direction: "asc" }))).toEqual([
-      "B",
-      "A",
-      "C",
-    ])
+    expect(names(sortUsageFormats(near, { key: "size", direction: "asc" }))).toEqual(["B", "A", "C"])
   })
 
-  it("uses the format name as a tie-breaker with the same sort direction", () => {
+  it("breaks ties by format in the same direction as the selected sort", () => {
     const tied = [
-      { format: "PNG", count: 5, sizeLabel: "1 MB", capacityPercent: 1 },
-      { format: "JPEG", count: 5, sizeLabel: "1 MB", capacityPercent: 1 },
+      { format: "PNG", count: 5, sizeBytes: 1_000_000 },
+      { format: "JPEG", count: 5, sizeBytes: 1_000_000 },
     ]
-    expect(names(sortUsageFormats(tied, { key: "count", direction: "asc" }))).toEqual([
-      "JPEG",
-      "PNG",
-    ])
-    expect(names(sortUsageFormats(tied, { key: "count", direction: "desc" }))).toEqual([
-      "PNG",
-      "JPEG",
-    ])
+    expect(names(sortUsageFormats(tied, { key: "count", direction: "asc" }))).toEqual(["JPEG", "PNG"])
+    expect(names(sortUsageFormats(tied, { key: "count", direction: "desc" }))).toEqual(["PNG", "JPEG"])
   })
 
-  it("handles an empty breakdown without creating placeholder data", () => {
+  it("handles an empty breakdown", () => {
     expect(sortUsageFormats([], null)).toEqual([])
     expect(sortUsageFormats([], { key: "size", direction: "asc" })).toEqual([])
   })
