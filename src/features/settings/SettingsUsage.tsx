@@ -5,8 +5,8 @@ import {
   Box,
   Button,
   Group,
-  Skeleton,
   Progress,
+  Skeleton,
   Stack,
   Table,
   Text,
@@ -100,7 +100,7 @@ export function SettingsUsage({
   const sortHeader = (key: SortKey, label: string) => (
     <UnstyledButton
       onClick={() => toggleSort(key)}
-      disabled={status === "loading"}
+      disabled={status !== "ready"}
       aria-label={`${label}で並べ替え`}
       style={{
         font: "inherit",
@@ -132,11 +132,19 @@ export function SettingsUsage({
             <FeedbackAlert kind="error" title="利用状況を取得できませんでした" role="alert">
               通信状況を確認して、もう一度お試しください。
             </FeedbackAlert>
-            {onRetry && <Button size="sm" variant="light" onClick={onRetry}>再試行</Button>}
+            {onRetry && (
+              <Button size="sm" variant="light" onClick={onRetry}>
+                再試行
+              </Button>
+            )}
           </Stack>
         </Box>
       ) : (
-      <Stack gap="xl" role={status === "loading" ? "status" : undefined} aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}>
+      <Stack
+        gap="xl"
+        role={status === "loading" ? "status" : undefined}
+        aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
+      >
       <Box>
         <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
@@ -177,7 +185,7 @@ export function SettingsUsage({
       {(status === "loading" || usage.formatBreakdown) && (
         <Box>
           <SectionHeader>ファイル形式別内訳</SectionHeader>
-          <Table striped highlightOnHover>
+          <Table striped highlightOnHover={status === "ready"}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th
