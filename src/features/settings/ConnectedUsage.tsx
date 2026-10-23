@@ -2,7 +2,6 @@
 
 import {
   useCommunityUsageQuery,
-  useCurrentUserQuery,
   usePersonalUsageQuery,
 } from "@/infrastructure/graphql/generated"
 import { SettingsUsage } from "./SettingsUsage"
@@ -27,13 +26,9 @@ export function ConnectedUsage({
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   })
-  const preferences = useCurrentUserQuery({ skip: scope !== "personal" })
   const active = scope === "personal" ? personal : community
   const projection =
     scope === "personal" ? personal.data?.me?.usage : community.data?.communityUsage
-  const preferencesLoading = scope === "personal" && preferences.loading
-  const preferencesError = scope === "personal" &&
-    (Boolean(preferences.error) || (!preferences.loading && !preferences.data?.me))
 
   let usage: SettingsUsageData = emptyUsage
   let conversionFailed = false
@@ -46,9 +41,9 @@ export function ConnectedUsage({
   }
 
   const status: UsageStatus =
-    active.loading || preferencesLoading
+    active.loading
       ? "loading"
-      : active.error || preferencesError || conversionFailed || !projection
+      : active.error || conversionFailed || !projection
         ? "error"
         : "ready"
 
@@ -56,9 +51,6 @@ export function ConnectedUsage({
     // 再取得で再び失敗した場合もApolloのerror stateに反映し、Retryを維持する。
     if (active.error || !projection || conversionFailed) {
       void active.refetch().catch(() => undefined)
-    }
-    if (scope === "personal" && preferencesError) {
-      void preferences.refetch().catch(() => undefined)
     }
   }
 
@@ -70,7 +62,7 @@ export function ConnectedUsage({
       onRetry={retry}
       fileSizeUnit={
         scope === "personal" &&
-        preferences.data?.me?.preferences.fileSizeUnit === "BINARY"
+        personal.data?.me?.preferences.fileSizeUnit === "BINARY"
           ? "BINARY"
           : "DECIMAL"
       }
