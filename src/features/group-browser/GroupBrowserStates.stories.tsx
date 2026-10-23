@@ -97,3 +97,22 @@ export const CompactError: Story = {
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
+
+export const DiscoveryLoadingMore: Story = {
+  name: "Visual · Discovery · Loading More",
+  args: { discoveryState: "ready", discoveryPageState: "loading" },
+}
+export const DiscoveryLoadMoreError: Story = {
+  name: "Visual · Discovery · Load More Error",
+  args: { discoveryState: "ready", discoveryPageState: "error", onRetryDiscoveryPage: () => {} },
+}
+export const CompactDiscoveryLoadingMore: Story = {
+  name: "Visual · Compact · Discovery Loading More",
+  args: { discoveryState: "ready", discoveryPageState: "loading" },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+export const CompactDiscoveryLoadMoreError: Story = {
+  name: "Visual · Compact · Discovery Load More Error",
+  args: { discoveryState: "ready", discoveryPageState: "error", onRetryDiscoveryPage: () => {} },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
