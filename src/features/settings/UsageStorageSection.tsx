@@ -2,7 +2,9 @@
 
 import { Box, Group, Progress, Skeleton, Stack, Text } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
-import { formatUsageBytes, usagePercent, type FileSizeUnit } from "./usageSize"
+import type { FileSizeUnit } from "./formatFileSize"
+import { UsageFileSize } from "./UsageFileSize"
+import { usagePercent } from "./usagePercent"
 import { usageFormatColors as formatColors } from "./usageFormatColors"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
 
@@ -25,7 +27,7 @@ export function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              {formatUsageBytes(usage.usedBytes, fileSizeUnit)}{` ( ${usagePercent(usage.usedBytes, usage.limitBytes)} % )`}
+              <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />{` ( ${usagePercent(usage.usedBytes, usage.limitBytes)} % )`}
             </Text>
           )}
         </Group>
@@ -35,7 +37,7 @@ export function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              {formatUsageBytes(Math.max(0, usage.limitBytes - usage.usedBytes), fileSizeUnit)}{` ( ${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "")} % )`}
+              <UsageFileSize bytes={Math.max(0, usage.limitBytes - usage.usedBytes)} fileSizeUnit={fileSizeUnit} />{` ( ${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "")} % )`}
             </Text>
           )}
         </Group>
@@ -67,7 +69,7 @@ export function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              {formatUsageBytes(usage.limitBytes, fileSizeUnit)} ( 100 % )
+              <UsageFileSize bytes={usage.limitBytes} fileSizeUnit={fileSizeUnit} /> ( 100 % )
             </Text>
           )}
         </Group>
