@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, within } from "storybook/test"
 import { UsageSortHeader } from "./UsageSortHeader"
 
 const meta = {
@@ -10,7 +10,7 @@ const meta = {
     direction: null,
     align: "right",
     disabled: false,
-    onSort: () => undefined,
+    onSort: fn(),
   },
 } satisfies Meta<typeof UsageSortHeader>
 
@@ -62,12 +62,13 @@ export const KeyboardContract: Story = {
   name: "Interaction · キーボード操作",
   tags: ["interaction"],
   args: { direction: "desc" },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const button = canvas.getByRole("button", { name: "使用量で並べ替え" })
     button.focus()
     await expect(button).toHaveFocus()
     await userEvent.keyboard("{Enter}")
+    await expect(args.onSort).toHaveBeenCalledTimes(1)
     await expect(canvas.getByTestId("usage-sort-icon-desc")).toBeInTheDocument()
   },
 }
