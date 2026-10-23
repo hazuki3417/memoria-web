@@ -72,7 +72,7 @@ export const RetryInteraction: Story = {
     )
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(canvas.getByRole("status", { name: "利用状況を読み込んでいます" })).toBeVisible()
-    await expect(await canvas.findByText(/1\\.24 GB/)).toBeVisible()
+    await expect(await canvas.findByText(/1\.24 GB/)).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
