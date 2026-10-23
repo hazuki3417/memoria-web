@@ -23,6 +23,33 @@ export const Compact: Story = {
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
+/** Stable unit preference variants for future VRT selection (no vrt opt-in). */
+export const BinaryUnit: Story = {
+  name: "Binary（GiB）",
+  args: { initialUsageFileSizeUnit: "BINARY" },
+  tags: ["visual"],
+}
+
+export const BinaryUnitCompact: Story = {
+  name: "Binary（GiB・Compact）",
+  args: { initialUsageFileSizeUnit: "BINARY" },
+  tags: ["visual"],
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+
+export const BinaryUnitContract: Story = {
+  name: "Interaction · Binary単位の表示契約",
+  args: { initialUsageFileSizeUnit: "BINARY" },
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("4.66 GiB ( 100 % )")).toBeVisible()
+    await expect(canvas.getAllByText("1.15 GiB").length).toBeGreaterThan(0)
+    await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeEnabled()
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
 export const Loading: Story = {
   name: "Loading",
   args: { initialUsageScenario: "loading" },
