@@ -125,6 +125,7 @@ export function SettingsUsage({
             : "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。"
         }
       />
+      <Box>
       {status === "error" ? (
         <Box role="region" aria-label="利用状況の取得エラー">
           <Stack gap="md" align="flex-start">
@@ -135,7 +136,7 @@ export function SettingsUsage({
           </Stack>
         </Box>
       ) : (
-      <>
+      <Stack gap="xl" role={status === "loading" ? "status" : undefined} aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}>
       <Box>
         <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
@@ -286,8 +287,9 @@ export function SettingsUsage({
           </Table>
         </Box>
       )}
-      </>
+      </Stack>
       )}
+      </Box>
     </Stack>
   )
 }
