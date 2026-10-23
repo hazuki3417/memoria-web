@@ -283,18 +283,7 @@ export function SettingsUsage({
       />
       <Box>
       {status === "error" ? (
-        <Box role="region" aria-label="利用状況の取得エラー">
-          <Stack gap="md" align="flex-start">
-            <FeedbackAlert kind="error" title="利用状況を取得できませんでした" role="alert">
-              通信状況を確認して、もう一度お試しください。
-            </FeedbackAlert>
-            {onRetry && (
-              <Button size="sm" variant="light" onClick={onRetry}>
-                再試行
-              </Button>
-            )}
-          </Stack>
-        </Box>
+        <UsageErrorContent onRetry={onRetry} />
       ) : (
       <Stack
         gap="xl"
