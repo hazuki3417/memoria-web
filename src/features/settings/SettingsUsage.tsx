@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, type ReactNode } from "react"
+import { useMemo, useState } from "react"
 import {
   Box,
   Button,
@@ -15,6 +15,7 @@ import {
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
+import { sortUsageFormats, type UsageFormatItem, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
 
 export type SettingsUsageData = {
   usedStorageLabel: string
@@ -22,12 +23,7 @@ export type SettingsUsageData = {
   availableStorageLabel: string
   storageUsagePercent: number
   mediaCount: number
-  formatBreakdown?: {
-    format: string
-    count: number
-    sizeLabel: string
-    capacityPercent: number
-  }[]
+  formatBreakdown?: UsageFormatItem[]
 }
 
 const formatColors: Record<string, string> = {
@@ -37,27 +33,7 @@ const formatColors: Record<string, string> = {
   "HEIC / HEIF": "orange",
 }
 
-type SortKey = "format" | "count" | "size" | "percent"
-type SortDirection = "asc" | "desc"
-
-const sizeMultipliers: Record<string, number> = {
-  B: 1,
-  KB: 1024,
-  MB: 1024 ** 2,
-  GB: 1024 ** 3,
-  TB: 1024 ** 4,
-  PB: 1024 ** 5,
-}
-function parseSize(label: string): number {
-  const match = label.trim().match(/^([\d,.]+)\s*(B|KB|MB|GB|TB|PB)$/i)
-  if (!match) return 0
-  return (
-    Number(match[1].replace(/,/g, "")) * sizeMultipliers[match[2].toUpperCase()]
-  )
-}
-
 type UsageStatus = "ready" | "loading" | "error"
-type UsageSort = { key: SortKey; direction: SortDirection } | null
 
 function UsageStorageSection({
   usage,
@@ -112,14 +88,32 @@ function UsageFormatBreakdownSection({
   status,
   sort,
   sortedBreakdown,
-  sortHeader,
+  onSort,
 }: {
   usage: SettingsUsageData
   status: UsageStatus
   sort: UsageSort
-  sortedBreakdown: NonNullable<SettingsUsageData["formatBreakdown"]>
-  sortHeader: (key: SortKey, label: string) => ReactNode
+  sortedBreakdown: UsageFormatItem[]
+  onSort: (key: UsageSortKey) => void
 }) {
+  const sortHeader = (key: UsageSortKey, label: string) => (
+    <UnstyledButton
+      onClick={() => onSort(key)}
+      disabled={status !== "ready"}
+      aria-label={`${label}で並べ替え`}
+      style={{
+        font: "inherit",
+        fontWeight: "inherit",
+        width: "100%",
+        textAlign: key === "format" ? "left" : "right",
+      }}
+    >
+      {label}{" "}
+      <Text span size="xs" c="dimmed" aria-hidden="true">
+        {sort?.key === key ? (sort.direction === "asc" ? "▲" : "▼") : "↕"}
+      </Text>
+    </UnstyledButton>
+  )
   return (
     <>
       {(status === "loading" || usage.formatBreakdown) && (
@@ -251,50 +245,17 @@ export function SettingsUsage({
   onRetry?: () => void
 }) {
   const [sort, setSort] = useState<UsageSort>(null)
-  const sortedBreakdown = useMemo(() => {
-    const items = [...(usage.formatBreakdown ?? [])]
-    if (!sort) return items
-    const collator = new Intl.Collator("ja-JP", { numeric: true })
-    return items.sort((a, b) => {
-      const result =
-        sort.key === "format"
-          ? collator.compare(a.format, b.format)
-          : sort.key === "count"
-            ? a.count - b.count
-            : sort.key === "size"
-              ? parseSize(a.sizeLabel) - parseSize(b.sizeLabel)
-              : a.capacityPercent - b.capacityPercent
-      return (
-        (sort.direction === "asc" ? 1 : -1) *
-        (result || collator.compare(a.format, b.format))
-      )
-    })
-  }, [usage.formatBreakdown, sort])
-  const toggleSort = (key: SortKey) => {
+  const sortedBreakdown = useMemo(
+    () => sortUsageFormats(usage.formatBreakdown ?? [], sort),
+    [usage.formatBreakdown, sort],
+  )
+  const toggleSort = (key: UsageSortKey) => {
     setSort((current) => ({
       key,
       direction:
         current?.key === key && current.direction === "asc" ? "desc" : "asc",
     }))
   }
-  const sortHeader = (key: SortKey, label: string) => (
-    <UnstyledButton
-      onClick={() => toggleSort(key)}
-      disabled={status !== "ready"}
-      aria-label={`${label}で並べ替え`}
-      style={{
-        font: "inherit",
-        fontWeight: "inherit",
-        width: "100%",
-        textAlign: key === "format" ? "left" : "right",
-      }}
-    >
-      {label}{" "}
-      <Text span size="xs" c="dimmed" aria-hidden="true">
-        {sort?.key === key ? (sort.direction === "asc" ? "▲" : "▼") : "↕"}
-      </Text>
-    </UnstyledButton>
-  )
   return (
     <Stack gap="xl">
       <PageHeader
@@ -331,7 +292,7 @@ export function SettingsUsage({
         status={status}
         sort={sort}
         sortedBreakdown={sortedBreakdown}
-        sortHeader={sortHeader}
+        onSort={toggleSort}
       />
       </Stack>
       )}
