@@ -345,7 +345,7 @@ export const ListingLoading: Story = {
 const pageOneResult: OperationBrowseGroupsQuery = {
   mediaGroups: {
     edges: [{ cursor: "cursor-a", node: {
-      id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z",
+      __typename: "MediaGroup", id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z",
     } }],
     pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: "cursor-a", endCursor: "cursor-a" },
   },
@@ -353,8 +353,8 @@ const pageOneResult: OperationBrowseGroupsQuery = {
 const pageTwoResult: OperationBrowseGroupsQuery = {
   mediaGroups: {
     edges: [
-      { cursor: "cursor-a", node: { id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z" } },
-      { cursor: "cursor-b", node: { id: "pagination-group-b", name: "ページ2のGroup", stateToken: "2", createdAt: "2026-01-02T00:00:00Z" } },
+      { cursor: "cursor-a", node: { __typename: "MediaGroup", id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z" } },
+      { cursor: "cursor-b", node: { __typename: "MediaGroup", id: "pagination-group-b", name: "ページ2のGroup", stateToken: "2", createdAt: "2026-01-02T00:00:00Z" } },
     ],
     pageInfo: { hasNextPage: false, hasPreviousPage: true, startCursor: "cursor-a", endCursor: "cursor-b" },
   },
@@ -444,7 +444,7 @@ const itemTwo = {
 }
 const detailPageOneResult: OperationBrowseGroupDetailQuery = {
   mediaGroup: {
-    id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z",
+    __typename: "MediaGroup", id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z",
     parents: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } },
     children: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } },
     aggregateMedia: {
