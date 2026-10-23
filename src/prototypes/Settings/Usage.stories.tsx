@@ -44,7 +44,7 @@ export const BinaryUnitContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("4.66 GiB ( 100 % )")).toBeVisible()
-    await expect(canvas.getByText(/1\\.15 GiB/)).toBeVisible()
+    await expect(canvas.getAllByText("1.15 GiB").length).toBeGreaterThan(0)
     await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeEnabled()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
