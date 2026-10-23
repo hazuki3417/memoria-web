@@ -56,96 +56,18 @@ function parseSize(label: string): number {
   )
 }
 
-export function SettingsUsage({
+type UsageStatus = "ready" | "loading" | "error"
+type UsageSort = { key: SortKey; direction: SortDirection } | null
+
+function UsageStorageSection({
   usage,
-  scope = "personal",
-  status = "ready",
-  onRetry,
+  status,
 }: {
   usage: SettingsUsageData
-  scope?: "personal" | "community"
-  status?: "ready" | "loading" | "error"
-  onRetry?: () => void
+  status: UsageStatus
 }) {
-  const [sort, setSort] = useState<{
-    key: SortKey
-    direction: SortDirection
-  } | null>(null)
-  const sortedBreakdown = useMemo(() => {
-    const items = [...(usage.formatBreakdown ?? [])]
-    if (!sort) return items
-    const collator = new Intl.Collator("ja-JP", { numeric: true })
-    return items.sort((a, b) => {
-      const result =
-        sort.key === "format"
-          ? collator.compare(a.format, b.format)
-          : sort.key === "count"
-            ? a.count - b.count
-            : sort.key === "size"
-              ? parseSize(a.sizeLabel) - parseSize(b.sizeLabel)
-              : a.capacityPercent - b.capacityPercent
-      return (
-        (sort.direction === "asc" ? 1 : -1) *
-        (result || collator.compare(a.format, b.format))
-      )
-    })
-  }, [usage.formatBreakdown, sort])
-  const toggleSort = (key: SortKey) => {
-    setSort((current) => ({
-      key,
-      direction:
-        current?.key === key && current.direction === "asc" ? "desc" : "asc",
-    }))
-  }
-  const sortHeader = (key: SortKey, label: string) => (
-    <UnstyledButton
-      onClick={() => toggleSort(key)}
-      disabled={status !== "ready"}
-      aria-label={`${label}で並べ替え`}
-      style={{
-        font: "inherit",
-        fontWeight: "inherit",
-        width: "100%",
-        textAlign: key === "format" ? "left" : "right",
-      }}
-    >
-      {label}{" "}
-      <Text span size="xs" c="dimmed" aria-hidden="true">
-        {sort?.key === key ? (sort.direction === "asc" ? "▲" : "▼") : "↕"}
-      </Text>
-    </UnstyledButton>
-  )
   return (
-    <Stack gap="xl">
-      <PageHeader
-        title="利用状況"
-        description={
-          scope === "community"
-            ? "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。"
-            : "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。"
-        }
-      />
-      <Box>
-      {status === "error" ? (
-        <Box role="region" aria-label="利用状況の取得エラー">
-          <Stack gap="md" align="flex-start">
-            <FeedbackAlert kind="error" title="利用状況を取得できませんでした" role="alert">
-              通信状況を確認して、もう一度お試しください。
-            </FeedbackAlert>
-            {onRetry && (
-              <Button size="sm" variant="light" onClick={onRetry}>
-                再試行
-              </Button>
-            )}
-          </Stack>
-        </Box>
-      ) : (
-      <Stack
-        gap="xl"
-        role={status === "loading" ? "status" : undefined}
-        aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
-      >
-      <Box>
+<Box>
         <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="wrap">
@@ -182,7 +104,25 @@ export function SettingsUsage({
           </Group>
         </Stack>
       </Box>
-      {(status === "loading" || usage.formatBreakdown) && (
+  )
+}
+
+function UsageFormatBreakdownSection({
+  usage,
+  status,
+  sort,
+  sortedBreakdown,
+  sortHeader,
+}: {
+  usage: SettingsUsageData
+  status: UsageStatus
+  sort: UsageSort
+  sortedBreakdown: NonNullable<SettingsUsageData["formatBreakdown"]>
+  sortHeader: (key: SortKey, label: string) => React.ReactNode
+}) {
+  return (
+    <>
+{(status === "loading" || usage.formatBreakdown) && (
         <Box>
           <SectionHeader>ファイル形式別内訳</SectionHeader>
           <Table striped highlightOnHover={status === "ready"}>
@@ -295,6 +235,104 @@ export function SettingsUsage({
           </Table>
         </Box>
       )}
+    </>
+  )
+}
+
+export function SettingsUsage({
+  usage,
+  scope = "personal",
+  status = "ready",
+  onRetry,
+}: {
+  usage: SettingsUsageData
+  scope?: "personal" | "community"
+  status?: UsageStatus
+  onRetry?: () => void
+}) {
+  const [sort, setSort] = useState<UsageSort>(null)
+  const sortedBreakdown = useMemo(() => {
+    const items = [...(usage.formatBreakdown ?? [])]
+    if (!sort) return items
+    const collator = new Intl.Collator("ja-JP", { numeric: true })
+    return items.sort((a, b) => {
+      const result =
+        sort.key === "format"
+          ? collator.compare(a.format, b.format)
+          : sort.key === "count"
+            ? a.count - b.count
+            : sort.key === "size"
+              ? parseSize(a.sizeLabel) - parseSize(b.sizeLabel)
+              : a.capacityPercent - b.capacityPercent
+      return (
+        (sort.direction === "asc" ? 1 : -1) *
+        (result || collator.compare(a.format, b.format))
+      )
+    })
+  }, [usage.formatBreakdown, sort])
+  const toggleSort = (key: SortKey) => {
+    setSort((current) => ({
+      key,
+      direction:
+        current?.key === key && current.direction === "asc" ? "desc" : "asc",
+    }))
+  }
+  const sortHeader = (key: SortKey, label: string) => (
+    <UnstyledButton
+      onClick={() => toggleSort(key)}
+      disabled={status !== "ready"}
+      aria-label={`${label}で並べ替え`}
+      style={{
+        font: "inherit",
+        fontWeight: "inherit",
+        width: "100%",
+        textAlign: key === "format" ? "left" : "right",
+      }}
+    >
+      {label}{" "}
+      <Text span size="xs" c="dimmed" aria-hidden="true">
+        {sort?.key === key ? (sort.direction === "asc" ? "▲" : "▼") : "↕"}
+      </Text>
+    </UnstyledButton>
+  )
+  return (
+    <Stack gap="xl">
+      <PageHeader
+        title="利用状況"
+        description={
+          scope === "community"
+            ? "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。"
+            : "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。"
+        }
+      />
+      <Box>
+      {status === "error" ? (
+        <Box role="region" aria-label="利用状況の取得エラー">
+          <Stack gap="md" align="flex-start">
+            <FeedbackAlert kind="error" title="利用状況を取得できませんでした" role="alert">
+              通信状況を確認して、もう一度お試しください。
+            </FeedbackAlert>
+            {onRetry && (
+              <Button size="sm" variant="light" onClick={onRetry}>
+                再試行
+              </Button>
+            )}
+          </Stack>
+        </Box>
+      ) : (
+      <Stack
+        gap="xl"
+        role={status === "loading" ? "status" : undefined}
+        aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
+      >
+      <UsageStorageSection usage={usage} status={status} />
+      <UsageFormatBreakdownSection
+        usage={usage}
+        status={status}
+        sort={sort}
+        sortedBreakdown={sortedBreakdown}
+        sortHeader={sortHeader}
+      />
       </Stack>
       )}
       </Box>
