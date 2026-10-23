@@ -384,8 +384,8 @@ function PreferencesContent({
   )
 }
 
-function UsageContent() {
-  return <SettingsUsage usage={MOCK_USAGE} />
+function UsageContent({ fileSizeUnit }: { fileSizeUnit: UserPreferences["fileSizeUnit"] }) {
+  return <SettingsUsage usage={MOCK_USAGE} fileSizeUnit={fileSizeUnit} />
 }
 
 function AccountContent() {
@@ -441,7 +441,7 @@ export function Settings({
         onSave={savePreferences}
       />
     ) : section === "usage" ? (
-      <UsageContent />
+      <UsageContent fileSizeUnit={initialPreferences?.fileSizeUnit ?? "DECIMAL"} />
     ) : (
       <AccountContent />
     )
