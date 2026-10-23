@@ -383,7 +383,7 @@ export const ListingPagination: Story = {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText("ページ1のGroup")).toBeVisible()
     await expect(await canvas.findByText("ページ2のGroup")).toBeVisible()
-    await expect(canvas.getAllByText("ページ1のGroup")).toHaveLength(1)
+    await waitFor(() => expect(canvas.getAllByText("ページ1のGroup")).toHaveLength(1))
     await expect(canvas.queryByText("追加のGroupを取得できませんでした")).not.toBeInTheDocument()
   },
 }
@@ -408,7 +408,7 @@ export const ListingPaginationRetry: Story = {
     await expect(canvas.getByText("ページ1のGroup")).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(await canvas.findByText("ページ2のGroup")).toBeVisible()
-    await expect(canvas.getAllByText("ページ1のGroup")).toHaveLength(1)
+    await waitFor(() => expect(canvas.getAllByText("ページ1のGroup")).toHaveLength(1))
   },
 }
 
