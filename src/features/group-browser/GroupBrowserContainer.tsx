@@ -61,6 +61,9 @@ export function GroupBrowserContainer({
     variables: { id: selectedId ?? "", scope },
     skip: !selectedId,
   })
+  // Apollo exposes its previous query result during a fetchMore transition;
+  // this is a read from Apollo, not a second Server State store.
+  const detailData = detail.data ?? detail.previousData
   const candidateQuery = useBrowseGroupRelationCandidatesQuery({
     variables: { groupId: selectedId ?? "", first: 100 },
     skip: !selectedId,
@@ -132,9 +135,9 @@ export function GroupBrowserContainer({
   }, [candidateCursor, candidateQuery.loading, candidateQuery.error,
       candidateQuery.fetchMore, candidateLoadFailureId, candidateRetryingId, selectedId])
 
-  const mediaCursor = detail.data?.mediaGroup?.id === selectedId &&
-    detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
-    ? detail.data.mediaGroup.aggregateMedia.pageInfo.endCursor : null
+  const mediaCursor = detailData?.mediaGroup?.id === selectedId &&
+    detailData.mediaGroup.aggregateMedia.pageInfo.hasNextPage
+    ? detailData.mediaGroup.aggregateMedia.pageInfo.endCursor : null
   const mediaPageKey = selectedId && mediaCursor ? selectedId + ":" + mediaCursor : null
   const [mediaPageFailedKey, setMediaPageFailedKey] = useState<string | null>(null)
   const [mediaPageLoadingKey, setMediaPageLoadingKey] = useState<string | null>(null)
@@ -188,7 +191,7 @@ export function GroupBrowserContainer({
   const [addToGroup] = useAddBrowserMediaToGroupMutation()
   const [removeFromGroup] = useRemoveBrowserMediaFromGroupMutation()
 
-  const listingSnapshot = listing.data
+  const listingSnapshot = listing.data ?? listing.previousData
   const page = listingSnapshot?.mediaGroups
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
 
@@ -235,7 +238,7 @@ export function GroupBrowserContainer({
   const retryListingPage = useCallback(() => fetchListingPage(true), [fetchListingPage])
 
   const allGroups = useMemo<GroupBrowserGroup[]>(() => {
-    const currentDetail = detail.data?.mediaGroup
+    const currentDetail = detailData?.mediaGroup
     return (listingSnapshot?.mediaGroups.edges ?? []).map(({ node }) => {
       const matching = currentDetail?.id === node.id ? currentDetail : null
       return {
@@ -251,7 +254,7 @@ export function GroupBrowserContainer({
           matching?.children.edges.map(({ node: child }) => child.name) ?? [],
       }
     })
-  }, [listingSnapshot, detail.data])
+  }, [listingSnapshot, detailData])
 
   const relationAvailability = useMemo(() => {
     const result: Record<
@@ -281,27 +284,27 @@ export function GroupBrowserContainer({
   const groupMemberships = useMemo<Record<string, string[]>>(
     () =>
       Object.fromEntries(
-        (detail.data?.mediaGroup?.id === selectedId
-          ? detail.data.mediaGroup.aggregateMedia.edges
+        (detailData?.mediaGroup?.id === selectedId
+          ? detailData.mediaGroup.aggregateMedia.edges
           : []
         ).map(({ node }) => [
           node.id,
           node.groups.edges.map(({ node: group }) => group.name),
         ]),
       ),
-    [detail.data, selectedId],
+    [detailData, selectedId],
   )
 
   const mediaItemsData = useMemo(
     () =>
-      detail.data?.mediaGroup?.id === selectedId
-        ? detail.data.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
+      detailData?.mediaGroup?.id === selectedId
+        ? detailData.mediaGroup.aggregateMedia.edges.map(({ node }) => ({
             id: node.id,
             label: node.originalFileName,
             src: node.image?.variants[0]?.url ?? null,
           }))
         : [],
-    [detail.data, selectedId],
+    [detailData, selectedId],
   )
 
   const nameToId = useMemo(
@@ -362,7 +365,7 @@ export function GroupBrowserContainer({
     async (id: string, name: string, parents: string[], children: string[]) => {
       const old = allGroups.find((group) => group.id === id)
       if (!old) throw new Error("Group is no longer available")
-      const currentDetail = detail.data?.mediaGroup
+      const currentDetail = detailData?.mediaGroup
       if (!currentDetail || currentDetail.id !== id ||
           currentDetail.parents.pageInfo.hasNextPage ||
           currentDetail.children.pageInfo.hasNextPage) {
@@ -407,7 +410,7 @@ export function GroupBrowserContainer({
         throw error
       }
     },
-    [allGroups, detail.data, detail.refetch, candidateQuery.refetch, listing.refetch, nameToId, updateGroup, refetch],
+    [allGroups, detailData, detail.refetch, candidateQuery.refetch, listing.refetch, nameToId, updateGroup, refetch],
   )
 
   const onSaveMediaGroups = useCallback(
@@ -505,7 +508,7 @@ export function GroupBrowserContainer({
         }
       }}
       mediaPageState={
-        !mediaPageKey || !detail.data?.mediaGroup?.aggregateMedia.edges.length
+        !mediaPageKey || !detailData?.mediaGroup?.aggregateMedia.edges.length
           ? "idle"
           : mediaPageFailedKey === mediaPageKey
             ? "error"
@@ -515,10 +518,10 @@ export function GroupBrowserContainer({
       onMediaEndVisible={requestMediaPage}
       mediaDetailState={
         !selectedId ? "ready" :
-        detail.data?.mediaGroup?.id !== selectedId ? "loading" :
-        detail.data.mediaGroup.aggregateMedia.edges.length > 0 ? "ready" :
+        detailData?.mediaGroup?.id !== selectedId ? "loading" :
+        detailData.mediaGroup.aggregateMedia.edges.length > 0 ? "ready" :
         mediaPageFailedKey === mediaPageKey || detail.error ? "error" :
-        detail.loading || detail.data.mediaGroup.aggregateMedia.pageInfo.hasNextPage
+        detail.loading || detailData.mediaGroup.aggregateMedia.pageInfo.hasNextPage
           ? "loading" : "ready"
       }
       detailsReady={
@@ -532,9 +535,9 @@ export function GroupBrowserContainer({
           !candidateQuery.loading &&
           !candidateQuery.data?.mediaGroupRelationCandidates.pageInfo
             .hasNextPage &&
-          detail.data?.mediaGroup?.id === selectedId &&
-          !detail.data.mediaGroup.parents.pageInfo.hasNextPage &&
-          !detail.data.mediaGroup.children.pageInfo.hasNextPage)
+          detailData?.mediaGroup?.id === selectedId &&
+          !detailData.mediaGroup.parents.pageInfo.hasNextPage &&
+          !detailData.mediaGroup.children.pageInfo.hasNextPage)
       }
       hideManagementActions={
         contextKind === "community" &&
