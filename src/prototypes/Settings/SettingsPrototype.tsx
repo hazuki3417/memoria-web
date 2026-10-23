@@ -44,21 +44,14 @@ const MOCK_PROFILE = { nickname: "ユーザー" }
 
 // Deterministic Storybook sample data; these values are not product values.
 const MOCK_USAGE: SettingsUsageData = {
-  usedStorageLabel: "1.24 GB",
-  effectiveLimitLabel: "5 GB",
-  availableStorageLabel: "3.76 GB",
-  storageUsagePercent: 24.8,
+  usedBytes: 1_240_000_000,
+  limitBytes: 5_000_000_000,
   mediaCount: 1248,
   formatBreakdown: [
-    { format: "JPEG", count: 900, sizeLabel: "0.90 GB", capacityPercent: 18 },
-    { format: "PNG", count: 200, sizeLabel: "0.20 GB", capacityPercent: 4 },
-    { format: "WebP", count: 100, sizeLabel: "0.10 GB", capacityPercent: 2 },
-    {
-      format: "HEIC / HEIF",
-      count: 48,
-      sizeLabel: "0.04 GB",
-      capacityPercent: 0.8,
-    },
+    { format: "JPEG", count: 900, sizeBytes: 900_000_000 },
+    { format: "PNG", count: 200, sizeBytes: 200_000_000 },
+    { format: "WebP", count: 100, sizeBytes: 100_000_000 },
+    { format: "HEIC / HEIF", count: 48, sizeBytes: 40_000_000 },
   ],
 }
 
@@ -73,23 +66,19 @@ type UsageScenario =
   | "limit-reached"
 
 const ZERO_USAGE: SettingsUsageData = {
-  usedStorageLabel: "0 GB",
-  effectiveLimitLabel: "5 GB",
-  availableStorageLabel: "5 GB",
-  storageUsagePercent: 0,
+  usedBytes: 0,
+  limitBytes: 5_000_000_000,
   mediaCount: 0,
   formatBreakdown: [],
 }
 
 const LIMIT_REACHED_USAGE: SettingsUsageData = {
-  usedStorageLabel: "5 GB",
-  effectiveLimitLabel: "5 GB",
-  availableStorageLabel: "0 GB",
-  storageUsagePercent: 100,
+  usedBytes: 5_000_000_000,
+  limitBytes: 5_000_000_000,
   mediaCount: 5000,
   formatBreakdown: [
-    { format: "JPEG", count: 3500, sizeLabel: "3.5 GB", capacityPercent: 70 },
-    { format: "PNG", count: 1500, sizeLabel: "1.5 GB", capacityPercent: 30 },
+    { format: "JPEG", count: 3500, sizeBytes: 3_500_000_000 },
+    { format: "PNG", count: 1500, sizeBytes: 1_500_000_000 },
   ],
 }
 
