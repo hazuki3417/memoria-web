@@ -252,6 +252,8 @@ export function GroupBrowserContainer({
     if (!nextCursor || listingPageActivatedCursor !== nextCursor || listing.loading || listingPageFailedCursor === nextCursor ||
       listingPageInFlight.current === nextCursor) return
     listingPageInFlight.current = nextCursor
+    // Pin the first page before fetchMore changes the active Apollo query.
+    if (listing.data?.mediaGroups) setRetainedListing(listing.data)
     setListingPageLoadingCursor(nextCursor)
     void listing.fetchMore({
       variables: { after: nextCursor },
@@ -276,7 +278,7 @@ export function GroupBrowserContainer({
       if (listingPageInFlight.current === nextCursor) listingPageInFlight.current = null
       setListingPageLoadingCursor((current) => current === nextCursor ? null : current)
     })
-  }, [nextCursor, listing.loading, listing.fetchMore, listingPageFailedCursor, listingPageActivatedCursor])
+  }, [nextCursor, listing.loading, listing.fetchMore, listingPageFailedCursor, listingPageActivatedCursor, listing.data])
 
   const allGroups = useMemo<GroupBrowserGroup[]>(() => {
     const currentDetail = detailSnapshot?.mediaGroup
