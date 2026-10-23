@@ -3,13 +3,16 @@
 import { useMemo, useState } from "react"
 import {
   Box,
+  Button,
   Group,
+  Skeleton,
   Progress,
   Stack,
   Table,
   Text,
   UnstyledButton,
 } from "@mantine/core"
+import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 
@@ -56,9 +59,13 @@ function parseSize(label: string): number {
 export function SettingsUsage({
   usage,
   scope = "personal",
+  status = "ready",
+  onRetry,
 }: {
   usage: SettingsUsageData
   scope?: "personal" | "community"
+  status?: "ready" | "loading" | "error"
+  onRetry?: () => void
 }) {
   const [sort, setSort] = useState<{
     key: SortKey
@@ -107,6 +114,69 @@ export function SettingsUsage({
       </Text>
     </UnstyledButton>
   )
+  if (status !== "ready") {
+    return (
+      <Stack gap="xl">
+        <PageHeader
+          title="利用状況"
+          description={
+            scope === "community"
+              ? "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。"
+              : "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。"
+          }
+        />
+        {status === "error" ? (
+          <Box role="region" aria-label="利用状況の取得エラー">
+            <Stack gap="md" align="flex-start">
+              <FeedbackAlert kind="error" title="利用状況を取得できませんでした" role="alert">
+                通信状況を確認して、もう一度お試しください。
+              </FeedbackAlert>
+              {onRetry && (
+                <Button size="sm" variant="light" onClick={onRetry}>
+                  再試行
+                </Button>
+              )}
+            </Stack>
+          </Box>
+        ) : (
+          <Stack gap="xl" role="status" aria-label="利用状況を読み込んでいます">
+            <Box>
+              <SectionHeader>ストレージ</SectionHeader>
+              <Stack gap="sm">
+                <Group justify="space-between" align="center">
+                  <Text size="sm">使用済み</Text>
+                  <Skeleton w={92} h={16} radius="sm" />
+                </Group>
+                <Group justify="space-between" align="center">
+                  <Text size="sm">空き容量</Text>
+                  <Skeleton w={92} h={16} radius="sm" />
+                </Group>
+                <Skeleton h={12} radius="xl" />
+                <Group justify="space-between" align="center">
+                  <Text size="sm">総容量</Text>
+                  <Skeleton w={92} h={16} radius="sm" />
+                </Group>
+              </Stack>
+            </Box>
+            <Box>
+              <SectionHeader>ファイル形式別内訳</SectionHeader>
+              <Stack gap="sm">
+                <Group justify="space-between">
+                  {["形式", "登録件数", "使用量", "割合"].map((label) => (
+                    <Text key={label} size="sm" c="dimmed">{label}</Text>
+                  ))}
+                </Group>
+                {Array.from({ length: 4 }, (_, index) => (
+                  <Skeleton key={index} h={32} radius="sm" />
+                ))}
+              </Stack>
+            </Box>
+          </Stack>
+        )}
+      </Stack>
+    )
+  }
+
   return (
     <Stack gap="xl">
       <PageHeader
@@ -218,6 +288,15 @@ export function SettingsUsage({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
+              {sortedBreakdown.length === 0 && (
+                <Table.Tr>
+                  <Table.Td colSpan={4}>
+                    <Text size="sm" c="dimmed" ta="center" py="md">
+                      登録済みのオリジナルファイルはありません
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
               {sortedBreakdown.map((item) => (
                 <Table.Tr key={item.format}>
                   <Table.Td>
