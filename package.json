@@ -19,6 +19,7 @@
     "check:type": "tsc --noEmit",
     "test:unit": "vitest run",
     "test:interaction": "vitest run --config vitest.storybook.config.ts",
+    "test:responsive": "playwright test --config=playwright.storybook-responsive.config.ts",
     "test:visual": "playwright test --config=playwright.storybook-visual.config.ts",
     "test:visual:update": "playwright test --config=playwright.storybook-visual.config.ts --update-snapshots",
     "test:visual:report": "playwright show-report ./e2e/storybook-visual/report",
