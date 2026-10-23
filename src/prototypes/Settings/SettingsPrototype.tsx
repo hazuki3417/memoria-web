@@ -62,6 +62,37 @@ const MOCK_USAGE: SettingsUsageData = {
   ],
 }
 
+type UsageScenario =
+  | "default"
+  | "loading"
+  | "retrying"
+  | "error"
+  | "error-no-retry"
+  | "retry-error"
+  | "zero"
+  | "limit-reached"
+
+const ZERO_USAGE: SettingsUsageData = {
+  usedStorageLabel: "0 GB",
+  effectiveLimitLabel: "5 GB",
+  availableStorageLabel: "5 GB",
+  storageUsagePercent: 0,
+  mediaCount: 0,
+  formatBreakdown: [],
+}
+
+const LIMIT_REACHED_USAGE: SettingsUsageData = {
+  usedStorageLabel: "5 GB",
+  effectiveLimitLabel: "5 GB",
+  availableStorageLabel: "0 GB",
+  storageUsagePercent: 100,
+  mediaCount: 5000,
+  formatBreakdown: [
+    { format: "JPEG", count: 3500, sizeLabel: "3.5 GB", capacityPercent: 70 },
+    { format: "PNG", count: 1500, sizeLabel: "1.5 GB", capacityPercent: 30 },
+  ],
+}
+
 function ProfileContent({
   initialSaveState = "idle",
 }: {
@@ -292,8 +323,38 @@ function PreferencesContent({ compact }: { compact: boolean }) {
   )
 }
 
-function UsageContent() {
-  return <SettingsUsage usage={MOCK_USAGE} />
+function UsageContent({ initialScenario }: { initialScenario: UsageScenario }) {
+  const [scenario, setScenario] = useState<UsageScenario | "retrying">(
+    initialScenario === "retry-error" ? "error" : initialScenario,
+  )
+  const usage =
+    scenario === "zero"
+      ? ZERO_USAGE
+      : scenario === "limit-reached"
+        ? LIMIT_REACHED_USAGE
+        : MOCK_USAGE
+  const status =
+    scenario === "loading" || scenario === "retrying"
+      ? "loading"
+      : (scenario === "error" || scenario === "error-no-retry")
+        ? "error"
+        : "ready"
+
+  const retry = async () => {
+    if (scenario !== "error") return
+    setScenario("retrying")
+    // Story fixture: both the retry in progress and its result can be observed.
+    await new Promise((resolve) => setTimeout(resolve, 600))
+    setScenario(initialScenario === "retry-error" ? "error" : "default")
+  }
+
+  return (
+    <SettingsUsage
+      usage={usage}
+      status={status}
+      onRetry={initialScenario === "error-no-retry" ? undefined : retry}
+    />
+  )
 }
 
 function AccountContent() {
@@ -320,9 +381,11 @@ function AccountContent() {
 export function SettingsPrototype({
   initialSection = "profile",
   initialProfileSaveState = "idle",
+  initialUsageScenario = "default",
 }: {
   initialSection?: Section
   initialProfileSaveState?: ProfileSaveState
+  initialUsageScenario?: UsageScenario
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>(initialSection)
@@ -334,7 +397,7 @@ export function SettingsPrototype({
     ) : section === "preferences" ? (
       <PreferencesContent compact={compact} />
     ) : section === "usage" ? (
-      <UsageContent />
+      <UsageContent initialScenario={initialUsageScenario} />
     ) : (
       <AccountContent />
     )

@@ -3,13 +3,16 @@
 import { useMemo, useState } from "react"
 import {
   Box,
+  Button,
   Group,
   Progress,
+  Skeleton,
   Stack,
   Table,
   Text,
   UnstyledButton,
 } from "@mantine/core"
+import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 
@@ -56,9 +59,13 @@ function parseSize(label: string): number {
 export function SettingsUsage({
   usage,
   scope = "personal",
+  status = "ready",
+  onRetry,
 }: {
   usage: SettingsUsageData
   scope?: "personal" | "community"
+  status?: "ready" | "loading" | "error"
+  onRetry?: () => void
 }) {
   const [sort, setSort] = useState<{
     key: SortKey
@@ -93,6 +100,7 @@ export function SettingsUsage({
   const sortHeader = (key: SortKey, label: string) => (
     <UnstyledButton
       onClick={() => toggleSort(key)}
+      disabled={status !== "ready"}
       aria-label={`${label}で並べ替え`}
       style={{
         font: "inherit",
@@ -118,25 +126,37 @@ export function SettingsUsage({
         }
       />
       <Box>
+      {status === "error" ? (
+        <Box role="region" aria-label="利用状況の取得エラー">
+          <Stack gap="md" align="flex-start">
+            <FeedbackAlert kind="error" title="利用状況を取得できませんでした" role="alert">
+              通信状況を確認して、もう一度お試しください。
+            </FeedbackAlert>
+            {onRetry && (
+              <Button size="sm" variant="light" onClick={onRetry}>
+                再試行
+              </Button>
+            )}
+          </Stack>
+        </Box>
+      ) : (
+      <Stack
+        gap="xl"
+        role={status === "loading" ? "status" : undefined}
+        aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
+      >
+      <Box>
         <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="wrap">
             <Text size="sm">使用済み</Text>
-            <Text size="sm" ta="right">
-              {usage.usedStorageLabel}
-              {` ( ${usage.storageUsagePercent} % )`}
-            </Text>
+            {status === "loading" ? <Skeleton w={92} h={16} radius="sm" /> : <Text size="sm" ta="right">{usage.usedStorageLabel}{` ( ${usage.storageUsagePercent} % )`}</Text>}
           </Group>
           <Group justify="space-between" align="center" wrap="wrap">
             <Text size="sm">空き容量</Text>
-            <Text size="sm" ta="right">
-              {usage.availableStorageLabel}
-              {` ( ${Math.max(0, 100 - usage.storageUsagePercent)
-                .toFixed(1)
-                .replace(/\.0$/, "")} % )`}
-            </Text>
+            {status === "loading" ? <Skeleton w={92} h={16} radius="sm" /> : <Text size="sm" ta="right">{usage.availableStorageLabel}{` ( ${Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} % )`}</Text>}
           </Group>
-          <Progress.Root
+          {status === "loading" ? <Skeleton h={12} radius="xl" /> : <Progress.Root
             size="md"
             aria-label={`ストレージ使用率 ${usage.storageUsagePercent}%、ファイル形式別内訳`}
           >
@@ -153,19 +173,19 @@ export function SettingsUsage({
                 color="blue"
               />
             )}
-          </Progress.Root>
+          </Progress.Root>}
           <Group justify="space-between" align="center" wrap="wrap">
             <Text size="sm">総容量</Text>
-            <Text size="sm" ta="right">
-              {usage.effectiveLimitLabel} ( 100 % )
-            </Text>
+            {status === "loading" ? <Skeleton w={92} h={16} radius="sm" /> : (
+              <Text size="sm" ta="right">{usage.effectiveLimitLabel} ( 100 % )</Text>
+            )}
           </Group>
         </Stack>
       </Box>
-      {usage.formatBreakdown && (
+      {(status === "loading" || usage.formatBreakdown) && (
         <Box>
           <SectionHeader>ファイル形式別内訳</SectionHeader>
-          <Table striped highlightOnHover>
+          <Table striped highlightOnHover={status === "ready"}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th
@@ -218,7 +238,25 @@ export function SettingsUsage({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {sortedBreakdown.map((item) => (
+              {status === "loading" && Array.from({ length: 4 }, (_, row) => (
+                <Table.Tr key={`loading-${row}`}>
+                  {Array.from({ length: 4 }, (_, column) => (
+                    <Table.Td key={column}>
+                      <Skeleton h={16} radius="sm" />
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))}
+              {status === "ready" && sortedBreakdown.length === 0 && (
+                <Table.Tr>
+                  <Table.Td colSpan={4}>
+                    <Text size="sm" c="dimmed" ta="center" py="md">
+                      登録済みのオリジナルファイルはありません
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+              {status === "ready" && sortedBreakdown.map((item) => (
                 <Table.Tr key={item.format}>
                   <Table.Td>
                     <Group gap="xs" wrap="nowrap">
@@ -240,7 +278,7 @@ export function SettingsUsage({
                 </Table.Tr>
               ))}
             </Table.Tbody>
-            <Table.Tfoot
+            {status === "ready" && <Table.Tfoot
               style={{
                 borderTop: "2px solid var(--mantine-color-default-border)",
               }}
@@ -253,10 +291,13 @@ export function SettingsUsage({
                 <Table.Th ta="right">{usage.usedStorageLabel}</Table.Th>
                 <Table.Th ta="right">{usage.storageUsagePercent} %</Table.Th>
               </Table.Tr>
-            </Table.Tfoot>
+            </Table.Tfoot>}
           </Table>
         </Box>
       )}
+      </Stack>
+      )}
+      </Box>
     </Stack>
   )
 }
