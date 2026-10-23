@@ -29,6 +29,13 @@ export const Loading: Story = {
   tags: ["visual"],
 }
 
+export const LoadingCompact: Story = {
+  name: "Loading（Compact）",
+  args: { initialUsageScenario: "loading" },
+  tags: ["visual"],
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+
 export const Error: Story = {
   name: "Error / Retry",
   args: { initialUsageScenario: "error" },
@@ -64,7 +71,26 @@ export const RetryInteraction: Story = {
       "利用状況を取得できませんでした",
     )
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByText(/1\.24 GB/)).toBeVisible()
+    await expect(canvas.getByRole("status", { name: "利用状況を読み込んでいます" })).toBeVisible()
+    await expect(await canvas.findByText(/1\\.24 GB/)).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const RetryFailureInteraction: Story = {
+  name: "Errorから再試行して再失敗",
+  args: { initialUsageScenario: "retry-error" },
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("alert")).toHaveTextContent(
+      "利用状況を取得できませんでした",
+    )
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(canvas.getByRole("status", { name: "利用状況を読み込んでいます" })).toBeVisible()
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "利用状況を取得できませんでした",
+    )
+    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
   },
 }
