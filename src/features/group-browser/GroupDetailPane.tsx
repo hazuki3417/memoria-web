@@ -4,6 +4,7 @@ import type { ReactNode, Ref } from "react"
 import { Alert, Box, Button, Center, Divider, Group, Loader, ScrollArea, Stack, Text, ThemeIcon } from "@mantine/core"
 import { IconEdit, IconPhoto, IconX } from "@tabler/icons-react"
 import { MediaGrid } from "./MediaGrid"
+import { LoadMoreSentinel } from "./LoadMoreSentinel"
 
 export type GroupDetailPaneProps = {
   compact?: boolean
@@ -14,6 +15,7 @@ export type GroupDetailPaneProps = {
   onRetryGroupMedia?: () => Promise<void>
   onOpenMedia: (index: number) => void
   mediaPageFeedback: ReactNode
+  onMediaEndVisible?: () => void
   relationCandidateFeedback: ReactNode
   relationDetailSection: ReactNode
   hideManagementActions: boolean
@@ -27,6 +29,7 @@ export type GroupDetailPaneProps = {
 export function GroupDetailPane({
   compact = false, selected, headingRef: compactDetailHeadingRef, mediaDetailState,
   mediaItemsData, onRetryGroupMedia, onOpenMedia: openMediaAt, mediaPageFeedback,
+  onMediaEndVisible,
   relationCandidateFeedback, relationDetailSection, hideManagementActions,
   canManage, detailsReady, onEdit: openEdit, onClose: closeDetail,
 }: GroupDetailPaneProps) {
@@ -98,6 +101,7 @@ export function GroupDetailPane({
                     <>
                       <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
                       {mediaPageFeedback}
+                      {onMediaEndVisible && <LoadMoreSentinel onVisible={onMediaEndVisible} />}
                     </>
                   )}
                 </Box>
@@ -192,6 +196,7 @@ export function GroupDetailPane({
                               items={mediaItemsData}
                             />
                             {mediaPageFeedback}
+                      {onMediaEndVisible && <LoadMoreSentinel onVisible={onMediaEndVisible} />}
                           </>
                         )}
                       </Box>
