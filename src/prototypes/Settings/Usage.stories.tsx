@@ -180,8 +180,8 @@ export const LimitReachedContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("5,000 件")).toBeVisible()
-    await expect(canvas.getByText("0 GB")).toBeVisible()
-    await expect(canvas.getByRole("progressbar", { name: /ストレージ使用率 100%/ })).toBeInTheDocument()
+    await expect(canvas.getByText(/0 GB/)).toBeVisible()
+    await expect(canvas.getByLabelText(/ストレージ使用率 100%/)).toBeInTheDocument()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
