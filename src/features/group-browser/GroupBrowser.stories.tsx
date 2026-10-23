@@ -613,8 +613,8 @@ export const EmptyScopeKeepsCreateEntry: Story = {
   args: { groupsData: [] },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeEnabled()
-    await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
+    await expect(canvas.getAllByRole("button", { name: "Groupを作成" })[0]).toBeEnabled()
+    await userEvent.click(canvas.getAllByRole("button", { name: "Groupを作成" })[0])
     const dialog = await within(document.body).findByRole("dialog", { name: "Groupを作成" })
     await waitFor(() => expect(dialog).toBeVisible())
   },
