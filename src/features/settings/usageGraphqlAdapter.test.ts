@@ -42,6 +42,14 @@ describe("GraphQL Usage表示Adapter", () => {
     expect(emptyUsage.limitBytes).toBe(0)
   })
 
+  it("確定0件でもAPIの不正な形式別データを見逃さない", () => {
+    expect(() => mapUsageProjection({
+      mediaCount: 0,
+      storage: { usedBytes: "0", effectiveLimitBytes: "5000000000" },
+      formatBreakdown: [{ format: "HEIF", mediaCount: 0, usedBytes: "-1" }],
+    })).toThrow()
+  })
+
   it.each(["9007199254740992", "-1", "1.5", "1e6", "abc"])(
     "精度を喪失する、または不正なbyte値 %s を拒否する",
     (usedBytes) => {
