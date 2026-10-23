@@ -107,7 +107,7 @@ export const LimitReachedContract: Story = {
   args: { usage: limitReachedUsage },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("5 GB ( 100 % )")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB ( 100 % )")).toHaveLength(2)
     await expect(canvas.getByText("0 GB ( 0 % )")).toBeVisible()
     await expect(canvas.getByLabelText(/ストレージ使用率 100%/)).toBeInTheDocument()
     await expect(canvas.getByRole("table")).toHaveTextContent("5,000 件")
