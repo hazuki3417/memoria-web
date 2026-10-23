@@ -91,7 +91,7 @@ export const ZeroUsageContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("0 GB ( 0 % )")).toBeVisible()
-    await expect(canvas.getByText("5 GB ( 100 % )")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB ( 100 % )")).toHaveLength(2)
     await expect(canvas.getByText("登録済みのオリジナルファイルはありません")).toBeVisible()
     const table = canvas.getByRole("table")
     await expect(table).toHaveTextContent("0 件")
