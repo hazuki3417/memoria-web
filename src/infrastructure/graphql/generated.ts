@@ -989,7 +989,7 @@ export type OperationSaveUserPreferencesMutation = { updateUserPreferences: { pr
 export type OperationPersonalUsageQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type OperationPersonalUsageQuery = { me: { usage: { mediaCount: number, storage: { usedBytes: string, effectiveLimitBytes: string }, formatBreakdown: Array<{ format: OperationOriginalImageFormat, mediaCount: number, usedBytes: string }> } } | null };
+export type OperationPersonalUsageQuery = { me: { id: string, preferences: { fileSizeUnit: OperationFileSizeUnit }, usage: { mediaCount: number, storage: { usedBytes: string, effectiveLimitBytes: string }, formatBreakdown: Array<{ format: OperationOriginalImageFormat, mediaCount: number, usedBytes: string }> } } | null };
 
 export const GroupBrowserGroupFragmentDoc = gql`
     fragment GroupBrowserGroup on MediaGroup {
@@ -2036,6 +2036,10 @@ export type SaveUserPreferencesMutationOptions = Apollo.BaseMutationOptions<Oper
 export const PersonalUsageDocument = gql`
     query PersonalUsage {
   me {
+    id
+    preferences {
+      fileSizeUnit
+    }
     usage {
       mediaCount
       storage {
