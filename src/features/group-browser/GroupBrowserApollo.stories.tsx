@@ -335,3 +335,73 @@ export const ListingLoading: Story = {
     await expect(canvas.queryByText("まだGroupがありません")).not.toBeInTheDocument()
   },
 }
+
+const pageOneResult: OperationBrowseGroupsQuery = {
+  mediaGroups: {
+    edges: [{ cursor: "cursor-a", node: {
+      id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z",
+    } }],
+    pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: "cursor-a", endCursor: "cursor-a" },
+  },
+}
+const pageTwoResult: OperationBrowseGroupsQuery = {
+  mediaGroups: {
+    edges: [
+      { cursor: "cursor-a", node: { id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z" } },
+      { cursor: "cursor-b", node: { id: "pagination-group-b", name: "ページ2のGroup", stateToken: "2", createdAt: "2026-01-02T00:00:00Z" } },
+    ],
+    pageInfo: { hasNextPage: false, hasPreviousPage: true, startCursor: "cursor-a", endCursor: "cursor-b" },
+  },
+}
+const pageTwoRequest = {
+  query: BrowseGroupsDocument,
+  variables: { ...request.variables, after: "cursor-a" },
+}
+const pageOneReply: MockedResponse<OperationBrowseGroupsQuery> = {
+  request, result: { data: pageOneResult },
+}
+const pageTwoReply: MockedResponse<OperationBrowseGroupsQuery> = {
+  request: pageTwoRequest, result: { data: pageTwoResult },
+}
+
+/** Scrolling near the end fetches the second page, keeps the first, deduplicates, and stops at the final page. */
+export const ListingPagination: Story = {
+  name: "Integration · Listing Fetch More",
+  tags: ["interaction"],
+  decorators: [(Story) => (
+    <MockedProvider mocks={[pageOneReply, pageTwoReply]} addTypename={false}>
+      <Story />
+    </MockedProvider>
+  )],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText("ページ1のGroup")).toBeVisible()
+    await expect(await canvas.findByText("ページ2のGroup")).toBeVisible()
+    await expect(canvas.getAllByText("ページ1のGroup")).toHaveLength(1)
+    await expect(canvas.queryByText("追加のGroupを取得できませんでした")).not.toBeInTheDocument()
+  },
+}
+
+/** The first page remains available when fetchMore fails, and an explicit retry recovers. */
+export const ListingPaginationRetry: Story = {
+  name: "Integration · Listing Fetch More Retry",
+  tags: ["interaction"],
+  decorators: [(Story) => (
+    <MockedProvider mocks={[
+      pageOneReply,
+      { request: pageTwoRequest, error: new Error("次ページの取得に失敗") },
+      pageTwoReply,
+    ]} addTypename={false}>
+      <Story />
+    </MockedProvider>
+  )],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText("ページ1のGroup")).toBeVisible()
+    await expect(await canvas.findByText("追加のGroupを取得できませんでした")).toBeVisible()
+    await expect(canvas.getByText("ページ1のGroup")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(await canvas.findByText("ページ2のGroup")).toBeVisible()
+    await expect(canvas.getAllByText("ページ1のGroup")).toHaveLength(1)
+  },
+}
