@@ -242,17 +242,17 @@ function UsageFormatBreakdownSection({
             {status === "ready" && (
               <Table.Tfoot
                 style={{
-                borderTop: "2px solid var(--mantine-color-default-border)",
-              }}
-            >
-              <Table.Tr>
-                <Table.Th>合計</Table.Th>
-                <Table.Th ta="right">
+                  borderTop: "2px solid var(--mantine-color-default-border)",
+                }}
+              >
+                <Table.Tr>
+                  <Table.Th>合計</Table.Th>
+                  <Table.Th ta="right">
                   {usage.mediaCount.toLocaleString("ja-JP")} 件
-                </Table.Th>
-                <Table.Th ta="right">{usage.usedStorageLabel}</Table.Th>
-                <Table.Th ta="right">{usage.storageUsagePercent} %</Table.Th>
-              </Table.Tr>
+                  </Table.Th
+                  <Table.Th ta="right">{usage.usedStorageLabel}</Table.Th>
+                  <Table.Th ta="right">{usage.storageUsagePercent} %</Table.Th>
+                </Table.Tr>
               </Table.Tfoot>
             )}
           </Table>
