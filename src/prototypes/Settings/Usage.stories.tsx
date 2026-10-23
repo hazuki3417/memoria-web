@@ -127,7 +127,7 @@ export const LoadingContract: Story = {
     await expect(canvas.getByText("ファイル形式別内訳")).toBeVisible()
     await expect(canvas.getAllByRole("columnheader")).toHaveLength(4)
     await expect(canvas.getByRole("button", { name: "登録件数で並べ替え" })).toBeDisabled()
-    await expect(canvas.queryByText(/1\\.24 GB/)).not.toBeInTheDocument()
+    await expect(canvas.queryByText(/1\.24 GB/)).not.toBeInTheDocument()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -142,7 +142,7 @@ export const ErrorContract: Story = {
     await expect(canvas.getByRole("region", { name: "利用状況の取得エラー" })).toBeVisible()
     await expect(canvas.getByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
     await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
-    await expect(canvas.queryByText(/1\\.24 GB/)).not.toBeInTheDocument()
+    await expect(canvas.queryByText(/1\.24 GB/)).not.toBeInTheDocument()
     await expect(canvas.queryByRole("status", { name: "利用状況を読み込んでいます" })).not.toBeInTheDocument()
   },
 }
