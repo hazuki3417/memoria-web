@@ -719,6 +719,7 @@ export function GroupBrowser({
                   })}
                 </Box>
                 {discoveryPageFeedback}
+                {onDiscoveryEndVisible && discoveryPageState !== "error" && <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />}
               </ScrollArea>
             </Box>
           </SplitView.Pane>
@@ -743,7 +744,7 @@ export function GroupBrowser({
                   transition={{ duration: 0.3 }}
                 >
                   <GroupDetailPane selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData}
-                onRetryGroupMedia={onRetryGroupMedia} onOpenMedia={openMediaAt}
+                onRetryGroupMedia={onRetryGroupMedia} onMediaEndVisible={onMediaEndVisible} onOpenMedia={openMediaAt}
                 mediaPageFeedback={mediaPageFeedback} relationCandidateFeedback={relationCandidateFeedback}
                 relationDetailSection={relationDetailSection} hideManagementActions={hideManagementActions}
                 canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} />
