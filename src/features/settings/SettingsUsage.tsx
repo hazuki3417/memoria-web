@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, type ReactNode } from "react"
 import {
   Box,
   Button,
@@ -67,7 +67,7 @@ function UsageStorageSection({
   status: UsageStatus
 }) {
   return (
-<Box>
+    <Box>
         <SectionHeader>ストレージ</SectionHeader>
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="wrap">
@@ -118,11 +118,11 @@ function UsageFormatBreakdownSection({
   status: UsageStatus
   sort: UsageSort
   sortedBreakdown: NonNullable<SettingsUsageData["formatBreakdown"]>
-  sortHeader: (key: SortKey, label: string) => React.ReactNode
+  sortHeader: (key: SortKey, label: string) => ReactNode
 }) {
   return (
     <>
-{(status === "loading" || usage.formatBreakdown) && (
+      {(status === "loading" || usage.formatBreakdown) && (
         <Box>
           <SectionHeader>ファイル形式別内訳</SectionHeader>
           <Table striped highlightOnHover={status === "ready"}>
