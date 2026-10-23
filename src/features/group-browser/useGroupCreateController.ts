@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import { useDisclosure } from "@mantine/hooks"
 import { showNotification } from "@/components/Feedback"
 import { validGroupName } from "./groupName"
 import { creationFailureDescription } from "./groupCreationFailureDescription"
-import type { GroupBrowserGroup, GroupBrowserProps } from "./GroupBrowser"
+import type { GroupBrowserProps } from "./GroupBrowser"
 
 export function useGroupCreateController({
   onCreateGroup,
@@ -14,7 +13,6 @@ export function useGroupCreateController({
   onCreateGroup: GroupBrowserProps["onCreateGroup"]
   runAction: (action: () => Promise<void>) => Promise<"ok" | "busy" | "error">
 }) {
-  const [createdGroups, setCreatedGroups] = useState<GroupBrowserGroup[]>([])
   const [createOpened, create] = useDisclosure(false)
   const [createName, setCreateName] = useState("")
   const [createParents, setCreateParents] = useState<string[]>([])
@@ -31,28 +29,15 @@ export function useGroupCreateController({
     let outcomeUnknown = false
     let failureDescription = "入力内容と通信状態を確認して、もう一度お試しください。"
     const result = await runAction(async () => {
-      if (onCreateGroup) {
-        let outcome
-        try {
-          outcome = await onCreateGroup(name, createParents, createChildren)
-        } catch (error) {
-          failureDescription = creationFailureDescription(error)
-          throw error
-        }
-        if (outcome === "unknown") outcomeUnknown = true
-      } else {
-        setCreatedGroups((current) => [
-          ...current,
-          {
-            id: `created-${Date.now()}-${current.length}`,
-            name,
-            mediaCount: 0,
-            previewCount: 0,
-            parentNames: createParents,
-            childNames: createChildren,
-          },
-        ])
+      if (!onCreateGroup) throw new Error("Group create operation is not configured")
+      let outcome
+      try {
+        outcome = await onCreateGroup(name, createParents, createChildren)
+      } catch (error) {
+        failureDescription = creationFailureDescription(error)
+        throw error
       }
+      if (outcome === "unknown") outcomeUnknown = true
     })
     if (result === "error") {
       showNotification({
@@ -81,7 +66,7 @@ export function useGroupCreateController({
 
 
   return {
-    createdGroups, createOpened, createName, createParents, createChildren,
+    createOpened, createName, createParents, createChildren,
     setCreateName, setCreateParents, setCreateChildren, openCreate, submitCreate,
     closeCreate: create.close,
   }
