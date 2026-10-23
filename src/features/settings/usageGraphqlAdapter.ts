@@ -34,23 +34,22 @@ export function mapUsageProjection(usage: UsageProjection): SettingsUsageData {
   if (!Number.isSafeInteger(usage.mediaCount) || usage.mediaCount < 0) {
     throw new Error("Usageの登録件数が不正です")
   }
+  const usedBytes = safeBytes(usage.storage.usedBytes)
+  const limitBytes = safeBytes(usage.storage.effectiveLimitBytes)
+  const formatBreakdown = usage.formatBreakdown.map((item) => {
+    if (!Number.isSafeInteger(item.mediaCount) || item.mediaCount < 0) {
+      throw new Error("形式別の登録件数が不正です")
+    }
+    const format = formatLabels[item.format as keyof typeof formatLabels]
+    if (!format) throw new Error("未対応の形式が含まれています")
+    return { format, count: item.mediaCount, sizeBytes: safeBytes(item.usedBytes) }
+  })
   return {
-    usedBytes: safeBytes(usage.storage.usedBytes),
-    limitBytes: safeBytes(usage.storage.effectiveLimitBytes),
-    mediaCount: usage.mediaCount,
-    // Backendは0件でも全形式を返す。既存UIの空状態表示を保つ。
-    formatBreakdown: usage.mediaCount === 0 ? [] : usage.formatBreakdown.map((item) => {
-      if (!Number.isSafeInteger(item.mediaCount) || item.mediaCount < 0) {
-        throw new Error("形式別の登録件数が不正です")
-      }
-      const format = formatLabels[item.format as keyof typeof formatLabels]
-      if (!format) throw new Error("未対応の形式が含まれています")
-      return {
-        format,
-        count: item.mediaCount,
-        sizeBytes: safeBytes(item.usedBytes),
-      }
-    }),
+    usedBytes,
+    limitBytes,
+    mediaCount,
+    // Backendは0件でも全形式を返すが、既存UIでは確定0件をEmptyとして表示する。
+    formatBreakdown: usage.mediaCount === 0 ? [] : formatBreakdown,
   }
 }
 
