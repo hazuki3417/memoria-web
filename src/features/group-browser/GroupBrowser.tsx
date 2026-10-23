@@ -129,14 +129,11 @@ export function GroupBrowser({
 }: GroupBrowserProps) {
   const { saving, runAction } = useGroupMutationAction()
   const {
-    createdGroups, createOpened, createName, createParents, createChildren,
+    createOpened, createName, createParents, createChildren,
     setCreateName, setCreateParents, setCreateChildren, openCreate, submitCreate,
     closeCreate,
   } = useGroupCreateController({ onCreateGroup, runAction })
-  const allGroups = useMemo(
-    () => [...(groupsData ?? []), ...createdGroups],
-    [groupsData, createdGroups],
-  )
+  const allGroups = groupsData ?? []
   const { query, setQuery, appliedQuery, setAppliedQuery } = useGroupSearchState()
   const {
     selectedId, compact, compactView, splitViewRef, savedLayout,
