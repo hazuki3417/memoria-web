@@ -36,6 +36,18 @@ export const LoadingCompact: Story = {
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
+/** Retry in progress is a stable snapshot, separate from the timed interaction Story. */
+export const Retrying: Story = {
+  name: "再試行中",
+  args: { initialUsageScenario: "retrying" },
+}
+
+export const RetryingCompact: Story = {
+  name: "再試行中（Compact）",
+  args: { initialUsageScenario: "retrying" },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+
 export const Error: Story = {
   name: "Error / Retry",
   args: { initialUsageScenario: "error" },
@@ -199,5 +211,54 @@ export const SortInteraction: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "登録件数で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
     await expect(within(table).getByRole("columnheader", { name: /登録件数/ })).toHaveAttribute("aria-sort", "descending")
+  },
+}
+
+/** Initial loading preserves the table contract without exposing real values. */
+export const LoadingTableContract: Story = {
+  name: "Interaction · Loading時のTable構造",
+  args: { initialUsageScenario: "loading" },
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const table = canvas.getByRole("table")
+    const rows = within(table).getAllByRole("row")
+    await expect(rows).toHaveLength(5) // header + four placeholder rows; no total footer
+    await expect(within(table).getAllByRole("columnheader")).toHaveLength(4)
+    await expect(within(table).queryByText("合計")).not.toBeInTheDocument()
+    await expect(canvas.queryByText("1.24 GB")).not.toBeInTheDocument()
+    await expect(canvas.getByRole("heading", { name: "利用状況" })).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "形式で並べ替え" })).toBeDisabled()
+  },
+}
+
+/** A completed Query renders values, sorting actions and its real summary. */
+export const ReadyContract: Story = {
+  name: "Interaction · Readyの表示契約",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("heading", { name: "利用状況" })).toBeVisible()
+    await expect(canvas.getByText("1.24 GB")).toBeVisible()
+    await expect(canvas.getByText("1,248 件")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "形式で並べ替え" })).toBeEnabled()
+    await expect(canvas.queryByRole("status", { name: "利用状況を読み込んでいます" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+/** The static retry-in-progress fixture is VRT-ready but not opted in. */
+export const RetryingContract: Story = {
+  name: "Interaction · 再試行中の表示契約",
+  args: { initialUsageScenario: "retrying" },
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("heading", { name: "利用状況" })).toBeVisible()
+    await expect(canvas.getByRole("status", { name: "利用状況を読み込んでいます" })).toBeVisible()
+    await expect(canvas.getByText("ファイル形式別内訳")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "登録件数で並べ替え" })).toBeDisabled()
+    await expect(canvas.queryByRole("button", { name: "再試行" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
