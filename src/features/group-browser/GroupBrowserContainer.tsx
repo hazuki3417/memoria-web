@@ -208,7 +208,11 @@ export function GroupBrowserContainer({
   const [addToGroup] = useAddBrowserMediaToGroupMutation()
   const [removeFromGroup] = useRemoveBrowserMediaFromGroupMutation()
 
-  const listingSnapshot = listing.data ?? listing.previousData
+  // Apollo can temporarily clear query results while fetchMore changes network status.
+  // Keep the last complete listing visible until the new page has settled.
+  const lastListingData = useRef<typeof listing.data>(undefined)
+  if (listing.data) lastListingData.current = listing.data
+  const listingSnapshot = listing.data ?? listing.previousData ?? lastListingData.current
   const page = listingSnapshot?.mediaGroups
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
 
