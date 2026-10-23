@@ -92,6 +92,8 @@ export type GroupBrowserProps = {
   hideManagementActions?: boolean
   discoveryState?: "ready" | "loading" | "error"
   onRetryDiscovery?: () => void
+  discoveryPageState?: "idle" | "loading" | "error"
+  onRetryDiscoveryPage?: () => void
 }
 
 type GroupFixture = {
@@ -196,6 +198,8 @@ export function GroupBrowser({
   hideManagementActions = false,
   discoveryState = "ready",
   onRetryDiscovery,
+  discoveryPageState = "idle",
+  onRetryDiscoveryPage,
 }: GroupBrowserProps) {
   const { saving, runAction } = useGroupMutationAction()
   const {
@@ -289,6 +293,11 @@ export function GroupBrowser({
         </Stack>
       </Alert>
     </Box>
+  ) : null
+  const discoveryPageFeedback = discoveryPageState === "loading" ? (
+    <Center py="lg"><Stack align="center" gap={6}><Loader size="sm" /><Text size="xs" c="dimmed">追加のGroupを取得しています</Text></Stack></Center>
+  ) : discoveryPageState === "error" ? (
+    <Box p="sm"><Alert color="red" title="追加のGroupを取得できませんでした"><Button size="xs" variant="light" mt="xs" onClick={onRetryDiscoveryPage}>再試行</Button></Alert></Box>
   ) : null
   const searchEmptyState = discoveryState === "ready" && allGroups.length > 0 && visibleGroups.length === 0 && appliedQuery.trim() ? (
     <Center mih={360}>
@@ -569,6 +578,7 @@ export function GroupBrowser({
                     </UnstyledButton>
                   ))}
                 </Box>
+                {discoveryPageFeedback}
               </ScrollArea>
             </Box>
           ) : (
@@ -702,6 +712,7 @@ export function GroupBrowser({
                     )
                   })}
                 </Box>
+                {discoveryPageFeedback}
               </ScrollArea>
             </Box>
           </SplitView.Pane>
