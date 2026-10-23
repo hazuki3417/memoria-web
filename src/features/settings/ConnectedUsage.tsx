@@ -25,6 +25,7 @@ export function ConnectedUsage({
     variables: { communityId: communityId ?? "" },
     skip: scope !== "community" || !communityId,
     fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
   })
   const preferences = useCurrentUserQuery({ skip: scope !== "personal" })
   const active = scope === "personal" ? personal : community
