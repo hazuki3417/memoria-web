@@ -13,6 +13,7 @@ import {
   useRemoveCommunityMemberMutation,
   useLeaveCommunityMutation,
 } from "@/infrastructure/graphql/generated"
+import { ConnectedUsage } from "@/features/settings"
 import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
@@ -63,6 +64,7 @@ export function CommunitySettingsRoute({
       members={members ?? undefined}
       role={members.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
+      usageContent={section === "usage" ? <ConnectedUsage scope="community" communityId={communityId} /> : undefined}
       onRemoveMember={async (userId) => {
         try {
           const result = await removeMember({
