@@ -62,7 +62,14 @@ const MOCK_USAGE: SettingsUsageData = {
   ],
 }
 
-type UsageScenario = "default" | "loading" | "error" | "retry-error" | "zero" | "limit-reached"
+type UsageScenario =
+  | "default"
+  | "loading"
+  | "error"
+  | "error-no-retry"
+  | "retry-error"
+  | "zero"
+  | "limit-reached"
 
 const ZERO_USAGE: SettingsUsageData = {
   usedStorageLabel: "0 GB",
@@ -328,7 +335,7 @@ function UsageContent({ initialScenario }: { initialScenario: UsageScenario }) {
   const status =
     scenario === "loading" || scenario === "retrying"
       ? "loading"
-      : scenario === "error"
+      : (scenario === "error" || scenario === "error-no-retry")
         ? "error"
         : "ready"
 
@@ -340,7 +347,13 @@ function UsageContent({ initialScenario }: { initialScenario: UsageScenario }) {
     setScenario(initialScenario === "retry-error" ? "error" : "default")
   }
 
-  return <SettingsUsage usage={usage} status={status} onRetry={retry} />
+  return (
+    <SettingsUsage
+      usage={usage}
+      status={status}
+      onRetry={initialScenario === "error-no-retry" ? undefined : retry}
+    />
+  )
 }
 
 function AccountContent() {
