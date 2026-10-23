@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import {
   CommunityUsageDocument,
-  CurrentUserDocument,
   PersonalUsageDocument,
 } from "@/infrastructure/graphql/generated"
 import { ConnectedUsage } from "./ConnectedUsage"
@@ -34,24 +33,12 @@ const communityFailure = {
 
 const personalSuccess = {
   request: { query: PersonalUsageDocument },
-  result: { data: { me: { usage } } },
-}
-const preferencesBinary = {
-  request: { query: CurrentUserDocument },
   result: {
     data: {
       me: {
         id: "user-a",
-        profile: { nickname: "ユーザー" },
-        preferences: {
-          personalAccentColor: "#0000FF",
-          dateFormat: "YYYY_MM_DD",
-          fileSizeUnit: "BINARY",
-          mediaThumbnailSize: "MEDIUM",
-          mediaDetailNavigationWrap: false,
-          mediaDetailInitialInfoWide: true,
-          mediaDetailInitialInfoMedium: false,
-        },
+        preferences: { fileSizeUnit: "BINARY" },
+        usage,
       },
     },
   },
@@ -149,13 +136,13 @@ export const CommunityRetryFailure: Story = {
   },
 }
 
-// SC-01・UN-02: PersonalのUsageとUser Preferencesを別Operationから取得する。
+// SC-01・UN-02: PersonalのUsageと表示単位を同一Operationから取得する。
 export const PersonalBinary: Story = {
   name: "Integration · Personal UsageとBinary設定",
   tags: ["interaction"],
   args: { scope: "personal", communityId: undefined },
   decorators: [(Story) => (
-    <MockedProvider mocks={[personalSuccess, preferencesBinary]} addTypename={false}>
+    <MockedProvider mocks={[personalSuccess]} addTypename={false}>
       <Story />
     </MockedProvider>
   )],
