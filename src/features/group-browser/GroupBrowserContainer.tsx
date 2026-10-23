@@ -208,11 +208,15 @@ export function GroupBrowserContainer({
   const [addToGroup] = useAddBrowserMediaToGroupMutation()
   const [removeFromGroup] = useRemoveBrowserMediaFromGroupMutation()
 
-  // Apollo can temporarily clear query results while fetchMore changes network status.
-  // Keep the last complete listing visible until the new page has settled.
-  const lastListingData = useRef<typeof listing.data>(undefined)
-  if (listing.data) lastListingData.current = listing.data
-  const listingSnapshot = listing.data ?? listing.previousData ?? lastListingData.current
+  // Keep an independent page snapshot: Apollo's active query can briefly expose
+  // the requested next page rather than the merged connection during fetchMore.
+  const [retainedListing, setRetainedListing] = useState<typeof listing.data>(undefined)
+  useEffect(() => {
+    if (listing.data?.mediaGroups && !listing.loading) {
+      setRetainedListing(listing.data)
+    }
+  }, [listing.data, listing.loading])
+  const listingSnapshot = retainedListing ?? listing.data ?? listing.previousData
   const page = listingSnapshot?.mediaGroups
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
 
