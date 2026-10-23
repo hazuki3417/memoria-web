@@ -29,10 +29,16 @@ describe("GraphQL Usage表示Adapter", () => {
     const result = mapUsageProjection({
       mediaCount: 0,
       storage: { usedBytes: "0", effectiveLimitBytes: "5000000000" },
-      formatBreakdown: [],
+      formatBreakdown: [
+        { format: "JPEG", mediaCount: 0, usedBytes: "0" },
+        { format: "PNG", mediaCount: 0, usedBytes: "0" },
+        { format: "WEBP", mediaCount: 0, usedBytes: "0" },
+        { format: "HEIF", mediaCount: 0, usedBytes: "0" },
+      ],
     })
     expect(result.usedBytes).toBe(0)
     expect(result.limitBytes).toBe(5_000_000_000)
+    expect(result.formatBreakdown).toEqual([])
     expect(emptyUsage.limitBytes).toBe(0)
   })
 
