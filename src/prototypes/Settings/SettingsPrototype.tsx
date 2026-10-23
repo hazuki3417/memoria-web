@@ -312,7 +312,7 @@ function PreferencesContent({ compact }: { compact: boolean }) {
   )
 }
 
-function UsageContent({ initialScenario }: { initialScenario: UsageScenario }) {
+function UsageContent({ initialScenario, fileSizeUnit }: { initialScenario: UsageScenario; fileSizeUnit: "DECIMAL" | "BINARY" }) {
   const [scenario, setScenario] = useState<UsageScenario | "retrying">(
     initialScenario === "retry-error" ? "error" : initialScenario,
   )
@@ -340,6 +340,7 @@ function UsageContent({ initialScenario }: { initialScenario: UsageScenario }) {
   return (
     <SettingsUsage
       usage={usage}
+      fileSizeUnit={fileSizeUnit}
       status={status}
       onRetry={initialScenario === "error-no-retry" ? undefined : retry}
     />
@@ -371,10 +372,12 @@ export function SettingsPrototype({
   initialSection = "profile",
   initialProfileSaveState = "idle",
   initialUsageScenario = "default",
+  initialUsageFileSizeUnit = "DECIMAL",
 }: {
   initialSection?: Section
   initialProfileSaveState?: ProfileSaveState
   initialUsageScenario?: UsageScenario
+  initialUsageFileSizeUnit?: "DECIMAL" | "BINARY"
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>(initialSection)
@@ -386,7 +389,7 @@ export function SettingsPrototype({
     ) : section === "preferences" ? (
       <PreferencesContent compact={compact} />
     ) : section === "usage" ? (
-      <UsageContent initialScenario={initialUsageScenario} />
+      <UsageContent initialScenario={initialUsageScenario} fileSizeUnit={initialUsageFileSizeUnit} />
     ) : (
       <AccountContent />
     )
