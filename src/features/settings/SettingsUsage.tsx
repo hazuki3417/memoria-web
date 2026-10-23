@@ -15,7 +15,12 @@ import {
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
-import { sortUsageFormats, type UsageFormatItem, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
+import {
+  sortUsageFormats,
+  type UsageFormatItem,
+  type UsageSort,
+  type UsageSortKey,
+} from "./sortUsageFormats"
 
 export type SettingsUsageData = {
   usedStorageLabel: string
@@ -44,17 +49,32 @@ function UsageStorageSection({
 }) {
   return (
     <Box>
-        <SectionHeader>ストレージ</SectionHeader>
-        <Stack gap="sm">
-          <Group justify="space-between" align="center" wrap="wrap">
-            <Text size="sm">使用済み</Text>
-            {status === "loading" ? <Skeleton w={92} h={16} radius="sm" /> : <Text size="sm" ta="right">{usage.usedStorageLabel}{` ( ${usage.storageUsagePercent} % )`}</Text>}
-          </Group>
-          <Group justify="space-between" align="center" wrap="wrap">
-            <Text size="sm">空き容量</Text>
-            {status === "loading" ? <Skeleton w={92} h={16} radius="sm" /> : <Text size="sm" ta="right">{usage.availableStorageLabel}{` ( ${Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} % )`}</Text>}
-          </Group>
-          {status === "loading" ? <Skeleton h={12} radius="xl" /> : <Progress.Root
+      <SectionHeader>ストレージ</SectionHeader>
+      <Stack gap="sm">
+        <Group justify="space-between" align="center" wrap="wrap">
+          <Text size="sm">使用済み</Text>
+          {status === "loading" ? (
+            <Skeleton w={92} h={16} radius="sm" />
+          ) : (
+            <Text size="sm" ta="right">
+              {usage.usedStorageLabel}{` ( ${usage.storageUsagePercent} % )`}
+            </Text>
+          )}
+        </Group>
+        <Group justify="space-between" align="center" wrap="wrap">
+          <Text size="sm">空き容量</Text>
+          {status === "loading" ? (
+            <Skeleton w={92} h={16} radius="sm" />
+          ) : (
+            <Text size="sm" ta="right">
+              {usage.availableStorageLabel}{` ( ${Math.max(0, 100 - usage.storageUsagePercent).toFixed(1).replace(/\.0$/, "")} % )`}
+            </Text>
+          )}
+        </Group>
+        {status === "loading" ? (
+          <Skeleton h={12} radius="xl" />
+        ) : (
+          <Progress.Root
             size="md"
             aria-label={`ストレージ使用率 ${usage.storageUsagePercent}%、ファイル形式別内訳`}
           >
@@ -71,15 +91,20 @@ function UsageStorageSection({
                 color="blue"
               />
             )}
-          </Progress.Root>}
-          <Group justify="space-between" align="center" wrap="wrap">
-            <Text size="sm">総容量</Text>
-            {status === "loading" ? <Skeleton w={92} h={16} radius="sm" /> : (
-              <Text size="sm" ta="right">{usage.effectiveLimitLabel} ( 100 % )</Text>
-            )}
-          </Group>
-        </Stack>
-      </Box>
+          </Progress.Root>
+        )}
+        <Group justify="space-between" align="center" wrap="wrap">
+          <Text size="sm">総容量</Text>
+          {status === "loading" ? (
+            <Skeleton w={92} h={16} radius="sm" />
+          ) : (
+            <Text size="sm" ta="right">
+              {usage.effectiveLimitLabel} ( 100 % )
+            </Text>
+          )}
+        </Group>
+      </Stack>
+    </Box>
   )
 }
 
@@ -214,8 +239,9 @@ function UsageFormatBreakdownSection({
                 </Table.Tr>
               ))}
             </Table.Tbody>
-            {status === "ready" && <Table.Tfoot
-              style={{
+            {status === "ready" && (
+              <Table.Tfoot
+                style={{
                 borderTop: "2px solid var(--mantine-color-default-border)",
               }}
             >
@@ -227,7 +253,8 @@ function UsageFormatBreakdownSection({
                 <Table.Th ta="right">{usage.usedStorageLabel}</Table.Th>
                 <Table.Th ta="right">{usage.storageUsagePercent} %</Table.Th>
               </Table.Tr>
-            </Table.Tfoot>}
+              </Table.Tfoot>
+            )}
           </Table>
         </Box>
       )}
@@ -237,18 +264,22 @@ function UsageFormatBreakdownSection({
 
 function UsageErrorContent({ onRetry }: { onRetry?: () => void }) {
   return (
-        <Box role="region" aria-label="利用状況の取得エラー">
-          <Stack gap="md" align="flex-start">
-            <FeedbackAlert kind="error" title="利用状況を取得できませんでした" role="alert">
-              通信状況を確認して、もう一度お試しください。
-            </FeedbackAlert>
-            {onRetry && (
-              <Button size="sm" variant="light" onClick={onRetry}>
-                再試行
-              </Button>
-            )}
-          </Stack>
-        </Box>
+    <Box role="region" aria-label="利用状況の取得エラー">
+      <Stack gap="md" align="flex-start">
+        <FeedbackAlert
+          kind="error"
+          title="利用状況を取得できませんでした"
+          role="alert"
+        >
+          通信状況を確認して、もう一度お試しください。
+        </FeedbackAlert>
+        {onRetry && (
+          <Button size="sm" variant="light" onClick={onRetry}>
+            再試行
+          </Button>
+        )}
+      </Stack>
+    </Box>
   )
 }
 
@@ -282,23 +313,23 @@ export function SettingsUsage({
         }
       />
       <Box>
-      {status === "error" ? (
-        <UsageErrorContent onRetry={onRetry} />
-      ) : (
-      <Stack
-        gap="xl"
-        role={status === "loading" ? "status" : undefined}
-        aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
-      >
-      <UsageStorageSection usage={usage} status={status} />
-      <UsageFormatBreakdownSection
-        usage={usage}
-        status={status}
-        sort={sort}
-        onSort={toggleSort}
-      />
-      </Stack>
-      )}
+        {status === "error" ? (
+          <UsageErrorContent onRetry={onRetry} />
+        ) : (
+          <Stack
+            gap="xl"
+            role={status === "loading" ? "status" : undefined}
+            aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
+          >
+            <UsageStorageSection usage={usage} status={status} />
+            <UsageFormatBreakdownSection
+              usage={usage}
+              status={status}
+              sort={sort}
+              onSort={toggleSort}
+            />
+          </Stack>
+        )}
       </Box>
     </Stack>
   )
