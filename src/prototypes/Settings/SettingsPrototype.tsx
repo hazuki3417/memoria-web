@@ -62,6 +62,29 @@ const MOCK_USAGE: SettingsUsageData = {
   ],
 }
 
+type UsageScenario = "default" | "loading" | "error" | "zero" | "limit-reached"
+
+const ZERO_USAGE: SettingsUsageData = {
+  usedStorageLabel: "0 GB",
+  effectiveLimitLabel: "5 GB",
+  availableStorageLabel: "5 GB",
+  storageUsagePercent: 0,
+  mediaCount: 0,
+  formatBreakdown: [],
+}
+
+const LIMIT_REACHED_USAGE: SettingsUsageData = {
+  usedStorageLabel: "5 GB",
+  effectiveLimitLabel: "5 GB",
+  availableStorageLabel: "0 GB",
+  storageUsagePercent: 100,
+  mediaCount: 5000,
+  formatBreakdown: [
+    { format: "JPEG", count: 3500, sizeLabel: "3.5 GB", capacityPercent: 70 },
+    { format: "PNG", count: 1500, sizeLabel: "1.5 GB", capacityPercent: 30 },
+  ],
+}
+
 function ProfileContent({
   initialSaveState = "idle",
 }: {
@@ -292,8 +315,23 @@ function PreferencesContent({ compact }: { compact: boolean }) {
   )
 }
 
-function UsageContent() {
-  return <SettingsUsage usage={MOCK_USAGE} />
+function UsageContent({ initialScenario }: { initialScenario: UsageScenario }) {
+  const [scenario, setScenario] = useState(initialScenario)
+  const usage =
+    scenario === "zero"
+      ? ZERO_USAGE
+      : scenario === "limit-reached"
+        ? LIMIT_REACHED_USAGE
+        : MOCK_USAGE
+  const status = scenario === "loading" || scenario === "error" ? scenario : "ready"
+
+  return (
+    <SettingsUsage
+      usage={usage}
+      status={status}
+      onRetry={() => setScenario("default")}
+    />
+  )
 }
 
 function AccountContent() {
@@ -320,9 +358,11 @@ function AccountContent() {
 export function SettingsPrototype({
   initialSection = "profile",
   initialProfileSaveState = "idle",
+  initialUsageScenario = "default",
 }: {
   initialSection?: Section
   initialProfileSaveState?: ProfileSaveState
+  initialUsageScenario?: UsageScenario
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>(initialSection)
@@ -334,7 +374,7 @@ export function SettingsPrototype({
     ) : section === "preferences" ? (
       <PreferencesContent compact={compact} />
     ) : section === "usage" ? (
-      <UsageContent />
+      <UsageContent initialScenario={initialUsageScenario} />
     ) : (
       <AccountContent />
     )
