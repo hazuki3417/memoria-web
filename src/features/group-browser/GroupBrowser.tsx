@@ -31,6 +31,7 @@ import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupDetailPane } from "./GroupDetailPane"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
+import { LoadMoreSentinel } from "./LoadMoreSentinel"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
 import { GroupDeleteDialog } from "./GroupDeleteDialog"
 import { GroupCreateDialog } from "./GroupCreateDialog"
@@ -94,6 +95,8 @@ export type GroupBrowserProps = {
   onRetryDiscovery?: () => void
   discoveryPageState?: "idle" | "loading" | "error"
   onRetryDiscoveryPage?: () => void
+  onDiscoveryEndVisible?: () => void
+  onMediaEndVisible?: () => void
 }
 
 type GroupFixture = {
@@ -200,6 +203,8 @@ export function GroupBrowser({
   onRetryDiscovery,
   discoveryPageState = "idle",
   onRetryDiscoveryPage,
+  onDiscoveryEndVisible,
+  onMediaEndVisible,
 }: GroupBrowserProps) {
   const { saving, runAction } = useGroupMutationAction()
   const {
@@ -579,11 +584,12 @@ export function GroupBrowser({
                   ))}
                 </Box>
                 {discoveryPageFeedback}
+                {onDiscoveryEndVisible && discoveryPageState !== "error" && <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />}
               </ScrollArea>
             </Box>
           ) : (
             <GroupDetailPane compact selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData}
-                onRetryGroupMedia={onRetryGroupMedia} onOpenMedia={openMediaAt}
+                onRetryGroupMedia={onRetryGroupMedia} onMediaEndVisible={onMediaEndVisible} onOpenMedia={openMediaAt}
                 mediaPageFeedback={mediaPageFeedback} relationCandidateFeedback={relationCandidateFeedback}
                 relationDetailSection={relationDetailSection} hideManagementActions={hideManagementActions}
                 canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} headingRef={compactDetailHeadingRef} />
