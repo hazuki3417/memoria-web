@@ -54,6 +54,7 @@ export function CommunitySettings({
   onRemoveMember,
   onLeaveCommunity,
   onLeaveSuccess,
+  fileSizeUnit = "DECIMAL",
 }: {
   role?: Role
   communityId?: string
@@ -66,6 +67,7 @@ export function CommunitySettings({
   onRemoveMember?: (userId: string) => Promise<boolean>
   onLeaveCommunity?: () => Promise<void>
   onLeaveSuccess?: () => void
+  fileSizeUnit?: "DECIMAL" | "BINARY"
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -373,7 +375,7 @@ export function CommunitySettings({
   ],
 }
   const usageContent = (
-    <SettingsUsage scope="community" usage={communityUsage} />
+    <SettingsUsage scope="community" usage={communityUsage} fileSizeUnit={fileSizeUnit} />
   )
   const preferencesContent = (
     <Stack gap="xl">
