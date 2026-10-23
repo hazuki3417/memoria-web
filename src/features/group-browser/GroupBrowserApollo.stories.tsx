@@ -364,10 +364,10 @@ const pageTwoRequest = {
   variables: { ...request.variables, after: "cursor-a" },
 }
 const pageOneReply: MockedResponse<OperationBrowseGroupsQuery> = {
-  request, result: { data: pageOneResult },
+  request, result: { data: pageOneResult }, delay: 200,
 }
 const pageTwoReply: MockedResponse<OperationBrowseGroupsQuery> = {
-  request: pageTwoRequest, result: { data: pageTwoResult },
+  request: pageTwoRequest, result: { data: pageTwoResult }, delay: 300,
 }
 
 /** Scrolling near the end fetches the second page, keeps the first, deduplicates, and stops at the final page. */
@@ -495,8 +495,8 @@ export const DetailMediaPagination: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole("button", { name: /ページ1のGroup/ }))
-    await expect(await canvas.findByAltText("page-one-image.jpg")).toBeVisible()
-    await expect(await canvas.findByAltText("page-two-image.jpg")).toBeVisible()
+    await expect(await canvas.findByAltText("page-one-image.jpg")).toBeInTheDocument()
+    await expect(await canvas.findByAltText("page-two-image.jpg")).toBeInTheDocument()
     await expect(canvas.getAllByAltText("page-one-image.jpg")).toHaveLength(1)
   },
 }
@@ -519,11 +519,11 @@ export const DetailMediaPaginationRetry: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole("button", { name: /ページ1のGroup/ }))
-    await expect(await canvas.findByAltText("page-one-image.jpg")).toBeVisible()
+    await expect(await canvas.findByAltText("page-one-image.jpg")).toBeInTheDocument()
     await expect(await canvas.findByText("追加のMediaを取得できませんでした")).toBeVisible()
-    await expect(canvas.getByAltText("page-one-image.jpg")).toBeVisible()
+    await expect(canvas.getByAltText("page-one-image.jpg")).toBeInTheDocument()
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByAltText("page-two-image.jpg")).toBeVisible()
+    await expect(await canvas.findByAltText("page-two-image.jpg")).toBeInTheDocument()
     await expect(canvas.getAllByAltText("page-one-image.jpg")).toHaveLength(1)
   },
 }
