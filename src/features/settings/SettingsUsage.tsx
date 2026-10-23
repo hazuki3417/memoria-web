@@ -87,15 +87,17 @@ function UsageFormatBreakdownSection({
   usage,
   status,
   sort,
-  sortedBreakdown,
   onSort,
 }: {
   usage: SettingsUsageData
   status: UsageStatus
   sort: UsageSort
-  sortedBreakdown: UsageFormatItem[]
   onSort: (key: UsageSortKey) => void
 }) {
+  const sortedBreakdown = useMemo(
+    () => sortUsageFormats(usage.formatBreakdown ?? [], sort),
+    [usage.formatBreakdown, sort],
+  )
   const sortHeader = (key: UsageSortKey, label: string) => (
     <UnstyledButton
       onClick={() => onSort(key)}
@@ -233,6 +235,12 @@ function UsageFormatBreakdownSection({
   )
 }
 
+function UsageErrorContent({ onRetry }: { onRetry?: () => void }) {
+  return (
+        <UsageErrorContent onRetry={onRetry} />
+  )
+}
+
 export function SettingsUsage({
   usage,
   scope = "personal",
@@ -245,10 +253,6 @@ export function SettingsUsage({
   onRetry?: () => void
 }) {
   const [sort, setSort] = useState<UsageSort>(null)
-  const sortedBreakdown = useMemo(
-    () => sortUsageFormats(usage.formatBreakdown ?? [], sort),
-    [usage.formatBreakdown, sort],
-  )
   const toggleSort = (key: UsageSortKey) => {
     setSort((current) => ({
       key,
@@ -291,7 +295,6 @@ export function SettingsUsage({
         usage={usage}
         status={status}
         sort={sort}
-        sortedBreakdown={sortedBreakdown}
         onSort={toggleSort}
       />
       </Stack>
