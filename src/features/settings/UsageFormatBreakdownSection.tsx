@@ -27,6 +27,10 @@ export function UsageFormatBreakdownSection({
     () => sortUsageFormats(usage.formatBreakdown ?? [], sort),
     [usage.formatBreakdown, sort],
   )
+  const ariaSort = (key: UsageSortKey): "ascending" | "descending" | "none" => {
+    if (sort?.key !== key) return "none"
+    return sort.direction === "asc" ? "ascending" : "descending"
+  }
   const sortHeader = (key: UsageSortKey, label: string) => (
     <UnstyledButton
       onClick={() => onSort(key)}
@@ -54,49 +58,25 @@ export function UsageFormatBreakdownSection({
             <Table.Thead>
               <Table.Tr>
                 <Table.Th
-                  aria-sort={
-                    sort?.key === "format"
-                      ? sort.direction === "asc"
-                        ? "ascending"
-                        : "descending"
-                      : "none"
-                  }
+                  aria-sort={ariaSort("format")}
                 >
                   {sortHeader("format", "形式")}
                 </Table.Th>
                 <Table.Th
                   ta="right"
-                  aria-sort={
-                    sort?.key === "count"
-                      ? sort.direction === "asc"
-                        ? "ascending"
-                        : "descending"
-                      : "none"
-                  }
+                  aria-sort={ariaSort("count")}
                 >
                   {sortHeader("count", "登録件数")}
                 </Table.Th>
                 <Table.Th
                   ta="right"
-                  aria-sort={
-                    sort?.key === "size"
-                      ? sort.direction === "asc"
-                        ? "ascending"
-                        : "descending"
-                      : "none"
-                  }
+                  aria-sort={ariaSort("size")}
                 >
                   {sortHeader("size", "使用量")}
                 </Table.Th>
                 <Table.Th
                   ta="right"
-                  aria-sort={
-                    sort?.key === "percent"
-                      ? sort.direction === "asc"
-                        ? "ascending"
-                        : "descending"
-                      : "none"
-                  }
+                  aria-sort={ariaSort("percent")}
                 >
                   {sortHeader("percent", "割合")}
                 </Table.Th>
