@@ -6,7 +6,7 @@ type UsageProjection = {
   mediaCount: number
   storage: { usedBytes: UsageInt64; effectiveLimitBytes: UsageInt64 }
   formatBreakdown: Array<{
-    format: "JPEG" | "PNG" | "WEBP" | "HEIF"
+    format: string
     mediaCount: number
     usedBytes: UsageInt64
   }>
@@ -38,11 +38,12 @@ export function mapUsageProjection(usage: UsageProjection): SettingsUsageData {
     usedBytes: safeBytes(usage.storage.usedBytes),
     limitBytes: safeBytes(usage.storage.effectiveLimitBytes),
     mediaCount: usage.mediaCount,
-    formatBreakdown: usage.formatBreakdown.map((item) => {
+    // Backendは0件でも全形式を返す。既存UIの空状態表示を保つ。
+    formatBreakdown: usage.mediaCount === 0 ? [] : usage.formatBreakdown.map((item) => {
       if (!Number.isSafeInteger(item.mediaCount) || item.mediaCount < 0) {
         throw new Error("形式別の登録件数が不正です")
       }
-      const format = formatLabels[item.format]
+      const format = formatLabels[item.format as keyof typeof formatLabels]
       if (!format) throw new Error("未対応の形式が含まれています")
       return {
         format,
