@@ -140,6 +140,11 @@ export function GroupBrowserContainer({
   const mediaPageKey = selectedId && mediaCursor ? selectedId + ":" + mediaCursor : null
   const [mediaPageFailedKey, setMediaPageFailedKey] = useState<string | null>(null)
   const mediaPageInFlight = useRef<string | null>(null)
+  const [mediaPageActivatedKey, setMediaPageActivatedKey] = useState<string | null>(null)
+  const requestMediaPage = useCallback(() => {
+    if (mediaPageKey) setMediaPageActivatedKey(mediaPageKey)
+  }, [mediaPageKey])
+
 
   // Retry the failed cursor explicitly while preserving already loaded Media.
   const retryMediaPage = useCallback(() => {
@@ -151,6 +156,7 @@ export function GroupBrowserContainer({
   useEffect(() => {
     if (
       !mediaPageKey || !mediaCursor || !selectedId ||
+      (mediaPageActivatedKey !== mediaPageKey && Boolean(detail.data?.mediaGroup?.aggregateMedia.edges.length)) ||
       detail.loading ||
       mediaPageFailedKey === mediaPageKey ||
       mediaPageInFlight.current === mediaPageKey
@@ -194,7 +200,7 @@ export function GroupBrowserContainer({
       }
     })
   }, [mediaPageKey, mediaCursor, selectedId, detail.loading,
-      detail.fetchMore, mediaPageFailedKey])
+      detail.fetchMore, mediaPageFailedKey, mediaPageActivatedKey, detail.data])
 
   const [createGroup] = useCreateBrowserGroupMutation()
   const [updateGroup] = useUpdateBrowserGroupMutation()
@@ -209,6 +215,10 @@ export function GroupBrowserContainer({
   const [listingPageFailedCursor, setListingPageFailedCursor] = useState<string | null>(null)
   const [listingPageLoadingCursor, setListingPageLoadingCursor] = useState<string | null>(null)
   const listingPageInFlight = useRef<string | null>(null)
+  const [listingPageActivatedCursor, setListingPageActivatedCursor] = useState<string | null>(null)
+  const requestListingPage = useCallback(() => {
+    if (nextCursor) setListingPageActivatedCursor(nextCursor)
+  }, [nextCursor])
   const retryListingPage = useCallback(() => {
     if (listingPageKey && listingPageFailedCursor === listingPageKey) {
       setListingPageFailedCursor(null)
@@ -217,7 +227,7 @@ export function GroupBrowserContainer({
 
   // Continue from the current cursor while preserving existing Group items.
   useEffect(() => {
-    if (!nextCursor || listing.loading || listingPageFailedCursor === nextCursor ||
+    if (!nextCursor || listingPageActivatedCursor !== nextCursor || listing.loading || listingPageFailedCursor === nextCursor ||
       listingPageInFlight.current === nextCursor) return
     listingPageInFlight.current = nextCursor
     setListingPageLoadingCursor(nextCursor)
@@ -244,7 +254,7 @@ export function GroupBrowserContainer({
       if (listingPageInFlight.current === nextCursor) listingPageInFlight.current = null
       setListingPageLoadingCursor((current) => current === nextCursor ? null : current)
     })
-  }, [nextCursor, listing.loading, listing.fetchMore, listingPageFailedCursor])
+  }, [nextCursor, listing.loading, listing.fetchMore, listingPageFailedCursor, listingPageActivatedCursor])
 
   const allGroups = useMemo<GroupBrowserGroup[]>(() => {
     const currentDetail = detail.data?.mediaGroup
@@ -486,6 +496,7 @@ export function GroupBrowserContainer({
       discoveryState={listing.error && !listing.data ? "error" : listing.loading && !listing.data ? "loading" : "ready"}
       discoveryPageState={listingPageKey && listingPageFailedCursor === listingPageKey ? "error" : listingPageKey && listingPageLoadingCursor === listingPageKey ? "loading" : "idle"}
       onRetryDiscoveryPage={retryListingPage}
+      onDiscoveryEndVisible={requestListingPage}
       onRetryDiscovery={() => {
         void listing.refetch().catch(() => {
           // Keep the discovery error state until a successful response.
@@ -520,9 +531,10 @@ export function GroupBrowserContainer({
           ? "idle"
           : mediaPageFailedKey === mediaPageKey
             ? "error"
-            : "loading"
+            : mediaPageActivatedKey === mediaPageKey || !detail.data?.mediaGroup?.aggregateMedia.edges.length ? "loading" : "idle"
       }
       onRetryMediaPage={retryMediaPage}
+      onMediaEndVisible={requestMediaPage}
       mediaDetailState={
         !selectedId ? "ready" :
         detail.data?.mediaGroup?.id !== selectedId ? "loading" :
