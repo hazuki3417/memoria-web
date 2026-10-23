@@ -39,6 +39,18 @@ export const Ready: Story = {
   tags: ["visual"],
 }
 
+export const SortAscending: Story = {
+  name: "使用量・昇順",
+  tags: ["visual"],
+  args: { sort: { key: "size", direction: "asc" } },
+}
+
+export const SortDescending: Story = {
+  name: "使用量・降順",
+  tags: ["visual"],
+  args: { sort: { key: "size", direction: "desc" } },
+}
+
 export const ReadyCompact: Story = {
   name: "Ready（Compact）",
   tags: ["visual"],
@@ -77,18 +89,21 @@ export const SortInteraction: Story = {
     const canvas = within(canvasElement)
     const table = canvas.getByRole("table")
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
+    await expect(canvas.getAllByTestId("usage-sort-icon-none")).toHaveLength(4)
     await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
     await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute(
       "aria-sort",
       "ascending",
     )
+    await expect(canvas.getByTestId("usage-sort-icon-asc")).toBeInTheDocument()
     await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
     await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute(
       "aria-sort",
       "descending",
     )
+    await expect(canvas.getByTestId("usage-sort-icon-desc")).toBeInTheDocument()
   },
 }
 
