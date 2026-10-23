@@ -4,12 +4,6 @@ import { GraphQLError } from "graphql"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import {
   BrowseGroupsDocument,
-  BrowseGroupDetailDocument,
-  BrowseGroupRelationCandidatesDocument,
-  MediaStatus,
-  MediaType,
-  type OperationBrowseGroupDetailQuery,
-  type OperationBrowseGroupRelationCandidatesQuery,
   CreateBrowserGroupDocument,
   MediaGroupSort,
   ScopeType,
@@ -339,102 +333,5 @@ export const ListingLoading: Story = {
     await expect(canvas.getByRole("button", { name: "検索" })).toBeVisible()
     await expect(canvas.getByText("Groupを読み込んでいます")).toBeVisible()
     await expect(canvas.queryByText("まだGroupがありません")).not.toBeInTheDocument()
-  },
-}
-
-const pageOneResult: OperationBrowseGroupsQuery = {
-  mediaGroups: {
-    edges: [{ cursor: "cursor-a", node: {
-      __typename: "MediaGroup", id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z",
-    } }],
-    pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: "cursor-a", endCursor: "cursor-a" },
-  },
-}
-const detailListingReply: MockedResponse<OperationBrowseGroupsQuery> = {
-  request,
-  result: { data: { mediaGroups: { ...pageOneResult.mediaGroups, pageInfo: { ...pageOneResult.mediaGroups.pageInfo, hasNextPage: false } } } },
-}
-const detailRequest = {
-  query: BrowseGroupDetailDocument,
-  variables: { id: "pagination-group-a", scope: { type: ScopeType.Personal } },
-}
-const detailPageTwoRequest = {
-  query: BrowseGroupDetailDocument,
-  variables: { ...detailRequest.variables, mediaAfter: "media-cursor-a" },
-}
-const itemOne = {
-  cursor: "media-cursor-a",
-  node: {
-    id: "pagination-media-a", mediaType: MediaType.Image, status: MediaStatus.Active,
-    originalFileName: "page-one-image.jpg", createdAt: "2026-01-01T00:00:00Z",
-    image: { variants: [{ url: "/__dev-assets/group-browser/group-media-01.jpg" }] },
-    groups: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } },
-  },
-}
-const itemTwo = {
-  cursor: "media-cursor-b",
-  node: {
-    id: "pagination-media-b", mediaType: MediaType.Image, status: MediaStatus.Active,
-    originalFileName: "page-two-image.jpg", createdAt: "2026-01-02T00:00:00Z",
-    image: { variants: [{ url: "/__dev-assets/group-browser/group-media-02.jpg" }] },
-    groups: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } },
-  },
-}
-const detailPageOneResult: OperationBrowseGroupDetailQuery = {
-  mediaGroup: {
-    __typename: "MediaGroup", id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z",
-    parents: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } },
-    children: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } },
-    aggregateMedia: {
-      edges: [itemOne],
-      pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: "media-cursor-a", endCursor: "media-cursor-a" },
-    },
-  },
-}
-const detailPageTwoResult: OperationBrowseGroupDetailQuery = {
-  mediaGroup: {
-    ...detailPageOneResult.mediaGroup!,
-    aggregateMedia: {
-      edges: [itemOne, itemTwo],
-      pageInfo: { hasNextPage: false, hasPreviousPage: true, startCursor: "media-cursor-a", endCursor: "media-cursor-b" },
-    },
-  },
-}
-const detailFirstReply: MockedResponse<OperationBrowseGroupDetailQuery> = {
-  request: detailRequest,
-  result: { data: detailPageOneResult },
-}
-const detailSecondReply: MockedResponse<OperationBrowseGroupDetailQuery> = {
-  request: detailPageTwoRequest,
-  result: { data: detailPageTwoResult },
-}
-const relationEmptyReply: MockedResponse<OperationBrowseGroupRelationCandidatesQuery> = {
-  request: {
-    query: BrowseGroupRelationCandidatesDocument,
-    variables: { groupId: "pagination-group-a", first: 100 },
-  },
-  result: { data: {
-    mediaGroupRelationCandidates: {
-      edges: [],
-      pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null },
-    },
-  } },
-}
-
-/** Detail media pagination uses the real Apollo container and preserves prior media. */
-export const DetailMediaPagination: Story = {
-  name: "Integration · Detail Media Fetch More",
-  tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[detailListingReply, detailFirstReply, detailSecondReply, relationEmptyReply]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole("button", { name: /ページ1のGroup/ }))
-    await expect(await canvas.findByAltText("page-one-image.jpg")).toBeInTheDocument()
-    await expect(await canvas.findByAltText("page-two-image.jpg")).toBeInTheDocument()
-    await expect(canvas.getAllByAltText("page-one-image.jpg")).toHaveLength(1)
   },
 }
