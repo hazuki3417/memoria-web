@@ -345,7 +345,7 @@ export function GroupBrowserContainer({
             src: node.image?.variants[0]?.url ?? null,
           }))
         : [],
-    [detail.data, selectedId],
+    [detailSnapshot, selectedId],
   )
 
   const nameToId = useMemo(
@@ -559,7 +559,7 @@ export function GroupBrowserContainer({
       onMediaEndVisible={requestMediaPage}
       mediaDetailState={
         !selectedId ? "ready" :
-        detail.data?.mediaGroup?.id !== selectedId ? "loading" :
+        detailSnapshot?.mediaGroup?.id !== selectedId ? "loading" :
         detailSnapshot.mediaGroup.aggregateMedia.edges.length > 0 ? "ready" :
         mediaPageFailedKey === mediaPageKey || detail.error ? "error" :
         detail.loading || detailSnapshot.mediaGroup.aggregateMedia.pageInfo.hasNextPage
