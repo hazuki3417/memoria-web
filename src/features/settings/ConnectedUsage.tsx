@@ -19,6 +19,7 @@ export function ConnectedUsage({
   const personal = usePersonalUsageQuery({
     skip: scope !== "personal",
     fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
   })
   const community = useCommunityUsageQuery({
     variables: { communityId: communityId ?? "" },
@@ -52,8 +53,10 @@ export function ConnectedUsage({
 
   const retry = () => {
     // 再取得で再び失敗した場合もApolloのerror stateに反映し、Retryを維持する。
-    void active.refetch().catch(() => undefined)
-    if (scope === "personal") {
+    if (active.error || !projection || conversionFailed) {
+      void active.refetch().catch(() => undefined)
+    }
+    if (scope === "personal" && preferencesError) {
       void preferences.refetch().catch(() => undefined)
     }
   }
