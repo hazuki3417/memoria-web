@@ -208,7 +208,8 @@ export function GroupBrowserContainer({
   const [addToGroup] = useAddBrowserMediaToGroupMutation()
   const [removeFromGroup] = useRemoveBrowserMediaFromGroupMutation()
 
-  const page = listing.data?.mediaGroups
+  const listingSnapshot = listing.data ?? listing.previousData
+  const page = listingSnapshot?.mediaGroups
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
 
   const listingPageKey = nextCursor
@@ -258,7 +259,7 @@ export function GroupBrowserContainer({
 
   const allGroups = useMemo<GroupBrowserGroup[]>(() => {
     const currentDetail = detail.data?.mediaGroup
-    return (listing.data?.mediaGroups.edges ?? []).map(({ node }) => {
+    return (listingSnapshot?.mediaGroups.edges ?? []).map(({ node }) => {
       const matching = currentDetail?.id === node.id ? currentDetail : null
       return {
         id: node.id,
@@ -273,7 +274,7 @@ export function GroupBrowserContainer({
           matching?.children.edges.map(({ node: child }) => child.name) ?? [],
       }
     })
-  }, [listing.data, detail.data])
+  }, [listingSnapshot, detail.data])
 
   const relationAvailability = useMemo(() => {
     const result: Record<
@@ -493,7 +494,7 @@ export function GroupBrowserContainer({
 
   return (
     <GroupBrowser
-      discoveryState={listing.error && !listing.data ? "error" : listing.loading && !listing.data ? "loading" : "ready"}
+      discoveryState={listing.error && !listingSnapshot ? "error" : !listingSnapshot ? "loading" : "ready"}
       discoveryPageState={listingPageKey && listingPageFailedCursor === listingPageKey ? "error" : listingPageKey && listingPageLoadingCursor === listingPageKey ? "loading" : "idle"}
       onRetryDiscoveryPage={retryListingPage}
       onDiscoveryEndVisible={requestListingPage}
