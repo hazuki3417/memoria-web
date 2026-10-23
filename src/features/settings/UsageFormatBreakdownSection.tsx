@@ -1,11 +1,12 @@
 "use client"
 
 import { useMemo } from "react"
-import { Box, Group, Skeleton, Table, Text, UnstyledButton } from "@mantine/core"
+import { Box, Group, Skeleton, Table, Text } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { sortUsageFormats, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
 import type { FileSizeUnit } from "./formatFileSize"
 import { UsageFileSize } from "./UsageFileSize"
+import { UsageSortHeader } from "./UsageSortHeader"
 import { usagePercent } from "./usagePercent"
 import { usageFormatColors as formatColors } from "./usageFormatColors"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
@@ -32,22 +33,13 @@ export function UsageFormatBreakdownSection({
     return sort.direction === "asc" ? "ascending" : "descending"
   }
   const sortHeader = (key: UsageSortKey, label: string) => (
-    <UnstyledButton
-      onClick={() => onSort(key)}
+    <UsageSortHeader
+      label={label}
+      direction={sort?.key === key ? sort.direction : null}
+      align={key === "format" ? "left" : "right"}
       disabled={status !== "ready"}
-      aria-label={`${label}で並べ替え`}
-      style={{
-        font: "inherit",
-        fontWeight: "inherit",
-        width: "100%",
-        textAlign: key === "format" ? "left" : "right",
-      }}
-    >
-      {label}{" "}
-      <Text span size="xs" c="dimmed" aria-hidden="true">
-        {sort?.key === key ? (sort.direction === "asc" ? "▲" : "▼") : "↕"}
-      </Text>
-    </UnstyledButton>
+      onSort={() => onSort(key)}
+    />
   )
   return (
     <>
