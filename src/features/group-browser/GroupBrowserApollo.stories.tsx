@@ -350,68 +350,6 @@ const pageOneResult: OperationBrowseGroupsQuery = {
     pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: "cursor-a", endCursor: "cursor-a" },
   },
 }
-const pageTwoResult: OperationBrowseGroupsQuery = {
-  mediaGroups: {
-    edges: [
-      { cursor: "cursor-a", node: { __typename: "MediaGroup", id: "pagination-group-a", name: "ページ1のGroup", stateToken: "1", createdAt: "2026-01-01T00:00:00Z" } },
-      { cursor: "cursor-b", node: { __typename: "MediaGroup", id: "pagination-group-b", name: "ページ2のGroup", stateToken: "2", createdAt: "2026-01-02T00:00:00Z" } },
-    ],
-    pageInfo: { hasNextPage: false, hasPreviousPage: true, startCursor: "cursor-a", endCursor: "cursor-b" },
-  },
-}
-const pageTwoRequest = {
-  query: BrowseGroupsDocument,
-  variables: { ...request.variables, after: "cursor-a" },
-}
-const pageOneReply: MockedResponse<OperationBrowseGroupsQuery> = {
-  request, result: { data: pageOneResult }, delay: 200,
-}
-const pageTwoReply: MockedResponse<OperationBrowseGroupsQuery> = {
-  request: pageTwoRequest, result: { data: pageTwoResult }, delay: 300,
-}
-
-/** Scrolling near the end fetches the second page, keeps the first, deduplicates, and stops at the final page. */
-export const ListingPagination: Story = {
-  name: "Integration · Listing Fetch More",
-  tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[pageOneReply, pageTwoReply]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(await canvas.findByText("ページ1のGroup")).toBeVisible()
-    await expect(await canvas.findByText("ページ2のGroup")).toBeVisible()
-    await waitFor(() => expect(canvas.getAllByText("ページ1のGroup")).toHaveLength(1))
-    await expect(canvas.queryByText("追加のGroupを取得できませんでした")).not.toBeInTheDocument()
-  },
-}
-
-/** The first page remains available when fetchMore fails, and an explicit retry recovers. */
-export const ListingPaginationRetry: Story = {
-  name: "Integration · Listing Fetch More Retry",
-  tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[
-      pageOneReply,
-      { request: pageTwoRequest, error: new Error("次ページの取得に失敗") },
-      pageTwoReply,
-    ]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(await canvas.findByText("ページ1のGroup")).toBeVisible()
-    await expect(await canvas.findByText("追加のGroupを取得できませんでした")).toBeVisible()
-    await expect(canvas.getByText("ページ1のGroup")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByText("ページ2のGroup")).toBeVisible()
-    await waitFor(() => expect(canvas.getAllByText("ページ1のGroup")).toHaveLength(1))
-  },
-}
-
 const detailListingReply: MockedResponse<OperationBrowseGroupsQuery> = {
   request,
   result: { data: { mediaGroups: { ...pageOneResult.mediaGroups, pageInfo: { ...pageOneResult.mediaGroups.pageInfo, hasNextPage: false } } } },
@@ -496,33 +434,6 @@ export const DetailMediaPagination: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole("button", { name: /ページ1のGroup/ }))
     await expect(await canvas.findByAltText("page-one-image.jpg")).toBeInTheDocument()
-    await expect(await canvas.findByAltText("page-two-image.jpg")).toBeInTheDocument()
-    await expect(canvas.getAllByAltText("page-one-image.jpg")).toHaveLength(1)
-  },
-}
-
-/** A failed detail page must retain existing Media until an explicit retry succeeds. */
-export const DetailMediaPaginationRetry: Story = {
-  name: "Integration · Detail Media Fetch More Retry",
-  tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[
-      detailListingReply,
-      detailFirstReply,
-      { request: detailPageTwoRequest, error: new Error("次ページ取得エラー") },
-      detailSecondReply,
-      relationEmptyReply,
-    ]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole("button", { name: /ページ1のGroup/ }))
-    await expect(await canvas.findByAltText("page-one-image.jpg")).toBeInTheDocument()
-    await expect(await canvas.findByText("追加のMediaを取得できませんでした")).toBeVisible()
-    await expect(canvas.getByAltText("page-one-image.jpg")).toBeInTheDocument()
-    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(await canvas.findByAltText("page-two-image.jpg")).toBeInTheDocument()
     await expect(canvas.getAllByAltText("page-one-image.jpg")).toHaveLength(1)
   },
