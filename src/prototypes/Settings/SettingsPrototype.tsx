@@ -62,7 +62,7 @@ const MOCK_USAGE: SettingsUsageData = {
   ],
 }
 
-type UsageScenario = "default" | "loading" | "error" | "zero" | "limit-reached"
+type UsageScenario = "default" | "loading" | "error" | "retry-error" | "zero" | "limit-reached"
 
 const ZERO_USAGE: SettingsUsageData = {
   usedStorageLabel: "0 GB",
@@ -316,22 +316,31 @@ function PreferencesContent({ compact }: { compact: boolean }) {
 }
 
 function UsageContent({ initialScenario }: { initialScenario: UsageScenario }) {
-  const [scenario, setScenario] = useState(initialScenario)
+  const [scenario, setScenario] = useState<UsageScenario | "retrying">(
+    initialScenario === "retry-error" ? "error" : initialScenario,
+  )
   const usage =
     scenario === "zero"
       ? ZERO_USAGE
       : scenario === "limit-reached"
         ? LIMIT_REACHED_USAGE
         : MOCK_USAGE
-  const status = scenario === "loading" || scenario === "error" ? scenario : "ready"
+  const status =
+    scenario === "loading" || scenario === "retrying"
+      ? "loading"
+      : scenario === "error"
+        ? "error"
+        : "ready"
 
-  return (
-    <SettingsUsage
-      usage={usage}
-      status={status}
-      onRetry={() => setScenario("default")}
-    />
-  )
+  const retry = async () => {
+    if (scenario !== "error") return
+    setScenario("retrying")
+    // Story fixture: both the retry in progress and its result can be observed.
+    await new Promise((resolve) => setTimeout(resolve, 600))
+    setScenario(initialScenario === "retry-error" ? "error" : "default")
+  }
+
+  return <SettingsUsage usage={usage} status={status} onRetry={retry} />
 }
 
 function AccountContent() {
