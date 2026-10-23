@@ -53,3 +53,14 @@ export const CompactMediaLoading: Story = { name: "Visual · Compact · Detail M
 export const CompactMediaError: Story = { name: "Visual · Compact · Detail Media Load Error", args: { compact: true, mediaDetailState: "error", onRetryGroupMedia: async () => {} }, parameters: { viewport: { defaultViewport: "mobile1" } } }
 export const CompactNoRelations: Story = { name: "Visual · Compact · Detail No Relations", args: { compact: true, relationDetailSection: <GroupRelationSection opened parentNames={[]} childNames={[]} onToggle={() => {}} /> }, parameters: { viewport: { defaultViewport: "mobile1" } } }
 export const CompactReadOnly: Story = { name: "Visual · Compact · Detail Read Only", args: { compact: true, canManage: false, hideManagementActions: true }, parameters: { viewport: { defaultViewport: "mobile1" } } }
+
+export const CompactMoreMediaLoading: Story = {
+  name: "Visual · Compact · Detail Media Loading More",
+  args: { compact: true, mediaPageFeedback: <GroupMediaPageFeedback state="loading" /> },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+export const CompactMoreMediaError: Story = {
+  name: "Visual · Compact · Detail Media Load More Error",
+  args: { compact: true, mediaPageFeedback: <GroupMediaPageFeedback state="error" onRetry={() => {}} /> },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
