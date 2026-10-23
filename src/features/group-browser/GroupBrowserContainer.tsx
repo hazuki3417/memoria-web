@@ -205,18 +205,28 @@ export function GroupBrowserContainer({
   const page = listing.data?.mediaGroups
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
 
-  // The backend bounds individual pages; continue fetching until the scope's
-  // complete group set is available for name-based relation selection.
+  const listingPageKey = nextCursor
+  const [listingPageFailedCursor, setListingPageFailedCursor] = useState<string | null>(null)
+  const [listingPageLoadingCursor, setListingPageLoadingCursor] = useState<string | null>(null)
+  const listingPageInFlight = useRef<string | null>(null)
+  const retryListingPage = useCallback(() => {
+    if (listingPageKey && listingPageFailedCursor === listingPageKey) {
+      setListingPageFailedCursor(null)
+    }
+  }, [listingPageKey, listingPageFailedCursor])
+
+  // Continue from the current cursor while preserving existing Group items.
   useEffect(() => {
-    if (!nextCursor || listing.loading) return
+    if (!nextCursor || listing.loading || listingPageFailedCursor === nextCursor ||
+      listingPageInFlight.current === nextCursor) return
+    listingPageInFlight.current = nextCursor
+    setListingPageLoadingCursor(nextCursor)
     void listing.fetchMore({
       variables: { after: nextCursor },
       updateQuery: (previous, { fetchMoreResult }) => {
         const incoming = fetchMoreResult?.mediaGroups
         if (!incoming) return previous
-        const seen = new Set(
-          previous.mediaGroups.edges.map((edge) => edge.cursor),
-        )
+        const seen = new Set(previous.mediaGroups.edges.map((edge) => edge.cursor))
         return {
           ...previous,
           mediaGroups: {
@@ -228,8 +238,13 @@ export function GroupBrowserContainer({
           },
         }
       },
+    }).catch(() => {
+      setListingPageFailedCursor(nextCursor)
+    }).finally(() => {
+      if (listingPageInFlight.current === nextCursor) listingPageInFlight.current = null
+      setListingPageLoadingCursor((current) => current === nextCursor ? null : current)
     })
-  }, [nextCursor, listing.loading, listing.fetchMore])
+  }, [nextCursor, listing.loading, listing.fetchMore, listingPageFailedCursor])
 
   const allGroups = useMemo<GroupBrowserGroup[]>(() => {
     const currentDetail = detail.data?.mediaGroup
@@ -468,7 +483,9 @@ export function GroupBrowserContainer({
 
   return (
     <GroupBrowser
-      discoveryState={listing.error ? "error" : (listing.loading && !listing.data) || listing.data?.mediaGroups.pageInfo.hasNextPage ? "loading" : "ready"}
+      discoveryState={listing.error && !listing.data ? "error" : listing.loading && !listing.data ? "loading" : "ready"}
+      discoveryPageState={listingPageKey && listingPageFailedCursor === listingPageKey ? "error" : listingPageKey && listingPageLoadingCursor === listingPageKey ? "loading" : "idle"}
+      onRetryDiscoveryPage={retryListingPage}
       onRetryDiscovery={() => {
         void listing.refetch().catch(() => {
           // Keep the discovery error state until a successful response.
