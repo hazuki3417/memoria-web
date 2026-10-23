@@ -41,7 +41,7 @@ import { filterVisibleGroups } from "./groupSearch"
 import { useGroupSearchState } from "./useGroupSearchState"
 import { useGroupNavigation } from "./useGroupNavigation"
 import { useGroupCreateController } from "./useGroupCreateController"
-import { GroupPreviewGrid as PreviewGrid, previewImages } from "./GroupPreviewGrid"
+import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
 
 export type GroupBrowserGroup = {
   id: string
@@ -99,85 +99,6 @@ export type GroupBrowserProps = {
   onMediaEndVisible?: () => void
 }
 
-type GroupFixture = {
-  id: string
-  name: string
-  mediaCount: number
-  previewCount: number
-  parentNames: string[]
-  childNames: string[]
-}
-
-const groups: GroupFixture[] = [
-  {
-    id: "travel",
-    name: "旅行",
-    mediaCount: 128,
-    previewCount: 7,
-    parentNames: ["2026"],
-    childNames: ["北海道", "東北", "関東"],
-  },
-  {
-    id: "family",
-    name: "家族",
-    mediaCount: 84,
-    previewCount: 4,
-    parentNames: [],
-    childNames: ["イベント"],
-  },
-  {
-    id: "food",
-    name: "料理",
-    mediaCount: 42,
-    previewCount: 3,
-    parentNames: ["日常"],
-    childNames: [],
-  },
-  {
-    id: "landscape",
-    name: "風景写真",
-    mediaCount: 31,
-    previewCount: 1,
-    parentNames: ["旅行", "お気に入り"],
-    childNames: ["山", "海", "夕景"],
-  },
-  {
-    id: "archive",
-    name: "あとで整理する写真と動画をまとめた非常に長い名前のGroup",
-    mediaCount: 18,
-    previewCount: 2,
-    parentNames: ["アーカイブ"],
-    childNames: ["未整理"],
-  },
-  {
-    id: "empty",
-    name: "新しいGroup",
-    mediaCount: 3,
-    previewCount: 0,
-    parentNames: [],
-    childNames: [],
-  },
-]
-
-const relationCandidateNames = [
-  ...groups.map((group) => group.name),
-  "北海道",
-  "東北",
-  "関東",
-  "関西",
-  "九州",
-  "イベント",
-  "日常",
-  "お気に入り",
-  "山",
-  "海",
-  "夕景",
-  "夜景",
-  "ポートレート",
-  "アーカイブ",
-  "未整理",
-]
-
 export function GroupBrowser({
   contextKind = "personal",
   groupsData,
@@ -213,7 +134,7 @@ export function GroupBrowser({
     closeCreate,
   } = useGroupCreateController({ onCreateGroup, runAction })
   const allGroups = useMemo(
-    () => [...(groupsData ?? groups), ...createdGroups],
+    () => [...(groupsData ?? []), ...createdGroups],
     [groupsData, createdGroups],
   )
   const { query, setQuery, appliedQuery, setAppliedQuery } = useGroupSearchState()
@@ -225,27 +146,16 @@ export function GroupBrowser({
   } = useGroupNavigation(onSelectGroup)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = useMemo(
-    () =>
-      mediaItemsData
-        ? mediaItemsData.map((item) => ({
-            ...item,
-            src: item.src ?? "",
-            failed: !item.src,
-          }))
-        : Array.from({ length: 24 }, (_, index) => ({
-            id: `group-media-${index + 1}`,
-            label: `Media ${index + 1}`,
-            src: previewImages[index % previewImages.length],
-          })),
+    () => (mediaItemsData ?? []).map((item) => ({
+      ...item,
+      src: item.src ?? "",
+      failed: !item.src,
+    })),
     [mediaItemsData],
   )
 
   const openMediaAt = (index: number) => {
-    if (!mediaItemsData) {
-      setMediaDetailIndex(index)
-      return
-    }
-    const id = mediaItemsData[index]?.id
+    const id = mediaItemsData?.[index]?.id
     const availableIndex = groupMediaItems.findIndex((item) => item.id === id)
     if (availableIndex >= 0) setMediaDetailIndex(availableIndex)
   }
@@ -358,7 +268,7 @@ export function GroupBrowser({
       name={createName}
       parents={createParents}
       children={createChildren}
-      candidates={candidates ?? relationCandidateNames}
+      candidates={candidates ?? []}
       canManage={canManage}
       saving={saving}
       onNameChange={setCreateName}
@@ -413,7 +323,7 @@ export function GroupBrowser({
       name={draftName}
       parents={draftParents}
       children={draftChildren}
-      candidates={candidates ?? relationCandidateNames}
+      candidates={candidates ?? []}
       currentGroupName={selected?.name ?? ""}
       availability={relationAvailability}
       canManage={canManage}
