@@ -205,6 +205,8 @@ export function GroupBrowserContainer({
     if (!nextCursor || listing.loading || listingPageInFlight.current === nextCursor ||
         listingPageCompleted.current === nextCursor ||
         (!retry && listingPageFailedCursor === nextCursor)) return
+    // Capture the current Apollo connection for cache reconciliation after fetchMore.
+    const previousEdges = listingSnapshot?.mediaGroups.edges ?? []
     listingPageInFlight.current = nextCursor
     if (retry) setListingPageFailedCursor(null)
     setListingPageLoadingCursor(nextCursor)
@@ -226,6 +228,20 @@ export function GroupBrowserContainer({
         }
       },
     }).then(() => {
+      // Reconcile against the original Apollo page after fetchMore has settled:
+      // some cache configurations momentarily expose only the incoming page.
+      listing.updateQuery(previous => {
+        if (!previous.mediaGroups) return previous
+        const incomingEdges = previous.mediaGroups.edges
+        const seen = new Set(previousEdges.map(edge => edge.cursor))
+        return {
+          ...previous,
+          mediaGroups: {
+            ...previous.mediaGroups,
+            edges: [...previousEdges, ...incomingEdges.filter(edge => !seen.has(edge.cursor))],
+          },
+        }
+      })
       listingPageCompleted.current = nextCursor
     }).catch(() => {
       setListingPageFailedCursor(nextCursor)
@@ -233,7 +249,7 @@ export function GroupBrowserContainer({
       if (listingPageInFlight.current === nextCursor) listingPageInFlight.current = null
       setListingPageLoadingCursor(current => current === nextCursor ? null : current)
     })
-  }, [nextCursor, listing.loading, listing.fetchMore, listingPageFailedCursor])
+  }, [nextCursor, listing.loading, listing.fetchMore, listingPageFailedCursor, listingSnapshot, listing.updateQuery])
   const requestListingPage = useCallback(() => fetchListingPage(), [fetchListingPage])
   const retryListingPage = useCallback(() => fetchListingPage(true), [fetchListingPage])
 
