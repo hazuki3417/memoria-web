@@ -21,7 +21,7 @@ import {
 } from "@tabler/icons-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { NavigationItem } from "@/components/NavigationItem"
 import { PageHeader } from "@/components/PageHeader"
@@ -422,12 +422,14 @@ export function Settings({
   profileNickname,
   initialPreferences,
   savePreferences,
+  usageContent,
 }: {
   section: Section
   saveProfile?: SaveProfile
   profileNickname?: string
   initialPreferences?: UserPreferences
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+  usageContent?: ReactNode
 }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
@@ -441,7 +443,7 @@ export function Settings({
         onSave={savePreferences}
       />
     ) : section === "usage" ? (
-      <UsageContent fileSizeUnit={initialPreferences?.fileSizeUnit ?? "DECIMAL"} />
+      usageContent ?? <UsageContent fileSizeUnit={initialPreferences?.fileSizeUnit ?? "DECIMAL"} />
     ) : (
       <AccountContent />
     )
