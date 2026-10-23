@@ -8,7 +8,7 @@ import {
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
-import type { FileSizeUnit } from "./usageSize"
+import type { FileSizeUnit } from "./formatFileSize"
 import { UsageStorageSection } from "./UsageStorageSection"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
