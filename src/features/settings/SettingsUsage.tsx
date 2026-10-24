@@ -4,7 +4,10 @@ import { useState } from "react"
 import {
   Box,
   Button,
+  Group,
+  SegmentedControl,
   Stack,
+  Text,
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
@@ -12,6 +15,7 @@ import type { FileSizeUnit } from "./formatFileSize"
 import { UsageStorageSection } from "./UsageStorageSection"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
+import type { UsageDisplayMode } from "./usageDisplayMode"
 export type { SettingsUsageData } from "./usageTypes"
 import type { UsageSort, UsageSortKey } from "./sortUsageFormats"
 
@@ -51,6 +55,7 @@ export function SettingsUsage({
   fileSizeUnit?: FileSizeUnit
 }) {
   const [sort, setSort] = useState<UsageSort>(null)
+  const [displayMode, setDisplayMode] = useState<UsageDisplayMode>("size")
   const toggleSort = (key: UsageSortKey) => {
     setSort((current) => ({
       key,
@@ -60,14 +65,28 @@ export function SettingsUsage({
   }
   return (
     <Stack gap="xl">
-      <PageHeader
-        title="利用状況"
-        description={
-          scope === "community"
-            ? "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。"
-            : "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。"
-        }
-      />
+      <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
+        <PageHeader
+          title="利用状況"
+          description={
+            scope === "community"
+              ? "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。"
+              : "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。"
+          }
+        />
+        <Group gap="xs" wrap="nowrap">
+          <Text size="sm" c="dimmed" id="usage-display-mode-label">表示</Text>
+          <SegmentedControl
+            aria-labelledby="usage-display-mode-label"
+            value={displayMode}
+            onChange={(value) => setDisplayMode(value as UsageDisplayMode)}
+            data={[
+              { label: "容量", value: "size" },
+              { label: "割合", value: "percent" },
+            ]}
+          />
+        </Group>
+      </Group>
       <Box>
         {status === "error" ? (
           <UsageErrorContent onRetry={onRetry} />
@@ -77,13 +96,14 @@ export function SettingsUsage({
             role={status === "loading" ? "status" : undefined}
             aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
           >
-            <UsageStorageSection usage={usage} status={status} fileSizeUnit={fileSizeUnit} />
+            <UsageStorageSection usage={usage} status={status} fileSizeUnit={fileSizeUnit} displayMode={displayMode} />
             <UsageFormatBreakdownSection
               usage={usage}
               status={status}
               sort={sort}
               onSort={toggleSort}
               fileSizeUnit={fileSizeUnit}
+              displayMode={displayMode}
             />
           </Stack>
         )}
