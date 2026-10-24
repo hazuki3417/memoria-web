@@ -19,6 +19,38 @@ function UnitPreferenceStory() {
   )
 }
 
+
+function RetryContractStory({ scope }: { scope: "personal" | "community" }) {
+  const [status, setStatus] = useState<"error" | "ready">("error")
+  const [retryCount, setRetryCount] = useState(0)
+  return (
+    <>
+      <span data-testid="retry-count">{retryCount}</span>
+      <SettingsUsage
+        usage={sampleUsage}
+        scope={scope}
+        status={status}
+        onRetry={() => {
+          setRetryCount((count) => count + 1)
+          setStatus("ready")
+        }}
+      />
+    </>
+  )
+}
+
+function ModeLifetimeContractStory() {
+  const [scope, setScope] = useState<"personal" | "community">("personal")
+  return (
+    <>
+      <Button onClick={() => setScope((current) => current === "personal" ? "community" : "personal")}>
+        Scopeを切り替え
+      </Button>
+      <SettingsUsage key={scope} usage={sampleUsage} scope={scope} />
+    </>
+  )
+}
+
 const limitReachedUsage = {
   usedBytes: 5_000_000_000,
   limitBytes: 5_000_000_000,
@@ -279,3 +311,45 @@ export const DisplayModeSwitchContract: Story = {
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
   },
 }
+
+
+// SS-02/03: Errorは必ず再試行可能であり、操作後にReadyへ復旧する（API接続なし）。
+export const ErrorRetryContract: Story = {
+  name: "Interaction · 取得失敗と再試行（SS-02/SS-03）",
+  tags: ["interaction"],
+  render: () => <RetryContractStory scope="personal" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
+    await expect(canvas.getByRole("alert")).toHaveTextContent("通信状況を確認して、もう一度お試しください。")
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(canvas.getByTestId("retry-count")).toHaveTextContent("1")
+    await expect(canvas.getByRole("table")).toBeVisible()
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+// UI-14: 表示モードはコンポーネント存続中のみ保持し、別scopeへ持ち越さない。
+export const DisplayModeLifetimeContract: Story = {
+  name: "Interaction · 表示モードの初期値とscope間独立（UI-14）",
+  tags: ["interaction"],
+  render: () => <ModeLifetimeContractStory />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("radio", { name: "容量" })).toBeChecked()
+    await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
+    await expect(canvas.getByRole("radio", { name: "割合" })).toBeChecked()
+    await userEvent.click(canvas.getByRole("button", { name: "Scopeを切り替え" }))
+    await expect(canvas.getByText("このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
+    await expect(canvas.getByRole("radio", { name: "容量" })).toBeChecked()
+  },
+}
+
+// Play無しの静的StoryのみをVRT候補とし、画像Baselineは別途Visual Reviewで承認する。
+export const VrtReady: Story = { name: "VRT · Ready", tags: ["vrt"] }
+export const VrtEmpty: Story = { name: "VRT · 0件", tags: ["vrt"], args: { usage: zeroUsage } }
+export const VrtLoading: Story = { name: "VRT · Loading", tags: ["vrt"], args: { status: "loading" } }
+export const VrtError: Story = { name: "VRT · Error / Retry", tags: ["vrt"], args: { status: "error", onRetry: () => undefined } }
+export const VrtLimit: Story = { name: "VRT · 上限到達", tags: ["vrt"], args: { usage: limitReachedUsage } }
+export const VrtCommunity: Story = { name: "VRT · Community", tags: ["vrt"], args: { scope: "community" } }
