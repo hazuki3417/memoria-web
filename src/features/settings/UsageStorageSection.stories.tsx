@@ -17,7 +17,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Ready: Story = {
-  name: "Ready（Decimal）",
+  name: "Visual · Ready（Decimal）",
   tags: ["visual"],
 }
 
@@ -46,25 +46,25 @@ export const ProgressOrderContract: Story = {
 }
 
 export const ReadyCompact: Story = {
-  name: "Ready（Compact）",
+  name: "Visual · Ready（Compact）",
   tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
 export const Loading: Story = {
-  name: "Loading",
+  name: "Visual · Loading",
   tags: ["visual"],
   args: { status: "loading" },
 }
 
 export const Empty: Story = {
-  name: "使用量0",
+  name: "Visual · 使用量0",
   tags: ["visual"],
   args: { usage: zeroUsage },
 }
 
 export const Binary: Story = {
-  name: "Binary単位",
+  name: "Visual · Binary単位",
   tags: ["visual"],
   args: { fileSizeUnit: "BINARY" },
 }
@@ -81,7 +81,7 @@ export const BinaryContract: Story = {
 }
 
 export const Percent: Story = {
-  name: "割合表示",
+  name: "Visual · 割合表示",
   tags: ["visual", "vrt"],
   args: { displayMode: "percent" },
 }
