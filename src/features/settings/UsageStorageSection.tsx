@@ -7,15 +7,18 @@ import { UsageFileSize } from "./UsageFileSize"
 import { usagePercent } from "./usagePercent"
 import { usageFormatColors as formatColors } from "./usageFormatColors"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
+import type { UsageDisplayMode } from "./usageDisplayMode"
 
 export function UsageStorageSection({
   usage,
   status,
   fileSizeUnit,
+  displayMode = "size",
 }: {
   usage: SettingsUsageData
   status: UsageStatus
   fileSizeUnit: FileSizeUnit
+  displayMode?: UsageDisplayMode
 }) {
   return (
     <Box>
@@ -27,7 +30,11 @@ export function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />{` ( ${usagePercent(usage.usedBytes, usage.limitBytes)} % )`}
+              {displayMode === "size" ? (
+                <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />
+              ) : (
+                `${usagePercent(usage.usedBytes, usage.limitBytes)} %`
+              )}
             </Text>
           )}
         </Group>
@@ -37,7 +44,11 @@ export function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              <UsageFileSize bytes={Math.max(0, usage.limitBytes - usage.usedBytes)} fileSizeUnit={fileSizeUnit} />{` ( ${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "")} % )`}
+              {displayMode === "size" ? (
+                <UsageFileSize bytes={Math.max(0, usage.limitBytes - usage.usedBytes)} fileSizeUnit={fileSizeUnit} />
+              ) : (
+                `${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "")} %`
+              )}
             </Text>
           )}
         </Group>
@@ -64,12 +75,12 @@ export function UsageStorageSection({
           </Progress.Root>
         )}
         <Group justify="space-between" align="center" wrap="wrap">
-          <Text size="sm">総容量</Text>
+          <Text size="sm">容量上限</Text>
           {status === "loading" ? (
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              <UsageFileSize bytes={usage.limitBytes} fileSizeUnit={fileSizeUnit} /> ( 100 % )
+              <UsageFileSize bytes={usage.limitBytes} fileSizeUnit={fileSizeUnit} />
             </Text>
           )}
         </Group>
