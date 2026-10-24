@@ -23,7 +23,8 @@
     "test:visual:update": "playwright test --config=playwright.storybook-visual.config.ts --update-snapshots",
     "test:visual:report": "playwright show-report ./e2e/storybook-visual/report",
     "graphql:codegen": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs",
-    "graphql:codegen:api": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs"
+    "graphql:codegen:api": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs",
+    "openapi:codegen": "node scripts/generate-media-upload-client.mjs"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
