@@ -90,15 +90,15 @@ export const SortInteraction: Story = {
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
     await expect(canvas.getByTestId("usage-sort-icon-desc")).toBeInTheDocument()
     await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "descending")
-    await userEvent.click(canvas.getByRole("button", { name: "Visual · 使用量で並べ替え" }))
+    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
     await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "none")
     await expect(canvas.getAllByTestId("usage-sort-icon-none")).toHaveLength(3)
-    await userEvent.click(canvas.getByRole("button", { name: "Visual · 使用量で並べ替え" }))
+    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
     await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "ascending")
     await expect(canvas.getByTestId("usage-sort-icon-asc")).toBeInTheDocument()
-    await userEvent.click(canvas.getByRole("button", { name: "Visual · 使用量で並べ替え" }))
+    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
     await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "descending")
   },
@@ -110,7 +110,7 @@ export const LoadingContract: Story = {
   args: { status: "loading" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "Visual · 使用量で並べ替え" })).toBeDisabled()
+    await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeDisabled()
     await expect(within(canvas.getAllByRole("row")[0]).getAllByRole("columnheader")).toHaveLength(3)
     await expect(canvas.getAllByRole("row")).toHaveLength(6)
   },
