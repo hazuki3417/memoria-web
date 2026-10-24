@@ -12,6 +12,8 @@ const viewports = [
 ] as const
 
 test("Storybook visual snapshots", async ({ page, request }) => {
+  // 全VRT対象Story × Desktop/Mobileを1テストで撮影するため、既定の30秒では不足する。
+  test.setTimeout(180_000)
   const response = await request.get("/index.json")
   expect(response.ok()).toBeTruthy()
   const index = (await response.json()) as StoryIndex
