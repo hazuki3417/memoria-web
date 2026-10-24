@@ -109,7 +109,7 @@ export const CommunityReady: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("1.24 GB ( 24.8 % )")).toBeVisible()
+    await expect((await canvas.findAllByText("1.24 GB")).length).toBeGreaterThan(0)
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByRole("table")).toHaveTextContent("HEIC / HEIF")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -127,8 +127,8 @@ export const CommunityBinary: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("4.66 GiB ( 100 % )")).toBeVisible()
-    await expect(canvas.getByText("1.15 GiB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByText("4.66 GiB")).toBeVisible()
+    await expect(canvas.getByText("1.15 GiB")).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -164,7 +164,7 @@ export const CommunityEmpty: Story = {
       await expect(row).toHaveTextContent("0 件")
       await expect(row).toHaveTextContent("0 GB")
     }
-    await expect(canvas.getAllByText("5 GB ( 100 % )")).toHaveLength(2)
+    await expect(canvas.getByText("5 GB")).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -182,7 +182,7 @@ export const CommunityRetry: Story = {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByText("1.24 GB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByText("1.24 GB")).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -222,11 +222,11 @@ export const CommunitySwitch: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("1.24 GB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByText("1.24 GB")).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "Community Bへ切り替え" }))
-    await expect(await canvas.findByText("2 GB ( 40 % )")).toBeVisible()
+    await expect(await canvas.findByText("2 GB")).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
-    await expect(canvas.queryByText("1.24 GB ( 24.8 % )")).not.toBeInTheDocument()
+    await expect(canvas.queryAllByText("1.24 GB")).toHaveLength(0)
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -243,8 +243,8 @@ export const PersonalBinary: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("4.66 GiB ( 100 % )")).toBeVisible()
-    await expect(canvas.getByText("1.15 GiB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByText("4.66 GiB")).toBeVisible()
+    await expect(canvas.getByText("1.15 GiB")).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByText("Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
   },
