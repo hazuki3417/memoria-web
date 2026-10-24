@@ -175,6 +175,26 @@ export const LoadingContract: Story = {
   },
 }
 
+// 0件の内訳では件数・使用量の昇順・降順でも形式順を変えず、3回目で未ソートへ戻る。
+export const ZeroSortContract: Story = {
+  name: "Interaction · 0件の安定ソートとソート解除",
+  tags: ["interaction"],
+  args: { usage: zeroUsage },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const table = canvas.getByRole("table")
+    const getFormats = () => within(table).getAllByRole("row").slice(1, 5).map((row) => within(row).getAllByRole("cell")[0].textContent)
+    const initial = getFormats()
+    for (const label of ["登録件数", "使用量"]) {
+      for (const direction of ["ascending", "descending", "none"]) {
+        await userEvent.click(canvas.getByRole("button", { name: `${label}で並べ替え` }))
+        await expect(within(table).getByRole("columnheader", { name: new RegExp(label) })).toHaveAttribute("aria-sort", direction)
+        await expect(getFormats()).toEqual(initial)
+      }
+    }
+  },
+}
+
 // Communityの表示差異のみ確認する。scopeがサーバーで隔離される保証ではない。
 export const CommunityDisplayContract: Story = {
   name: "Interaction · Community Usage表示（ST-04/FM-01）",
