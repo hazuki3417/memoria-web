@@ -1,5 +1,5 @@
-// Generate TypeScript HTTP client from the API's canonical OpenAPI schema.
-// Usage: node scripts/generate-media-upload-client.mjs <path-to-memoria-api>
+// Generates the HTTP client and MSW mocks from the API repository's schema.
+// Usage: npm run openapi:codegen -- <path-to-memoria-api>
 import { spawnSync } from "node:child_process"
 import { resolve, join } from "node:path"
 import { existsSync } from "node:fs"
@@ -14,11 +14,10 @@ if (!existsSync(schema)) {
   console.error(`Missing canonical OpenAPI schema: ${schema}`)
   process.exit(2)
 }
-const output = resolve("src/infrastructure/openapi/generated")
-const result = spawnSync("npx", [
-  "--no-install", "openapi-typescript-codegen", "--input", schema,
-  "--output", output, "--client", "fetch", "--useOptions"
-], { stdio: "inherit" })
+const result = spawnSync("npx", ["--no-install", "orval", "--config", "orval.config.ts"], {
+  stdio: "inherit",
+  env: { ...process.env, MEMORIA_MEDIA_UPLOAD_OPENAPI: schema },
+})
 if (result.error) {
   console.error(result.error.message)
   process.exit(1)
