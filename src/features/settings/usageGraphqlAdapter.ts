@@ -48,8 +48,8 @@ export function mapUsageProjection(usage: UsageProjection): SettingsUsageData {
     usedBytes,
     limitBytes,
     mediaCount: usage.mediaCount,
-    // Backendは0件でも全形式を返すが、既存UIでは確定0件をEmptyとして表示する。
-    formatBreakdown: usage.mediaCount === 0 ? [] : formatBreakdown,
+    // Backendの0件行もそのまま渡し、4形式の内訳を常に表示する。
+    formatBreakdown,
   }
 }
 
