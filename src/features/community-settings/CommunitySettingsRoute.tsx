@@ -28,14 +28,19 @@ export function CommunitySettingsRoute({
   section?: CommunitySettingsSection
 }) {
   const router = useRouter()
-  const { name, members, loadError, membersError } = useCommunity()
+  // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
+  const requiresMembers = section !== "usage"
+  const { name, members, loadError, membersError } = useCommunity({
+    includeMembers: requiresMembers,
+  })
   const [renameCommunity] = useRenameCommunityMutation()
   const [changeRole] = useChangeCommunityMemberRoleMutation()
   const [removeMember] = useRemoveCommunityMemberMutation()
   const [leaveCommunity] = useLeaveCommunityMutation()
 
   const pending =
-    !loadError && !membersError && (name === null || members === null)
+    !loadError && !(requiresMembers && membersError) &&
+    (name === null || (requiresMembers && members === null))
 
   if (loadError)
     return (
@@ -43,7 +48,7 @@ export function CommunitySettingsRoute({
         Community情報を取得できませんでした。再読み込みしてください。
       </Text>
     )
-  if (membersError)
+  if (requiresMembers && membersError)
     return (
       <Text c="red">
         メンバー一覧を取得できませんでした。再読み込みしてください。
@@ -55,14 +60,14 @@ export function CommunitySettingsRoute({
         {null}
       </LoadingBoundary>
     )
-  if (name === null || members === null) return null
+  if (name === null || (requiresMembers && members === null)) return null
 
   return (
     <CommunitySettings
       communityId={communityId}
       communityName={name}
       members={members ?? undefined}
-      role={members.find((member) => member.isSelf)?.role ?? "member"}
+      role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
       usageContent={section === "usage" ? <ConnectedUsage scope="community" communityId={communityId} /> : undefined}
       onRemoveMember={async (userId) => {
