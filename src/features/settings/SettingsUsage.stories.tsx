@@ -365,7 +365,8 @@ export const DisplayModeLifetimeContract: Story = {
 // Play無しの静的StoryのみをVRT候補とし、画像Baselineは別途Visual Reviewで承認する。
 export const VrtReady: Story = { name: "Visual · Ready", tags: ["visual", "vrt"] }
 export const VrtEmpty: Story = { name: "Visual · 0件", tags: ["visual", "vrt"], args: { usage: zeroUsage } }
-export const VrtLoading: Story = { name: "Visual · Loading", tags: ["visual", "vrt"], args: { status: "loading" } }
+// Skeletonの撮影安定化方針が確定するまでVRT対象外（memoria-web#171）。
+export const VrtLoading: Story = { name: "Visual · Loading", tags: ["visual"], args: { status: "loading" } }
 export const VrtError: Story = { name: "Visual · Error / Retry", tags: ["visual", "vrt"], args: { status: "error", onRetry: () => undefined } }
 export const VrtLimit: Story = { name: "Visual · 上限到達", tags: ["visual", "vrt"], args: { usage: limitReachedUsage } }
 export const VrtCommunity: Story = { name: "Visual · Community", tags: ["visual", "vrt"], args: { scope: "community" } }
