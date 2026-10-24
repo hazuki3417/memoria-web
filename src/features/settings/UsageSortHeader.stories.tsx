@@ -52,7 +52,7 @@ export const IconContract: Story = {
   args: { direction: "asc" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "Visual · 使用量で並べ替え" })).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeEnabled()
     await expect(canvas.getByTestId("usage-sort-icon-asc")).toHaveAttribute("aria-hidden", "true")
     await expect(canvas.queryByText("▲")).not.toBeInTheDocument()
   },
@@ -64,7 +64,7 @@ export const KeyboardContract: Story = {
   args: { direction: "desc" },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
-    const button = canvas.getByRole("button", { name: "Visual · 使用量で並べ替え" })
+    const button = canvas.getByRole("button", { name: "使用量で並べ替え" })
     button.focus()
     await expect(button).toHaveFocus()
     await userEvent.keyboard("{Enter}")
