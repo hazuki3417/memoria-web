@@ -7,3 +7,5 @@ node_modules
 *storybook.log
 storybook-static
 /public/__dev-assets
+test-results/*
+e2e/storybook-visual/report/*

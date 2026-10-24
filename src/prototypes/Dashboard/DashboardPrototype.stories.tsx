@@ -13,7 +13,7 @@ type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
   name: "Personal",
-  tags: ["vrt", "visual"],
+  tags: ["visual"],
   args: { initialContext: "personal", initialState: "default" },
 }
 export const Community: Story = {
@@ -27,7 +27,7 @@ export const Community: Story = {
 }
 export const Empty: Story = {
   name: "Empty",
-  tags: ["vrt", "visual"],
+  tags: ["visual"],
   args: { initialContext: "personal", initialState: "empty" },
 }
 export const CommunityEmpty: Story = {

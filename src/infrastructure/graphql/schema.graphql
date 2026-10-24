@@ -10,7 +10,7 @@ type Mutation {
  updateUserPreferences(input: UpdateUserPreferencesInput!): UpdateUserPreferencesPayload!
  createCommunity(input: CreateCommunityInput!): CreateCommunityPayload!
 }
-type User { id: ID! profile: UserProfile! preferences: UserPreferences! createdAt: DateTime! updatedAt: DateTime! }
+type User { id: ID! profile: UserProfile! preferences: UserPreferences! usage: UserUsage! createdAt: DateTime! updatedAt: DateTime! }
 type UserProfile { nickname: String! }
 input RegisterUserInput { nickname: String! }
 type RegisterUserPayload { user: User! }
@@ -57,6 +57,7 @@ type RenameCommunityPayload {
 extend type Query {
   myCommunities: [Community!]!
   community(communityId: ID!): Community
+  communityUsage(communityId: ID!): CommunityUsage!
 }
 
 extend type Mutation {
@@ -344,3 +345,11 @@ extend type Mutation {
   addMediaToGroup(input: ChangeMediaGroupClassificationInput!): ChangeMediaGroupClassificationPayload!
   removeMediaFromGroup(input: ChangeMediaGroupClassificationInput!): ChangeMediaGroupClassificationPayload!
 }
+
+# Usage契約: memoria-api/schemas/graphql/user.graphql・community.graphql
+# Int64はGraphQLレスポンス上で10進数文字列として返される。
+enum OriginalImageFormat { JPEG PNG WEBP HEIF }
+type MediaFormatUsage { format: OriginalImageFormat! mediaCount: Int! usedBytes: Int64! }
+type StorageUsage { usedBytes: Int64! effectiveLimitBytes: Int64! }
+type UserUsage { mediaCount: Int! storage: StorageUsage! formatBreakdown: [MediaFormatUsage!]! }
+type CommunityUsage { mediaCount: Int! storage: StorageUsage! formatBreakdown: [MediaFormatUsage!]! }

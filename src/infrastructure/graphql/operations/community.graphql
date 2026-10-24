@@ -37,3 +37,11 @@ mutation LeaveCommunity($communityId: ID!) {
 mutation AcceptCommunityDeletion($input: AcceptCommunityDeletionInput!) {
   acceptCommunityDeletion(input: $input) { accepted }
 }
+
+query CommunityUsage($communityId: ID!) {
+  communityUsage(communityId: $communityId) {
+    mediaCount
+    storage { usedBytes effectiveLimitBytes }
+    formatBreakdown { format mediaCount usedBytes }
+  }
+}

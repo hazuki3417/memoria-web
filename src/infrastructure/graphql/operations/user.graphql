@@ -23,3 +23,15 @@ mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
     }
   }
 }
+
+query PersonalUsage {
+  me {
+    id
+    preferences { fileSizeUnit }
+    usage {
+      mediaCount
+      storage { usedBytes effectiveLimitBytes }
+      formatBreakdown { format mediaCount usedBytes }
+    }
+  }
+}
