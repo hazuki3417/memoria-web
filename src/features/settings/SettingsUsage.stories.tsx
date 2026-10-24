@@ -90,7 +90,7 @@ export const ZeroUsageContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getAllByText("0 GB").length).toBeGreaterThan(0)
-    await expect(canvas.getByText("5 GB")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
     const table = canvas.getByRole("table")
     const rows = within(table).getAllByRole("row")
     await expect(rows).toHaveLength(6)
@@ -144,7 +144,7 @@ export const UnitPreferenceChangeContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const table = canvas.getByRole("table")
-    await expect(canvas.getByText("5 GB")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
     await expect(table).toHaveTextContent("1,248 件")
     await userEvent.click(canvas.getByRole("button", { name: "Binaryに変更" }))
     await expect(canvas.getAllByText("4.66 GiB")[0]).toBeVisible()
@@ -152,7 +152,7 @@ export const UnitPreferenceChangeContract: Story = {
     await expect(table).toHaveTextContent("1,248 件")
     await expect(canvas.getByLabelText(/ストレージ使用率 24.8%/)).toBeInTheDocument()
     await userEvent.click(canvas.getByRole("button", { name: "Decimalに戻す" }))
-    await expect(canvas.getByText("5 GB")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
     await expect(table).toHaveTextContent("1.24 GB")
     await expect(table).toHaveTextContent("1,248 件")
   },
@@ -201,7 +201,7 @@ export const DisplayModeSwitchContract: Story = {
     await expect(canvas.getAllByText("24.8%").length).toBeGreaterThan(0)
     await expect(within(table).getByRole("columnheader", { name: /割合/ })).toBeVisible()
     await expect(within(table).getAllByRole("row")).toHaveLength(6)
-    await expect(canvas.getByText("5 GB")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "割合で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
     await userEvent.click(canvas.getByRole("radio", { name: "容量" }))
