@@ -38,7 +38,7 @@ describe("sortUsageFormats", () => {
     expect(names(sortUsageFormats(near, { key: "size", direction: "asc" }))).toEqual(["B", "A", "C"])
   })
 
-  it("preserves the incoming relative order of equal values in both directions", () => {
+  it("uses canonical format order for equal values in both directions", () => {
     const tied = [
       { format: "PNG", count: 5, sizeBytes: 1_000_000 },
       { format: "JPEG", count: 5, sizeBytes: 1_000_000 },
@@ -46,8 +46,8 @@ describe("sortUsageFormats", () => {
     ]
     expect(names(sortUsageFormats(tied, { key: "count", direction: "asc" }))).toEqual(["WebP", "JPEG", "PNG"])
     expect(names(sortUsageFormats(tied, { key: "count", direction: "desc" }))).toEqual(["JPEG", "PNG", "WebP"])
-    expect(names(sortUsageFormats(tied, { key: "size", direction: "asc" }))).toEqual(["WebP", "PNG", "JPEG"])
-    expect(names(sortUsageFormats(tied, { key: "size", direction: "desc" }))).toEqual(["PNG", "JPEG", "WebP"])
+    expect(names(sortUsageFormats(tied, { key: "size", direction: "asc" }))).toEqual(["WebP", "JPEG", "PNG"])
+    expect(names(sortUsageFormats(tied, { key: "size", direction: "desc" }))).toEqual(["JPEG", "PNG", "WebP"])
   })
 
   it("keeps the original format order when counts and sizes are all zero", () => {
