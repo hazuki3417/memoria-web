@@ -38,7 +38,12 @@ describe("GraphQL Usage表示Adapter", () => {
     })
     expect(result.usedBytes).toBe(0)
     expect(result.limitBytes).toBe(5_000_000_000)
-    expect(result.formatBreakdown).toEqual([])
+    expect(result.formatBreakdown).toEqual([
+      { format: "JPEG", count: 0, sizeBytes: 0 },
+      { format: "PNG", count: 0, sizeBytes: 0 },
+      { format: "WebP", count: 0, sizeBytes: 0 },
+      { format: "HEIC / HEIF", count: 0, sizeBytes: 0 },
+    ])
     expect(emptyUsage.limitBytes).toBe(0)
   })
 
