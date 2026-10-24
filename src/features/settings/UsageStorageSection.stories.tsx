@@ -82,6 +82,6 @@ export const BinaryContract: Story = {
 
 export const Percent: Story = {
   name: "割合表示",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: { displayMode: "percent" },
 }
