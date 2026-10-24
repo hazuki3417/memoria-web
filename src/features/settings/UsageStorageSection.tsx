@@ -33,7 +33,7 @@ export function UsageStorageSection({
               {displayMode === "size" ? (
                 <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />
               ) : (
-                `${usagePercent(usage.usedBytes, usage.limitBytes }%`
+                `${usagePercent(usage.usedBytes, usage.limitBytes)}%`
               )}
             </Text>
           )}
