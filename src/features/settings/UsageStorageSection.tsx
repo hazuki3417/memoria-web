@@ -5,6 +5,7 @@ import { SectionHeader } from "@/components/SectionHeader"
 import type { FileSizeUnit } from "./formatFileSize"
 import { UsageFileSize } from "./UsageFileSize"
 import { usagePercent } from "./usagePercent"
+import { defaultUsageSort, sortUsageFormats } from "./sortUsageFormats"
 import { usageFormatColors as formatColors } from "./usageFormatColors"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
 import type { UsageDisplayMode } from "./usageDisplayMode"
@@ -59,7 +60,7 @@ export function UsageStorageSection({
             size="md"
             aria-label={`ストレージ使用率 ${usagePercent(usage.usedBytes, usage.limitBytes)}%、ファイル形式別内訳`}
           >
-            {usage.formatBreakdown?.map((item) => (
+            {usage.formatBreakdown && sortUsageFormats(usage.formatBreakdown, defaultUsageSort).map((item) => (
               <Progress.Section
                 key={item.format}
                 value={usagePercent(item.sizeBytes, usage.limitBytes)}
