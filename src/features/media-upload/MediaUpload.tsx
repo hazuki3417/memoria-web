@@ -382,19 +382,19 @@ export function MediaUpload({
     if (targets.length === 0 || sending) return
     setSending(true)
     await uploadMediaBatch(targets, async (item) => {
-      setFiles((current) => current.map((file) => file.id === item.id ? { ...file, status: "uploading" } : file))
+      setFiles((current) => current.map((file) => file.id === item.id ? { ...file, status: "uploading" as const } : file))
       try {
         await uploadMedia(
           item.original!,
           context === "personal" ? { scopeType: "PERSONAL" } : { scopeType: "COMMUNITY", communityId },
           item.idempotencyKey!,
         )
-        setFiles((current) => current.map((file) => file.id === item.id ? { ...file, status: "processing" } : file))
+        setFiles((current) => current.map((file) => file.id === item.id ? { ...file, status: "processing" as const } : file))
       } catch (error) {
         const unknown = error instanceof MediaUploadError && error.resultUnknown
         const rejected = error instanceof MediaUploadError && [400, 401, 403, 404, 409, 413, 415].includes(error.status)
         setFiles((current) => current.map((file) => file.id === item.id ? {
-          ...file, status: unknown ? "result-unknown" : rejected ? "upload-rejected" : "upload-failed",
+          ...file, status: (unknown ? "result-unknown" : rejected ? "upload-rejected" : "upload-failed") as FileStatus,
           reason: error instanceof Error ? error.message : "アップロードに失敗しました",
         } : file))
       }
