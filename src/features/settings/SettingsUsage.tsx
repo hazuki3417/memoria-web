@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { IconDeviceHdd, IconPercentage } from "@tabler/icons-react"
+import { IconDatabase, IconPercentage } from "@tabler/icons-react"
 import {
   Box,
   Button,
@@ -89,7 +89,7 @@ export function SettingsUsage({
                 label: (
                   <Tooltip label="容量で表示" withArrow>
                     <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-                      <IconDeviceHdd size={18} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
+                      <IconDatabase size={18} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
                       <VisuallyHidden>容量</VisuallyHidden>
                     </span>
                   </Tooltip>
