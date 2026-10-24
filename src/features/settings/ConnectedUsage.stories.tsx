@@ -109,7 +109,7 @@ export const CommunityReady: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("1.24 GB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByLabelText("1.24 GB ( 24.8 % )")).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByRole("table")).toHaveTextContent("HEIC / HEIF")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -127,13 +127,13 @@ export const CommunityBinary: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("4.66 GiB ( 100 % )")).toBeVisible()
-    await expect(canvas.getByText("1.15 GiB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByLabelText("4.66 GiB ( 100 % )")).toBeVisible()
+    await expect(canvas.getByLabelText("1.15 GiB ( 24.8 % )")).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
 
-// ST-03・SS-05: APIが全形式の0件行を返しても既存のEmpty UXを維持する。
+// ST-03・SS-05: APIの確定0件でも4形式の0件行を表示する。
 export const CommunityEmpty: Story = {
   name: "Integration · 確定0件",
   tags: ["interaction"],
@@ -157,8 +157,14 @@ export const CommunityEmpty: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("登録済みのオリジナルファイルはありません")).toBeVisible()
-    await expect(canvas.getAllByText("5 GB ( 100 % )")).toHaveLength(2)
+    const table = await canvas.findByRole("table")
+    await expect(within(table).getAllByRole("row")).toHaveLength(6)
+    for (const format of ["JPEG", "PNG", "WebP", "HEIC / HEIF"]) {
+      const row = within(table).getByRole("row", { name: new RegExp(format.replace("/", "\\/")) })
+      await expect(row).toHaveTextContent("0 件")
+      await expect(row).toHaveTextContent("0 GB")
+    }
+    await expect(canvas.getAllByLabelText("5 GB ( 100 % )")).toHaveLength(2)
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -176,7 +182,7 @@ export const CommunityRetry: Story = {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByText("1.24 GB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByLabelText("1.24 GB ( 24.8 % )")).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -216,11 +222,11 @@ export const CommunitySwitch: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("1.24 GB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByLabelText("1.24 GB ( 24.8 % )")).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "Community Bへ切り替え" }))
-    await expect(await canvas.findByText("2 GB ( 40 % )")).toBeVisible()
+    await expect(await canvas.findByLabelText("2 GB ( 40 % )")).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
-    await expect(canvas.queryByText("1.24 GB ( 24.8 % )")).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText("1.24 GB ( 24.8 % )")).not.toBeInTheDocument()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -237,8 +243,8 @@ export const PersonalBinary: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("4.66 GiB ( 100 % )")).toBeVisible()
-    await expect(canvas.getByText("1.15 GiB ( 24.8 % )")).toBeVisible()
+    await expect(await canvas.findByLabelText("4.66 GiB ( 100 % )")).toBeVisible()
+    await expect(canvas.getByLabelText("1.15 GiB ( 24.8 % )")).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByText("Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
   },
