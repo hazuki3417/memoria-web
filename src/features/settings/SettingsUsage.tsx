@@ -80,6 +80,7 @@ export function SettingsUsage({
         <Group gap="xs" wrap="nowrap">
           <Text size="sm" c="dimmed" id="usage-display-mode-label">表示</Text>
           <SegmentedControl
+            size="xs"
             aria-labelledby="usage-display-mode-label"
             value={displayMode}
             onChange={(value) => setDisplayMode(value as UsageDisplayMode)}
@@ -89,7 +90,7 @@ export function SettingsUsage({
                 label: (
                   <Tooltip label="容量で表示" withArrow>
                     <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-                      <IconDatabase size={18} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
+                      <IconDatabase size={15} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
                       <VisuallyHidden>容量</VisuallyHidden>
                     </span>
                   </Tooltip>
@@ -100,7 +101,7 @@ export function SettingsUsage({
                 label: (
                   <Tooltip label="割合で表示" withArrow>
                     <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 18 }}>
-                      <IconPercentage size={18} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
+                      <IconPercentage size={15} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
                       <VisuallyHidden>割合</VisuallyHidden>
                     </span>
                   </Tooltip>
