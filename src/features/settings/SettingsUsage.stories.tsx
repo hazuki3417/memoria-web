@@ -427,3 +427,35 @@ export const AllColumnsSortContract: Story = {
     await expect(first()).toHaveTextContent("JPEG")
   },
 }
+
+// UI-08/UI-13: 操作モードはラベル付きでKeyboardから選択できる。
+export const KeyboardDisplayModeContract: Story = {
+  name: "Interaction · 表示切替のKeyboard操作（UI-08/UI-13）",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const size = canvas.getByRole("radio", { name: "容量" })
+    const percent = canvas.getByRole("radio", { name: "割合" })
+    await expect(size).toBeChecked()
+    size.focus()
+    await userEvent.keyboard("{ArrowRight}")
+    await expect(percent).toBeChecked()
+    await expect(canvas.getAllByText("24.8%").length).toBeGreaterThan(0)
+    await userEvent.keyboard("{ArrowLeft}")
+    await expect(size).toBeChecked()
+  },
+}
+
+// Usage UI: ErrorはCommunityでも必須のRetryを示し、正常値を誤表示しない。
+export const CommunityErrorContract: Story = {
+  name: "Interaction · Communityのエラー復旧UI（SS-02）",
+  tags: ["interaction"],
+  args: { scope: "community", status: "error", onRetry: () => undefined },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("alert")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+    await expect(canvas.queryByText("1.24 GB")).not.toBeInTheDocument()
+  },
+}
