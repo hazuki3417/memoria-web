@@ -32,7 +32,18 @@ function StorageValue({
       }}
     >
       <span>{value} {unit}</span>
-      <span>( {percent} % )</span>
+      <span
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1ch minmax(0, 1fr) 1ch",
+          columnGap: "0.5ch",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <span>(</span>
+        <span style={{ textAlign: "right" }}>{percent} %</span>
+        <span>)</span>
+      </span>
     </Text>
   )
 }
