@@ -150,6 +150,11 @@ export function UsageFormatBreakdownSection({
               </Table.Tfoot>
             )}
           </Table>
+          {status === "ready" && displayMode === "percent" && (
+            <Text size="xs" c="dimmed" mt="xs">
+              割合はストレージ上限に対する値です。
+            </Text>
+          )}
         </Box>
       )}
     </>
