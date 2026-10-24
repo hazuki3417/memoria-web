@@ -20,7 +20,7 @@ import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
 import type { UsageDisplayMode } from "./usageDisplayMode"
 export type { SettingsUsageData } from "./usageTypes"
-import { nextUsageSort, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
+import { defaultUsageSort, nextUsageSort, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
 
 
 function UsageErrorContent({ onRetry }: { onRetry?: () => void }) {
@@ -57,7 +57,7 @@ export function SettingsUsage({
   onRetry?: () => void
   fileSizeUnit?: FileSizeUnit
 }) {
-  const [sort, setSort] = useState<UsageSort>(null)
+  const [sort, setSort] = useState<UsageSort>(defaultUsageSort)
   const [displayMode, setDisplayMode] = useState<UsageDisplayMode>("size")
   const toggleSort = (key: UsageSortKey) => {
     setSort((current) => nextUsageSort(current, key))
