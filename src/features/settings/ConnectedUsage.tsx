@@ -2,6 +2,7 @@
 
 import {
   useCommunityUsageQuery,
+  useCurrentUserQuery,
   usePersonalUsageQuery,
 } from "@/infrastructure/graphql/generated"
 import { SettingsUsage } from "./SettingsUsage"
@@ -26,9 +27,15 @@ export function ConnectedUsage({
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   })
+  const communityPreferences = useCurrentUserQuery({ skip: scope !== "community" })
   const active = scope === "personal" ? personal : community
   const projection =
     scope === "personal" ? personal.data?.me?.usage : community.data?.communityUsage
+
+  const communityPreferencesLoading = scope === "community" && communityPreferences.loading
+  const communityPreferencesError = scope === "community" &&
+    (Boolean(communityPreferences.error) ||
+      (!communityPreferences.loading && !communityPreferences.data?.me))
 
   let usage: SettingsUsageData = emptyUsage
   let conversionFailed = false
@@ -41,9 +48,9 @@ export function ConnectedUsage({
   }
 
   const status: UsageStatus =
-    active.loading
+    active.loading || communityPreferencesLoading
       ? "loading"
-      : active.error || conversionFailed || !projection
+      : active.error || communityPreferencesError || conversionFailed || !projection
         ? "error"
         : "ready"
 
@@ -51,6 +58,9 @@ export function ConnectedUsage({
     // 再取得で再び失敗した場合もApolloのerror stateに反映し、Retryを維持する。
     if (active.error || !projection || conversionFailed) {
       void active.refetch().catch(() => undefined)
+    }
+    if (communityPreferencesError) {
+      void communityPreferences.refetch().catch(() => undefined)
     }
   }
 
@@ -61,8 +71,9 @@ export function ConnectedUsage({
       status={status}
       onRetry={retry}
       fileSizeUnit={
-        scope === "personal" &&
-        personal.data?.me?.preferences.fileSizeUnit === "BINARY"
+        (scope === "personal"
+          ? personal.data?.me?.preferences.fileSizeUnit
+          : communityPreferences.data?.me?.preferences.fileSizeUnit) === "BINARY"
           ? "BINARY"
           : "DECIMAL"
       }
