@@ -1,11 +1,10 @@
+import { uploadMedia as generatedUploadMedia, type MediaUploadReceipt } from "@/infrastructure/openapi/generated/mediaUpload"
+
 export type UploadScope =
   | { scopeType: "PERSONAL"; communityId?: never }
   | { scopeType: "COMMUNITY"; communityId: string }
 
-export type MediaUploadReceipt = {
-  mediaId: string
-  processingStatus: "PROCESSING"
-}
+export type { MediaUploadReceipt } from "@/infrastructure/openapi/generated/mediaUpload"
 
 export class MediaUploadError extends Error {
   constructor(
@@ -27,20 +26,15 @@ export async function uploadMedia(
   idempotencyKey: string,
   signal?: AbortSignal,
 ): Promise<MediaUploadReceipt> {
-  const body = new FormData()
-  body.set("file", file, file.name)
-  body.set("scopeType", scope.scopeType)
-  if (scope.scopeType === "COMMUNITY") body.set("communityId", scope.communityId)
-
-  let response: Response
+  let response: Awaited<ReturnType<typeof generatedUploadMedia>>
   try {
-    response = await fetch("/api/media/uploads", {
-      method: "POST",
-      headers: { "Idempotency-Key": idempotencyKey },
-      body,
-      signal,
-    })
+    response = await generatedUploadMedia(
+      { file, scopeType: scope.scopeType, ...(scope.scopeType === "COMMUNITY" ? { communityId: scope.communityId } : {}) },
+      { headers: { "Idempotency-Key": idempotencyKey }, signal },
+    )
   } catch {
+    // Network errors or an unreadable JSON response leave the result ambiguous.
+    // Never silently retry with another key.
     throw new MediaUploadError(
       "RESULT_UNKNOWN",
       "送信結果を確認できません。Media Browserで登録結果を確認してください。",
@@ -49,33 +43,21 @@ export async function uploadMedia(
     )
   }
 
-  let result: unknown
-  try {
-    result = await response.json()
-  } catch {
+  if (response.status !== 201) {
+    const failure = response.data as { error?: { code?: string; message?: string } }
     throw new MediaUploadError(
-      "RESULT_UNKNOWN",
-      "送信結果を確認できません。Media Browserで登録結果を確認してください。",
-      response.status,
-      true,
-    )
-  }
-
-  if (!response.ok) {
-    const error = (result as { error?: { code?: string; message?: string } })?.error
-    throw new MediaUploadError(
-      error?.code ?? "UPLOAD_FAILED",
-      error?.message ?? "アップロードに失敗しました",
+      failure?.error?.code ?? "UPLOAD_FAILED",
+      failure?.error?.message ?? "アップロードに失敗しました",
       response.status,
       response.status === 502 || response.status === 504,
     )
   }
 
-  const receipt = result as Partial<MediaUploadReceipt>
+  const receipt = response.data
   if (typeof receipt?.mediaId !== "string" || receipt.processingStatus !== "PROCESSING") {
     throw new MediaUploadError("RESULT_UNKNOWN", "Uploadの受付結果を確認できません", response.status, true)
   }
-  return receipt as MediaUploadReceipt
+  return receipt
 }
 
 // Limit in-flight upload bodies. Each file retains its own success/failure.
