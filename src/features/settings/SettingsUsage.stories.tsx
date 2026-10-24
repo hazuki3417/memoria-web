@@ -67,6 +67,25 @@ export const ReadyValuesContract: Story = {
   },
 }
 
+// 初期表示で使用量降順が有効になり、ソート解除で標準順へ戻る。
+export const DefaultSortContract: Story = {
+  name: "Interaction · 使用量降順の初期表示と解除",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const table = canvas.getByRole("table")
+    const sizeHeader = within(table).getByRole("columnheader", { name: /使用量/ })
+    await expect(sizeHeader).toHaveAttribute("aria-sort", "descending")
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
+    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
+    await expect(sizeHeader).toHaveAttribute("aria-sort", "none")
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
+    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
+    await expect(sizeHeader).toHaveAttribute("aria-sort", "ascending")
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
+  },
+}
+
 // FM-06: format行にMedia選択・削除・変換のActionを提供しない。
 export const BreakdownReadOnlyContract: Story = {
   name: "Interaction · 内訳に一括操作なし（FM-06）",
@@ -185,8 +204,12 @@ export const ZeroSortContract: Story = {
     const table = canvas.getByRole("table")
     const getFormats = () => within(table).getAllByRole("row").slice(1, 5).map((row) => within(row).getAllByRole("cell")[0].textContent)
     const initial = getFormats()
-    for (const label of ["登録件数", "使用量"]) {
-      for (const direction of ["ascending", "descending", "none"]) {
+    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "descending")
+    for (const [label, directions] of [
+      ["使用量", ["none", "ascending", "descending"]],
+      ["登録件数", ["ascending", "descending", "none"]],
+    ] as const) {
+      for (const direction of directions) {
         await userEvent.click(canvas.getByRole("button", { name: `${label}で並べ替え` }))
         await expect(within(table).getByRole("columnheader", { name: new RegExp(label) })).toHaveAttribute("aria-sort", direction)
         await expect(getFormats()).toEqual(initial)
@@ -222,6 +245,7 @@ export const DisplayModeSwitchContract: Story = {
     await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toBeVisible()
     await expect(within(table).getAllByRole("row")).toHaveLength(6)
     await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
     await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
     await userEvent.click(canvas.getByRole("radio", { name: "容量" }))
