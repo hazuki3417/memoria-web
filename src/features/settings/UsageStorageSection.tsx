@@ -3,39 +3,10 @@
 import { Box, Group, Progress, Skeleton, Stack, Text } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import type { FileSizeUnit } from "./formatFileSize"
-import { formatFileSize } from "./formatFileSize"
+import { UsageFileSize } from "./UsageFileSize"
 import { usagePercent } from "./usagePercent"
 import { usageFormatColors as formatColors } from "./usageFormatColors"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
-
-/** サイズと割合の桁位置を各行で揃え、全体を読み上げ可能に保つ。 */
-function StorageValue({
-  bytes,
-  percent,
-  fileSizeUnit,
-}: {
-  bytes: number
-  percent: number
-  fileSizeUnit: FileSizeUnit
-}) {
-  const { value, unit } = formatFileSize(bytes, fileSizeUnit)
-  return (
-    <Text
-      size="sm"
-      ta="right"
-      aria-label={`${value} ${unit} ( ${percent} % )`}
-      style={{
-        display: "inline-grid",
-        gridTemplateColumns: "11ch 10ch",
-        columnGap: "var(--mantine-spacing-xs)",
-        fontVariantNumeric: "tabular-nums",
-      }}
-    >
-      <span>{value} {unit}</span>
-      <span>( {percent} % )</span>
-    </Text>
-  )
-}
 
 export function UsageStorageSection({
   usage,
@@ -55,7 +26,9 @@ export function UsageStorageSection({
           {status === "loading" ? (
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
-            <StorageValue bytes={usage.usedBytes} percent={usagePercent(usage.usedBytes, usage.limitBytes)} fileSizeUnit={fileSizeUnit} />
+            <Text size="sm" ta="right">
+              <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />{` ( ${usagePercent(usage.usedBytes, usage.limitBytes)} % )`}
+            </Text>
           )}
         </Group>
         <Group justify="space-between" align="center" wrap="wrap">
@@ -63,11 +36,9 @@ export function UsageStorageSection({
           {status === "loading" ? (
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
-            <StorageValue
-              bytes={Math.max(0, usage.limitBytes - usage.usedBytes)}
-              percent={Number(Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1))}
-              fileSizeUnit={fileSizeUnit}
-            />
+            <Text size="sm" ta="right">
+              <UsageFileSize bytes={Math.max(0, usage.limitBytes - usage.usedBytes)} fileSizeUnit={fileSizeUnit} />{` ( ${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "")} % )`}
+            </Text>
           )}
         </Group>
         {status === "loading" ? (
@@ -97,7 +68,9 @@ export function UsageStorageSection({
           {status === "loading" ? (
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
-            <StorageValue bytes={usage.limitBytes} percent={100} fileSizeUnit={fileSizeUnit} />
+            <Text size="sm" ta="right">
+              <UsageFileSize bytes={usage.limitBytes} fileSizeUnit={fileSizeUnit} /> ( 100 % )
+            </Text>
           )}
         </Group>
       </Stack>
