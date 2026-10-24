@@ -20,7 +20,7 @@ import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
 import type { UsageDisplayMode } from "./usageDisplayMode"
 export type { SettingsUsageData } from "./usageTypes"
-import type { UsageSort, UsageSortKey } from "./sortUsageFormats"
+import { nextUsageSort, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
 
 
 function UsageErrorContent({ onRetry }: { onRetry?: () => void }) {
@@ -60,11 +60,7 @@ export function SettingsUsage({
   const [sort, setSort] = useState<UsageSort>(null)
   const [displayMode, setDisplayMode] = useState<UsageDisplayMode>("size")
   const toggleSort = (key: UsageSortKey) => {
-    setSort((current) => ({
-      key,
-      direction:
-        current?.key === key && current.direction === "asc" ? "desc" : "asc",
-    }))
+    setSort((current) => nextUsageSort(current, key))
   }
   return (
     <Stack gap="xl">
