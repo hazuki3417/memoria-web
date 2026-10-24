@@ -198,7 +198,7 @@ export const DisplayModeSwitchContract: Story = {
     const table = canvas.getByRole("table")
     await expect(canvas.getAllByText("1.24 GB").length).toBeGreaterThan(0)
     await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
-    await expect(canvas.getAllByText("24.8 %").length).toBeGreaterThan(0)
+    await expect(canvas.getAllByText("24.8%").length).toBeGreaterThan(0)
     await expect(within(table).getByRole("columnheader", { name: /割合/ })).toBeVisible()
     await expect(within(table).getAllByRole("row")).toHaveLength(6)
     await expect(canvas.getByText("5 GB")).toBeVisible()
