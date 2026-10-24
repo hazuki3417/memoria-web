@@ -11,6 +11,13 @@ export type UsageSort = {
   direction: UsageSortDirection
 } | null
 
+/** 同じ列は 昇順 → 降順 → ソートなし。別の列は昇順から開始する。 */
+export function nextUsageSort(current: UsageSort, key: UsageSortKey): UsageSort {
+  if (current?.key !== key) return { key, direction: "asc" }
+  if (current.direction === "asc") return { key, direction: "desc" }
+  return null
+}
+
 export function sortUsageFormats(
   items: readonly UsageFormatItem[],
   sort: UsageSort,
@@ -34,9 +41,7 @@ export function sortUsageFormats(
         break
     }
 
-    return (
-      (sort.direction === "asc" ? 1 : -1) *
-      (result || collator.compare(a.format, b.format))
-    )
+    // 同値では0を返し、元の並び順を維持する（安定ソート）。
+    return (sort.direction === "asc" ? 1 : -1) * result
   })
 }
