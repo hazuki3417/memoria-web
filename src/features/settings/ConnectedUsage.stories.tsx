@@ -40,7 +40,7 @@ const communityPreferences = (unit: "DECIMAL" | "BINARY") => ({
     data: {
       me: {
         id: "user-a",
-        profile: { nickname: "ユーザー" },
+        profile: { nickname: "Visual · ユーザー" },
         preferences: {
           personalAccentColor: "#0000FF",
           dateFormat: "YYYY_MM_DD",
@@ -100,7 +100,7 @@ type Story = StoryObj<typeof meta>
 
 // SC-02・ST-04・FM-01: Apolloの実HookとAdapterを通したCommunity Usage表示。
 export const CommunityReady: Story = {
-  name: "Integration · Communityの取得成功",
+  name: "Interaction · Communityの取得成功",
   tags: ["interaction"],
   decorators: [(Story) => (
     <MockedProvider mocks={[communitySuccess, communityPreferences("DECIMAL")]} addTypename={false}>
@@ -118,7 +118,7 @@ export const CommunityReady: Story = {
 
 // UN-02: Community Usageも現在のUser Preferencesに従いBinaryで表示する。
 export const CommunityBinary: Story = {
-  name: "Integration · CommunityのBinary表示",
+  name: "Interaction · CommunityのBinary表示",
   tags: ["interaction"],
   decorators: [(Story) => (
     <MockedProvider mocks={[communitySuccess, communityPreferences("BINARY")]} addTypename={false}>
@@ -135,7 +135,7 @@ export const CommunityBinary: Story = {
 
 // ST-03・SS-05: APIの確定0件でも4形式の0件行を表示する。
 export const CommunityEmpty: Story = {
-  name: "Integration · 確定0件",
+  name: "Interaction · 確定0件",
   tags: ["interaction"],
   decorators: [(Story) => (
     <MockedProvider mocks={[{
@@ -171,7 +171,7 @@ export const CommunityEmpty: Story = {
 
 // SS-02/03: GraphQLの通信失敗から、同じOperationのrefetchで復旧する。
 export const CommunityRetry: Story = {
-  name: "Integration · Errorから再取得成功",
+  name: "Interaction · Errorから再取得成功",
   tags: ["interaction"],
   decorators: [(Story) => (
     <MockedProvider mocks={[communityFailure, communitySuccess, communityPreferences("DECIMAL")]} addTypename={false}>
@@ -181,7 +181,7 @@ export const CommunityRetry: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
-    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await userEvent.click(canvas.getByRole("button", { name: "Visual · 再試行" }))
     await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
@@ -189,7 +189,7 @@ export const CommunityRetry: Story = {
 
 // SS-04: 同じGraphQL失敗が再発しても、再試行Actionを失わない。
 export const CommunityRetryFailure: Story = {
-  name: "Integration · 再試行して再失敗",
+  name: "Interaction · 再試行して再失敗",
   tags: ["interaction"],
   decorators: [(Story) => (
     <MockedProvider mocks={[communityFailure, communityFailure, communityPreferences("DECIMAL")]} addTypename={false}>
@@ -199,15 +199,15 @@ export const CommunityRetryFailure: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await userEvent.click(canvas.getByRole("button", { name: "Visual · 再試行" }))
     await expect(await canvas.findByRole("alert")).toBeVisible()
-    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "Visual · 再試行" })).toBeEnabled()
   },
 }
 
 // NV-04: Communityを切り替えたときApolloがIDに対応するUsageだけを表示する。
 export const CommunitySwitch: Story = {
-  name: "Integration · Community AからBへの切り替え",
+  name: "Interaction · Community AからBへの切り替え",
   tags: ["interaction"],
   render: () => <CommunitySwitchScenario />,
   decorators: [(Story) => (
@@ -223,7 +223,7 @@ export const CommunitySwitch: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "Community Bへ切り替え" }))
+    await userEvent.click(canvas.getByRole("button", { name: "Visual · Community Bへ切り替え" }))
     await expect(await canvas.findAllByText("2 GB").then((elements) => elements[0])).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
     await expect(canvas.queryAllByText("1.24 GB")).toHaveLength(0)
@@ -233,7 +233,7 @@ export const CommunitySwitch: Story = {
 
 // SC-01・UN-02: PersonalのUsageと表示単位を同一Operationから取得する。
 export const PersonalBinary: Story = {
-  name: "Integration · Personal UsageとBinary設定",
+  name: "Interaction · Personal UsageとBinary設定",
   tags: ["interaction"],
   args: { scope: "personal", communityId: undefined },
   decorators: [(Story) => (
