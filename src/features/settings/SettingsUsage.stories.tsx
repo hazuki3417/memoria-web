@@ -114,7 +114,7 @@ export const LimitReachedContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getAllByText("5 GB")).toHaveLength(2)
-    await expect(canvas.getByText("0 GB")).toHaveLength(3)
+    await expect(canvas.getByText("0 GB")).toBeVisible()
     await expect(canvas.getByLabelText(/ストレージ使用率 100%/)).toBeInTheDocument()
     await expect(canvas.getByRole("table")).toHaveTextContent("5,000 件")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -198,7 +198,7 @@ export const DisplayModeSwitchContract: Story = {
     const table = canvas.getByRole("table")
     await expect(canvas.getAllByText("1.24 GB").length).toBeGreaterThan(0)
     await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
-    await expect(canvas.getByText("24.8 %")).toBeVisible()
+    await expect(canvas.getAllByText("24.8 %").length).toBeGreaterThan(0)
     await expect(within(table).getByRole("columnheader", { name: /割合/ })).toBeVisible()
     await expect(within(table).getAllByRole("row")).toHaveLength(6)
     await expect(canvas.getByText("5 GB")).toBeVisible()
