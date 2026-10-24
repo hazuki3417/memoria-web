@@ -35,17 +35,22 @@ export function CommunityProvider({
   return <Context.Provider value={communityId}>{children}</Context.Provider>
 }
 
-export function useCommunity(): CommunityData {
+export function useCommunity({
+  includeMembers = true,
+}: { includeMembers?: boolean } = {}): CommunityData {
   const communityId = useContext(Context)
   if (!communityId) throw new Error("CommunityProvider is required")
   const community = useCommunityDetailsQuery({ variables: { communityId } })
-  const members = useCommunityMembersQuery({ variables: { communityId } })
-  const currentUser = useCurrentUserQuery()
+  const members = useCommunityMembersQuery({
+    variables: { communityId },
+    skip: !includeMembers,
+  })
+  const currentUser = useCurrentUserQuery({ skip: !includeMembers })
   return {
     communityId,
     name: community.data?.community?.name ?? null,
     members:
-      members.data?.communityMembers && currentUser.data
+      includeMembers && members.data?.communityMembers && currentUser.data
         ? members.data.communityMembers.map((member) => ({
             id: member.userId,
             name: member.nickname,
@@ -56,6 +61,6 @@ export function useCommunity(): CommunityData {
     loadError:
       Boolean(community.error) ||
       (!community.loading && !!community.data && !community.data.community),
-    membersError: Boolean(members.error || currentUser.error),
+    membersError: includeMembers && Boolean(members.error || currentUser.error),
   }
 }
