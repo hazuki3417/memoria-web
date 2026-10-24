@@ -116,7 +116,7 @@ export const LoadingContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeDisabled()
-    await expect(canvas.getAllByRole("columnheader")).toHaveLength(3)
+    await expect(within(canvas.getAllByRole("row")[0]).getAllByRole("columnheader")).toHaveLength(3)
     await expect(canvas.getAllByRole("row")).toHaveLength(6)
   },
 }
