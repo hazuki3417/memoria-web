@@ -47,7 +47,7 @@ export function UsageStorageSection({
               {displayMode === "size" ? (
                 <UsageFileSize bytes={Math.max(0, usage.limitBytes - usage.usedBytes)} fileSizeUnit={fileSizeUnit} />
               ) : (
-                `${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "" }%`
+                `${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "")}%`
               )}
             </Text>
           )}
