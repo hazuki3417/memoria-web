@@ -3,7 +3,7 @@ import type { ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
-import type { UsageSort, UsageSortKey } from "./sortUsageFormats"
+import { nextUsageSort, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
 import { sampleUsage, zeroUsage } from "./usageStoryFixtures"
 
 function SortableBreakdownStory(
@@ -11,10 +11,7 @@ function SortableBreakdownStory(
 ) {
   const [sort, setSort] = useState<UsageSort>(null)
   const toggleSort = (key: UsageSortKey) => {
-    setSort((current) => ({
-      key,
-      direction: current?.key === key && current.direction === "asc" ? "desc" : "asc",
-    }))
+    setSort((current) => nextUsageSort(current, key))
   }
   return <UsageFormatBreakdownSection {...props} sort={sort} onSort={toggleSort} />
 }
@@ -106,6 +103,10 @@ export const SortInteraction: Story = {
       "descending",
     )
     await expect(canvas.getByTestId("usage-sort-icon-desc")).toBeInTheDocument()
+    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
+    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "none")
+    await expect(canvas.getAllByTestId("usage-sort-icon-none")).toHaveLength(3)
   },
 }
 
