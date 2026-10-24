@@ -24,7 +24,7 @@
     "test:visual:report": "playwright show-report ./e2e/storybook-visual/report",
     "graphql:codegen": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs",
     "graphql:codegen:api": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs",
-    "openapi:codegen": "node scripts/generate-media-upload-client.mjs"
+    "openapi:codegen": "orval --config orval.config.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
