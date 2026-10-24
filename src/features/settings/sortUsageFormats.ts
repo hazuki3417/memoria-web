@@ -4,7 +4,7 @@ export type UsageFormatItem = {
   sizeBytes: number
 }
 
-export type UsageSortKey = "format" | "count" | "size" | "percent"
+export type UsageSortKey = "format" | "count" | "size"
 export type UsageSortDirection = "asc" | "desc"
 export type UsageSort = {
   key: UsageSortKey
@@ -29,8 +29,7 @@ export function sortUsageFormats(
         result = a.count - b.count
         break
       case "size":
-      case "percent":
-        // 同一上限に対する割合はsizeBytesと同じ順序になる。
+        // 同一上限に対する割合もsizeBytesと同じ順序になる。
         result = a.sizeBytes - b.sizeBytes
         break
     }
