@@ -10,6 +10,7 @@ import { UsageSortHeader } from "./UsageSortHeader"
 import { usagePercent } from "./usagePercent"
 import { usageFormatColors as formatColors } from "./usageFormatColors"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
+import type { UsageDisplayMode } from "./usageDisplayMode"
 
 // 取得成功の0件でも、分類を省略せず4形式の0件行を表示する。
 const zeroFormatBreakdown = [
@@ -25,12 +26,14 @@ export function UsageFormatBreakdownSection({
   sort,
   onSort,
   fileSizeUnit,
+  displayMode = "size",
 }: {
   usage: SettingsUsageData
   status: UsageStatus
   sort: UsageSort
   onSort: (key: UsageSortKey) => void
   fileSizeUnit: FileSizeUnit
+  displayMode?: UsageDisplayMode
 }) {
   const sortedBreakdown = useMemo(
     () => sortUsageFormats(
@@ -73,24 +76,15 @@ export function UsageFormatBreakdownSection({
                 >
                   {sortHeader("count", "登録件数")}
                 </Table.Th>
-                <Table.Th
-                  ta="right"
-                  aria-sort={ariaSort("size")}
-                >
-                  {sortHeader("size", "使用量")}
-                </Table.Th>
-                <Table.Th
-                  ta="right"
-                  aria-sort={ariaSort("percent")}
-                >
-                  {sortHeader("percent", "割合")}
+                <Table.Th ta="right" aria-sort={ariaSort("size")}>
+                  {sortHeader("size", displayMode === "size" ? "使用量" : "割合")}
                 </Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {status === "loading" && Array.from({ length: 4 }, (_, row) => (
                 <Table.Tr key={`loading-${row}`}>
-                  {Array.from({ length: 4 }, (_, column) => (
+                  {Array.from({ length: 3 }, (_, column) => (
                     <Table.Td key={column}>
                       <Skeleton h={16} radius="sm" />
                     </Table.Td>
@@ -114,8 +108,13 @@ export function UsageFormatBreakdownSection({
                   <Table.Td ta="right">
                     {item.count.toLocaleString("ja-JP")} 件
                   </Table.Td>
-                  <Table.Td ta="right"><UsageFileSize bytes={item.sizeBytes} fileSizeUnit={fileSizeUnit} /></Table.Td>
-                  <Table.Td ta="right">{usagePercent(item.sizeBytes, usage.limitBytes)} %</Table.Td>
+                  <Table.Td ta="right">
+                    {displayMode === "size" ? (
+                      <UsageFileSize bytes={item.sizeBytes} fileSizeUnit={fileSizeUnit} />
+                    ) : (
+                      `${usagePercent(item.sizeBytes, usage.limitBytes)} %`
+                    )}
+                  </Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -129,7 +128,7 @@ export function UsageFormatBreakdownSection({
                   <Table.Th>合計</Table.Th>
                   {status === "loading" ? (
                     <>
-                      {["count", "size", "percent"].map((field) => (
+                      {["count", "value"].map((field) => (
                         <Table.Th key={field} ta="right">
                           <Skeleton h={16} radius="sm" />
                         </Table.Th>
@@ -138,8 +137,13 @@ export function UsageFormatBreakdownSection({
                   ) : (
                     <>
                       <Table.Th ta="right">{usage.mediaCount.toLocaleString("ja-JP")} 件</Table.Th>
-                      <Table.Th ta="right"><UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} /></Table.Th>
-                      <Table.Th ta="right">{usagePercent(usage.usedBytes, usage.limitBytes)} %</Table.Th>
+                      <Table.Th ta="right">
+                        {displayMode === "size" ? (
+                          <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />
+                        ) : (
+                          `${usagePercent(usage.usedBytes, usage.limitBytes)} %`
+                        )}
+                      </Table.Th>
                     </>
                   )}
                 </Table.Tr>
