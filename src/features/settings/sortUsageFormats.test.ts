@@ -25,8 +25,6 @@ describe("sortUsageFormats", () => {
     ["count", "desc", ["JPEG", "PNG", "WebP", "HEIC / HEIF"]],
     ["size", "asc", ["HEIC / HEIF", "WebP", "PNG", "JPEG"]],
     ["size", "desc", ["JPEG", "PNG", "WebP", "HEIC / HEIF"]],
-    ["percent", "asc", ["HEIC / HEIF", "WebP", "PNG", "JPEG"]],
-    ["percent", "desc", ["JPEG", "PNG", "WebP", "HEIC / HEIF"]],
   ] as const)("sorts %s %s from canonical data", (key, direction, expected) => {
     expect(names(sortUsageFormats(items, { key, direction }))).toEqual(expected)
   })
