@@ -43,13 +43,14 @@ export async function uploadMedia(
     )
   }
 
-  if (response.status !== 201) {
+  const status: number = response.status
+  if (status !== 201) {
     const failure = response.data as { error?: { code?: string; message?: string } }
     throw new MediaUploadError(
       failure?.error?.code ?? "UPLOAD_FAILED",
       failure?.error?.message ?? "アップロードに失敗しました",
-      response.status,
-      response.status === 502 || response.status === 504,
+      status,
+      status === 502 || status === 504,
     )
   }
 
