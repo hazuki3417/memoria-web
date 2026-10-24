@@ -86,7 +86,7 @@ type Story = StoryObj<typeof meta>
 // ST-01・ST-04・ST-08・FM-01・FM-05・UN-01・UI-04:
 // UIに渡された確定済み集計値の表示だけを保証し、Backendの集計処理は保証しない。
 export const ReadyValuesContract: Story = {
-  name: "Interaction · 使用量・内訳・合計の表示（ST-01/ST-04/ST-08/FM-01/FM-05/UN-01/UI-04）",
+  name: "Interaction · 使用量・内訳・合計の表示",
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -137,7 +137,7 @@ export const DefaultSortContract: Story = {
 // SO-01: API返却順が使用量順でなくても初期表示は正本byte数の降順になる。
 // Personal / Community共通Componentで同じ初期sort contractを確認する。
 export const ShuffledDefaultSortContract: Story = {
-  name: "Interaction · API順に依存しない初期使用量降順（SO-01）",
+  name: "Interaction · API順に依存しない初期使用量降順",
   tags: ["interaction"],
   args: {
     usage: {
@@ -162,7 +162,7 @@ export const ShuffledDefaultSortContract: Story = {
 
 // FM-06: format行にMedia選択・削除・変換のActionを提供しない。
 export const BreakdownReadOnlyContract: Story = {
-  name: "Interaction · 内訳に一括操作なし（FM-06）",
+  name: "Interaction · 内訳に一括操作なし",
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const table = within(canvasElement).getByRole("table")
@@ -177,7 +177,7 @@ export const BreakdownReadOnlyContract: Story = {
 
 // ST-03 / SS-05: 取得成功後の実値0はLoading / Errorと区別される。
 export const ZeroUsageContract: Story = {
-  name: "Interaction · 確定0件（ST-03/SS-05）",
+  name: "Interaction · 確定0件",
   tags: ["interaction"],
   args: { usage: zeroUsage },
   play: async ({ canvasElement }) => {
@@ -201,7 +201,7 @@ export const ZeroUsageContract: Story = {
 
 // ST-05 / SS-06: 使用率100%でも上限を越えた利用可能量を示さない。
 export const LimitReachedContract: Story = {
-  name: "Interaction · 上限到達（ST-05/SS-06）",
+  name: "Interaction · 上限到達",
   tags: ["interaction"],
   args: { usage: limitReachedUsage },
   play: async ({ canvasElement }) => {
@@ -216,7 +216,7 @@ export const LimitReachedContract: Story = {
 
 // UN-02: 非10進単位を使用し、正本のbyte値からGiBへ換算して表示。
 export const BinaryDisplayContract: Story = {
-  name: "Interaction · Binary換算（UN-02）",
+  name: "Interaction · Binary換算",
   tags: ["interaction"],
   args: { fileSizeUnit: "BINARY" },
   play: async ({ canvasElement }) => {
@@ -231,7 +231,7 @@ export const BinaryDisplayContract: Story = {
 // UN-03: ComponentへのPreference変更を反映しても件数・割合は不変。
 // Preferenceの保存・同期およびGraphQLでの再取得は本テストの対象外。
 export const UnitPreferenceChangeContract: Story = {
-  name: "Interaction · 表示単位切替（UN-03）",
+  name: "Interaction · 表示単位切替",
   tags: ["interaction"],
   render: () => <UnitPreferenceStory />,
   play: async ({ canvasElement }) => {
@@ -253,7 +253,7 @@ export const UnitPreferenceChangeContract: Story = {
 
 // SS-01: Loadingでは確定値を露出せず、空データと誤認させない。
 export const LoadingContract: Story = {
-  name: "Interaction · 未確定値を隠す（SS-01）",
+  name: "Interaction · 未確定値を隠す",
   tags: ["interaction"],
   args: { status: "loading" },
   play: async ({ canvasElement }) => {
@@ -294,7 +294,7 @@ export const ZeroSortContract: Story = {
 
 // Communityの表示差異のみ確認する。scopeがサーバーで隔離される保証ではない。
 export const CommunityDisplayContract: Story = {
-  name: "Interaction · Community Usage表示（ST-04/FM-01）",
+  name: "Interaction · Community Usage表示",
   tags: ["interaction"],
   args: { scope: "community" },
   play: async ({ canvasElement }) => {
@@ -331,7 +331,7 @@ export const DisplayModeSwitchContract: Story = {
 
 // SS-02/03: Errorは必ず再試行可能であり、操作後にReadyへ復旧する（API接続なし）。
 export const ErrorRetryContract: Story = {
-  name: "Interaction · 取得失敗と再試行（SS-02/SS-03）",
+  name: "Interaction · 取得失敗と再試行",
   tags: ["interaction"],
   render: () => <RetryContractStory scope="personal" />,
   play: async ({ canvasElement }) => {
@@ -348,7 +348,7 @@ export const ErrorRetryContract: Story = {
 
 // UI-14: 表示モードはコンポーネント存続中のみ保持し、別scopeへ持ち越さない。
 export const DisplayModeLifetimeContract: Story = {
-  name: "Interaction · 表示モードの初期値とscope間独立（UI-14）",
+  name: "Interaction · 表示モードの初期値とscope間独立",
   tags: ["interaction"],
   render: () => <ModeLifetimeContractStory />,
   play: async ({ canvasElement }) => {
@@ -372,7 +372,7 @@ export const VrtCommunity: Story = { name: "Visual · Community", tags: ["visual
 
 // SS-04: 再取得が再失敗してもEmptyではなくErrorと復旧Actionを維持する。
 export const ErrorRetryFailureContract: Story = {
-  name: "Interaction · 再試行後の再失敗（SS-04）",
+  name: "Interaction · 再試行後の再失敗",
   tags: ["interaction"],
   render: () => <RetryFailureContractStory scope="community" />,
   play: async ({ canvasElement }) => {
@@ -388,7 +388,7 @@ export const ErrorRetryFailureContract: Story = {
 
 // UI-06/07: 割合はscope上限を分母とし、上限・件数・列名は切り替わらない。
 export const PercentDenominatorContract: Story = {
-  name: "Interaction · 上限を分母とする割合表示（UI-06/UI-07）",
+  name: "Interaction · 上限を分母とする割合表示",
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -407,7 +407,7 @@ export const PercentDenominatorContract: Story = {
 
 // UI-11: 形式列と件数列の切替を実際の行順およびaria-sortで検証する。
 export const AllColumnsSortContract: Story = {
-  name: "Interaction · 全列ソートとaria-sort（UI-11）",
+  name: "Interaction · 全列ソートとaria-sort",
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -430,7 +430,7 @@ export const AllColumnsSortContract: Story = {
 
 // UI-08/UI-13: 操作モードはラベル付きでKeyboardから選択できる。
 export const KeyboardDisplayModeContract: Story = {
-  name: "Interaction · 表示切替のKeyboard操作（UI-08/UI-13）",
+  name: "Interaction · 表示切替のKeyboard操作",
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -448,7 +448,7 @@ export const KeyboardDisplayModeContract: Story = {
 
 // Usage UI: ErrorはCommunityでも必須のRetryを示し、正常値を誤表示しない。
 export const CommunityErrorContract: Story = {
-  name: "Interaction · Communityのエラー復旧UI（SS-02）",
+  name: "Interaction · Communityのエラー復旧UI",
   tags: ["interaction"],
   args: { scope: "community", status: "error", onRetry: () => undefined },
   play: async ({ canvasElement }) => {
