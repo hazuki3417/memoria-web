@@ -8,6 +8,8 @@ import {
   SegmentedControl,
   Stack,
   Text,
+  Tooltip,
+  VisuallyHidden,
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
@@ -19,6 +21,27 @@ import type { UsageDisplayMode } from "./usageDisplayMode"
 export type { SettingsUsageData } from "./usageTypes"
 import type { UsageSort, UsageSortKey } from "./sortUsageFormats"
 
+
+function HardDriveIcon() {
+  return (
+    <svg
+      width={18}
+      height={18}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 13h18" />
+      <circle cx="7" cy="16" r="0.8" fill="currentColor" stroke="none" />
+      <path d="M11 16h6" />
+    </svg>
+  )
+}
 
 function UsageErrorContent({ onRetry }: { onRetry?: () => void }) {
   return (
@@ -81,8 +104,28 @@ export function SettingsUsage({
             value={displayMode}
             onChange={(value) => setDisplayMode(value as UsageDisplayMode)}
             data={[
-              { label: "容量", value: "size" },
-              { label: "割合", value: "percent" },
+              {
+                value: "size",
+                label: (
+                  <Tooltip label="容量で表示" withArrow>
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                      <HardDriveIcon />
+                      <VisuallyHidden>容量</VisuallyHidden>
+                    </span>
+                  </Tooltip>
+                ),
+              },
+              {
+                value: "percent",
+                label: (
+                  <Tooltip label="割合で表示" withArrow>
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 18, fontWeight: 600 }}>
+                      <span aria-hidden="true">%</span>
+                      <VisuallyHidden>割合</VisuallyHidden>
+                    </span>
+                  </Tooltip>
+                ),
+              },
             ]}
           />
         </Group>
