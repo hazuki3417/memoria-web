@@ -40,7 +40,7 @@ const communityPreferences = (unit: "DECIMAL" | "BINARY") => ({
     data: {
       me: {
         id: "user-a",
-        profile: { nickname: "Visual · ユーザー" },
+        profile: { nickname: "ユーザー" },
         preferences: {
           personalAccentColor: "#0000FF",
           dateFormat: "YYYY_MM_DD",
