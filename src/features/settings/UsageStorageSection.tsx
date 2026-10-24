@@ -26,8 +26,8 @@ function StorageValue({
       aria-label={`${value} ${unit} ( ${percent} % )`}
       style={{
         display: "inline-grid",
-        gridTemplateColumns: "11ch 10ch",
-        columnGap: "var(--mantine-spacing-xs)",
+        gridTemplateColumns: "9ch 9ch",
+        columnGap: "4px",
         fontVariantNumeric: "tabular-nums",
       }}
     >
