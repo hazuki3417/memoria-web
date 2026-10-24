@@ -86,6 +86,32 @@ export const DefaultSortContract: Story = {
   },
 }
 
+// SO-01: API返却順が使用量順でなくても初期表示は正本byte数の降順になる。
+// Personal / Community共通Componentで同じ初期sort contractを確認する。
+export const ShuffledDefaultSortContract: Story = {
+  name: "Interaction · API順に依存しない初期使用量降順（SO-01）",
+  tags: ["interaction"],
+  args: {
+    usage: {
+      ...sampleUsage,
+      formatBreakdown: [
+        { format: "HEIC / HEIF", count: 48, sizeBytes: 40_000_000 },
+        { format: "WebP", count: 100, sizeBytes: 100_000_000 },
+        { format: "JPEG", count: 900, sizeBytes: 900_000_000 },
+        { format: "PNG", count: 200, sizeBytes: 200_000_000 },
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const table = within(canvasElement).getByRole("table")
+    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "descending")
+    const rows = within(table).getAllByRole("row").slice(1, 5)
+    for (const [index, format] of ["JPEG", "PNG", "WebP", "HEIC / HEIF"].entries()) {
+      await expect(rows[index]).toHaveTextContent(format)
+    }
+  },
+}
+
 // FM-06: format行にMedia選択・削除・変換のActionを提供しない。
 export const BreakdownReadOnlyContract: Story = {
   name: "Interaction · 内訳に一括操作なし（FM-06）",
