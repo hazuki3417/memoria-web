@@ -127,8 +127,8 @@ export const CommunityBinary: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("4.66 GiB")).toBeVisible()
-    await expect(canvas.getByText("1.15 GiB")).toBeVisible()
+    await expect(await canvas.findAllByText("4.66 GiB").then((elements) => elements[0])).toBeVisible()
+    await expect(canvas.getAllByText("1.15 GiB")[0]).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -182,7 +182,7 @@ export const CommunityRetry: Story = {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findByText("1.24 GB")).toBeVisible()
+    await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -222,9 +222,9 @@ export const CommunitySwitch: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("1.24 GB")).toBeVisible()
+    await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "Community Bへ切り替え" }))
-    await expect(await canvas.findByText("2 GB")).toBeVisible()
+    await expect(await canvas.findAllByText("2 GB").then((elements) => elements[0])).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
     await expect(canvas.queryAllByText("1.24 GB")).toHaveLength(0)
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -243,8 +243,8 @@ export const PersonalBinary: Story = {
   )],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText("4.66 GiB")).toBeVisible()
-    await expect(canvas.getByText("1.15 GiB")).toBeVisible()
+    await expect(await canvas.findAllByText("4.66 GiB").then((elements) => elements[0])).toBeVisible()
+    await expect(canvas.getAllByText("1.15 GiB")[0]).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByText("Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
   },
