@@ -39,6 +39,22 @@ function RetryContractStory({ scope }: { scope: "personal" | "community" }) {
   )
 }
 
+
+function RetryFailureContractStory({ scope }: { scope: "personal" | "community" }) {
+  const [retryCount, setRetryCount] = useState(0)
+  return (
+    <>
+      <span data-testid="retry-count">{retryCount}</span>
+      <SettingsUsage
+        usage={sampleUsage}
+        scope={scope}
+        status="error"
+        onRetry={() => setRetryCount((count) => count + 1)}
+      />
+    </>
+  )
+}
+
 function ModeLifetimeContractStory() {
   const [scope, setScope] = useState<"personal" | "community">("personal")
   return (
@@ -353,3 +369,61 @@ export const VrtLoading: Story = { name: "VRT · Loading", tags: ["vrt"], args: 
 export const VrtError: Story = { name: "VRT · Error / Retry", tags: ["vrt"], args: { status: "error", onRetry: () => undefined } }
 export const VrtLimit: Story = { name: "VRT · 上限到達", tags: ["vrt"], args: { usage: limitReachedUsage } }
 export const VrtCommunity: Story = { name: "VRT · Community", tags: ["vrt"], args: { scope: "community" } }
+
+// SS-04: 再取得が再失敗してもEmptyではなくErrorと復旧Actionを維持する。
+export const ErrorRetryFailureContract: Story = {
+  name: "Interaction · 再試行後の再失敗（SS-04）",
+  tags: ["interaction"],
+  render: () => <RetryFailureContractStory scope="community" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(canvas.getByTestId("retry-count")).toHaveTextContent("1")
+    await expect(canvas.getByRole("alert")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+  },
+}
+
+// UI-06/07: 割合はscope上限を分母とし、上限・件数・列名は切り替わらない。
+export const PercentDenominatorContract: Story = {
+  name: "Interaction · 上限を分母とする割合表示（UI-06/UI-07）",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const table = canvas.getByRole("table")
+    await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
+    await expect(canvas.getAllByText("24.8%").length).toBeGreaterThan(0)
+    for (const [format, percent] of [["JPEG", "18%"], ["PNG", "4%"], ["WebP", "2%"], ["HEIC / HEIF", "0.8%"]]) {
+      await expect(within(table).getByRole("row", { name: new RegExp(format.replace("/", "\\/")) })).toHaveTextContent(percent)
+    }
+    await expect(table).toHaveTextContent("1,248 件")
+    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toBeVisible()
+    await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
+    await expect(canvas.queryByText("割合はストレージ上限に対する値です。")).not.toBeInTheDocument()
+  },
+}
+
+// UI-11: 形式列と件数列の切替を実際の行順およびaria-sortで検証する。
+export const AllColumnsSortContract: Story = {
+  name: "Interaction · 全列ソートとaria-sort（UI-11）",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const table = canvas.getByRole("table")
+    const first = () => within(table).getAllByRole("row")[1]
+    await userEvent.click(canvas.getByRole("button", { name: "形式で並べ替え" }))
+    await expect(within(table).getByRole("columnheader", { name: "形式" })).toHaveAttribute("aria-sort", "ascending")
+    await expect(first()).toHaveTextContent("HEIC / HEIF")
+    await userEvent.click(canvas.getByRole("button", { name: "形式で並べ替え" }))
+    await expect(within(table).getByRole("columnheader", { name: "形式" })).toHaveAttribute("aria-sort", "descending")
+    await expect(first()).toHaveTextContent("WebP")
+    await userEvent.click(canvas.getByRole("button", { name: "登録件数で並べ替え" }))
+    await expect(within(table).getByRole("columnheader", { name: /登録件数/ })).toHaveAttribute("aria-sort", "ascending")
+    await expect(first()).toHaveTextContent("HEIC / HEIF")
+    await userEvent.click(canvas.getByRole("button", { name: "登録件数で並べ替え" }))
+    await expect(within(table).getByRole("columnheader", { name: /登録件数/ })).toHaveAttribute("aria-sort", "descending")
+    await expect(first()).toHaveTextContent("JPEG")
+  },
+}
