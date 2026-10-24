@@ -26,6 +26,7 @@ const meta = {
     usage: sampleUsage,
     status: "ready",
     fileSizeUnit: "DECIMAL",
+    displayMode: "size",
     sort: null,
     onSort: () => undefined,
   },
@@ -83,13 +84,14 @@ export const SortInteraction: Story = {
       usage={args.usage}
       status={args.status}
       fileSizeUnit={args.fileSizeUnit}
+      displayMode={args.displayMode}
     />
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const table = canvas.getByRole("table")
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
-    await expect(canvas.getAllByTestId("usage-sort-icon-none")).toHaveLength(4)
+    await expect(canvas.getAllByTestId("usage-sort-icon-none")).toHaveLength(3)
     await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
     await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute(
@@ -114,7 +116,13 @@ export const LoadingContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeDisabled()
-    await expect(canvas.getAllByRole("columnheader")).toHaveLength(4)
-    await expect(canvas.getAllByRole("row")).toHaveLength(5)
+    await expect(canvas.getAllByRole("columnheader")).toHaveLength(3)
+    await expect(canvas.getAllByRole("row")).toHaveLength(6)
   },
+}
+
+export const Percent: Story = {
+  name: "割合表示",
+  tags: ["visual"],
+  args: { displayMode: "percent" },
 }
