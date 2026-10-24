@@ -67,7 +67,7 @@ export async function uploadMedia(
       error?.code ?? "UPLOAD_FAILED",
       error?.message ?? "アップロードに失敗しました",
       response.status,
-      false,
+      response.status === 502 || response.status === 504,
     )
   }
 
