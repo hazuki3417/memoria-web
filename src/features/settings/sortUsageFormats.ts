@@ -6,6 +6,8 @@ export type UsageFormatItem = {
 
 export type UsageSortKey = "format" | "count" | "size"
 export type UsageSortDirection = "asc" | "desc"
+export const defaultUsageSort = { key: "size", direction: "desc" } as const
+
 export type UsageSort = {
   key: UsageSortKey
   direction: UsageSortDirection
@@ -18,11 +20,21 @@ export function nextUsageSort(current: UsageSort, key: UsageSortKey): UsageSort 
   return null
 }
 
+/** ソートなしと同値時の基準を、APIの返却順に依存させない。 */
+export function orderUsageFormats(items: readonly UsageFormatItem[]): UsageFormatItem[] {
+  const order = ["JPEG", "PNG", "WebP", "HEIC / HEIF"]
+  return [...items].sort((a, b) => {
+    const aIndex = order.indexOf(a.format)
+    const bIndex = order.indexOf(b.format)
+    return (aIndex < 0 ? order.length : aIndex) - (bIndex < 0 ? order.length : bIndex)
+  })
+}
+
 export function sortUsageFormats(
   items: readonly UsageFormatItem[],
   sort: UsageSort,
 ): UsageFormatItem[] {
-  const sorted = [...items]
+  const sorted = orderUsageFormats(items)
   if (!sort) return sorted
 
   const collator = new Intl.Collator("ja-JP", { numeric: true })
@@ -41,7 +53,7 @@ export function sortUsageFormats(
         break
     }
 
-    // 同値では0を返し、元の並び順を維持する（安定ソート）。
+    // 同値では0を返し、標準形式順を維持する（安定ソート）。
     return (sort.direction === "asc" ? 1 : -1) * result
   })
 }
