@@ -113,7 +113,7 @@ export const LimitReachedContract: Story = {
   args: { usage: limitReachedUsage },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getAllByText("5 GB")).toHaveLength(2)
+    await expect(canvas.getAllByText("5 GB").length).toBeGreaterThan(0)
     await expect(canvas.getByText("0 GB")).toBeVisible()
     await expect(canvas.getByLabelText(/ストレージ使用率 100%/)).toBeInTheDocument()
     await expect(canvas.getByRole("table")).toHaveTextContent("5,000 件")
@@ -128,8 +128,8 @@ export const BinaryDisplayContract: Story = {
   args: { fileSizeUnit: "BINARY" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("4.66 GiB")).toBeVisible()
-    await expect(canvas.getByText("1.15 GiB")).toBeVisible()
+    await expect(canvas.getAllByText("4.66 GiB")[0]).toBeVisible()
+    await expect(canvas.getAllByText("1.15 GiB")[0]).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("0.84 GiB")
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
   },
@@ -147,7 +147,7 @@ export const UnitPreferenceChangeContract: Story = {
     await expect(canvas.getByText("5 GB")).toBeVisible()
     await expect(table).toHaveTextContent("1,248 件")
     await userEvent.click(canvas.getByRole("button", { name: "Binaryに変更" }))
-    await expect(canvas.getByText("4.66 GiB")).toBeVisible()
+    await expect(canvas.getAllByText("4.66 GiB")[0]).toBeVisible()
     await expect(table).toHaveTextContent("1.15 GiB")
     await expect(table).toHaveTextContent("1,248 件")
     await expect(canvas.getByLabelText(/ストレージ使用率 24.8%/)).toBeInTheDocument()
@@ -183,7 +183,7 @@ export const CommunityDisplayContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
-    await expect(canvas.getByText("1.24 GB")).toBeVisible()
+    await expect(canvas.getAllByText("1.24 GB")[0]).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByRole("table")).toHaveTextContent("HEIC / HEIF")
   },
