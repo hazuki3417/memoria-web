@@ -15,9 +15,6 @@ export default defineConfig({
       target: "./src/infrastructure/openapi/generated/mediaUpload.ts",
       client: "fetch",
       mock: true,
-      override: {
-        fetch: { includeHttpResponseReturnType: false },
-      },
     },
   },
 })
