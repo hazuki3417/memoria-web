@@ -42,23 +42,22 @@ export const ReadyValuesContract: Story = {
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("1.24 GB ( 24.8 % )")).toBeVisible()
-    await expect(canvas.getByText("3.76 GB ( 75.2 % )")).toBeVisible()
-    await expect(canvas.getByText("5 GB ( 100 % )")).toBeVisible()
+    await expect(canvas.getAllByText("1.24 GB").length).toBeGreaterThan(0)
+    await expect(canvas.getByText("3.76 GB")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB").length).toBeGreaterThan(0)
     const table = canvas.getByRole("table")
     const rows = within(table).getAllByRole("row")
     await expect(rows).toHaveLength(6) // 1 header + 4 formats + 1 total
     const formats = [
-      ["JPEG", "900 件", "0.90 GB", "18 %"],
-      ["PNG", "200 件", "0.20 GB", "4 %"],
-      ["WebP", "100 件", "0.10 GB", "2 %"],
-      ["HEIC / HEIF", "48 件", "0.04 GB", "0.8 %"],
+      ["JPEG", "900 件", "0.90 GB"],
+      ["PNG", "200 件", "0.20 GB"],
+      ["WebP", "100 件", "0.10 GB"],
+      ["HEIC / HEIF", "48 件", "0.04 GB"],
     ]
-    for (const [name, count, size, percent] of formats) {
+    for (const [name, count, size] of formats) {
       const row = within(table).getByRole("row", { name: new RegExp(name.replace("/", "\\/")) })
       await expect(row).toHaveTextContent(count)
       await expect(row).toHaveTextContent(size)
-      await expect(row).toHaveTextContent(percent)
     }
     const footer = rows[5]
     await expect(footer).toHaveTextContent("合計")
@@ -90,8 +89,8 @@ export const ZeroUsageContract: Story = {
   args: { usage: zeroUsage },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("0 GB ( 0 % )")).toBeVisible()
-    await expect(canvas.getAllByText("5 GB ( 100 % )")).toHaveLength(2)
+    await expect(canvas.getAllByText("0 GB").length).toBeGreaterThan(0)
+    await expect(canvas.getByText("5 GB")).toBeVisible()
     const table = canvas.getByRole("table")
     const rows = within(table).getAllByRole("row")
     await expect(rows).toHaveLength(6)
@@ -99,7 +98,6 @@ export const ZeroUsageContract: Story = {
       const row = within(table).getByRole("row", { name: new RegExp(format.replace("/", "\\/")) })
       await expect(row).toHaveTextContent("0 件")
       await expect(row).toHaveTextContent("0 GB")
-      await expect(row).toHaveTextContent("0 %")
     }
     await expect(table).toHaveTextContent("合計")
     await expect(table).toHaveTextContent("0 件")
@@ -115,8 +113,8 @@ export const LimitReachedContract: Story = {
   args: { usage: limitReachedUsage },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getAllByText("5 GB ( 100 % )")).toHaveLength(2)
-    await expect(canvas.getByText("0 GB ( 0 % )")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB")).toHaveLength(2)
+    await expect(canvas.getByText("0 GB")).toHaveLength(3)
     await expect(canvas.getByLabelText(/ストレージ使用率 100%/)).toBeInTheDocument()
     await expect(canvas.getByRole("table")).toHaveTextContent("5,000 件")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -130,8 +128,8 @@ export const BinaryDisplayContract: Story = {
   args: { fileSizeUnit: "BINARY" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("4.66 GiB ( 100 % )")).toBeVisible()
-    await expect(canvas.getByText("1.15 GiB ( 24.8 % )")).toBeVisible()
+    await expect(canvas.getByText("4.66 GiB")).toBeVisible()
+    await expect(canvas.getByText("1.15 GiB")).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("0.84 GiB")
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
   },
@@ -146,15 +144,15 @@ export const UnitPreferenceChangeContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const table = canvas.getByRole("table")
-    await expect(canvas.getByText("5 GB ( 100 % )")).toBeVisible()
+    await expect(canvas.getByText("5 GB")).toBeVisible()
     await expect(table).toHaveTextContent("1,248 件")
     await userEvent.click(canvas.getByRole("button", { name: "Binaryに変更" }))
-    await expect(canvas.getByText("4.66 GiB ( 100 % )")).toBeVisible()
+    await expect(canvas.getByText("4.66 GiB")).toBeVisible()
     await expect(table).toHaveTextContent("1.15 GiB")
     await expect(table).toHaveTextContent("1,248 件")
     await expect(canvas.getByLabelText(/ストレージ使用率 24.8%/)).toBeInTheDocument()
     await userEvent.click(canvas.getByRole("button", { name: "Decimalに戻す" }))
-    await expect(canvas.getByText("5 GB ( 100 % )")).toBeVisible()
+    await expect(canvas.getByText("5 GB")).toBeVisible()
     await expect(table).toHaveTextContent("1.24 GB")
     await expect(table).toHaveTextContent("1,248 件")
   },
@@ -185,8 +183,29 @@ export const CommunityDisplayContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
-    await expect(canvas.getByText("1.24 GB ( 24.8 % )")).toBeVisible()
+    await expect(canvas.getByText("1.24 GB")).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByRole("table")).toHaveTextContent("HEIC / HEIF")
+  },
+}
+
+// 容量と割合をページ全体で切り替え、内訳の列数・ソート状態を維持する。
+export const DisplayModeSwitchContract: Story = {
+  name: "Interaction · 容量／割合の一括切替",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const table = canvas.getByRole("table")
+    await expect(canvas.getAllByText("1.24 GB").length).toBeGreaterThan(0)
+    await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
+    await expect(canvas.getByText("24.8 %")).toBeVisible()
+    await expect(within(table).getByRole("columnheader", { name: /割合/ })).toBeVisible()
+    await expect(within(table).getAllByRole("row")).toHaveLength(6)
+    await expect(canvas.getByText("5 GB")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "割合で並べ替え" }))
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
+    await userEvent.click(canvas.getByRole("radio", { name: "容量" }))
+    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "ascending")
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
   },
 }
