@@ -34,6 +34,7 @@ function HardDriveIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      style={{ display: "block", transform: "translateY(1px)" }}
     >
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="M3 13h18" />
