@@ -18,30 +18,30 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Unsorted: Story = {
-  name: "未ソート",
+  name: "Visual · 未ソート",
   tags: ["visual"],
 }
 
 export const Ascending: Story = {
-  name: "昇順",
+  name: "Visual · 昇順",
   tags: ["visual"],
   args: { direction: "asc" },
 }
 
 export const Descending: Story = {
-  name: "降順",
+  name: "Visual · 降順",
   tags: ["visual"],
   args: { direction: "desc" },
 }
 
 export const LeftAligned: Story = {
-  name: "形式列（左揃え）",
+  name: "Visual · 形式列（左揃え）",
   tags: ["visual"],
   args: { label: "形式", align: "left" },
 }
 
 export const Disabled: Story = {
-  name: "Loading時の操作不可",
+  name: "Visual · Loading時の操作不可",
   tags: ["visual"],
   args: { disabled: true },
 }
@@ -52,7 +52,7 @@ export const IconContract: Story = {
   args: { direction: "asc" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "Visual · 使用量で並べ替え" })).toBeEnabled()
     await expect(canvas.getByTestId("usage-sort-icon-asc")).toHaveAttribute("aria-hidden", "true")
     await expect(canvas.queryByText("▲")).not.toBeInTheDocument()
   },
@@ -64,7 +64,7 @@ export const KeyboardContract: Story = {
   args: { direction: "desc" },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
-    const button = canvas.getByRole("button", { name: "使用量で並べ替え" })
+    const button = canvas.getByRole("button", { name: "Visual · 使用量で並べ替え" })
     button.focus()
     await expect(button).toHaveFocus()
     await userEvent.keyboard("{Enter}")
