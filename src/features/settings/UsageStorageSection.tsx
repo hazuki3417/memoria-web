@@ -60,14 +60,14 @@ export function UsageStorageSection({
             size="md"
             aria-label={`ストレージ使用率 ${usagePercent(usage.usedBytes, usage.limitBytes)}%、ファイル形式別内訳`}
           >
-            {usage.formatBreakdown && sortUsageFormats(usage.formatBreakdown, defaultUsageSort).map((item) => (
+            {(usage.formatBreakdown && sortUsageFormats(usage.formatBreakdown, defaultUsageSort).map((item) => (
               <Progress.Section
                 key={item.format}
                 value={usagePercent(item.sizeBytes, usage.limitBytes)}
                 color={formatColors[item.format] ?? "gray"}
                 aria-label={`${item.format} ${usagePercent(item.sizeBytes, usage.limitBytes)}%`}
               />
-            )) ?? (
+            ))) ?? (
               <Progress.Section
                 value={usagePercent(usage.usedBytes, usage.limitBytes)}
                 color="blue"
