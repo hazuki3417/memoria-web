@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import {
   CommunityUsageDocument,
+  CurrentUserDocument,
   PersonalUsageDocument,
 } from "@/infrastructure/graphql/generated"
 import { ConnectedUsage } from "./ConnectedUsage"
@@ -31,6 +32,27 @@ const communityFailure = {
   error: new Error("Usage取得失敗"),
 }
 
+const communityPreferences = (unit: "DECIMAL" | "BINARY") => ({
+  request: { query: CurrentUserDocument },
+  result: {
+    data: {
+      me: {
+        id: "user-a",
+        profile: { nickname: "ユーザー" },
+        preferences: {
+          personalAccentColor: "#0000FF",
+          dateFormat: "YYYY_MM_DD",
+          fileSizeUnit: unit,
+          mediaThumbnailSize: "MEDIUM",
+          mediaDetailNavigationWrap: false,
+          mediaDetailInitialInfoWide: true,
+          mediaDetailInitialInfoMedium: false,
+        },
+      },
+    },
+  },
+})
+
 const personalSuccess = {
   request: { query: PersonalUsageDocument },
   result: {
@@ -57,7 +79,7 @@ export const CommunityReady: Story = {
   name: "Integration · Communityの取得成功",
   tags: ["interaction"],
   decorators: [(Story) => (
-    <MockedProvider mocks={[communitySuccess]} addTypename={false}>
+    <MockedProvider mocks={[communitySuccess, communityPreferences("DECIMAL")]} addTypename={false}>
       <Story />
     </MockedProvider>
   )],
@@ -66,6 +88,23 @@ export const CommunityReady: Story = {
     await expect(await canvas.findByText("1.24 GB ( 24.8 % )")).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByRole("table")).toHaveTextContent("HEIC / HEIF")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+// UN-02: Community Usageも現在のUser Preferencesに従いBinaryで表示する。
+export const CommunityBinary: Story = {
+  name: "Integration · CommunityのBinary表示",
+  tags: ["interaction"],
+  decorators: [(Story) => (
+    <MockedProvider mocks={[communitySuccess, communityPreferences("BINARY")]} addTypename={false}>
+      <Story />
+    </MockedProvider>
+  )],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText("4.66 GiB ( 100 % )")).toBeVisible()
+    await expect(canvas.getByText("1.15 GiB ( 24.8 % )")).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -88,7 +127,7 @@ export const CommunityEmpty: Story = {
           },
         },
       },
-    }]} addTypename={false}>
+    }, communityPreferences("DECIMAL")]} addTypename={false}>
       <Story />
     </MockedProvider>
   )],
@@ -105,7 +144,7 @@ export const CommunityRetry: Story = {
   name: "Integration · Errorから再取得成功",
   tags: ["interaction"],
   decorators: [(Story) => (
-    <MockedProvider mocks={[communityFailure, communitySuccess]} addTypename={false}>
+    <MockedProvider mocks={[communityFailure, communitySuccess, communityPreferences("DECIMAL")]} addTypename={false}>
       <Story />
     </MockedProvider>
   )],
@@ -123,7 +162,7 @@ export const CommunityRetryFailure: Story = {
   name: "Integration · 再試行して再失敗",
   tags: ["interaction"],
   decorators: [(Story) => (
-    <MockedProvider mocks={[communityFailure, communityFailure]} addTypename={false}>
+    <MockedProvider mocks={[communityFailure, communityFailure, communityPreferences("DECIMAL")]} addTypename={false}>
       <Story />
     </MockedProvider>
   )],
