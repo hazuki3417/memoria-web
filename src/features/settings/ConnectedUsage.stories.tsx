@@ -1,4 +1,6 @@
 import { MockedProvider } from "@apollo/client/testing"
+import { Button } from "@mantine/core"
+import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import {
@@ -64,6 +66,28 @@ const personalSuccess = {
       },
     },
   },
+}
+
+// NV-04: 同一画面でCommunity IDが変わっても別Communityの集計値を表示しない。
+function CommunitySwitchScenario() {
+  const [communityId, setCommunityId] = useState("club-a")
+  return (
+    <>
+      <Button onClick={() => setCommunityId("club-b")}>Community Bへ切り替え</Button>
+      <ConnectedUsage scope="community" communityId={communityId} />
+    </>
+  )
+}
+
+const otherCommunityUsage = {
+  mediaCount: 1,
+  storage: { usedBytes: "2000000000", effectiveLimitBytes: "5000000000" },
+  formatBreakdown: [
+    { format: "JPEG", mediaCount: 1, usedBytes: "2000000000" },
+    { format: "PNG", mediaCount: 0, usedBytes: "0" },
+    { format: "WEBP", mediaCount: 0, usedBytes: "0" },
+    { format: "HEIF", mediaCount: 0, usedBytes: "0" },
+  ],
 }
 
 const meta = {
@@ -172,6 +196,32 @@ export const CommunityRetryFailure: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(await canvas.findByRole("alert")).toBeVisible()
     await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
+  },
+}
+
+// NV-04: Communityを切り替えたときApolloがIDに対応するUsageだけを表示する。
+export const CommunitySwitch: Story = {
+  name: "Integration · Community AからBへの切り替え",
+  tags: ["interaction"],
+  render: () => <CommunitySwitchScenario />,
+  decorators: [(Story) => (
+    <MockedProvider mocks={[
+      communitySuccess,
+      { request: { query: CommunityUsageDocument, variables: { communityId: "club-b" } },
+        result: { data: { communityUsage: otherCommunityUsage } } },
+      communityPreferences("DECIMAL"),
+    ]} addTypename={false}>
+      <Story />
+    </MockedProvider>
+  )],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText("1.24 GB ( 24.8 % )")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "Community Bへ切り替え" }))
+    await expect(await canvas.findByText("2 GB ( 40 % )")).toBeVisible()
+    await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
+    await expect(canvas.queryByText("1.24 GB ( 24.8 % )")).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
 
