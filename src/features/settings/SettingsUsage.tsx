@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { IconDeviceHdd, IconPercentage } from "@tabler/icons-react"
 import {
   Box,
   Button,
@@ -21,28 +22,6 @@ import type { UsageDisplayMode } from "./usageDisplayMode"
 export type { SettingsUsageData } from "./usageTypes"
 import type { UsageSort, UsageSortKey } from "./sortUsageFormats"
 
-
-function HardDriveIcon() {
-  return (
-    <svg
-      width={18}
-      height={18}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      style={{ display: "block", transform: "translateY(1px)" }}
-    >
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="M3 13h18" />
-      <circle cx="7" cy="16" r="0.8" fill="currentColor" stroke="none" />
-      <path d="M11 16h6" />
-    </svg>
-  )
-}
 
 function UsageErrorContent({ onRetry }: { onRetry?: () => void }) {
   return (
@@ -110,7 +89,7 @@ export function SettingsUsage({
                 label: (
                   <Tooltip label="容量で表示" withArrow>
                     <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-                      <HardDriveIcon />
+                      <IconDeviceHdd size={18} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
                       <VisuallyHidden>容量</VisuallyHidden>
                     </span>
                   </Tooltip>
@@ -120,8 +99,8 @@ export function SettingsUsage({
                 value: "percent",
                 label: (
                   <Tooltip label="割合で表示" withArrow>
-                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 18, fontWeight: 600 }}>
-                      <span aria-hidden="true">%</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 18 }}>
+                      <IconPercentage size={18} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
                       <VisuallyHidden>割合</VisuallyHidden>
                     </span>
                   </Tooltip>
