@@ -164,7 +164,7 @@ export const CommunityEmpty: Story = {
       await expect(row).toHaveTextContent("0 件")
       await expect(row).toHaveTextContent("0 GB")
     }
-    await expect(canvas.getByText("5 GB")).toBeVisible()
+    await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
