@@ -77,7 +77,7 @@ export function UsageFormatBreakdownSection({
                   {sortHeader("count", "登録件数")}
                 </Table.Th>
                 <Table.Th ta="right" aria-sort={ariaSort("size")}>
-                  {sortHeader("size", displayMode === "size" ? "使用量" : "割合")}
+                  {sortHeader("size", "使用量")}
                 </Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -150,11 +150,6 @@ export function UsageFormatBreakdownSection({
               </Table.Tfoot>
             )}
           </Table>
-          {status === "ready" && displayMode === "percent" && (
-            <Text size="xs" c="dimmed" mt="xs">
-              割合はストレージ上限に対する値です。
-            </Text>
-          )}
         </Box>
       )}
     </>
