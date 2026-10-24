@@ -181,7 +181,7 @@ export const CommunityRetry: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
-    await userEvent.click(canvas.getByRole("button", { name: "Visual · 再試行" }))
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
@@ -199,9 +199,9 @@ export const CommunityRetryFailure: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "Visual · 再試行" }))
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(await canvas.findByRole("alert")).toBeVisible()
-    await expect(canvas.getByRole("button", { name: "Visual · 再試行" })).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
   },
 }
 
@@ -223,7 +223,7 @@ export const CommunitySwitch: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "Visual · Community Bへ切り替え" }))
+    await userEvent.click(canvas.getByRole("button", { name: "Community Bへ切り替え" }))
     await expect(await canvas.findAllByText("2 GB").then((elements) => elements[0])).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
     await expect(canvas.queryAllByText("1.24 GB")).toHaveLength(0)
