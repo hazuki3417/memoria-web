@@ -21,6 +21,30 @@ export const Ready: Story = {
   tags: ["visual"],
 }
 
+// APIが返した順序に関係なく、Storageバーの各形式は使用量降順。
+const reorderedUsage = {
+  ...sampleUsage,
+  formatBreakdown: [
+    { format: "JPEG", count: 900, sizeBytes: 40_000_000 },
+    { format: "WebP", count: 100, sizeBytes: 100_000_000 },
+    { format: "PNG", count: 200, sizeBytes: 200_000_000 },
+    { format: "HEIC / HEIF", count: 48, sizeBytes: 900_000_000 },
+  ],
+}
+
+export const ProgressOrderContract: Story = {
+  name: "Interaction · Storageバーは使用量降順",
+  tags: ["interaction"],
+  args: { usage: reorderedUsage },
+  play: async ({ canvasElement }) => {
+    const names = Array.from(canvasElement.querySelectorAll("[aria-label]"))
+      .map((element) => element.getAttribute("aria-label"))
+      .filter((label) => label && /^(JPEG|PNG|WebP|HEIC \/ HEIF) /.test(label))
+      .map((label) => label?.split(" ")[0])
+    await expect(names).toEqual(["HEIC", "PNG", "WebP", "JPEG"])
+  },
+}
+
 export const ReadyCompact: Story = {
   name: "Ready（Compact）",
   tags: ["visual"],
