@@ -112,7 +112,7 @@ export function UsageFormatBreakdownSection({
                     {displayMode === "size" ? (
                       <UsageFileSize bytes={item.sizeBytes} fileSizeUnit={fileSizeUnit} />
                     ) : (
-                      `${usagePercent(item.sizeBytes, usage.limitBytes)} %`
+                      `${usagePercent(item.sizeBytes, usage.limitBytes)}%`
                     )}
                   </Table.Td>
                 </Table.Tr>
@@ -141,7 +141,7 @@ export function UsageFormatBreakdownSection({
                         {displayMode === "size" ? (
                           <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />
                         ) : (
-                          `${usagePercent(usage.usedBytes, usage.limitBytes)} %`
+                          `${usagePercent(usage.usedBytes, usage.limitBytes)}%`
                         )}
                       </Table.Th>
                     </>
