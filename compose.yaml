@@ -1,6 +1,6 @@
 services:
   vrt:
-    image: ${MEMORIA_VRT_IMAGE:-mcr.microsoft.com/playwright:v1.62.1-noble}
+    image: ${MEMORIA_VRT_IMAGE:-mcr.microsoft.com/playwright:v1.64.1-noble}
     profiles: [vrt]
     init: true
     ipc: host
@@ -15,7 +15,7 @@ services:
     command:
       - |
         node -e 'if (Number(process.versions.node.split(".")[0]) !== 24) { console.error("VRT requires Node.js 24; got " + process.version); process.exit(1) }'
-        node -e 'const lock = require("./package-lock.json"); if (lock.packages["node_modules/playwright"].version !== "1.62.1") { console.error("VRT requires Playwright 1.62.1"); process.exit(1) }'
+        node -e 'const lock = require("./package-lock.json"); if (lock.packages["node_modules/playwright"].version !== "1.64.1") { console.error("VRT requires Playwright 1.64.1"); process.exit(1) }'
         # Named volumes are initialized as root. The official Playwright image runs as root by default.
         npm ci
         npm run "test:visual$${VRT_UPDATE:+:update}"
