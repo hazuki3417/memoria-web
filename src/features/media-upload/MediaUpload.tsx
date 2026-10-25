@@ -24,7 +24,8 @@ import {
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { uploadMedia, uploadMediaBatch, MediaUploadError } from "./uploadMedia"
 import { FeedbackAlert } from "@/components/Feedback"
 import {
   MediaTagBulkEditor,
@@ -65,6 +66,8 @@ type UploadFile = {
   status: FileStatus
   reason?: string
   tags: string[]
+  original?: File
+  idempotencyKey?: string
 }
 
 const fixtures: Record<
@@ -353,6 +356,52 @@ export function MediaUpload({
       .map((file) => file.id),
   )
   const [bulkTag, setBulkTag] = useState("")
+  const fileInput = useRef<HTMLInputElement>(null)
+  const [sending, setSending] = useState(false)
+  const addFiles = (added: FileList | File[]) => {
+    const remaining = Math.max(0, 100 - files.length)
+    const newFiles: UploadFile[] = Array.from(added).slice(0, remaining).map((file) => {
+      const validType = /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name)
+      const validSize = file.size > 0 && file.size <= 128 * 1024 * 1024
+      return {
+        id: crypto.randomUUID(),
+        name: file.name,
+        size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
+        status: validType && validSize ? "ready" : "validation-error",
+        reason: !validType ? "対応していない画像形式です" : !validSize ? "ファイルサイズが128 MiBを超えているか、空のファイルです" : undefined,
+        tags: [],
+        original: file,
+        idempotencyKey: crypto.randomUUID(),
+      }
+    })
+    setFiles((current) => [...current, ...newFiles])
+    setSelectedIds((current) => [...current, ...newFiles.filter((file) => file.status === "ready").map((file) => file.id)])
+  }
+  const startUpload = async () => {
+    const targets = files.filter((file) => selectedIds.includes(file.id) && file.original && selectableStatuses.includes(file.status))
+    if (targets.length === 0 || sending) return
+    setSending(true)
+    await uploadMediaBatch(targets, async (item) => {
+      setFiles((current) => current.map((file) => file.id === item.id ? { ...file, status: "uploading" as const } : file))
+      try {
+        await uploadMedia(
+          item.original!,
+          context === "personal" ? { scopeType: "PERSONAL" } : { scopeType: "COMMUNITY", communityId },
+          item.idempotencyKey!,
+        )
+        setFiles((current) => current.map((file) => file.id === item.id ? { ...file, status: "processing" as const } : file))
+      } catch (error) {
+        const unknown = error instanceof MediaUploadError && error.resultUnknown
+        const rejected = error instanceof MediaUploadError && [400, 401, 403, 404, 409, 413, 415].includes(error.status)
+        setFiles((current) => current.map((file) => file.id === item.id ? {
+          ...file, status: (unknown ? "result-unknown" : rejected ? "upload-rejected" : "upload-failed") as FileStatus,
+          reason: error instanceof Error ? error.message : "アップロードに失敗しました",
+        } : file))
+      }
+    })
+    setSending(false)
+    setSelectedIds([])
+  }
   const currentContext = contexts[context]
 
   const selectableFiles = files.filter((file) =>
@@ -417,7 +466,23 @@ export function MediaUpload({
     <>
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
+          <input
+            ref={fileInput}
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp,.heic,.heif"
+            multiple
+            hidden
+            onChange={(event) => {
+              if (event.target.files) addFiles(event.target.files)
+              event.target.value = ""
+            }}
+          />
           <Paper
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault()
+              if (event.dataTransfer.files) addFiles(event.dataTransfer.files)
+            }}
             withBorder
             radius="md"
             p={files.length === 0 ? "xl" : "md"}
@@ -441,7 +506,7 @@ export function MediaUpload({
                   JPEG / PNG / WebP / HEIC・HEIF ・ 最大100件 ・ 1件128 MiBまで
                 </Text>
               </Box>
-              <Button variant="default" size="sm">
+              <Button variant="default" size="sm" onClick={() => fileInput.current?.click()}>
                 ファイルを選択
               </Button>
             </Stack>
@@ -626,7 +691,7 @@ export function MediaUpload({
                 Media Browserへ戻る
               </Button>
             ) : (
-              <Button disabled={activeUpload || selectedFiles.length === 0}>
+              <Button onClick={startUpload} disabled={sending || activeUpload || selectedFiles.length === 0}>
                 {activeUpload ? "アップロード中" : "アップロード"}
               </Button>
             )}
