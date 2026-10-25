@@ -6,6 +6,7 @@ import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
 import { FeedbackAlert } from "@/components/Feedback"
+import { applyMediaTagDraftAction } from "@/components/MediaTagEditor/mediaTagDraft"
 import {
   MediaTagBulkEditor,
   MediaTagEditorList,
@@ -137,18 +138,9 @@ export function MediaUpdate({
                           unavailable.has(item.id)
                         )
                           return item
-                        if (action === "replace")
-                          return { ...item, tags: [tag] }
-                        if (action === "remove")
-                          return {
-                            ...item,
-                            tags: item.tags.filter((value) => value !== tag),
-                          }
                         return {
                           ...item,
-                          tags: item.tags.includes(tag)
-                            ? item.tags
-                            : [...item.tags, tag],
+                          tags: applyMediaTagDraftAction(item.tags, tag, action),
                         }
                       }),
                     )
