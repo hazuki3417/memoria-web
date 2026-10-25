@@ -54,7 +54,9 @@ export async function uploadMedia(
     )
   }
 
-  const receipt = response.data
+  // The generated response union is not narrowed through the numeric status alias.
+  // Validate the receipt at runtime before returning it.
+  const receipt = response.data as MediaUploadReceipt
   if (typeof receipt?.mediaId !== "string" || receipt.processingStatus !== "PROCESSING") {
     throw new MediaUploadError("RESULT_UNKNOWN", "Uploadの受付結果を確認できません", response.status, true)
   }
