@@ -1,10 +1,10 @@
 import { PageWidth } from "@/components/PageWidth/PageWidth"
-import { Dashboard } from "@/features/dashboard/Dashboard"
+import { DashboardContainer } from "@/features/dashboard/DashboardContainer"
 
 export default function Page() {
   return (
     <PageWidth variant="contained">
-      <Dashboard />
+      <DashboardContainer />
     </PageWidth>
   )
 }

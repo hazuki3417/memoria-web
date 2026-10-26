@@ -929,6 +929,20 @@ export type OperationCommunityUsageQueryVariables = Exact<{
 
 export type OperationCommunityUsageQuery = { communityUsage: { mediaCount: number, storage: { usedBytes: string, effectiveLimitBytes: string }, formatBreakdown: Array<{ format: OperationOriginalImageFormat, mediaCount: number, usedBytes: string }> } };
 
+export type OperationDashboardRecentMediaQueryVariables = Exact<{
+  scope: OperationScopeInput;
+}>;
+
+
+export type OperationDashboardRecentMediaQuery = { mediaList: { edges: Array<{ node: { id: string, image: { variants: Array<{ url: string, width: number }> } | null } }> } };
+
+export type OperationDashboardRecentGroupsQueryVariables = Exact<{
+  scope: OperationScopeInput;
+}>;
+
+
+export type OperationDashboardRecentGroupsQuery = { mediaGroups: { edges: Array<{ node: { id: string, name: string, media: { edges: Array<{ node: { id: string, image: { variants: Array<{ url: string, width: number }> } | null } }>, pageInfo: { hasNextPage: boolean } } } }> } };
+
 export type OperationGroupBrowserGroupFragment = { id: string, name: string, stateToken: string, createdAt: string };
 
 export type OperationBrowseGroupsQueryVariables = Exact<{
@@ -1504,6 +1518,123 @@ export type CommunityUsageQueryHookResult = ReturnType<typeof useCommunityUsageQ
 export type CommunityUsageLazyQueryHookResult = ReturnType<typeof useCommunityUsageLazyQuery>;
 export type CommunityUsageSuspenseQueryHookResult = ReturnType<typeof useCommunityUsageSuspenseQuery>;
 export type CommunityUsageQueryResult = Apollo.QueryResult<OperationCommunityUsageQuery, OperationCommunityUsageQueryVariables>;
+export const DashboardRecentMediaDocument = gql`
+    query DashboardRecentMedia($scope: ScopeInput!) {
+  mediaList(scope: $scope, first: 32) {
+    edges {
+      node {
+        id
+        image {
+          variants {
+            url
+            width
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useDashboardRecentMediaQuery__
+ *
+ * To run a query within a React component, call `useDashboardRecentMediaQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDashboardRecentMediaQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDashboardRecentMediaQuery({
+ *   variables: {
+ *      scope: // value for 'scope'
+ *   },
+ * });
+ */
+export function useDashboardRecentMediaQuery(baseOptions: Apollo.QueryHookOptions<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables> & ({ variables: OperationDashboardRecentMediaQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>(DashboardRecentMediaDocument, options);
+      }
+export function useDashboardRecentMediaLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>(DashboardRecentMediaDocument, options);
+        }
+// @ts-ignore
+export function useDashboardRecentMediaSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>): Apollo.UseSuspenseQueryResult<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>;
+export function useDashboardRecentMediaSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>): Apollo.UseSuspenseQueryResult<OperationDashboardRecentMediaQuery | undefined, OperationDashboardRecentMediaQueryVariables>;
+export function useDashboardRecentMediaSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>(DashboardRecentMediaDocument, options);
+        }
+export type DashboardRecentMediaQueryHookResult = ReturnType<typeof useDashboardRecentMediaQuery>;
+export type DashboardRecentMediaLazyQueryHookResult = ReturnType<typeof useDashboardRecentMediaLazyQuery>;
+export type DashboardRecentMediaSuspenseQueryHookResult = ReturnType<typeof useDashboardRecentMediaSuspenseQuery>;
+export type DashboardRecentMediaQueryResult = Apollo.QueryResult<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>;
+export const DashboardRecentGroupsDocument = gql`
+    query DashboardRecentGroups($scope: ScopeInput!) {
+  mediaGroups(scope: $scope, sort: CREATED_AT_DESC, first: 6) {
+    edges {
+      node {
+        id
+        name
+        media(first: 4) {
+          edges {
+            node {
+              id
+              image {
+                variants {
+                  url
+                  width
+                }
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useDashboardRecentGroupsQuery__
+ *
+ * To run a query within a React component, call `useDashboardRecentGroupsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDashboardRecentGroupsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDashboardRecentGroupsQuery({
+ *   variables: {
+ *      scope: // value for 'scope'
+ *   },
+ * });
+ */
+export function useDashboardRecentGroupsQuery(baseOptions: Apollo.QueryHookOptions<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables> & ({ variables: OperationDashboardRecentGroupsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>(DashboardRecentGroupsDocument, options);
+      }
+export function useDashboardRecentGroupsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>(DashboardRecentGroupsDocument, options);
+        }
+// @ts-ignore
+export function useDashboardRecentGroupsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>): Apollo.UseSuspenseQueryResult<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>;
+export function useDashboardRecentGroupsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>): Apollo.UseSuspenseQueryResult<OperationDashboardRecentGroupsQuery | undefined, OperationDashboardRecentGroupsQueryVariables>;
+export function useDashboardRecentGroupsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>(DashboardRecentGroupsDocument, options);
+        }
+export type DashboardRecentGroupsQueryHookResult = ReturnType<typeof useDashboardRecentGroupsQuery>;
+export type DashboardRecentGroupsLazyQueryHookResult = ReturnType<typeof useDashboardRecentGroupsLazyQuery>;
+export type DashboardRecentGroupsSuspenseQueryHookResult = ReturnType<typeof useDashboardRecentGroupsSuspenseQuery>;
+export type DashboardRecentGroupsQueryResult = Apollo.QueryResult<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>;
 export const BrowseGroupsDocument = gql`
     query BrowseGroups($scope: ScopeInput!, $search: String, $sort: MediaGroupSort! = NAME_ASC, $first: Int, $after: String) {
   mediaGroups(
