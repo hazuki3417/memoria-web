@@ -1,5 +1,5 @@
 import { PageWidth } from "@/components/PageWidth/PageWidth"
-import { Dashboard } from "@/features/dashboard/Dashboard"
+import { DashboardContainer } from "@/features/dashboard/DashboardContainer"
 
 export default async function Page({
   params,
@@ -9,7 +9,7 @@ export default async function Page({
   const { communityId } = await params
   return (
     <PageWidth variant="contained">
-      <Dashboard contextKind="community" communityId={communityId} />
+      <DashboardContainer contextKind="community" communityId={communityId} />
     </PageWidth>
   )
 }
