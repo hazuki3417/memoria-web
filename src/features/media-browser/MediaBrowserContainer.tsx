@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { MediaBrowser } from "./MediaBrowser"
 import { selectBrowserThumbnail } from "./selectBrowserThumbnail"
+import { resolveTagFilter } from "./resolveTagFilter"
 import type { MediaItem } from "@/features/media-detail"
 
 // API-side scope is authoritative; the Web never sends user IDs for Personal.
@@ -114,14 +115,14 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
       setTagError("Tagの取得が完了していません。再度お試しください。")
       return
     }
-    const resolved = names.map(name => tagsByName.get(name))
-    if (resolved.some(id => !id)) {
-      setTagError("現在の範囲に存在するTagを選択してください。")
+    const resolution = resolveTagFilter(names, (tagsPage?.edges ?? []).map(edge => edge.node))
+    if (!resolution.ok) {
+      setTagError("現在の範囲に存在するTagを重複なく選択してください。")
       return
     }
     setTagError(null)
-    setAppliedFilter({ scopeKey, tagIds: [...new Set(resolved as string[])] })
-  }, [scopeKey, allTagsLoaded, tagsByName])
+    setAppliedFilter({ scopeKey, tagIds: resolution.tagIds })
+  }, [scopeKey, allTagsLoaded, tagsPage])
 
   const query = useQuery<ListResult>(MEDIA_LIST, {
     variables: { scope, filter: { tagIds: selectedTagIds }, first: 50 },
