@@ -344,7 +344,7 @@ export function AccountDeletionFlow({
                   setStep(0)
                 }}>最初に戻る</Button>
               </Stack>
-            ) : {cancelled || confirmed || deletionPending ? (
+            ) : cancelled || confirmed || deletionPending ? (
               <Stack gap="lg" maw={600} mx="auto" w="100%" py="xl">
                 {deletionPending ? (
                   <>
