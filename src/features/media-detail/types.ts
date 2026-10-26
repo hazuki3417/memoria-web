@@ -3,4 +3,6 @@ export type MediaItem = {
   label: string
   src: string
   failed?: boolean
+  processing?: boolean
+  variants?: { width: number; url: string }[]
 }

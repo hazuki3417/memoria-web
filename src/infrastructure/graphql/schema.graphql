@@ -164,6 +164,9 @@ type MediaUploader {
   nickname: String
   deleted: Boolean!
 }
+# Variants can be empty while Processing is pending or has failed.
+# Clients select a suitable width; array order is not a thumbnail priority.
+# Variant URL is an authorized, browser-reachable URL, never a storage key.
 type Image { width: Int! height: Int! variants: [ImageVariant!]! }
 type ImageVariant {
   id: ID!
@@ -176,6 +179,9 @@ type ImageVariant {
 type MediaProcessing { status: ProcessingStatus! }
 type MediaEdge { cursor: String! node: Media! }
 type MediaConnection { edges: [MediaEdge!]! pageInfo: PageInfo! }
+# Tag IDs are scoped to the requested ScopeInput. Empty means no filtering;
+# invalid, duplicated, or cross-scope IDs are VALIDATION, not empty results.
+# Multiple IDs combine with AND semantics.
 input MediaFilterInput { tagIds: [ID!] }
 extend type Query {
   media(id: ID!): Media
@@ -184,6 +190,9 @@ extend type Query {
 type MediaTag { id: ID! name: String! }
 type MediaTagEdge { cursor: String! node: MediaTag! }
 type MediaTagConnection { edges: [MediaTagEdge!]! pageInfo: PageInfo! }
+extend type Query {
+  mediaTags(scope: ScopeInput!, search: String, first: Int, after: String, last: Int, before: String): MediaTagConnection!
+}
 
 # Source of Truth: memoria-design/content/system/api/graphql.mdx#group
 type MediaGroup {
@@ -315,6 +324,11 @@ type UpdateMediaGroupPayload {
   group: MediaGroup!
 }
 
+input AddMediaToGroupsInput {
+  groupIds: [ID!]!
+  mediaIds: [ID!]!
+}
+
 input ChangeMediaGroupClassificationInput {
   groupId: ID!
   mediaIds: [ID!]!
@@ -343,6 +357,7 @@ extend type Mutation {
   updateMediaGroup(input: UpdateMediaGroupInput!): UpdateMediaGroupPayload!
   deleteMediaGroup(input: DeleteMediaGroupInput!): DeleteMediaGroupPayload!
   addMediaToGroup(input: ChangeMediaGroupClassificationInput!): ChangeMediaGroupClassificationPayload!
+  addMediaToGroups(input: AddMediaToGroupsInput!): ChangeMediaGroupClassificationPayload!
   removeMediaFromGroup(input: ChangeMediaGroupClassificationInput!): ChangeMediaGroupClassificationPayload!
 }
 
