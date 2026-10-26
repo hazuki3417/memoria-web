@@ -57,6 +57,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     id: node.id,
     label: node.originalFileName,
     src: selectBrowserThumbnail(node.image?.variants ?? []),
+    variants: node.image?.variants ?? [],
     failed: node.processing?.status === "FAILED",
     processing: node.processing?.status === "PROCESSING",
   }))
