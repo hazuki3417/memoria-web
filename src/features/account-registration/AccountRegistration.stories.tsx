@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { AccountRegistration } from "./AccountRegistration"
 
 const meta = {
@@ -37,7 +37,7 @@ export const ExitConfirmation: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "終了" }))
     const dialog = within(await within(document.body).findByRole("dialog", { name: "登録せずに終了しますか？" }))
-    await expect(dialog.getByText("登録せずに終了すると、ログアウトしてトップページに戻ります。")).toBeVisible()
+    await waitFor(() => expect(dialog.getByText("登録せずに終了すると、ログアウトしてトップページに戻ります。")).toBeVisible())
     await userEvent.click(dialog.getByRole("button", { name: "戻る" }))
     await expect(args.onExit).not.toHaveBeenCalled()
     await expect(canvas.getByRole("textbox", { name: "ニックネーム" })).toHaveValue("ユーザー")
