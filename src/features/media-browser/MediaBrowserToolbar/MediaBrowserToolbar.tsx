@@ -2,8 +2,10 @@
 
 import { Box, Center, Group, SegmentedControl } from "@mantine/core"
 import { IconCheckbox, IconEye } from "@tabler/icons-react"
-import { MediaBrowserSelectionActions, MediaBrowserSelectionCount } from "./MediaBrowserSelectionActions"
-import { MediaBrowserViewActions, MediaBrowserViewSearch } from "./MediaBrowserViewActions"
+import { MediaBrowserSelectionActions } from "./MediaBrowserSelectionActions"
+import { MediaBrowserSelectionCount } from "./MediaBrowserSelectionCount"
+import { MediaBrowserViewActions } from "./MediaBrowserViewActions"
+import { MediaBrowserViewSearch } from "./MediaBrowserViewSearch"
 
 type MediaBrowserToolbarProps = {
   compact: boolean
