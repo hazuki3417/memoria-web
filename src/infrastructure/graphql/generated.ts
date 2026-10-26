@@ -2090,3 +2090,63 @@ export type PersonalUsageQueryHookResult = ReturnType<typeof usePersonalUsageQue
 export type PersonalUsageLazyQueryHookResult = ReturnType<typeof usePersonalUsageLazyQuery>;
 export type PersonalUsageSuspenseQueryHookResult = ReturnType<typeof usePersonalUsageSuspenseQuery>;
 export type PersonalUsageQueryResult = Apollo.QueryResult<OperationPersonalUsageQuery, OperationPersonalUsageQueryVariables>;
+
+/** DashboardRecentMedia - generated from operations/dashboard.graphql. */
+export type OperationDashboardRecentMediaQueryVariables = Exact<{ scope: OperationScopeInput }>;
+export type OperationDashboardRecentMediaQuery = {
+  mediaList: { edges: Array<{ node: { id: string; image: { variants: Array<{ url: string; width: number }> } | null } }> }
+};
+export const DashboardRecentMediaDocument = gql`
+  query DashboardRecentMedia($scope: ScopeInput!) {
+    mediaList(scope: $scope, first: 32) {
+      edges { node { id image { variants { url width } } } }
+    }
+  }
+`;
+export function useDashboardRecentMediaQuery(
+  baseOptions: Apollo.QueryHookOptions<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>
+    & ({ variables: OperationDashboardRecentMediaQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  return Apollo.useQuery<OperationDashboardRecentMediaQuery, OperationDashboardRecentMediaQueryVariables>(
+    DashboardRecentMediaDocument, { ...defaultOptions, ...baseOptions }
+  );
+}
+export type DashboardRecentMediaQueryHookResult = ReturnType<typeof useDashboardRecentMediaQuery>;
+
+/** DashboardRecentGroups - generated from operations/dashboard.graphql. */
+export type OperationDashboardRecentGroupsQueryVariables = Exact<{ scope: OperationScopeInput }>;
+export type OperationDashboardRecentGroupsQuery = {
+  mediaGroups: { edges: Array<{ node: {
+    id: string;
+    name: string;
+    media: {
+      edges: Array<{ node: { id: string; image: { variants: Array<{ url: string; width: number }> } | null } }>;
+      pageInfo: { hasNextPage: boolean };
+    };
+  } }> };
+};
+export const DashboardRecentGroupsDocument = gql`
+  query DashboardRecentGroups($scope: ScopeInput!) {
+    mediaGroups(scope: $scope, sort: CREATED_AT_DESC, first: 6) {
+      edges {
+        node {
+          id
+          name
+          media(first: 4) {
+            edges { node { id image { variants { url width } } } }
+            pageInfo { hasNextPage }
+          }
+        }
+      }
+    }
+  }
+`;
+export function useDashboardRecentGroupsQuery(
+  baseOptions: Apollo.QueryHookOptions<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>
+    & ({ variables: OperationDashboardRecentGroupsQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  return Apollo.useQuery<OperationDashboardRecentGroupsQuery, OperationDashboardRecentGroupsQueryVariables>(
+    DashboardRecentGroupsDocument, { ...defaultOptions, ...baseOptions }
+  );
+}
+export type DashboardRecentGroupsQueryHookResult = ReturnType<typeof useDashboardRecentGroupsQuery>;
