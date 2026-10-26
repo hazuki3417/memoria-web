@@ -190,3 +190,5 @@ export function useAccountDeletionController({
 
   return { resolved, setFlowError, step, setStep, compactStepper, loadState, setLoadState, decisions, confirmations, setConfirmations, cancelled, setCancelled, cancelConfirmationOpened, setCancelConfirmationOpened, reauth, setReauth, setGrant, setReview, busy, flowError, confirmed, setConfirmed, deletionPending, mediaCount, communities, communitiesToResolve, hasCommunities, needsResolution, allResolved, toDelete, allConfirmed, cancel, skipped, next, back, changeDecision, startReauthentication, confirmDeletion }
 }
+
+export type AccountDeletionController = ReturnType<typeof useAccountDeletionController>
