@@ -12,10 +12,6 @@ type ProfileSaveErrorKind = "retryable" | "blocked"
 type ProfileSaveError = { kind: ProfileSaveErrorKind }
 export type SaveProfile = (nickname: string) => Promise<void>
 
-async function saveMockProfile() {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-}
-
 function isBlockingProfileSaveError(error: unknown): error is ProfileSaveError {
   return (
     typeof error === "object" &&
@@ -26,12 +22,12 @@ function isBlockingProfileSaveError(error: unknown): error is ProfileSaveError {
 }
 
 export function SettingsProfile({
-  onSave = saveMockProfile,
+  onSave,
   initialNickname = MOCK_PROFILE.nickname,
   initialSaveState = "idle",
   blockedMessage = "Userの状態が変わったため、この画面での変更を続けられません。画面を再読み込みして現在の状態を確認してください。",
 }: {
-  onSave?: SaveProfile
+  onSave: SaveProfile
   initialNickname?: string
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
