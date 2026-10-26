@@ -10,7 +10,7 @@ const config: CodegenConfig = {
         { "typescript-operations": { typesPrefix: "Operation" } },
         "typescript-react-apollo",
       ],
-      config: { withHooks: true, withComponent: false, withHOC: false, scalars: { DateTime: "string", Int64: "string", Upload: "File" } },
+      config: { withHooks: true, withComponent: false, withHOC: false, apolloReactHooksImportFrom: "@apollo/client/react", scalars: { DateTime: "string", Int64: "string", Upload: "File" } },
     },
   },
 }
