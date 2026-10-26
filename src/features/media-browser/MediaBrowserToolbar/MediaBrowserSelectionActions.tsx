@@ -1,6 +1,6 @@
 "use client"
 
-import { Badge, Button } from "@mantine/core"
+import { Button } from "@mantine/core"
 import { IconEdit, IconFolderPlus, IconShare, IconTrash } from "@tabler/icons-react"
 
 type MediaBrowserSelectionProps = {
@@ -10,12 +10,6 @@ type MediaBrowserSelectionProps = {
   hasRemoteItems: boolean
   navigate: (path: string) => void
   onSelectionDialog: (dialog: "group" | "share" | "delete") => void
-}
-
-export function MediaBrowserSelectionCount({
-  count,
-}: { count: number }) {
-  return <Badge size="lg" variant="light">{count}件選択</Badge>
 }
 
 export function MediaBrowserSelectionActions({
