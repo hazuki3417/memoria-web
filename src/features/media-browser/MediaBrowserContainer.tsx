@@ -135,6 +135,9 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
 
   const query = useQuery<ListResult>(MEDIA_LIST, {
     variables: { scope, filter: { tagIds: selectedTagIds }, first: 50 },
+    // Signed Variant URLs are valid for 15 minutes. Never trust an old
+    // cached connection when the user revisits this screen.
+    fetchPolicy: "network-only",
     skip,
     notifyOnNetworkStatusChange: true,
   })
