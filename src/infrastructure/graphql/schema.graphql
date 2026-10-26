@@ -164,6 +164,9 @@ type MediaUploader {
   nickname: String
   deleted: Boolean!
 }
+# Variants can be empty while Processing is pending or has failed.
+# Clients select a suitable width; array order is not a thumbnail priority.
+# Variant URL is an authorized, browser-reachable URL, never a storage key.
 type Image { width: Int! height: Int! variants: [ImageVariant!]! }
 type ImageVariant {
   id: ID!
@@ -176,6 +179,9 @@ type ImageVariant {
 type MediaProcessing { status: ProcessingStatus! }
 type MediaEdge { cursor: String! node: Media! }
 type MediaConnection { edges: [MediaEdge!]! pageInfo: PageInfo! }
+# Tag IDs are scoped to the requested ScopeInput. Empty means no filtering;
+# invalid, duplicated, or cross-scope IDs are VALIDATION, not empty results.
+# Multiple IDs combine with AND semantics.
 input MediaFilterInput { tagIds: [ID!] }
 extend type Query {
   media(id: ID!): Media
