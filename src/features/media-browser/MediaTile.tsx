@@ -74,7 +74,7 @@ export function MediaTile({
         <Image
           src={item.src}
           srcSet={item.variants?.filter(variant => variant.url).map(variant => `${variant.url} ${variant.width}w`).join(", ") || undefined}
-          sizes="(max-width: 768px) 50vw, 168px"
+          sizes="(max-width: 360px) 100vw, (max-width: 768px) 50vw, 168px"
           alt={item.label}
           w="100%"
           h="100%"
