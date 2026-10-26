@@ -43,14 +43,43 @@ export function Settings({
 }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
-  const content = section === "profile" ? (
-    <SettingsProfile onSave={saveProfile} initialNickname={profileNickname} />
-  ) : section === "preferences" ? (
-    <SettingsPreferences compact={compact} initialPreferences={initialPreferences} onSave={savePreferences} />
-  ) : section === "usage" ? (
-    usageContent ?? <UsageContent fileSizeUnit={initialPreferences?.fileSizeUnit ?? "DECIMAL"} />
-  ) : (
-    <SettingsAccount deletionAction={<Button component={Link} href="/settings/account/delete" color="red" size="sm">アカウントを削除する</Button>} />
+  let content: ReactNode
+  switch (section) {
+    case "profile":
+      content = (
+        <SettingsProfile onSave={saveProfile} initialNickname={profileNickname} />
+      )
+      break
+    case "preferences":
+      content = (
+        <SettingsPreferences
+          compact={compact}
+          initialPreferences={initialPreferences}
+          onSave={savePreferences}
+        />
+      )
+      break
+    case "usage":
+      content = usageContent ?? (
+        <UsageContent fileSizeUnit={initialPreferences?.fileSizeUnit ?? "DECIMAL"} />
+      )
+      break
+    case "account":
+      content = (
+        <SettingsAccount
+          deletionAction={
+            <Button component={Link} href="/settings/account/delete" color="red" size="sm">
+              アカウントを削除する
+            </Button>
+          }
+        />
+      )
+      break
+  }
+
+  return (
+    <SettingsLayout section={section} onSectionChange={(next) => router.push(`/settings/${next}`)}>
+      {content}
+    </SettingsLayout>
   )
-  return <SettingsLayout section={section} onSectionChange={(next) => router.push(`/settings/${next}`)}>{content}</SettingsLayout>
 }
