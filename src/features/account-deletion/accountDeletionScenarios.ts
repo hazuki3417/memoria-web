@@ -9,7 +9,7 @@ export type CommunityScenario =
   | "last-administrator-no-candidate"
   | "multiple-last-administrators"
 export type RetryOutcome = "success" | "failure"
-type Decision = { choice: "keep" | "delete" | null; successors: string[] }
+export type Decision = { choice: "keep" | "delete" | null; successors: string[] }
 type CommunityFixture = {
   id: string
   name: string
