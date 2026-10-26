@@ -154,6 +154,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
       contextKind={contextKind}
       communityId={communityId}
       items={items}
+      filterResetKey={scopeKey + ":" + selectedTagIds.join(",")}
       tagOptions={allTagsLoaded ? [...tagsByName.keys()] : []}
       onApplyTags={applyTags}
       listState={query.error ? "error" : query.loading && !page ? "loading"
