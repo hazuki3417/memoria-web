@@ -50,14 +50,16 @@ export function MediaBrowserToolbar({
               >
                 <Box style={{ minWidth: 0 }}>
                   {!selecting ? (
-                    <Box
+                    <Group
                       component="form"
                       onSubmit={(event) => {
                         event.preventDefault()
                         onSubmitTags()
                       }}
+                      gap="xs"
+                      wrap="nowrap"
+                      style={{ minWidth: 0 }}
                     >
-                      <Group gap="xs" wrap="nowrap">
                         <TagsInput
                           placeholder="Tagを検索"
                           value={tags}
@@ -74,8 +76,7 @@ export function MediaBrowserToolbar({
                         <Button size="xs" type="submit" style={{ flexShrink: 0 }}>
                           検索
                         </Button>
-                      </Group>
-                    </Box>
+                    </Group>
                   ) : (
                     <Badge size="lg" variant="light">
                       {selected.size}件選択
