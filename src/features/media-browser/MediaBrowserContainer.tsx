@@ -168,6 +168,31 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
       .finally(() => { if (groupPageInFlight.current === key) groupPageInFlight.current = null })
   }, [groupCursor, scopeKey, skip, groupQuery.loading, groupQuery.error, groupQuery.fetchMore, groupPageFailure])
 
+  // Variant Signed URLs expire 15 minutes after issuance. Refresh the
+  // connection before expiry (and when returning from a sleeping tab).
+  // Refetching the first page intentionally discards older paged URLs; it
+  // avoids retaining expired authorization in already-loaded pages.
+  const lastVariantRefresh = useRef(Date.now())
+  useEffect(() => {
+    if (skip) return
+    const refresh = () => {
+      lastVariantRefresh.current = Date.now()
+      void query.refetch().catch(() => {
+        // Apollo exposes query.error and the existing Retry control.
+      })
+    }
+    const interval = window.setInterval(refresh, 12 * 60 * 1000)
+    const onVisible = () => {
+      if (document.visibilityState === "visible" &&
+          Date.now() - lastVariantRefresh.current >= 12 * 60 * 1000) refresh()
+    }
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
+  }, [skip, query.refetch, scopeKey, selectedTagIds.join(",")])
+
   const [pageFailure, setPageFailure] = useState<string | null>(null)
   const [pageLoading, setPageLoading] = useState<string | null>(null)
   const pageInFlight = useRef<string | null>(null)
