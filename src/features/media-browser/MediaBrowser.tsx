@@ -115,6 +115,10 @@ function MediaBrowserContent({
   tagOptions,
   onApplyTags,
   filterResetKey,
+  groupOptions,
+  onAddToGroups,
+  groupActionPending = false,
+  groupActionError,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
@@ -132,6 +136,10 @@ function MediaBrowserContent({
   tagOptions?: string[]
   onApplyTags?: (names: string[]) => void
   filterResetKey?: string
+  groupOptions?: { value: string; label: string }[]
+  onAddToGroups?: (mediaIds: string[], groupIds: string[]) => Promise<boolean>
+  groupActionPending?: boolean
+  groupActionError?: string | null
 }) {
   const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -162,6 +170,18 @@ function MediaBrowserContent({
           ? `${count}件のMediaを${groupTargets.length}件のGroup（${groupTargets.join("、")}）へ追加する操作を確認しました。実際のデータは変更されていません。`
           : `${count}件のMediaを削除する操作を確認しました。実際のデータは削除されていません。`,
     })
+  }
+  const addToGroups = async () => {
+    if (!onAddToGroups) {
+      completeMockSelection("group")
+      return
+    }
+    if (selected.size === 0 || groupTargets.length === 0 || groupActionPending) return
+    if (await onAddToGroups([...selected], groupTargets)) {
+      setSelectionDialog(null)
+      setGroupTargets([])
+      endSelection()
+    }
   }
   const [communityTarget, setCommunityTarget] = useState<string | null>(null)
   const [tags, setTags] = useState<string[]>(
@@ -295,7 +315,7 @@ function MediaBrowserContent({
                     variant="default"
                     color="red"
                     leftSection={<IconTrash size={15} />}
-                    disabled={selected.size === 0}
+                    disabled={selected.size === 0 || Boolean(items)}
                     onClick={() => setSelectionDialog("delete")}
                   >
                     削除
@@ -516,8 +536,9 @@ function MediaBrowserContent({
             }
             primary={
               <Button
-                disabled={groupTargets.length === 0}
-                onClick={() => completeMockSelection("group")}
+                disabled={groupTargets.length === 0 || groupActionPending || selected.size === 0}
+                loading={groupActionPending}
+                onClick={() => void addToGroups()}
               >
                 追加
               </Button>
@@ -529,11 +550,12 @@ function MediaBrowserContent({
           <Text size="sm">
             {selected.size}件のMediaを選択したすべてのGroupに追加します。
           </Text>
+          {groupActionError && <Alert color="red" role="alert">{groupActionError}</Alert>}
           <MultiSelect
             label="Group"
             placeholder="Groupを選択"
             searchable
-            data={["旅行", "家族", "風景写真", "お気に入り"]}
+            data={groupOptions ?? ["旅行", "家族", "風景写真", "お気に入り"]}
             value={groupTargets}
             onChange={setGroupTargets}
           />
