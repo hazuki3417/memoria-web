@@ -46,6 +46,12 @@ export function SettingsProfile({
   const invalid = normalized.length === 0
   const isSaving = saveState === "saving"
   const isBlocked = saveState === "blocked"
+  let saveLabel = "更新"
+  if (saveState === "retryable-error") {
+    saveLabel = "再試行"
+  } else if (isSaving) {
+    saveLabel = "更新中"
+  }
 
   const save = async () => {
     if (!dirty || invalid || isSaving || isBlocked) return
@@ -111,11 +117,7 @@ export function SettingsProfile({
             loading={isSaving}
             onClick={save}
           >
-            {saveState === "retryable-error"
-              ? "再試行"
-              : isSaving
-                ? "更新中"
-                : "更新"}
+            {saveLabel}
           </Button>
         </Stack>
       </Box>
