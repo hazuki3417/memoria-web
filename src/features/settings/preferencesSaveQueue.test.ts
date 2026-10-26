@@ -46,4 +46,32 @@ describe("preferences save queue", () => {
     expect(save).toHaveBeenCalledTimes(2)
     expect(save).toHaveBeenLastCalledWith({ mediaDetailNavigationWrap: true })
   })
+
+  it("keeps the selected Personal Accent Color after a failed save and retries the same value", async () => {
+    vi.useFakeTimers()
+    const selectedColor = "#4287F5"
+    const save = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("network"))
+      .mockResolvedValueOnce({
+        ...defaultUserPreferences,
+        personalAccentColor: selectedColor,
+      })
+    const onError = vi.fn()
+    const queue = createPreferencesSaveQueue(save, vi.fn(), onError)
+    queue.enqueue({ personalAccentColor: selectedColor })
+    await vi.advanceTimersByTimeAsync(400)
+
+    expect(onError).toHaveBeenCalledTimes(1)
+    expect(onError).toHaveBeenCalledWith(
+      expect.any(Error),
+      { personalAccentColor: selectedColor },
+    )
+
+    await queue.flush()
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(save).toHaveBeenLastCalledWith({
+      personalAccentColor: selectedColor,
+    })
+  })
 })
