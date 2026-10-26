@@ -1,72 +1,53 @@
 "use client"
 
-import { gql, useQuery } from "@apollo/client"
 import { useEffect, useMemo, useRef } from "react"
-import { ScopeType } from "@/infrastructure/graphql/generated"
-import { Dashboard } from "./Dashboard"
-import type { DashboardGroup } from "./Dashboard"
+import {
+  ScopeType,
+  useDashboardRecentMediaQuery,
+  useDashboardRecentGroupsQuery,
+} from "@/infrastructure/graphql/generated"
+import { Dashboard, type DashboardGroup } from "./Dashboard"
 import { selectDashboardThumbnail } from "./selectDashboardThumbnail"
 
-type Scope = { type: ScopeType; communityId?: string }
-type PreviewMedia = { id: string; image: { variants: Array<{ url: string; width: number }> } | null }
-type MediaResponse = {
-  mediaList: { edges: Array<{ node: PreviewMedia }> }
-}
-type GroupsResponse = {
-  mediaGroups: { edges: Array<{ node: {
-    id: string
-    name: string
-    media: { edges: Array<{ node: PreviewMedia }> }
-  } }> }
-}
-
-const DASHBOARD_MEDIA = gql`
-  query DashboardRecentMedia($scope: ScopeInput!) {
-    mediaList(scope: $scope, first: 32) {
-      edges { node { id image { variants { url width } } } }
-    }
-  }
-`
-
-const DASHBOARD_GROUPS = gql`
-  query DashboardRecentGroups($scope: ScopeInput!) {
-    mediaGroups(scope: $scope, sort: CREATED_AT_DESC, first: 6) {
-      edges {
-        node {
-          id
-          name
-          media(first: 4) {
-            edges { node { id image { variants { url width } } } }
-          }
-        }
-      }
-    }
-  }
-`
-
+// Remount the entire scoped query consumer when switching contexts. Apollo
+// must not expose the previous Community's protected data while loading.
 export function DashboardContainer({ contextKind = "personal", communityId }: {
   contextKind?: "personal" | "community"
   communityId?: string
 }) {
-  const scope = useMemo<Scope>(
+  return <ScopedDashboard
+    key={contextKind === "personal" ? "personal" : `community:${communityId ?? ""}`}
+    contextKind={contextKind}
+    communityId={communityId}
+  />
+}
+
+function ScopedDashboard({ contextKind, communityId }: {
+  contextKind: "personal" | "community"
+  communityId?: string
+}) {
+  const scope = useMemo(
     () => contextKind === "community"
       ? { type: ScopeType.Community, communityId }
       : { type: ScopeType.Personal },
     [contextKind, communityId],
   )
   const skip = contextKind === "community" && !communityId
-  const media = useQuery<MediaResponse>(DASHBOARD_MEDIA, {
+  const media = useDashboardRecentMediaQuery({
     variables: { scope },
     skip,
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
-  const groups = useQuery<GroupsResponse>(DASHBOARD_GROUPS, {
+  const groups = useDashboardRecentGroupsQuery({
     variables: { scope },
     skip,
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
+
+  // Media image URLs are signed for 15 minutes. Refresh before expiry and
+  // when a sleeping tab returns, without persisting signed URLs separately.
   const lastRefresh = useRef(Date.now())
   useEffect(() => {
     if (skip) return
@@ -85,17 +66,19 @@ export function DashboardContainer({ contextKind = "personal", communityId }: {
       window.clearInterval(interval)
       document.removeEventListener("visibilitychange", onVisible)
     }
-  }, [skip, media.refetch, groups.refetch, contextKind, communityId])
+  }, [skip, media.refetch, groups.refetch])
 
   const mediaNodes = media.data?.mediaList.edges.map(edge => edge.node) ?? []
   const groupItems: DashboardGroup[] = (groups.data?.mediaGroups.edges ?? []).map(({ node }) => ({
     id: node.id,
     name: node.name,
-    mediaCount: node.media.edges.length,
+    // Distinguish exactly four Media from a Group with more than four.
+    mediaCount: node.media.edges.length + (node.media.pageInfo.hasNextPage ? 1 : 0),
     media: node.media.edges.map(edge => selectDashboardThumbnail(edge.node.image?.variants)),
   }))
   const mediaState = skip || media.error ? "error" : !media.data ? "loading" : "ready"
   const groupState = skip || groups.error ? "error" : !groups.data ? "loading" : "ready"
+
   return <Dashboard
     contextKind={contextKind}
     communityId={communityId}
