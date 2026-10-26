@@ -190,6 +190,9 @@ extend type Query {
 type MediaTag { id: ID! name: String! }
 type MediaTagEdge { cursor: String! node: MediaTag! }
 type MediaTagConnection { edges: [MediaTagEdge!]! pageInfo: PageInfo! }
+extend type Query {
+  mediaTags(scope: ScopeInput!, search: String, first: Int, after: String, last: Int, before: String): MediaTagConnection!
+}
 
 # Source of Truth: memoria-design/content/system/api/graphql.mdx#group
 type MediaGroup {
