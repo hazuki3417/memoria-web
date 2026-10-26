@@ -297,8 +297,8 @@ function MediaBrowserContent({
                     onClick={() =>
                       navigate(
                         context === "community"
-                          ? `/communities/${communityId}/media/edit`
-                          : "/media/edit",
+                          ? `/communities/${communityId}/media/edit?mediaIds=${encodeURIComponent([...selected].join(","))}`
+                          : `/media/edit?mediaIds=${encodeURIComponent([...selected].join(","))}`,
                       )
                     }
                   >
