@@ -26,8 +26,8 @@ import {
 } from "./accountDeletionGateway"
 import { FeedbackAlert } from "@/components/Feedback"
 
-type ReviewState = "default" | "empty" | "failure" | "retrying"
-type CommunityScenario =
+export type ReviewState = "default" | "empty" | "failure" | "retrying"
+export type CommunityScenario =
   | "mixed-memberships"
   | "no-communities"
   | "member-only"
@@ -36,7 +36,7 @@ type CommunityScenario =
   | "last-administrator"
   | "last-administrator-no-candidate"
   | "multiple-last-administrators"
-type RetryOutcome = "success" | "failure"
+export type RetryOutcome = "success" | "failure"
 type Decision = { choice: "keep" | "delete" | null; successors: string[] }
 type CommunityFixture = {
   id: string
