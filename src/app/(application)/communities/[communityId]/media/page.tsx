@@ -1,4 +1,4 @@
-import { MediaBrowser } from "@/features/media-browser/MediaBrowser"
+import { MediaBrowserContainer } from "@/features/media-browser/MediaBrowserContainer"
 
 export default async function Page({
   params,
@@ -6,5 +6,5 @@ export default async function Page({
   params: Promise<{ communityId: string }>
 }) {
   const { communityId } = await params
-  return <MediaBrowser contextKind="community" communityId={communityId} />
+  return <MediaBrowserContainer contextKind="community" communityId={communityId} />
 }

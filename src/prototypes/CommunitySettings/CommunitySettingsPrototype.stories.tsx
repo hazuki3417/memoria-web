@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { CommunitySettings } from "@/features/community-settings/CommunitySettings"
+import { SettingsUsage } from "@/features/usage"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
@@ -50,9 +51,27 @@ export const Compact: Story = {
 export const Members: Story = {
   name: "Members",
   tags: ["visual"], args: { role: "admin", section: "members" } }
+const communityUsageFixture = {
+  usedBytes: 1_240_000_000,
+  limitBytes: 5_000_000_000,
+  mediaCount: 1248,
+  formatBreakdown: [
+    { format: "JPEG" as const, count: 900, sizeBytes: 900_000_000 },
+    { format: "PNG" as const, count: 200, sizeBytes: 200_000_000 },
+    { format: "WebP" as const, count: 100, sizeBytes: 100_000_000 },
+    { format: "HEIC / HEIF" as const, count: 48, sizeBytes: 40_000_000 },
+  ],
+}
+
 export const Usage: Story = {
   name: "Usage",
-  tags: ["visual"], args: { role: "member", section: "usage" } }
+  tags: ["visual"],
+  args: {
+    role: "member",
+    section: "usage",
+    usageContent: <SettingsUsage scope="community" usage={communityUsageFixture} fileSizeUnit="DECIMAL" />,
+  },
+}
 export const Preferences: Story = {
   name: "Preferences",
   tags: ["visual"],

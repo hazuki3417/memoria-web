@@ -47,12 +47,12 @@ export function ConnectedUsage({
     }
   }
 
-  const status: UsageStatus =
-    active.loading || communityPreferencesLoading
-      ? "loading"
-      : active.error || communityPreferencesError || conversionFailed || !projection
-        ? "error"
-        : "ready"
+  let status: UsageStatus = "ready"
+  if (active.loading || communityPreferencesLoading) {
+    status = "loading"
+  } else if (active.error || communityPreferencesError || conversionFailed || !projection) {
+    status = "error"
+  }
 
   const retry = () => {
     // 再取得で再び失敗した場合もApolloのerror stateに反映し、Retryを維持する。

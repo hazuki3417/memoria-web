@@ -2,29 +2,17 @@
 
 import { Text } from "@mantine/core"
 import { Settings } from "./Settings"
-import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import type { UserPreferencesPatch } from "./preferences/userPreferences"
+import {
+  fromGraphqlUserPreferences,
+  toGraphqlUserPreferencesPatch,
+} from "./preferences/userPreferencesGraphqlAdapter"
 import {
   CurrentUserDocument,
-  DateFormat,
-  FileSizeUnit,
-  MediaThumbnailSize,
-  type UpdateUserPreferencesInput,
   useCurrentUserQuery,
   useSaveUserPreferencesMutation,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
-
-const dates = {
-  YYYY_MM_DD: DateFormat.YyyyMmDd,
-  MM_DD_YYYY: DateFormat.MmDdYyyy,
-  DD_MM_YYYY: DateFormat.DdMmYyyy,
-}
-const sizes = { DECIMAL: FileSizeUnit.Decimal, BINARY: FileSizeUnit.Binary }
-const thumbnails = {
-  SMALL: MediaThumbnailSize.Small,
-  MEDIUM: MediaThumbnailSize.Medium,
-  LARGE: MediaThumbnailSize.Large,
-}
 
 export function ConnectedSettings({
   section,
@@ -40,7 +28,7 @@ export function ConnectedSettings({
       <Text c="red">設定を取得できませんでした。再読み込みしてください。</Text>
     )
 
-  const preferences = data.me.preferences as UserPreferences
+  const preferences = fromGraphqlUserPreferences(data.me.preferences)
   return (
     <Settings
       key={section}
@@ -55,16 +43,7 @@ export function ConnectedSettings({
         })
       }}
       savePreferences={async (patch: UserPreferencesPatch) => {
-        const input: UpdateUserPreferencesInput = {
-          ...patch,
-          dateFormat: patch.dateFormat ? dates[patch.dateFormat] : undefined,
-          fileSizeUnit: patch.fileSizeUnit
-            ? sizes[patch.fileSizeUnit]
-            : undefined,
-          mediaThumbnailSize: patch.mediaThumbnailSize
-            ? thumbnails[patch.mediaThumbnailSize]
-            : undefined,
-        }
+        const input = toGraphqlUserPreferencesPatch(patch)
         const result = await updatePreferences({
           variables: { input },
           refetchQueries: [CurrentUserDocument],
@@ -72,7 +51,7 @@ export function ConnectedSettings({
         })
         if (!result.data?.updateUserPreferences.preferences)
           throw new Error("Preferences update unconfirmed")
-        return result.data.updateUserPreferences.preferences as UserPreferences
+        return fromGraphqlUserPreferences(result.data.updateUserPreferences.preferences)
       }}
     />
   )

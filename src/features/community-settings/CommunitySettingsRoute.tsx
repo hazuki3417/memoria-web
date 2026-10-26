@@ -1,6 +1,7 @@
 "use client"
 
 import { Text } from "@mantine/core"
+import type { ReactNode } from "react"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
@@ -13,7 +14,6 @@ import {
   useRemoveCommunityMemberMutation,
   useLeaveCommunityMutation,
 } from "@/infrastructure/graphql/generated"
-import { ConnectedUsage } from "@/features/settings"
 import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
@@ -23,9 +23,11 @@ import {
 export function CommunitySettingsRoute({
   communityId,
   section = "general",
+  usageContent,
 }: {
   communityId: string
   section?: CommunitySettingsSection
+  usageContent?: ReactNode
 }) {
   const router = useRouter()
   // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
@@ -69,7 +71,7 @@ export function CommunitySettingsRoute({
       members={members ?? undefined}
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
-      usageContent={section === "usage" ? <ConnectedUsage scope="community" communityId={communityId} /> : undefined}
+      usageContent={usageContent}
       onRemoveMember={async (userId) => {
         try {
           const result = await removeMember({

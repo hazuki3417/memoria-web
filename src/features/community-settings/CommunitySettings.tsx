@@ -7,10 +7,6 @@ import {
   CommunityMembersContent,
   type CommunityMember,
 } from "./CommunityMembersContent"
-import {
-  SettingsUsage,
-  type SettingsUsageData,
-} from "@/features/settings/SettingsUsage"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconSettings,
@@ -367,20 +363,6 @@ export function CommunitySettings({
       onLeaveSuccess={onLeaveSuccess}
     />
   )
-  const communityUsage: SettingsUsageData = {
-  usedBytes: 1_240_000_000,
-  limitBytes: 5_000_000_000,
-  mediaCount: 1248,
-  formatBreakdown: [
-    { format: "JPEG", count: 900, sizeBytes: 900_000_000 },
-    { format: "PNG", count: 200, sizeBytes: 200_000_000 },
-    { format: "WebP", count: 100, sizeBytes: 100_000_000 },
-    { format: "HEIC / HEIF", count: 48, sizeBytes: 40_000_000 },
-  ],
-}
-  const defaultUsageContent = (
-    <SettingsUsage scope="community" usage={communityUsage} fileSizeUnit={fileSizeUnit} />
-  )
   const preferencesContent = (
     <Stack gap="xl">
       <PageHeader
@@ -412,7 +394,7 @@ export function CommunitySettings({
       : currentSection === "members"
         ? membersContent
         : currentSection === "usage"
-          ? (usageContent ?? defaultUsageContent)
+          ? usageContent
           : preferencesContent
 
   return (

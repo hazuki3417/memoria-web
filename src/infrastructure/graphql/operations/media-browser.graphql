@@ -1,0 +1,22 @@
+# Shared API queries, composed specifically for the Media Browser.
+query MediaBrowserList($scope: ScopeInput!, $filter: MediaFilterInput, $first: Int!, $after: String) {
+  mediaList(scope: $scope, filter: $filter, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        originalFileName
+        processing { status }
+        image { variants { url width } }
+      }
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+
+query MediaBrowserTags($scope: ScopeInput!, $first: Int!, $after: String) {
+  mediaTags(scope: $scope, first: $first, after: $after) {
+    edges { cursor node { id name } }
+    pageInfo { hasNextPage endCursor }
+  }
+}
