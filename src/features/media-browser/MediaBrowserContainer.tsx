@@ -89,8 +89,8 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     contextKind={contextKind}
     communityId={communityId}
     items={items}
-    listState={query.loading && !snapshot ? "loading" : query.error && !snapshot
-      ? "error" : items.length === 0 ? "true-empty" : "default"}
+    listState={query.error ? "error" : query.loading && !snapshot ? "loading"
+      : items.length === 0 ? "true-empty" : "default"}
     onRetry={() => void query.refetch()}
     onLoadMore={() => void loadMore()}
     hasMore={Boolean(pageInfo?.hasNextPage)}
