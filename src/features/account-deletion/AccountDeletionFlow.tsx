@@ -19,7 +19,7 @@ import { Fragment, type ComponentType, type PropsWithChildren } from "react"
 import type { MockScenario } from "./accountDeletionGateway"
 import { FeedbackAlert } from "@/components/Feedback"
 
-import { labels, type ReviewState, type CommunityScenario, type RetryOutcome } from "./accountDeletionScenarios"
+import { labels, type Decision, type ReviewState, type CommunityScenario, type RetryOutcome } from "./accountDeletionScenarios"
 import { useAccountDeletionController } from "./useAccountDeletionController"
 export type { ReviewState, CommunityScenario, RetryOutcome } from "./accountDeletionScenarios"
 
