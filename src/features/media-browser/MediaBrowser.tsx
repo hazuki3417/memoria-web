@@ -212,6 +212,13 @@ function MediaBrowserContent({
   communityId = "photo-club",
   downloadMock = "available",
   navigate,
+  items,
+  listState,
+  onRetry,
+  onLoadMore,
+  hasMore = false,
+  loadingMore = false,
+  loadMoreError = false,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
@@ -219,6 +226,13 @@ function MediaBrowserContent({
   communityId?: string
   downloadMock?: "available" | "forbidden" | "processing"
   navigate: (path: string) => void
+  items?: MediaItem[]
+  listState?: MediaBrowserState
+  onRetry?: () => void
+  onLoadMore?: () => void
+  hasMore?: boolean
+  loadingMore?: boolean
+  loadMoreError?: boolean
 }) {
   const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -252,7 +266,8 @@ function MediaBrowserContent({
   const [appliedTags, setAppliedTags] = useState<string[]>(tags)
   // The mock has no tag metadata or Relay connection; keep the submitted filter separate.
   void appliedTags
-  const stateItems = [
+  const activeState = listState ?? initialState
+  const stateItems = items ?? ([
     "true-empty",
     "filtered-empty",
     "loading",
@@ -261,7 +276,7 @@ function MediaBrowserContent({
     ? []
     : initialState === "processing-failure"
       ? [...media.slice(0, 5), media[media.length - 1]]
-      : media.slice(0, 12)
+      : media.slice(0, 12))
 
   const toggle = (id: string) =>
     setSelected((current) => {
@@ -449,7 +464,7 @@ function MediaBrowserContent({
           </Box>
           <Divider />
 
-          {initialState === "loading" && (
+          {activeState === "loading" && (
             <Center mih={360}>
               <Stack align="center">
                 <Loader />
@@ -459,7 +474,7 @@ function MediaBrowserContent({
               </Stack>
             </Center>
           )}
-          {initialState === "error" && (
+          {activeState === "error" && (
             <Alert
               icon={<IconAlertCircle size={18} />}
               title="Mediaを読み込めませんでした"
@@ -469,13 +484,13 @@ function MediaBrowserContent({
                 <Text size="sm">
                   通信状態を確認して、もう一度お試しください。
                 </Text>
-                <Button size="xs" variant="default">
+                <Button size="xs" variant="default" onClick={onRetry}>
                   再試行
                 </Button>
               </Group>
             </Alert>
           )}
-          {initialState === "true-empty" && (
+          {activeState === "true-empty" && (
             <Center mih={360}>
               <Stack align="center" maw={420}>
                 <ThemeIcon size={48} radius="xl" variant="light">
@@ -497,7 +512,7 @@ function MediaBrowserContent({
               </Stack>
             </Center>
           )}
-          {initialState === "filtered-empty" && (
+          {activeState === "filtered-empty" && (
             <Center mih={360}>
               <Stack align="center" maw={420}>
                 <ThemeIcon size={48} radius="xl" variant="light" color="gray">
@@ -543,7 +558,10 @@ function MediaBrowserContent({
               ))}
             </Box>
           )}
-          {initialState === "loading-more" && (
+          {hasMore && !loadingMore && !loadMoreError && (
+            <Center py="md"><Button size="xs" variant="default" onClick={onLoadMore}>さらに読み込む</Button></Center>
+          )}
+          {(loadingMore || activeState === "loading-more") && (
             <Center py="md">
               <Group gap="xs">
                 <Loader size="sm" />
@@ -553,14 +571,14 @@ function MediaBrowserContent({
               </Group>
             </Center>
           )}
-          {initialState === "load-more-error" && (
+          {(loadMoreError || activeState === "load-more-error") && (
             <Paper withBorder radius="md" p="sm">
               <Group justify="space-between">
                 <Group gap="xs">
                   <IconAlertCircle size={18} />
                   <Text size="sm">続きのMediaを読み込めませんでした</Text>
                 </Group>
-                <Button size="xs" variant="default">
+                <Button size="xs" variant="default" onClick={onLoadMore}>
                   再試行
                 </Button>
               </Group>
