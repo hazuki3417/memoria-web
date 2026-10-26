@@ -424,7 +424,7 @@ function MediaBrowserContent({
             </Center>
           )}
 
-          {stateItems.length > 0 && (
+          {activeState !== "error" && activeState !== "loading" && stateItems.length > 0 && (
             <Box
               p={3}
               style={{
@@ -451,7 +451,7 @@ function MediaBrowserContent({
               ))}
             </Box>
           )}
-          {hasMore && !loadingMore && !loadMoreError && (
+          {activeState !== "error" && hasMore && !loadingMore && !loadMoreError && (
             <Center py="md"><Button size="xs" variant="default" onClick={onLoadMore}>さらに読み込む</Button></Center>
           )}
           {(loadingMore || activeState === "loading-more") && (
