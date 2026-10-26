@@ -25,18 +25,27 @@ type MediaBrowserToolbarProps = {
 }
 
 export function MediaBrowserToolbar({
-  compact, selecting, selected, tags, setTags, onSubmitTags,
-  tagOptions, context, communityId, hasRemoteItems, navigate,
-  onSelectionDialog, onStartSelection, onEndSelection,
+  compact,
+  selecting,
+  selected,
+  tags,
+  setTags,
+  onSubmitTags,
+  tagOptions,
+  context,
+  communityId,
+  hasRemoteItems,
+  navigate,
+  onSelectionDialog,
+  onStartSelection,
+  onEndSelection,
 }: MediaBrowserToolbarProps) {
   return (
     <Box
       pb="xs"
       style={{
         display: "grid",
-        gridTemplateColumns: compact
-          ? "minmax(0, 1fr)"
-          : "minmax(0, 1fr) auto",
+        gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto",
         alignItems: "center",
         gap: "var(--mantine-spacing-xs)",
       }}

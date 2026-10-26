@@ -1,7 +1,12 @@
 "use client"
 
 import { Button } from "@mantine/core"
-import { IconEdit, IconFolderPlus, IconShare, IconTrash } from "@tabler/icons-react"
+import {
+  IconEdit,
+  IconFolderPlus,
+  IconShare,
+  IconTrash,
+} from "@tabler/icons-react"
 
 type MediaBrowserSelectionProps = {
   selected: Set<string>

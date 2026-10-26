@@ -1,7 +1,12 @@
 "use client"
 
 import { Button, Menu } from "@mantine/core"
-import { IconChevronDown, IconCloudUpload, IconPlus, IconShare } from "@tabler/icons-react"
+import {
+  IconChevronDown,
+  IconCloudUpload,
+  IconPlus,
+  IconShare,
+} from "@tabler/icons-react"
 
 type MediaBrowserViewActionsProps = {
   context: "personal" | "community"
@@ -10,7 +15,9 @@ type MediaBrowserViewActionsProps = {
 }
 
 export function MediaBrowserViewActions({
-  context, communityId, navigate,
+  context,
+  communityId,
+  navigate,
 }: MediaBrowserViewActionsProps) {
   return context === "personal" ? (
     <Button

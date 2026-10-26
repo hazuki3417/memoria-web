@@ -12,7 +12,11 @@ type MediaBrowserViewSearchProps = {
 }
 
 export function MediaBrowserViewSearch({
-  compact, tags, onTagsChange, onSubmitTags, tagOptions,
+  compact,
+  tags,
+  onTagsChange,
+  onSubmitTags,
+  tagOptions,
 }: MediaBrowserViewSearchProps) {
   return (
     <Group
@@ -44,4 +48,3 @@ export function MediaBrowserViewSearch({
     </Group>
   )
 }
-
