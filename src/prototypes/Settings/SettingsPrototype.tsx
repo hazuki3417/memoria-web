@@ -100,6 +100,11 @@ function UsageContent({ initialScenario, fileSizeUnit }: { initialScenario: Usag
   )
 }
 
+// Storybook / Prototype専用。製品本体へモックの成功動作を混入させない。
+async function saveMockProfile(): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, 500))
+}
+
 export function SettingsPrototype({
   initialSection = "profile",
   initialProfileSaveState = "idle",
@@ -120,6 +125,7 @@ export function SettingsPrototype({
     case "profile":
       content = (
         <SettingsProfile
+          onSave={saveMockProfile}
           initialSaveState={initialProfileSaveState}
           blockedMessage="Userの状態が変わったため、この画面での変更を続けられません。ページを再読み込みして現在の状態を確認してください。"
         />
