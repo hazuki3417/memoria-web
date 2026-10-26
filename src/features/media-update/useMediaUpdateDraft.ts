@@ -35,6 +35,11 @@ export function useMediaUpdateDraft(
   const idsKey = targets.map((target) => target.id).join(",")
   const load = useCallback(async () => {
     setStatus("loading")
+    if (targets.length === 0) {
+      setItems([])
+      setStatus("load-failure")
+      return
+    }
     const knownTags = await listMediaUpdateTags(scope)
     if (knownTags.kind !== "ok") {
       setStatus("load-failure")
