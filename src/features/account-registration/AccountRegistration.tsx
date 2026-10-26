@@ -11,9 +11,7 @@ import {
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
-import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
-import { useRegisterMemoriaUserMutation } from "@/infrastructure/graphql/generated"
 import {
   ApplicationHeader,
   ApplicationShell,
@@ -22,7 +20,7 @@ import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 
-type ReviewState =
+export type AccountRegistrationReviewState =
   | "default"
   | "invalid"
   | "registering"
@@ -31,13 +29,21 @@ type ReviewState =
   | "registered"
   | "no-display-name"
 
-export function UserRegistration({
+export type AccountRegistrationResult = "success" | "failure" | "blocking"
+
+type AccountRegistrationProps = {
+  reviewState?: AccountRegistrationReviewState
+  onRegister: (nickname: string) => Promise<AccountRegistrationResult>
+  onRegisterSuccess?: () => void
+  onExit: () => void
+}
+
+export function AccountRegistration({
   reviewState = "default",
-}: {
-  reviewState?: ReviewState
-}) {
-  const router = useRouter()
-  const [registerMutation] = useRegisterMemoriaUserMutation()
+  onRegister,
+  onRegisterSuccess,
+  onExit,
+}: AccountRegistrationProps) {
   const [nickname, setNickname] = useState(
     reviewState === "invalid"
       ? "   "
@@ -45,7 +51,7 @@ export function UserRegistration({
         ? ""
         : "ユーザー",
   )
-  const [status, setStatus] = useState<ReviewState>(reviewState)
+  const [status, setStatus] = useState<AccountRegistrationReviewState>(reviewState)
   const [exitOpened, { open: openExit, close: closeExit }] =
     useDisclosure(false)
   const [exited, setExited] = useState(false)
@@ -58,7 +64,7 @@ export function UserRegistration({
     const success = kind === "success"
     showNotification({
       kind: success ? "success" : "error",
-      title: "User登録",
+      title: "アカウント登録",
       description: success
         ? "登録が完了しました。"
         : "入力内容は保持されています。再試行してください。",
@@ -74,36 +80,22 @@ export function UserRegistration({
   }, [reviewState, showFeedback])
 
   const register = async () => {
-    if (invalid || registering || blocking || registered) return
+    if (invalid || registering || blocking || registered || exited) return
     setStatus("registering")
     try {
-      const result = await registerMutation({
-        variables: { input: { nickname: nickname.trim() } },
-      })
-      if (result.data?.registerUser.user) {
+      const outcome = await onRegister(nickname.trim())
+      if (outcome === "success") {
         setStatus("registered")
-        router.replace("/dashboard")
-        router.refresh()
-      } else {
-        setStatus("failure")
-        showFeedback("failure")
-      }
-    } catch (error) {
-      const failure = error as {
-        networkError?: { statusCode?: number }
-        graphQLErrors?: Array<{ extensions?: { code?: string } }>
-      }
-      if (
-        failure.networkError?.statusCode === 401 ||
-        failure.graphQLErrors?.some(
-          (item) => item.extensions?.code === "UNAUTHENTICATED",
-        )
-      ) {
+        onRegisterSuccess?.()
+      } else if (outcome === "blocking") {
         setStatus("blocking")
       } else {
         setStatus("failure")
         showFeedback("failure")
       }
+    } catch {
+      setStatus("failure")
+      showFeedback("failure")
     }
   }
 
@@ -203,7 +195,7 @@ export function UserRegistration({
               onClick={() => {
                 closeExit()
                 setExited(true)
-                window.location.assign("/auth/logout")
+                onExit()
               }}
             >
               終了

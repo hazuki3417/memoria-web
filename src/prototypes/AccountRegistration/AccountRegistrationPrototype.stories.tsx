@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { UserRegistrationPrototype } from "./UserRegistrationPrototype"
+import { AccountRegistrationPrototype } from "./AccountRegistrationPrototype"
 
 const meta = {
-  title: "Design Prototypes/User Registration",
-  component: UserRegistrationPrototype,
+  title: "Design Prototypes/Account Registration",
+  component: AccountRegistrationPrototype,
   parameters: { layout: "fullscreen" },
-} satisfies Meta<typeof UserRegistrationPrototype>
+} satisfies Meta<typeof AccountRegistrationPrototype>
 
 export default meta
 type Story = StoryObj<typeof meta>
