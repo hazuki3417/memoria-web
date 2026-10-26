@@ -1,0 +1,30 @@
+query DashboardRecentMedia($scope: ScopeInput!) {
+  mediaList(scope: $scope, first: 32) {
+    edges {
+      node {
+        id
+        image { variants { url width } }
+      }
+    }
+  }
+}
+
+query DashboardRecentGroups($scope: ScopeInput!) {
+  mediaGroups(scope: $scope, sort: CREATED_AT_DESC, first: 6) {
+    edges {
+      node {
+        id
+        name
+        media(first: 4) {
+          edges {
+            node {
+              id
+              image { variants { url width } }
+            }
+          }
+          pageInfo { hasNextPage }
+        }
+      }
+    }
+  }
+}
