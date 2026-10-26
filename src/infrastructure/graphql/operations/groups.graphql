@@ -49,3 +49,8 @@ mutation AddBrowserMediaToGroup($input: ChangeMediaGroupClassificationInput!) {
 mutation RemoveBrowserMediaFromGroup($input: ChangeMediaGroupClassificationInput!) {
   removeMediaFromGroup(input: $input) { results { mediaId status errorCode } }
 }
+
+# One action can assign the same set of Groups to multiple Media.
+mutation AddBrowserMediaToGroups($input: AddMediaToGroupsInput!) {
+  addMediaToGroups(input: $input) { results { mediaId status errorCode } }
+}
