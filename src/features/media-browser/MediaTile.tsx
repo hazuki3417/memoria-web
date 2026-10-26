@@ -60,10 +60,15 @@ export function MediaTile({
             処理に失敗しました
           </Text>
         </Stack>
-      ) : !item.src ? (
+      ) : item.processing ? (
         <Stack align="center" justify="center" gap={6} p="sm" c="dimmed">
           <Loader size="sm" />
           <Text size="xs" ta="center">画像を処理しています</Text>
+        </Stack>
+      ) : !item.src ? (
+        <Stack align="center" justify="center" gap={6} p="sm" c="dimmed">
+          <IconPhotoOff size={30} stroke={1.5} aria-hidden="true" />
+          <Text size="xs" ta="center">画像を表示できません</Text>
         </Stack>
       ) : (
         <Image
