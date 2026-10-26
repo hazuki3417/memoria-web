@@ -1,6 +1,6 @@
 import { MockedProvider, type MockedResponse } from "@apollo/client/testing"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, within } from "storybook/test"
+import { expect, waitFor, within } from "storybook/test"
 import {
   DashboardRecentGroupsDocument,
   DashboardRecentMediaDocument,
@@ -22,7 +22,7 @@ const groupResult = { mediaGroups: { edges: [{
 }] } }
 const emptyMediaResult = { mediaList: { edges: [] } }
 const emptyGroupResult = { mediaGroups: { edges: [] } }
-const response = (request: MockedResponse["request"], data: unknown): MockedResponse => ({
+const response = (request: MockedResponse["request"], data: Record<string, unknown>): MockedResponse => ({
   request, result: { data },
 })
 const meta = {
@@ -44,7 +44,7 @@ export const PopulatedPersonal: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText("旅行")).toBeVisible()
-    await expect(canvas.getByRole("link", { name: "すべて見る" })).toBeDefined()
+    await expect(canvas.getAllByRole("link", { name: "すべて見る" })).toHaveLength(2)
     await expect(canvas.queryByText("メディアはまだありません")).not.toBeInTheDocument()
   },
 }
@@ -76,7 +76,7 @@ export const RetryMedia: Story = {
     await expect(await canvas.findByText("メディアを取得できませんでした")).toBeVisible()
     await expect(canvas.getByText("旅行")).toBeVisible()
     await canvas.getByRole("button", { name: "再試行" }).click()
-    await expect(await canvas.findByRole("link", { name: "すべて見る" })).toBeDefined()
+    await waitFor(() => expect(canvas.getAllByRole("link", { name: "すべて見る" })).toHaveLength(2))
     await expect(canvas.queryByText("メディアを取得できませんでした")).not.toBeInTheDocument()
   },
 }
