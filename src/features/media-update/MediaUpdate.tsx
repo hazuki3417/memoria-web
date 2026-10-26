@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation"
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
+import { useMediaUpdateDraft, type MediaUpdateDraftItem } from "./useMediaUpdateDraft"
+import type { MediaUpdateScope } from "./mediaTagApi"
+
 import { FeedbackAlert } from "@/components/Feedback"
 import { applyMediaTagDraftAction } from "@/components/MediaTagEditor/mediaTagDraft"
 import {
@@ -42,11 +45,44 @@ const initialItems = [
   { id: "3", label: "sunset.webp", detail: "3.1 MB", tags: ["家族"] },
 ]
 
+type LiveProps = {
+ items: MediaUpdateDraftItem[]
+ status: "idle" | "loading" | "saving" | "saved" | "partial-failure" | "load-failure"
+ changed: boolean
+ onChangeTags: (id: string, tags: string[]) => void
+ onDiscard: (id: string) => void
+ onSave: () => void
+ onReload: () => void
+}
+
+export function MediaUpdateLive({
+ targets,
+ context = "personal",
+ communityId = "photo-club",
+}: {
+ targets: { id: string; label: string; detail: string }[]
+ context?: "personal" | "community"
+ communityId?: string
+}) {
+ const scope: MediaUpdateScope = context === "personal"
+  ? { type: "PERSONAL" }
+  : { type: "COMMUNITY", communityId }
+ const draft = useMediaUpdateDraft(targets, scope)
+ return <MediaUpdate context={context} communityId={communityId} live={{
+  items: draft.items, status: draft.status, changed: draft.changed,
+  onChangeTags: draft.updateTags, onDiscard: draft.discard,
+  onSave: () => { void draft.save() },
+  onReload: () => { void draft.reload() },
+ }} />
+}
+
 export function MediaUpdate({
   scenario = "editing",
   context = "personal",
   communityId = "photo-club",
+  live,
 }: {
+  live?: LiveProps
   scenario?: MediaUpdateScenario
   context?: "personal" | "community"
   communityId?: string
@@ -57,27 +93,29 @@ export function MediaUpdate({
     initialItems.map((item) => item.id),
   )
   const [bulkTag, setBulkTag] = useState("")
+  const shownItems = live?.items ?? items
+  const shownScenario = live ? (live.status === "idle" || live.status === "loading" ? "editing" : live.status) : scenario
   const currentContext = contexts[context]
   const unavailable =
-    scenario === "partial-failure" ? new Set(["2"]) : new Set<string>()
+    !live && shownScenario === "partial-failure" ? new Set(["2"]) : new Set<string>()
 
   return (
     <>
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
-          {scenario === "load-failure" ? (
+          {shownScenario === "load-failure" ? (
             <FeedbackAlert kind="error" title="Mediaを読み込めませんでした">
               編集対象を取得できません。再試行するかMedia
               Browserへ戻ってください。
             </FeedbackAlert>
           ) : (
             <>
-              {scenario === "saved" && (
+              {shownScenario === "saved" && (
                 <FeedbackAlert kind="success" title="変更を保存しました">
                   すべてのMediaの変更が保存されました。
                 </FeedbackAlert>
               )}
-              {scenario === "partial-failure" && (
+              {shownScenario === "partial-failure" && (
                 <FeedbackAlert
                   kind="warning"
                   title="一部の変更を保存できませんでした"
@@ -90,30 +128,30 @@ export function MediaUpdate({
                 <MediaTagBulkEditor
                   selectedCount={selectedIds.length}
                   allSelected={
-                    items.length > 0 && selectedIds.length === items.length
+                    shownItems.length > 0 && selectedIds.length === shownItems.length
                   }
                   indeterminate={
                     selectedIds.length > 0 &&
-                    selectedIds.length !== items.length
+                    selectedIds.length !== shownItems.length
                   }
-                  selectionDisabled={items.length === 0}
+                  selectionDisabled={shownItems.length === 0 || live?.status === "loading" || live?.status === "saving"}
                   summaryItems={[
-                    { label: "Media登録済み", value: `${items.length}件` },
+                    { label: "Media登録済み", value: `${shownItems.length}件` },
                     { label: "画像処理中", value: "0件" },
-                    { label: "完了", value: `${items.length}件` },
+                    { label: "完了", value: `${shownItems.length}件` },
                   ]}
                   value={bulkTag}
-                  actionDisabled={!bulkTag.trim() || selectedIds.length === 0}
+                  actionDisabled={!bulkTag.trim() || selectedIds.length === 0 || live?.status === "loading" || live?.status === "saving"}
                   selectAllLabel="Mediaをすべて選択"
                   headerAction={
                     <Button
                       variant="subtle"
                       color="gray"
                       size="compact-sm"
-                      disabled={items.length === 0}
+                      disabled={shownItems.length === 0}
                       aria-label="すべて削除"
                       onClick={() => {
-                        setItems([])
+                        if (live) { shownItems.forEach((item) => live.onDiscard(item.id)) } else setItems([])
                         setSelectedIds([])
                       }}
                     >
@@ -122,16 +160,22 @@ export function MediaUpdate({
                   }
                   onToggleAll={() =>
                     setSelectedIds(
-                      selectedIds.length === items.length
+                      selectedIds.length === shownItems.length
                         ? []
-                        : items.map((item) => item.id),
+                        : shownItems.map((item) => item.id),
                     )
                   }
                   onChange={setBulkTag}
                   onAction={(action) => {
                     const tag = bulkTag.trim()
                     if (!tag) return
-                    setItems((current) =>
+                    if (live) {
+                      shownItems.forEach((item) => {
+                        if (selectedIds.includes(item.id) && !unavailable.has(item.id)) {
+                          live.onChangeTags(item.id, applyMediaTagDraftAction(item.tags, tag, action))
+                        }
+                      })
+                    } else setItems((current) =>
                       current.map((item) => {
                         if (
                           !selectedIds.includes(item.id) ||
@@ -148,7 +192,7 @@ export function MediaUpdate({
                   }}
                 />
                 <MediaTagEditorList>
-                  {items.map((item) => (
+                  {shownItems.map((item) => (
                     <MediaTagEditorRow
                       key={item.id}
                       label={item.label}
@@ -163,7 +207,8 @@ export function MediaUpdate({
                           color="gray"
                           size="compact-sm"
                           onClick={() => {
-                            setItems((current) =>
+                            if (live) live.onDiscard(item.id)
+                            else setItems((current) =>
                               current.filter(
                                 (currentItem) => currentItem.id !== item.id,
                               ),
@@ -186,7 +231,8 @@ export function MediaUpdate({
                       }
                       onTagsChange={(tags) => {
                         if (unavailable.has(item.id)) return
-                        setItems((current) =>
+                        if (live) live.onChangeTags(item.id, tags)
+                        else setItems((current) =>
                           current.map((currentItem) =>
                             currentItem.id === item.id
                               ? { ...currentItem, tags }
@@ -216,7 +262,7 @@ export function MediaUpdate({
       >
         <Box maw={1120} mx="auto" px="lg" py="sm">
           <Group justify="flex-end">
-            {scenario === "load-failure" ? (
+            {shownScenario === "load-failure" ? (
               <>
                 <Button
                   variant="default"
@@ -230,16 +276,17 @@ export function MediaUpdate({
                 >
                   Media Browserへ戻る
                 </Button>
-                <Button>再試行</Button>
+                <Button onClick={live?.onReload}>再試行</Button>
               </>
             ) : (
               <>
-                <Button variant="default">キャンセル</Button>
+                <Button variant="default" onClick={() => router.push(context === "community" ? `/communities/${communityId}/media` : "/media")}>キャンセル</Button>
                 <Button
-                  loading={scenario === "saving"}
-                  disabled={scenario === "saved"}
+                  loading={shownScenario === "saving"}
+                  disabled={shownScenario === "saved" || (live ? (!live.changed || live.status === "loading") : false)}
+                  onClick={live?.onSave}
                 >
-                  {scenario === "saved" ? "保存済み" : "変更を保存"}
+                  {shownScenario === "saved" ? "保存済み" : "変更を保存"}
                 </Button>
               </>
             )}
