@@ -23,7 +23,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     scopeKey, tagIds: [],
   })
   const selectedTagIds = appliedFilter.scopeKey === scopeKey ? appliedFilter.tagIds : []
-  const [tagError, setTagError] = useState<string | null>(null)
+  const [tagError, setTagError] = useState<{ scopeKey: string; message: string } | null>(null)
 
   const tagQuery = useMediaBrowserTagsQuery({
     variables: { scope, first: 100 },
@@ -76,12 +76,12 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     .map(({ node }) => [node.name, node.id] as const)), [tagsPage])
   const applyTags = useCallback((names: string[]) => {
     if (names.length > 0 && !allTagsLoaded) {
-      setTagError("Tagの取得が完了していません。再度お試しください。")
+      setTagError({ scopeKey, message: "Tagの取得が完了していません。再度お試しください。" })
       return
     }
     const resolution = resolveTagFilter(names, (tagsPage?.edges ?? []).map(edge => edge.node))
     if (!resolution.ok) {
-      setTagError("現在の範囲に存在するTagを重複なく選択してください。")
+      setTagError({ scopeKey, message: "現在の範囲に存在するTagを重複なく選択してください。" })
       return
     }
     setTagError(null)
@@ -140,7 +140,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
   }, [nextCursor, query.loading, query.fetchMore, requestKey])
 
   return <>
-    {tagError && <Alert color="red" title="Tag検索" role="alert">{tagError}</Alert>}
+    {tagError?.scopeKey === scopeKey && <Alert color="red" title="Tag検索" role="alert">{tagError.message}</Alert>}
     {(tagQuery.error || (tagPageFailedKey && tagPageFailedKey.startsWith(scopeKey + ":"))) && (
       <Alert color="red" title="Tagを読み込めませんでした" role="alert">
         <Group justify="space-between">
