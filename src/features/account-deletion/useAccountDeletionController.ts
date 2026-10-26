@@ -13,21 +13,18 @@ import {
   communitiesForScenario,
   type CommunityScenario,
   type ReviewState,
-  type RetryOutcome,
   type Decision,
 } from "./accountDeletionScenarios"
 
 export function useAccountDeletionController({
   reviewState,
   communityScenario,
-  retryOutcome,
   mockScenario,
   prototype,
   onNavigateBack,
 }: {
   reviewState: ReviewState
   communityScenario: CommunityScenario
-  retryOutcome: RetryOutcome
   mockScenario?: MockScenario
   prototype: boolean
   onNavigateBack: () => void
