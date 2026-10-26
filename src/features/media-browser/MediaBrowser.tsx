@@ -112,6 +112,8 @@ function MediaBrowserContent({
   hasMore = false,
   loadingMore = false,
   loadMoreError = false,
+  tagOptions,
+  onApplyTags,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
@@ -126,6 +128,8 @@ function MediaBrowserContent({
   hasMore?: boolean
   loadingMore?: boolean
   loadMoreError?: boolean
+  tagOptions?: string[]
+  onApplyTags?: (names: string[]) => void
 }) {
   const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -205,6 +209,7 @@ function MediaBrowserContent({
                   onSubmit={(event) => {
                     event.preventDefault()
                     setAppliedTags([...tags])
+                    onApplyTags?.([...tags])
                   }}
                 >
                   <Group gap="xs" wrap="nowrap">
@@ -212,6 +217,7 @@ function MediaBrowserContent({
                       placeholder="Tagを検索"
                       value={tags}
                       onChange={setTags}
+                      data={tagOptions}
                       clearable
                       leftSection={<IconSearch size={16} />}
                       size="xs"
@@ -417,7 +423,11 @@ function MediaBrowserContent({
                 <Text size="sm" c="dimmed" ta="center">
                   選択中のTagを変更するか、filterを解除してください。
                 </Text>
-                <Button variant="default" onClick={() => setTags([])}>
+                <Button variant="default" onClick={() => {
+                  setTags([])
+                  setAppliedTags([])
+                  onApplyTags?.([])
+                }}>
                   Filterを解除
                 </Button>
               </Stack>
