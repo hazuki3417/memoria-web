@@ -1,9 +1,9 @@
 "use client"
 
-import { BulkItemStatus, ScopeType, useAddBrowserMediaToGroupMutation, useBrowseGroupsQuery, useMediaBrowserListQuery, useMediaBrowserTagsQuery } from "@/infrastructure/graphql/generated"
+import { BulkItemStatus, ScopeType, useAddBrowserMediaToGroupsMutation, useBrowseGroupsQuery, useMediaBrowserListQuery, useMediaBrowserTagsQuery } from "@/infrastructure/graphql/generated"
 import { Alert, Button, Group, Text } from "@mantine/core"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { MediaBrowser } from "./MediaBrowser"
+import { MediaBrowser, type GroupActionResult } from "./MediaBrowser"
 import { selectBrowserThumbnail } from "./selectBrowserThumbnail"
 import { resolveTagFilter } from "./resolveTagFilter"
 import type { MediaItem } from "@/features/media-detail"
@@ -102,9 +102,10 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     skip,
     notifyOnNetworkStatusChange: true,
   })
-  const [addToGroupMutation] = useAddBrowserMediaToGroupMutation()
+  const [addToGroupsMutation] = useAddBrowserMediaToGroupsMutation()
   const [groupActionPending, setGroupActionPending] = useState(false)
   const [groupActionError, setGroupActionError] = useState<string | null>(null)
+  const [groupActionResult, setGroupActionResult] = useState<GroupActionResult | null>(null)
   const groupsPage = groupQuery.data?.mediaGroups
   const groupOptions = (groupsPage?.edges ?? []).map(({ node }) => ({
     value: node.id, label: node.name,
@@ -119,29 +120,39 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     }
     setGroupActionPending(true)
     setGroupActionError(null)
+    setGroupActionResult(null)
     try {
-      const results = await Promise.all(groupIds.map(groupId =>
-        addToGroupMutation({ variables: { input: { groupId, mediaIds } } })
-      ))
-      const failures = results.flatMap(result =>
-        (result.data?.addMediaToGroup.results ?? []).filter(item => item.status === BulkItemStatus.Failed))
-      if (failures.length || results.some(result => !result.data)) {
-        setGroupActionError("一部のMediaをGroupへ追加できませんでした。結果を確認して再試行してください。")
+      const response = await addToGroupsMutation({ variables: { input: { groupIds, mediaIds } } })
+      const results = response.data?.addMediaToGroups.results
+      // A missing or malformed payload must not be treated as success.
+      if (!results || results.length !== mediaIds.length ||
+          new Set(results.map(item => item.mediaId)).size !== mediaIds.length ||
+          results.some(item => !mediaIds.includes(item.mediaId))) {
+        setGroupActionError("処理結果を確認できませんでした。最新の所属状態を確認してください。")
         return false
       }
+      const outcome: GroupActionResult = {
+        succeeded: results.filter(item => item.status === BulkItemStatus.Succeeded).length,
+        alreadyApplied: results.filter(item => item.status === BulkItemStatus.AlreadyApplied).length,
+        failed: results.filter(item => item.status === BulkItemStatus.Failed)
+          .map(item => ({ mediaId: item.mediaId, errorCode: item.errorCode })),
+      }
+      setGroupActionResult(outcome)
+      if (outcome.failed.length > 0) return false
       showNotification({
         kind: "success",
         title: "Groupへの追加",
-        description: `${mediaIds.length}件のMediaを${groupIds.length}件のGroupへ追加しました。`,
+        description: `${mediaIds.length}件のMediaについて${groupIds.length}件のGroupへの追加を確認しました。`,
       })
       return true
     } catch {
-      setGroupActionError("Groupへの追加結果を確認できませんでした。再試行前に状態を確認してください。")
+      // A timeout may occur after commit. Do not promise rollback or blindly retry.
+      setGroupActionError("結果を確認できませんでした。所属状態を確認してから再試行してください。")
       return false
     } finally {
       setGroupActionPending(false)
     }
-  }, [groupActionPending, groupsPage, groupQuery.error, addToGroupMutation])
+  }, [groupActionPending, groupsPage, groupQuery.error, addToGroupsMutation])
 
   // Group results can span multiple pages. Only offer a complete list.
   const groupCursor = groupsPage?.pageInfo.hasNextPage ? groupsPage.pageInfo.endCursor : null
@@ -263,6 +274,8 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
       onAddToGroups={addToGroups}
       groupActionPending={groupActionPending}
       onRetryGroupOptions={retryGroups}
+      groupActionResult={groupActionResult}
+      onDismissGroupActionResult={() => { setGroupActionResult(null); setGroupActionError(null) }}
       groupActionError={groupActionError ?? (groupQuery.error || groupPageFailure === scopeKey
         ? "Groupを取得できませんでした。"
         : groupsPage?.pageInfo.hasNextPage || groupQuery.loading ? "Groupを読み込み中です。" : null)}
