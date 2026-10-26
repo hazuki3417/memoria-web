@@ -10,6 +10,7 @@ import {
   Loader,
   MultiSelect,
   Paper,
+  ScrollArea,
   Select,
   Stack,
   Text,
@@ -223,7 +224,8 @@ function MediaBrowserContent({
       {
         <Box
           w="100%"
-          style={{ display: "flex", flexDirection: "column", minWidth: 0 }}
+          h="calc(100vh - 88px)"
+          style={{ display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0, overflow: "hidden" }}
         >
           <MediaBrowserToolbar
             compact={compact}
@@ -245,7 +247,7 @@ function MediaBrowserContent({
             onEndSelection={endSelection}
           />
           <Divider />
-
+          <ScrollArea flex={1} style={{ minHeight: 0 }}>
           {activeState === "loading" && (
             <Center mih={360}>
               <Stack align="center">
@@ -394,6 +396,7 @@ function MediaBrowserContent({
               </Group>
             </Paper>
           )}
+          </ScrollArea>
         </Box>
       }
 
