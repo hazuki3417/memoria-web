@@ -4,4 +4,5 @@ export type MediaItem = {
   src: string
   failed?: boolean
   processing?: boolean
+  variants?: { width: number; url: string }[]
 }
