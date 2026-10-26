@@ -1,23 +1,17 @@
 "use client"
 
 import { useState } from "react"
+import { Button, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { SettingsLayout, type Section } from "@/features/settings/SettingsLayout"
 import { SettingsProfile } from "@/features/settings/SettingsProfile"
 import { SettingsPreferences } from "@/features/settings/SettingsPreferences"
 import { SettingsAccount } from "@/features/settings/SettingsAccount"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
-import { FeedbackAlert, showNotification } from "@/components/Feedback"
-import { NavigationItem } from "@/components/NavigationItem"
-import { PageHeader } from "@/components/PageHeader"
-import { SectionHeader } from "@/components/SectionHeader"
-import { SettingRow } from "@/components/SettingRow"
 import { SettingsUsage, type SettingsUsageData } from "@/features/settings"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type ProfileSaveState = "idle" | "saving" | "retryable-error" | "blocked"
-
-const MOCK_PROFILE = { nickname: "ユーザー" }
 
 // Deterministic Storybook sample data; these values are not product values.
 const MOCK_USAGE: SettingsUsageData = {
@@ -167,7 +161,6 @@ export function SettingsPrototype({
       >
         現在の設定: {currentLabel}
       </Text>
-      </Box>
     </PrototypeApplicationShell>
   )
 }
