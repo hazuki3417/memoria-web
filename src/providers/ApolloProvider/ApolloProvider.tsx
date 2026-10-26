@@ -2,10 +2,10 @@
 
 import {
   ApolloClient,
-  ApolloProvider as ReactApolloProvider,
   HttpLink,
   InMemoryCache,
 } from "@apollo/client"
+import { ApolloProvider as ReactApolloProvider } from "@apollo/client/react"
 import { useState, type ReactNode } from "react"
 
 export function ApolloProvider({ children }: { children: ReactNode }) {
