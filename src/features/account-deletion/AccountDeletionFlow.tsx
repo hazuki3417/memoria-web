@@ -861,8 +861,13 @@ export function AccountDeletionFlow({
                         </FeedbackAlert>
                       )}
                       {reauth && (
-                        <FeedbackAlert kind="info" title="再認証済み">
-                          削除を確定する前に、内容をもう一度確認してください。
+                        <FeedbackAlert
+                          kind="info"
+                          title={prototype ? "再認証（プロトタイプ）" : "再認証済み"}
+                        >
+                          {prototype
+                            ? "実際のAuth0認証は行いません。削除処理も実行されません。"
+                            : "削除を確定する前に、内容をもう一度確認してください。"}
                         </FeedbackAlert>
                       )}
                       <Group gap="sm" justify="space-between">
