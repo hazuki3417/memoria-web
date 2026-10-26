@@ -156,6 +156,11 @@ function MediaTile({
             処理に失敗しました
           </Text>
         </Stack>
+      ) : !item.src ? (
+        <Stack align="center" justify="center" gap={6} p="sm" c="dimmed">
+          <Loader size="sm" />
+          <Text size="xs" ta="center">画像を処理しています</Text>
+        </Stack>
       ) : (
         <Image
           src={item.src}
@@ -552,7 +557,7 @@ function MediaBrowserContent({
                       toggle(item.id)
                       return
                     }
-                    setDetail(item)
+                    if (!items) setDetail(item)
                   }}
                 />
               ))}
