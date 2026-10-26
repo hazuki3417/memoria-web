@@ -6,11 +6,11 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import { SettingsLayout, type Section } from "./SettingsLayout"
-import { SettingsProfile, type SaveProfile } from "./SettingsProfile"
-import { SettingsPreferences } from "./SettingsPreferences"
-import { SettingsAccount } from "./SettingsAccount"
+import { SettingsProfile, type SaveProfile } from "./profile/SettingsProfile"
+import { SettingsPreferences } from "./preferences/SettingsPreferences"
+import { SettingsAccount } from "./account/SettingsAccount"
 import { SettingsUsage, type SettingsUsageData } from "@/features/usage"
-import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import type { UserPreferences, UserPreferencesPatch } from "./preferences/userPreferences"
 
 const MOCK_USAGE: SettingsUsageData = {
   usedBytes: 1_240_000_000, limitBytes: 5_000_000_000, mediaCount: 1248,
