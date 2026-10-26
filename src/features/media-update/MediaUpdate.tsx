@@ -117,6 +117,11 @@ export function MediaUpdate({
             </FeedbackAlert>
           ) : (
             <>
+              {live?.status === "loading" && (
+                <FeedbackAlert kind="info" title="Mediaを読み込んでいます">
+                  Tagの現在状態を取得しています。
+                </FeedbackAlert>
+              )}
               {shownScenario === "saved" && (
                 <FeedbackAlert kind="success" title="変更を保存しました">
                   すべてのMediaの変更が保存されました。
@@ -127,7 +132,7 @@ export function MediaUpdate({
                   kind="warning"
                   title="一部の変更を保存できませんでした"
                 >
-                  {live ? "一部のMediaの変更を保存できませんでした。未保存の内容を確認して再試行してください。" : "Media 2は現在編集できません。ほかのMediaの変更は保存されています。"}
+                  {live ? "一部のMediaの保存に失敗しました。競合や権限変更が発生したMediaは、再読込して編集内容を確認してから保存してください。" : "Media 2は現在編集できません。ほかのMediaの変更は保存されています。"}
                 </FeedbackAlert>
               )}
               <Stack gap="sm">
