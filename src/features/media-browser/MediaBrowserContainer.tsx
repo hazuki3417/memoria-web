@@ -1,6 +1,6 @@
 "use client"
 
-import { gql, useQuery } from "@apollo/client"
+import { ScopeType, useMediaBrowserListQuery, useMediaBrowserTagsQuery } from "@/infrastructure/graphql/generated"
 import { Alert, Button, Group, Text } from "@mantine/core"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { MediaBrowser } from "./MediaBrowser"
@@ -8,58 +8,13 @@ import { selectBrowserThumbnail } from "./selectBrowserThumbnail"
 import { resolveTagFilter } from "./resolveTagFilter"
 import type { MediaItem } from "@/features/media-detail"
 
-// API-side scope is authoritative; the Web never sends user IDs for Personal.
-const MEDIA_LIST = gql`
-  query MediaBrowserList($scope: ScopeInput!, $filter: MediaFilterInput, $first: Int!, $after: String) {
-    mediaList(scope: $scope, filter: $filter, first: $first, after: $after) {
-      edges {
-        cursor
-        node {
-          id
-          originalFileName
-          processing { status }
-          image { variants { url width } }
-        }
-      }
-      pageInfo { hasNextPage endCursor }
-    }
-  }
-`
-const MEDIA_TAGS = gql`
-  query MediaBrowserTags($scope: ScopeInput!, $first: Int!, $after: String) {
-    mediaTags(scope: $scope, first: $first, after: $after) {
-      edges { cursor node { id name } }
-      pageInfo { hasNextPage endCursor }
-    }
-  }
-`
-
-type PageInfo = { hasNextPage: boolean; endCursor: string | null }
-type ListResult = {
-  mediaList: {
-    edges: { cursor: string; node: {
-      id: string
-      originalFileName: string
-      processing: { status: string } | null
-      image: { variants: { url: string; width: number }[] } | null
-    } }[]
-    pageInfo: PageInfo
-  }
-}
-type TagsResult = {
-  mediaTags: {
-    edges: { cursor: string; node: { id: string; name: string } }[]
-    pageInfo: PageInfo
-  }
-}
-
 export function MediaBrowserContainer({ contextKind = "personal", communityId }: {
   contextKind?: "personal" | "community"
   communityId?: string
 }) {
   const scope = useMemo(() => contextKind === "personal"
-    ? { type: "PERSONAL" }
-    : { type: "COMMUNITY", communityId }, [contextKind, communityId])
+    ? { type: ScopeType.Personal }
+    : { type: ScopeType.Community, communityId }, [contextKind, communityId])
   const skip = contextKind === "community" && !communityId
   const scopeKey = contextKind + ":" + (communityId ?? "")
 
@@ -70,7 +25,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
   const selectedTagIds = appliedFilter.scopeKey === scopeKey ? appliedFilter.tagIds : []
   const [tagError, setTagError] = useState<string | null>(null)
 
-  const tagQuery = useQuery<TagsResult>(MEDIA_TAGS, {
+  const tagQuery = useMediaBrowserTagsQuery({
     variables: { scope, first: 100 },
     skip,
     notifyOnNetworkStatusChange: true,
@@ -133,7 +88,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     setAppliedFilter({ scopeKey, tagIds: resolution.tagIds })
   }, [scopeKey, allTagsLoaded, tagsPage])
 
-  const query = useQuery<ListResult>(MEDIA_LIST, {
+  const query = useMediaBrowserListQuery({
     variables: { scope, filter: { tagIds: selectedTagIds }, first: 50 },
     // Signed Variant URLs are valid for 15 minutes. Never trust an old
     // cached connection when the user revisits this screen.
