@@ -9,22 +9,7 @@ import { SettingsLayout, type Section } from "./SettingsLayout"
 import { SettingsProfile, type SaveProfile } from "./profile/SettingsProfile"
 import { SettingsPreferences } from "./preferences/SettingsPreferences"
 import { SettingsAccount } from "./account/SettingsAccount"
-import { SettingsUsage, type SettingsUsageData } from "@/features/usage"
 import type { UserPreferences, UserPreferencesPatch } from "./preferences/userPreferences"
-
-const MOCK_USAGE: SettingsUsageData = {
-  usedBytes: 1_240_000_000, limitBytes: 5_000_000_000, mediaCount: 1248,
-  formatBreakdown: [
-    { format: "JPEG", count: 900, sizeBytes: 900_000_000 },
-    { format: "PNG", count: 200, sizeBytes: 200_000_000 },
-    { format: "WebP", count: 100, sizeBytes: 100_000_000 },
-    { format: "HEIC / HEIF", count: 48, sizeBytes: 40_000_000 },
-  ],
-}
-
-function UsageContent({ fileSizeUnit }: { fileSizeUnit: UserPreferences["fileSizeUnit"] }) {
-  return <SettingsUsage usage={MOCK_USAGE} fileSizeUnit={fileSizeUnit} />
-}
 
 export function Settings({
   section,
@@ -60,9 +45,7 @@ export function Settings({
       )
       break
     case "usage":
-      content = usageContent ?? (
-        <UsageContent fileSizeUnit={initialPreferences?.fileSizeUnit ?? "DECIMAL"} />
-      )
+      content = usageContent ?? null
       break
     case "account":
       content = (
