@@ -1,6 +1,7 @@
 "use client"
 
 import { gql, useQuery } from "@apollo/client"
+import { Alert, Button, Group, Text } from "@mantine/core"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { MediaBrowser } from "./MediaBrowser"
 import { selectBrowserThumbnail } from "./selectBrowserThumbnail"
@@ -78,6 +79,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
   const nextTagsCursor = tagsPage?.pageInfo.hasNextPage ? tagsPage.pageInfo.endCursor : null
   const tagPageInFlight = useRef<string | null>(null)
   const tagPageFailures = useRef<Set<string>>(new Set())
+  const [tagPageFailedKey, setTagPageFailedKey] = useState<string | null>(null)
 
   // Tag names are the display contract; only persisted IDs reach mediaList.
   // Exhaust the bounded Tag connection so Search can resolve all scoped names.
@@ -101,10 +103,17 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
       },
     }).catch(() => {
       tagPageFailures.current.add(key)
+      setTagPageFailedKey(key)
     }).finally(() => {
       if (tagPageInFlight.current === key) tagPageInFlight.current = null
     })
-  }, [nextTagsCursor, scopeKey, tagQuery.loading, tagQuery.error, tagQuery.fetchMore, skip])
+  }, [nextTagsCursor, scopeKey, tagQuery.loading, tagQuery.error, tagQuery.fetchMore, skip, tagPageFailedKey])
+
+  const retryTags = useCallback(() => {
+    tagPageFailures.current.clear()
+    setTagPageFailedKey(null)
+    if (tagQuery.error) void tagQuery.refetch()
+  }, [tagQuery.error, tagQuery.refetch])
 
   const allTagsLoaded = !tagQuery.loading && !tagQuery.error &&
     Boolean(tagsPage && !tagsPage.pageInfo.hasNextPage)
@@ -173,7 +182,15 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
   }, [nextCursor, query.loading, query.fetchMore, requestKey])
 
   return <>
-    {tagError && <div role="alert">{tagError}</div>}
+    {tagError && <Alert color="red" title="Tag検索" role="alert">{tagError}</Alert>}
+    {(tagQuery.error || (tagPageFailedKey && tagPageFailedKey.startsWith(scopeKey + ":"))) && (
+      <Alert color="red" title="Tagを読み込めませんでした" role="alert">
+        <Group justify="space-between">
+          <Text size="sm">通信状態を確認して再度お試しください。</Text>
+          <Button size="xs" variant="default" onClick={retryTags}>再試行</Button>
+        </Group>
+      </Alert>
+    )}
     <MediaBrowser
       key={scopeKey}
       contextKind={contextKind}
