@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from "react"
 import { ScopeType } from "@/infrastructure/graphql/generated"
 import { Dashboard } from "./Dashboard"
 import type { DashboardGroup } from "./Dashboard"
+import { selectDashboardThumbnail } from "./selectDashboardThumbnail"
 
 type Scope = { type: ScopeType; communityId?: string }
 type PreviewMedia = { id: string; image: { variants: Array<{ url: string; width: number }> } | null }
@@ -42,11 +43,6 @@ const DASHBOARD_GROUPS = gql`
     }
   }
 `
-
-function thumbnail(variants: Array<{ url: string; width: number }> = []): string {
-  const sorted = variants.filter((item) => item.url).sort((a, b) => a.width - b.width)
-  return sorted.find((item) => item.width >= 320)?.url ?? sorted.at(-1)?.url ?? ""
-}
 
 export function DashboardContainer({ contextKind = "personal", communityId }: {
   contextKind?: "personal" | "community"
@@ -96,14 +92,14 @@ export function DashboardContainer({ contextKind = "personal", communityId }: {
     id: node.id,
     name: node.name,
     mediaCount: node.media.edges.length,
-    media: node.media.edges.map(edge => thumbnail(edge.node.image?.variants)),
+    media: node.media.edges.map(edge => selectDashboardThumbnail(edge.node.image?.variants)),
   }))
   const mediaState = skip || media.error ? "error" : !media.data ? "loading" : "ready"
   const groupState = skip || groups.error ? "error" : !groups.data ? "loading" : "ready"
   return <Dashboard
     contextKind={contextKind}
     communityId={communityId}
-    mediaItems={mediaNodes.map(node => thumbnail(node.image?.variants))}
+    mediaItems={mediaNodes.map(node => selectDashboardThumbnail(node.image?.variants))}
     mediaState={mediaState}
     groupState={groupState}
     groupItems={groupItems}
