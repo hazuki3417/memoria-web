@@ -18,7 +18,7 @@ import {
   IconFolder,
   IconPhoto,
 } from "@tabler/icons-react"
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { showNotification } from "@/components/Feedback"
 import { recentGroups, recentMedia } from "./dashboardData"
@@ -52,14 +52,20 @@ function MediaPage({
             background: "var(--mantine-color-default-hover)",
           }}
         >
-          <Image
-            src={src}
-            alt={`最近のMedia ${page * pageSize + index + 1}`}
-            w="100%"
-            h="100%"
-            fit="cover"
-            draggable={false}
-          />
+          {src ? (
+            <Image
+              src={src}
+              alt={`最近のMedia ${page * pageSize + index + 1}`}
+              w="100%"
+              h="100%"
+              fit="cover"
+              draggable={false}
+            />
+          ) : (
+            <Center h="100%" aria-label="サムネイルを表示できません">
+              <IconPhoto size={20} stroke={1.5} color="var(--mantine-color-dimmed)" />
+            </Center>
+          )}
         </Box>
       ))}
     </SimpleGrid>
@@ -180,6 +186,16 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
         </Box>
       )}
 
+      {hasPrevious && (
+        <Box aria-hidden="true" pos="absolute" top={0} bottom={0} left={0} w={72}
+          style={{ pointerEvents: "none", zIndex: 1,
+            background: "linear-gradient(90deg, var(--mantine-color-body), transparent)" }} />
+      )}
+      {hasNext && (
+        <Box aria-hidden="true" pos="absolute" top={0} bottom={0} right={0} w={72}
+          style={{ pointerEvents: "none", zIndex: 1,
+            background: "linear-gradient(270deg, var(--mantine-color-body), transparent)" }} />
+      )}
       {hasPrevious && (
         <ActionIcon
           aria-label="前のMediaへ"
@@ -302,7 +318,6 @@ export function Dashboard({
   communityId = "photo-club",
   mediaItems,
   groupItems,
-  groupContent,
   mediaState,
   groupState,
   onRetryMedia,
@@ -313,7 +328,6 @@ export function Dashboard({
   communityId?: string
   mediaItems?: string[]
   groupItems?: DashboardGroup[]
-  groupContent?: ReactNode
   mediaState?: "loading" | "error" | "ready"
   groupState?: "loading" | "error" | "ready"
   onRetryMedia?: () => void
@@ -387,7 +401,7 @@ export function Dashboard({
           ) : noGroups ? (
             <EmptyState kind="group" href={groupsHref} />
           ) : (
-            groupContent ?? <RecentGroups groups={groups} />
+            <RecentGroups groups={groups} />
           )}
         </Stack>
       </Stack>
