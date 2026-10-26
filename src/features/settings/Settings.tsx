@@ -9,7 +9,7 @@ import { SettingsLayout, type Section } from "./SettingsLayout"
 import { SettingsProfile, type SaveProfile } from "./SettingsProfile"
 import { SettingsPreferences } from "./SettingsPreferences"
 import { SettingsAccount } from "./SettingsAccount"
-import { SettingsUsage, type SettingsUsageData } from "./SettingsUsage"
+import { SettingsUsage, type SettingsUsageData } from "@/features/usage"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 
 const MOCK_USAGE: SettingsUsageData = {
