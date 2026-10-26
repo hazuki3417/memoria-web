@@ -58,6 +58,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     src: [...(node.image?.variants ?? [])].sort((a, b) => a.width - b.width).find(v => v.width >= 320)?.url
       ?? [...(node.image?.variants ?? [])].sort((a, b) => b.width - a.width)[0]?.url ?? "",
     failed: node.processing?.status === "FAILED",
+    processing: node.processing?.status === "PROCESSING",
   }))
   const pageInfo = snapshot?.mediaList.pageInfo
 
