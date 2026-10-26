@@ -2,38 +2,25 @@
 
 import {
   Alert,
-  Badge,
   Box,
   Button,
   Center,
   Divider,
   Group,
   Loader,
-  Menu,
   MultiSelect,
   Paper,
-  SegmentedControl,
   Select,
   Stack,
-  TagsInput,
   Text,
   ThemeIcon,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconAlertCircle,
-  IconCheckbox,
-  IconChevronDown,
   IconCloudUpload,
-  IconEdit,
-  IconEye,
-  IconFolderPlus,
   IconPhoto,
-  IconPlus,
-  IconSearch,
-  IconShare,
   IconTags,
-  IconTrash,
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
