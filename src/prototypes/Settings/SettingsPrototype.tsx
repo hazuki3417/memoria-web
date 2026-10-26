@@ -8,10 +8,9 @@ import {
   SettingsProfile,
   SettingsPreferences,
   SettingsAccount,
-  SettingsUsage,
-  type SettingsUsageData,
   type Section,
 } from "@/features/settings"
+import { SettingsUsage, type SettingsUsageData } from "@/features/usage"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
