@@ -93,6 +93,8 @@ export function MediaUpdate({
     initialItems.map((item) => item.id),
   )
   const [bulkTag, setBulkTag] = useState("")
+  const [leavePrompt, setLeavePrompt] = useState(false)
+  const backToBrowser = () => router.push(context === "community" ? `/communities/${communityId}/media` : "/media")
   useEffect(() => {
     if (live) setSelectedIds(live.items.map((item) => item.id))
   // Sync selection when loaded Media identifiers change.
@@ -284,7 +286,7 @@ export function MediaUpdate({
               </>
             ) : (
               <>
-                <Button variant="default" onClick={() => router.push(context === "community" ? `/communities/${communityId}/media` : "/media")}>キャンセル</Button>
+                <Button variant="default" onClick={() => live?.changed ? setLeavePrompt(true) : backToBrowser()}>キャンセル</Button>
                 <Button
                   loading={shownScenario === "saving"}
                   disabled={shownScenario === "saved" || (live ? (!live.changed || live.status === "loading") : false)}
@@ -299,8 +301,8 @@ export function MediaUpdate({
       </Box>
 
       <Modal
-        opened={scenario === "leave-confirmation"}
-        onClose={() => undefined}
+        opened={scenario === "leave-confirmation" || leavePrompt}
+        onClose={() => setLeavePrompt(false)}
         title="編集画面を離れますか？"
         centered
       >
@@ -309,8 +311,8 @@ export function MediaUpdate({
             保存していないTagの変更があります。この画面を離れると変更は破棄されます。
           </Text>
           <Group justify="flex-end">
-            <Button variant="default">この画面に残る</Button>
-            <Button color="red">変更を破棄して移動</Button>
+            <Button variant="default" onClick={() => setLeavePrompt(false)}>この画面に残る</Button>
+            <Button color="red" onClick={backToBrowser}>変更を破棄して移動</Button>
           </Group>
         </Stack>
       </Modal>
