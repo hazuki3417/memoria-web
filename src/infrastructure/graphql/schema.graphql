@@ -324,6 +324,11 @@ type UpdateMediaGroupPayload {
   group: MediaGroup!
 }
 
+input AddMediaToGroupsInput {
+  groupIds: [ID!]!
+  mediaIds: [ID!]!
+}
+
 input ChangeMediaGroupClassificationInput {
   groupId: ID!
   mediaIds: [ID!]!
@@ -352,6 +357,7 @@ extend type Mutation {
   updateMediaGroup(input: UpdateMediaGroupInput!): UpdateMediaGroupPayload!
   deleteMediaGroup(input: DeleteMediaGroupInput!): DeleteMediaGroupPayload!
   addMediaToGroup(input: ChangeMediaGroupClassificationInput!): ChangeMediaGroupClassificationPayload!
+  addMediaToGroups(input: AddMediaToGroupsInput!): ChangeMediaGroupClassificationPayload!
   removeMediaFromGroup(input: ChangeMediaGroupClassificationInput!): ChangeMediaGroupClassificationPayload!
 }
 
