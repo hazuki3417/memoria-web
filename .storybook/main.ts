@@ -6,7 +6,6 @@ const config: StorybookConfig = {
     "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
   "addons": [
-    "@chromatic-com/storybook",
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
     "@storybook/addon-docs"
@@ -21,9 +20,9 @@ const config: StorybookConfig = {
         ...(Array.isArray(config.resolve?.alias)
           ? config.resolve.alias
           : Object.entries(config.resolve?.alias ?? {}).map(([find, replacement]) => ({
-              find,
-              replacement,
-            }))),
+            find,
+            replacement,
+          }))),
       ],
     },
   }),
