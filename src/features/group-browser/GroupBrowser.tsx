@@ -12,7 +12,6 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  TextInput,
   ThemeIcon,
   UnstyledButton,
 } from "@mantine/core"
@@ -33,6 +32,7 @@ import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback
 import { GroupDeleteDialog } from "./GroupDeleteDialog"
 import { GroupCreateDialog } from "./GroupCreateDialog"
 import { GroupEditDialog } from "./GroupEditDialog"
+import { GroupBrowserToolbar } from "./GroupBrowserToolbar"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { filterVisibleGroups } from "./groupSearch"
 import { useGroupSearchState } from "./useGroupSearchState"
@@ -450,62 +450,16 @@ export function GroupBrowser({
               h="100%"
               style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
             >
-              <Box
-                pb="xs"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: compact
-                    ? "minmax(0, 1fr)"
-                    : "minmax(0, 1fr) auto",
-                  alignItems: "center",
-                  gap: "var(--mantine-spacing-xs)",
-                }}
-              >
-                <Box style={{ minWidth: 0 }}>
-                  <Group
-                    component="form"
-                    onSubmit={(event) => {
-                      event.preventDefault()
-                      setAppliedQuery(query)
-                    }}
-                    gap="xs"
-                    wrap="nowrap"
-                    style={{ minWidth: 0 }}
-                  >
-                    <TextInput
-                      w={compact ? "100%" : 280}
-                      maw="100%"
-                      size="xs"
-                      ref={compactSearchRef}
-                      value={query}
-                      onChange={(event) => setQuery(event.currentTarget.value)}
-                      placeholder="Groupを検索"
-                      leftSection={<IconSearch size={16} />}
-                      style={{ flex: compact ? "1 1 auto" : undefined }}
-                    />
-                    <Button size="xs" type="submit">
-                      検索
-                    </Button>
-                  </Group>
-                </Box>
-                <Group
-                  gap="xs"
-                  wrap="nowrap"
-                  justify="flex-end"
-                  style={{ gridColumn: compact ? "1" : undefined }}
-                >
-                  {!hideManagementActions && (
-                    <Button
-                      size="xs"
-                      leftSection={<IconFolderPlus size={16} />}
-                      onClick={openCreate}
-                      disabled={!canManage}
-                    >
-                      Groupを作成
-                    </Button>
-                  )}
-                </Group>
-              </Box>
+              <GroupBrowserToolbar
+                compact={compact}
+                query={query}
+                onQueryChange={setQuery}
+                onSearch={() => setAppliedQuery(query)}
+                searchRef={compactSearchRef}
+                hideManagementActions={hideManagementActions}
+                canManage={canManage}
+                onCreate={openCreate}
+              />
               <Divider />
               <ScrollArea flex={1}>
                 {discoveryFeedback}
@@ -601,61 +555,15 @@ export function GroupBrowser({
                 minHeight: 0,
               }}
             >
-              <Box
-                pb="xs"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: compact
-                    ? "minmax(0, 1fr)"
-                    : "minmax(0, 1fr) auto",
-                  alignItems: "center",
-                  gap: "var(--mantine-spacing-xs)",
-                }}
-              >
-                <Box style={{ minWidth: 0 }}>
-                  <Group
-                    component="form"
-                    onSubmit={(event) => {
-                      event.preventDefault()
-                      setAppliedQuery(query)
-                    }}
-                    gap="xs"
-                    wrap="nowrap"
-                    style={{ minWidth: 0 }}
-                  >
-                    <TextInput
-                      w={compact ? "100%" : 280}
-                      maw="100%"
-                      size="xs"
-                      value={query}
-                      onChange={(event) => setQuery(event.currentTarget.value)}
-                      placeholder="Groupを検索"
-                      leftSection={<IconSearch size={16} />}
-                      style={{ flex: compact ? "1 1 auto" : undefined }}
-                    />
-                    <Button size="xs" type="submit">
-                      検索
-                    </Button>
-                  </Group>
-                </Box>
-                <Group
-                  gap="xs"
-                  wrap="nowrap"
-                  justify="flex-end"
-                  style={{ gridColumn: compact ? "1" : undefined }}
-                >
-                  {!hideManagementActions && (
-                    <Button
-                      size="xs"
-                      leftSection={<IconFolderPlus size={16} />}
-                      onClick={openCreate}
-                      disabled={!canManage}
-                    >
-                      Groupを作成
-                    </Button>
-                  )}
-                </Group>
-              </Box>
+              <GroupBrowserToolbar
+                compact={compact}
+                query={query}
+                onQueryChange={setQuery}
+                onSearch={() => setAppliedQuery(query)}
+                hideManagementActions={hideManagementActions}
+                canManage={canManage}
+                onCreate={openCreate}
+              />
               <Divider />
               <ScrollArea flex={1}>
                 {discoveryFeedback}
