@@ -61,7 +61,7 @@ export const EmptyScope: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[emptyReply]} addTypename={false}>
+      <MockedProvider mocks={[emptyReply]}>
         <Story />
       </MockedProvider>
     ),
@@ -79,7 +79,7 @@ export const ListingError: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[failedReply]} addTypename={false}>
+      <MockedProvider mocks={[failedReply]}>
         <Story />
       </MockedProvider>
     ),
@@ -101,7 +101,7 @@ export const RetryAfterError: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[failedReply, emptyReply]} addTypename={false}>
+      <MockedProvider mocks={[failedReply, emptyReply]}>
         <Story />
       </MockedProvider>
     ),
@@ -121,7 +121,7 @@ export const RetryFailsThenRecovers: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[failedReply, failedReply, emptyReply]} addTypename={false}>
+      <MockedProvider mocks={[failedReply, failedReply, emptyReply]}>
         <Story />
       </MockedProvider>
     ),
@@ -147,7 +147,7 @@ export const EmptyScopeCreateCancel: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[emptyReply]} addTypename={false}>
+      <MockedProvider mocks={[emptyReply]}>
         <Story />
       </MockedProvider>
     ),
@@ -231,7 +231,7 @@ export const CreateMutationSuccess: Story = {
           } satisfies MockedResponse<OperationCreateBrowserGroupMutation>,
           emptyReply,
         ]}
-        addTypename={false}
+       
       >
         <Story />
       </MockedProvider>
@@ -264,7 +264,7 @@ export const CreateMutationRejected: Story = {
             result: createRejectedReply,
           },
         ]}
-        addTypename={false}
+       
       >
         <Story />
       </MockedProvider>
@@ -296,7 +296,7 @@ export const CreateMutationUnknown: Story = {
           emptyReply,
           { request: createRequest, result: createUnknownReply },
         ]}
-        addTypename={false}
+       
       >
         <Story />
       </MockedProvider>
@@ -323,7 +323,7 @@ export const ListingLoading: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[{ ...emptyReply, delay: 3000 }]} addTypename={false}>
+      <MockedProvider mocks={[{ ...emptyReply, delay: 3000 }]}>
         <Story />
       </MockedProvider>
     ),
