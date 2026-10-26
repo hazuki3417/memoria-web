@@ -41,7 +41,7 @@ export const PopulatedPersonal: Story = {
   decorators: [(Story) => <MockedProvider mocks={[
     response(requestMedia, mediaResult),
     response(requestGroups, groupResult),
-  ]} addTypename={false}><Story /></MockedProvider>],
+  ]}><Story /></MockedProvider>],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText("旅行")).toBeVisible()
@@ -56,7 +56,7 @@ export const EmptyPersonal: Story = {
   decorators: [(Story) => <MockedProvider mocks={[
     response(requestMedia, emptyMediaResult),
     response(requestGroups, emptyGroupResult),
-  ]} addTypename={false}><Story /></MockedProvider>],
+  ]}><Story /></MockedProvider>],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText("メディアはまだありません")).toBeVisible()
@@ -71,7 +71,7 @@ export const RetryMedia: Story = {
     { request: requestMedia, error: new Error("temporary failure") },
     response(requestMedia, mediaResult),
     response(requestGroups, groupResult),
-  ]} addTypename={false}><Story /></MockedProvider>],
+  ]}><Story /></MockedProvider>],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText("メディアを取得できませんでした")).toBeVisible()
