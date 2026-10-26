@@ -47,7 +47,7 @@ export function AccountDeletionFlow({
     prototype,
     onNavigateBack,
   })
-  const { setFlowError, step, setStep, compactStepper, cancelled, setCancelled, cancelConfirmationOpened, setCancelConfirmationOpened, setReauth, setGrant, setReview, confirmed, setConfirmed, deletionPending, skipped, mockScenario, prototype, onNavigateBack } = flow
+  const { setFlowError, step, setStep, compactStepper, cancelled, setCancelled, cancelConfirmationOpened, setCancelConfirmationOpened, setReauth, setGrant, setReview, confirmed, setConfirmed, deletionPending, skipped } = flow
   return (
     <>
       <Modal
