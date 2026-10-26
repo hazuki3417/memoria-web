@@ -3,6 +3,7 @@
 import { gql, useQuery } from "@apollo/client"
 import { useCallback, useState } from "react"
 import { MediaBrowser } from "./MediaBrowser"
+import { selectBrowserThumbnail } from "./selectBrowserThumbnail"
 import type { MediaItem } from "@/features/media-detail"
 
 // Keep the query local until the generated operation is added to GraphQL codegen.
@@ -55,8 +56,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
   const items: MediaItem[] = edges.map(({ node }) => ({
     id: node.id,
     label: node.originalFileName,
-    src: [...(node.image?.variants ?? [])].sort((a, b) => a.width - b.width).find(v => v.width >= 320)?.url
-      ?? [...(node.image?.variants ?? [])].sort((a, b) => b.width - a.width)[0]?.url ?? "",
+    src: selectBrowserThumbnail(node.image?.variants ?? []),
     failed: node.processing?.status === "FAILED",
     processing: node.processing?.status === "PROCESSING",
   }))
