@@ -20,7 +20,7 @@ import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 
-export type AccountRegistrationAccountRegistrationReviewState =
+export type AccountRegistrationReviewState =
   | "default"
   | "invalid"
   | "registering"
