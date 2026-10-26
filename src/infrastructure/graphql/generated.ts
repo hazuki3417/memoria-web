@@ -1271,7 +1271,7 @@ export const CreateCommunityDocument = gql`
   }
 }
     `;
-export type CreateCommunityMutationFn = Apollo.MutationFunction<OperationCreateCommunityMutation, OperationCreateCommunityMutationVariables>;
+export type CreateCommunityMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationCreateCommunityMutation, OperationCreateCommunityMutationVariables>;
 
 /**
  * __useCreateCommunityMutation__
@@ -1296,7 +1296,7 @@ export function useCreateCommunityMutation(baseOptions?: ApolloReactHooks.Mutati
       }
 export type CreateCommunityMutationHookResult = ReturnType<typeof useCreateCommunityMutation>;
 export type CreateCommunityMutationResult = ApolloReactHooks.MutationResult<OperationCreateCommunityMutation>;
-export type CreateCommunityMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationCreateCommunityMutation, OperationCreateCommunityMutationVariables>;
+export type CreateCommunityMutationOptions = ApolloReactHooks.useMutation.Options<OperationCreateCommunityMutation, OperationCreateCommunityMutationVariables>;
 export const RenameCommunityDocument = gql`
     mutation RenameCommunity($input: RenameCommunityInput!) {
   renameCommunity(input: $input) {
@@ -1309,7 +1309,7 @@ export const RenameCommunityDocument = gql`
   }
 }
     `;
-export type RenameCommunityMutationFn = Apollo.MutationFunction<OperationRenameCommunityMutation, OperationRenameCommunityMutationVariables>;
+export type RenameCommunityMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationRenameCommunityMutation, OperationRenameCommunityMutationVariables>;
 
 /**
  * __useRenameCommunityMutation__
@@ -1334,7 +1334,7 @@ export function useRenameCommunityMutation(baseOptions?: ApolloReactHooks.Mutati
       }
 export type RenameCommunityMutationHookResult = ReturnType<typeof useRenameCommunityMutation>;
 export type RenameCommunityMutationResult = ApolloReactHooks.MutationResult<OperationRenameCommunityMutation>;
-export type RenameCommunityMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationRenameCommunityMutation, OperationRenameCommunityMutationVariables>;
+export type RenameCommunityMutationOptions = ApolloReactHooks.useMutation.Options<OperationRenameCommunityMutation, OperationRenameCommunityMutationVariables>;
 export const ChangeCommunityMemberRoleDocument = gql`
     mutation ChangeCommunityMemberRole($input: ChangeCommunityMemberRoleInput!) {
   changeCommunityMemberRole(input: $input) {
@@ -1342,7 +1342,7 @@ export const ChangeCommunityMemberRoleDocument = gql`
   }
 }
     `;
-export type ChangeCommunityMemberRoleMutationFn = Apollo.MutationFunction<OperationChangeCommunityMemberRoleMutation, OperationChangeCommunityMemberRoleMutationVariables>;
+export type ChangeCommunityMemberRoleMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationChangeCommunityMemberRoleMutation, OperationChangeCommunityMemberRoleMutationVariables>;
 
 /**
  * __useChangeCommunityMemberRoleMutation__
@@ -1367,7 +1367,7 @@ export function useChangeCommunityMemberRoleMutation(baseOptions?: ApolloReactHo
       }
 export type ChangeCommunityMemberRoleMutationHookResult = ReturnType<typeof useChangeCommunityMemberRoleMutation>;
 export type ChangeCommunityMemberRoleMutationResult = ApolloReactHooks.MutationResult<OperationChangeCommunityMemberRoleMutation>;
-export type ChangeCommunityMemberRoleMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationChangeCommunityMemberRoleMutation, OperationChangeCommunityMemberRoleMutationVariables>;
+export type ChangeCommunityMemberRoleMutationOptions = ApolloReactHooks.useMutation.Options<OperationChangeCommunityMemberRoleMutation, OperationChangeCommunityMemberRoleMutationVariables>;
 export const RemoveCommunityMemberDocument = gql`
     mutation RemoveCommunityMember($input: RemoveCommunityMemberInput!) {
   removeCommunityMember(input: $input) {
@@ -1375,7 +1375,7 @@ export const RemoveCommunityMemberDocument = gql`
   }
 }
     `;
-export type RemoveCommunityMemberMutationFn = Apollo.MutationFunction<OperationRemoveCommunityMemberMutation, OperationRemoveCommunityMemberMutationVariables>;
+export type RemoveCommunityMemberMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationRemoveCommunityMemberMutation, OperationRemoveCommunityMemberMutationVariables>;
 
 /**
  * __useRemoveCommunityMemberMutation__
@@ -1400,7 +1400,7 @@ export function useRemoveCommunityMemberMutation(baseOptions?: ApolloReactHooks.
       }
 export type RemoveCommunityMemberMutationHookResult = ReturnType<typeof useRemoveCommunityMemberMutation>;
 export type RemoveCommunityMemberMutationResult = ApolloReactHooks.MutationResult<OperationRemoveCommunityMemberMutation>;
-export type RemoveCommunityMemberMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationRemoveCommunityMemberMutation, OperationRemoveCommunityMemberMutationVariables>;
+export type RemoveCommunityMemberMutationOptions = ApolloReactHooks.useMutation.Options<OperationRemoveCommunityMemberMutation, OperationRemoveCommunityMemberMutationVariables>;
 export const LeaveCommunityDocument = gql`
     mutation LeaveCommunity($communityId: ID!) {
   leaveCommunity(communityId: $communityId) {
@@ -1408,7 +1408,7 @@ export const LeaveCommunityDocument = gql`
   }
 }
     `;
-export type LeaveCommunityMutationFn = Apollo.MutationFunction<OperationLeaveCommunityMutation, OperationLeaveCommunityMutationVariables>;
+export type LeaveCommunityMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationLeaveCommunityMutation, OperationLeaveCommunityMutationVariables>;
 
 /**
  * __useLeaveCommunityMutation__
@@ -1433,7 +1433,7 @@ export function useLeaveCommunityMutation(baseOptions?: ApolloReactHooks.Mutatio
       }
 export type LeaveCommunityMutationHookResult = ReturnType<typeof useLeaveCommunityMutation>;
 export type LeaveCommunityMutationResult = ApolloReactHooks.MutationResult<OperationLeaveCommunityMutation>;
-export type LeaveCommunityMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationLeaveCommunityMutation, OperationLeaveCommunityMutationVariables>;
+export type LeaveCommunityMutationOptions = ApolloReactHooks.useMutation.Options<OperationLeaveCommunityMutation, OperationLeaveCommunityMutationVariables>;
 export const AcceptCommunityDeletionDocument = gql`
     mutation AcceptCommunityDeletion($input: AcceptCommunityDeletionInput!) {
   acceptCommunityDeletion(input: $input) {
@@ -1441,7 +1441,7 @@ export const AcceptCommunityDeletionDocument = gql`
   }
 }
     `;
-export type AcceptCommunityDeletionMutationFn = Apollo.MutationFunction<OperationAcceptCommunityDeletionMutation, OperationAcceptCommunityDeletionMutationVariables>;
+export type AcceptCommunityDeletionMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationAcceptCommunityDeletionMutation, OperationAcceptCommunityDeletionMutationVariables>;
 
 /**
  * __useAcceptCommunityDeletionMutation__
@@ -1466,7 +1466,7 @@ export function useAcceptCommunityDeletionMutation(baseOptions?: ApolloReactHook
       }
 export type AcceptCommunityDeletionMutationHookResult = ReturnType<typeof useAcceptCommunityDeletionMutation>;
 export type AcceptCommunityDeletionMutationResult = ApolloReactHooks.MutationResult<OperationAcceptCommunityDeletionMutation>;
-export type AcceptCommunityDeletionMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationAcceptCommunityDeletionMutation, OperationAcceptCommunityDeletionMutationVariables>;
+export type AcceptCommunityDeletionMutationOptions = ApolloReactHooks.useMutation.Options<OperationAcceptCommunityDeletionMutation, OperationAcceptCommunityDeletionMutationVariables>;
 export const CommunityUsageDocument = gql`
     query CommunityUsage($communityId: ID!) {
   communityUsage(communityId: $communityId) {
@@ -1888,7 +1888,7 @@ export const CreateBrowserGroupDocument = gql`
   }
 }
     ${GroupBrowserGroupFragmentDoc}`;
-export type CreateBrowserGroupMutationFn = Apollo.MutationFunction<OperationCreateBrowserGroupMutation, OperationCreateBrowserGroupMutationVariables>;
+export type CreateBrowserGroupMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationCreateBrowserGroupMutation, OperationCreateBrowserGroupMutationVariables>;
 
 /**
  * __useCreateBrowserGroupMutation__
@@ -1913,7 +1913,7 @@ export function useCreateBrowserGroupMutation(baseOptions?: ApolloReactHooks.Mut
       }
 export type CreateBrowserGroupMutationHookResult = ReturnType<typeof useCreateBrowserGroupMutation>;
 export type CreateBrowserGroupMutationResult = ApolloReactHooks.MutationResult<OperationCreateBrowserGroupMutation>;
-export type CreateBrowserGroupMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationCreateBrowserGroupMutation, OperationCreateBrowserGroupMutationVariables>;
+export type CreateBrowserGroupMutationOptions = ApolloReactHooks.useMutation.Options<OperationCreateBrowserGroupMutation, OperationCreateBrowserGroupMutationVariables>;
 export const UpdateBrowserGroupDocument = gql`
     mutation UpdateBrowserGroup($input: UpdateMediaGroupInput!) {
   updateMediaGroup(input: $input) {
@@ -1923,7 +1923,7 @@ export const UpdateBrowserGroupDocument = gql`
   }
 }
     ${GroupBrowserGroupFragmentDoc}`;
-export type UpdateBrowserGroupMutationFn = Apollo.MutationFunction<OperationUpdateBrowserGroupMutation, OperationUpdateBrowserGroupMutationVariables>;
+export type UpdateBrowserGroupMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationUpdateBrowserGroupMutation, OperationUpdateBrowserGroupMutationVariables>;
 
 /**
  * __useUpdateBrowserGroupMutation__
@@ -1948,7 +1948,7 @@ export function useUpdateBrowserGroupMutation(baseOptions?: ApolloReactHooks.Mut
       }
 export type UpdateBrowserGroupMutationHookResult = ReturnType<typeof useUpdateBrowserGroupMutation>;
 export type UpdateBrowserGroupMutationResult = ApolloReactHooks.MutationResult<OperationUpdateBrowserGroupMutation>;
-export type UpdateBrowserGroupMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationUpdateBrowserGroupMutation, OperationUpdateBrowserGroupMutationVariables>;
+export type UpdateBrowserGroupMutationOptions = ApolloReactHooks.useMutation.Options<OperationUpdateBrowserGroupMutation, OperationUpdateBrowserGroupMutationVariables>;
 export const DeleteBrowserGroupDocument = gql`
     mutation DeleteBrowserGroup($input: DeleteMediaGroupInput!) {
   deleteMediaGroup(input: $input) {
@@ -1956,7 +1956,7 @@ export const DeleteBrowserGroupDocument = gql`
   }
 }
     `;
-export type DeleteBrowserGroupMutationFn = Apollo.MutationFunction<OperationDeleteBrowserGroupMutation, OperationDeleteBrowserGroupMutationVariables>;
+export type DeleteBrowserGroupMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationDeleteBrowserGroupMutation, OperationDeleteBrowserGroupMutationVariables>;
 
 /**
  * __useDeleteBrowserGroupMutation__
@@ -1981,7 +1981,7 @@ export function useDeleteBrowserGroupMutation(baseOptions?: ApolloReactHooks.Mut
       }
 export type DeleteBrowserGroupMutationHookResult = ReturnType<typeof useDeleteBrowserGroupMutation>;
 export type DeleteBrowserGroupMutationResult = ApolloReactHooks.MutationResult<OperationDeleteBrowserGroupMutation>;
-export type DeleteBrowserGroupMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationDeleteBrowserGroupMutation, OperationDeleteBrowserGroupMutationVariables>;
+export type DeleteBrowserGroupMutationOptions = ApolloReactHooks.useMutation.Options<OperationDeleteBrowserGroupMutation, OperationDeleteBrowserGroupMutationVariables>;
 export const AddBrowserMediaToGroupDocument = gql`
     mutation AddBrowserMediaToGroup($input: ChangeMediaGroupClassificationInput!) {
   addMediaToGroup(input: $input) {
@@ -1993,7 +1993,7 @@ export const AddBrowserMediaToGroupDocument = gql`
   }
 }
     `;
-export type AddBrowserMediaToGroupMutationFn = Apollo.MutationFunction<OperationAddBrowserMediaToGroupMutation, OperationAddBrowserMediaToGroupMutationVariables>;
+export type AddBrowserMediaToGroupMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationAddBrowserMediaToGroupMutation, OperationAddBrowserMediaToGroupMutationVariables>;
 
 /**
  * __useAddBrowserMediaToGroupMutation__
@@ -2018,7 +2018,7 @@ export function useAddBrowserMediaToGroupMutation(baseOptions?: ApolloReactHooks
       }
 export type AddBrowserMediaToGroupMutationHookResult = ReturnType<typeof useAddBrowserMediaToGroupMutation>;
 export type AddBrowserMediaToGroupMutationResult = ApolloReactHooks.MutationResult<OperationAddBrowserMediaToGroupMutation>;
-export type AddBrowserMediaToGroupMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationAddBrowserMediaToGroupMutation, OperationAddBrowserMediaToGroupMutationVariables>;
+export type AddBrowserMediaToGroupMutationOptions = ApolloReactHooks.useMutation.Options<OperationAddBrowserMediaToGroupMutation, OperationAddBrowserMediaToGroupMutationVariables>;
 export const RemoveBrowserMediaFromGroupDocument = gql`
     mutation RemoveBrowserMediaFromGroup($input: ChangeMediaGroupClassificationInput!) {
   removeMediaFromGroup(input: $input) {
@@ -2030,7 +2030,7 @@ export const RemoveBrowserMediaFromGroupDocument = gql`
   }
 }
     `;
-export type RemoveBrowserMediaFromGroupMutationFn = Apollo.MutationFunction<OperationRemoveBrowserMediaFromGroupMutation, OperationRemoveBrowserMediaFromGroupMutationVariables>;
+export type RemoveBrowserMediaFromGroupMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationRemoveBrowserMediaFromGroupMutation, OperationRemoveBrowserMediaFromGroupMutationVariables>;
 
 /**
  * __useRemoveBrowserMediaFromGroupMutation__
@@ -2055,7 +2055,7 @@ export function useRemoveBrowserMediaFromGroupMutation(baseOptions?: ApolloReact
       }
 export type RemoveBrowserMediaFromGroupMutationHookResult = ReturnType<typeof useRemoveBrowserMediaFromGroupMutation>;
 export type RemoveBrowserMediaFromGroupMutationResult = ApolloReactHooks.MutationResult<OperationRemoveBrowserMediaFromGroupMutation>;
-export type RemoveBrowserMediaFromGroupMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationRemoveBrowserMediaFromGroupMutation, OperationRemoveBrowserMediaFromGroupMutationVariables>;
+export type RemoveBrowserMediaFromGroupMutationOptions = ApolloReactHooks.useMutation.Options<OperationRemoveBrowserMediaFromGroupMutation, OperationRemoveBrowserMediaFromGroupMutationVariables>;
 export const AddBrowserMediaToGroupsDocument = gql`
     mutation AddBrowserMediaToGroups($input: AddMediaToGroupsInput!) {
   addMediaToGroups(input: $input) {
@@ -2067,7 +2067,7 @@ export const AddBrowserMediaToGroupsDocument = gql`
   }
 }
     `;
-export type AddBrowserMediaToGroupsMutationFn = Apollo.MutationFunction<OperationAddBrowserMediaToGroupsMutation, OperationAddBrowserMediaToGroupsMutationVariables>;
+export type AddBrowserMediaToGroupsMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationAddBrowserMediaToGroupsMutation, OperationAddBrowserMediaToGroupsMutationVariables>;
 
 /**
  * __useAddBrowserMediaToGroupsMutation__
@@ -2092,7 +2092,7 @@ export function useAddBrowserMediaToGroupsMutation(baseOptions?: ApolloReactHook
       }
 export type AddBrowserMediaToGroupsMutationHookResult = ReturnType<typeof useAddBrowserMediaToGroupsMutation>;
 export type AddBrowserMediaToGroupsMutationResult = ApolloReactHooks.MutationResult<OperationAddBrowserMediaToGroupsMutation>;
-export type AddBrowserMediaToGroupsMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationAddBrowserMediaToGroupsMutation, OperationAddBrowserMediaToGroupsMutationVariables>;
+export type AddBrowserMediaToGroupsMutationOptions = ApolloReactHooks.useMutation.Options<OperationAddBrowserMediaToGroupsMutation, OperationAddBrowserMediaToGroupsMutationVariables>;
 export const MediaBrowserListDocument = gql`
     query MediaBrowserList($scope: ScopeInput!, $filter: MediaFilterInput, $first: Int!, $after: String) {
   mediaList(scope: $scope, filter: $filter, first: $first, after: $after) {
@@ -2279,7 +2279,7 @@ export const RegisterMemoriaUserDocument = gql`
   }
 }
     `;
-export type RegisterMemoriaUserMutationFn = Apollo.MutationFunction<OperationRegisterMemoriaUserMutation, OperationRegisterMemoriaUserMutationVariables>;
+export type RegisterMemoriaUserMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationRegisterMemoriaUserMutation, OperationRegisterMemoriaUserMutationVariables>;
 
 /**
  * __useRegisterMemoriaUserMutation__
@@ -2304,7 +2304,7 @@ export function useRegisterMemoriaUserMutation(baseOptions?: ApolloReactHooks.Mu
       }
 export type RegisterMemoriaUserMutationHookResult = ReturnType<typeof useRegisterMemoriaUserMutation>;
 export type RegisterMemoriaUserMutationResult = ApolloReactHooks.MutationResult<OperationRegisterMemoriaUserMutation>;
-export type RegisterMemoriaUserMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationRegisterMemoriaUserMutation, OperationRegisterMemoriaUserMutationVariables>;
+export type RegisterMemoriaUserMutationOptions = ApolloReactHooks.useMutation.Options<OperationRegisterMemoriaUserMutation, OperationRegisterMemoriaUserMutationVariables>;
 export const UpdateMemoriaUserProfileDocument = gql`
     mutation UpdateMemoriaUserProfile($input: UpdateUserProfileInput!) {
   updateUserProfile(input: $input) {
@@ -2317,7 +2317,7 @@ export const UpdateMemoriaUserProfileDocument = gql`
   }
 }
     `;
-export type UpdateMemoriaUserProfileMutationFn = Apollo.MutationFunction<OperationUpdateMemoriaUserProfileMutation, OperationUpdateMemoriaUserProfileMutationVariables>;
+export type UpdateMemoriaUserProfileMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationUpdateMemoriaUserProfileMutation, OperationUpdateMemoriaUserProfileMutationVariables>;
 
 /**
  * __useUpdateMemoriaUserProfileMutation__
@@ -2342,7 +2342,7 @@ export function useUpdateMemoriaUserProfileMutation(baseOptions?: ApolloReactHoo
       }
 export type UpdateMemoriaUserProfileMutationHookResult = ReturnType<typeof useUpdateMemoriaUserProfileMutation>;
 export type UpdateMemoriaUserProfileMutationResult = ApolloReactHooks.MutationResult<OperationUpdateMemoriaUserProfileMutation>;
-export type UpdateMemoriaUserProfileMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationUpdateMemoriaUserProfileMutation, OperationUpdateMemoriaUserProfileMutationVariables>;
+export type UpdateMemoriaUserProfileMutationOptions = ApolloReactHooks.useMutation.Options<OperationUpdateMemoriaUserProfileMutation, OperationUpdateMemoriaUserProfileMutationVariables>;
 export const SaveUserPreferencesDocument = gql`
     mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
   updateUserPreferences(input: $input) {
@@ -2358,7 +2358,7 @@ export const SaveUserPreferencesDocument = gql`
   }
 }
     `;
-export type SaveUserPreferencesMutationFn = Apollo.MutationFunction<OperationSaveUserPreferencesMutation, OperationSaveUserPreferencesMutationVariables>;
+export type SaveUserPreferencesMutationFn = ApolloReactHooks.useMutation.MutationFunction<OperationSaveUserPreferencesMutation, OperationSaveUserPreferencesMutationVariables>;
 
 /**
  * __useSaveUserPreferencesMutation__
@@ -2383,7 +2383,7 @@ export function useSaveUserPreferencesMutation(baseOptions?: ApolloReactHooks.Mu
       }
 export type SaveUserPreferencesMutationHookResult = ReturnType<typeof useSaveUserPreferencesMutation>;
 export type SaveUserPreferencesMutationResult = ApolloReactHooks.MutationResult<OperationSaveUserPreferencesMutation>;
-export type SaveUserPreferencesMutationOptions = ApolloReactHooks.BaseMutationOptions<OperationSaveUserPreferencesMutation, OperationSaveUserPreferencesMutationVariables>;
+export type SaveUserPreferencesMutationOptions = ApolloReactHooks.useMutation.Options<OperationSaveUserPreferencesMutation, OperationSaveUserPreferencesMutationVariables>;
 export const PersonalUsageDocument = gql`
     query PersonalUsage {
   me {
