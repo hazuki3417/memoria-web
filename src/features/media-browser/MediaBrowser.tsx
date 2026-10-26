@@ -412,7 +412,7 @@ function MediaBrowserContent({
                     ? "最初のMediaをアップロードすると、ここから閲覧・整理できます。"
                     : "CommunityへMediaを追加すると、ここから閲覧・整理できます。"}
                 </Text>
-                <Button leftSection={<IconCloudUpload size={16} />}>
+                <Button leftSection={<IconCloudUpload size={16} />} onClick={items ? () => navigate(context === "personal" ? "/media/upload" : `/communities/${communityId}/media/upload`) : undefined}>
                   {context === "personal"
                     ? "Mediaをアップロード"
                     : "Mediaを追加"}
