@@ -193,6 +193,7 @@ function MediaBrowserContent({
     if (await onAddToGroups(targetIds, groupTargets)) {
       setSelectionDialog(null)
       setGroupTargets([])
+      onDismissGroupActionResult?.()
       endSelection()
     }
   }
