@@ -1,5 +1,5 @@
-import { MediaBrowser } from "@/features/media-browser/MediaBrowser"
+import { MediaBrowserContainer } from "@/features/media-browser/MediaBrowserContainer"
 
 export default function Page() {
-  return <MediaBrowser />
+  return <MediaBrowserContainer />
 }
