@@ -120,7 +120,8 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     }
     setGroupActionPending(true)
     setGroupActionError(null)
-    setGroupActionResult(null)
+    // Retried requests contain only the previously failed Media.
+    const previous = groupActionResult
     try {
       const response = await addToGroupsMutation({ variables: { input: { groupIds, mediaIds } } })
       const results = response.data?.addMediaToGroups.results
@@ -132,8 +133,8 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
         return false
       }
       const outcome: GroupActionResult = {
-        succeeded: results.filter(item => item.status === BulkItemStatus.Succeeded).length,
-        alreadyApplied: results.filter(item => item.status === BulkItemStatus.AlreadyApplied).length,
+        succeeded: (previous?.succeeded ?? 0) + results.filter(item => item.status === BulkItemStatus.Succeeded).length,
+        alreadyApplied: (previous?.alreadyApplied ?? 0) + results.filter(item => item.status === BulkItemStatus.AlreadyApplied).length,
         failed: results.filter(item => item.status === BulkItemStatus.Failed)
           .map(item => ({ mediaId: item.mediaId, errorCode: item.errorCode })),
       }
@@ -142,7 +143,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
       showNotification({
         kind: "success",
         title: "Groupへの追加",
-        description: `${mediaIds.length}件のMediaについて${groupIds.length}件のGroupへの追加を確認しました。`,
+        description: `${outcome.succeeded + outcome.alreadyApplied}件のMediaについて${groupIds.length}件のGroupへの追加を確認しました。`,
       })
       return true
     } catch {
@@ -152,7 +153,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     } finally {
       setGroupActionPending(false)
     }
-  }, [groupActionPending, groupsPage, groupQuery.error, addToGroupsMutation])
+  }, [groupActionPending, groupsPage, groupQuery.error, addToGroupsMutation, groupActionResult])
 
   // Group results can span multiple pages. Only offer a complete list.
   const groupCursor = groupsPage?.pageInfo.hasNextPage ? groupsPage.pageInfo.endCursor : null
