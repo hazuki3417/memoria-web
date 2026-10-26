@@ -518,6 +518,7 @@ export type Query = {
   mediaGroupRelationCandidates: MediaGroupRelationCandidateConnection;
   mediaGroups: MediaGroupConnection;
   mediaList: MediaConnection;
+  mediaTags: MediaTagConnection;
   myCommunities: Array<Community>;
 };
 
@@ -580,6 +581,16 @@ export type QueryMediaListArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
   scope: ScopeInput;
+};
+
+
+export type QueryMediaTagsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  scope: ScopeInput;
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type RegisterUserInput = {
@@ -741,6 +752,10 @@ export type OperationFileSizeUnit =
   | 'BINARY'
   | 'DECIMAL';
 
+export type OperationMediaFilterInput = {
+  tagIds?: Array<string | number> | null | undefined;
+};
+
 export type OperationMediaGroupRelationUnavailableReason =
   | 'ALREADY_RELATED'
   | 'CHILD_LIMIT'
@@ -772,6 +787,11 @@ export type OperationOriginalImageFormat =
   | 'JPEG'
   | 'PNG'
   | 'WEBP';
+
+export type OperationProcessingStatus =
+  | 'FAILED'
+  | 'PROCESSING'
+  | 'READY';
 
 export type OperationRegisterUserInput = {
   nickname: string;
@@ -959,6 +979,25 @@ export type OperationRemoveBrowserMediaFromGroupMutationVariables = Exact<{
 
 
 export type OperationRemoveBrowserMediaFromGroupMutation = { removeMediaFromGroup: { results: Array<{ mediaId: string, status: OperationBulkItemStatus, errorCode: string | null }> } };
+
+export type OperationMediaBrowserListQueryVariables = Exact<{
+  scope: OperationScopeInput;
+  filter?: OperationMediaFilterInput | null | undefined;
+  first: number;
+  after?: string | null | undefined;
+}>;
+
+
+export type OperationMediaBrowserListQuery = { mediaList: { edges: Array<{ cursor: string, node: { id: string, originalFileName: string, processing: { status: OperationProcessingStatus } | null, image: { variants: Array<{ url: string, width: number }> } | null } }>, pageInfo: { hasNextPage: boolean, endCursor: string | null } } };
+
+export type OperationMediaBrowserTagsQueryVariables = Exact<{
+  scope: OperationScopeInput;
+  first: number;
+  after?: string | null | undefined;
+}>;
+
+
+export type OperationMediaBrowserTagsQuery = { mediaTags: { edges: Array<{ cursor: string, node: { id: string, name: string } }>, pageInfo: { hasNextPage: boolean, endCursor: string | null } } };
 
 export type OperationCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1862,6 +1901,126 @@ export function useRemoveBrowserMediaFromGroupMutation(baseOptions?: Apollo.Muta
 export type RemoveBrowserMediaFromGroupMutationHookResult = ReturnType<typeof useRemoveBrowserMediaFromGroupMutation>;
 export type RemoveBrowserMediaFromGroupMutationResult = Apollo.MutationResult<OperationRemoveBrowserMediaFromGroupMutation>;
 export type RemoveBrowserMediaFromGroupMutationOptions = Apollo.BaseMutationOptions<OperationRemoveBrowserMediaFromGroupMutation, OperationRemoveBrowserMediaFromGroupMutationVariables>;
+export const MediaBrowserListDocument = gql`
+    query MediaBrowserList($scope: ScopeInput!, $filter: MediaFilterInput, $first: Int!, $after: String) {
+  mediaList(scope: $scope, filter: $filter, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        originalFileName
+        processing {
+          status
+        }
+        image {
+          variants {
+            url
+            width
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useMediaBrowserListQuery__
+ *
+ * To run a query within a React component, call `useMediaBrowserListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMediaBrowserListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMediaBrowserListQuery({
+ *   variables: {
+ *      scope: // value for 'scope'
+ *      filter: // value for 'filter'
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useMediaBrowserListQuery(baseOptions: Apollo.QueryHookOptions<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables> & ({ variables: OperationMediaBrowserListQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>(MediaBrowserListDocument, options);
+      }
+export function useMediaBrowserListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>(MediaBrowserListDocument, options);
+        }
+// @ts-ignore
+export function useMediaBrowserListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>): Apollo.UseSuspenseQueryResult<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>;
+export function useMediaBrowserListSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>): Apollo.UseSuspenseQueryResult<OperationMediaBrowserListQuery | undefined, OperationMediaBrowserListQueryVariables>;
+export function useMediaBrowserListSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>(MediaBrowserListDocument, options);
+        }
+export type MediaBrowserListQueryHookResult = ReturnType<typeof useMediaBrowserListQuery>;
+export type MediaBrowserListLazyQueryHookResult = ReturnType<typeof useMediaBrowserListLazyQuery>;
+export type MediaBrowserListSuspenseQueryHookResult = ReturnType<typeof useMediaBrowserListSuspenseQuery>;
+export type MediaBrowserListQueryResult = Apollo.QueryResult<OperationMediaBrowserListQuery, OperationMediaBrowserListQueryVariables>;
+export const MediaBrowserTagsDocument = gql`
+    query MediaBrowserTags($scope: ScopeInput!, $first: Int!, $after: String) {
+  mediaTags(scope: $scope, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        name
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useMediaBrowserTagsQuery__
+ *
+ * To run a query within a React component, call `useMediaBrowserTagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMediaBrowserTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMediaBrowserTagsQuery({
+ *   variables: {
+ *      scope: // value for 'scope'
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useMediaBrowserTagsQuery(baseOptions: Apollo.QueryHookOptions<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables> & ({ variables: OperationMediaBrowserTagsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>(MediaBrowserTagsDocument, options);
+      }
+export function useMediaBrowserTagsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>(MediaBrowserTagsDocument, options);
+        }
+// @ts-ignore
+export function useMediaBrowserTagsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>): Apollo.UseSuspenseQueryResult<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>;
+export function useMediaBrowserTagsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>): Apollo.UseSuspenseQueryResult<OperationMediaBrowserTagsQuery | undefined, OperationMediaBrowserTagsQueryVariables>;
+export function useMediaBrowserTagsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>(MediaBrowserTagsDocument, options);
+        }
+export type MediaBrowserTagsQueryHookResult = ReturnType<typeof useMediaBrowserTagsQuery>;
+export type MediaBrowserTagsLazyQueryHookResult = ReturnType<typeof useMediaBrowserTagsLazyQuery>;
+export type MediaBrowserTagsSuspenseQueryHookResult = ReturnType<typeof useMediaBrowserTagsSuspenseQuery>;
+export type MediaBrowserTagsQueryResult = Apollo.QueryResult<OperationMediaBrowserTagsQuery, OperationMediaBrowserTagsQueryVariables>;
 export const CurrentUserDocument = gql`
     query CurrentUser {
   me {
