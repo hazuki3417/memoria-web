@@ -36,7 +36,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog } from "@/components/Dialog"
 import { showNotification } from "@/components/Feedback"
 import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
@@ -114,6 +114,7 @@ function MediaBrowserContent({
   loadMoreError = false,
   tagOptions,
   onApplyTags,
+  filterResetKey,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
@@ -130,6 +131,7 @@ function MediaBrowserContent({
   loadMoreError?: boolean
   tagOptions?: string[]
   onApplyTags?: (names: string[]) => void
+  filterResetKey?: string
 }) {
   const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -138,6 +140,13 @@ function MediaBrowserContent({
     initialState === "selection" ? new Set(["2", "5", "7"]) : new Set(),
   )
   const [detail, setDetail] = useState<MediaItem | null>(null)
+  // A changed Media query must never keep selections from the former filter.
+  // Prototype stories omit this prop, preserving their existing state model.
+  useEffect(() => {
+    if (filterResetKey === undefined) return
+    setSelected(new Set())
+    setSelecting(false)
+  }, [filterResetKey])
   const [selectionDialog, setSelectionDialog] =
     useState<SelectionDialog>(initialDialog)
   const [groupTargets, setGroupTargets] = useState<string[]>([])
