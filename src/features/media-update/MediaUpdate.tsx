@@ -53,6 +53,7 @@ type LiveProps = {
  onDiscard: (id: string) => void
  onSave: () => void
  onReload: () => void
+ onRefreshFailed: (id: string) => void
 }
 
 export function MediaUpdateLive({
