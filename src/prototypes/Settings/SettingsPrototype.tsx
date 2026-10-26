@@ -1,14 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { Button, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { SettingsLayout, type Section } from "@/features/settings/SettingsLayout"
-import { SettingsProfile } from "@/features/settings/SettingsProfile"
-import { SettingsPreferences } from "@/features/settings/SettingsPreferences"
-import { SettingsAccount } from "@/features/settings/SettingsAccount"
+import {
+  SettingsLayout,
+  SettingsProfile,
+  SettingsPreferences,
+  SettingsAccount,
+  SettingsUsage,
+  type SettingsUsageData,
+  type Section,
+} from "@/features/settings"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
-import { SettingsUsage, type SettingsUsageData } from "@/features/settings"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type ProfileSaveState = "idle" | "saving" | "retryable-error" | "blocked"
@@ -57,18 +61,27 @@ function UsageContent({ initialScenario, fileSizeUnit }: { initialScenario: Usag
   const [scenario, setScenario] = useState<UsageScenario | "retrying">(
     initialScenario === "retry-error" ? "error" : initialScenario,
   )
-  const usage =
-    scenario === "zero"
-      ? ZERO_USAGE
-      : scenario === "limit-reached"
-        ? LIMIT_REACHED_USAGE
-        : MOCK_USAGE
-  const status =
-    scenario === "loading" || scenario === "retrying"
-      ? "loading"
-      : (scenario === "error" || scenario === "error-no-retry")
-        ? "error"
-        : "ready"
+  let usage = MOCK_USAGE
+  switch (scenario) {
+    case "zero":
+      usage = ZERO_USAGE
+      break
+    case "limit-reached":
+      usage = LIMIT_REACHED_USAGE
+      break
+  }
+
+  let status: "loading" | "error" | "ready" = "ready"
+  switch (scenario) {
+    case "loading":
+    case "retrying":
+      status = "loading"
+      break
+    case "error":
+    case "error-no-retry":
+      status = "error"
+      break
+  }
 
   const retry = async () => {
     if (scenario !== "error") return
@@ -103,16 +116,35 @@ export function SettingsPrototype({
   const [section, setSection] = useState<Section>(initialSection)
   const currentLabel = ({ profile: "プロフィール", account: "アカウント", preferences: "環境設定", usage: "利用状況" } as const)[section]
 
-  const content =
-    section === "profile" ? (
-      <SettingsProfile initialSaveState={initialProfileSaveState} blockedMessage="Userの状態が変わったため、この画面での変更を続けられません。ページを再読み込みして現在の状態を確認してください。" />
-    ) : section === "preferences" ? (
-      <SettingsPreferences compact={compact} />
-    ) : section === "usage" ? (
-      <UsageContent initialScenario={initialUsageScenario} fileSizeUnit={initialUsageFileSizeUnit} />
-    ) : (
-      <SettingsAccount deletionAction={<Button variant="default" size="sm">アカウントを削除する</Button>} />
-    )
+  let content: ReactNode
+  switch (section) {
+    case "profile":
+      content = (
+        <SettingsProfile
+          initialSaveState={initialProfileSaveState}
+          blockedMessage="Userの状態が変わったため、この画面での変更を続けられません。ページを再読み込みして現在の状態を確認してください。"
+        />
+      )
+      break
+    case "preferences":
+      content = <SettingsPreferences compact={compact} />
+      break
+    case "usage":
+      content = (
+        <UsageContent
+          initialScenario={initialUsageScenario}
+          fileSizeUnit={initialUsageFileSizeUnit}
+        />
+      )
+      break
+    case "account":
+      content = (
+        <SettingsAccount
+          deletionAction={<Button variant="default" size="sm">アカウントを削除する</Button>}
+        />
+      )
+      break
+  }
 
   return (
     <PrototypeApplicationShell
