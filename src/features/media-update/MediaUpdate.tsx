@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useMediaUpdateDraft, type MediaUpdateDraftItem } from "./useMediaUpdateDraft"
 import type { MediaUpdateScope } from "./mediaTagApi"
 
@@ -93,6 +93,11 @@ export function MediaUpdate({
     initialItems.map((item) => item.id),
   )
   const [bulkTag, setBulkTag] = useState("")
+  useEffect(() => {
+    if (live) setSelectedIds(live.items.map((item) => item.id))
+  // Sync selection when loaded Media identifiers change.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live?.items.map((item) => item.id).join(",")])
   const shownItems = live?.items ?? items
   const shownScenario = live ? (live.status === "idle" || live.status === "loading" ? "editing" : live.status) : scenario
   const currentContext = contexts[context]
@@ -120,8 +125,7 @@ export function MediaUpdate({
                   kind="warning"
                   title="一部の変更を保存できませんでした"
                 >
-                  Media
-                  2は現在編集できません。ほかのMediaの変更は保存されています。
+                  {live ? "一部のMediaの変更を保存できませんでした。未保存の内容を確認して再試行してください。" : "Media 2は現在編集できません。ほかのMediaの変更は保存されています。"}
                 </FeedbackAlert>
               )}
               <Stack gap="sm">
@@ -199,8 +203,8 @@ export function MediaUpdate({
                       detail={item.detail}
                       tags={item.tags}
                       selected={selectedIds.includes(item.id)}
-                      selectable={!unavailable.has(item.id)}
-                      tagEditable={!unavailable.has(item.id)}
+                      selectable={!unavailable.has(item.id) && live?.status !== "loading" && live?.status !== "saving"}
+                      tagEditable={!unavailable.has(item.id) && live?.status !== "loading" && live?.status !== "saving"}
                       action={
                         <Button
                           variant="subtle"
