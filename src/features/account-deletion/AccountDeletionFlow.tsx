@@ -41,6 +41,8 @@ export function AccountDeletionFlow({
   shell?: ComponentType<PropsWithChildren>
 }) {
   const {
+    resolved,
+    setFlowError,
     step,
     setStep,
     compactStepper,
