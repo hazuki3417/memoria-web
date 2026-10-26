@@ -2,26 +2,21 @@
 
 import { gql, useQuery } from "@apollo/client"
 import { useEffect, useMemo, useRef } from "react"
-import { MediaGroupSort, ScopeType, useBrowseGroupsQuery } from "@/infrastructure/graphql/generated"
-import { Dashboard, type DashboardGroup } from "./Dashboard"
+import { ScopeType } from "@/infrastructure/graphql/generated"
+import { Dashboard } from "./Dashboard"
+import type { DashboardGroup } from "./Dashboard"
 
 type Scope = { type: ScopeType; communityId?: string }
+type PreviewMedia = { id: string; image: { variants: Array<{ url: string; width: number }> } | null }
 type MediaResponse = {
-  mediaList: {
-    edges: Array<{ node: {
-      id: string
-      image: { variants: Array<{ url: string; width: number }> } | null
-    } }>
-  }
+  mediaList: { edges: Array<{ node: PreviewMedia }> }
 }
-type PreviewResponse = {
-  mediaGroup: {
+type GroupsResponse = {
+  mediaGroups: { edges: Array<{ node: {
     id: string
-    media: { edges: Array<{ node: {
-      id: string
-      image: { variants: Array<{ url: string; width: number }> } | null
-    } }> }
-  } | null
+    name: string
+    media: { edges: Array<{ node: PreviewMedia }> }
+  } }> }
 }
 
 const DASHBOARD_MEDIA = gql`
@@ -32,12 +27,17 @@ const DASHBOARD_MEDIA = gql`
   }
 `
 
-const DASHBOARD_GROUP_PREVIEW = gql`
-  query DashboardGroupPreview($id: ID!) {
-    mediaGroup(id: $id) {
-      id
-      media(first: 4) {
-        edges { node { id image { variants { url width } } } }
+const DASHBOARD_GROUPS = gql`
+  query DashboardRecentGroups($scope: ScopeInput!) {
+    mediaGroups(scope: $scope, sort: CREATED_AT_DESC, first: 6) {
+      edges {
+        node {
+          id
+          name
+          media(first: 4) {
+            edges { node { id image { variants { url width } } } }
+          }
+        }
       }
     }
   }
@@ -46,49 +46,6 @@ const DASHBOARD_GROUP_PREVIEW = gql`
 function thumbnail(variants: Array<{ url: string; width: number }> = []): string {
   const sorted = variants.filter((item) => item.url).sort((a, b) => a.width - b.width)
   return sorted.find((item) => item.width >= 320)?.url ?? sorted.at(-1)?.url ?? ""
-}
-
-function GroupPreview({ id, name }: { id: string; name: string }) {
-  const result = useQuery<PreviewResponse>(DASHBOARD_GROUP_PREVIEW, {
-    variables: { id },
-    fetchPolicy: "network-only",
-  })
-  const nodes = result.data?.mediaGroup?.media.edges.map((edge) => edge.node) ?? []
-  // Never substitute invented imagery for failed or unavailable signed URLs.
-  const group: DashboardGroup = {
-    id,
-    name,
-    mediaCount: nodes.length,
-    media: nodes.map((node) => thumbnail(node.image?.variants)),
-  }
-  return { group, loading: result.loading, error: result.error, refetch: result.refetch }
-}
-
-// Keep every hook inside a React component; per-group previews are rendered by
-// the scoped listing below and never fetched for a group outside that listing.
-function DashboardGroupItem({ id, name }: { id: string; name: string }) {
-  const { group, loading, error, refetch } = GroupPreview({ id, name })
-  return <DashboardGroupsVisual group={group} loading={loading} failed={Boolean(error)} onRetry={() => void refetch()} />
-}
-
-import { Button, Center, SimpleGrid, Stack, Text } from "@mantine/core"
-import { GroupPreviewGrid } from "@/features/group-browser/GroupPreviewGrid"
-
-function DashboardGroupsVisual({ group, loading, failed, onRetry }: {
-  group: DashboardGroup; loading: boolean; failed: boolean; onRetry: () => void
-}) {
-  return <Stack gap={8} p="xs" bdrs="md" bg="var(--mantine-color-default-hover)">
-    <Text size="sm">{group.name}</Text>
-    {failed ? <Center><Button size="xs" variant="subtle" onClick={onRetry}>Previewを再試行</Button></Center>
-      : loading ? <Text size="xs" c="dimmed" role="status">Previewを読み込み中です</Text>
-      : <GroupPreviewGrid count={group.mediaCount} sources={group.media} remote />}
-  </Stack>
-}
-
-function DashboardGroupList({ groups }: { groups: Array<{ id: string; name: string }> }) {
-  return <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-    {groups.map(group => <DashboardGroupItem key={group.id} id={group.id} name={group.name} />)}
-  </SimpleGrid>
 }
 
 export function DashboardContainer({ contextKind = "personal", communityId }: {
@@ -108,8 +65,8 @@ export function DashboardContainer({ contextKind = "personal", communityId }: {
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
-  const groups = useBrowseGroupsQuery({
-    variables: { scope, sort: MediaGroupSort.CreatedAtDesc, first: 6 },
+  const groups = useQuery<GroupsResponse>(DASHBOARD_GROUPS, {
+    variables: { scope },
     skip,
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
@@ -134,8 +91,13 @@ export function DashboardContainer({ contextKind = "personal", communityId }: {
     }
   }, [skip, media.refetch, groups.refetch, contextKind, communityId])
 
-  const groupNodes = groups.data?.mediaGroups.edges.map(edge => edge.node) ?? []
   const mediaNodes = media.data?.mediaList.edges.map(edge => edge.node) ?? []
+  const groupItems: DashboardGroup[] = (groups.data?.mediaGroups.edges ?? []).map(({ node }) => ({
+    id: node.id,
+    name: node.name,
+    mediaCount: node.media.edges.length,
+    media: node.media.edges.map(edge => thumbnail(edge.node.image?.variants)),
+  }))
   const mediaState = skip || media.error ? "error" : !media.data ? "loading" : "ready"
   const groupState = skip || groups.error ? "error" : !groups.data ? "loading" : "ready"
   return <Dashboard
@@ -144,8 +106,7 @@ export function DashboardContainer({ contextKind = "personal", communityId }: {
     mediaItems={mediaNodes.map(node => thumbnail(node.image?.variants))}
     mediaState={mediaState}
     groupState={groupState}
-    groupItems={[]}
-    groupContent={groupState === "ready" ? <DashboardGroupList groups={groupNodes} /> : undefined}
+    groupItems={groupItems}
     onRetryMedia={() => void media.refetch()}
     onRetryGroups={() => void groups.refetch()}
   />
