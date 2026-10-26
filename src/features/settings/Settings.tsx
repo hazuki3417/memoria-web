@@ -11,6 +11,11 @@ import { SettingsPreferences } from "./preferences/SettingsPreferences"
 import { SettingsAccount } from "./account/SettingsAccount"
 import type { UserPreferences, UserPreferencesPatch } from "./preferences/userPreferences"
 
+// Productionで保存接続がない場合に成功を装わない。
+async function unavailableProfileSave(): Promise<void> {
+  throw new Error("Profile save unavailable")
+}
+
 export function Settings({
   section,
   saveProfile,
@@ -32,7 +37,7 @@ export function Settings({
   switch (section) {
     case "profile":
       content = (
-        <SettingsProfile onSave={saveProfile} initialNickname={profileNickname} />
+        <SettingsProfile onSave={saveProfile ?? unavailableProfileSave} initialNickname={profileNickname} />
       )
       break
     case "preferences":
