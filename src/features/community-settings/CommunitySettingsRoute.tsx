@@ -13,7 +13,7 @@ import {
   useRemoveCommunityMemberMutation,
   useLeaveCommunityMutation,
 } from "@/infrastructure/graphql/generated"
-import { ConnectedUsage } from "@/features/settings"
+import { ConnectedUsage } from "@/features/usage"
 import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
