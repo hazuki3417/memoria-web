@@ -29,6 +29,11 @@ export type AcceptCommunityDeletionPayload = {
   accepted: Scalars['Boolean']['output'];
 };
 
+export type AddMediaToGroupsInput = {
+  groupIds: Array<Scalars['ID']['input']>;
+  mediaIds: Array<Scalars['ID']['input']>;
+};
+
 export enum BulkItemStatus {
   AlreadyApplied = 'ALREADY_APPLIED',
   Failed = 'FAILED',
@@ -401,6 +406,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   acceptCommunityDeletion: AcceptCommunityDeletionPayload;
   addMediaToGroup: ChangeMediaGroupClassificationPayload;
+  addMediaToGroups: ChangeMediaGroupClassificationPayload;
   changeCommunityMemberRole: ChangeCommunityMemberRolePayload;
   createCommunity: CreateCommunityPayload;
   createMediaGroup: MediaGroupPayload;
@@ -423,6 +429,11 @@ export type MutationAcceptCommunityDeletionArgs = {
 
 export type MutationAddMediaToGroupArgs = {
   input: ChangeMediaGroupClassificationInput;
+};
+
+
+export type MutationAddMediaToGroupsArgs = {
+  input: AddMediaToGroupsInput;
 };
 
 
@@ -708,6 +719,11 @@ export type OperationAcceptCommunityDeletionInput = {
   revision: string;
 };
 
+export type OperationAddMediaToGroupsInput = {
+  groupIds: Array<string | number>;
+  mediaIds: Array<string | number>;
+};
+
 export type OperationBulkItemStatus =
   | 'ALREADY_APPLIED'
   | 'FAILED'
@@ -979,6 +995,13 @@ export type OperationRemoveBrowserMediaFromGroupMutationVariables = Exact<{
 
 
 export type OperationRemoveBrowserMediaFromGroupMutation = { removeMediaFromGroup: { results: Array<{ mediaId: string, status: OperationBulkItemStatus, errorCode: string | null }> } };
+
+export type OperationAddBrowserMediaToGroupsMutationVariables = Exact<{
+  input: OperationAddMediaToGroupsInput;
+}>;
+
+
+export type OperationAddBrowserMediaToGroupsMutation = { addMediaToGroups: { results: Array<{ mediaId: string, status: OperationBulkItemStatus, errorCode: string | null }> } };
 
 export type OperationMediaBrowserListQueryVariables = Exact<{
   scope: OperationScopeInput;
@@ -1901,6 +1924,43 @@ export function useRemoveBrowserMediaFromGroupMutation(baseOptions?: Apollo.Muta
 export type RemoveBrowserMediaFromGroupMutationHookResult = ReturnType<typeof useRemoveBrowserMediaFromGroupMutation>;
 export type RemoveBrowserMediaFromGroupMutationResult = Apollo.MutationResult<OperationRemoveBrowserMediaFromGroupMutation>;
 export type RemoveBrowserMediaFromGroupMutationOptions = Apollo.BaseMutationOptions<OperationRemoveBrowserMediaFromGroupMutation, OperationRemoveBrowserMediaFromGroupMutationVariables>;
+export const AddBrowserMediaToGroupsDocument = gql`
+    mutation AddBrowserMediaToGroups($input: AddMediaToGroupsInput!) {
+  addMediaToGroups(input: $input) {
+    results {
+      mediaId
+      status
+      errorCode
+    }
+  }
+}
+    `;
+export type AddBrowserMediaToGroupsMutationFn = Apollo.MutationFunction<OperationAddBrowserMediaToGroupsMutation, OperationAddBrowserMediaToGroupsMutationVariables>;
+
+/**
+ * __useAddBrowserMediaToGroupsMutation__
+ *
+ * To run a mutation, you first call `useAddBrowserMediaToGroupsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddBrowserMediaToGroupsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addBrowserMediaToGroupsMutation, { data, loading, error }] = useAddBrowserMediaToGroupsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddBrowserMediaToGroupsMutation(baseOptions?: Apollo.MutationHookOptions<OperationAddBrowserMediaToGroupsMutation, OperationAddBrowserMediaToGroupsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<OperationAddBrowserMediaToGroupsMutation, OperationAddBrowserMediaToGroupsMutationVariables>(AddBrowserMediaToGroupsDocument, options);
+      }
+export type AddBrowserMediaToGroupsMutationHookResult = ReturnType<typeof useAddBrowserMediaToGroupsMutation>;
+export type AddBrowserMediaToGroupsMutationResult = Apollo.MutationResult<OperationAddBrowserMediaToGroupsMutation>;
+export type AddBrowserMediaToGroupsMutationOptions = Apollo.BaseMutationOptions<OperationAddBrowserMediaToGroupsMutation, OperationAddBrowserMediaToGroupsMutationVariables>;
 export const MediaBrowserListDocument = gql`
     query MediaBrowserList($scope: ScopeInput!, $filter: MediaFilterInput, $first: Int!, $after: String) {
   mediaList(scope: $scope, filter: $filter, first: $first, after: $after) {
