@@ -10,7 +10,15 @@ export default async function Page({
   const { communityId } = await params
   const { mediaIds } = await searchParams
   const ids = [...new Set((mediaIds ?? "").split(",").filter(Boolean))]
-  return <MediaUpdateLive context="community" communityId={communityId} targets={ids.map((id, index) => ({
-    id, label: `Media ${index + 1}`, detail: "",
-  }))} />
+  return (
+    <MediaUpdateLive
+      context="community"
+      communityId={communityId}
+      targets={ids.map((id, index) => ({
+        id,
+        label: `Media ${index + 1}`,
+        detail: "",
+      }))}
+    />
+  )
 }

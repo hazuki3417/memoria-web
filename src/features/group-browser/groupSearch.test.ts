@@ -15,7 +15,10 @@ describe("filterVisibleGroups", () => {
     expect(filterVisibleGroups(items, "alpha", true)).toEqual([items[1]])
   })
   it("keeps preview fixture search case-insensitive", () => {
-    expect(filterVisibleGroups(items, "alpha", false)).toEqual([items[0], items[1]])
+    expect(filterVisibleGroups(items, "alpha", false)).toEqual([
+      items[0],
+      items[1],
+    ])
   })
   it("trims the applied query without changing the original item order", () => {
     expect(filterVisibleGroups(items, " アル ", true)).toEqual([items[2]])

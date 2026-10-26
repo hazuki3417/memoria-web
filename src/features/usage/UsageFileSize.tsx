@@ -11,5 +11,9 @@ export function UsageFileSize({
   fileSizeUnit: FileSizeUnit
 }) {
   const { value, unit } = formatFileSize(bytes, fileSizeUnit)
-  return <>{value} {unit}</>
+  return (
+    <>
+      {value} {unit}
+    </>
+  )
 }

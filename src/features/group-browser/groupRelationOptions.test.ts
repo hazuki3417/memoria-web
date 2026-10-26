@@ -49,11 +49,11 @@ describe("Group relation selector rules (GB-048, GB-050)", () => {
 
   it("keeps a previously selected relation removable even if adding it is now forbidden", () => {
     const availability = {
-      "既存": {
+      既存: {
         parent: { canAdd: false, reason: "上限" },
         child: { canAdd: true },
       },
-      "新規": {
+      新規: {
         parent: { canAdd: false, reason: "循環します" },
         child: { canAdd: true },
       },
@@ -86,12 +86,15 @@ describe("Group relation selector rules (GB-048, GB-050)", () => {
       currentGroupName: "現在",
       direction: "child" as const,
     }
-    expect(groupRelationOptionReason({ ...base, name: "現在", checked: true }))
-      .toBe("現在のGroup")
-    expect(groupRelationOptionReason({ ...base, name: "反対", checked: true }))
-      .toBe("Parentに指定されています")
-    expect(groupRelationOptionReason({ ...base, name: "選択", checked: true }))
-      .toBe("選択済み")
+    expect(
+      groupRelationOptionReason({ ...base, name: "現在", checked: true }),
+    ).toBe("現在のGroup")
+    expect(
+      groupRelationOptionReason({ ...base, name: "反対", checked: true }),
+    ).toBe("Parentに指定されています")
+    expect(
+      groupRelationOptionReason({ ...base, name: "選択", checked: true }),
+    ).toBe("選択済み")
   })
   it("treats an omitted checked flag as not selected", () => {
     expect(
@@ -103,5 +106,4 @@ describe("Group relation selector rules (GB-048, GB-050)", () => {
       }),
     ).toBe("")
   })
-
 })

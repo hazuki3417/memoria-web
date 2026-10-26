@@ -63,10 +63,9 @@ describe("preferences save queue", () => {
     await vi.advanceTimersByTimeAsync(400)
 
     expect(onError).toHaveBeenCalledTimes(1)
-    expect(onError).toHaveBeenCalledWith(
-      expect.any(Error),
-      { personalAccentColor: selectedColor },
-    )
+    expect(onError).toHaveBeenCalledWith(expect.any(Error), {
+      personalAccentColor: selectedColor,
+    })
 
     await queue.flush()
     expect(save).toHaveBeenCalledTimes(2)
@@ -76,12 +75,16 @@ describe("preferences save queue", () => {
   })
   it("keeps newer values when retrying after a failed save", async () => {
     vi.useFakeTimers()
-    const save = vi.fn()
+    const save = vi
+      .fn()
       .mockRejectedValueOnce(new Error("network"))
       .mockResolvedValue(defaultUserPreferences)
     const queue = createPreferencesSaveQueue(save, vi.fn(), vi.fn())
 
-    queue.enqueue({ personalAccentColor: "#111111", mediaThumbnailSize: "SMALL" })
+    queue.enqueue({
+      personalAccentColor: "#111111",
+      mediaThumbnailSize: "SMALL",
+    })
     await vi.advanceTimersByTimeAsync(400)
 
     queue.enqueue({ personalAccentColor: "#222222" })
@@ -96,11 +99,17 @@ describe("preferences save queue", () => {
 
   it("saves changes queued during an in-flight request without dropping them", async () => {
     vi.useFakeTimers()
-    let completeFirstSave: ((value: typeof defaultUserPreferences) => void) | undefined
-    const save = vi.fn()
-      .mockImplementationOnce(() => new Promise((resolve) => {
-        completeFirstSave = resolve
-      }))
+    let completeFirstSave:
+      | ((value: typeof defaultUserPreferences) => void)
+      | undefined
+    const save = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            completeFirstSave = resolve
+          }),
+      )
       .mockResolvedValue(defaultUserPreferences)
     const queue = createPreferencesSaveQueue(save, vi.fn(), vi.fn())
 
@@ -114,7 +123,9 @@ describe("preferences save queue", () => {
 
     expect(save).toHaveBeenCalledTimes(2)
     expect(save).toHaveBeenNthCalledWith(1, { dateFormat: "DD_MM_YYYY" })
-    expect(save).toHaveBeenNthCalledWith(2, { mediaDetailInitialInfoMedium: true })
+    expect(save).toHaveBeenNthCalledWith(2, {
+      mediaDetailInitialInfoMedium: true,
+    })
   })
 
   it("does not save new edits after disposal", async () => {
@@ -130,5 +141,4 @@ describe("preferences save queue", () => {
 
     expect(save).not.toHaveBeenCalled()
   })
-
 })

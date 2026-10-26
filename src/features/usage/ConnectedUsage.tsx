@@ -27,13 +27,19 @@ export function ConnectedUsage({
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   })
-  const communityPreferences = useCurrentUserQuery({ skip: scope !== "community" })
+  const communityPreferences = useCurrentUserQuery({
+    skip: scope !== "community",
+  })
   const active = scope === "personal" ? personal : community
   const projection =
-    scope === "personal" ? personal.data?.me?.usage : community.data?.communityUsage
+    scope === "personal"
+      ? personal.data?.me?.usage
+      : community.data?.communityUsage
 
-  const communityPreferencesLoading = scope === "community" && communityPreferences.loading
-  const communityPreferencesError = scope === "community" &&
+  const communityPreferencesLoading =
+    scope === "community" && communityPreferences.loading
+  const communityPreferencesError =
+    scope === "community" &&
     (Boolean(communityPreferences.error) ||
       (!communityPreferences.loading && !communityPreferences.data?.me))
 
@@ -50,7 +56,12 @@ export function ConnectedUsage({
   let status: UsageStatus = "ready"
   if (active.loading || communityPreferencesLoading) {
     status = "loading"
-  } else if (active.error || communityPreferencesError || conversionFailed || !projection) {
+  } else if (
+    active.error ||
+    communityPreferencesError ||
+    conversionFailed ||
+    !projection
+  ) {
     status = "error"
   }
 
@@ -73,7 +84,8 @@ export function ConnectedUsage({
       fileSizeUnit={
         (scope === "personal"
           ? personal.data?.me?.preferences.fileSizeUnit
-          : communityPreferences.data?.me?.preferences.fileSizeUnit) === "BINARY"
+          : communityPreferences.data?.me?.preferences.fileSizeUnit) ===
+        "BINARY"
           ? "BINARY"
           : "DECIMAL"
       }

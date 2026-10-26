@@ -51,7 +51,6 @@ export const prototypeGroups: GroupBrowserGroup[] = [
   },
 ]
 
-
 export const prototypeRelationCandidateNames = [
   ...prototypeGroups.map((group) => group.name),
   "北海道",
@@ -70,4 +69,3 @@ export const prototypeRelationCandidateNames = [
   "アーカイブ",
   "未整理",
 ]
-

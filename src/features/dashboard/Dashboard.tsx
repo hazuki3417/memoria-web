@@ -63,7 +63,11 @@ function MediaPage({
             />
           ) : (
             <Center h="100%" aria-label="サムネイルを表示できません">
-              <IconPhoto size={20} stroke={1.5} color="var(--mantine-color-dimmed)" />
+              <IconPhoto
+                size={20}
+                stroke={1.5}
+                color="var(--mantine-color-dimmed)"
+              />
             </Center>
           )}
         </Box>
@@ -187,14 +191,36 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
       )}
 
       {hasPrevious && (
-        <Box aria-hidden="true" pos="absolute" top={0} bottom={0} left={0} w={72}
-          style={{ pointerEvents: "none", zIndex: 1,
-            background: "linear-gradient(90deg, var(--mantine-color-body), transparent)" }} />
+        <Box
+          aria-hidden="true"
+          pos="absolute"
+          top={0}
+          bottom={0}
+          left={0}
+          w={72}
+          style={{
+            pointerEvents: "none",
+            zIndex: 1,
+            background:
+              "linear-gradient(90deg, var(--mantine-color-body), transparent)",
+          }}
+        />
       )}
       {hasNext && (
-        <Box aria-hidden="true" pos="absolute" top={0} bottom={0} right={0} w={72}
-          style={{ pointerEvents: "none", zIndex: 1,
-            background: "linear-gradient(270deg, var(--mantine-color-body), transparent)" }} />
+        <Box
+          aria-hidden="true"
+          pos="absolute"
+          top={0}
+          bottom={0}
+          right={0}
+          w={72}
+          style={{
+            pointerEvents: "none",
+            zIndex: 1,
+            background:
+              "linear-gradient(270deg, var(--mantine-color-body), transparent)",
+          }}
+        />
       )}
       {hasPrevious && (
         <ActionIcon
@@ -240,7 +266,12 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
   )
 }
 
-export type DashboardGroup = { id: string; name: string; media: string[]; mediaCount: number }
+export type DashboardGroup = {
+  id: string
+  name: string
+  media: string[]
+  mediaCount: number
+}
 
 function RecentGroups({ groups }: { groups: DashboardGroup[] }) {
   return (
@@ -265,21 +296,33 @@ function RecentGroups({ groups }: { groups: DashboardGroup[] }) {
   )
 }
 
-function SectionFeedback({ state, onRetry, kind }: {
+function SectionFeedback({
+  state,
+  onRetry,
+  kind,
+}: {
   state: "loading" | "error"
   onRetry?: () => void
   kind: "media" | "group"
 }) {
-  return <Center mih={132}>
-    {state === "loading" ? (
-      <Text size="sm" c="dimmed" role="status">読み込み中です</Text>
-    ) : (
-      <Stack gap="xs" align="center" role="alert">
-        <Text size="sm" c="dimmed">{kind === "media" ? "メディア" : "Group"}を取得できませんでした</Text>
-        <Button variant="subtle" size="compact-sm" onClick={onRetry}>再試行</Button>
-      </Stack>
-    )}
-  </Center>
+  return (
+    <Center mih={132}>
+      {state === "loading" ? (
+        <Text size="sm" c="dimmed" role="status">
+          読み込み中です
+        </Text>
+      ) : (
+        <Stack gap="xs" align="center" role="alert">
+          <Text size="sm" c="dimmed">
+            {kind === "media" ? "メディア" : "Group"}を取得できませんでした
+          </Text>
+          <Button variant="subtle" size="compact-sm" onClick={onRetry}>
+            再試行
+          </Button>
+        </Stack>
+      )}
+    </Center>
+  )
 }
 
 function EmptyState({ kind, href }: { kind: "media" | "group"; href: string }) {
@@ -349,7 +392,13 @@ export function Dashboard({
   const mediaHref = `${prefix}/media`
   const groupsHref = `${prefix}/groups`
   const media = mediaItems ?? recentMedia
-  const groups = groupItems ?? recentGroups.map((group, index) => ({ ...group, id: String(index), mediaCount: group.media.length }))
+  const groups =
+    groupItems ??
+    recentGroups.map((group, index) => ({
+      ...group,
+      id: String(index),
+      mediaCount: group.media.length,
+    }))
   const noMedia = empty || (mediaState === "ready" && media.length === 0)
   const noGroups = empty || (groupState === "ready" && groups.length === 0)
 
@@ -373,11 +422,18 @@ export function Dashboard({
             )}
           </Group>
           {mediaState === "loading" || mediaState === "error" ? (
-            <SectionFeedback state={mediaState} onRetry={onRetryMedia} kind="media" />
+            <SectionFeedback
+              state={mediaState}
+              onRetry={onRetryMedia}
+              kind="media"
+            />
           ) : noMedia ? (
             <EmptyState kind="media" href={mediaHref} />
           ) : (
-            <RecentMediaCarousel key={contextKind + communityId} items={media.slice(0, 32)} />
+            <RecentMediaCarousel
+              key={contextKind + communityId}
+              items={media.slice(0, 32)}
+            />
           )}
         </Stack>
         <Stack gap="sm">
@@ -385,19 +441,25 @@ export function Dashboard({
             <Title order={3} size="h4">
               最近のGroup
             </Title>
-            {!noGroups && groupState !== "loading" && groupState !== "error" && (
-              <Button
-                variant="subtle"
-                size="compact-sm"
-                component={Link}
-                href={groupsHref}
-              >
-                すべて見る
-              </Button>
-            )}
+            {!noGroups &&
+              groupState !== "loading" &&
+              groupState !== "error" && (
+                <Button
+                  variant="subtle"
+                  size="compact-sm"
+                  component={Link}
+                  href={groupsHref}
+                >
+                  すべて見る
+                </Button>
+              )}
           </Group>
           {groupState === "loading" || groupState === "error" ? (
-            <SectionFeedback state={groupState} onRetry={onRetryGroups} kind="group" />
+            <SectionFeedback
+              state={groupState}
+              onRetry={onRetryGroups}
+              kind="group"
+            />
           ) : noGroups ? (
             <EmptyState kind="group" href={groupsHref} />
           ) : (

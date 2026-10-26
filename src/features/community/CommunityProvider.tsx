@@ -37,7 +37,9 @@ export function CommunityProvider({
 
 export function useCommunity({
   includeMembers = true,
-}: { includeMembers?: boolean } = {}): CommunityData {
+}: {
+  includeMembers?: boolean
+} = {}): CommunityData {
   const communityId = useContext(Context)
   if (!communityId) throw new Error("CommunityProvider is required")
   const community = useCommunityDetailsQuery({ variables: { communityId } })

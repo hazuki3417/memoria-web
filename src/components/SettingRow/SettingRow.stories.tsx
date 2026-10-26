@@ -25,7 +25,8 @@ type Story = StoryObj<typeof meta>
 
 export const Wide: Story = {
   name: "Visual · Wide",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 
 export const Compact: Story = {
   name: "Visual · Compact",

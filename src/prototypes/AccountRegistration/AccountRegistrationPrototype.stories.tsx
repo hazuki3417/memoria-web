@@ -12,7 +12,9 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   name: "Default",
-  tags: ["visual"], args: { reviewState: "default" } }
+  tags: ["visual"],
+  args: { reviewState: "default" },
+}
 export const NoDisplayName: Story = {
   name: "No Display Name",
   tags: ["visual"],
@@ -20,7 +22,9 @@ export const NoDisplayName: Story = {
 }
 export const InvalidInput: Story = {
   name: "Invalid Input",
-  tags: ["visual"], args: { reviewState: "invalid" } }
+  tags: ["visual"],
+  args: { reviewState: "invalid" },
+}
 export const Registering: Story = {
   name: "Registering",
   tags: ["visual"],
@@ -33,10 +37,14 @@ export const RegistrationFailed: Story = {
 }
 export const Blocked: Story = {
   name: "Blocked",
-  tags: ["visual"], args: { reviewState: "blocking" } }
+  tags: ["visual"],
+  args: { reviewState: "blocking" },
+}
 export const Registered: Story = {
   name: "Registered",
-  tags: ["visual"], args: { reviewState: "registered" } }
+  tags: ["visual"],
+  args: { reviewState: "registered" },
+}
 export const Compact: Story = {
   name: "Compact",
   tags: ["visual"],

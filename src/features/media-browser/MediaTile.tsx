@@ -63,17 +63,26 @@ export function MediaTile({
       ) : item.processing ? (
         <Stack align="center" justify="center" gap={6} p="sm" c="dimmed">
           <Loader size="sm" />
-          <Text size="xs" ta="center">画像を処理しています</Text>
+          <Text size="xs" ta="center">
+            画像を処理しています
+          </Text>
         </Stack>
       ) : !item.src ? (
         <Stack align="center" justify="center" gap={6} p="sm" c="dimmed">
           <IconPhotoOff size={30} stroke={1.5} aria-hidden="true" />
-          <Text size="xs" ta="center">画像を表示できません</Text>
+          <Text size="xs" ta="center">
+            画像を表示できません
+          </Text>
         </Stack>
       ) : (
         <Image
           src={item.src}
-          srcSet={item.variants?.filter(variant => variant.url).map(variant => `${variant.url} ${variant.width}w`).join(", ") || undefined}
+          srcSet={
+            item.variants
+              ?.filter((variant) => variant.url)
+              .map((variant) => `${variant.url} ${variant.width}w`)
+              .join(", ") || undefined
+          }
           sizes="(max-width: 360px) 100vw, (max-width: 768px) 50vw, 168px"
           alt={item.label}
           w="100%"

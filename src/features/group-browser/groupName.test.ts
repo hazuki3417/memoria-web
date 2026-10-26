@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { canEnterGroupName, countGroupNameGraphemes, validGroupName } from "./groupName"
+import {
+  canEnterGroupName,
+  countGroupNameGraphemes,
+  validGroupName,
+} from "./groupName"
 
 describe("Group name grapheme validation", () => {
   it("treats combining marks as one perceived character", () => {
@@ -29,14 +33,15 @@ describe("Group name grapheme validation", () => {
     expect(validGroupName("")).toBe(false)
     expect(validGroupName("　\t ")).toBe(false)
     expect(validGroupName("  卒業式  ")).toBe(true)
-    expect(validGroupName(" ".repeat(50) + "卒業式" + " ".repeat(50))).toBe(true)
+    expect(validGroupName(" ".repeat(50) + "卒業式" + " ".repeat(50))).toBe(
+      true,
+    )
   })
 
   it("counts joined emoji as one grapheme rather than code points", () => {
     expect(countGroupNameGraphemes("👨‍👩‍👧‍👦")).toBe(1)
     expect(countGroupNameGraphemes("🇯🇵")).toBe(1)
   })
-
 
   it("rejects forbidden Cc before trim, whether leading, internal, or trailing (GB-038)", () => {
     for (const control of ["\n", "\t", "\u0000", "\u0001", "\u007f"]) {
@@ -62,11 +67,16 @@ describe("Group name grapheme validation", () => {
   })
 
   it("does not normalize case, width or permitted interior spacing (GB-040)", () => {
-    for (const value of ["Group", "group", "Ｇｒｏｕｐ", "Group Name", "Group  Name"]) {
+    for (const value of [
+      "Group",
+      "group",
+      "Ｇｒｏｕｐ",
+      "Group Name",
+      "Group  Name",
+    ]) {
       expect(validGroupName(value)).toBe(true)
     }
     expect(countGroupNameGraphemes("e\u0301")).toBe(1)
     expect(countGroupNameGraphemes("é")).toBe(1)
   })
-
 })

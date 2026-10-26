@@ -32,7 +32,10 @@ export function UsageStorageSection({
           ) : (
             <Text size="sm" ta="right">
               {displayMode === "size" ? (
-                <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />
+                <UsageFileSize
+                  bytes={usage.usedBytes}
+                  fileSizeUnit={fileSizeUnit}
+                />
               ) : (
                 `${usagePercent(usage.usedBytes, usage.limitBytes)}%`
               )}
@@ -46,9 +49,17 @@ export function UsageStorageSection({
           ) : (
             <Text size="sm" ta="right">
               {displayMode === "size" ? (
-                <UsageFileSize bytes={Math.max(0, usage.limitBytes - usage.usedBytes)} fileSizeUnit={fileSizeUnit} />
+                <UsageFileSize
+                  bytes={Math.max(0, usage.limitBytes - usage.usedBytes)}
+                  fileSizeUnit={fileSizeUnit}
+                />
               ) : (
-                `${Math.max(0, 100 - usagePercent(usage.usedBytes, usage.limitBytes)).toFixed(1).replace(/\.0$/, "")}%`
+                `${Math.max(
+                  0,
+                  100 - usagePercent(usage.usedBytes, usage.limitBytes),
+                )
+                  .toFixed(1)
+                  .replace(/\.0$/, "")}%`
               )}
             </Text>
           )}
@@ -60,14 +71,17 @@ export function UsageStorageSection({
             size="md"
             aria-label={`ストレージ使用率 ${usagePercent(usage.usedBytes, usage.limitBytes)}%、ファイル形式別内訳`}
           >
-            {(usage.formatBreakdown && sortUsageFormats(usage.formatBreakdown, defaultUsageSort).map((item) => (
-              <Progress.Section
-                key={item.format}
-                value={usagePercent(item.sizeBytes, usage.limitBytes)}
-                color={formatColors[item.format] ?? "gray"}
-                aria-label={`${item.format} ${usagePercent(item.sizeBytes, usage.limitBytes)}%`}
-              />
-            ))) ?? (
+            {(usage.formatBreakdown &&
+              sortUsageFormats(usage.formatBreakdown, defaultUsageSort).map(
+                (item) => (
+                  <Progress.Section
+                    key={item.format}
+                    value={usagePercent(item.sizeBytes, usage.limitBytes)}
+                    color={formatColors[item.format] ?? "gray"}
+                    aria-label={`${item.format} ${usagePercent(item.sizeBytes, usage.limitBytes)}%`}
+                  />
+                ),
+              )) ?? (
               <Progress.Section
                 value={usagePercent(usage.usedBytes, usage.limitBytes)}
                 color="blue"
@@ -81,7 +95,10 @@ export function UsageStorageSection({
             <Skeleton w={92} h={16} radius="sm" />
           ) : (
             <Text size="sm" ta="right">
-              <UsageFileSize bytes={usage.limitBytes} fileSizeUnit={fileSizeUnit} />
+              <UsageFileSize
+                bytes={usage.limitBytes}
+                fileSizeUnit={fileSizeUnit}
+              />
             </Text>
           )}
         </Group>
@@ -89,4 +106,3 @@ export function UsageStorageSection({
     </Box>
   )
 }
-

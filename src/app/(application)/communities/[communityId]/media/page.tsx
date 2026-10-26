@@ -6,5 +6,7 @@ export default async function Page({
   params: Promise<{ communityId: string }>
 }) {
   const { communityId } = await params
-  return <MediaBrowserContainer contextKind="community" communityId={communityId} />
+  return (
+    <MediaBrowserContainer contextKind="community" communityId={communityId} />
+  )
 }

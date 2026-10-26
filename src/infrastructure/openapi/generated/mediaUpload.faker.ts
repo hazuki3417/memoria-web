@@ -6,14 +6,14 @@
  *
  * OpenAPI spec version: 1.0.0
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from "@faker-js/faker"
 
-import type {
-  MediaUploadReceipt
-} from './mediaUpload';
+import type { MediaUploadReceipt } from "./mediaUpload"
 
-
-export const getUploadMediaResponseMock = (overrideResponse: Partial<Extract<MediaUploadReceipt, object>> = {}): MediaUploadReceipt => ({mediaId: faker.string.alpha({length: {min: 10, max: 20}}), processingStatus: faker.helpers.arrayElement(['PROCESSING'] as const), ...overrideResponse})
-
+export const getUploadMediaResponseMock = (
+  overrideResponse: Partial<Extract<MediaUploadReceipt, object>> = {},
+): MediaUploadReceipt => ({
+  mediaId: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  processingStatus: faker.helpers.arrayElement(["PROCESSING"] as const),
+  ...overrideResponse,
+})

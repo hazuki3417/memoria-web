@@ -20,8 +20,12 @@ import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
 import type { UsageDisplayMode } from "./usageDisplayMode"
 export type { SettingsUsageData } from "./usageTypes"
-import { defaultUsageSort, nextUsageSort, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
-
+import {
+  defaultUsageSort,
+  nextUsageSort,
+  type UsageSort,
+  type UsageSortKey,
+} from "./sortUsageFormats"
 
 function UsageErrorContent({ onRetry }: { onRetry?: () => void }) {
   return (
@@ -74,7 +78,9 @@ export function SettingsUsage({
           }
         />
         <Group gap="xs" wrap="nowrap">
-          <Text size="sm" c="dimmed" id="usage-display-mode-label">表示</Text>
+          <Text size="sm" c="dimmed" id="usage-display-mode-label">
+            表示
+          </Text>
           <SegmentedControl
             size="xs"
             aria-labelledby="usage-display-mode-label"
@@ -85,8 +91,19 @@ export function SettingsUsage({
                 value: "size",
                 label: (
                   <Tooltip label="容量で表示" withArrow>
-                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-                      <IconDatabase size={15} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <IconDatabase
+                        size={15}
+                        stroke={1.75}
+                        aria-hidden="true"
+                        style={{ display: "block" }}
+                      />
                       <VisuallyHidden>容量</VisuallyHidden>
                     </span>
                   </Tooltip>
@@ -96,8 +113,20 @@ export function SettingsUsage({
                 value: "percent",
                 label: (
                   <Tooltip label="割合で表示" withArrow>
-                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 18 }}>
-                      <IconPercentage size={15} stroke={1.75} aria-hidden="true" style={{ display: "block" }} />
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        minWidth: 18,
+                      }}
+                    >
+                      <IconPercentage
+                        size={15}
+                        stroke={1.75}
+                        aria-hidden="true"
+                        style={{ display: "block" }}
+                      />
                       <VisuallyHidden>割合</VisuallyHidden>
                     </span>
                   </Tooltip>
@@ -114,9 +143,16 @@ export function SettingsUsage({
           <Stack
             gap="xl"
             role={status === "loading" ? "status" : undefined}
-            aria-label={status === "loading" ? "利用状況を読み込んでいます" : undefined}
+            aria-label={
+              status === "loading" ? "利用状況を読み込んでいます" : undefined
+            }
           >
-            <UsageStorageSection usage={usage} status={status} fileSizeUnit={fileSizeUnit} displayMode={displayMode} />
+            <UsageStorageSection
+              usage={usage}
+              status={status}
+              fileSizeUnit={fileSizeUnit}
+              displayMode={displayMode}
+            />
             <UsageFormatBreakdownSection
               usage={usage}
               status={status}

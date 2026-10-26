@@ -86,7 +86,9 @@ export const ListingError: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(
-      await canvas.findByText("Group一覧の取得に失敗しました。再試行できます。"),
+      await canvas.findByText(
+        "Group一覧の取得に失敗しました。再試行できます。",
+      ),
     ).toBeVisible()
     await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
     await expect(canvas.getByPlaceholderText("Groupを検索")).toBeVisible()
@@ -109,10 +111,11 @@ export const RetryAfterError: Story = {
     const canvas = within(canvasElement)
     await canvas.findByText("Group一覧の取得に失敗しました。再試行できます。")
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect((await canvas.findAllByRole("button", { name: "Groupを作成" }))[0]).toBeVisible()
+    await expect(
+      (await canvas.findAllByRole("button", { name: "Groupを作成" }))[0],
+    ).toBeVisible()
   },
 }
-
 
 /** GB-010: 再試行が再び失敗してもError表示を維持し、次の明示的なRetryで回復する。 */
 export const RetryFailsThenRecovers: Story = {
@@ -120,7 +123,10 @@ export const RetryFailsThenRecovers: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[failedReply, failedReply, emptyReply]} addTypename={false}>
+      <MockedProvider
+        mocks={[failedReply, failedReply, emptyReply]}
+        addTypename={false}
+      >
         <Story />
       </MockedProvider>
     ),
@@ -135,7 +141,9 @@ export const RetryFailsThenRecovers: Story = {
       expect(canvas.getByText(message)).toBeVisible()
     })
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect((await canvas.findAllByRole("button", { name: "Groupを作成" }))[0]).toBeVisible()
+    await expect(
+      (await canvas.findAllByRole("button", { name: "Groupを作成" }))[0],
+    ).toBeVisible()
     await expect(canvas.queryByText(message)).not.toBeInTheDocument()
   },
 }
@@ -153,18 +161,25 @@ export const EmptyScopeCreateCancel: Story = {
   ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click((await canvas.findAllByRole("button", { name: "Groupを作成" }))[0])
+    await userEvent.click(
+      (await canvas.findAllByRole("button", { name: "Groupを作成" }))[0],
+    )
     const dialog = within(
       await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
     )
-    await userEvent.type(dialog.getByPlaceholderText("Group名"), "未保存のGroup")
+    await userEvent.type(
+      dialog.getByPlaceholderText("Group名"),
+      "未保存のGroup",
+    )
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await waitFor(() => {
       expect(
         within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
       ).not.toBeInTheDocument()
     })
-    await expect(canvas.getAllByRole("button", { name: "Groupを作成" })[0]).toBeVisible()
+    await expect(
+      canvas.getAllByRole("button", { name: "Groupを作成" })[0],
+    ).toBeVisible()
   },
 }
 
@@ -194,19 +209,25 @@ const createdGroup: OperationCreateBrowserGroupMutation = {
 // Invoked only after Apollo's MockLink matches the operation and its variables.
 const createSuccessReply = fn(() => ({ data: createdGroup }))
 const createRejectedReply = fn(() => ({
-  errors: [new GraphQLError("同名のGroupが存在します", {
-    extensions: { code: "DUPLICATE_NAME" },
-  })],
+  errors: [
+    new GraphQLError("同名のGroupが存在します", {
+      extensions: { code: "DUPLICATE_NAME" },
+    }),
+  ],
 }))
 const createUnknownReply = fn(() => ({
-  errors: [new GraphQLError("作成結果を確認できません", {
-    extensions: { code: "UNKNOWN_OUTCOME" },
-  })],
+  errors: [
+    new GraphQLError("作成結果を確認できません", {
+      extensions: { code: "UNKNOWN_OUTCOME" },
+    }),
+  ],
 }))
 
 async function submitCreation(canvasElement: HTMLElement) {
   const canvas = within(canvasElement)
-  await userEvent.click((await canvas.findAllByRole("button", { name: "Groupを作成" }))[0])
+  await userEvent.click(
+    (await canvas.findAllByRole("button", { name: "Groupを作成" }))[0],
+  )
   const dialog = within(
     await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
   )
@@ -245,7 +266,9 @@ export const CreateMutationSuccess: Story = {
         within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
       ).not.toBeInTheDocument()
     })
-    await expect(within(canvasElement).getAllByRole("button", { name: "Groupを作成" })[0]).toBeVisible()
+    await expect(
+      within(canvasElement).getAllByRole("button", { name: "Groupを作成" })[0],
+    ).toBeVisible()
   },
 }
 
@@ -274,12 +297,16 @@ export const CreateMutationRejected: Story = {
     await submitCreation(canvasElement)
     await waitFor(() => {
       expect(createRejectedReply).toHaveBeenCalledTimes(1)
-      expect(within(document.body).getByRole("dialog", { name: "Groupを作成" })).toBeVisible()
+      expect(
+        within(document.body).getByRole("dialog", { name: "Groupを作成" }),
+      ).toBeVisible()
     })
     const dialog = within(
       within(document.body).getByRole("dialog", { name: "Groupを作成" }),
     )
-    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(creationName)
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(
+      creationName,
+    )
     await expect(dialog.getByRole("button", { name: "作成" })).toBeEnabled()
   },
 }
@@ -306,12 +333,16 @@ export const CreateMutationUnknown: Story = {
     await submitCreation(canvasElement)
     await waitFor(() => {
       expect(createUnknownReply).toHaveBeenCalledTimes(1)
-      expect(within(document.body).getByRole("dialog", { name: "Groupを作成" })).toBeVisible()
+      expect(
+        within(document.body).getByRole("dialog", { name: "Groupを作成" }),
+      ).toBeVisible()
     })
     const dialog = within(
       within(document.body).getByRole("dialog", { name: "Groupを作成" }),
     )
-    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(creationName)
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(
+      creationName,
+    )
     await expect(dialog.getByRole("button", { name: "作成" })).toBeEnabled()
   },
 }
@@ -322,7 +353,10 @@ export const ListingLoading: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[{ ...emptyReply, delay: 3000 }]} addTypename={false}>
+      <MockedProvider
+        mocks={[{ ...emptyReply, delay: 3000 }]}
+        addTypename={false}
+      >
         <Story />
       </MockedProvider>
     ),
@@ -332,6 +366,8 @@ export const ListingLoading: Story = {
     await expect(canvas.getByPlaceholderText("Groupを検索")).toBeVisible()
     await expect(canvas.getByRole("button", { name: "検索" })).toBeVisible()
     await expect(canvas.getByText("Groupを読み込んでいます")).toBeVisible()
-    await expect(canvas.queryByText("まだGroupがありません")).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByText("まだGroupがありません"),
+    ).not.toBeInTheDocument()
   },
 }

@@ -12,10 +12,14 @@ type Story = StoryObj<typeof meta>
 
 export const Empty: Story = {
   name: "Empty",
-  tags: ["visual"], args: { scenario: "empty", context: "personal" } }
+  tags: ["visual"],
+  args: { scenario: "empty", context: "personal" },
+}
 export const Ready: Story = {
   name: "Ready",
-  tags: ["visual"], args: { scenario: "ready", context: "personal" } }
+  tags: ["visual"],
+  args: { scenario: "ready", context: "personal" },
+}
 export const ValidationErrors: Story = {
   name: "Validation Errors",
   tags: ["visual"],

@@ -41,7 +41,8 @@ export function CommunitySettingsRoute({
   const [leaveCommunity] = useLeaveCommunityMutation()
 
   const pending =
-    !loadError && !(requiresMembers && membersError) &&
+    !loadError &&
+    !(requiresMembers && membersError) &&
     (name === null || (requiresMembers && members === null))
 
   if (loadError)

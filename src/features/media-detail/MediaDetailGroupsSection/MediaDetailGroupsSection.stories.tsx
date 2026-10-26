@@ -24,7 +24,8 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   name: "Visual · Default",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Expanded: Story = {
   name: "Visual · Expanded",
   tags: ["visual"],

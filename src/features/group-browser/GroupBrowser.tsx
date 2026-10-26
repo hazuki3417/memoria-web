@@ -17,10 +17,7 @@ import {
   UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import {
-  IconFolderPlus,
-  IconSearch,
-} from "@tabler/icons-react"
+import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useMemo, useState } from "react"
 import { showNotification } from "@/components/Feedback"
@@ -129,25 +126,43 @@ export function GroupBrowser({
 }: GroupBrowserProps) {
   const { saving, runAction } = useGroupMutationAction()
   const {
-    createOpened, createName, createParents, createChildren,
-    setCreateName, setCreateParents, setCreateChildren, openCreate, submitCreate,
+    createOpened,
+    createName,
+    createParents,
+    createChildren,
+    setCreateName,
+    setCreateParents,
+    setCreateChildren,
+    openCreate,
+    submitCreate,
     closeCreate,
   } = useGroupCreateController({ onCreateGroup, runAction })
   const allGroups = groupsData ?? []
-  const { query, setQuery, appliedQuery, setAppliedQuery } = useGroupSearchState()
+  const { query, setQuery, appliedQuery, setAppliedQuery } =
+    useGroupSearchState()
   const {
-    selectedId, compact, compactView, splitViewRef, savedLayout,
-    compactDetailHeadingRef, compactSearchRef, compactGroupItemRefs,
-    compactReturnGroupIdRef, openDetail, closeDetail,
-    handleDetailExitComplete, handleLayoutChanged,
+    selectedId,
+    compact,
+    compactView,
+    splitViewRef,
+    savedLayout,
+    compactDetailHeadingRef,
+    compactSearchRef,
+    compactGroupItemRefs,
+    compactReturnGroupIdRef,
+    openDetail,
+    closeDetail,
+    handleDetailExitComplete,
+    handleLayoutChanged,
   } = useGroupNavigation(onSelectGroup)
   const [imageDetailIndex, setMediaDetailIndex] = useState<number | null>(null)
   const groupMediaItems = useMemo(
-    () => (mediaItemsData ?? []).map((item) => ({
-      ...item,
-      src: item.src ?? "",
-      failed: !item.src,
-    })),
+    () =>
+      (mediaItemsData ?? []).map((item) => ({
+        ...item,
+        src: item.src ?? "",
+        failed: !item.src,
+      })),
     [mediaItemsData],
   )
 
@@ -166,65 +181,115 @@ export function GroupBrowser({
   const [conflictNeedsReview, setConflictNeedsReview] = useState(false)
 
   const visibleGroups = useMemo(
-    () => filterVisibleGroups(allGroups, appliedQuery, groupsData !== undefined),
+    () =>
+      filterVisibleGroups(allGroups, appliedQuery, groupsData !== undefined),
     [allGroups, appliedQuery, groupsData],
   )
 
-  const emptyGroupState = discoveryState === "ready" && allGroups.length === 0 && !appliedQuery.trim() ? (
-    <Center mih={360}>
-      <Stack align="center" maw={420}>
-        <ThemeIcon size={48} radius="xl" variant="light">
-          <IconFolderPlus size={24} />
-        </ThemeIcon>
-        <Text fw={700} size="lg">まだGroupがありません</Text>
-        <Text size="sm" c="dimmed" ta="center">
-          最初のGroupを作成すると、ここからMediaを整理できます。
-        </Text>
-        {!hideManagementActions && (
-          <Button leftSection={<IconFolderPlus size={16} />} onClick={openCreate} disabled={!canManage}>
-            Groupを作成
-          </Button>
-        )}
-      </Stack>
-    </Center>
-  ) : null
-
-  const discoveryFeedback = discoveryState === "loading" ? (
-    <Center mih={360}>
-      <Stack align="center">
-        <Loader />
-        <Text size="sm" c="dimmed">Groupを読み込んでいます</Text>
-      </Stack>
-    </Center>
-  ) : discoveryState === "error" ? (
-    <Box p="sm">
-      <Alert color="red" title="Group一覧を取得できませんでした">
-        <Stack gap="xs" align="flex-start">
-          <Text size="sm">Group一覧の取得に失敗しました。再試行できます。</Text>
-          <Button size="xs" variant="light" onClick={onRetryDiscovery}>再試行</Button>
+  const emptyGroupState =
+    discoveryState === "ready" &&
+    allGroups.length === 0 &&
+    !appliedQuery.trim() ? (
+      <Center mih={360}>
+        <Stack align="center" maw={420}>
+          <ThemeIcon size={48} radius="xl" variant="light">
+            <IconFolderPlus size={24} />
+          </ThemeIcon>
+          <Text fw={700} size="lg">
+            まだGroupがありません
+          </Text>
+          <Text size="sm" c="dimmed" ta="center">
+            最初のGroupを作成すると、ここからMediaを整理できます。
+          </Text>
+          {!hideManagementActions && (
+            <Button
+              leftSection={<IconFolderPlus size={16} />}
+              onClick={openCreate}
+              disabled={!canManage}
+            >
+              Groupを作成
+            </Button>
+          )}
         </Stack>
-      </Alert>
-    </Box>
-  ) : null
-  const discoveryPageFeedback = discoveryPageState === "loading" ? (
-    <Center py="lg"><Stack align="center" gap={6}><Loader size="sm" /><Text size="xs" c="dimmed">追加のGroupを取得しています</Text></Stack></Center>
-  ) : discoveryPageState === "error" ? (
-    <Box p="sm"><Alert color="red" title="追加のGroupを取得できませんでした"><Button size="xs" variant="light" mt="xs" onClick={onRetryDiscoveryPage}>再試行</Button></Alert></Box>
-  ) : null
-  const searchEmptyState = discoveryState === "ready" && allGroups.length > 0 && visibleGroups.length === 0 && appliedQuery.trim() ? (
-    <Center mih={360}>
-      <Stack align="center" maw={420}>
-        <ThemeIcon size={48} radius="xl" variant="light" color="gray">
-          <IconSearch size={24} />
-        </ThemeIcon>
-        <Text fw={700} size="lg">一致するGroupがありません</Text>
-        <Text size="sm" c="dimmed" ta="center">検索条件を変更するか、検索を解除してください。</Text>
-        <Button variant="default" onClick={() => { setQuery(""); setAppliedQuery("") }}>
-          検索を解除
-        </Button>
-      </Stack>
-    </Center>
-  ) : null
+      </Center>
+    ) : null
+
+  const discoveryFeedback =
+    discoveryState === "loading" ? (
+      <Center mih={360}>
+        <Stack align="center">
+          <Loader />
+          <Text size="sm" c="dimmed">
+            Groupを読み込んでいます
+          </Text>
+        </Stack>
+      </Center>
+    ) : discoveryState === "error" ? (
+      <Box p="sm">
+        <Alert color="red" title="Group一覧を取得できませんでした">
+          <Stack gap="xs" align="flex-start">
+            <Text size="sm">
+              Group一覧の取得に失敗しました。再試行できます。
+            </Text>
+            <Button size="xs" variant="light" onClick={onRetryDiscovery}>
+              再試行
+            </Button>
+          </Stack>
+        </Alert>
+      </Box>
+    ) : null
+  const discoveryPageFeedback =
+    discoveryPageState === "loading" ? (
+      <Center py="lg">
+        <Stack align="center" gap={6}>
+          <Loader size="sm" />
+          <Text size="xs" c="dimmed">
+            追加のGroupを取得しています
+          </Text>
+        </Stack>
+      </Center>
+    ) : discoveryPageState === "error" ? (
+      <Box p="sm">
+        <Alert color="red" title="追加のGroupを取得できませんでした">
+          <Button
+            size="xs"
+            variant="light"
+            mt="xs"
+            onClick={onRetryDiscoveryPage}
+          >
+            再試行
+          </Button>
+        </Alert>
+      </Box>
+    ) : null
+  const searchEmptyState =
+    discoveryState === "ready" &&
+    allGroups.length > 0 &&
+    visibleGroups.length === 0 &&
+    appliedQuery.trim() ? (
+      <Center mih={360}>
+        <Stack align="center" maw={420}>
+          <ThemeIcon size={48} radius="xl" variant="light" color="gray">
+            <IconSearch size={24} />
+          </ThemeIcon>
+          <Text fw={700} size="lg">
+            一致するGroupがありません
+          </Text>
+          <Text size="sm" c="dimmed" ta="center">
+            検索条件を変更するか、検索を解除してください。
+          </Text>
+          <Button
+            variant="default"
+            onClick={() => {
+              setQuery("")
+              setAppliedQuery("")
+            }}
+          >
+            検索を解除
+          </Button>
+        </Stack>
+      </Center>
+    ) : null
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
@@ -297,7 +362,8 @@ export function GroupBrowser({
         showNotification({
           kind: "error",
           title: "保存結果を確認できませんでした",
-          description: "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
+          description:
+            "通信状態が不明です。編集内容を保持しています。最新状態を確認してから操作してください。",
         })
       }
       return
@@ -306,8 +372,7 @@ export function GroupBrowser({
       showNotification({
         kind: "error",
         title: "Groupを更新できませんでした",
-        description:
-          "最新のGroup情報を確認してから、再度お試しください。",
+        description: "最新のGroup情報を確認してから、再度お試しください。",
       })
       return
     }
@@ -430,14 +495,14 @@ export function GroupBrowser({
                   style={{ gridColumn: compact ? "1" : undefined }}
                 >
                   {!hideManagementActions && (
-                  <Button
-                    size="xs"
-                    leftSection={<IconFolderPlus size={16} />}
-                    onClick={openCreate}
-                    disabled={!canManage}
-                  >
-                    Groupを作成
-                  </Button>
+                    <Button
+                      size="xs"
+                      leftSection={<IconFolderPlus size={16} />}
+                      onClick={openCreate}
+                      disabled={!canManage}
+                    >
+                      Groupを作成
+                    </Button>
                   )}
                 </Group>
               </Box>
@@ -454,52 +519,70 @@ export function GroupBrowser({
                     gap: "var(--mantine-spacing-sm)",
                   }}
                 >
-                  {(discoveryState === "ready" ? visibleGroups : []).map((group) => (
-                    <UnstyledButton
-                      key={group.id}
-                      ref={(element) => {
-                        if (element) compactGroupItemRefs.current.set(group.id, element)
-                        else compactGroupItemRefs.current.delete(group.id)
-                      }}
-                      onClick={() => openDetail(group.id)}
-                      p="xs"
-                      bdrs="sm"
-                      w={240}
-                    >
-                      <Stack gap={6}>
-                        <Text
-                          fw={600}
-                          size="sm"
-                          truncate="end"
-                          title={group.name}
-                        >
-                          {group.name}
-                        </Text>
-                        <PreviewGrid
-                          count={group.previewCount}
-                          remote={groupsData !== undefined}
-                          sources={
-                            group.id === selectedId
-                              ? (mediaItemsData ?? []).flatMap((item) =>
-                                  item.src ? [item.src] : [],
-                                )
-                              : []
-                          }
-                        />
-                      </Stack>
-                    </UnstyledButton>
-                  ))}
+                  {(discoveryState === "ready" ? visibleGroups : []).map(
+                    (group) => (
+                      <UnstyledButton
+                        key={group.id}
+                        ref={(element) => {
+                          if (element)
+                            compactGroupItemRefs.current.set(group.id, element)
+                          else compactGroupItemRefs.current.delete(group.id)
+                        }}
+                        onClick={() => openDetail(group.id)}
+                        p="xs"
+                        bdrs="sm"
+                        w={240}
+                      >
+                        <Stack gap={6}>
+                          <Text
+                            fw={600}
+                            size="sm"
+                            truncate="end"
+                            title={group.name}
+                          >
+                            {group.name}
+                          </Text>
+                          <PreviewGrid
+                            count={group.previewCount}
+                            remote={groupsData !== undefined}
+                            sources={
+                              group.id === selectedId
+                                ? (mediaItemsData ?? []).flatMap((item) =>
+                                    item.src ? [item.src] : [],
+                                  )
+                                : []
+                            }
+                          />
+                        </Stack>
+                      </UnstyledButton>
+                    ),
+                  )}
                 </Box>
                 {discoveryPageFeedback}
-                {onDiscoveryEndVisible && discoveryPageState !== "error" && <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />}
+                {onDiscoveryEndVisible && discoveryPageState !== "error" && (
+                  <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />
+                )}
               </ScrollArea>
             </Box>
           ) : (
-            <GroupDetailPane compact selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData}
-                onRetryGroupMedia={onRetryGroupMedia} onMediaEndVisible={onMediaEndVisible} onOpenMedia={openMediaAt}
-                mediaPageFeedback={mediaPageFeedback} relationCandidateFeedback={relationCandidateFeedback}
-                relationDetailSection={relationDetailSection} hideManagementActions={hideManagementActions}
-                canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} headingRef={compactDetailHeadingRef} />
+            <GroupDetailPane
+              compact
+              selected={selected}
+              mediaDetailState={mediaDetailState}
+              mediaItemsData={mediaItemsData}
+              onRetryGroupMedia={onRetryGroupMedia}
+              onMediaEndVisible={onMediaEndVisible}
+              onOpenMedia={openMediaAt}
+              mediaPageFeedback={mediaPageFeedback}
+              relationCandidateFeedback={relationCandidateFeedback}
+              relationDetailSection={relationDetailSection}
+              hideManagementActions={hideManagementActions}
+              canManage={canManage}
+              detailsReady={detailsReady}
+              onEdit={openEdit}
+              onClose={closeDetail}
+              headingRef={compactDetailHeadingRef}
+            />
           )}
         </Box>
       ) : (
@@ -562,14 +645,14 @@ export function GroupBrowser({
                   style={{ gridColumn: compact ? "1" : undefined }}
                 >
                   {!hideManagementActions && (
-                  <Button
-                    size="xs"
-                    leftSection={<IconFolderPlus size={16} />}
-                    onClick={openCreate}
-                    disabled={!canManage}
-                  >
-                    Groupを作成
-                  </Button>
+                    <Button
+                      size="xs"
+                      leftSection={<IconFolderPlus size={16} />}
+                      onClick={openCreate}
+                      disabled={!canManage}
+                    >
+                      Groupを作成
+                    </Button>
                   )}
                 </Group>
               </Box>
@@ -586,47 +669,51 @@ export function GroupBrowser({
                     gap: "var(--mantine-spacing-sm)",
                   }}
                 >
-                  {(discoveryState === "ready" ? visibleGroups : []).map((group) => {
-                    const selectedItem = group.id === selectedId
-                    return (
-                      <UnstyledButton
-                        key={group.id}
-                        onClick={() => openDetail(group.id)}
-                        aria-pressed={selectedItem}
-                        w={240}
-                        p="xs"
-                        bdrs="sm"
-                        bg={
-                          selectedItem
-                            ? "var(--mantine-color-default-hover)"
-                            : undefined
-                        }
-                        style={{
-                          border: selectedItem
-                            ? "1px solid var(--mantine-primary-color-filled)"
-                            : "1px solid transparent",
-                        }}
-                      >
-                        <Stack gap={6}>
-                          <Text
-                            fw={600}
-                            size="sm"
-                            truncate="end"
-                            title={group.name}
-                          >
-                            {group.name}
-                          </Text>
-                          <PreviewGrid
-                            count={group.previewCount}
-                            remote={groupsData !== undefined}
-                          />
-                        </Stack>
-                      </UnstyledButton>
-                    )
-                  })}
+                  {(discoveryState === "ready" ? visibleGroups : []).map(
+                    (group) => {
+                      const selectedItem = group.id === selectedId
+                      return (
+                        <UnstyledButton
+                          key={group.id}
+                          onClick={() => openDetail(group.id)}
+                          aria-pressed={selectedItem}
+                          w={240}
+                          p="xs"
+                          bdrs="sm"
+                          bg={
+                            selectedItem
+                              ? "var(--mantine-color-default-hover)"
+                              : undefined
+                          }
+                          style={{
+                            border: selectedItem
+                              ? "1px solid var(--mantine-primary-color-filled)"
+                              : "1px solid transparent",
+                          }}
+                        >
+                          <Stack gap={6}>
+                            <Text
+                              fw={600}
+                              size="sm"
+                              truncate="end"
+                              title={group.name}
+                            >
+                              {group.name}
+                            </Text>
+                            <PreviewGrid
+                              count={group.previewCount}
+                              remote={groupsData !== undefined}
+                            />
+                          </Stack>
+                        </UnstyledButton>
+                      )
+                    },
+                  )}
                 </Box>
                 {discoveryPageFeedback}
-                {onDiscoveryEndVisible && discoveryPageState !== "error" && <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />}
+                {onDiscoveryEndVisible && discoveryPageState !== "error" && (
+                  <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />
+                )}
               </ScrollArea>
             </Box>
           </SplitView.Pane>
@@ -650,11 +737,22 @@ export function GroupBrowser({
                   exit={{ opacity: 0, x: 100 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <GroupDetailPane selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData}
-                onRetryGroupMedia={onRetryGroupMedia} onMediaEndVisible={onMediaEndVisible} onOpenMedia={openMediaAt}
-                mediaPageFeedback={mediaPageFeedback} relationCandidateFeedback={relationCandidateFeedback}
-                relationDetailSection={relationDetailSection} hideManagementActions={hideManagementActions}
-                canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} />
+                  <GroupDetailPane
+                    selected={selected}
+                    mediaDetailState={mediaDetailState}
+                    mediaItemsData={mediaItemsData}
+                    onRetryGroupMedia={onRetryGroupMedia}
+                    onMediaEndVisible={onMediaEndVisible}
+                    onOpenMedia={openMediaAt}
+                    mediaPageFeedback={mediaPageFeedback}
+                    relationCandidateFeedback={relationCandidateFeedback}
+                    relationDetailSection={relationDetailSection}
+                    hideManagementActions={hideManagementActions}
+                    canManage={canManage}
+                    detailsReady={detailsReady}
+                    onEdit={openEdit}
+                    onClose={closeDetail}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>

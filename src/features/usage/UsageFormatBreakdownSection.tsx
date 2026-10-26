@@ -3,7 +3,11 @@
 import { useMemo } from "react"
 import { Box, Group, Skeleton, Table, Text } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
-import { sortUsageFormats, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
+import {
+  sortUsageFormats,
+  type UsageSort,
+  type UsageSortKey,
+} from "./sortUsageFormats"
 import type { FileSizeUnit } from "./formatFileSize"
 import { UsageFileSize } from "./UsageFileSize"
 import { UsageSortHeader } from "./UsageSortHeader"
@@ -36,12 +40,13 @@ export function UsageFormatBreakdownSection({
   displayMode?: UsageDisplayMode
 }) {
   const sortedBreakdown = useMemo(
-    () => sortUsageFormats(
-      usage.mediaCount === 0 && !usage.formatBreakdown?.length
-        ? zeroFormatBreakdown
-        : usage.formatBreakdown ?? [],
-      sort,
-    ),
+    () =>
+      sortUsageFormats(
+        usage.mediaCount === 0 && !usage.formatBreakdown?.length
+          ? zeroFormatBreakdown
+          : (usage.formatBreakdown ?? []),
+        sort,
+      ),
     [usage.mediaCount, usage.formatBreakdown, sort],
   )
   const ariaSort = (key: UsageSortKey): "ascending" | "descending" | "none" => {
@@ -65,15 +70,10 @@ export function UsageFormatBreakdownSection({
           <Table striped highlightOnHover={status === "ready"}>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th
-                  aria-sort={ariaSort("format")}
-                >
+                <Table.Th aria-sort={ariaSort("format")}>
                   {sortHeader("format", "形式")}
                 </Table.Th>
-                <Table.Th
-                  ta="right"
-                  aria-sort={ariaSort("count")}
-                >
+                <Table.Th ta="right" aria-sort={ariaSort("count")}>
                   {sortHeader("count", "登録件数")}
                 </Table.Th>
                 <Table.Th ta="right" aria-sort={ariaSort("size")}>
@@ -82,41 +82,46 @@ export function UsageFormatBreakdownSection({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {status === "loading" && Array.from({ length: 4 }, (_, row) => (
-                <Table.Tr key={`loading-${row}`}>
-                  {Array.from({ length: 3 }, (_, column) => (
-                    <Table.Td key={column}>
-                      <Skeleton h={16} radius="sm" />
+              {status === "loading" &&
+                Array.from({ length: 4 }, (_, row) => (
+                  <Table.Tr key={`loading-${row}`}>
+                    {Array.from({ length: 3 }, (_, column) => (
+                      <Table.Td key={column}>
+                        <Skeleton h={16} radius="sm" />
+                      </Table.Td>
+                    ))}
+                  </Table.Tr>
+                ))}
+              {status === "ready" &&
+                sortedBreakdown.map((item) => (
+                  <Table.Tr key={item.format}>
+                    <Table.Td>
+                      <Group gap="xs" wrap="nowrap">
+                        <Box
+                          w={12}
+                          h={12}
+                          bg={`var(--mantine-color-${formatColors[item.format] ?? "gray"}-6)`}
+                          style={{ flexShrink: 0 }}
+                          aria-hidden="true"
+                        />
+                        <Text size="sm">{item.format}</Text>
+                      </Group>
                     </Table.Td>
-                  ))}
-                </Table.Tr>
-              ))}
-              {status === "ready" && sortedBreakdown.map((item) => (
-                <Table.Tr key={item.format}>
-                  <Table.Td>
-                    <Group gap="xs" wrap="nowrap">
-                      <Box
-                        w={12}
-                        h={12}
-                        bg={`var(--mantine-color-${formatColors[item.format] ?? "gray"}-6)`}
-                        style={{ flexShrink: 0 }}
-                        aria-hidden="true"
-                      />
-                      <Text size="sm">{item.format}</Text>
-                    </Group>
-                  </Table.Td>
-                  <Table.Td ta="right">
-                    {item.count.toLocaleString("ja-JP")} 件
-                  </Table.Td>
-                  <Table.Td ta="right">
-                    {displayMode === "size" ? (
-                      <UsageFileSize bytes={item.sizeBytes} fileSizeUnit={fileSizeUnit} />
-                    ) : (
-                      `${usagePercent(item.sizeBytes, usage.limitBytes)}%`
-                    )}
-                  </Table.Td>
-                </Table.Tr>
-              ))}
+                    <Table.Td ta="right">
+                      {item.count.toLocaleString("ja-JP")} 件
+                    </Table.Td>
+                    <Table.Td ta="right">
+                      {displayMode === "size" ? (
+                        <UsageFileSize
+                          bytes={item.sizeBytes}
+                          fileSizeUnit={fileSizeUnit}
+                        />
+                      ) : (
+                        `${usagePercent(item.sizeBytes, usage.limitBytes)}%`
+                      )}
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
             </Table.Tbody>
             {(status === "ready" || status === "loading") && (
               <Table.Tfoot
@@ -136,10 +141,15 @@ export function UsageFormatBreakdownSection({
                     </>
                   ) : (
                     <>
-                      <Table.Th ta="right">{usage.mediaCount.toLocaleString("ja-JP")} 件</Table.Th>
+                      <Table.Th ta="right">
+                        {usage.mediaCount.toLocaleString("ja-JP")} 件
+                      </Table.Th>
                       <Table.Th ta="right">
                         {displayMode === "size" ? (
-                          <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />
+                          <UsageFileSize
+                            bytes={usage.usedBytes}
+                            fileSizeUnit={fileSizeUnit}
+                          />
                         ) : (
                           `${usagePercent(usage.usedBytes, usage.limitBytes)}%`
                         )}
@@ -155,4 +165,3 @@ export function UsageFormatBreakdownSection({
     </>
   )
 }
-

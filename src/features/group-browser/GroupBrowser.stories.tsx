@@ -3,8 +3,22 @@ import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
 
 const fixtures: GroupBrowserGroup[] = [
-  { id: "a", name: "アルバムA", mediaCount: 0, previewCount: 0, parentNames: [], childNames: [] },
-  { id: "b", name: "アルバムB", mediaCount: 0, previewCount: 0, parentNames: [], childNames: [] },
+  {
+    id: "a",
+    name: "アルバムA",
+    mediaCount: 0,
+    previewCount: 0,
+    parentNames: [],
+    childNames: [],
+  },
+  {
+    id: "b",
+    name: "アルバムB",
+    mediaCount: 0,
+    previewCount: 0,
+    parentNames: [],
+    childNames: [],
+  },
 ]
 
 const meta = {
@@ -46,14 +60,21 @@ export const CreateDialogCancel: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
     const create = dialog.getByRole("button", { name: "作成" })
     await expect(create).toBeDisabled()
-    await userEvent.type(dialog.getByPlaceholderText("Group名"), "新しいアルバム")
+    await userEvent.type(
+      dialog.getByPlaceholderText("Group名"),
+      "新しいアルバム",
+    )
     await expect(create).toBeEnabled()
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await waitFor(() => {
-      expect(within(document.body).queryByRole("dialog", { name: "Groupを作成" })).not.toBeInTheDocument()
+      expect(
+        within(document.body).queryByRole("dialog", { name: "Groupを作成" }),
+      ).not.toBeInTheDocument()
     })
     await expect(args.onCreateGroup).not.toHaveBeenCalled()
   },
@@ -66,13 +87,21 @@ export const CreateGroupSubmitsName: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
-    await userEvent.type(dialog.getByPlaceholderText("Group名"), "新しいアルバム")
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
+    await userEvent.type(
+      dialog.getByPlaceholderText("Group名"),
+      "新しいアルバム",
+    )
     await userEvent.click(dialog.getByRole("button", { name: "作成" }))
-    await expect(args.onCreateGroup).toHaveBeenCalledWith("新しいアルバム", [], [])
+    await expect(args.onCreateGroup).toHaveBeenCalledWith(
+      "新しいアルバム",
+      [],
+      [],
+    )
   },
 }
-
 
 /** GB-003: root以外のGroupも通常の一覧から発見できる。 */
 export const FlatDiscovery: Story = {
@@ -80,9 +109,30 @@ export const FlatDiscovery: Story = {
   tags: ["interaction"],
   args: {
     groupsData: [
-      { id: "root", name: "ルート", mediaCount: 0, previewCount: 0, parentNames: [], childNames: ["子"] },
-      { id: "child", name: "子", mediaCount: 0, previewCount: 0, parentNames: ["ルート"], childNames: [] },
-      { id: "multi", name: "複数Parent", mediaCount: 0, previewCount: 0, parentNames: ["ルート", "別"], childNames: [] },
+      {
+        id: "root",
+        name: "ルート",
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: [],
+        childNames: ["子"],
+      },
+      {
+        id: "child",
+        name: "子",
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: ["ルート"],
+        childNames: [],
+      },
+      {
+        id: "multi",
+        name: "複数Parent",
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: ["ルート", "別"],
+        childNames: [],
+      },
     ],
   },
   play: async ({ canvasElement }) => {
@@ -112,7 +162,10 @@ export const SearchNoMatches: Story = {
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.type(canvas.getByPlaceholderText("Groupを検索"), "存在しないGroup{Enter}")
+    await userEvent.type(
+      canvas.getByPlaceholderText("Groupを検索"),
+      "存在しないGroup{Enter}",
+    )
     await expect(canvas.queryByText("アルバムA")).not.toBeInTheDocument()
     await expect(canvas.queryByText("アルバムB")).not.toBeInTheDocument()
     await expect(canvas.getByText("一致するGroupがありません")).toBeVisible()
@@ -146,10 +199,16 @@ export const CreateWithoutRelations: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "新規Group")
     await userEvent.click(dialog.getByRole("button", { name: "作成" }))
-    await expect(args.onCreateGroup).toHaveBeenCalledExactlyOnceWith("新規Group", [], [])
+    await expect(args.onCreateGroup).toHaveBeenCalledExactlyOnceWith(
+      "新規Group",
+      [],
+      [],
+    )
   },
 }
 
@@ -157,15 +216,26 @@ export const CreateWithoutRelations: Story = {
 export const CreateFailurePreservesDraft: Story = {
   name: "Interaction · Create Failure Preserves Draft",
   tags: ["interaction"],
-  args: { onCreateGroup: fn(async () => { throw new Error("rejected") }) },
+  args: {
+    onCreateGroup: fn(async () => {
+      throw new Error("rejected")
+    }),
+  },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
-    await userEvent.type(dialog.getByPlaceholderText("Group名"), "再試行するGroup")
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
+    await userEvent.type(
+      dialog.getByPlaceholderText("Group名"),
+      "再試行するGroup",
+    )
     await userEvent.click(dialog.getByRole("button", { name: "作成" }))
     await expect(args.onCreateGroup).toHaveBeenCalledTimes(1)
-    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("再試行するGroup")
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(
+      "再試行するGroup",
+    )
     await expect(dialog.getByRole("button", { name: "作成" })).toBeEnabled()
   },
 }
@@ -178,11 +248,18 @@ export const CreateUnknownOutcome: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
-    await userEvent.type(dialog.getByPlaceholderText("Group名"), "結果不明Group")
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
+    await userEvent.type(
+      dialog.getByPlaceholderText("Group名"),
+      "結果不明Group",
+    )
     await userEvent.click(dialog.getByRole("button", { name: "作成" }))
     await expect(args.onCreateGroup).toHaveBeenCalledTimes(1)
-    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("結果不明Group")
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(
+      "結果不明Group",
+    )
   },
 }
 
@@ -193,7 +270,9 @@ export const ManagementActionDisabled: Story = {
   args: { canManage: false },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "Groupを作成" })).toBeDisabled()
+    await expect(
+      canvas.getByRole("button", { name: "Groupを作成" }),
+    ).toBeDisabled()
     await expect(args.onCreateGroup).not.toHaveBeenCalled()
   },
 }
@@ -202,13 +281,18 @@ export const ManagementActionDisabled: Story = {
 export const MemberManagementActionHidden: Story = {
   name: "Interaction · Member Management Action Hidden",
   tags: ["interaction"],
-  args: { canManage: false, hideManagementActions: true, contextKind: "community" },
+  args: {
+    canManage: false,
+    hideManagementActions: true,
+    contextKind: "community",
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.queryByRole("button", { name: "Groupを作成" })).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByRole("button", { name: "Groupを作成" }),
+    ).not.toBeInTheDocument()
   },
 }
-
 
 /** GB-009/015: Groupを選ぶと同一画面で選択が切り替わる。 */
 export const SelectAnotherGroup: Story = {
@@ -233,7 +317,9 @@ export const SearchKeepsSelectedGroup: Story = {
     const search = canvas.getByPlaceholderText("Groupを検索")
     await userEvent.type(search, "アルバムB{Enter}")
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
-    await expect(canvas.getByRole("button", { name: /アルバムB/ })).toBeVisible()
+    await expect(
+      canvas.getByRole("button", { name: /アルバムB/ }),
+    ).toBeVisible()
   },
 }
 
@@ -243,14 +329,30 @@ export const RelationDisclosureToggle: Story = {
   tags: ["interaction"],
   args: {
     groupsData: [
-      { id: "a", name: "アルバムA", mediaCount: 0, previewCount: 0, parentNames: ["親"], childNames: ["子"] },
-      { id: "b", name: "アルバムB", mediaCount: 0, previewCount: 0, parentNames: [], childNames: [] },
+      {
+        id: "a",
+        name: "アルバムA",
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: ["親"],
+        childNames: ["子"],
+      },
+      {
+        id: "b",
+        name: "アルバムB",
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: [],
+        childNames: [],
+      },
     ],
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    const disclosure = canvas.getByRole("button", { name: "このGroupとの関係を開閉" })
+    const disclosure = canvas.getByRole("button", {
+      name: "このGroupとの関係を開閉",
+    })
     await expect(disclosure).toHaveAttribute("aria-expanded", "false")
     await userEvent.click(disclosure)
     await expect(disclosure).toHaveAttribute("aria-expanded", "true")
@@ -267,16 +369,26 @@ export const EditCancelDiscardsDraft: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     const name = dialog.getByPlaceholderText("Group名")
     await userEvent.clear(name)
     await userEvent.type(name, "保存しない名前")
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
-    await waitFor(() => expect(within(document.body).queryByRole("dialog", { name: "Groupを編集" })).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(
+        within(document.body).queryByRole("dialog", { name: "Groupを編集" }),
+      ).not.toBeInTheDocument(),
+    )
     await expect(args.onUpdateGroup).not.toHaveBeenCalled()
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const reopened = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
-    await expect(reopened.getByPlaceholderText("Group名")).toHaveValue("アルバムA")
+    const reopened = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
+    await expect(reopened.getByPlaceholderText("Group名")).toHaveValue(
+      "アルバムA",
+    )
   },
 }
 
@@ -286,7 +398,14 @@ export const RenamePreservesRelations: Story = {
   tags: ["interaction"],
   args: {
     groupsData: [
-      { id: "a", name: "アルバムA", mediaCount: 0, previewCount: 0, parentNames: ["親"], childNames: ["子"] },
+      {
+        id: "a",
+        name: "アルバムA",
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: ["親"],
+        childNames: ["子"],
+      },
     ],
     relationCandidates: ["親", "子"],
   },
@@ -294,12 +413,22 @@ export const RenamePreservesRelations: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.clear(dialog.getByPlaceholderText("Group名"))
-    await userEvent.type(dialog.getByPlaceholderText("Group名"), "改名したアルバム")
+    await userEvent.type(
+      dialog.getByPlaceholderText("Group名"),
+      "改名したアルバム",
+    )
     await expect(args.onUpdateGroup).not.toHaveBeenCalled()
     await userEvent.click(dialog.getByRole("button", { name: "保存" }))
-    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith("a", "改名したアルバム", ["親"], ["子"])
+    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith(
+      "a",
+      "改名したアルバム",
+      ["親"],
+      ["子"],
+    )
   },
 }
 
@@ -307,17 +436,28 @@ export const RenamePreservesRelations: Story = {
 export const EditFailurePreservesDraft: Story = {
   name: "Interaction · Edit Failure Preserves Draft",
   tags: ["interaction"],
-  args: { onUpdateGroup: fn(async () => { throw new Error("rejected") }) },
+  args: {
+    onUpdateGroup: fn(async () => {
+      throw new Error("rejected")
+    }),
+  },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.clear(dialog.getByPlaceholderText("Group名"))
-    await userEvent.type(dialog.getByPlaceholderText("Group名"), "再試行する名前")
+    await userEvent.type(
+      dialog.getByPlaceholderText("Group名"),
+      "再試行する名前",
+    )
     await userEvent.click(dialog.getByRole("button", { name: "保存" }))
     await expect(args.onUpdateGroup).toHaveBeenCalledTimes(1)
-    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("再試行する名前")
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(
+      "再試行する名前",
+    )
   },
 }
 
@@ -330,7 +470,9 @@ export const EditConflictBlocksResubmit: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "保存" }))
     await expect(args.onUpdateGroup).toHaveBeenCalledTimes(1)
     await expect(dialog.getByRole("button", { name: "保存" })).toBeDisabled()
@@ -345,10 +487,16 @@ export const DeleteCancelKeepsSelection: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const editor = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const editor = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(editor.getByRole("button", { name: "削除" }))
-    const confirmation = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
-    await userEvent.click(confirmation.getByRole("button", { name: "キャンセル" }))
+    const confirmation = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを削除" }),
+    )
+    await userEvent.click(
+      confirmation.getByRole("button", { name: "キャンセル" }),
+    )
     await expect(args.onDeleteGroup).not.toHaveBeenCalled()
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
   },
@@ -362,9 +510,13 @@ export const DeleteSuccessClearsSelection: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const editor = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const editor = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(editor.getByRole("button", { name: "削除" }))
-    const confirmation = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
+    const confirmation = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを削除" }),
+    )
     await userEvent.click(confirmation.getByRole("button", { name: "削除" }))
     await expect(args.onDeleteGroup).toHaveBeenCalledExactlyOnceWith("a")
     await expect(args.onSelectGroup).toHaveBeenLastCalledWith(null)
@@ -375,21 +527,30 @@ export const DeleteSuccessClearsSelection: Story = {
 export const DeleteFailureKeepsSelection: Story = {
   name: "Interaction · Delete Failure Keeps Selection",
   tags: ["interaction"],
-  args: { onDeleteGroup: fn(async () => { throw new Error("delete rejected") }) },
+  args: {
+    onDeleteGroup: fn(async () => {
+      throw new Error("delete rejected")
+    }),
+  },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const editor = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const editor = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(editor.getByRole("button", { name: "削除" }))
-    const confirmation = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
+    const confirmation = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを削除" }),
+    )
     await userEvent.click(confirmation.getByRole("button", { name: "削除" }))
     await expect(args.onDeleteGroup).toHaveBeenCalledTimes(1)
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
-    await expect(confirmation.getByRole("button", { name: "削除" })).toBeEnabled()
+    await expect(
+      confirmation.getByRole("button", { name: "削除" }),
+    ).toBeEnabled()
   },
 }
-
 
 /** GB-043: 関係候補の取得失敗では編集を開始せず、閲覧と再試行を維持。 */
 export const RelationCandidateErrorRetry: Story = {
@@ -402,7 +563,13 @@ export const RelationCandidateErrorRetry: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    await waitFor(() => expect(canvas.getByText("関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。")).toBeVisible())
+    await waitFor(() =>
+      expect(
+        canvas.getByText(
+          "関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。",
+        ),
+      ).toBeVisible(),
+    )
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(args.onRetryRelationCandidates).toHaveBeenCalledTimes(1)
   },
@@ -419,7 +586,11 @@ export const DetailLoadErrorRetry: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    await waitFor(() => expect(canvas.getByText("最新のGroup情報を確認するため、再取得してください。")).toBeVisible())
+    await waitFor(() =>
+      expect(
+        canvas.getByText("最新のGroup情報を確認するため、再取得してください。"),
+      ).toBeVisible(),
+    )
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(args.onRetryGroupMedia).toHaveBeenCalledTimes(1)
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
@@ -433,8 +604,22 @@ export const MediaPageErrorRetry: Story = {
   args: {
     mediaPageState: "error",
     groupsData: [
-      { id: "a", name: "アルバムA", mediaCount: 1, previewCount: 1, parentNames: [], childNames: [] },
-      { id: "b", name: "アルバムB", mediaCount: 0, previewCount: 0, parentNames: [], childNames: [] },
+      {
+        id: "a",
+        name: "アルバムA",
+        mediaCount: 1,
+        previewCount: 1,
+        parentNames: [],
+        childNames: [],
+      },
+      {
+        id: "b",
+        name: "アルバムB",
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: [],
+        childNames: [],
+      },
     ],
     mediaItemsData: [{ id: "m1", label: "写真A", src: null }],
     onRetryMediaPage: fn(),
@@ -442,13 +627,16 @@ export const MediaPageErrorRetry: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    await waitFor(() => expect(canvas.getByText("取得済みのMediaは引き続き閲覧できます。")).toBeVisible())
+    await waitFor(() =>
+      expect(
+        canvas.getByText("取得済みのMediaは引き続き閲覧できます。"),
+      ).toBeVisible(),
+    )
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(args.onRetryMediaPage).toHaveBeenCalledTimes(1)
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
   },
 }
-
 
 /** GB-031: 作成時に選んだParentとChildを1回の確定要求として通知する。 */
 export const CreateWithRelations: Story = {
@@ -458,18 +646,28 @@ export const CreateWithRelations: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "新しいGroup")
     const inputs = dialog.getAllByPlaceholderText("Groupを検索")
     await userEvent.click(inputs[0])
     await userEvent.type(inputs[0], "親Group")
-    await userEvent.click(await within(document.body).findByRole("option", { name: /親Group/ }))
+    await userEvent.click(
+      await within(document.body).findByRole("option", { name: /親Group/ }),
+    )
     await userEvent.click(inputs[1])
     await userEvent.type(inputs[1], "子Group")
-    await userEvent.click(await within(document.body).findByRole("option", { name: /子Group/ }))
+    await userEvent.click(
+      await within(document.body).findByRole("option", { name: /子Group/ }),
+    )
     await expect(args.onCreateGroup).not.toHaveBeenCalled()
     await userEvent.click(dialog.getByRole("button", { name: "作成" }))
-    await expect(args.onCreateGroup).toHaveBeenCalledExactlyOnceWith("新しいGroup", ["親Group"], ["子Group"])
+    await expect(args.onCreateGroup).toHaveBeenCalledExactlyOnceWith(
+      "新しいGroup",
+      ["親Group"],
+      ["子Group"],
+    )
   },
 }
 
@@ -484,11 +682,15 @@ export const EditPendingPreventsDoubleSubmit: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     const save = dialog.getByRole("button", { name: "保存" })
     await userEvent.click(save)
     await expect(save).toBeDisabled()
-    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("アルバムA")
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(
+      "アルバムA",
+    )
     await waitFor(() => expect(args.onUpdateGroup).toHaveBeenCalledTimes(1))
   },
 }
@@ -502,7 +704,9 @@ export const EditUnknownOutcome: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "保存" }))
     await expect(args.onUpdateGroup).toHaveBeenCalledTimes(1)
     await expect(dialog.getByRole("button", { name: "保存" })).toBeDisabled()
@@ -520,12 +724,18 @@ export const DeletePendingPreventsDoubleSubmit: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const editor = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const editor = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(editor.getByRole("button", { name: "削除" }))
-    const confirm = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
+    const confirm = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを削除" }),
+    )
     await userEvent.click(confirm.getByRole("button", { name: "削除" }))
     await expect(confirm.getByRole("button", { name: "削除" })).toBeDisabled()
-    await expect(confirm.getByRole("button", { name: "キャンセル" })).toBeDisabled()
+    await expect(
+      confirm.getByRole("button", { name: "キャンセル" }),
+    ).toBeDisabled()
     await waitFor(() => expect(args.onDeleteGroup).toHaveBeenCalledTimes(1))
   },
 }
@@ -540,7 +750,9 @@ export const CreatePendingDisablesSubmission: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "新規Group")
     const create = dialog.getByRole("button", { name: "作成" })
     await userEvent.click(create)
@@ -555,19 +767,27 @@ export const RelationsAreMetadata: Story = {
   tags: ["interaction"],
   args: {
     groupsData: [
-      { id: "a", name: "アルバムA", mediaCount: 0, previewCount: 0, parentNames: ["親Group"], childNames: ["子Group"] },
+      {
+        id: "a",
+        name: "アルバムA",
+        mediaCount: 0,
+        previewCount: 0,
+        parentNames: ["親Group"],
+        childNames: ["子Group"],
+      },
     ],
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
-    await userEvent.click(canvas.getByRole("button", { name: "このGroupとの関係を開閉" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "このGroupとの関係を開閉" }),
+    )
     await expect(canvas.getByText("親Group")).toBeVisible()
     await expect(canvas.getByText("子Group")).toBeVisible()
     await expect(args.onSelectGroup).toHaveBeenCalledExactlyOnceWith("a")
   },
 }
-
 
 /** GB-092/093: Compactで選択後はDetail見出しへ、戻ると起点ItemへFocusを復帰する。 */
 export const CompactSelectionRestoresFocus: Story = {
@@ -584,7 +804,9 @@ export const CompactSelectionRestoresFocus: Story = {
     const back = await canvas.findByRole("button", { name: "一覧に戻る" })
     await expect(canvas.getByText("アルバムA")).toHaveFocus()
     await userEvent.click(back)
-    await expect(await canvas.findByRole("button", { name: /アルバムA/ })).toHaveFocus()
+    await expect(
+      await canvas.findByRole("button", { name: /アルバムA/ }),
+    ).toHaveFocus()
     await expect(args.onSelectGroup).toHaveBeenLastCalledWith(null)
   },
 }
@@ -597,14 +819,19 @@ export const EditEscapeDiscardsDraft: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "変更")
     await userEvent.keyboard("{Escape}")
-    await waitFor(() => expect(within(document.body).queryByRole("dialog", { name: "Groupを編集" })).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(
+        within(document.body).queryByRole("dialog", { name: "Groupを編集" }),
+      ).not.toBeInTheDocument(),
+    )
     await expect(args.onUpdateGroup).not.toHaveBeenCalled()
   },
 }
-
 
 /** GB-011: Group 0件の確定状態でも作成入口を利用できる。 */
 export const EmptyScopeKeepsCreateEntry: Story = {
@@ -613,9 +840,15 @@ export const EmptyScopeKeepsCreateEntry: Story = {
   args: { groupsData: [] },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getAllByRole("button", { name: "Groupを作成" })[0]).toBeEnabled()
-    await userEvent.click(canvas.getAllByRole("button", { name: "Groupを作成" })[0])
-    const dialog = await within(document.body).findByRole("dialog", { name: "Groupを作成" })
+    await expect(
+      canvas.getAllByRole("button", { name: "Groupを作成" })[0],
+    ).toBeEnabled()
+    await userEvent.click(
+      canvas.getAllByRole("button", { name: "Groupを作成" })[0],
+    )
+    const dialog = await within(document.body).findByRole("dialog", {
+      name: "Groupを作成",
+    })
     await waitFor(() => expect(dialog).toBeVisible())
   },
 }
@@ -627,7 +860,9 @@ export const WhitespaceNameCannotBeCreated: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "   ")
     await expect(dialog.getByRole("button", { name: "作成" })).toBeDisabled()
     await expect(args.onCreateGroup).not.toHaveBeenCalled()
@@ -646,11 +881,15 @@ export const DuplicateNameRejected: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
     await userEvent.type(dialog.getByPlaceholderText("Group名"), "アルバムA")
     await userEvent.click(dialog.getByRole("button", { name: "作成" }))
     await expect(args.onCreateGroup).toHaveBeenCalledTimes(1)
-    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("アルバムA")
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(
+      "アルバムA",
+    )
   },
 }
 
@@ -662,11 +901,15 @@ export const NewGroupRelationDraftIsLocal: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
     const parents = dialog.getAllByPlaceholderText("Groupを検索")[0]
     await userEvent.click(parents)
     await userEvent.type(parents, "親候補")
-    await userEvent.click(await within(document.body).findByRole("option", { name: /親候補/ }))
+    await userEvent.click(
+      await within(document.body).findByRole("option", { name: /親候補/ }),
+    )
     await expect(args.onCreateGroup).not.toHaveBeenCalled()
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await expect(args.onCreateGroup).not.toHaveBeenCalled()
@@ -682,17 +925,25 @@ export const EditRelationsRemainDraftUntilSave: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     const parentInput = dialog.getAllByPlaceholderText("Groupを検索")[0]
     await userEvent.click(parentInput)
     await userEvent.type(parentInput, "親候補")
-    await userEvent.click(await within(document.body).findByRole("option", { name: /親候補/ }))
+    await userEvent.click(
+      await within(document.body).findByRole("option", { name: /親候補/ }),
+    )
     await expect(args.onUpdateGroup).not.toHaveBeenCalled()
     await userEvent.click(dialog.getByRole("button", { name: "保存" }))
-    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith("a", "アルバムA", ["親候補"], [])
+    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith(
+      "a",
+      "アルバムA",
+      ["親候補"],
+      [],
+    )
   },
 }
-
 
 /** GB-032: relationの確定拒否を成功扱いせず、全Draftを保持する。Backend Rollbackの保証は別途必要。 */
 export const CreateRelationFailureKeepsDraft: Story = {
@@ -707,15 +958,28 @@ export const CreateRelationFailureKeepsDraft: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Groupを作成" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
-    await userEvent.type(dialog.getByPlaceholderText("Group名"), "作成希望Group")
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
+    await userEvent.type(
+      dialog.getByPlaceholderText("Group名"),
+      "作成希望Group",
+    )
     const parentInput = dialog.getAllByPlaceholderText("Groupを検索")[0]
     await userEvent.click(parentInput)
     await userEvent.type(parentInput, "親候補")
-    await userEvent.click(await within(document.body).findByRole("option", { name: /親候補/ }))
+    await userEvent.click(
+      await within(document.body).findByRole("option", { name: /親候補/ }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "作成" }))
-    await expect(args.onCreateGroup).toHaveBeenCalledExactlyOnceWith("作成希望Group", ["親候補"], [])
-    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue("作成希望Group")
+    await expect(args.onCreateGroup).toHaveBeenCalledExactlyOnceWith(
+      "作成希望Group",
+      ["親候補"],
+      [],
+    )
+    await expect(dialog.getByPlaceholderText("Group名")).toHaveValue(
+      "作成希望Group",
+    )
     await expect(dialog.getByText("親候補")).toBeVisible()
   },
 }
@@ -729,17 +993,30 @@ export const EditNameAndRelationsTogether: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /アルバムA/ }))
     await userEvent.click(canvas.getByRole("button", { name: "編集" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     const name = dialog.getByPlaceholderText("Group名")
     await userEvent.clear(name)
     await userEvent.type(name, "変更後Group")
     const parentInput = dialog.getAllByPlaceholderText("Groupを検索")[0]
     await userEvent.click(parentInput)
     await userEvent.type(parentInput, "親候補")
-    await userEvent.click(await within(document.body).findByRole("option", { name: /親候補/ }))
+    await userEvent.click(
+      await within(document.body).findByRole("option", { name: /親候補/ }),
+    )
     await expect(args.onUpdateGroup).not.toHaveBeenCalled()
     await userEvent.click(dialog.getByRole("button", { name: "保存" }))
-    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith("a", "変更後Group", ["親候補"], [])
-    await waitFor(() => expect(within(document.body).queryByRole("dialog", { name: "Groupを編集" })).not.toBeInTheDocument())
+    await expect(args.onUpdateGroup).toHaveBeenCalledExactlyOnceWith(
+      "a",
+      "変更後Group",
+      ["親候補"],
+      [],
+    )
+    await waitFor(() =>
+      expect(
+        within(document.body).queryByRole("dialog", { name: "Groupを編集" }),
+      ).not.toBeInTheDocument(),
+    )
   },
 }

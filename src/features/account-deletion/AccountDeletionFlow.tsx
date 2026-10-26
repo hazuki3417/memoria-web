@@ -15,13 +15,22 @@ import { Fragment, type ComponentType, type PropsWithChildren } from "react"
 import type { MockScenario } from "./accountDeletionGateway"
 import { FeedbackAlert } from "@/components/Feedback"
 
-import { labels, type ReviewState, type CommunityScenario, type RetryOutcome } from "./accountDeletionScenarios"
+import {
+  labels,
+  type ReviewState,
+  type CommunityScenario,
+  type RetryOutcome,
+} from "./accountDeletionScenarios"
 import { useAccountDeletionController } from "./useAccountDeletionController"
 import { AccountDeletionImpactStep } from "./AccountDeletionImpactStep"
 import { AccountDeletionResolutionStep } from "./AccountDeletionResolutionStep"
 import { AccountDeletionCommunityReviewStep } from "./AccountDeletionCommunityReviewStep"
 import { AccountDeletionFinalStep } from "./AccountDeletionFinalStep"
-export type { ReviewState, CommunityScenario, RetryOutcome } from "./accountDeletionScenarios"
+export type {
+  ReviewState,
+  CommunityScenario,
+  RetryOutcome,
+} from "./accountDeletionScenarios"
 
 export function AccountDeletionFlow({
   reviewState = "default",
@@ -47,7 +56,23 @@ export function AccountDeletionFlow({
     prototype,
     onNavigateBack,
   })
-  const { setFlowError, step, setStep, compactStepper, cancelled, setCancelled, cancelConfirmationOpened, setCancelConfirmationOpened, setReauth, setGrant, setReview, confirmed, setConfirmed, deletionPending, skipped } = flow
+  const {
+    setFlowError,
+    step,
+    setStep,
+    compactStepper,
+    cancelled,
+    setCancelled,
+    cancelConfirmationOpened,
+    setCancelConfirmationOpened,
+    setReauth,
+    setGrant,
+    setReview,
+    confirmed,
+    setConfirmed,
+    deletionPending,
+    skipped,
+  } = flow
   return (
     <>
       <Modal
@@ -93,17 +118,27 @@ export function AccountDeletionFlow({
             {prototype && (cancelled || confirmed) ? (
               <Stack gap="md">
                 <Title order={2} size="h4">
-                  {confirmed ? "削除を確認しました（プロトタイプ）" : "削除手続きを中止しました"}
+                  {confirmed
+                    ? "削除を確認しました（プロトタイプ）"
+                    : "削除手続きを中止しました"}
                 </Title>
                 <Text c="dimmed">
-                  {confirmed ? "このプロトタイプではアカウントとデータは削除されません。" : "削除は開始されていません。"}
+                  {confirmed
+                    ? "このプロトタイプではアカウントとデータは削除されません。"
+                    : "削除は開始されていません。"}
                 </Text>
-                <Button variant="default" size="sm" onClick={() => {
-                  setCancelled(false)
-                  setConfirmed(false)
-                  setReauth(false)
-                  setStep(0)
-                }}>最初に戻る</Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => {
+                    setCancelled(false)
+                    setConfirmed(false)
+                    setReauth(false)
+                    setStep(0)
+                  }}
+                >
+                  最初に戻る
+                </Button>
               </Stack>
             ) : cancelled || confirmed || deletionPending ? (
               <Stack gap="lg" maw={600} mx="auto" w="100%" py="xl">
@@ -235,11 +270,19 @@ export function AccountDeletionFlow({
                     </Stepper>
                   )}
                 </Box>
-                {step === 0 && <AccountDeletionImpactStep flow={flow} retryOutcome={retryOutcome} />}
+                {step === 0 && (
+                  <AccountDeletionImpactStep
+                    flow={flow}
+                    retryOutcome={retryOutcome}
+                  />
+                )}
                 {step === 1 && <AccountDeletionResolutionStep flow={flow} />}
-                {step === 2 && <AccountDeletionCommunityReviewStep flow={flow} />}
-                {step === 3 && <AccountDeletionFinalStep flow={flow} prototype={prototype} />}
-
+                {step === 2 && (
+                  <AccountDeletionCommunityReviewStep flow={flow} />
+                )}
+                {step === 3 && (
+                  <AccountDeletionFinalStep flow={flow} prototype={prototype} />
+                )}
               </>
             )}
           </Stack>

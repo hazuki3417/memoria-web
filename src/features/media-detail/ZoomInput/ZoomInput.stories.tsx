@@ -10,7 +10,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {
   name: "Visual · Default",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Enlarged: Story = {
   name: "Visual · Enlarged",
-  tags: ["visual"], args: { value: 200 } }
+  tags: ["visual"],
+  args: { value: 200 },
+}

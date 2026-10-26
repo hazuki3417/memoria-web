@@ -3,17 +3,27 @@ import type { ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
-import { defaultUsageSort, nextUsageSort, type UsageSort, type UsageSortKey } from "./sortUsageFormats"
+import {
+  defaultUsageSort,
+  nextUsageSort,
+  type UsageSort,
+  type UsageSortKey,
+} from "./sortUsageFormats"
 import { sampleUsage, zeroUsage } from "./usageStoryFixtures"
 
 function SortableBreakdownStory(
-  props: Omit<ComponentProps<typeof UsageFormatBreakdownSection>, "sort" | "onSort">,
+  props: Omit<
+    ComponentProps<typeof UsageFormatBreakdownSection>,
+    "sort" | "onSort"
+  >,
 ) {
   const [sort, setSort] = useState<UsageSort>(defaultUsageSort)
   const toggleSort = (key: UsageSortKey) => {
     setSort((current) => nextUsageSort(current, key))
   }
-  return <UsageFormatBreakdownSection {...props} sort={sort} onSort={toggleSort} />
+  return (
+    <UsageFormatBreakdownSection {...props} sort={sort} onSort={toggleSort} />
+  )
 }
 
 const meta = {
@@ -89,18 +99,34 @@ export const SortInteraction: Story = {
     const table = canvas.getByRole("table")
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
     await expect(canvas.getByTestId("usage-sort-icon-desc")).toBeInTheDocument()
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "descending")
-    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toHaveAttribute("aria-sort", "descending")
+    await userEvent.click(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    )
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "none")
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toHaveAttribute("aria-sort", "none")
     await expect(canvas.getAllByTestId("usage-sort-icon-none")).toHaveLength(3)
-    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
-    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "ascending")
+    await userEvent.click(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    )
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent(
+      "HEIC / HEIF",
+    )
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toHaveAttribute("aria-sort", "ascending")
     await expect(canvas.getByTestId("usage-sort-icon-asc")).toBeInTheDocument()
-    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    )
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "descending")
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toHaveAttribute("aria-sort", "descending")
   },
 }
 
@@ -110,8 +136,12 @@ export const LoadingContract: Story = {
   args: { status: "loading" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeDisabled()
-    await expect(within(canvas.getAllByRole("row")[0]).getAllByRole("columnheader")).toHaveLength(3)
+    await expect(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    ).toBeDisabled()
+    await expect(
+      within(canvas.getAllByRole("row")[0]).getAllByRole("columnheader"),
+    ).toHaveLength(3)
     await expect(canvas.getAllByRole("row")).toHaveLength(6)
   },
 }

@@ -1,7 +1,12 @@
 "use client"
 
 import { Box, Select, Stack, Text } from "@mantine/core"
-import { IconChartBar, IconSettings, IconUser, IconUserCircle } from "@tabler/icons-react"
+import {
+  IconChartBar,
+  IconSettings,
+  IconUser,
+  IconUserCircle,
+} from "@tabler/icons-react"
 import { NavigationItem } from "@/components/NavigationItem"
 
 export type SettingsSection = "profile" | "account" | "preferences" | "usage"
@@ -47,12 +52,7 @@ export function SettingsNavigation({
   }
 
   return (
-    <Box
-      component="nav"
-      aria-label="設定"
-      w={200}
-      style={{ flexShrink: 0 }}
-    >
+    <Box component="nav" aria-label="設定" w={200} style={{ flexShrink: 0 }}>
       <Text size="xs" fw={700} c="dimmed" mb="xs">
         設定
       </Text>

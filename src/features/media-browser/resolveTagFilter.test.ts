@@ -9,19 +9,22 @@ const tags = [
 describe("resolveTagFilter", () => {
   it("uses persisted Tag IDs in the selected order for AND filtering", () => {
     expect(resolveTagFilter(["家族", "旅行"], tags)).toEqual({
-      ok: true, tagIds: ["TAG_B", "TAG_A"],
+      ok: true,
+      tagIds: ["TAG_B", "TAG_A"],
     })
   })
 
   it("does not widen the list when a name is not in the authorized scope", () => {
     expect(resolveTagFilter(["別CommunityのTag"], tags)).toEqual({
-      ok: false, reason: "UNKNOWN_TAG",
+      ok: false,
+      reason: "UNKNOWN_TAG",
     })
   })
 
   it("rejects duplicate selections", () => {
     expect(resolveTagFilter(["旅行", "旅行"], tags)).toEqual({
-      ok: false, reason: "DUPLICATE_TAG",
+      ok: false,
+      reason: "DUPLICATE_TAG",
     })
   })
 

@@ -103,7 +103,10 @@ export async function listMediaUpdateTags(
       }
     }> = await graphql(TAGS_QUERY, "GetMediaUpdateTags", { scope, after })
     if (response.kind !== "ok") return response
-    const page: { edges: { node: MediaTagRecord }[]; pageInfo: { hasNextPage: boolean; endCursor: string | null } } = response.value.mediaTags
+    const page: {
+      edges: { node: MediaTagRecord }[]
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
+    } = response.value.mediaTags
     records.push(...page.edges.map((edge) => edge.node))
     if (!page.pageInfo.hasNextPage) break
     const cursor: string | null = page.pageInfo.endCursor

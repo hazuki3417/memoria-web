@@ -76,7 +76,9 @@ export const BinaryContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("4.66 GiB")).toBeVisible()
-    await expect(canvas.getByLabelText(/ストレージ使用率 24.8%/)).toBeInTheDocument()
+    await expect(
+      canvas.getByLabelText(/ストレージ使用率 24.8%/),
+    ).toBeInTheDocument()
   },
 }
 

@@ -6,48 +6,48 @@
  *
  * OpenAPI spec version: 1.0.0
  */
-export type MediaUploadReceiptProcessingStatus = typeof MediaUploadReceiptProcessingStatus[keyof typeof MediaUploadReceiptProcessingStatus];
-
+export type MediaUploadReceiptProcessingStatus =
+  (typeof MediaUploadReceiptProcessingStatus)[keyof typeof MediaUploadReceiptProcessingStatus]
 
 export const MediaUploadReceiptProcessingStatus = {
-  PROCESSING: 'PROCESSING',
-} as const;
+  PROCESSING: "PROCESSING",
+} as const
 
 export interface MediaUploadReceipt {
   /** ULID of the registered Media. */
-  mediaId: string;
-  processingStatus: MediaUploadReceiptProcessingStatus;
+  mediaId: string
+  processingStatus: MediaUploadReceiptProcessingStatus
 }
 
 export type MediaUploadErrorError = {
-  code: string;
-  message: string;
-};
+  code: string
+  message: string
+}
 
 export interface MediaUploadError {
-  error: MediaUploadErrorError;
+  error: MediaUploadErrorError
 }
 
 /**
  * Upload failed with a stable application error code.
  */
-export type UploadErrorResponse = MediaUploadError;
+export type UploadErrorResponse = MediaUploadError
 
-export type UploadMediaBodyScopeType = typeof UploadMediaBodyScopeType[keyof typeof UploadMediaBodyScopeType];
-
+export type UploadMediaBodyScopeType =
+  (typeof UploadMediaBodyScopeType)[keyof typeof UploadMediaBodyScopeType]
 
 export const UploadMediaBodyScopeType = {
-  PERSONAL: 'PERSONAL',
-  COMMUNITY: 'COMMUNITY',
-} as const;
+  PERSONAL: "PERSONAL",
+  COMMUNITY: "COMMUNITY",
+} as const
 
 export type UploadMediaBody = {
   /** One Original, max 128 MiB; JPEG/PNG/WebP/HEIC/HEIF per Media processing specification. */
-  file: Blob | File;
-  scopeType: UploadMediaBodyScopeType;
+  file: Blob | File
+  scopeType: UploadMediaBodyScopeType
   /** Required for COMMUNITY; forbidden for PERSONAL. */
-  communityId?: string;
-};
+  communityId?: string
+}
 
 export type uploadMediaResponse201 = {
   data: MediaUploadReceipt
@@ -99,46 +99,57 @@ export type uploadMediaResponse503 = {
   status: 503
 }
 
-export type uploadMediaResponseSuccess = (uploadMediaResponse201) & {
-  headers: Headers;
-};
-export type uploadMediaResponseError = (uploadMediaResponse400 | uploadMediaResponse401 | uploadMediaResponse403 | uploadMediaResponse404 | uploadMediaResponse409 | uploadMediaResponse413 | uploadMediaResponse415 | uploadMediaResponse500 | uploadMediaResponse503) & {
-  headers: Headers;
-};
+export type uploadMediaResponseSuccess = uploadMediaResponse201 & {
+  headers: Headers
+}
+export type uploadMediaResponseError = (
+  | uploadMediaResponse400
+  | uploadMediaResponse401
+  | uploadMediaResponse403
+  | uploadMediaResponse404
+  | uploadMediaResponse409
+  | uploadMediaResponse413
+  | uploadMediaResponse415
+  | uploadMediaResponse500
+  | uploadMediaResponse503
+) & {
+  headers: Headers
+}
 
-export type uploadMediaResponse = (uploadMediaResponseSuccess | uploadMediaResponseError)
+export type uploadMediaResponse =
+  | uploadMediaResponseSuccess
+  | uploadMediaResponseError
 
 export const getUploadMediaUrl = () => {
-
-
-
-
   return `/api/media/uploads`
 }
 
 /**
  * @summary Upload an image Original and register one Media
  */
-export const uploadMedia = async (uploadMediaBody: UploadMediaBody, options?: RequestInit): Promise<uploadMediaResponse> => {
-    const formData = new FormData();
-formData.append(`file`, uploadMediaBody.file);
-formData.append(`scopeType`, uploadMediaBody.scopeType);
-if(uploadMediaBody.communityId !== undefined) {
- formData.append(`communityId`, uploadMediaBody.communityId);
- }
-
-  const res = await fetch(getUploadMediaUrl(),
-  {
-    ...options,
-    method: 'POST'
-    ,
-    body: formData
+export const uploadMedia = async (
+  uploadMediaBody: UploadMediaBody,
+  options?: RequestInit,
+): Promise<uploadMediaResponse> => {
+  const formData = new FormData()
+  formData.append(`file`, uploadMediaBody.file)
+  formData.append(`scopeType`, uploadMediaBody.scopeType)
+  if (uploadMediaBody.communityId !== undefined) {
+    formData.append(`communityId`, uploadMediaBody.communityId)
   }
-)
 
+  const res = await fetch(getUploadMediaUrl(), {
+    ...options,
+    method: "POST",
+    body: formData,
+  })
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
 
-  const data: uploadMediaResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as uploadMediaResponse
+  const data: uploadMediaResponse["data"] = body ? JSON.parse(body) : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as uploadMediaResponse
 }

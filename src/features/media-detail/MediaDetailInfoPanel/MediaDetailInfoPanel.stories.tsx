@@ -32,13 +32,20 @@ type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
   name: "Visual · Personal",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Community: Story = {
   name: "Visual · Community",
-  tags: ["visual"], args: { context: "community" } }
+  tags: ["visual"],
+  args: { context: "community" },
+}
 export const Compact: Story = {
   name: "Visual · Compact",
-  tags: ["visual"], args: { compact: true } }
+  tags: ["visual"],
+  args: { compact: true },
+}
 export const ForbiddenDownload: Story = {
   name: "Visual · Forbidden Download",
-  tags: ["visual"], args: { downloadMock: "forbidden" } }
+  tags: ["visual"],
+  args: { downloadMock: "forbidden" },
+}

@@ -16,7 +16,8 @@ type Story = StoryObj<typeof meta>
 
 export const Info: Story = {
   name: "Visual · Info",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 
 export const Success: Story = {
   name: "Visual · Success",

@@ -6,36 +6,42 @@
  *
  * OpenAPI spec version: 1.0.0
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from "@faker-js/faker"
 
-import {
-  HttpResponse,
-  http
-} from 'msw';
-import type {
-  RequestHandlerOptions
-} from 'msw';
+import { HttpResponse, http } from "msw"
+import type { RequestHandlerOptions } from "msw"
 
-import type {
-  MediaUploadReceipt
-} from './mediaUpload';
+import type { MediaUploadReceipt } from "./mediaUpload"
 
+export const getUploadMediaResponseMock = (
+  overrideResponse: Partial<Extract<MediaUploadReceipt, object>> = {},
+): MediaUploadReceipt => ({
+  mediaId: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  processingStatus: faker.helpers.arrayElement(["PROCESSING"] as const),
+  ...overrideResponse,
+})
 
-export const getUploadMediaResponseMock = (overrideResponse: Partial<Extract<MediaUploadReceipt, object>> = {}): MediaUploadReceipt => ({mediaId: faker.string.alpha({length: {min: 10, max: 20}}), processingStatus: faker.helpers.arrayElement(['PROCESSING'] as const), ...overrideResponse})
-
-
-export const getUploadMediaMockHandler = (overrideResponse?: MediaUploadReceipt | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<MediaUploadReceipt> | MediaUploadReceipt), options?: RequestHandlerOptions) => {
-  return http.post('*/api/media/uploads', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getUploadMediaResponseMock(),
-      { status: 201
-      })
-  }, options)
+export const getUploadMediaMockHandler = (
+  overrideResponse?:
+    | MediaUploadReceipt
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<MediaUploadReceipt> | MediaUploadReceipt),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/api/media/uploads",
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getUploadMediaResponseMock(),
+        { status: 201 },
+      )
+    },
+    options,
+  )
 }
-export const getMemoriaMediaUploadAPIMock = () => [
-  getUploadMediaMockHandler()]
+export const getMemoriaMediaUploadAPIMock = () => [getUploadMediaMockHandler()]

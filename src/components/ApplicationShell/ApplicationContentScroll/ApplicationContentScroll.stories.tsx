@@ -29,4 +29,5 @@ type Story = StoryObj<typeof meta>
 
 export const Scrollable: Story = {
   name: "Visual · Scrollable",
-  tags: ["visual"],}
+  tags: ["visual"],
+}

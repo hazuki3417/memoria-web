@@ -51,7 +51,9 @@ export function ConnectedSettings({
         })
         if (!result.data?.updateUserPreferences.preferences)
           throw new Error("Preferences update unconfirmed")
-        return fromGraphqlUserPreferences(result.data.updateUserPreferences.preferences)
+        return fromGraphqlUserPreferences(
+          result.data.updateUserPreferences.preferences,
+        )
       }}
     />
   )

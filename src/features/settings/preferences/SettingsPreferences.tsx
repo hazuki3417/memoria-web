@@ -1,12 +1,24 @@
 "use client"
 
-import { Box, Button, ColorInput, Select, Stack, Switch, useMantineColorScheme } from "@mantine/core"
+import {
+  Box,
+  Button,
+  ColorInput,
+  Select,
+  Stack,
+  Switch,
+  useMantineColorScheme,
+} from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import { useUserPreferences } from "./useUserPreferences"
-import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
+import {
+  defaultUserPreferences,
+  type UserPreferences,
+  type UserPreferencesPatch,
+} from "./userPreferences"
 
 export function SettingsPreferences({
   compact,
@@ -210,4 +222,3 @@ export function SettingsPreferences({
     </Stack>
   )
 }
-

@@ -23,7 +23,9 @@ export const InvalidNickname: Story = {
   args: { reviewState: "no-display-name" },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("ニックネームを入力してください。")).toBeVisible()
+    await expect(
+      canvas.getByText("ニックネームを入力してください。"),
+    ).toBeVisible()
     await expect(canvas.getByRole("button", { name: "登録" })).toBeDisabled()
     await expect(args.onRegister).not.toHaveBeenCalled()
   },
@@ -36,13 +38,29 @@ export const ExitConfirmation: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "終了" }))
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "登録せずに終了しますか？" }))
-    await waitFor(() => expect(dialog.getByText("登録せずに終了すると、ログアウトしてトップページに戻ります。")).toBeVisible())
+    const dialog = within(
+      await within(document.body).findByRole("dialog", {
+        name: "登録せずに終了しますか？",
+      }),
+    )
+    await waitFor(() =>
+      expect(
+        dialog.getByText(
+          "登録せずに終了すると、ログアウトしてトップページに戻ります。",
+        ),
+      ).toBeVisible(),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "戻る" }))
     await expect(args.onExit).not.toHaveBeenCalled()
-    await expect(canvas.getByRole("textbox", { name: "ニックネーム" })).toHaveValue("ユーザー")
+    await expect(
+      canvas.getByRole("textbox", { name: "ニックネーム" }),
+    ).toHaveValue("ユーザー")
     await userEvent.click(canvas.getByRole("button", { name: "終了" }))
-    const reopened = within(await within(document.body).findByRole("dialog", { name: "登録せずに終了しますか？" }))
+    const reopened = within(
+      await within(document.body).findByRole("dialog", {
+        name: "登録せずに終了しますか？",
+      }),
+    )
     await userEvent.click(reopened.getByRole("button", { name: "終了" }))
     await expect(args.onExit).toHaveBeenCalledTimes(1)
   },
@@ -55,7 +73,9 @@ export const Registering: Story = {
   args: { reviewState: "registering" },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("textbox", { name: "ニックネーム" })).toBeDisabled()
+    await expect(
+      canvas.getByRole("textbox", { name: "ニックネーム" }),
+    ).toBeDisabled()
     await expect(canvas.getByRole("button", { name: "登録" })).toBeDisabled()
     await expect(canvas.getByRole("button", { name: "終了" })).toBeDisabled()
     await expect(args.onRegister).not.toHaveBeenCalled()

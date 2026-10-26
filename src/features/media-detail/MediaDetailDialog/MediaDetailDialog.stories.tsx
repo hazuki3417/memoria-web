@@ -31,10 +31,15 @@ type Story = StoryObj<typeof meta>
 
 export const Portrait: Story = {
   name: "Visual · Portrait",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Landscape: Story = {
   name: "Visual · Landscape",
-  tags: ["visual"], args: { initialId: "landscape-01" } }
+  tags: ["visual"],
+  args: { initialId: "landscape-01" },
+}
 export const Community: Story = {
   name: "Visual · Community",
-  tags: ["visual"], args: { contextKind: "community" } }
+  tags: ["visual"],
+  args: { contextKind: "community" },
+}

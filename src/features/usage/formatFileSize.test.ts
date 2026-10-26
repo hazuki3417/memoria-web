@@ -10,8 +10,14 @@ describe("ファイルサイズの表示値と単位", () => {
   })
 
   it("Binaryで1024基準の値と明示的な単位を返す", () => {
-    expect(formatFileSize(1_073_741_824, "BINARY")).toEqual({ value: "1", unit: "GiB" })
-    expect(formatFileSize(5_000_000_000, "BINARY")).toEqual({ value: "4.66", unit: "GiB" })
+    expect(formatFileSize(1_073_741_824, "BINARY")).toEqual({
+      value: "1",
+      unit: "GiB",
+    })
+    expect(formatFileSize(5_000_000_000, "BINARY")).toEqual({
+      value: "4.66",
+      unit: "GiB",
+    })
     expect(formatFileSize(0, "BINARY")).toEqual({ value: "0", unit: "GiB" })
   })
 

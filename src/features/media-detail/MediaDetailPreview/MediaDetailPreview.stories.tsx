@@ -43,13 +43,20 @@ type Story = StoryObj<typeof meta>
 
 export const First: Story = {
   name: "Visual · First",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Last: Story = {
   name: "Visual · Last",
-  tags: ["visual"], args: { detail: second, prev: first, next: null } }
+  tags: ["visual"],
+  args: { detail: second, prev: first, next: null },
+}
 export const Compact: Story = {
   name: "Visual · Compact",
-  tags: ["visual"], args: { compact: true } }
+  tags: ["visual"],
+  args: { compact: true },
+}
 export const Zoomed: Story = {
   name: "Visual · Zoomed",
-  tags: ["visual"], args: { detailZoom: 200 } }
+  tags: ["visual"],
+  args: { detailZoom: 200 },
+}

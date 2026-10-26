@@ -112,7 +112,8 @@ type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
   name: "Visual · Personal",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 
 export const Community: Story = {
   name: "Visual · Community",

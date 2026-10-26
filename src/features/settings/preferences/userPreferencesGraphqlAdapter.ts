@@ -54,7 +54,9 @@ export function toGraphqlUserPreferencesPatch(
   return {
     ...patch,
     dateFormat: patch.dateFormat ? dateFormats[patch.dateFormat] : undefined,
-    fileSizeUnit: patch.fileSizeUnit ? fileSizeUnits[patch.fileSizeUnit] : undefined,
+    fileSizeUnit: patch.fileSizeUnit
+      ? fileSizeUnits[patch.fileSizeUnit]
+      : undefined,
     mediaThumbnailSize: patch.mediaThumbnailSize
       ? thumbnailSizes[patch.mediaThumbnailSize]
       : undefined,

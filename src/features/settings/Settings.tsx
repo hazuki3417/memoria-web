@@ -9,7 +9,10 @@ import { SettingsLayout, type Section } from "./SettingsLayout"
 import { SettingsProfile, type SaveProfile } from "./profile/SettingsProfile"
 import { SettingsPreferences } from "./preferences/SettingsPreferences"
 import { SettingsAccount } from "./account/SettingsAccount"
-import type { UserPreferences, UserPreferencesPatch } from "./preferences/userPreferences"
+import type {
+  UserPreferences,
+  UserPreferencesPatch,
+} from "./preferences/userPreferences"
 
 // Productionで保存接続がない場合に成功を装わない。
 async function unavailableProfileSave(): Promise<void> {
@@ -37,7 +40,10 @@ export function Settings({
   switch (section) {
     case "profile":
       content = (
-        <SettingsProfile onSave={saveProfile ?? unavailableProfileSave} initialNickname={profileNickname} />
+        <SettingsProfile
+          onSave={saveProfile ?? unavailableProfileSave}
+          initialNickname={profileNickname}
+        />
       )
       break
     case "preferences":
@@ -56,7 +62,12 @@ export function Settings({
       content = (
         <SettingsAccount
           deletionAction={
-            <Button component={Link} href="/settings/account/delete" color="red" size="sm">
+            <Button
+              component={Link}
+              href="/settings/account/delete"
+              color="red"
+              size="sm"
+            >
               アカウントを削除する
             </Button>
           }
@@ -66,7 +77,10 @@ export function Settings({
   }
 
   return (
-    <SettingsLayout section={section} onSectionChange={(next) => router.push(`/settings/${next}`)}>
+    <SettingsLayout
+      section={section}
+      onSectionChange={(next) => router.push(`/settings/${next}`)}
+    >
       {content}
     </SettingsLayout>
   )

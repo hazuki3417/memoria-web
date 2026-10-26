@@ -6,7 +6,10 @@ export type TagFilterResolution =
 
 // Tag display names never become filter IDs. Unknown and ambiguous selections
 // fail instead of broadening the query or pretending the result is empty.
-export function resolveTagFilter(names: readonly string[], tags: readonly BrowserTag[]): TagFilterResolution {
+export function resolveTagFilter(
+  names: readonly string[],
+  tags: readonly BrowserTag[],
+): TagFilterResolution {
   const byName = new Map<string, string>()
   for (const tag of tags) {
     if (byName.has(tag.name)) return { ok: false, reason: "DUPLICATE_TAG" }

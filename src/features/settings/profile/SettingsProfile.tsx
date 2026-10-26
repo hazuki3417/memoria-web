@@ -32,7 +32,11 @@ export function SettingsProfile({
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
 }) {
-  const [name, setName] = useState(initialSaveState === "saving" || initialSaveState === "retryable-error" ? `${initialNickname}新` : initialNickname)
+  const [name, setName] = useState(
+    initialSaveState === "saving" || initialSaveState === "retryable-error"
+      ? `${initialNickname}新`
+      : initialNickname,
+  )
   const [saved, setSaved] = useState(initialNickname)
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "retryable-error" | "blocked"
@@ -120,4 +124,3 @@ export function SettingsProfile({
     </Stack>
   )
 }
-

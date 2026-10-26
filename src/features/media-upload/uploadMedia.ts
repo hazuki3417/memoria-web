@@ -1,4 +1,7 @@
-import { uploadMedia as generatedUploadMedia, type MediaUploadReceipt } from "@/infrastructure/openapi/generated/mediaUpload"
+import {
+  uploadMedia as generatedUploadMedia,
+  type MediaUploadReceipt,
+} from "@/infrastructure/openapi/generated/mediaUpload"
 
 export type UploadScope =
   | { scopeType: "PERSONAL"; communityId?: never }
@@ -29,7 +32,13 @@ export async function uploadMedia(
   let response: Awaited<ReturnType<typeof generatedUploadMedia>>
   try {
     response = await generatedUploadMedia(
-      { file, scopeType: scope.scopeType, ...(scope.scopeType === "COMMUNITY" ? { communityId: scope.communityId } : {}) },
+      {
+        file,
+        scopeType: scope.scopeType,
+        ...(scope.scopeType === "COMMUNITY"
+          ? { communityId: scope.communityId }
+          : {}),
+      },
       { headers: { "Idempotency-Key": idempotencyKey }, signal },
     )
   } catch {
@@ -45,7 +54,9 @@ export async function uploadMedia(
 
   const status: number = response.status
   if (status !== 201) {
-    const failure = response.data as { error?: { code?: string; message?: string } }
+    const failure = response.data as {
+      error?: { code?: string; message?: string }
+    }
     throw new MediaUploadError(
       failure?.error?.code ?? "UPLOAD_FAILED",
       failure?.error?.message ?? "アップロードに失敗しました",
@@ -57,8 +68,16 @@ export async function uploadMedia(
   // The generated response union is not narrowed through the numeric status alias.
   // Validate the receipt at runtime before returning it.
   const receipt = response.data as MediaUploadReceipt
-  if (typeof receipt?.mediaId !== "string" || receipt.processingStatus !== "PROCESSING") {
-    throw new MediaUploadError("RESULT_UNKNOWN", "Uploadの受付結果を確認できません", response.status, true)
+  if (
+    typeof receipt?.mediaId !== "string" ||
+    receipt.processingStatus !== "PROCESSING"
+  ) {
+    throw new MediaUploadError(
+      "RESULT_UNKNOWN",
+      "Uploadの受付結果を確認できません",
+      response.status,
+      true,
+    )
   }
   return receipt
 }
@@ -69,16 +88,19 @@ export async function uploadMediaBatch<T>(
   worker: (item: T) => Promise<void>,
   concurrency = 3,
 ): Promise<void> {
-  if (!Number.isInteger(concurrency) || concurrency < 1) throw new RangeError("invalid concurrency")
+  if (!Number.isInteger(concurrency) || concurrency < 1)
+    throw new RangeError("invalid concurrency")
   let cursor = 0
-  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, async () => {
-    while (cursor < items.length) {
-      const item = items[cursor++]
-      try {
-        await worker(item)
-      } catch {
-        // Each worker reports its own failure; remaining files must still be processed.
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+      while (cursor < items.length) {
+        const item = items[cursor++]
+        try {
+          await worker(item)
+        } catch {
+          // Each worker reports its own failure; remaining files must still be processed.
+        }
       }
-    }
-  }))
+    }),
+  )
 }

@@ -31,7 +31,8 @@ type Story = StoryObj<typeof meta>
 
 export const Opened: Story = {
   name: "Visual · Opened",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const CommunityAccent: Story = {
   name: "Visual · Community Accent",
   tags: ["visual"],

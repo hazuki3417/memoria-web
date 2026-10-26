@@ -187,8 +187,11 @@ function MediaBrowserContent({
       completeMockSelection("group")
       return
     }
-    if (selected.size === 0 || groupTargets.length === 0 || groupActionPending) return
-    const targetIds = groupActionResult?.failed.map(item => item.mediaId) ?? [...selected]
+    if (selected.size === 0 || groupTargets.length === 0 || groupActionPending)
+      return
+    const targetIds = groupActionResult?.failed.map((item) => item.mediaId) ?? [
+      ...selected,
+    ]
     if (targetIds.length === 0) return
     if (await onAddToGroups(targetIds, groupTargets)) {
       setSelectionDialog(null)
@@ -207,16 +210,13 @@ function MediaBrowserContent({
   // The mock has no tag metadata or Relay connection; keep the submitted filter separate.
   void appliedTags
   const activeState = listState ?? initialState
-  const stateItems = items ?? ([
-    "true-empty",
-    "filtered-empty",
-    "loading",
-    "error",
-  ].includes(initialState)
-    ? []
-    : initialState === "processing-failure"
-      ? [...media.slice(0, 5), media[media.length - 1]]
-      : media.slice(0, 12))
+  const stateItems =
+    items ??
+    (["true-empty", "filtered-empty", "loading", "error"].includes(initialState)
+      ? []
+      : initialState === "processing-failure"
+        ? [...media.slice(0, 5), media[media.length - 1]]
+        : media.slice(0, 12))
 
   const toggle = (id: string) =>
     setSelected((current) => {
@@ -446,7 +446,19 @@ function MediaBrowserContent({
                     ? "最初のMediaをアップロードすると、ここから閲覧・整理できます。"
                     : "CommunityへMediaを追加すると、ここから閲覧・整理できます。"}
                 </Text>
-                <Button leftSection={<IconCloudUpload size={16} />} onClick={items ? () => navigate(context === "personal" ? "/media/upload" : `/communities/${communityId}/media/upload`) : undefined}>
+                <Button
+                  leftSection={<IconCloudUpload size={16} />}
+                  onClick={
+                    items
+                      ? () =>
+                          navigate(
+                            context === "personal"
+                              ? "/media/upload"
+                              : `/communities/${communityId}/media/upload`,
+                          )
+                      : undefined
+                  }
+                >
                   {context === "personal"
                     ? "Mediaをアップロード"
                     : "Mediaを追加"}
@@ -466,47 +478,59 @@ function MediaBrowserContent({
                 <Text size="sm" c="dimmed" ta="center">
                   選択中のTagを変更するか、filterを解除してください。
                 </Text>
-                <Button variant="default" onClick={() => {
-                  setTags([])
-                  setAppliedTags([])
-                  onApplyTags?.([])
-                }}>
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    setTags([])
+                    setAppliedTags([])
+                    onApplyTags?.([])
+                  }}
+                >
                   Filterを解除
                 </Button>
               </Stack>
             </Center>
           )}
 
-          {activeState !== "error" && activeState !== "loading" && stateItems.length > 0 && (
-            <Box
-              p={3}
-              style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(auto-fill, minmax(min(168px, 100%), 1fr))",
-                gap: "var(--mantine-spacing-xs)",
-              }}
-            >
-              {stateItems.map((item) => (
-                <MediaTile
-                  key={item.id}
-                  item={item}
-                  selecting={selecting}
-                  selected={selected.has(item.id)}
-                  onClick={() => {
-                    if (selecting) {
-                      toggle(item.id)
-                      return
-                    }
-                    if (!items) setDetail(item)
-                  }}
-                />
-              ))}
-            </Box>
-          )}
-          {activeState !== "error" && hasMore && !loadingMore && !loadMoreError && (
-            <Center py="md"><Button size="xs" variant="default" onClick={onLoadMore}>さらに読み込む</Button></Center>
-          )}
+          {activeState !== "error" &&
+            activeState !== "loading" &&
+            stateItems.length > 0 && (
+              <Box
+                p={3}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "repeat(auto-fill, minmax(min(168px, 100%), 1fr))",
+                  gap: "var(--mantine-spacing-xs)",
+                }}
+              >
+                {stateItems.map((item) => (
+                  <MediaTile
+                    key={item.id}
+                    item={item}
+                    selecting={selecting}
+                    selected={selected.has(item.id)}
+                    onClick={() => {
+                      if (selecting) {
+                        toggle(item.id)
+                        return
+                      }
+                      if (!items) setDetail(item)
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+          {activeState !== "error" &&
+            hasMore &&
+            !loadingMore &&
+            !loadMoreError && (
+              <Center py="md">
+                <Button size="xs" variant="default" onClick={onLoadMore}>
+                  さらに読み込む
+                </Button>
+              </Center>
+            )}
           {(loadingMore || activeState === "loading-more") && (
             <Center py="md">
               <Group gap="xs">
@@ -535,7 +559,12 @@ function MediaBrowserContent({
 
       <Dialog
         opened={selectionDialog === "group"}
-        onClose={() => { if (!groupActionPending) { setSelectionDialog(null); onDismissGroupActionResult?.() } }}
+        onClose={() => {
+          if (!groupActionPending) {
+            setSelectionDialog(null)
+            onDismissGroupActionResult?.()
+          }
+        }}
         title="Groupに追加"
         size="md"
         footer={
@@ -544,14 +573,21 @@ function MediaBrowserContent({
               <Button
                 variant="default"
                 disabled={groupActionPending}
-                onClick={() => { setSelectionDialog(null); onDismissGroupActionResult?.() }}
+                onClick={() => {
+                  setSelectionDialog(null)
+                  onDismissGroupActionResult?.()
+                }}
               >
                 {groupActionResult ? "結果を閉じる" : "キャンセル"}
               </Button>
             }
             primary={
               <Button
-                disabled={groupTargets.length === 0 || groupActionPending || selected.size === 0}
+                disabled={
+                  groupTargets.length === 0 ||
+                  groupActionPending ||
+                  selected.size === 0
+                }
                 loading={groupActionPending}
                 onClick={() => void addToGroups()}
               >
@@ -569,16 +605,33 @@ function MediaBrowserContent({
             <Alert color="red" role="alert">
               <Group justify="space-between">
                 <Text size="sm">{groupActionError}</Text>
-                {onRetryGroupOptions && <Button size="xs" variant="default" onClick={onRetryGroupOptions}>再試行</Button>}
+                {onRetryGroupOptions && (
+                  <Button
+                    size="xs"
+                    variant="default"
+                    onClick={onRetryGroupOptions}
+                  >
+                    再試行
+                  </Button>
+                )}
               </Group>
             </Alert>
           )}
           {groupActionResult && (
             <Stack gap="xs">
-              <Text size="sm">追加成功: {groupActionResult.succeeded}件 / 既に追加済み: {groupActionResult.alreadyApplied}件 / 失敗: {groupActionResult.failed.length}件</Text>
-              {groupActionResult.failed.map(item => (
+              <Text size="sm">
+                追加成功: {groupActionResult.succeeded}件 / 既に追加済み:{" "}
+                {groupActionResult.alreadyApplied}件 / 失敗:{" "}
+                {groupActionResult.failed.length}件
+              </Text>
+              {groupActionResult.failed.map((item) => (
                 <Text key={item.mediaId} size="sm" c="red">
-                  {stateItems.find(media => media.id === item.mediaId)?.label ?? item.mediaId}：{item.errorCode === "NOT_FOUND" ? "Mediaが利用できません" : "追加できませんでした"}
+                  {stateItems.find((media) => media.id === item.mediaId)
+                    ?.label ?? item.mediaId}
+                  ：
+                  {item.errorCode === "NOT_FOUND"
+                    ? "Mediaが利用できません"
+                    : "追加できませんでした"}
                 </Text>
               ))}
             </Stack>
@@ -589,7 +642,10 @@ function MediaBrowserContent({
             searchable
             data={groupOptions ?? ["旅行", "家族", "風景写真", "お気に入り"]}
             value={groupTargets}
-            onChange={value => { setGroupTargets(value); onDismissGroupActionResult?.() }}
+            onChange={(value) => {
+              setGroupTargets(value)
+              onDismissGroupActionResult?.()
+            }}
           />
         </Stack>
       </Dialog>

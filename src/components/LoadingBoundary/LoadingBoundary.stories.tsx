@@ -18,7 +18,8 @@ type Story = StoryObj<typeof meta>
 
 export const Loading: Story = {
   name: "Visual · Loading",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 
 export const Ready: Story = {
   name: "Visual · Ready",

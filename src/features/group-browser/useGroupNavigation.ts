@@ -9,7 +9,9 @@ import { useGroupRef } from "react-resizable-panels"
  * Owns Group selection, Compact focus recovery, and Wide split view restoration.
  * Preserve the original event order and DOM focus targets.
  */
-export function useGroupNavigation(onSelectGroup?: (id: string | null) => void) {
+export function useGroupNavigation(
+  onSelectGroup?: (id: string | null) => void,
+) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const splitViewRef = useGroupRef()
   const [savedLayout, setSavedLayout] = useState({ groups: 40, detail: 60 })
@@ -89,11 +91,19 @@ export function useGroupNavigation(onSelectGroup?: (id: string | null) => void) 
     )
   }
 
-
   return {
-    selectedId, compact, compactView, splitViewRef, savedLayout,
-    compactDetailHeadingRef, compactSearchRef, compactGroupItemRefs,
-    compactReturnGroupIdRef, openDetail, closeDetail,
-    handleDetailExitComplete, handleLayoutChanged,
+    selectedId,
+    compact,
+    compactView,
+    splitViewRef,
+    savedLayout,
+    compactDetailHeadingRef,
+    compactSearchRef,
+    compactGroupItemRefs,
+    compactReturnGroupIdRef,
+    openDetail,
+    closeDetail,
+    handleDetailExitComplete,
+    handleLayoutChanged,
   }
 }

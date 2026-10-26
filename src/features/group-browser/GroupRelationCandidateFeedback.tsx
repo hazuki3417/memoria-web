@@ -22,7 +22,11 @@ export function GroupRelationCandidateFeedback({
               関係の編集に必要な候補を取得できませんでした。GroupとMediaの閲覧は継続できます。
             </Text>
             <Group justify="flex-start">
-              <Button size="xs" variant="light" onClick={() => void onRetry?.()}>
+              <Button
+                size="xs"
+                variant="light"
+                onClick={() => void onRetry?.()}
+              >
                 再試行
               </Button>
             </Group>

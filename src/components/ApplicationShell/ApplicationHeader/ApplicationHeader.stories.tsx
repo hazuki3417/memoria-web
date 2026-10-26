@@ -21,7 +21,8 @@ type Story = StoryObj<typeof meta>
 
 export const BrandOnly: Story = {
   name: "Visual · Brand Only",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Composed: Story = {
   name: "Visual · Composed",
   tags: ["visual"],

@@ -53,7 +53,9 @@ export const Cancel: Story = {
   name: "Interaction · Cancel",
   tags: ["interaction"],
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await expect(args.onClose).toHaveBeenCalledTimes(1)
     await expect(args.onSubmit).not.toHaveBeenCalled()

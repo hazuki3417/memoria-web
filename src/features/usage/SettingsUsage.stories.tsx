@@ -19,7 +19,6 @@ function UnitPreferenceStory() {
   )
 }
 
-
 function RetryContractStory({ scope }: { scope: "personal" | "community" }) {
   const [status, setStatus] = useState<"error" | "ready">("error")
   const [retryCount, setRetryCount] = useState(0)
@@ -39,8 +38,11 @@ function RetryContractStory({ scope }: { scope: "personal" | "community" }) {
   )
 }
 
-
-function RetryFailureContractStory({ scope }: { scope: "personal" | "community" }) {
+function RetryFailureContractStory({
+  scope,
+}: {
+  scope: "personal" | "community"
+}) {
   const [retryCount, setRetryCount] = useState(0)
   return (
     <>
@@ -59,7 +61,13 @@ function ModeLifetimeContractStory() {
   const [scope, setScope] = useState<"personal" | "community">("personal")
   return (
     <>
-      <Button onClick={() => setScope((current) => current === "personal" ? "community" : "personal")}>
+      <Button
+        onClick={() =>
+          setScope((current) =>
+            current === "personal" ? "community" : "personal",
+          )
+        }
+      >
         Scopeを切り替え
       </Button>
       <SettingsUsage key={scope} usage={sampleUsage} scope={scope} />
@@ -103,7 +111,9 @@ export const ReadyValuesContract: Story = {
       ["HEIC / HEIF", "48 件", "0.04 GB"],
     ]
     for (const [name, count, size] of formats) {
-      const row = within(table).getByRole("row", { name: new RegExp(name.replace("/", "\\/")) })
+      const row = within(table).getByRole("row", {
+        name: new RegExp(name.replace("/", "\\/")),
+      })
       await expect(row).toHaveTextContent(count)
       await expect(row).toHaveTextContent(size)
     }
@@ -111,7 +121,9 @@ export const ReadyValuesContract: Story = {
     await expect(footer).toHaveTextContent("合計")
     await expect(footer).toHaveTextContent("1,248 件")
     await expect(footer).toHaveTextContent("1.24 GB")
-    await expect(canvas.getByLabelText(/ストレージ使用率 24.8%/)).toBeInTheDocument()
+    await expect(
+      canvas.getByLabelText(/ストレージ使用率 24.8%/),
+    ).toBeInTheDocument()
   },
 }
 
@@ -122,15 +134,23 @@ export const DefaultSortContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const table = canvas.getByRole("table")
-    const sizeHeader = within(table).getByRole("columnheader", { name: /使用量/ })
+    const sizeHeader = within(table).getByRole("columnheader", {
+      name: /使用量/,
+    })
     await expect(sizeHeader).toHaveAttribute("aria-sort", "descending")
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
-    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    )
     await expect(sizeHeader).toHaveAttribute("aria-sort", "none")
     await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("JPEG")
-    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    )
     await expect(sizeHeader).toHaveAttribute("aria-sort", "ascending")
-    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent(
+      "HEIC / HEIF",
+    )
   },
 }
 
@@ -152,9 +172,16 @@ export const ShuffledDefaultSortContract: Story = {
   },
   play: async ({ canvasElement }) => {
     const table = within(canvasElement).getByRole("table")
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "descending")
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toHaveAttribute("aria-sort", "descending")
     const rows = within(table).getAllByRole("row").slice(1, 5)
-    for (const [index, format] of ["JPEG", "PNG", "WebP", "HEIC / HEIF"].entries()) {
+    for (const [index, format] of [
+      "JPEG",
+      "PNG",
+      "WebP",
+      "HEIC / HEIF",
+    ].entries()) {
       await expect(rows[index]).toHaveTextContent(format)
     }
   },
@@ -167,7 +194,9 @@ export const BreakdownReadOnlyContract: Story = {
   play: async ({ canvasElement }) => {
     const table = within(canvasElement).getByRole("table")
     for (const name of ["JPEG", "PNG", "WebP", "HEIC / HEIF"]) {
-      const row = within(table).getByRole("row", { name: new RegExp(name.replace("/", "\\/")) })
+      const row = within(table).getByRole("row", {
+        name: new RegExp(name.replace("/", "\\/")),
+      })
       await expect(within(row).queryByRole("button")).not.toBeInTheDocument()
       await expect(within(row).queryByRole("checkbox")).not.toBeInTheDocument()
       await expect(within(row).queryByRole("link")).not.toBeInTheDocument()
@@ -188,13 +217,17 @@ export const ZeroUsageContract: Story = {
     const rows = within(table).getAllByRole("row")
     await expect(rows).toHaveLength(6)
     for (const format of ["JPEG", "PNG", "WebP", "HEIC / HEIF"]) {
-      const row = within(table).getByRole("row", { name: new RegExp(format.replace("/", "\\/")) })
+      const row = within(table).getByRole("row", {
+        name: new RegExp(format.replace("/", "\\/")),
+      })
       await expect(row).toHaveTextContent("0 件")
       await expect(row).toHaveTextContent("0 GB")
     }
     await expect(table).toHaveTextContent("合計")
     await expect(table).toHaveTextContent("0 件")
-    await expect(canvas.queryByRole("status", { name: "利用状況を読み込んでいます" })).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByRole("status", { name: "利用状況を読み込んでいます" }),
+    ).not.toBeInTheDocument()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -208,7 +241,9 @@ export const LimitReachedContract: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getAllByText("5 GB").length).toBeGreaterThan(0)
     await expect(canvas.getByText("0 GB")).toBeVisible()
-    await expect(canvas.getByLabelText(/ストレージ使用率 100%/)).toBeInTheDocument()
+    await expect(
+      canvas.getByLabelText(/ストレージ使用率 100%/),
+    ).toBeInTheDocument()
     await expect(canvas.getByRole("table")).toHaveTextContent("5,000 件")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
@@ -243,7 +278,9 @@ export const UnitPreferenceChangeContract: Story = {
     await expect(canvas.getAllByText("4.66 GiB")[0]).toBeVisible()
     await expect(table).toHaveTextContent("1.15 GiB")
     await expect(table).toHaveTextContent("1,248 件")
-    await expect(canvas.getByLabelText(/ストレージ使用率 24.8%/)).toBeInTheDocument()
+    await expect(
+      canvas.getByLabelText(/ストレージ使用率 24.8%/),
+    ).toBeInTheDocument()
     await userEvent.click(canvas.getByRole("button", { name: "Decimalに戻す" }))
     await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
     await expect(table).toHaveTextContent("1.24 GB")
@@ -258,12 +295,16 @@ export const LoadingContract: Story = {
   args: { status: "loading" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("status", { name: "利用状況を読み込んでいます" })).toBeVisible()
+    await expect(
+      canvas.getByRole("status", { name: "利用状況を読み込んでいます" }),
+    ).toBeVisible()
     await expect(canvas.queryByText("1.24 GB")).not.toBeInTheDocument()
     const table = canvas.getByRole("table")
     await expect(within(table).getAllByRole("row")).toHaveLength(6)
     await expect(within(table).getAllByRole("row")[5]).toHaveTextContent("合計")
-    await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeDisabled()
+    await expect(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    ).toBeDisabled()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -276,16 +317,26 @@ export const ZeroSortContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const table = canvas.getByRole("table")
-    const getFormats = () => within(table).getAllByRole("row").slice(1, 5).map((row) => within(row).getAllByRole("cell")[0].textContent)
+    const getFormats = () =>
+      within(table)
+        .getAllByRole("row")
+        .slice(1, 5)
+        .map((row) => within(row).getAllByRole("cell")[0].textContent)
     const initial = getFormats()
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "descending")
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toHaveAttribute("aria-sort", "descending")
     for (const [label, directions] of [
       ["使用量", ["none", "ascending", "descending"]],
       ["登録件数", ["ascending", "descending", "none"]],
     ] as const) {
       for (const direction of directions) {
-        await userEvent.click(canvas.getByRole("button", { name: `${label}で並べ替え` }))
-        await expect(within(table).getByRole("columnheader", { name: new RegExp(label) })).toHaveAttribute("aria-sort", direction)
+        await userEvent.click(
+          canvas.getByRole("button", { name: `${label}で並べ替え` }),
+        )
+        await expect(
+          within(table).getByRole("columnheader", { name: new RegExp(label) }),
+        ).toHaveAttribute("aria-sort", direction)
         await expect(getFormats()).toEqual(initial)
       }
     }
@@ -299,7 +350,11 @@ export const CommunityDisplayContract: Story = {
   args: { scope: "community" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
+    await expect(
+      canvas.getByText(
+        "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。",
+      ),
+    ).toBeVisible()
     await expect(canvas.getAllByText("1.24 GB")[0]).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByRole("table")).toHaveTextContent("HEIC / HEIF")
@@ -316,18 +371,29 @@ export const DisplayModeSwitchContract: Story = {
     await expect(canvas.getAllByText("1.24 GB").length).toBeGreaterThan(0)
     await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
     await expect(canvas.getAllByText("24.8%").length).toBeGreaterThan(0)
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toBeVisible()
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toBeVisible()
     await expect(within(table).getAllByRole("row")).toHaveLength(6)
     await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
-    await userEvent.click(canvas.getByRole("button", { name: "使用量で並べ替え" }))
-    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
+    await userEvent.click(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    )
+    await userEvent.click(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    )
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent(
+      "HEIC / HEIF",
+    )
     await userEvent.click(canvas.getByRole("radio", { name: "容量" }))
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toHaveAttribute("aria-sort", "ascending")
-    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("HEIC / HEIF")
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toHaveAttribute("aria-sort", "ascending")
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent(
+      "HEIC / HEIF",
+    )
   },
 }
-
 
 // SS-02/03: Errorは必ず再試行可能であり、操作後にReadyへ復旧する（API接続なし）。
 export const ErrorRetryContract: Story = {
@@ -336,8 +402,12 @@ export const ErrorRetryContract: Story = {
   render: () => <RetryContractStory scope="personal" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
-    await expect(canvas.getByRole("alert")).toHaveTextContent("通信状況を確認して、もう一度お試しください。")
+    await expect(canvas.getByRole("alert")).toHaveTextContent(
+      "利用状況を取得できませんでした",
+    )
+    await expect(canvas.getByRole("alert")).toHaveTextContent(
+      "通信状況を確認して、もう一度お試しください。",
+    )
     await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(canvas.getByTestId("retry-count")).toHaveTextContent("1")
@@ -356,20 +426,49 @@ export const DisplayModeLifetimeContract: Story = {
     await expect(canvas.getByRole("radio", { name: "容量" })).toBeChecked()
     await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
     await expect(canvas.getByRole("radio", { name: "割合" })).toBeChecked()
-    await userEvent.click(canvas.getByRole("button", { name: "Scopeを切り替え" }))
-    await expect(canvas.getByText("このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Scopeを切り替え" }),
+    )
+    await expect(
+      canvas.getByText(
+        "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。",
+      ),
+    ).toBeVisible()
     await expect(canvas.getByRole("radio", { name: "容量" })).toBeChecked()
   },
 }
 
 // Play無しの静的StoryのみをVRT候補とし、画像Baselineは別途Visual Reviewで承認する。
-export const VrtReady: Story = { name: "Visual · Ready", tags: ["visual", "vrt"] }
-export const VrtEmpty: Story = { name: "Visual · 0件", tags: ["visual", "vrt"], args: { usage: zeroUsage } }
+export const VrtReady: Story = {
+  name: "Visual · Ready",
+  tags: ["visual", "vrt"],
+}
+export const VrtEmpty: Story = {
+  name: "Visual · 0件",
+  tags: ["visual", "vrt"],
+  args: { usage: zeroUsage },
+}
 // Skeletonの撮影安定化方針が確定するまでVRT対象外（memoria-web#171）。
-export const VrtLoading: Story = { name: "Visual · Loading", tags: ["visual"], args: { status: "loading" } }
-export const VrtError: Story = { name: "Visual · Error / Retry", tags: ["visual", "vrt"], args: { status: "error", onRetry: () => undefined } }
-export const VrtLimit: Story = { name: "Visual · 上限到達", tags: ["visual", "vrt"], args: { usage: limitReachedUsage } }
-export const VrtCommunity: Story = { name: "Visual · Community", tags: ["visual", "vrt"], args: { scope: "community" } }
+export const VrtLoading: Story = {
+  name: "Visual · Loading",
+  tags: ["visual"],
+  args: { status: "loading" },
+}
+export const VrtError: Story = {
+  name: "Visual · Error / Retry",
+  tags: ["visual", "vrt"],
+  args: { status: "error", onRetry: () => undefined },
+}
+export const VrtLimit: Story = {
+  name: "Visual · 上限到達",
+  tags: ["visual", "vrt"],
+  args: { usage: limitReachedUsage },
+}
+export const VrtCommunity: Story = {
+  name: "Visual · Community",
+  tags: ["visual", "vrt"],
+  args: { scope: "community" },
+}
 
 // SS-04: 再取得が再失敗してもEmptyではなくErrorと復旧Actionを維持する。
 export const ErrorRetryFailureContract: Story = {
@@ -378,7 +477,9 @@ export const ErrorRetryFailureContract: Story = {
   render: () => <RetryFailureContractStory scope="community" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
+    await expect(canvas.getByRole("alert")).toHaveTextContent(
+      "利用状況を取得できませんでした",
+    )
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(canvas.getByTestId("retry-count")).toHaveTextContent("1")
     await expect(canvas.getByRole("alert")).toBeVisible()
@@ -396,13 +497,26 @@ export const PercentDenominatorContract: Story = {
     const table = canvas.getByRole("table")
     await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
     await expect(canvas.getAllByText("24.8%").length).toBeGreaterThan(0)
-    for (const [format, percent] of [["JPEG", "18%"], ["PNG", "4%"], ["WebP", "2%"], ["HEIC / HEIF", "0.8%"]]) {
-      await expect(within(table).getByRole("row", { name: new RegExp(format.replace("/", "\\/")) })).toHaveTextContent(percent)
+    for (const [format, percent] of [
+      ["JPEG", "18%"],
+      ["PNG", "4%"],
+      ["WebP", "2%"],
+      ["HEIC / HEIF", "0.8%"],
+    ]) {
+      await expect(
+        within(table).getByRole("row", {
+          name: new RegExp(format.replace("/", "\\/")),
+        }),
+      ).toHaveTextContent(percent)
     }
     await expect(table).toHaveTextContent("1,248 件")
-    await expect(within(table).getByRole("columnheader", { name: /使用量/ })).toBeVisible()
+    await expect(
+      within(table).getByRole("columnheader", { name: /使用量/ }),
+    ).toBeVisible()
     await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
-    await expect(canvas.queryByText("割合はストレージ上限に対する値です。")).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByText("割合はストレージ上限に対する値です。"),
+    ).not.toBeInTheDocument()
   },
 }
 
@@ -414,17 +528,33 @@ export const AllColumnsSortContract: Story = {
     const canvas = within(canvasElement)
     const table = canvas.getByRole("table")
     const first = () => within(table).getAllByRole("row")[1]
-    await userEvent.click(canvas.getByRole("button", { name: "形式で並べ替え" }))
-    await expect(within(table).getByRole("columnheader", { name: "形式" })).toHaveAttribute("aria-sort", "ascending")
+    await userEvent.click(
+      canvas.getByRole("button", { name: "形式で並べ替え" }),
+    )
+    await expect(
+      within(table).getByRole("columnheader", { name: "形式" }),
+    ).toHaveAttribute("aria-sort", "ascending")
     await expect(first()).toHaveTextContent("HEIC / HEIF")
-    await userEvent.click(canvas.getByRole("button", { name: "形式で並べ替え" }))
-    await expect(within(table).getByRole("columnheader", { name: "形式" })).toHaveAttribute("aria-sort", "descending")
+    await userEvent.click(
+      canvas.getByRole("button", { name: "形式で並べ替え" }),
+    )
+    await expect(
+      within(table).getByRole("columnheader", { name: "形式" }),
+    ).toHaveAttribute("aria-sort", "descending")
     await expect(first()).toHaveTextContent("WebP")
-    await userEvent.click(canvas.getByRole("button", { name: "登録件数で並べ替え" }))
-    await expect(within(table).getByRole("columnheader", { name: /登録件数/ })).toHaveAttribute("aria-sort", "ascending")
+    await userEvent.click(
+      canvas.getByRole("button", { name: "登録件数で並べ替え" }),
+    )
+    await expect(
+      within(table).getByRole("columnheader", { name: /登録件数/ }),
+    ).toHaveAttribute("aria-sort", "ascending")
     await expect(first()).toHaveTextContent("HEIC / HEIF")
-    await userEvent.click(canvas.getByRole("button", { name: "登録件数で並べ替え" }))
-    await expect(within(table).getByRole("columnheader", { name: /登録件数/ })).toHaveAttribute("aria-sort", "descending")
+    await userEvent.click(
+      canvas.getByRole("button", { name: "登録件数で並べ替え" }),
+    )
+    await expect(
+      within(table).getByRole("columnheader", { name: /登録件数/ }),
+    ).toHaveAttribute("aria-sort", "descending")
     await expect(first()).toHaveTextContent("JPEG")
   },
 }

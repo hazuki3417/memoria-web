@@ -12,7 +12,9 @@ export default async function Page({
     <CommunitySettingsRoute
       communityId={communityId}
       section="usage"
-      usageContent={<ConnectedUsage scope="community" communityId={communityId} />}
+      usageContent={
+        <ConnectedUsage scope="community" communityId={communityId} />
+      }
     />
   )
 }

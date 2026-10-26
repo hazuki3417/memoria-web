@@ -67,7 +67,15 @@ export function GroupPreviewGrid({
                   bg="var(--mantine-color-default-hover)"
                 />
               ) : (
-                <MediaGroupTile sources={Array.from({ length: 3 }, (_, offset) => previewImages[(groupVisualStart + offset) % previewImages.length])} />
+                <MediaGroupTile
+                  sources={Array.from(
+                    { length: 3 },
+                    (_, offset) =>
+                      previewImages[
+                        (groupVisualStart + offset) % previewImages.length
+                      ],
+                  )}
+                />
               ))}
             {continuation && (
               <Box

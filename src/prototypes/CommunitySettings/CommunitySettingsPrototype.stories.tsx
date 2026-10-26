@@ -37,10 +37,14 @@ type Story = StoryObj<typeof meta>
 
 export const Administrator: Story = {
   name: "Administrator",
-  tags: ["visual"], args: { role: "admin" } }
+  tags: ["visual"],
+  args: { role: "admin" },
+}
 export const Member: Story = {
   name: "Member",
-  tags: ["visual"], args: { role: "member" } }
+  tags: ["visual"],
+  args: { role: "member" },
+}
 export const Compact: Story = {
   name: "Compact",
   tags: ["visual"],
@@ -50,7 +54,9 @@ export const Compact: Story = {
 
 export const Members: Story = {
   name: "Members",
-  tags: ["visual"], args: { role: "admin", section: "members" } }
+  tags: ["visual"],
+  args: { role: "admin", section: "members" },
+}
 const communityUsageFixture = {
   usedBytes: 1_240_000_000,
   limitBytes: 5_000_000_000,
@@ -69,7 +75,13 @@ export const Usage: Story = {
   args: {
     role: "member",
     section: "usage",
-    usageContent: <SettingsUsage scope="community" usage={communityUsageFixture} fileSizeUnit="DECIMAL" />,
+    usageContent: (
+      <SettingsUsage
+        scope="community"
+        usage={communityUsageFixture}
+        fileSizeUnit="DECIMAL"
+      />
+    ),
   },
 }
 export const Preferences: Story = {

@@ -13,7 +13,8 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   name: "Default",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 
 export const Compact: Story = {
   name: "Compact",

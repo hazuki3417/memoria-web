@@ -29,7 +29,9 @@ export const ParentSelection: Story = {
     const input = canvas.getByPlaceholderText("Groupを検索")
     await userEvent.click(input)
     await userEvent.type(input, "Parent")
-    const option = await within(document.body).findByRole("option", { name: /Parent/ })
+    const option = await within(document.body).findByRole("option", {
+      name: /Parent/,
+    })
     await userEvent.click(option)
     await expect(canvas.getByText("1 / 10")).toBeVisible()
     await expect(canvas.getByText("Parent")).toBeVisible()
@@ -70,7 +72,9 @@ export const RemoveOneSelectedRelation: Story = {
     const input = canvas.getByPlaceholderText("Groupを検索")
     await userEvent.click(input)
     await userEvent.type(input, "Parent")
-    const option = await within(document.body).findByRole("option", { name: /Parent/ })
+    const option = await within(document.body).findByRole("option", {
+      name: /Parent/,
+    })
     await userEvent.click(option)
 
     await expect(canvas.getByText("1 / 10")).toBeVisible()
@@ -121,7 +125,9 @@ export const SelectionLimit: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("10 / 10")).toBeVisible()
-    await expect(canvas.getByText("追加できるGroupは10件までです")).toBeVisible()
+    await expect(
+      canvas.getByText("追加できるGroupは10件までです"),
+    ).toBeVisible()
     const input = canvas.getByPlaceholderText("Groupを検索")
     await userEvent.click(input)
     await userEvent.type(input, "K")
@@ -129,7 +135,6 @@ export const SelectionLimit: Story = {
     await expect(canvas.getByText("10 / 10")).toBeVisible()
   },
 }
-
 
 /** GB-048: Childに選択済みのGroupをParentへ重複追加できない。 */
 export const PreventParentChildOverlap: Story = {
@@ -169,6 +174,8 @@ export const SearchDoesNotClearSelection: Story = {
     await userEvent.type(input, "候補")
     await expect(canvas.getByText("1 / 10")).toBeVisible()
     await expect(canvas.getByText("Parent")).toBeVisible()
-    await expect(await within(document.body).findByRole("option", { name: /^候補/ })).toBeVisible()
+    await expect(
+      await within(document.body).findByRole("option", { name: /^候補/ }),
+    ).toBeVisible()
   },
 }

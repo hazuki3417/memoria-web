@@ -12,10 +12,14 @@ type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
   name: "Personal",
-  tags: ["visual"], args: { initialContext: "personal" } }
+  tags: ["visual"],
+  args: { initialContext: "personal" },
+}
 export const Community: Story = {
   name: "Community",
-  tags: ["visual"], args: { initialContext: "community" } }
+  tags: ["visual"],
+  args: { initialContext: "community" },
+}
 export const Compact: Story = {
   name: "Compact",
   tags: ["visual"],

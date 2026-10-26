@@ -42,7 +42,11 @@ export function mapUsageProjection(usage: UsageProjection): SettingsUsageData {
     }
     const format = formatLabels[item.format as keyof typeof formatLabels]
     if (!format) throw new Error("未対応の形式が含まれています")
-    return { format, count: item.mediaCount, sizeBytes: safeBytes(item.usedBytes) }
+    return {
+      format,
+      count: item.mediaCount,
+      sizeBytes: safeBytes(item.usedBytes),
+    }
   })
   return {
     usedBytes,

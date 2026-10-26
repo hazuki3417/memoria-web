@@ -30,10 +30,13 @@ type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
   name: "Visual · Personal",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Community: Story = {
   name: "Visual · Community",
-  tags: ["visual"], args: { currentContext: family } }
+  tags: ["visual"],
+  args: { currentContext: family },
+}
 export const WithoutCreateCommunity: Story = {
   name: "Visual · Without Create Community",
   tags: ["visual"],

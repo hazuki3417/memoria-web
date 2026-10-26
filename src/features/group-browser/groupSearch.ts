@@ -14,8 +14,6 @@ export function filterVisibleGroups<T extends Pick<GroupBrowserGroup, "name">>(
   return allGroups.filter((group) =>
     hasExternalData
       ? group.name.includes(normalized)
-      : group.name
-          .toLocaleLowerCase()
-          .includes(normalized.toLocaleLowerCase()),
+      : group.name.toLocaleLowerCase().includes(normalized.toLocaleLowerCase()),
   )
 }

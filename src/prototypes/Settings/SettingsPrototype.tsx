@@ -56,7 +56,13 @@ const LIMIT_REACHED_USAGE: SettingsUsageData = {
   ],
 }
 
-function UsageContent({ initialScenario, fileSizeUnit }: { initialScenario: UsageScenario; fileSizeUnit: "DECIMAL" | "BINARY" }) {
+function UsageContent({
+  initialScenario,
+  fileSizeUnit,
+}: {
+  initialScenario: UsageScenario
+  fileSizeUnit: "DECIMAL" | "BINARY"
+}) {
   const [scenario, setScenario] = useState<UsageScenario | "retrying">(
     initialScenario === "retry-error" ? "error" : initialScenario,
   )
@@ -118,7 +124,14 @@ export function SettingsPrototype({
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [section, setSection] = useState<Section>(initialSection)
-  const currentLabel = ({ profile: "プロフィール", account: "アカウント", preferences: "環境設定", usage: "利用状況" } as const)[section]
+  const currentLabel = (
+    {
+      profile: "プロフィール",
+      account: "アカウント",
+      preferences: "環境設定",
+      usage: "利用状況",
+    } as const
+  )[section]
 
   let content: ReactNode
   switch (section) {
@@ -145,7 +158,11 @@ export function SettingsPrototype({
     case "account":
       content = (
         <SettingsAccount
-          deletionAction={<Button variant="default" size="sm">アカウントを削除する</Button>}
+          deletionAction={
+            <Button variant="default" size="sm">
+              アカウントを削除する
+            </Button>
+          }
         />
       )
       break
@@ -194,7 +211,12 @@ export function SettingsPrototype({
       </SettingsLayout>
       <Text
         pos="absolute"
-        style={{ width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}
+        style={{
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+          clip: "rect(0 0 0 0)",
+        }}
       >
         現在の設定: {currentLabel}
       </Text>

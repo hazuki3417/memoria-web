@@ -14,19 +14,27 @@ export type UsageSort = {
 } | null
 
 /** 同じ列は 昇順 → 降順 → ソートなし。別の列は昇順から開始する。 */
-export function nextUsageSort(current: UsageSort, key: UsageSortKey): UsageSort {
+export function nextUsageSort(
+  current: UsageSort,
+  key: UsageSortKey,
+): UsageSort {
   if (current?.key !== key) return { key, direction: "asc" }
   if (current.direction === "asc") return { key, direction: "desc" }
   return null
 }
 
 /** ソートなしと同値時の基準を、APIの返却順に依存させない。 */
-export function orderUsageFormats(items: readonly UsageFormatItem[]): UsageFormatItem[] {
+export function orderUsageFormats(
+  items: readonly UsageFormatItem[],
+): UsageFormatItem[] {
   const order = ["JPEG", "PNG", "WebP", "HEIC / HEIF"]
   return [...items].sort((a, b) => {
     const aIndex = order.indexOf(a.format)
     const bIndex = order.indexOf(b.format)
-    return (aIndex < 0 ? order.length : aIndex) - (bIndex < 0 ? order.length : bIndex)
+    return (
+      (aIndex < 0 ? order.length : aIndex) -
+      (bIndex < 0 ? order.length : bIndex)
+    )
   })
 }
 

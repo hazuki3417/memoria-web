@@ -1,6 +1,15 @@
 "use client"
 
-import { Badge, Box, Collapse, Group, SimpleGrid, Stack, Text, UnstyledButton } from "@mantine/core"
+import {
+  Badge,
+  Box,
+  Collapse,
+  Group,
+  SimpleGrid,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core"
 import { IconChevronRight } from "@tabler/icons-react"
 
 function RelationItems({ names }: { names: string[] }) {
@@ -59,11 +68,15 @@ export function GroupRelationSection({
         <Box px="lg" pb="sm">
           <SimpleGrid cols={2} spacing="lg">
             <Stack gap={4}>
-              <Text size="xs" c="dimmed">Parents</Text>
+              <Text size="xs" c="dimmed">
+                Parents
+              </Text>
               <RelationItems names={parentNames} />
             </Stack>
             <Stack gap={4}>
-              <Text size="xs" c="dimmed">Children</Text>
+              <Text size="xs" c="dimmed">
+                Children
+              </Text>
               <RelationItems names={childNames} />
             </Stack>
           </SimpleGrid>

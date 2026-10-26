@@ -12,12 +12,14 @@ const meta = {
     mediaState: "ready",
     groupState: "ready",
     mediaItems: [image, image, image],
-    groupItems: [{
-      id: "group-1",
-      name: "最近のGroup",
-      mediaCount: 5,
-      media: [image, image, image, image],
-    }],
+    groupItems: [
+      {
+        id: "group-1",
+        name: "最近のGroup",
+        mediaCount: 5,
+        media: [image, image, image, image],
+      },
+    ],
   },
 } satisfies Meta<typeof Dashboard>
 export default meta
@@ -34,8 +36,14 @@ export const Community: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const links = canvas.getAllByRole("link", { name: "すべて見る" })
-    await expect(links[0]).toHaveAttribute("href", "/communities/community-123/media")
-    await expect(links[1]).toHaveAttribute("href", "/communities/community-123/groups")
+    await expect(links[0]).toHaveAttribute(
+      "href",
+      "/communities/community-123/media",
+    )
+    await expect(links[1]).toHaveAttribute(
+      "href",
+      "/communities/community-123/groups",
+    )
   },
 }
 export const IndependentEmptyStates: Story = {
@@ -56,7 +64,9 @@ export const LoadingMediaOnly: Story = {
   args: { mediaState: "loading" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("heading", { name: "最近のGroup" })).toBeVisible()
+    await expect(
+      canvas.getByRole("heading", { name: "最近のGroup" }),
+    ).toBeVisible()
     await expect(canvas.getByRole("status")).toBeVisible()
   },
 }
@@ -68,7 +78,9 @@ export const FailedGroupsOnly: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("Groupを取得できませんでした")).toBeVisible()
     await expect(canvas.getByRole("button", { name: "再試行" })).toBeVisible()
-    await expect(canvas.getAllByRole("link", { name: "すべて見る" })).toHaveLength(1)
+    await expect(
+      canvas.getAllByRole("link", { name: "すべて見る" }),
+    ).toHaveLength(1)
   },
 }
 export const MissingThumbnail: Story = {
@@ -76,7 +88,9 @@ export const MissingThumbnail: Story = {
   tags: ["visual"],
   args: { mediaItems: [""] },
   play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByLabelText("サムネイルを表示できません")).toBeVisible()
+    await expect(
+      within(canvasElement).getByLabelText("サムネイルを表示できません"),
+    ).toBeVisible()
   },
 }
 export const Compact: Story = {

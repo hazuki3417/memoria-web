@@ -73,7 +73,9 @@ function CommunitySwitchScenario() {
   const [communityId, setCommunityId] = useState("club-a")
   return (
     <>
-      <Button onClick={() => setCommunityId("club-b")}>Community Bへ切り替え</Button>
+      <Button onClick={() => setCommunityId("club-b")}>
+        Community Bへ切り替え
+      </Button>
       <ConnectedUsage scope="community" communityId={communityId} />
     </>
   )
@@ -102,14 +104,21 @@ type Story = StoryObj<typeof meta>
 export const CommunityReady: Story = {
   name: "Interaction · Communityの取得成功",
   tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[communitySuccess, communityPreferences("DECIMAL")]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[communitySuccess, communityPreferences("DECIMAL")]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect((await canvas.findAllByText("1.24 GB")).length).toBeGreaterThan(0)
+    await expect(
+      (await canvas.findAllByText("1.24 GB")).length,
+    ).toBeGreaterThan(0)
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
     await expect(canvas.getByRole("table")).toHaveTextContent("HEIC / HEIF")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -120,14 +129,21 @@ export const CommunityReady: Story = {
 export const CommunityBinary: Story = {
   name: "Interaction · CommunityのBinary表示",
   tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[communitySuccess, communityPreferences("BINARY")]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[communitySuccess, communityPreferences("BINARY")]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findAllByText("4.66 GiB").then((elements) => elements[0])).toBeVisible()
+    await expect(
+      await canvas.findAllByText("4.66 GiB").then((elements) => elements[0]),
+    ).toBeVisible()
     await expect(canvas.getAllByText("1.15 GiB")[0]).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
@@ -137,30 +153,45 @@ export const CommunityBinary: Story = {
 export const CommunityEmpty: Story = {
   name: "Interaction · 確定0件",
   tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[{
-      request: communityRequest,
-      result: {
-        data: {
-          communityUsage: {
-            mediaCount: 0,
-            storage: { usedBytes: "0", effectiveLimitBytes: "5000000000" },
-            formatBreakdown: usage.formatBreakdown.map((item) => ({
-              ...item, mediaCount: 0, usedBytes: "0",
-            })),
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[
+          {
+            request: communityRequest,
+            result: {
+              data: {
+                communityUsage: {
+                  mediaCount: 0,
+                  storage: {
+                    usedBytes: "0",
+                    effectiveLimitBytes: "5000000000",
+                  },
+                  formatBreakdown: usage.formatBreakdown.map((item) => ({
+                    ...item,
+                    mediaCount: 0,
+                    usedBytes: "0",
+                  })),
+                },
+              },
+            },
           },
-        },
-      },
-    }, communityPreferences("DECIMAL")]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
+          communityPreferences("DECIMAL"),
+        ]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const table = await canvas.findByRole("table")
     await expect(within(table).getAllByRole("row")).toHaveLength(6)
     for (const format of ["JPEG", "PNG", "WebP", "HEIC / HEIF"]) {
-      const row = within(table).getByRole("row", { name: new RegExp(format.replace("/", "\\/")) })
+      const row = within(table).getByRole("row", {
+        name: new RegExp(format.replace("/", "\\/")),
+      })
       await expect(row).toHaveTextContent("0 件")
       await expect(row).toHaveTextContent("0 GB")
     }
@@ -173,16 +204,29 @@ export const CommunityEmpty: Story = {
 export const CommunityRetry: Story = {
   name: "Interaction · Errorから再取得成功",
   tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[communityFailure, communitySuccess, communityPreferences("DECIMAL")]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[
+          communityFailure,
+          communitySuccess,
+          communityPreferences("DECIMAL"),
+        ]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByRole("alert")).toHaveTextContent("利用状況を取得できませんでした")
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "利用状況を取得できませんでした",
+    )
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
+    await expect(
+      await canvas.findAllByText("1.24 GB").then((elements) => elements[0]),
+    ).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
@@ -191,11 +235,20 @@ export const CommunityRetry: Story = {
 export const CommunityRetryFailure: Story = {
   name: "Interaction · 再試行して再失敗",
   tags: ["interaction"],
-  decorators: [(Story) => (
-    <MockedProvider mocks={[communityFailure, communityFailure, communityPreferences("DECIMAL")]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[
+          communityFailure,
+          communityFailure,
+          communityPreferences("DECIMAL"),
+        ]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toBeVisible()
@@ -210,21 +263,37 @@ export const CommunitySwitch: Story = {
   name: "Interaction · Community AからBへの切り替え",
   tags: ["interaction"],
   render: () => <CommunitySwitchScenario />,
-  decorators: [(Story) => (
-    <MockedProvider mocks={[
-      communitySuccess,
-      { request: { query: CommunityUsageDocument, variables: { communityId: "club-b" } },
-        result: { data: { communityUsage: otherCommunityUsage } } },
-      communityPreferences("DECIMAL"),
-    ]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[
+          communitySuccess,
+          {
+            request: {
+              query: CommunityUsageDocument,
+              variables: { communityId: "club-b" },
+            },
+            result: { data: { communityUsage: otherCommunityUsage } },
+          },
+          communityPreferences("DECIMAL"),
+        ]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "Community Bへ切り替え" }))
-    await expect(await canvas.findAllByText("2 GB").then((elements) => elements[0])).toBeVisible()
+    await expect(
+      await canvas.findAllByText("1.24 GB").then((elements) => elements[0]),
+    ).toBeVisible()
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Community Bへ切り替え" }),
+    )
+    await expect(
+      await canvas.findAllByText("2 GB").then((elements) => elements[0]),
+    ).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
     await expect(canvas.queryAllByText("1.24 GB")).toHaveLength(0)
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -236,16 +305,24 @@ export const PersonalBinary: Story = {
   name: "Interaction · Personal UsageとBinary設定",
   tags: ["interaction"],
   args: { scope: "personal", communityId: undefined },
-  decorators: [(Story) => (
-    <MockedProvider mocks={[personalSuccess]} addTypename={false}>
-      <Story />
-    </MockedProvider>
-  )],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[personalSuccess]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findAllByText("4.66 GiB").then((elements) => elements[0])).toBeVisible()
+    await expect(
+      await canvas.findAllByText("4.66 GiB").then((elements) => elements[0]),
+    ).toBeVisible()
     await expect(canvas.getAllByText("1.15 GiB")[0]).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
-    await expect(canvas.getByText("Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
+    await expect(
+      canvas.getByText(
+        "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
+      ),
+    ).toBeVisible()
   },
 }

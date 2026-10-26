@@ -28,9 +28,11 @@ export function useGroupCreateController({
     const name = createName.trim()
     if (!validGroupName(createName)) return
     let outcomeUnknown = false
-    let failureDescription = "入力内容と通信状態を確認して、もう一度お試しください。"
+    let failureDescription =
+      "入力内容と通信状態を確認して、もう一度お試しください。"
     const result = await runAction(async () => {
-      if (!onCreateGroup) throw new Error("Group create operation is not configured")
+      if (!onCreateGroup)
+        throw new Error("Group create operation is not configured")
       let outcome
       try {
         outcome = await onCreateGroup(name, createParents, createChildren)
@@ -52,7 +54,8 @@ export function useGroupCreateController({
       showNotification({
         kind: "error",
         title: "Groupの作成結果を確認できませんでした",
-        description: "通信状態が不明です。入力内容は保持されています。必要であればご自身で再試行してください。",
+        description:
+          "通信状態が不明です。入力内容は保持されています。必要であればご自身で再試行してください。",
       })
       return
     }
@@ -65,10 +68,16 @@ export function useGroupCreateController({
     })
   }
 
-
   return {
-    createOpened, createName, createParents, createChildren,
-    setCreateName, setCreateParents, setCreateChildren, openCreate, submitCreate,
+    createOpened,
+    createName,
+    createParents,
+    createChildren,
+    setCreateName,
+    setCreateParents,
+    setCreateChildren,
+    openCreate,
+    submitCreate,
     closeCreate: create.close,
   }
 }

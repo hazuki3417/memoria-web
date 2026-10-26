@@ -12,10 +12,15 @@ type Story = StoryObj<typeof meta>
 
 export const Available: Story = {
   name: "Visual · Available",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Forbidden: Story = {
   name: "Visual · Forbidden",
-  tags: ["visual"], args: { downloadMock: "forbidden" } }
+  tags: ["visual"],
+  args: { downloadMock: "forbidden" },
+}
 export const Processing: Story = {
   name: "Visual · Processing",
-  tags: ["visual"], args: { downloadMock: "processing" } }
+  tags: ["visual"],
+  args: { downloadMock: "processing" },
+}

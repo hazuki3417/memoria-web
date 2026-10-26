@@ -6,8 +6,17 @@ const meta = {
   component: MediaTile,
   tags: ["visual"],
   parameters: { layout: "centered" },
-  decorators: [(Story) => <div style={{ width: 200, height: 200 }}><Story /></div>],
-  args: { src: "/__dev-assets/group-browser/group-media-01.jpg", label: "旅行の写真" },
+  decorators: [
+    (Story) => (
+      <div style={{ width: 200, height: 200 }}>
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    src: "/__dev-assets/group-browser/group-media-01.jpg",
+    label: "旅行の写真",
+  },
 } satisfies Meta<typeof MediaTile>
 
 export default meta

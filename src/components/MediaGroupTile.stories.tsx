@@ -12,7 +12,13 @@ const meta = {
   component: MediaGroupTile,
   tags: ["visual"],
   parameters: { layout: "centered" },
-  decorators: [(Story) => <div style={{ width: 200, height: 200 }}><Story /></div>],
+  decorators: [
+    (Story) => (
+      <div style={{ width: 200, height: 200 }}>
+        <Story />
+      </div>
+    ),
+  ],
   args: { sources: images },
 } satisfies Meta<typeof MediaGroupTile>
 

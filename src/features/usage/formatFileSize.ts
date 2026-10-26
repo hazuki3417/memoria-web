@@ -13,7 +13,13 @@ export type FileSizeSuffix =
 export type FormattedFileSize = { value: string; unit: FileSizeSuffix }
 
 const DECIMAL_UNITS: readonly FileSizeSuffix[] = ["B", "KB", "MB", "GB", "TB"]
-const BINARY_UNITS: readonly FileSizeSuffix[] = ["B", "KiB", "MiB", "GiB", "TiB"]
+const BINARY_UNITS: readonly FileSizeSuffix[] = [
+  "B",
+  "KiB",
+  "MiB",
+  "GiB",
+  "TiB",
+]
 
 /** byte数から表示用の値と単位を導出し、空白やDOMなどの表示構成は担当しない。 */
 export function formatFileSize(

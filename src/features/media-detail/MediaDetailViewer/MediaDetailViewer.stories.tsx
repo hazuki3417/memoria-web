@@ -59,10 +59,15 @@ type Story = StoryObj<typeof meta>
 
 export const Portrait: Story = {
   name: "Visual · Portrait",
-  tags: ["visual"],}
+  tags: ["visual"],
+}
 export const Landscape: Story = {
   name: "Visual · Landscape",
-  tags: ["visual"], args: { initialId: "landscape-01" } }
+  tags: ["visual"],
+  args: { initialId: "landscape-01" },
+}
 export const Compact: Story = {
   name: "Visual · Compact",
-  tags: ["visual"], args: { compact: true } }
+  tags: ["visual"],
+  args: { compact: true },
+}

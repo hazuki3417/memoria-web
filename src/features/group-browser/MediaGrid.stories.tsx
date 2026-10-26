@@ -8,9 +8,17 @@ const meta = {
   args: {
     onOpen: fn(),
     items: [
-      { id: "a", label: "写真A", src: "/__dev-assets/group-browser/group-media-01.jpg" },
+      {
+        id: "a",
+        label: "写真A",
+        src: "/__dev-assets/group-browser/group-media-01.jpg",
+      },
       { id: "b", label: "写真B", src: null },
-      { id: "c", label: "写真C", src: "/__dev-assets/group-browser/group-media-02.jpg" },
+      {
+        id: "c",
+        label: "写真C",
+        src: "/__dev-assets/group-browser/group-media-02.jpg",
+      },
     ],
   },
 } satisfies Meta<typeof MediaGrid>

@@ -51,7 +51,8 @@ export function AccountRegistration({
         ? ""
         : "ユーザー",
   )
-  const [status, setStatus] = useState<AccountRegistrationReviewState>(reviewState)
+  const [status, setStatus] =
+    useState<AccountRegistrationReviewState>(reviewState)
   const [exitOpened, { open: openExit, close: closeExit }] =
     useDisclosure(false)
   const [exited, setExited] = useState(false)

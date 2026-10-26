@@ -6,9 +6,16 @@ import { useEffect, useRef } from "react"
 export function LoadMoreSentinel({ onVisible }: { onVisible?: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (!onVisible || !ref.current || typeof IntersectionObserver === "undefined") return
+    if (
+      !onVisible ||
+      !ref.current ||
+      typeof IntersectionObserver === "undefined"
+    )
+      return
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) onVisible() },
+      ([entry]) => {
+        if (entry.isIntersecting) onVisible()
+      },
       { rootMargin: "160px" },
     )
     observer.observe(ref.current)

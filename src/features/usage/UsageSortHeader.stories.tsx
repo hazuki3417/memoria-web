@@ -52,8 +52,13 @@ export const IconContract: Story = {
   args: { direction: "asc" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeEnabled()
-    await expect(canvas.getByTestId("usage-sort-icon-asc")).toHaveAttribute("aria-hidden", "true")
+    await expect(
+      canvas.getByRole("button", { name: "使用量で並べ替え" }),
+    ).toBeEnabled()
+    await expect(canvas.getByTestId("usage-sort-icon-asc")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    )
     await expect(canvas.queryByText("▲")).not.toBeInTheDocument()
   },
 }

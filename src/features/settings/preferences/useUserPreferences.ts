@@ -17,8 +17,11 @@ export function useUserPreferences(
   initialPreferences: UserPreferences,
   onSave?: SavePreferences,
 ) {
-  const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences)
-  const [accentDraft, setAccentDraft] = useState(initialPreferences.personalAccentColor)
+  const [preferences, setPreferences] =
+    useState<UserPreferences>(initialPreferences)
+  const [accentDraft, setAccentDraft] = useState(
+    initialPreferences.personalAccentColor,
+  )
   const { saveError, enqueue, retry } = usePreferencesSave(onSave)
 
   const change = <K extends keyof UserPreferences>(
@@ -37,5 +40,12 @@ export function useUserPreferences(
     }
   }
 
-  return { preferences, accentDraft, change, changeAccentDraft, saveError, retry }
+  return {
+    preferences,
+    accentDraft,
+    change,
+    changeAccentDraft,
+    saveError,
+    retry,
+  }
 }

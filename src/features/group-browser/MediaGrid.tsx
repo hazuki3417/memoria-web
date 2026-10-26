@@ -5,7 +5,8 @@ import { MediaTile } from "@/components/MediaTile"
 
 const previewImages = Array.from(
   { length: 9 },
-  (_, index) => `/__dev-assets/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
+  (_, index) =>
+    `/__dev-assets/group-browser/group-media-${String(index + 1).padStart(2, "0")}.jpg`,
 )
 
 export function MediaGrid({
@@ -47,4 +48,3 @@ export function MediaGrid({
     </SimpleGrid>
   )
 }
-
