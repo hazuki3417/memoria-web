@@ -2,7 +2,7 @@
 
 import { Text } from "@mantine/core"
 import { Settings } from "./Settings"
-import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import type { UserPreferences, UserPreferencesPatch } from "./preferences/userPreferences"
 import {
   CurrentUserDocument,
   DateFormat,
