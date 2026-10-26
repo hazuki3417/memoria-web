@@ -42,6 +42,8 @@ export const IndependentEmptyStates: Story = {
   name: "Independent Empty States",
   tags: ["visual"],
   args: { mediaItems: [], groupItems: [] },
+  // Storybook merges array args by index; force genuinely empty collections.
+  render: (args) => <Dashboard {...args} mediaItems={[]} groupItems={[]} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("メディアはまだありません")).toBeVisible()
@@ -54,7 +56,7 @@ export const LoadingMediaOnly: Story = {
   args: { mediaState: "loading" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("最近のGroup")).toBeVisible()
+    await expect(canvas.getByRole("heading", { name: "最近のGroup" })).toBeVisible()
     await expect(canvas.getByRole("status")).toBeVisible()
   },
 }
