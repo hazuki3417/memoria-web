@@ -73,6 +73,7 @@ export function MediaUpdateLive({
   onChangeTags: draft.updateTags, onDiscard: draft.discard,
   onSave: () => { void draft.save() },
   onReload: () => { void draft.reload() },
+  onRefreshFailed: (id) => { void draft.refreshFailed(id) },
  }} />
 }
 
@@ -208,10 +209,15 @@ export function MediaUpdate({
                       key={item.id}
                       label={item.label}
                       detail={item.detail}
+                      supplementary={live && "error" in item && typeof item.error === "string" ? (
+                        <Button size="compact-xs" variant="subtle" color="orange" onClick={() => live.onRefreshFailed(item.id)}>
+                          {item.error === "conflict" ? "競合: 再取得" : "再取得して確認"}
+                        </Button>
+                      ) : undefined}
                       tags={item.tags}
                       selected={selectedIds.includes(item.id)}
                       selectable={!unavailable.has(item.id) && live?.status !== "loading" && live?.status !== "saving"}
-                      tagEditable={!unavailable.has(item.id) && live?.status !== "loading" && live?.status !== "saving"}
+                      tagEditable={!unavailable.has(item.id) && live?.status !== "loading" && live?.status !== "saving" && !("error" in item && item.error)}
                       action={
                         <Button
                           variant="subtle"
@@ -294,7 +300,7 @@ export function MediaUpdate({
                 <Button variant="default" onClick={() => live?.changed ? setLeavePrompt(true) : backToBrowser()}>キャンセル</Button>
                 <Button
                   loading={shownScenario === "saving"}
-                  disabled={shownScenario === "saved" || (live ? (!live.changed || live.status === "loading") : false)}
+                  disabled={shownScenario === "saved" || (live ? (!live.changed || live.status === "loading" || live.items.every((item) => !("error" in item) || Boolean(item.error))) : false)}
                   onClick={live?.onSave}
                 >
                   {shownScenario === "saved" ? "保存済み" : "変更を保存"}
