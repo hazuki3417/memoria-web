@@ -10,7 +10,7 @@ import {
 import {
   SettingsUsage,
   type SettingsUsageData,
-} from "@/features/settings"
+} from "@/features/usage"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   IconSettings,
