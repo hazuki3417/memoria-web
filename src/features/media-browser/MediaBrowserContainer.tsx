@@ -50,7 +50,8 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
   })
   const [pageError, setPageError] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
-  const snapshot = query.data ?? query.previousData
+  // Do not use previousData: it may belong to a different Personal / Community scope.
+  const snapshot = query.data
   const edges = snapshot?.mediaList.edges ?? []
   // Choose a suitable published variant by width, never by array position.
   const items: MediaItem[] = edges.map(({ node }) => ({
