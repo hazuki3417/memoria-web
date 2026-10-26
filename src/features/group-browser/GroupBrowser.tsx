@@ -627,7 +627,11 @@ export function GroupBrowser({
           </SplitView.Pane>
 
           <SplitView.Separator
-            style={{ visibility: selectedId ? "visible" : "hidden" }}
+            style={{
+              visibility: selectedId ? "visible" : "hidden",
+              width: selectedId ? 17 : 0,
+              flex: selectedId ? "0 0 17px" : "0 0 0px",
+            }}
           />
 
           <SplitView.Pane
