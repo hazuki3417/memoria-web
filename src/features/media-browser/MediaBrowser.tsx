@@ -119,6 +119,7 @@ function MediaBrowserContent({
   onAddToGroups,
   groupActionPending = false,
   groupActionError,
+  onRetryGroupOptions,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
@@ -140,6 +141,7 @@ function MediaBrowserContent({
   onAddToGroups?: (mediaIds: string[], groupIds: string[]) => Promise<boolean>
   groupActionPending?: boolean
   groupActionError?: string | null
+  onRetryGroupOptions?: () => void
 }) {
   const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -550,7 +552,14 @@ function MediaBrowserContent({
           <Text size="sm">
             {selected.size}件のMediaを選択したすべてのGroupに追加します。
           </Text>
-          {groupActionError && <Alert color="red" role="alert">{groupActionError}</Alert>}
+          {groupActionError && (
+            <Alert color="red" role="alert">
+              <Group justify="space-between">
+                <Text size="sm">{groupActionError}</Text>
+                {onRetryGroupOptions && <Button size="xs" variant="default" onClick={onRetryGroupOptions}>再試行</Button>}
+              </Group>
+            </Alert>
+          )}
           <MultiSelect
             label="Group"
             placeholder="Groupを選択"
