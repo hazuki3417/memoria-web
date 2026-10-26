@@ -300,7 +300,7 @@ export function MediaUpdate({
                 <Button variant="default" onClick={() => live?.changed ? setLeavePrompt(true) : backToBrowser()}>キャンセル</Button>
                 <Button
                   loading={shownScenario === "saving"}
-                  disabled={shownScenario === "saved" || (live ? (!live.changed || live.status === "loading" || live.items.every((item) => !("error" in item) || Boolean(item.error))) : false)}
+                  disabled={shownScenario === "saved" || (live ? (!live.changed || live.status === "loading" || live.items.every((item) => "error" in item && Boolean(item.error))) : false)}
                   onClick={live?.onSave}
                 >
                   {shownScenario === "saved" ? "保存済み" : "変更を保存"}
