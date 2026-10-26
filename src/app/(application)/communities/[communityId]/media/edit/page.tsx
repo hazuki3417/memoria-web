@@ -1,10 +1,16 @@
-import { MediaUpdate } from "@/features/media-update/MediaUpdate"
+import { MediaUpdateLive } from "@/features/media-update/MediaUpdate"
 
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: Promise<{ communityId: string }>
+  searchParams: Promise<{ mediaIds?: string }>
 }) {
   const { communityId } = await params
-  return <MediaUpdate context="community" communityId={communityId} />
+  const { mediaIds } = await searchParams
+  const ids = [...new Set((mediaIds ?? "").split(",").filter(Boolean))]
+  return <MediaUpdateLive context="community" communityId={communityId} targets={ids.map((id) => ({
+    id, label: id, detail: "",
+  }))} />
 }
