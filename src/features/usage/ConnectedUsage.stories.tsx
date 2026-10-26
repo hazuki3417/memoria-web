@@ -103,7 +103,7 @@ export const CommunityReady: Story = {
   name: "Interaction · Communityの取得成功",
   tags: ["interaction"],
   decorators: [(Story) => (
-    <MockedProvider mocks={[communitySuccess, communityPreferences("DECIMAL")]} addTypename={false}>
+    <MockedProvider mocks={[communitySuccess, communityPreferences("DECIMAL")]}>
       <Story />
     </MockedProvider>
   )],
@@ -121,7 +121,7 @@ export const CommunityBinary: Story = {
   name: "Interaction · CommunityのBinary表示",
   tags: ["interaction"],
   decorators: [(Story) => (
-    <MockedProvider mocks={[communitySuccess, communityPreferences("BINARY")]} addTypename={false}>
+    <MockedProvider mocks={[communitySuccess, communityPreferences("BINARY")]}>
       <Story />
     </MockedProvider>
   )],
@@ -151,7 +151,7 @@ export const CommunityEmpty: Story = {
           },
         },
       },
-    }, communityPreferences("DECIMAL")]} addTypename={false}>
+    }, communityPreferences("DECIMAL")]}>
       <Story />
     </MockedProvider>
   )],
@@ -174,7 +174,7 @@ export const CommunityRetry: Story = {
   name: "Interaction · Errorから再取得成功",
   tags: ["interaction"],
   decorators: [(Story) => (
-    <MockedProvider mocks={[communityFailure, communitySuccess, communityPreferences("DECIMAL")]} addTypename={false}>
+    <MockedProvider mocks={[communityFailure, communitySuccess, communityPreferences("DECIMAL")]}>
       <Story />
     </MockedProvider>
   )],
@@ -192,7 +192,7 @@ export const CommunityRetryFailure: Story = {
   name: "Interaction · 再試行して再失敗",
   tags: ["interaction"],
   decorators: [(Story) => (
-    <MockedProvider mocks={[communityFailure, communityFailure, communityPreferences("DECIMAL")]} addTypename={false}>
+    <MockedProvider mocks={[communityFailure, communityFailure, communityPreferences("DECIMAL")]}>
       <Story />
     </MockedProvider>
   )],
@@ -216,7 +216,7 @@ export const CommunitySwitch: Story = {
       { request: { query: CommunityUsageDocument, variables: { communityId: "club-b" } },
         result: { data: { communityUsage: otherCommunityUsage } } },
       communityPreferences("DECIMAL"),
-    ]} addTypename={false}>
+    ]}>
       <Story />
     </MockedProvider>
   )],
@@ -237,7 +237,7 @@ export const PersonalBinary: Story = {
   tags: ["interaction"],
   args: { scope: "personal", communityId: undefined },
   decorators: [(Story) => (
-    <MockedProvider mocks={[personalSuccess]} addTypename={false}>
+    <MockedProvider mocks={[personalSuccess]}>
       <Story />
     </MockedProvider>
   )],
