@@ -1,4 +1,4 @@
-import { MockedProvider } from "@apollo/client/testing"
+import { MockedProvider } from "@apollo/client/testing/react"
 import { Button } from "@mantine/core"
 import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
