@@ -55,6 +55,11 @@ type MediaBrowserState =
   | "selection"
 type ContextKind = "personal" | "community"
 type SelectionDialog = "group" | "share" | "delete" | null
+export type GroupActionResult = {
+  succeeded: number
+  alreadyApplied: number
+  failed: { mediaId: string; errorCode: string | null }[]
+}
 const media: MediaItem[] = [
   {
     id: "portrait-01",
@@ -120,6 +125,8 @@ function MediaBrowserContent({
   groupActionPending = false,
   groupActionError,
   onRetryGroupOptions,
+  groupActionResult,
+  onDismissGroupActionResult,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
@@ -142,6 +149,8 @@ function MediaBrowserContent({
   groupActionPending?: boolean
   groupActionError?: string | null
   onRetryGroupOptions?: () => void
+  groupActionResult?: GroupActionResult | null
+  onDismissGroupActionResult?: () => void
 }) {
   const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -179,7 +188,9 @@ function MediaBrowserContent({
       return
     }
     if (selected.size === 0 || groupTargets.length === 0 || groupActionPending) return
-    if (await onAddToGroups([...selected], groupTargets)) {
+    const targetIds = groupActionResult?.failed.map(item => item.mediaId) ?? [...selected]
+    if (targetIds.length === 0) return
+    if (await onAddToGroups(targetIds, groupTargets)) {
       setSelectionDialog(null)
       setGroupTargets([])
       endSelection()
@@ -523,7 +534,7 @@ function MediaBrowserContent({
 
       <Dialog
         opened={selectionDialog === "group"}
-        onClose={() => setSelectionDialog(null)}
+        onClose={() => { if (!groupActionPending) { setSelectionDialog(null); onDismissGroupActionResult?.() } }}
         title="Groupに追加"
         size="md"
         footer={
@@ -531,9 +542,10 @@ function MediaBrowserContent({
             secondary={
               <Button
                 variant="default"
-                onClick={() => setSelectionDialog(null)}
+                disabled={groupActionPending}
+                onClick={() => { setSelectionDialog(null); onDismissGroupActionResult?.() }}
               >
-                キャンセル
+                {groupActionResult ? "結果を閉じる" : "キャンセル"}
               </Button>
             }
             primary={
@@ -542,7 +554,7 @@ function MediaBrowserContent({
                 loading={groupActionPending}
                 onClick={() => void addToGroups()}
               >
-                追加
+                {groupActionResult ? "失敗したMediaを再試行" : "追加"}
               </Button>
             }
           />
@@ -560,13 +572,23 @@ function MediaBrowserContent({
               </Group>
             </Alert>
           )}
+          {groupActionResult && (
+            <Stack gap="xs">
+              <Text size="sm">追加成功: {groupActionResult.succeeded}件 / 既に追加済み: {groupActionResult.alreadyApplied}件 / 失敗: {groupActionResult.failed.length}件</Text>
+              {groupActionResult.failed.map(item => (
+                <Text key={item.mediaId} size="sm" c="red">
+                  {stateItems.find(media => media.id === item.mediaId)?.label ?? item.mediaId}：{item.errorCode === "NOT_FOUND" ? "Mediaが利用できません" : "追加できませんでした"}
+                </Text>
+              ))}
+            </Stack>
+          )}
           <MultiSelect
             label="Group"
             placeholder="Groupを選択"
             searchable
             data={groupOptions ?? ["旅行", "家族", "風景写真", "お気に入り"]}
             value={groupTargets}
-            onChange={setGroupTargets}
+            onChange={value => { setGroupTargets(value); onDismissGroupActionResult?.() }}
           />
         </Stack>
       </Dialog>
