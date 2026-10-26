@@ -18,7 +18,7 @@ import {
   IconFolder,
   IconPhoto,
 } from "@tabler/icons-react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import Link from "next/link"
 import { showNotification } from "@/components/Feedback"
 import { recentGroups, recentMedia } from "./dashboardData"
@@ -302,6 +302,7 @@ export function Dashboard({
   communityId = "photo-club",
   mediaItems,
   groupItems,
+  groupContent,
   mediaState,
   groupState,
   onRetryMedia,
@@ -312,6 +313,7 @@ export function Dashboard({
   communityId?: string
   mediaItems?: string[]
   groupItems?: DashboardGroup[]
+  groupContent?: ReactNode
   mediaState?: "loading" | "error" | "ready"
   groupState?: "loading" | "error" | "ready"
   onRetryMedia?: () => void
@@ -385,7 +387,7 @@ export function Dashboard({
           ) : noGroups ? (
             <EmptyState kind="group" href={groupsHref} />
           ) : (
-            <RecentGroups groups={groups} />
+            groupContent ?? <RecentGroups groups={groups} />
           )}
         </Stack>
       </Stack>
