@@ -1,9 +1,9 @@
 import {
   DEFAULT_THEME,
-  MantineSize,
   createTheme,
   mergeMantineTheme,
 } from "@mantine/core"
+import type { MantineSize } from "@mantine/core"
 
 declare module "@mantine/core" {
   export interface MantineThemeOther {
