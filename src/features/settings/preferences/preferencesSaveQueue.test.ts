@@ -74,4 +74,61 @@ describe("preferences save queue", () => {
       personalAccentColor: selectedColor,
     })
   })
+  it("keeps newer values when retrying after a failed save", async () => {
+    vi.useFakeTimers()
+    const save = vi.fn()
+      .mockRejectedValueOnce(new Error("network"))
+      .mockResolvedValue(defaultUserPreferences)
+    const queue = createPreferencesSaveQueue(save, vi.fn(), vi.fn())
+
+    queue.enqueue({ personalAccentColor: "#111111", mediaThumbnailSize: "SMALL" })
+    await vi.advanceTimersByTimeAsync(400)
+
+    queue.enqueue({ personalAccentColor: "#222222" })
+    await queue.flush()
+
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(save).toHaveBeenLastCalledWith({
+      personalAccentColor: "#222222",
+      mediaThumbnailSize: "SMALL",
+    })
+  })
+
+  it("saves changes queued during an in-flight request without dropping them", async () => {
+    vi.useFakeTimers()
+    let completeFirstSave: ((value: typeof defaultUserPreferences) => void) | undefined
+    const save = vi.fn()
+      .mockImplementationOnce(() => new Promise((resolve) => {
+        completeFirstSave = resolve
+      }))
+      .mockResolvedValue(defaultUserPreferences)
+    const queue = createPreferencesSaveQueue(save, vi.fn(), vi.fn())
+
+    queue.enqueue({ dateFormat: "DD_MM_YYYY" })
+    const draining = queue.flush()
+    expect(save).toHaveBeenCalledTimes(1)
+
+    queue.enqueue({ mediaDetailInitialInfoMedium: true })
+    completeFirstSave?.(defaultUserPreferences)
+    await draining
+
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(save).toHaveBeenNthCalledWith(1, { dateFormat: "DD_MM_YYYY" })
+    expect(save).toHaveBeenNthCalledWith(2, { mediaDetailInitialInfoMedium: true })
+  })
+
+  it("does not save new edits after disposal", async () => {
+    vi.useFakeTimers()
+    const save = vi.fn().mockResolvedValue(defaultUserPreferences)
+    const queue = createPreferencesSaveQueue(save, vi.fn(), vi.fn())
+
+    queue.enqueue({ mediaThumbnailSize: "LARGE" })
+    queue.dispose()
+    queue.enqueue({ mediaThumbnailSize: "SMALL" })
+    await vi.advanceTimersByTimeAsync(400)
+    await queue.flush()
+
+    expect(save).not.toHaveBeenCalled()
+  })
+
 })
