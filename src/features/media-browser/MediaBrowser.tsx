@@ -41,6 +41,7 @@ import { Dialog } from "@/components/Dialog"
 import { showNotification } from "@/components/Feedback"
 import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
 import { MediaTile } from "./MediaTile"
+import { MediaBrowserToolbar } from "./MediaBrowserToolbar"
 
 type MediaBrowserState =
   | "default"
@@ -234,176 +235,25 @@ function MediaBrowserContent({
     <>
       {
         <Stack gap={0} w="100%">
-          <Box
-            pb="xs"
-            style={{
-              display: "grid",
-              gridTemplateColumns: compact
-                ? "minmax(0, 1fr)"
-                : "minmax(0, 1fr) auto",
-              alignItems: "center",
-              gap: "var(--mantine-spacing-xs)",
+          <MediaBrowserToolbar
+            compact={compact}
+            selecting={selecting}
+            selected={selected}
+            tags={tags}
+            setTags={setTags}
+            onSubmitTags={() => {
+              setAppliedTags([...tags])
+              onApplyTags?.([...tags])
             }}
-          >
-            <Box style={{ minWidth: 0 }}>
-              {!selecting ? (
-                <Box
-                  component="form"
-                  onSubmit={(event) => {
-                    event.preventDefault()
-                    setAppliedTags([...tags])
-                    onApplyTags?.([...tags])
-                  }}
-                >
-                  <Group gap="xs" wrap="nowrap">
-                    <TagsInput
-                      placeholder="Tagを検索"
-                      value={tags}
-                      onChange={setTags}
-                      data={tagOptions}
-                      clearable
-                      leftSection={<IconSearch size={16} />}
-                      size="xs"
-                      w={compact ? "100%" : 280}
-                      maw="100%"
-                      style={{ flex: compact ? "1 1 auto" : undefined }}
-                      comboboxProps={{ withinPortal: true }}
-                    />
-                    <Button size="xs" type="submit" style={{ flexShrink: 0 }}>
-                      検索
-                    </Button>
-                  </Group>
-                </Box>
-              ) : (
-                <Badge size="lg" variant="light">
-                  {selected.size}件選択
-                </Badge>
-              )}
-            </Box>
-
-            <Group
-              gap="xs"
-              justify="flex-end"
-              wrap="nowrap"
-              style={{ gridColumn: compact ? "1" : undefined }}
-            >
-              {selecting && (
-                <>
-                  <Button
-                    size="xs"
-                    variant="default"
-                    leftSection={<IconEdit size={15} />}
-                    disabled={selected.size === 0}
-                    onClick={() =>
-                      navigate(
-                        context === "community"
-                          ? `/communities/${communityId}/media/edit?mediaIds=${encodeURIComponent([...selected].join(","))}`
-                          : `/media/edit?mediaIds=${encodeURIComponent([...selected].join(","))}`,
-                      )
-                    }
-                  >
-                    編集
-                  </Button>
-                  <Button
-                    size="xs"
-                    variant="default"
-                    leftSection={<IconFolderPlus size={15} />}
-                    disabled={selected.size === 0}
-                    onClick={() => setSelectionDialog("group")}
-                  >
-                    Group
-                  </Button>
-                  {context === "personal" && (
-                    <Button
-                      size="xs"
-                      variant="default"
-                      leftSection={<IconShare size={15} />}
-                      disabled={selected.size === 0}
-                      onClick={() => setSelectionDialog("share")}
-                    >
-                      共有
-                    </Button>
-                  )}
-                  <Button
-                    size="xs"
-                    variant="default"
-                    color="red"
-                    leftSection={<IconTrash size={15} />}
-                    disabled={selected.size === 0 || Boolean(items)}
-                    onClick={() => setSelectionDialog("delete")}
-                  >
-                    削除
-                  </Button>
-                </>
-              )}
-              {!selecting &&
-                (context === "personal" ? (
-                  <Button
-                    size="xs"
-                    leftSection={<IconCloudUpload size={16} />}
-                    onClick={() => navigate("/media/upload")}
-                  >
-                    アップロード
-                  </Button>
-                ) : (
-                  <Menu position="bottom-end">
-                    <Menu.Target>
-                      <Button
-                        size="xs"
-                        rightSection={<IconChevronDown size={14} />}
-                        leftSection={<IconPlus size={16} />}
-                      >
-                        Mediaを追加
-                      </Button>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item
-                        leftSection={<IconCloudUpload size={16} />}
-                        onClick={() =>
-                          navigate(`/communities/${communityId}/media/upload`)
-                        }
-                      >
-                        Communityへアップロード
-                      </Menu.Item>
-                      <Menu.Item leftSection={<IconShare size={16} />}>
-                        Personal Mediaから共有
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                ))}
-              <SegmentedControl
-                size="xs"
-                value={selecting ? "select" : "view"}
-                onChange={(value) => {
-                  if (value === "select") {
-                    setSelecting(true)
-                    return
-                  }
-                  endSelection()
-                }}
-                data={[
-                  {
-                    value: "view",
-                    label: (
-                      <Center style={{ gap: 6 }}>
-                        <IconEye size={15} />
-                        <span>View</span>
-                      </Center>
-                    ),
-                  },
-                  {
-                    value: "select",
-                    label: (
-                      <Center style={{ gap: 6 }}>
-                        <IconCheckbox size={15} />
-                        <span>Select</span>
-                      </Center>
-                    ),
-                  },
-                ]}
-              />
-            </Group>
-          </Box>
+            tagOptions={tagOptions}
+            context={context}
+            communityId={communityId}
+            hasRemoteItems={Boolean(items)}
+            navigate={navigate}
+            onSelectionDialog={setSelectionDialog}
+            onStartSelection={() => setSelecting(true)}
+            onEndSelection={endSelection}
+          />
           <Divider />
 
           {activeState === "loading" && (
