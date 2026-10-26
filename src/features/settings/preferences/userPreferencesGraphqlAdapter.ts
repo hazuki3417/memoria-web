@@ -9,9 +9,9 @@ import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 // GraphQLとの接続境界でのみGenerated Typeを使用する。
 type PreferencesProjection = {
   personalAccentColor: string
-  dateFormat: DateFormat
-  fileSizeUnit: FileSizeUnit
-  mediaThumbnailSize: MediaThumbnailSize
+  dateFormat: UserPreferences["dateFormat"]
+  fileSizeUnit: UserPreferences["fileSizeUnit"]
+  mediaThumbnailSize: UserPreferences["mediaThumbnailSize"]
   mediaDetailNavigationWrap: boolean
   mediaDetailInitialInfoWide: boolean
   mediaDetailInitialInfoMedium: boolean
@@ -34,31 +34,14 @@ const thumbnailSizes = {
   LARGE: MediaThumbnailSize.Large,
 } as const
 
-const dateFormatsFromGraphql: Record<DateFormat, UserPreferences["dateFormat"]> = {
-  [DateFormat.YyyyMmDd]: "YYYY_MM_DD",
-  [DateFormat.MmDdYyyy]: "MM_DD_YYYY",
-  [DateFormat.DdMmYyyy]: "DD_MM_YYYY",
-}
-
-const fileSizeUnitsFromGraphql: Record<FileSizeUnit, UserPreferences["fileSizeUnit"]> = {
-  [FileSizeUnit.Decimal]: "DECIMAL",
-  [FileSizeUnit.Binary]: "BINARY",
-}
-
-const thumbnailSizesFromGraphql: Record<MediaThumbnailSize, UserPreferences["mediaThumbnailSize"]> = {
-  [MediaThumbnailSize.Small]: "SMALL",
-  [MediaThumbnailSize.Medium]: "MEDIUM",
-  [MediaThumbnailSize.Large]: "LARGE",
-}
-
 export function fromGraphqlUserPreferences(
   preferences: PreferencesProjection,
 ): UserPreferences {
   return {
     personalAccentColor: preferences.personalAccentColor,
-    dateFormat: dateFormatsFromGraphql[preferences.dateFormat],
-    fileSizeUnit: fileSizeUnitsFromGraphql[preferences.fileSizeUnit],
-    mediaThumbnailSize: thumbnailSizesFromGraphql[preferences.mediaThumbnailSize],
+    dateFormat: preferences.dateFormat,
+    fileSizeUnit: preferences.fileSizeUnit,
+    mediaThumbnailSize: preferences.mediaThumbnailSize,
     mediaDetailNavigationWrap: preferences.mediaDetailNavigationWrap,
     mediaDetailInitialInfoWide: preferences.mediaDetailInitialInfoWide,
     mediaDetailInitialInfoMedium: preferences.mediaDetailInitialInfoMedium,
