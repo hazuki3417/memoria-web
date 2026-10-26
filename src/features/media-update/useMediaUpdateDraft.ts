@@ -17,7 +17,7 @@ export type MediaUpdateDraftItem = {
   tags: string[]
 }
 type SaveStatus = "idle" | "loading" | "saving" | "saved" | "partial-failure" | "load-failure"
-type LoadedItem = MediaUpdateDraftItem & {
+export type LoadedItem = MediaUpdateDraftItem & {
   original: string[]
   stateToken: string
   error?: string
@@ -83,9 +83,29 @@ export function useMediaUpdateDraft(
   }, [])
   const discard = useCallback((id: string) =>
     setItems((current) => current.filter((item) => item.id !== id)), [])
+  const refreshFailed = useCallback(async (id: string) => {
+    const response = await readMediaTagEditState(id, scope)
+    if (response.kind !== "ok") return
+    const catalogResponse = await listMediaUpdateTags(scope)
+    if (catalogResponse.kind !== "ok") return
+    const names = new Map(catalogResponse.value.map((tag) => [tag.id, tag.name]))
+    const original = response.value.tagIds.map((tagID) => names.get(tagID))
+    if (original.some((name) => name === undefined)) return
+    setCatalog(catalogResponse.value)
+    setItems((current) => current.map((item) =>
+      item.id === id ? {
+        ...item,
+        // Preserve the unsaved draft. A new token is only accepted after
+        // explicitly refreshing that Media; the user must review differences.
+        original: original as string[],
+        stateToken: response.value.stateToken,
+        error: undefined,
+      } : item))
+    setStatus("idle")
+  }, [scopeKey])
   const save = useCallback(async () => {
     if (status === "saving") return
-    const pending = items.filter((item) =>
+    const pending = items.filter((item) => !item.error &&
       item.tags.length !== item.original.length ||
       item.tags.some((name) => !item.original.includes(name)))
     if (!pending.length) return
@@ -106,5 +126,5 @@ export function useMediaUpdateDraft(
     }))
     setStatus(results.some((entry) => entry.result.kind !== "ok") ? "partial-failure" : "saved")
   }, [catalog, items, scope, status])
-  return { items, status, changed, updateTags, discard, save, reload: load }
+  return { items, status, changed, updateTags, discard, save, reload: load, refreshFailed }
 }
