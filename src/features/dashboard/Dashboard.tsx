@@ -22,6 +22,7 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { showNotification } from "@/components/Feedback"
 import { recentGroups, recentMedia } from "./dashboardData"
+import { GroupPreviewGrid } from "@/features/group-browser/GroupPreviewGrid"
 
 function MediaPage({
   items,
@@ -223,48 +224,46 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
   )
 }
 
-function RecentGroups() {
+export type DashboardGroup = { id: string; name: string; media: string[]; mediaCount: number }
+
+function RecentGroups({ groups }: { groups: DashboardGroup[] }) {
   return (
     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-      {recentGroups.map((group) => (
+      {groups.map((group) => (
         <Stack
-          key={group.name}
+          key={group.id}
           gap={8}
           p="xs"
           bdrs="md"
           bg="var(--mantine-color-default-hover)"
         >
-          <Text fw={600} size="sm">
-            {group.name}
-          </Text>
-          <SimpleGrid cols={2} spacing={4}>
-            {Array.from({ length: 4 }, (_, index) => {
-              const src = group.media[index]
-              return (
-                <Box
-                  key={index}
-                  bdrs="sm"
-                  style={{
-                    aspectRatio: "1 / 1",
-                    overflow: "hidden",
-                    background: "var(--mantine-color-default-hover)",
-                  }}
-                >
-                  {src ? (
-                    <Image src={src} alt="" w="100%" h="100%" fit="cover" />
-                  ) : (
-                    <Center h="100%">
-                      <IconPhoto size={20} stroke={1.5} />
-                    </Center>
-                  )}
-                </Box>
-              )
-            })}
-          </SimpleGrid>
+          <Text size="sm">{group.name}</Text>
+          <GroupPreviewGrid
+            count={group.mediaCount}
+            sources={group.media}
+            remote
+          />
         </Stack>
       ))}
     </SimpleGrid>
   )
+}
+
+function SectionFeedback({ state, onRetry, kind }: {
+  state: "loading" | "error"
+  onRetry?: () => void
+  kind: "media" | "group"
+}) {
+  return <Center mih={132}>
+    {state === "loading" ? (
+      <Text size="sm" c="dimmed" role="status">読み込み中です</Text>
+    ) : (
+      <Stack gap="xs" align="center" role="alert">
+        <Text size="sm" c="dimmed">{kind === "media" ? "メディア" : "Group"}を取得できませんでした</Text>
+        <Button variant="subtle" size="compact-sm" onClick={onRetry}>再試行</Button>
+      </Stack>
+    )}
+  </Center>
 }
 
 function EmptyState({ kind, href }: { kind: "media" | "group"; href: string }) {
@@ -301,10 +300,22 @@ export function Dashboard({
   empty = false,
   contextKind = "personal",
   communityId = "photo-club",
+  mediaItems,
+  groupItems,
+  mediaState,
+  groupState,
+  onRetryMedia,
+  onRetryGroups,
 }: {
   empty?: boolean
   contextKind?: "personal" | "community"
   communityId?: string
+  mediaItems?: string[]
+  groupItems?: DashboardGroup[]
+  mediaState?: "loading" | "error" | "ready"
+  groupState?: "loading" | "error" | "ready"
+  onRetryMedia?: () => void
+  onRetryGroups?: () => void
 }) {
   useEffect(() => {
     if (contextKind !== "personal") return
@@ -321,6 +332,10 @@ export function Dashboard({
     contextKind === "community" ? `/communities/${communityId}` : ""
   const mediaHref = `${prefix}/media`
   const groupsHref = `${prefix}/groups`
+  const media = mediaItems ?? recentMedia
+  const groups = groupItems ?? recentGroups.map((group, index) => ({ ...group, id: String(index), mediaCount: group.media.length }))
+  const noMedia = empty || (mediaState === "ready" && media.length === 0)
+  const noGroups = empty || (groupState === "ready" && groups.length === 0)
 
   return (
     <>
@@ -330,7 +345,7 @@ export function Dashboard({
             <Title order={3} size="h4">
               最近のメディア
             </Title>
-            {!empty && (
+            {!noMedia && mediaState !== "loading" && mediaState !== "error" && (
               <Button
                 variant="subtle"
                 size="compact-sm"
@@ -341,10 +356,12 @@ export function Dashboard({
               </Button>
             )}
           </Group>
-          {empty ? (
+          {mediaState === "loading" || mediaState === "error" ? (
+            <SectionFeedback state={mediaState} onRetry={onRetryMedia} kind="media" />
+          ) : noMedia ? (
             <EmptyState kind="media" href={mediaHref} />
           ) : (
-            <RecentMediaCarousel items={recentMedia} />
+            <RecentMediaCarousel key={contextKind + communityId} items={media.slice(0, 32)} />
           )}
         </Stack>
         <Stack gap="sm">
@@ -352,7 +369,7 @@ export function Dashboard({
             <Title order={3} size="h4">
               最近のGroup
             </Title>
-            {!empty && (
+            {!noGroups && groupState !== "loading" && groupState !== "error" && (
               <Button
                 variant="subtle"
                 size="compact-sm"
@@ -363,10 +380,12 @@ export function Dashboard({
               </Button>
             )}
           </Group>
-          {empty ? (
+          {groupState === "loading" || groupState === "error" ? (
+            <SectionFeedback state={groupState} onRetry={onRetryGroups} kind="group" />
+          ) : noGroups ? (
             <EmptyState kind="group" href={groupsHref} />
           ) : (
-            <RecentGroups />
+            <RecentGroups groups={groups} />
           )}
         </Stack>
       </Stack>
