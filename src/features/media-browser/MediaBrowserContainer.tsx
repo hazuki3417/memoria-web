@@ -1,12 +1,13 @@
 "use client"
 
-import { ScopeType, useMediaBrowserListQuery, useMediaBrowserTagsQuery } from "@/infrastructure/graphql/generated"
+import { BulkItemStatus, ScopeType, useAddBrowserMediaToGroupMutation, useBrowseGroupsQuery, useMediaBrowserListQuery, useMediaBrowserTagsQuery } from "@/infrastructure/graphql/generated"
 import { Alert, Button, Group, Text } from "@mantine/core"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { MediaBrowser } from "./MediaBrowser"
 import { selectBrowserThumbnail } from "./selectBrowserThumbnail"
 import { resolveTagFilter } from "./resolveTagFilter"
 import type { MediaItem } from "@/features/media-detail"
+import { showNotification } from "@/components/Feedback"
 
 export function MediaBrowserContainer({ contextKind = "personal", communityId }: {
   contextKind?: "personal" | "community"
@@ -96,6 +97,77 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
     skip,
     notifyOnNetworkStatusChange: true,
   })
+  const groupQuery = useBrowseGroupsQuery({
+    variables: { scope, first: 100 },
+    skip,
+    notifyOnNetworkStatusChange: true,
+  })
+  const [addToGroupMutation] = useAddBrowserMediaToGroupMutation()
+  const [groupActionPending, setGroupActionPending] = useState(false)
+  const [groupActionError, setGroupActionError] = useState<string | null>(null)
+  const groupsPage = groupQuery.data?.mediaGroups
+  const groupOptions = (groupsPage?.edges ?? []).map(({ node }) => ({
+    value: node.id, label: node.name,
+  }))
+  const addToGroups = useCallback(async (mediaIds: string[], groupIds: string[]): Promise<boolean> => {
+    if (groupActionPending || !mediaIds.length || !groupIds.length || !groupsPage ||
+        groupsPage.pageInfo.hasNextPage || groupQuery.error) return false
+    const available = new Set(groupsPage.edges.map(({ node }) => node.id))
+    if (!groupIds.every(id => available.has(id))) {
+      setGroupActionError("現在の範囲に存在するGroupを選択してください。")
+      return false
+    }
+    setGroupActionPending(true)
+    setGroupActionError(null)
+    try {
+      const results = await Promise.all(groupIds.map(groupId =>
+        addToGroupMutation({ variables: { input: { groupId, mediaIds } } })
+      ))
+      const failures = results.flatMap(result =>
+        (result.data?.addMediaToGroup.results ?? []).filter(item => item.status === BulkItemStatus.Failed))
+      if (failures.length || results.some(result => !result.data)) {
+        setGroupActionError("一部のMediaをGroupへ追加できませんでした。結果を確認して再試行してください。")
+        return false
+      }
+      showNotification({
+        kind: "success",
+        title: "Groupへの追加",
+        description: `${mediaIds.length}件のMediaを${groupIds.length}件のGroupへ追加しました。`,
+      })
+      return true
+    } catch {
+      setGroupActionError("Groupへの追加結果を確認できませんでした。再試行前に状態を確認してください。")
+      return false
+    } finally {
+      setGroupActionPending(false)
+    }
+  }, [groupActionPending, groupsPage, groupQuery.error, addToGroupMutation])
+
+  // Group results can span multiple pages. Only offer a complete list.
+  const groupCursor = groupsPage?.pageInfo.hasNextPage ? groupsPage.pageInfo.endCursor : null
+  const groupPageInFlight = useRef<string | null>(null)
+  const [groupPageFailure, setGroupPageFailure] = useState<string | null>(null)
+  useEffect(() => {
+    if (!groupCursor || skip || groupQuery.loading || groupQuery.error ||
+        groupPageFailure === scopeKey) return
+    const key = scopeKey + ":" + groupCursor
+    if (groupPageInFlight.current === key) return
+    groupPageInFlight.current = key
+    void groupQuery.fetchMore({
+      variables: { after: groupCursor },
+      updateQuery(previous, { fetchMoreResult }) {
+        if (!fetchMoreResult) return previous
+        const seen = new Set(previous.mediaGroups.edges.map(edge => edge.node.id))
+        return { mediaGroups: {
+          ...fetchMoreResult.mediaGroups,
+          edges: [...previous.mediaGroups.edges,
+            ...fetchMoreResult.mediaGroups.edges.filter(edge => !seen.has(edge.node.id))],
+        } }
+      },
+    }).catch(() => setGroupPageFailure(scopeKey))
+      .finally(() => { if (groupPageInFlight.current === key) groupPageInFlight.current = null })
+  }, [groupCursor, scopeKey, skip, groupQuery.loading, groupQuery.error, groupQuery.fetchMore, groupPageFailure])
+
   const [pageFailure, setPageFailure] = useState<string | null>(null)
   const [pageLoading, setPageLoading] = useState<string | null>(null)
   const pageInFlight = useRef<string | null>(null)
@@ -155,6 +227,12 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
       communityId={communityId}
       items={items}
       filterResetKey={scopeKey + ":" + selectedTagIds.join(",")}
+      groupOptions={groupQuery.loading || groupQuery.error || groupsPage?.pageInfo.hasNextPage || groupPageFailure === scopeKey ? [] : groupOptions}
+      onAddToGroups={addToGroups}
+      groupActionPending={groupActionPending}
+      groupActionError={groupActionError ?? (groupQuery.error || groupPageFailure === scopeKey
+        ? "Groupを取得できませんでした。"
+        : groupsPage?.pageInfo.hasNextPage || groupQuery.loading ? "Groupを読み込み中です。" : null)}
       tagOptions={allTagsLoaded ? [...tagsByName.keys()] : []}
       onApplyTags={applyTags}
       listState={query.error ? "error" : query.loading && !page ? "loading"
