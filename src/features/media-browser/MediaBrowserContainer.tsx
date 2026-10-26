@@ -15,7 +15,7 @@ const MEDIA_LIST = gql`
           id
           originalFileName
           processing { status }
-          image { variants { url } }
+          image { variants { url width } }
         }
       }
       pageInfo { hasNextPage endCursor }
@@ -29,7 +29,7 @@ type ListResult = {
       id: string
       originalFileName: string
       processing: { status: string } | null
-      image: { variants: { url: string }[] } | null
+      image: { variants: { url: string; width: number }[] } | null
     } }[]
     pageInfo: { hasNextPage: boolean; endCursor: string | null }
   }
@@ -51,11 +51,13 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
   const [loadingMore, setLoadingMore] = useState(false)
   const snapshot = query.data ?? query.previousData
   const edges = snapshot?.mediaList.edges ?? []
+  // Choose a suitable published variant by width, never by array position.
   const items: MediaItem[] = edges.map(({ node }) => ({
     id: node.id,
     label: node.originalFileName,
-    src: node.image?.variants[0]?.url ?? "",
-    failed: node.processing?.status === "FAILED" || !node.image?.variants[0]?.url,
+    src: [...(node.image?.variants ?? [])].sort((a, b) => a.width - b.width).find(v => v.width >= 320)?.url
+      ?? [...(node.image?.variants ?? [])].sort((a, b) => b.width - a.width)[0]?.url ?? "",
+    failed: node.processing?.status === "FAILED",
   }))
   const pageInfo = snapshot?.mediaList.pageInfo
 
