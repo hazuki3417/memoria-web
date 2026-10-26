@@ -40,9 +40,9 @@ const contexts = {
 }
 
 const initialItems = [
-  { id: "1", label: "IMG_1842.HEIC", detail: "8.4 MB", tags: ["旅行", "夏"] },
-  { id: "2", label: "IMG_1843.HEIC", detail: "7.9 MB", tags: ["旅行"] },
-  { id: "3", label: "sunset.webp", detail: "3.1 MB", tags: ["家族"] },
+  { id: "1", label: "Media 1", detail: "", tags: ["旅行", "夏"] },
+  { id: "2", label: "Media 2", detail: "", tags: ["旅行"] },
+  { id: "3", label: "Media 3", detail: "", tags: ["家族"] },
 ]
 
 type LiveProps = {
