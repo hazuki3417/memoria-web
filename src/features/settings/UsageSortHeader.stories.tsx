@@ -18,30 +18,30 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Unsorted: Story = {
-  name: "未ソート",
+  name: "Visual · 未ソート",
   tags: ["visual"],
 }
 
 export const Ascending: Story = {
-  name: "昇順",
+  name: "Visual · 昇順",
   tags: ["visual"],
   args: { direction: "asc" },
 }
 
 export const Descending: Story = {
-  name: "降順",
+  name: "Visual · 降順",
   tags: ["visual"],
   args: { direction: "desc" },
 }
 
 export const LeftAligned: Story = {
-  name: "形式列（左揃え）",
+  name: "Visual · 形式列（左揃え）",
   tags: ["visual"],
   args: { label: "形式", align: "left" },
 }
 
 export const Disabled: Story = {
-  name: "Loading時の操作不可",
+  name: "Visual · Loading時の操作不可",
   tags: ["visual"],
   args: { disabled: true },
 }

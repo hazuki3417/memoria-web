@@ -1,5 +1,7 @@
 "use client"
 
+import type { ReactNode } from "react"
+
 import { useEffect, useState } from "react"
 import {
   CommunityMembersContent,
@@ -55,6 +57,7 @@ export function CommunitySettings({
   onLeaveCommunity,
   onLeaveSuccess,
   fileSizeUnit = "DECIMAL",
+  usageContent,
 }: {
   role?: Role
   communityId?: string
@@ -68,6 +71,7 @@ export function CommunitySettings({
   onLeaveCommunity?: () => Promise<void>
   onLeaveSuccess?: () => void
   fileSizeUnit?: "DECIMAL" | "BINARY"
+  usageContent?: ReactNode
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -374,7 +378,7 @@ export function CommunitySettings({
     { format: "HEIC / HEIF", count: 48, sizeBytes: 40_000_000 },
   ],
 }
-  const usageContent = (
+  const defaultUsageContent = (
     <SettingsUsage scope="community" usage={communityUsage} fileSizeUnit={fileSizeUnit} />
   )
   const preferencesContent = (
@@ -408,7 +412,7 @@ export function CommunitySettings({
       : currentSection === "members"
         ? membersContent
         : currentSection === "usage"
-          ? usageContent
+          ? (usageContent ?? defaultUsageContent)
           : preferencesContent
 
   return (

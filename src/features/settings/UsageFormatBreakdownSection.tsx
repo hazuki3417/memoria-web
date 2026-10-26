@@ -10,6 +10,15 @@ import { UsageSortHeader } from "./UsageSortHeader"
 import { usagePercent } from "./usagePercent"
 import { usageFormatColors as formatColors } from "./usageFormatColors"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
+import type { UsageDisplayMode } from "./usageDisplayMode"
+
+// 取得成功の0件でも、分類を省略せず4形式の0件行を表示する。
+const zeroFormatBreakdown = [
+  { format: "JPEG", count: 0, sizeBytes: 0 },
+  { format: "PNG", count: 0, sizeBytes: 0 },
+  { format: "WebP", count: 0, sizeBytes: 0 },
+  { format: "HEIC / HEIF", count: 0, sizeBytes: 0 },
+]
 
 export function UsageFormatBreakdownSection({
   usage,
@@ -17,16 +26,23 @@ export function UsageFormatBreakdownSection({
   sort,
   onSort,
   fileSizeUnit,
+  displayMode = "size",
 }: {
   usage: SettingsUsageData
   status: UsageStatus
   sort: UsageSort
   onSort: (key: UsageSortKey) => void
   fileSizeUnit: FileSizeUnit
+  displayMode?: UsageDisplayMode
 }) {
   const sortedBreakdown = useMemo(
-    () => sortUsageFormats(usage.formatBreakdown ?? [], sort),
-    [usage.formatBreakdown, sort],
+    () => sortUsageFormats(
+      usage.mediaCount === 0 && !usage.formatBreakdown?.length
+        ? zeroFormatBreakdown
+        : usage.formatBreakdown ?? [],
+      sort,
+    ),
+    [usage.mediaCount, usage.formatBreakdown, sort],
   )
   const ariaSort = (key: UsageSortKey): "ascending" | "descending" | "none" => {
     if (sort?.key !== key) return "none"
@@ -60,39 +76,21 @@ export function UsageFormatBreakdownSection({
                 >
                   {sortHeader("count", "登録件数")}
                 </Table.Th>
-                <Table.Th
-                  ta="right"
-                  aria-sort={ariaSort("size")}
-                >
+                <Table.Th ta="right" aria-sort={ariaSort("size")}>
                   {sortHeader("size", "使用量")}
-                </Table.Th>
-                <Table.Th
-                  ta="right"
-                  aria-sort={ariaSort("percent")}
-                >
-                  {sortHeader("percent", "割合")}
                 </Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {status === "loading" && Array.from({ length: 4 }, (_, row) => (
                 <Table.Tr key={`loading-${row}`}>
-                  {Array.from({ length: 4 }, (_, column) => (
+                  {Array.from({ length: 3 }, (_, column) => (
                     <Table.Td key={column}>
                       <Skeleton h={16} radius="sm" />
                     </Table.Td>
                   ))}
                 </Table.Tr>
               ))}
-              {status === "ready" && sortedBreakdown.length === 0 && (
-                <Table.Tr>
-                  <Table.Td colSpan={4}>
-                    <Text size="sm" c="dimmed" ta="center" py="md">
-                      登録済みのオリジナルファイルはありません
-                    </Text>
-                  </Table.Td>
-                </Table.Tr>
-              )}
               {status === "ready" && sortedBreakdown.map((item) => (
                 <Table.Tr key={item.format}>
                   <Table.Td>
@@ -110,12 +108,17 @@ export function UsageFormatBreakdownSection({
                   <Table.Td ta="right">
                     {item.count.toLocaleString("ja-JP")} 件
                   </Table.Td>
-                  <Table.Td ta="right"><UsageFileSize bytes={item.sizeBytes} fileSizeUnit={fileSizeUnit} /></Table.Td>
-                  <Table.Td ta="right">{usagePercent(item.sizeBytes, usage.limitBytes)} %</Table.Td>
+                  <Table.Td ta="right">
+                    {displayMode === "size" ? (
+                      <UsageFileSize bytes={item.sizeBytes} fileSizeUnit={fileSizeUnit} />
+                    ) : (
+                      `${usagePercent(item.sizeBytes, usage.limitBytes)}%`
+                    )}
+                  </Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
-            {status === "ready" && (
+            {(status === "ready" || status === "loading") && (
               <Table.Tfoot
                 style={{
                   borderTop: "2px solid var(--mantine-color-default-border)",
@@ -123,11 +126,26 @@ export function UsageFormatBreakdownSection({
               >
                 <Table.Tr>
                   <Table.Th>合計</Table.Th>
-                  <Table.Th ta="right">
-                  {usage.mediaCount.toLocaleString("ja-JP")} 件
-                  </Table.Th>
-                  <Table.Th ta="right"><UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} /></Table.Th>
-                  <Table.Th ta="right">{usagePercent(usage.usedBytes, usage.limitBytes)} %</Table.Th>
+                  {status === "loading" ? (
+                    <>
+                      {["count", "value"].map((field) => (
+                        <Table.Th key={field} ta="right">
+                          <Skeleton h={16} radius="sm" />
+                        </Table.Th>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <Table.Th ta="right">{usage.mediaCount.toLocaleString("ja-JP")} 件</Table.Th>
+                      <Table.Th ta="right">
+                        {displayMode === "size" ? (
+                          <UsageFileSize bytes={usage.usedBytes} fileSizeUnit={fileSizeUnit} />
+                        ) : (
+                          `${usagePercent(usage.usedBytes, usage.limitBytes)}%`
+                        )}
+                      </Table.Th>
+                    </>
+                  )}
                 </Table.Tr>
               </Table.Tfoot>
             )}

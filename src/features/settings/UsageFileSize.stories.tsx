@@ -15,24 +15,24 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Decimal: Story = {
-  name: "Decimal（GB）",
+  name: "Visual · Decimal（GB）",
   tags: ["visual"],
 }
 
 export const Binary: Story = {
-  name: "Binary（GiB）",
+  name: "Visual · Binary（GiB）",
   tags: ["visual"],
   args: { fileSizeUnit: "BINARY" },
 }
 
 export const Zero: Story = {
-  name: "0 GB",
+  name: "Visual · 0 GB",
   tags: ["visual"],
   args: { bytes: 0 },
 }
 
 export const Small: Story = {
-  name: "小さいbyte数",
+  name: "Visual · 小さいbyte数",
   tags: ["visual"],
   args: { bytes: 1000 },
 }

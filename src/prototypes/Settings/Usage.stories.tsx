@@ -43,7 +43,7 @@ export const BinaryUnitContract: Story = {
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("4.66 GiB ( 100 % )")).toBeVisible()
+    await expect(canvas.getAllByText("4.66 GiB")[0]).toBeVisible()
     await expect(canvas.getAllByText("1.15 GiB").length).toBeGreaterThan(0)
     await expect(canvas.getByRole("button", { name: "使用量で並べ替え" })).toBeEnabled()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -128,7 +128,7 @@ export const RetryInteraction: Story = {
     )
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(canvas.getByRole("status", { name: "利用状況を読み込んでいます" })).toBeVisible()
-    await expect(await canvas.findByText("1.24 GB")).toBeVisible()
+    await expect(await canvas.findAllByText("1.24 GB").then((elements) => elements[0])).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
     await expect(canvas.getByRole("button", { name: "登録件数で並べ替え" })).toBeEnabled()
   },
@@ -162,9 +162,9 @@ export const LoadingContract: Story = {
     await expect(canvas.getByRole("status", { name: "利用状況を読み込んでいます" })).toBeVisible()
     await expect(canvas.getByText("使用済み")).toBeVisible()
     await expect(canvas.getByText("空き容量")).toBeVisible()
-    await expect(canvas.getByText("総容量")).toBeVisible()
+    await expect(canvas.getByText("容量上限")).toBeVisible()
     await expect(canvas.getByText("ファイル形式別内訳")).toBeVisible()
-    await expect(canvas.getAllByRole("columnheader")).toHaveLength(4)
+    await expect(within(canvas.getAllByRole("row")[0]).getAllByRole("columnheader")).toHaveLength(3)
     await expect(canvas.getByRole("button", { name: "登録件数で並べ替え" })).toBeDisabled()
     await expect(canvas.queryByText(/1\.24 GB/)).not.toBeInTheDocument()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -204,8 +204,8 @@ export const ZeroContract: Story = {
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("登録済みのオリジナルファイルはありません")).toBeVisible()
-    await expect(canvas.getByText("0 GB")).toBeVisible()
+    await expect(within(canvas.getByRole("table")).getAllByRole("row")).toHaveLength(6)
+    await expect(canvas.getAllByText("0 GB")[0]).toBeVisible()
     await expect(canvas.getByRole("button", { name: "登録件数で並べ替え" })).toBeEnabled()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
     await expect(canvas.queryByRole("status", { name: "利用状況を読み込んでいます" })).not.toBeInTheDocument()
@@ -250,9 +250,9 @@ export const LoadingTableContract: Story = {
     const canvas = within(canvasElement)
     const table = canvas.getByRole("table")
     const rows = within(table).getAllByRole("row")
-    await expect(rows).toHaveLength(5) // header + four placeholder rows; no total footer
-    await expect(within(table).getAllByRole("columnheader")).toHaveLength(4)
-    await expect(within(table).queryByText("合計")).not.toBeInTheDocument()
+    await expect(rows).toHaveLength(6) // header + four placeholder rows + total footer
+    await expect(within(rows[0]).getAllByRole("columnheader")).toHaveLength(3)
+    await expect(within(rows[5]).getByText("合計")).toBeVisible()
     await expect(canvas.queryByText("1.24 GB")).not.toBeInTheDocument()
     await expect(canvas.getByRole("heading", { name: "利用状況" })).toBeVisible()
     await expect(canvas.getByRole("button", { name: "形式で並べ替え" })).toBeDisabled()
@@ -266,7 +266,7 @@ export const ReadyContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("heading", { name: "利用状況" })).toBeVisible()
-    await expect(canvas.getByText("1.24 GB")).toBeVisible()
+    await expect(canvas.getAllByText("1.24 GB")[0]).toBeVisible()
     await expect(canvas.getByText("1,248 件")).toBeVisible()
     await expect(canvas.getByRole("button", { name: "形式で並べ替え" })).toBeEnabled()
     await expect(canvas.queryByRole("status", { name: "利用状況を読み込んでいます" })).not.toBeInTheDocument()
