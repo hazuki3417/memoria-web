@@ -1,12 +1,11 @@
 "use client"
 
 import { Box, Button, ColorInput, Select, Stack, Switch, useMantineColorScheme } from "@mantine/core"
-import { useState } from "react"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import { usePreferencesSave } from "./usePreferencesSave"
+import { useUserPreferences } from "./useUserPreferences"
 import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
 
 export function SettingsPreferences({
@@ -19,21 +18,14 @@ export function SettingsPreferences({
   onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
 }) {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
-  const [preferences, setPreferences] =
-    useState<UserPreferences>(initialPreferences)
-  const [accentDraft, setAccentDraft] = useState(
-    initialPreferences.personalAccentColor,
-  )
-  const { saveError, enqueue, retry } = usePreferencesSave(onSave)
-
-  const change = <K extends keyof UserPreferences>(
-    key: K,
-    value: UserPreferences[K],
-  ) => {
-    if (saveError === "blocked") return
-    setPreferences((current) => ({ ...current, [key]: value }))
-    enqueue({ [key]: value } as UserPreferencesPatch)
-  }
+  const {
+    preferences,
+    accentDraft,
+    change,
+    changeAccentDraft,
+    saveError,
+    retry,
+  } = useUserPreferences(initialPreferences, onSave)
   const dateFormat = preferences.dateFormat
   const fileSizeUnit = preferences.fileSizeUnit
   const loop = preferences.mediaDetailNavigationWrap
@@ -98,11 +90,7 @@ export function SettingsPreferences({
               aria-label="Personal Accent Color"
               format="hex"
               value={accentDraft}
-              onChange={(value) => {
-                setAccentDraft(value)
-                if (/^#[0-9a-fA-F]{6}$/.test(value))
-                  change("personalAccentColor", value.toUpperCase())
-              }}
+              onChange={changeAccentDraft}
             />
           </SettingRow>
           <SettingRow
