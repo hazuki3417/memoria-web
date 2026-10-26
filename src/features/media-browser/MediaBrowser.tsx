@@ -221,7 +221,10 @@ function MediaBrowserContent({
   return (
     <>
       {
-        <Stack gap={0} w="100%">
+        <Box
+          w="100%"
+          style={{ display: "flex", flexDirection: "column", minWidth: 0 }}
+        >
           <MediaBrowserToolbar
             compact={compact}
             selecting={selecting}
@@ -391,7 +394,7 @@ function MediaBrowserContent({
               </Group>
             </Paper>
           )}
-        </Stack>
+        </Box>
       }
 
       <Dialog
