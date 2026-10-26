@@ -10,7 +10,7 @@ const MOCK_PROFILE = { nickname: "ユーザー" }
 
 type ProfileSaveErrorKind = "retryable" | "blocked"
 type ProfileSaveError = { kind: ProfileSaveErrorKind }
-type SaveProfile = (nickname: string) => Promise<void>
+export type SaveProfile = (nickname: string) => Promise<void>
 
 async function saveMockProfile() {
   await new Promise((resolve) => setTimeout(resolve, 500))
