@@ -147,6 +147,13 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
   const groupCursor = groupsPage?.pageInfo.hasNextPage ? groupsPage.pageInfo.endCursor : null
   const groupPageInFlight = useRef<string | null>(null)
   const [groupPageFailure, setGroupPageFailure] = useState<string | null>(null)
+  const retryGroups = useCallback(() => {
+    setGroupPageFailure(null)
+    setGroupActionError(null)
+    void groupQuery.refetch().catch(() => {
+      // The existing error state is rendered in the Group dialog.
+    })
+  }, [groupQuery.refetch])
   useEffect(() => {
     if (!groupCursor || skip || groupQuery.loading || groupQuery.error ||
         groupPageFailure === scopeKey) return
@@ -255,6 +262,7 @@ export function MediaBrowserContainer({ contextKind = "personal", communityId }:
       groupOptions={groupQuery.loading || groupQuery.error || groupsPage?.pageInfo.hasNextPage || groupPageFailure === scopeKey ? [] : groupOptions}
       onAddToGroups={addToGroups}
       groupActionPending={groupActionPending}
+      onRetryGroupOptions={retryGroups}
       groupActionError={groupActionError ?? (groupQuery.error || groupPageFailure === scopeKey
         ? "Groupを取得できませんでした。"
         : groupsPage?.pageInfo.hasNextPage || groupQuery.loading ? "Groupを読み込み中です。" : null)}
