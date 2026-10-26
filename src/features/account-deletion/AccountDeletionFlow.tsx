@@ -80,7 +80,6 @@ export function AccountDeletionFlow({
   } = useAccountDeletionController({
     reviewState,
     communityScenario,
-    retryOutcome,
     mockScenario,
     prototype,
     onNavigateBack,
