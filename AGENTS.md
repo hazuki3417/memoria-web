@@ -38,7 +38,7 @@ Application Architectureの正本は `memoria-design/content/system/web/implemen
 
 - `src/app` はNext.jsのentry、routing、layout等を担当し、Product/Application Logicを蓄積しません。
 - Product Capabilityは `src/features` をownerとします。FeatureはURL hierarchyではなく独立したUser Purpose / Use Caseで分け、`src/features` 直下へkebab-caseでflatに配置します。Feature間の直接依存はtype-only importを含め原則として避けます。
-- Feature内部はflatをdefaultとし、`components` / `hooks` / `types` / `utils` 等のtechnical-type directoryを標準化しません。必要なnestingはresponsibility名で行います。
+- Feature内部はFrontendで把握しやすい責務・変更理由を起点に分類します。複数の独立したまとまりがある場合は意味を表すdirectoryへ近接配置し、一つの明確な責務に収まる小規模Featureではflat構成も許容します。`components` / `hooks` / `types` / `utils` 等のcode種別directoryは標準化しません。詳細は`memoria-design/content/system/web/implementation-conventions.mdx`を正本とします。
 - Feature rootの `index.ts` をPublic APIとし、外部consumerからFeature内部Fileへのdeep importを行いません。
 - Feature非依存のMemoria UI / Pattern実装は `src/ui` が所有します。再利用されるだけではFeature Componentを移動しません。`src/ui/<Component>/index.ts` をPublic APIとします。
 - GraphQL Client等の外部Integrationは `src/infrastructure` が所有し、`src/infrastructure/<integration>/index.ts` をPublic APIとします。
