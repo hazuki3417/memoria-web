@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect, useState } from "react"
 import {
   MyCommunitiesDocument,
+  useCurrentUserQuery,
   useMyCommunitiesQuery,
   useCreateCommunityMutation,
 } from "@/infrastructure/graphql/generated"
@@ -54,6 +55,7 @@ export function ApplicationShellContainer({
     loading: communitiesLoading,
     error: communitiesError,
   } = useMyCommunitiesQuery()
+  const { data: currentUserData } = useCurrentUserQuery()
   const [createMutation] = useCreateCommunityMutation()
   const created =
     communityData?.myCommunities.map((item) => ({
@@ -80,6 +82,10 @@ export function ApplicationShellContainer({
       : "personal"
   const communityId = communityMatch?.[1] ?? rememberedCommunityId
   const currentCreated = created.find((item) => item.id === communityId)
+  const resolvedPersonalContext = {
+    ...personalContext,
+    accentColor: currentUserData?.me?.preferences.personalAccentColor ?? personalContext.accentColor,
+  }
   const currentContext =
     contextKind === "community"
       ? {
@@ -90,7 +96,7 @@ export function ApplicationShellContainer({
             (communitiesLoaded ? "Community" : "読み込み中"),
           accentColor: currentCreated?.accentColor ?? communityContext.accentColor,
         }
-      : personalContext
+      : resolvedPersonalContext
   const activeSection = getApplicationSection(pathname)
   const navigationItems = getApplicationNavigation({
     contextKind,
@@ -243,7 +249,7 @@ export function ApplicationShellContainer({
                 <ApplicationContextSwitcher
                   currentContext={currentContext}
                   contexts={[
-                    personalContext,
+                    resolvedPersonalContext,
                     ...created.map((item) => ({
                       ...communityContext,
                       id: item.id,
