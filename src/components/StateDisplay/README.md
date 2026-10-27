@@ -1,19 +1,19 @@
 # State display component contract
 
-Media / Group Browser の Loading / Empty / Error は、共通の `StateDisplay` をレイアウト基盤として利用する。
+Media / Group Browser の Loading / Empty / Error は、共通の `StateDisplay` をレイアウト基盤として使用する。
 
-## Public interface
+## Public API
 
-- `LoadingState` / `EmptyState` / `ErrorState` は、いずれも `variant`, `icon`, `title`, `description`, `action` を中心としたAPIを提供する。
-- `variant="full"` は表示領域の中央に配置する。 `variant="inline"` は既存データを遮らない部分表示とする。
-- 各Featureが表示状態とアクションの実行条件を判断する。共通Componentはデータ取得や状態遷移を担当しない。
-- `LoadingState` は既定でLoaderを表示し、従来の追加読み込みの横並び・縦並びを `inlineLayout` で区別する。`inlineGap` / `inlinePadding` は既存UIの維持に必要な範囲のみ使用する。
-- `EmptyState` はアイコンとアクションを呼び出し元から受け取る。
-- `ErrorState` は既定のエラーアイコンと `role="alert"` を提供する。再試行は原則 `action` で渡す。既存Consumerの `onRetry` は互換として利用可能。
-- `LoadingState` の `status` は従来の `role="status"` が付いていた表示で維持する。
+- 各ラッパーは共通して `variant`, `title`, `description`, `action` を受け付ける。
+- `variant` は `full`（初回取得等の中央表示）と `inline`（一部のみの状態表示）に限る。レイアウトの `padding` / `gap` / `layout` は公開しない。
+- `LoadingState` はLoader、`role="status"`、表示サイズを内部で決める。
+- `EmptyState` は `kind="media" | "group" | "search" | "tags"` を受け取り、対応するアイコンと色を内部で決める。利用側はアイコン要素を渡さない。
+- `ErrorState` はエラーアイコン・色・`role="alert"` を内部で決める。再試行処理は `onRetry`、その他の操作は `action` で渡す。
+- `StateDisplay` は3種類に共通するレイアウト描画だけを担当する。状態判定、通信、イベント処理は各Featureが担当する。
+- `LoadingState` のInlineは共通の中央横並び表示とする。以前のGroup追加取得の縦並び・余白指定からのデザイン変更は意図的な統一として扱う。
 
-## Refactoring invariants
+## Regression contract
 
-- 既存Consumerの文言、アイコン、アクション、表示条件、スクロール・フォーカス・余白・Responsive Behaviorを合意なく変更しない。
-- 共通レイアウトの都合でFeature固有の情報やCapabilityを削らない。
-- 全ConsumerのTypeScript・Lint・Visual/Behavioral Regressionを検証し、実行できない検証は未実施として明記する。
+- 既存Consumerの文言、状態判定、再試行、管理権限、選択、フォーカス、スクロール等の振る舞いを維持する。
+- Emptyのアイコン種別は既存のMedia / Group / 検索 / Tagの表現を維持する。
+- 構造変更後は型・Lintに加えてVisual / Behavioral Regressionを検証し、未検証項目は明記する。
