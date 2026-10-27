@@ -33,6 +33,7 @@ export function ConnectedSettings({
     <Settings
       key={section}
       section={section}
+      personalAccentColor={data.me.preferences.personalAccentColor}
       profileNickname={data.me.profile.nickname}
       initialPreferences={preferences}
       saveProfile={async (nickname) => {
