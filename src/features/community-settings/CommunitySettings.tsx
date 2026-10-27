@@ -66,7 +66,11 @@ export function CommunitySettings({
   const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
   const [accent, setAccent] = useState("#7950f2")
-  const general = useCommunityGeneralSettings({ communityId, communityName })
+  const general = useCommunityGeneralSettings({
+    communityId,
+    communityName,
+    onSaveName,
+  })
 
   const sections = [
     {
@@ -99,7 +103,6 @@ export function CommunitySettings({
     <CommunityGeneralContent
       {...general}
       isAdmin={isAdmin}
-      onSaveName={onSaveName}
     />
   )
 
