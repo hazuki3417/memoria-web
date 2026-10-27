@@ -15,7 +15,16 @@ type GroupDetailToolbarProps = {
  onClose: () => void
 }
 
-export function GroupDetailToolbar({ compact, selected, headingRef: compactDetailHeadingRef, hideManagementActions, canManage, detailsReady, onEdit: openEdit, onClose: closeDetail }: GroupDetailToolbarProps) {
+export function GroupDetailToolbar({
+  compact,
+  selected,
+  headingRef: compactDetailHeadingRef,
+  hideManagementActions,
+  canManage,
+  detailsReady,
+  onEdit: openEdit,
+  onClose: closeDetail,
+}: GroupDetailToolbarProps) {
  return compact ? (
       <Box
         pb="xs"
