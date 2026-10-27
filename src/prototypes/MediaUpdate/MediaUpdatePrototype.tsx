@@ -1,4 +1,4 @@
-import { ApplicationContentScroll } from "@/components/ApplicationShell"
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
 
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
@@ -67,7 +67,7 @@ export function MediaUpdatePrototype({
         activeSection: "media",
       })}
     >
-      <ApplicationContentScroll>
+      <StandardPageScroll>
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
           {scenario === "load-failure" ? (
@@ -266,7 +266,7 @@ export function MediaUpdatePrototype({
           </Group>
         </Stack>
       </Modal>
-          </ApplicationContentScroll>
+          </StandardPageScroll>
 </PrototypeApplicationShell>
   )
 }
