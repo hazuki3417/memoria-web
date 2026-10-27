@@ -45,12 +45,29 @@ export function GroupDetailPane({
 }: GroupDetailPaneProps) {
   return compact ? (
     <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
-      <GroupDetailToolbar compact={compact} selected={selected} headingRef={compactDetailHeadingRef} hideManagementActions={hideManagementActions} canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} />
+      <GroupDetailToolbar
+        compact={compact}
+        selected={selected}
+        headingRef={compactDetailHeadingRef}
+        hideManagementActions={hideManagementActions}
+        canManage={canManage}
+        detailsReady={detailsReady}
+        onEdit={openEdit}
+        onClose={closeDetail}
+      />
       <Divider />
       {relationCandidateFeedback}
       {relationDetailSection}
       <Divider />
-      <GroupDetailMediaContent selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData} onRetryGroupMedia={onRetryGroupMedia} onOpenMedia={openMediaAt} mediaPageFeedback={mediaPageFeedback} onMediaEndVisible={onMediaEndVisible} />
+      <GroupDetailMediaContent
+        selected={selected}
+        mediaDetailState={mediaDetailState}
+        mediaItemsData={mediaItemsData}
+        onRetryGroupMedia={onRetryGroupMedia}
+        onOpenMedia={openMediaAt}
+        mediaPageFeedback={mediaPageFeedback}
+        onMediaEndVisible={onMediaEndVisible}
+      />
     </Box>
   ) : (
     <Box
@@ -62,14 +79,31 @@ export function GroupDetailPane({
         height: "100%",
       }}
     >
-      <GroupDetailToolbar compact={compact} selected={selected} headingRef={compactDetailHeadingRef} hideManagementActions={hideManagementActions} canManage={canManage} detailsReady={detailsReady} onEdit={openEdit} onClose={closeDetail} />
+      <GroupDetailToolbar
+        compact={compact}
+        selected={selected}
+        headingRef={compactDetailHeadingRef}
+        hideManagementActions={hideManagementActions}
+        canManage={canManage}
+        detailsReady={detailsReady}
+        onEdit={openEdit}
+        onClose={closeDetail}
+      />
       <Divider />
       {relationCandidateFeedback}
 
       {relationDetailSection}
       <Divider />
 
-      <GroupDetailMediaContent selected={selected} mediaDetailState={mediaDetailState} mediaItemsData={mediaItemsData} onRetryGroupMedia={onRetryGroupMedia} onOpenMedia={openMediaAt} mediaPageFeedback={mediaPageFeedback} onMediaEndVisible={onMediaEndVisible} />
+      <GroupDetailMediaContent
+        selected={selected}
+        mediaDetailState={mediaDetailState}
+        mediaItemsData={mediaItemsData}
+        onRetryGroupMedia={onRetryGroupMedia}
+        onOpenMedia={openMediaAt}
+        mediaPageFeedback={mediaPageFeedback}
+        onMediaEndVisible={onMediaEndVisible}
+      />
     </Box>
   )
 }
