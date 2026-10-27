@@ -33,7 +33,6 @@ export function GroupDetailToolbar({
           gridTemplateColumns: "minmax(0, 1fr) auto",
           alignItems: "center",
           minHeight: "calc(32px + var(--mantine-spacing-xs))",
-        minHeight: "calc(32px + var(--mantine-spacing-xs))",
           gap: "var(--mantine-spacing-xs)",
         }}
       >
@@ -64,7 +63,6 @@ export function GroupDetailToolbar({
           gridTemplateColumns: "minmax(0, 1fr) auto",
           alignItems: "center",
           minHeight: "calc(32px + var(--mantine-spacing-xs))",
-        minHeight: "calc(32px + var(--mantine-spacing-xs))",
           gap: "var(--mantine-spacing-xs)",
         }}
       >
