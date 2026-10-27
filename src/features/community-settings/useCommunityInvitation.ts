@@ -65,5 +65,16 @@ export function useCommunityInvitation(communityId: string) {
     }
   }
 
-  return { invitation, invitationUrl, expiresAt, active, busy, issue, copyInvitation, confirm, setConfirm, changeInvitation }
+  return {
+    invitation,
+    invitationUrl,
+    expiresAt,
+    active,
+    busy,
+    issue,
+    copyInvitation,
+    confirm,
+    setConfirm,
+    changeInvitation,
+  }
 }
