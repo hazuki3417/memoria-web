@@ -8,9 +8,11 @@ import { SectionHeader } from "@/components/SectionHeader"
 export function CommunityPreferencesContent({
   accent,
   setAccent,
+  isPreview = true,
 }: {
   accent: string
   setAccent: Dispatch<SetStateAction<string>>
+  isPreview?: boolean
 }) {
   return (
     <Stack gap="xl">
@@ -22,7 +24,9 @@ export function CommunityPreferencesContent({
         <SectionHeader>アクセントカラー</SectionHeader>
         <Stack gap="sm" maw={540}>
           <Text size="sm" c="dimmed">
-            色の選択はプレビューです。保存・Contextへの反映はまだ行われません。
+            {isPreview
+              ? "色の選択はプレビューです。保存・Contextへの反映はまだ行われません。"
+              : "選んだ色は自分のCommunity設定に自動保存されます。"}
           </Text>
           <Group gap="sm">
             <input
