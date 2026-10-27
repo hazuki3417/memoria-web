@@ -2,7 +2,7 @@
 
 import { Text } from "@mantine/core"
 import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
-import type { ReactNode } from "react"
+import { useEffect, type ReactNode } from "react"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
@@ -32,8 +32,13 @@ export function CommunitySettingsRoute({
   usageContent?: ReactNode
 }) {
   const router = useRouter()
-  const { data: accentData } = useMyCommunitiesQuery()
-  const communityAccentColor = accentData?.myCommunities.find((item) => item.id === communityId)?.mySettings.accentColor
+  const { data: accentData, loading: accentLoading, error: accentError } = useMyCommunitiesQuery()
+  const activeMembership = accentData?.myCommunities.find((item) => item.id === communityId)
+  const communityAccentColor = activeMembership?.mySettings.accentColor
+  const membershipLost = section === "preferences" && !accentLoading && !accentError && !!accentData && !activeMembership
+  useEffect(() => {
+    if (membershipLost) router.replace("/dashboard")
+  }, [membershipLost, router])
   // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
   const requiresMembers = section === "members" || section === "general"
   const { name, members, loadError, membersError } = useCommunity({
@@ -49,6 +54,8 @@ export function CommunitySettingsRoute({
     !(requiresMembers && membersError) &&
     (name === null || (requiresMembers && members === null))
 
+  if (membershipLost)
+    return <LoadingBoundary loading label="Communityの利用権限を確認中">{null}</LoadingBoundary>
   if (loadError)
     return (
       <Text c="red">
