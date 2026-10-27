@@ -4,7 +4,7 @@ import { fn } from "storybook/test"
 import { MediaTile } from "./MediaTile"
 
 type Item = ComponentProps<typeof MediaTile>["item"]
-const ready = { id: "media-1", label: "旅行の写真", src: "/storybook-assets/sample.jpg" } as Item
+const ready = { id: "media-1", label: "旅行の写真", src: "/media-browser/h-01.png" } as Item
 
 const meta = {
   title: "Features/Media Browser/MediaTile",
