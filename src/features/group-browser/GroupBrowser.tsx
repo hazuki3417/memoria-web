@@ -4,16 +4,13 @@ import {
   Alert,
   Box,
   Button,
-  Divider,
   Group,
   Center,
   Loader,
-  ScrollArea,
   SimpleGrid,
   Stack,
   Text,
   ThemeIcon,
-  UnstyledButton,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
@@ -27,18 +24,16 @@ import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupDetailPane } from "./GroupDetailPane"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
-import { LoadMoreSentinel } from "./LoadMoreSentinel"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
 import { GroupDeleteDialog } from "./GroupDeleteDialog"
 import { GroupCreateDialog } from "./GroupCreateDialog"
 import { GroupEditDialog } from "./GroupEditDialog"
-import { GroupBrowserToolbar } from "./GroupBrowserToolbar"
+import { GroupBrowserListPane } from "./GroupBrowserListPane"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { filterVisibleGroups } from "./groupSearch"
 import { useGroupSearchState } from "./useGroupSearchState"
 import { useGroupNavigation } from "./useGroupNavigation"
 import { useGroupCreateController } from "./useGroupCreateController"
-import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
 
 export type GroupBrowserGroup = {
   id: string
@@ -446,12 +441,8 @@ export function GroupBrowser({
       {compact ? (
         <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
           {compactView === "groups" ? (
-            <Box
-              h="100%"
-              style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
-            >
-              <GroupBrowserToolbar
-                compact={compact}
+<GroupBrowserListPane
+                compact={true}
                 query={query}
                 onQueryChange={setQuery}
                 onSearch={() => setAppliedQuery(query)}
@@ -459,65 +450,20 @@ export function GroupBrowser({
                 hideManagementActions={hideManagementActions}
                 canManage={canManage}
                 onCreate={openCreate}
+                visibleGroups={visibleGroups}
+                discoveryState={discoveryState}
+                groupsLoaded={groupsData !== undefined}
+                selectedId={selectedId}
+                mediaItemsData={mediaItemsData}
+                compactGroupItemRefs={compactGroupItemRefs}
+                onOpenDetail={openDetail}
+                discoveryFeedback={discoveryFeedback}
+                emptyGroupState={emptyGroupState}
+                searchEmptyState={searchEmptyState}
+                discoveryPageFeedback={discoveryPageFeedback}
+                discoveryPageState={discoveryPageState}
+                onDiscoveryEndVisible={onDiscoveryEndVisible}
               />
-              <Divider />
-              <ScrollArea flex={1}>
-                {discoveryFeedback}
-                {emptyGroupState}
-                {searchEmptyState}
-                <Box
-                  p="sm"
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "var(--mantine-spacing-sm)",
-                  }}
-                >
-                  {(discoveryState === "ready" ? visibleGroups : []).map(
-                    (group) => (
-                      <UnstyledButton
-                        key={group.id}
-                        ref={(element) => {
-                          if (element)
-                            compactGroupItemRefs.current.set(group.id, element)
-                          else compactGroupItemRefs.current.delete(group.id)
-                        }}
-                        onClick={() => openDetail(group.id)}
-                        p="xs"
-                        bdrs="sm"
-                        w={240}
-                      >
-                        <Stack gap={6}>
-                          <Text
-                            fw={600}
-                            size="sm"
-                            truncate="end"
-                            title={group.name}
-                          >
-                            {group.name}
-                          </Text>
-                          <PreviewGrid
-                            count={group.previewCount}
-                            remote={groupsData !== undefined}
-                            sources={
-                              group.id === selectedId
-                                ? (mediaItemsData ?? []).flatMap((item) =>
-                                    item.src ? [item.src] : [],
-                                  )
-                                : []
-                            }
-                          />
-                        </Stack>
-                      </UnstyledButton>
-                    ),
-                  )}
-                </Box>
-                {discoveryPageFeedback}
-                {onDiscoveryEndVisible && discoveryPageState !== "error" && (
-                  <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />
-                )}
-              </ScrollArea>
-            </Box>
           ) : (
             <GroupDetailPane
               compact
@@ -547,83 +493,29 @@ export function GroupBrowser({
           style={{ height: "calc(100vh - 88px)" }}
         >
           <SplitView.Pane id="groups" minWidth={264}>
-            <Box
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
-                minHeight: 0,
-              }}
-            >
-              <GroupBrowserToolbar
-                compact={compact}
+<GroupBrowserListPane
+                compact={false}
                 query={query}
                 onQueryChange={setQuery}
                 onSearch={() => setAppliedQuery(query)}
+                
                 hideManagementActions={hideManagementActions}
                 canManage={canManage}
                 onCreate={openCreate}
+                visibleGroups={visibleGroups}
+                discoveryState={discoveryState}
+                groupsLoaded={groupsData !== undefined}
+                selectedId={selectedId}
+                mediaItemsData={mediaItemsData}
+                compactGroupItemRefs={compactGroupItemRefs}
+                onOpenDetail={openDetail}
+                discoveryFeedback={discoveryFeedback}
+                emptyGroupState={emptyGroupState}
+                searchEmptyState={searchEmptyState}
+                discoveryPageFeedback={discoveryPageFeedback}
+                discoveryPageState={discoveryPageState}
+                onDiscoveryEndVisible={onDiscoveryEndVisible}
               />
-              <Divider />
-              <ScrollArea flex={1}>
-                {discoveryFeedback}
-                {emptyGroupState}
-                {searchEmptyState}
-                <Box
-                  p="sm"
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "var(--mantine-spacing-sm)",
-                  }}
-                >
-                  {(discoveryState === "ready" ? visibleGroups : []).map(
-                    (group) => {
-                      const selectedItem = group.id === selectedId
-                      return (
-                        <UnstyledButton
-                          key={group.id}
-                          onClick={() => openDetail(group.id)}
-                          aria-pressed={selectedItem}
-                          w={240}
-                          p="xs"
-                          bdrs="sm"
-                          bg={
-                            selectedItem
-                              ? "var(--mantine-color-default-hover)"
-                              : undefined
-                          }
-                          style={{
-                            border: selectedItem
-                              ? "1px solid var(--mantine-primary-color-filled)"
-                              : "1px solid transparent",
-                          }}
-                        >
-                          <Stack gap={6}>
-                            <Text
-                              fw={600}
-                              size="sm"
-                              truncate="end"
-                              title={group.name}
-                            >
-                              {group.name}
-                            </Text>
-                            <PreviewGrid
-                              count={group.previewCount}
-                              remote={groupsData !== undefined}
-                            />
-                          </Stack>
-                        </UnstyledButton>
-                      )
-                    },
-                  )}
-                </Box>
-                {discoveryPageFeedback}
-                {onDiscoveryEndVisible && discoveryPageState !== "error" && (
-                  <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />
-                )}
-              </ScrollArea>
-            </Box>
           </SplitView.Pane>
 
           <SplitView.Separator
