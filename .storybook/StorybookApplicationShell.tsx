@@ -1,5 +1,6 @@
-import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
+
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 
 import { useState, type ReactNode } from "react"
 import {
