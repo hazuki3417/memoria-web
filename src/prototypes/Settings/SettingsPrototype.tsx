@@ -1,4 +1,4 @@
-import { ApplicationContentScroll } from "@/components/ApplicationShell"
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
 
 import { useState, type ReactNode } from "react"
@@ -207,7 +207,7 @@ export function SettingsPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <ApplicationContentScroll>
+      <StandardPageScroll>
       <SettingsLayout section={section} onSectionChange={setSection}>
         {content}
       </SettingsLayout>
@@ -222,7 +222,7 @@ export function SettingsPrototype({
       >
         現在の設定: {currentLabel}
       </Text>
-          </ApplicationContentScroll>
+          </StandardPageScroll>
 </PrototypeApplicationShell>
   )
 }
