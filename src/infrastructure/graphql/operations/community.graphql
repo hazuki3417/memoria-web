@@ -45,3 +45,16 @@ query CommunityUsage($communityId: ID!) {
     formatBreakdown { format mediaCount usedBytes }
   }
 }
+
+query CommunityMySettings($communityId: ID!) {
+  community(communityId: $communityId) {
+    id
+    mySettings { accentColor }
+  }
+}
+
+mutation UpdateCommunitySettings($input: UpdateCommunitySettingsInput!) {
+  updateCommunitySettings(input: $input) {
+    settings { accentColor }
+  }
+}
