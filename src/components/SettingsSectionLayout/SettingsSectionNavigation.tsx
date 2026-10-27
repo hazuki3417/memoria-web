@@ -7,7 +7,7 @@ import { NavigationItem } from "@/components/NavigationItem"
 export type SettingsSectionItem<Section extends string> = {
   id: Section
   label: string
-  icon: ComponentType<{ size?: number | string }>
+  icon: ComponentType<{ size?: number; stroke?: number; "aria-hidden"?: boolean }>
 }
 
 export type SettingsSectionNavigationProps<Section extends string> = {
@@ -15,6 +15,7 @@ export type SettingsSectionNavigationProps<Section extends string> = {
   sections: readonly SettingsSectionItem<Section>[]
   compact: boolean
   ariaLabel: string
+  desktopAriaLabel: string
   accentColor: string
   onSectionChange: (section: Section) => void
 }
@@ -24,6 +25,7 @@ export function SettingsSectionNavigation<Section extends string>({
   sections,
   compact,
   ariaLabel,
+  desktopAriaLabel,
   accentColor,
   onSectionChange,
 }: SettingsSectionNavigationProps<Section>) {
@@ -50,7 +52,7 @@ export function SettingsSectionNavigation<Section extends string>({
   }
 
   return (
-    <Box component="nav" aria-label={ariaLabel === "設定画面" ? "設定" : "Community設定"} w={200} style={{ flexShrink: 0 }}>
+    <Box component="nav" aria-label={desktopAriaLabel} w={200} style={{ flexShrink: 0 }}>
       <Text size="xs" fw={700} c="dimmed" mb="xs">
         設定
       </Text>
