@@ -1,9 +1,6 @@
 "use client"
 
-import {
-  Box,
-  Group,
-} from "@mantine/core"
+import { Box } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { AnimatePresence, motion } from "framer-motion"
 import { useMemo, useState } from "react"
@@ -11,7 +8,6 @@ import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
 import { validGroupName } from "./groupName"
-import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupDetailPane } from "./GroupDetailPane"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
@@ -327,7 +323,7 @@ export function GroupBrowser({
       {compact ? (
         <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
           {compactView === "groups" ? (
-<GroupBrowserListPane
+            <GroupBrowserListPane
                 compact={true}
                 query={query}
                 onQueryChange={setQuery}
@@ -345,7 +341,10 @@ export function GroupBrowser({
                 onOpenDetail={openDetail}
                 groupCount={allGroups.length}
                 appliedQuery={appliedQuery}
-                onClearSearch={() => { setQuery(""); setAppliedQuery("") }}
+                onClearSearch={() => {
+                  setQuery("")
+                  setAppliedQuery("")
+                }}
                 onRetryDiscovery={onRetryDiscovery}
                 onRetryDiscoveryPage={onRetryDiscoveryPage}
                 discoveryPageState={discoveryPageState}
@@ -380,7 +379,7 @@ export function GroupBrowser({
           style={{ height: "calc(100vh - 88px)" }}
         >
           <SplitView.Pane id="groups" minWidth={264}>
-<GroupBrowserListPane
+            <GroupBrowserListPane
                 compact={false}
                 query={query}
                 onQueryChange={setQuery}
