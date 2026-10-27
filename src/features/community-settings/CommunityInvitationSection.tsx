@@ -1,10 +1,50 @@
 "use client"
-import { ActionIcon, Badge, Box, Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
+
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Group,
+  Modal,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core"
 import { IconCopy } from "@tabler/icons-react"
 import type { Dispatch, SetStateAction } from "react"
 import { SectionHeader } from "@/components/SectionHeader"
-export type CommunityInvitationSectionProps = { isAdmin: boolean; active: boolean; invitation: "none"|"active"|"expired"|"revoked"; invitationUrl: string; expiresAt: string; busy: boolean; issue: () => void; copyInvitation: () => Promise<void>; confirm: "reissue"|"revoke"|null; setConfirm: Dispatch<SetStateAction<"reissue"|"revoke"|null>>; changeInvitation: () => void }
-export function CommunityInvitationSection({ isAdmin, active, invitation, invitationUrl, expiresAt, busy, issue, copyInvitation, confirm, setConfirm, changeInvitation }: CommunityInvitationSectionProps) {
+
+type InvitationState = "none" | "active" | "expired" | "revoked"
+type Confirmation = "reissue" | "revoke" | null
+
+export type CommunityInvitationSectionProps = {
+  isAdmin: boolean
+  active: boolean
+  invitation: InvitationState
+  invitationUrl: string
+  expiresAt: string
+  busy: boolean
+  issue: () => void
+  copyInvitation: () => Promise<void>
+  confirm: Confirmation
+  setConfirm: Dispatch<SetStateAction<Confirmation>>
+  changeInvitation: () => void
+}
+
+export function CommunityInvitationSection({
+  isAdmin,
+  active,
+  invitation,
+  invitationUrl,
+  expiresAt,
+  busy,
+  issue,
+  copyInvitation,
+  confirm,
+  setConfirm,
+  changeInvitation,
+}: CommunityInvitationSectionProps) {
   return (
     <>
       <Box>
