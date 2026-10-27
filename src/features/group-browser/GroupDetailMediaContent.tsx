@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { Alert, Box, Button, Center, Loader, ScrollArea, Stack, Text, ThemeIcon } from "@mantine/core"
+import { Alert, Box, Button, Center, Loader, Stack, Text, ThemeIcon } from "@mantine/core"
 import { IconPhoto } from "@tabler/icons-react"
 import { MediaGrid } from "./MediaGrid"
 import { LoadMoreSentinel } from "./LoadMoreSentinel"
@@ -25,7 +25,6 @@ export function GroupDetailMediaContent({
   onMediaEndVisible,
 }: GroupDetailMediaContentProps) {
  return (
-      <ScrollArea flex={1}>
         <Box p="sm">
           {mediaDetailState === "loading" ? (
             <Center mih={360}>
@@ -75,6 +74,5 @@ export function GroupDetailMediaContent({
             </>
           )}
         </Box>
-      </ScrollArea>
  )
 }
