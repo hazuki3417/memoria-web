@@ -15,7 +15,6 @@ import { IconCopy } from "@tabler/icons-react"
 import type { Dispatch, SetStateAction } from "react"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
-import { showNotification } from "@/components/Feedback"
 
 type InvitationState = "none" | "active" | "expired" | "revoked"
 type Confirmation = "reissue" | "revoke" | null
@@ -28,9 +27,7 @@ export type CommunityGeneralContentProps = {
   invalid: boolean
   dirty: boolean
   savingName: boolean
-  setSavingName: Dispatch<SetStateAction<boolean>>
-  setName: Dispatch<SetStateAction<string>>
-  onSaveName?: (name: string) => Promise<boolean>
+  saveName: () => void
   active: boolean
   invitation: InvitationState
   invitationUrl: string
@@ -51,9 +48,7 @@ export function CommunityGeneralContent({
   invalid,
   dirty,
   savingName,
-  setSavingName,
-  setName,
-  onSaveName,
+  saveName,
   active,
   invitation,
   invitationUrl,
@@ -89,33 +84,7 @@ export function CommunityGeneralContent({
                 size="sm"
                 disabled={!dirty || invalid || savingName}
                 loading={savingName}
-                onClick={() => {
-                  if (savingName) return
-                  const updated = draft.trim()
-                  if (!onSaveName) {
-                    setName(updated)
-                    setDraft(updated)
-                    showNotification({
-                      kind: "success",
-                      title: "Community名を変更",
-                      description: "Community名を変更しました。",
-                    })
-                    return
-                  }
-                  setSavingName(true)
-                  void onSaveName(updated)
-                    .then((saved) => {
-                      if (!saved) return
-                      setName(updated)
-                      setDraft(updated)
-                      showNotification({
-                        kind: "success",
-                        title: "Community名を変更",
-                        description: "Community名を変更しました。",
-                      })
-                    })
-                    .finally(() => setSavingName(false))
-                }}
+                onClick={saveName}
               >
                 保存
               </Button>
