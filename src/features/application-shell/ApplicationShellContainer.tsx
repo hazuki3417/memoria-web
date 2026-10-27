@@ -59,6 +59,7 @@ export function ApplicationShellContainer({
     communityData?.myCommunities.map((item) => ({
       id: item.id,
       label: item.name,
+      accentColor: item.mySettings.accentColor,
     })) ?? []
   const communitiesLoaded = !communitiesLoading && !!communityData
   const [createBusy, setCreateBusy] = useState(false)
@@ -87,6 +88,7 @@ export function ApplicationShellContainer({
           label:
             currentCreated?.label ??
             (communitiesLoaded ? "Community" : "読み込み中"),
+          accentColor: currentCreated?.accentColor ?? communityContext.accentColor,
         }
       : personalContext
   const activeSection = getApplicationSection(pathname)
@@ -246,6 +248,7 @@ export function ApplicationShellContainer({
                       ...communityContext,
                       id: item.id,
                       label: item.label,
+                      accentColor: item.accentColor,
                     })),
                   ]}
                   onSelect={(id) => {
