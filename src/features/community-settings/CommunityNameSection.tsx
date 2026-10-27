@@ -1,11 +1,29 @@
 "use client"
+
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import type { Dispatch, SetStateAction } from "react"
 import { SectionHeader } from "@/components/SectionHeader"
-export type CommunityNameSectionProps = { isAdmin: boolean; draft: string; setDraft: Dispatch<SetStateAction<string>>; invalid: boolean; dirty: boolean; savingName: boolean; saveName: () => void }
-export function CommunityNameSection({ isAdmin, draft, setDraft, invalid, dirty, savingName, saveName }: CommunityNameSectionProps) {
+
+export type CommunityNameSectionProps = {
+  isAdmin: boolean
+  draft: string
+  setDraft: Dispatch<SetStateAction<string>>
+  invalid: boolean
+  dirty: boolean
+  savingName: boolean
+  saveName: () => void
+}
+
+export function CommunityNameSection({
+  isAdmin,
+  draft,
+  setDraft,
+  invalid,
+  dirty,
+  savingName,
+  saveName,
+}: CommunityNameSectionProps) {
   return (
-    <>
       <Box>
         <SectionHeader>基本情報</SectionHeader>
         <Stack gap="md" maw={540}>
@@ -32,6 +50,5 @@ export function CommunityNameSection({ isAdmin, draft, setDraft, invalid, dirty,
         </Stack>
       </Box>
 
-    </>
   )
 }
