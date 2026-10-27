@@ -1,9 +1,10 @@
 "use client"
 
-import { Alert, Box, Button, Center, Group, Loader, Paper, Stack, Text, ThemeIcon } from "@mantine/core"
-import { IconAlertCircle, IconCloudUpload, IconPhoto, IconTags } from "@tabler/icons-react"
+import { Box, Button, Center, Group, Loader, Stack, Text, ThemeIcon } from "@mantine/core"
+import { IconCloudUpload, IconPhoto, IconTags } from "@tabler/icons-react"
 import type { MediaItem } from "@/features/media-detail"
 import { MediaTile } from "./MediaTile"
+import { ErrorState } from "@/components/ErrorState"
 
 export type MediaBrowserListState = "default" | "tag-filtered" | "true-empty" | "filtered-empty" | "loading" | "error" | "loading-more" | "load-more-error" | "processing-failure" | "selection"
 
@@ -39,20 +40,7 @@ export function MediaBrowserListContent({ activeState, context, communityId, ite
               </Center>
             )}
             {activeState === "error" && (
-              <Alert
-                icon={<IconAlertCircle size={18} />}
-                title="Mediaを読み込めませんでした"
-                color="red"
-              >
-                <Group justify="space-between">
-                  <Text size="sm">
-                    通信状態を確認して、もう一度お試しください。
-                  </Text>
-                  <Button size="xs" variant="default" onClick={onRetry}>
-                    再試行
-                  </Button>
-                </Group>
-              </Alert>
+              <ErrorState variant="full" title="Mediaを読み込めませんでした" description="通信状態を確認して、もう一度お試しください。" onRetry={onRetry} />
             )}
             {activeState === "true-empty" && (
               <Center mih={360}>
@@ -160,17 +148,9 @@ export function MediaBrowserListContent({ activeState, context, communityId, ite
               </Center>
             )}
             {(loadMoreError || activeState === "load-more-error") && (
-              <Paper withBorder radius="md" p="sm">
-                <Group justify="space-between">
-                  <Group gap="xs">
-                    <IconAlertCircle size={18} />
-                    <Text size="sm">続きのMediaを読み込めませんでした</Text>
-                  </Group>
-                  <Button size="xs" variant="default" onClick={onLoadMore}>
-                    再試行
-                  </Button>
-                </Group>
-              </Paper>
+              <Box p="sm">
+                <ErrorState variant="inline" title="続きのMediaを読み込めませんでした" onRetry={onLoadMore} />
+              </Box>
             )}
 
  </>
