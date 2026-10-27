@@ -12,14 +12,11 @@ import {
 } from "@/components/SettingsSectionLayout"
 import { CommunityGeneralContent } from "./CommunityGeneralContent"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
-import { useCommunityGeneralSettings } from "./useCommunityGeneralSettings"
-import { getCommunitySettingsSections } from "./communitySettingsSections"
+import { useCommunityNameSettings } from "./useCommunityNameSettings"
+import { useCommunityInvitation } from "./useCommunityInvitation"
+import { getCommunitySettingsSections, type CommunitySettingsSection } from "./communitySettingsSections"
 
-export type CommunitySettingsSection =
-  | "general"
-  | "members"
-  | "usage"
-  | "preferences"
+export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
 
 export function CommunitySettings({
@@ -61,17 +58,16 @@ export function CommunitySettings({
   const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
   const [accent, setAccent] = useState("#7950f2")
-  const general = useCommunityGeneralSettings({
-    communityId,
-    communityName,
-    onSaveName,
-  })
+  const name = useCommunityNameSettings({ communityName, onSaveName })
+  const invitation = useCommunityInvitation(communityId)
 
   const sections = getCommunitySettingsSections(communityId)
 
   const generalContent = (
     <CommunityGeneralContent
-      {...general}
+      name={name}
+      invitation={invitation}
+      communityId={communityId}
       isAdmin={isAdmin}
     />
   )
