@@ -36,6 +36,7 @@ export function CommunitySettings({
   onLeaveSuccess,
   fileSizeUnit = "DECIMAL",
   usageContent,
+  preferencesContent,
 }: {
   role?: Role
   communityId?: string
@@ -50,6 +51,7 @@ export function CommunitySettings({
   onLeaveSuccess?: () => void
   fileSizeUnit?: "DECIMAL" | "BINARY"
   usageContent?: ReactNode
+  preferencesContent?: ReactNode
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -84,7 +86,7 @@ export function CommunitySettings({
       onLeaveSuccess={onLeaveSuccess}
     />
   )
-  const preferencesContent = (
+  const resolvedPreferencesContent = preferencesContent ?? (
     <CommunityPreferencesContent accent={accent} setAccent={setAccent} />
   )
   const content =
@@ -94,7 +96,7 @@ export function CommunitySettings({
         ? membersContent
         : currentSection === "usage"
           ? usageContent
-          : preferencesContent
+          : resolvedPreferencesContent
 
   return (
     <SettingsSectionLayout
