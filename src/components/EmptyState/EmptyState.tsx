@@ -1,17 +1,19 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { Center, Stack, Text, ThemeIcon } from "@mantine/core"
+import { StateDisplay } from "@/components/StateDisplay"
 
 type EmptyStateProps = {
-  icon: ReactNode
+  variant?: "full" | "inline"
+  icon?: ReactNode
   title: string
-  description: ReactNode
+  description?: ReactNode
   action?: ReactNode
   iconColor?: string
 }
 
 export function EmptyState({
+  variant = "full",
   icon,
   title,
   description,
@@ -19,15 +21,13 @@ export function EmptyState({
   iconColor,
 }: EmptyStateProps) {
   return (
-    <Center mih={360}>
-      <Stack align="center" maw={420}>
-        <ThemeIcon size={48} radius="xl" variant="light" color={iconColor}>
-          {icon}
-        </ThemeIcon>
-        <Text fw={700} size="lg">{title}</Text>
-        <Text size="sm" c="dimmed" ta="center">{description}</Text>
-        {action}
-      </Stack>
-    </Center>
+    <StateDisplay
+      variant={variant}
+      icon={icon}
+      title={title}
+      description={description}
+      action={action}
+      iconColor={iconColor}
+    />
   )
 }
