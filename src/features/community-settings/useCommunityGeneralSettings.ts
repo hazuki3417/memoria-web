@@ -86,7 +86,6 @@ export function useCommunityGeneralSettings({
     }
   }
 
-
   return {
     communityId,
     draft,
