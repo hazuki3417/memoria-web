@@ -12,7 +12,7 @@ export default async function Page({
   const { mediaIds } = await searchParams
   const ids = [...new Set((mediaIds ?? "").split(",").filter(Boolean))]
   return (
-    <ScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><Box pt="lg">
+    <ScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><Box>
     <MediaUpdateLive
       context="community"
       communityId={communityId}
