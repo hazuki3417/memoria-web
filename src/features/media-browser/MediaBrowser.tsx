@@ -8,10 +8,8 @@ import {
   Divider,
   Group,
   Loader,
-  MultiSelect,
   Paper,
   ScrollArea,
-  Select,
   Stack,
   Text,
   ThemeIcon,
@@ -25,11 +23,13 @@ import {
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Dialog } from "@/components/Dialog"
 import { showNotification } from "@/components/Feedback"
 import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
 import { MediaTile } from "./MediaTile"
 import { MediaBrowserToolbar } from "./MediaBrowserToolbar"
+import { MediaBrowserGroupDialog } from "./MediaBrowserGroupDialog"
+import { MediaBrowserShareDialog } from "./MediaBrowserShareDialog"
+import { MediaBrowserDeleteDialog } from "./MediaBrowserDeleteDialog"
 
 type MediaBrowserState =
   | "default"
@@ -406,176 +406,34 @@ function MediaBrowserContent({
         </Box>
       }
 
-      <Dialog
+      <MediaBrowserGroupDialog
         opened={selectionDialog === "group"}
-        onClose={() => {
-          if (!groupActionPending) {
-            setSelectionDialog(null)
-            onDismissGroupActionResult?.()
-          }
-        }}
-        title="Groupに追加"
-        size="md"
-        footer={
-          <Dialog.Footer
-            secondary={
-              <Button
-                variant="default"
-                disabled={groupActionPending}
-                onClick={() => {
-                  setSelectionDialog(null)
-                  onDismissGroupActionResult?.()
-                }}
-              >
-                {groupActionResult ? "結果を閉じる" : "キャンセル"}
-              </Button>
-            }
-            primary={
-              <Button
-                disabled={
-                  groupTargets.length === 0 ||
-                  groupActionPending ||
-                  selected.size === 0
-                }
-                loading={groupActionPending}
-                onClick={() => void addToGroups()}
-              >
-                {groupActionResult ? "失敗したMediaを再試行" : "追加"}
-              </Button>
-            }
-          />
-        }
-      >
-        <Stack gap="xs">
-          <Text size="sm">
-            {selected.size}件のMediaを選択したすべてのGroupに追加します。
-          </Text>
-          {groupActionError && (
-            <Alert color="red" role="alert">
-              <Group justify="space-between">
-                <Text size="sm">{groupActionError}</Text>
-                {onRetryGroupOptions && (
-                  <Button
-                    size="xs"
-                    variant="default"
-                    onClick={onRetryGroupOptions}
-                  >
-                    再試行
-                  </Button>
-                )}
-              </Group>
-            </Alert>
-          )}
-          {groupActionResult && (
-            <Stack gap="xs">
-              <Text size="sm">
-                追加成功: {groupActionResult.succeeded}件 / 既に追加済み:{" "}
-                {groupActionResult.alreadyApplied}件 / 失敗:{" "}
-                {groupActionResult.failed.length}件
-              </Text>
-              {groupActionResult.failed.map((item) => (
-                <Text key={item.mediaId} size="sm" c="red">
-                  {stateItems.find((media) => media.id === item.mediaId)
-                    ?.label ?? item.mediaId}
-                  ：
-                  {item.errorCode === "NOT_FOUND"
-                    ? "Mediaが利用できません"
-                    : "追加できませんでした"}
-                </Text>
-              ))}
-            </Stack>
-          )}
-          <MultiSelect
-            label="Group"
-            placeholder="Groupを選択"
-            searchable
-            data={groupOptions ?? ["旅行", "家族", "風景写真", "お気に入り"]}
-            value={groupTargets}
-            onChange={(value) => {
-              setGroupTargets(value)
-              onDismissGroupActionResult?.()
-            }}
-          />
-        </Stack>
-      </Dialog>
-
-      <Dialog
+        selected={selected}
+        groupActionPending={groupActionPending}
+        groupActionResult={groupActionResult}
+        groupActionError={groupActionError}
+        onRetryGroupOptions={onRetryGroupOptions}
+        onDismissGroupActionResult={onDismissGroupActionResult}
+        groupTargets={groupTargets}
+        onTargetsChange={setGroupTargets}
+        groupOptions={groupOptions}
+        items={stateItems}
+        onClose={() => setSelectionDialog(null)}
+        onAddToGroups={addToGroups}
+      />
+      <MediaBrowserShareDialog
         opened={selectionDialog === "share"}
+        selectedCount={selected.size}
+        communityTarget={communityTarget}
+        onTargetChange={setCommunityTarget}
         onClose={() => setSelectionDialog(null)}
-        title="Communityへ共有"
-        size="md"
-        footer={
-          <Dialog.Footer
-            secondary={
-              <Button
-                variant="default"
-                onClick={() => setSelectionDialog(null)}
-              >
-                キャンセル
-              </Button>
-            }
-            primary={
-              <Button
-                disabled={!communityTarget}
-                onClick={() => setSelectionDialog(null)}
-              >
-                共有
-              </Button>
-            }
-          />
-        }
-      >
-        <Stack gap="xs">
-          <Stack gap={4}>
-            <Text size="sm">
-              {selected.size}
-              件の選択Mediaから、共有可能なUser管理Mediaを1つのCommunityへ共有します。
-            </Text>
-            <Text size="xs" c="dimmed">
-              Community管理Mediaや、選択した共有先へすでに共有済みのMediaには新しい共有関係を作成しません。
-            </Text>
-          </Stack>
-          <Select
-            label="Community"
-            placeholder="Communityを選択"
-            data={["Photo Club", "Family Archive", "Travel Team"]}
-            value={communityTarget}
-            onChange={setCommunityTarget}
-          />
-        </Stack>
-      </Dialog>
-
-      <Dialog
+      />
+      <MediaBrowserDeleteDialog
         opened={selectionDialog === "delete"}
+        selectedCount={selected.size}
         onClose={() => setSelectionDialog(null)}
-        title="Mediaを削除"
-        size="md"
-        footer={
-          <Dialog.Footer
-            secondary={
-              <Button
-                variant="default"
-                onClick={() => setSelectionDialog(null)}
-              >
-                キャンセル
-              </Button>
-            }
-            primary={
-              <Button
-                color="red"
-                onClick={() => completeMockSelection("delete")}
-              >
-                削除
-              </Button>
-            }
-          />
-        }
-      >
-        <Text size="sm">
-          選択した{selected.size}
-          件のMediaを削除します。削除したMediaは復元できません。
-        </Text>
-      </Dialog>
+        onDelete={() => completeMockSelection("delete")}
+      />
 
       {detail && (
         <MediaDetailDialog
