@@ -50,7 +50,7 @@ jobs:
         run: docker compose --profile vrt run --rm -e VRT_UPDATE=1 vrt
       - name: Upload Playwright diagnostics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vrt-compose-diagnostics
           path: |
@@ -60,7 +60,7 @@ jobs:
           retention-days: 7
       - name: Upload candidate baselines for review (not approved)
         if: github.event_name == 'workflow_dispatch' && inputs.mode == 'generate'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vrt-candidate-baselines-unapproved
           path: e2e/storybook-visual/__screenshots__/

@@ -76,7 +76,7 @@ jobs:
         run: docker compose --profile vrt run --rm -e VRT_UPDATE=1 vrt
       - name: Upload candidate images for inspection
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vrt-candidate-baselines-unapproved
           path: e2e/storybook-visual/__screenshots__/
@@ -84,7 +84,7 @@ jobs:
           retention-days: 14
       - name: Upload failure diagnostics
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vrt-generation-diagnostics
           path: |
