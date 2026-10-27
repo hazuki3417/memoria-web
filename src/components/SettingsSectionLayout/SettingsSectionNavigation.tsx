@@ -7,7 +7,11 @@ import { NavigationItem } from "@/components/NavigationItem"
 export type SettingsSectionItem<Section extends string> = {
   id: Section
   label: string
-  icon: ComponentType<{ size?: number; stroke?: number; "aria-hidden"?: boolean }>
+  icon: ComponentType<{
+    size?: number
+    stroke?: number
+    "aria-hidden"?: boolean
+  }>
 }
 
 export type SettingsSectionNavigationProps<Section extends string> = {
@@ -52,7 +56,12 @@ export function SettingsSectionNavigation<Section extends string>({
   }
 
   return (
-    <Box component="nav" aria-label={desktopAriaLabel} w={200} style={{ flexShrink: 0 }}>
+    <Box
+      component="nav"
+      aria-label={desktopAriaLabel}
+      w={200}
+      style={{ flexShrink: 0 }}
+    >
       <Text size="xs" fw={700} c="dimmed" mb="xs">
         設定
       </Text>
