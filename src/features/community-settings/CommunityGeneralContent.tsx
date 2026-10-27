@@ -1,6 +1,16 @@
 "use client"
 
-import { ActionIcon, Badge, Box, Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Group,
+  Modal,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core"
 import { IconCopy } from "@tabler/icons-react"
 import type { Dispatch, SetStateAction } from "react"
 import { PageHeader } from "@/components/PageHeader"
@@ -34,10 +44,26 @@ export type CommunityGeneralContentProps = {
 }
 
 export function CommunityGeneralContent({
-  isAdmin, communityId, draft, setDraft, invalid, dirty,
-  savingName, setSavingName, setName, onSaveName,
-  active, invitation, invitationUrl, expiresAt,
-  busy, issue, copyInvitation, confirm, setConfirm, changeInvitation,
+  isAdmin,
+  communityId,
+  draft,
+  setDraft,
+  invalid,
+  dirty,
+  savingName,
+  setSavingName,
+  setName,
+  onSaveName,
+  active,
+  invitation,
+  invitationUrl,
+  expiresAt,
+  busy,
+  issue,
+  copyInvitation,
+  confirm,
+  setConfirm,
+  changeInvitation,
 }: CommunityGeneralContentProps) {
   return (
     <Stack gap="xl">
