@@ -1,11 +1,13 @@
 "use client"
 
 import type { RefObject } from "react"
-import { Box, Button, Center, Loader, Stack, Text, ThemeIcon, UnstyledButton } from "@mantine/core"
+import { Box, Button, Stack, Text, UnstyledButton } from "@mantine/core"
 import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
 import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
 import { LoadMoreSentinel } from "./LoadMoreSentinel"
 import { ErrorState } from "@/components/ErrorState"
+import { LoadingState } from "@/components/LoadingState"
+import { EmptyState } from "@/components/EmptyState"
 import type { GroupBrowserGroup } from "./GroupBrowser"
 
 type GroupBrowserListContentProps = {
@@ -53,40 +55,25 @@ export function GroupBrowserListContent({
     discoveryState === "ready" &&
     groupCount === 0 &&
     !appliedQuery.trim() ? (
-      <Center mih={360}>
-        <Stack align="center" maw={420}>
-          <ThemeIcon size={48} radius="xl" variant="light">
-            <IconFolderPlus size={24} />
-          </ThemeIcon>
-          <Text fw={700} size="lg">
-            まだGroupがありません
-          </Text>
-          <Text size="sm" c="dimmed" ta="center">
-            最初のGroupを作成すると、ここからMediaを整理できます。
-          </Text>
-          {!hideManagementActions && (
-            <Button
-              leftSection={<IconFolderPlus size={16} />}
-              onClick={onCreate}
-              disabled={!canManage}
-            >
-              Groupを作成
-            </Button>
-          )}
-        </Stack>
-      </Center>
+      <EmptyState
+        icon={<IconFolderPlus size={24} />}
+        title="まだGroupがありません"
+        description="最初のGroupを作成すると、ここからMediaを整理できます。"
+        action={!hideManagementActions ? (
+          <Button
+            leftSection={<IconFolderPlus size={16} />}
+            onClick={onCreate}
+            disabled={!canManage}
+          >
+            Groupを作成
+          </Button>
+        ) : undefined}
+      />
     ) : null
 
   const discoveryFeedback =
     discoveryState === "loading" ? (
-      <Center mih={360}>
-        <Stack align="center">
-          <Loader />
-          <Text size="sm" c="dimmed">
-            Groupを読み込んでいます
-          </Text>
-        </Stack>
-      </Center>
+      <LoadingState message="Groupを読み込んでいます" />
     ) : discoveryState === "error" ? (
       <Box p="sm">
         <ErrorState variant="full" title="Group一覧を取得できませんでした" description="Group一覧の取得に失敗しました。再試行できます。" onRetry={onRetryDiscovery} />
@@ -94,14 +81,7 @@ export function GroupBrowserListContent({
     ) : null
   const discoveryPageFeedback =
     discoveryPageState === "loading" ? (
-      <Center py="lg">
-        <Stack align="center" gap={6}>
-          <Loader size="sm" />
-          <Text size="xs" c="dimmed">
-            追加のGroupを取得しています
-          </Text>
-        </Stack>
-      </Center>
+      <LoadingState variant="inline" padding="lg" gap={6} message="追加のGroupを取得しています" />
     ) : discoveryPageState === "error" ? (
       <Box p="sm">
         <ErrorState variant="inline" title="追加のGroupを取得できませんでした" onRetry={onRetryDiscoveryPage} />
@@ -112,27 +92,13 @@ export function GroupBrowserListContent({
     groupCount > 0 &&
     visibleGroups.length === 0 &&
     appliedQuery.trim() ? (
-      <Center mih={360}>
-        <Stack align="center" maw={420}>
-          <ThemeIcon size={48} radius="xl" variant="light" color="gray">
-            <IconSearch size={24} />
-          </ThemeIcon>
-          <Text fw={700} size="lg">
-            一致するGroupがありません
-          </Text>
-          <Text size="sm" c="dimmed" ta="center">
-            検索条件を変更するか、検索を解除してください。
-          </Text>
-          <Button
-            variant="default"
-            onClick={() => {
-              onClearSearch()
-            }}
-          >
-            検索を解除
-          </Button>
-        </Stack>
-      </Center>
+      <EmptyState
+        icon={<IconSearch size={24} />}
+        iconColor="gray"
+        title="一致するGroupがありません"
+        description="検索条件を変更するか、検索を解除してください。"
+        action={<Button variant="default" onClick={onClearSearch}>検索を解除</Button>}
+      />
     ) : null
 
  return <>
