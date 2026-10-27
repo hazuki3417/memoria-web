@@ -43,42 +43,19 @@ export function GroupDetailPane({
   onEdit: openEdit,
   onClose: closeDetail,
 }: GroupDetailPaneProps) {
-  return compact ? (
-    <Box h="100%" style={{ display: "flex", flexDirection: "column" }}>
-      <GroupDetailToolbar
-        compact={compact}
-        selected={selected}
-        headingRef={compactDetailHeadingRef}
-        hideManagementActions={hideManagementActions}
-        canManage={canManage}
-        detailsReady={detailsReady}
-        onEdit={openEdit}
-        onClose={closeDetail}
-      />
-      <Divider />
-      {relationCandidateFeedback}
-      {relationDetailSection}
-      <Divider />
-      <ScrollArea flex={1}>
-      <GroupDetailMediaContent
-        selected={selected}
-        mediaDetailState={mediaDetailState}
-        mediaItemsData={mediaItemsData}
-        onRetryGroupMedia={onRetryGroupMedia}
-        onOpenMedia={openMediaAt}
-        mediaPageFeedback={mediaPageFeedback}
-        onMediaEndVisible={onMediaEndVisible}
-      />
-      </ScrollArea>
-    </Box>
-  ) : (
+  return (
     <Box
+      h={compact ? "100%" : undefined}
       style={{
         display: "flex",
         flexDirection: "column",
-        minWidth: 0,
-        minHeight: 0,
-        height: "100%",
+        ...(compact
+          ? {}
+          : {
+              minWidth: 0,
+              minHeight: 0,
+              height: "100%",
+            }),
       }}
     >
       <GroupDetailToolbar
@@ -93,10 +70,8 @@ export function GroupDetailPane({
       />
       <Divider />
       {relationCandidateFeedback}
-
       {relationDetailSection}
       <Divider />
-
       <ScrollArea flex={1}>
       <GroupDetailMediaContent
         selected={selected}
