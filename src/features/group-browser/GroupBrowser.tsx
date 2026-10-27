@@ -267,52 +267,49 @@ export function GroupBrowser({
     })
   }
 
-
   return (
     <>
       <GroupCreateDialog
-      opened={createOpened}
-      name={createName}
-      parents={createParents}
-      children={createChildren}
-      candidates={candidates ?? []}
-      canManage={canManage}
-      saving={saving}
-      onNameChange={setCreateName}
-      onParentsChange={setCreateParents}
-      onChildrenChange={setCreateChildren}
-      onClose={closeCreate}
-      onSubmit={submitCreate}
-    />
-
+        opened={createOpened}
+        name={createName}
+        parents={createParents}
+        children={createChildren}
+        candidates={candidates ?? []}
+        canManage={canManage}
+        saving={saving}
+        onNameChange={setCreateName}
+        onParentsChange={setCreateParents}
+        onChildrenChange={setCreateChildren}
+        onClose={closeCreate}
+        onSubmit={submitCreate}
+      />
       <GroupEditDialog
-      opened={editOpened}
-      name={draftName}
-      parents={draftParents}
-      children={draftChildren}
-      candidates={candidates ?? []}
-      currentGroupName={selected?.name ?? ""}
-      availability={relationAvailability}
-      canManage={canManage}
-      detailsReady={detailsReady}
-      conflictNeedsReview={conflictNeedsReview}
-      saving={saving}
-      onNameChange={setDraftName}
-      onParentsChange={setDraftParents}
-      onChildrenChange={setDraftChildren}
-      onDelete={deletion.open}
-      onClose={edit.close}
-      onSubmit={submitEdit}
-    />
-
+        opened={editOpened}
+        name={draftName}
+        parents={draftParents}
+        children={draftChildren}
+        candidates={candidates ?? []}
+        currentGroupName={selected?.name ?? ""}
+        availability={relationAvailability}
+        canManage={canManage}
+        detailsReady={detailsReady}
+        conflictNeedsReview={conflictNeedsReview}
+        saving={saving}
+        onNameChange={setDraftName}
+        onParentsChange={setDraftParents}
+        onChildrenChange={setDraftChildren}
+        onDelete={deletion.open}
+        onClose={edit.close}
+        onSubmit={submitEdit}
+      />
       <GroupDeleteDialog
-      opened={deleteOpened}
-      name={selected?.name ?? ""}
-      saving={saving}
-      canManage={canManage}
-      onClose={deletion.close}
-      onConfirm={confirmDelete}
-    />
+        opened={deleteOpened}
+        name={selected?.name ?? ""}
+        saving={saving}
+        canManage={canManage}
+        onClose={deletion.close}
+        onConfirm={confirmDelete}
+      />
 
       {compact ? (
         <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
