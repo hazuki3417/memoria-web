@@ -1,9 +1,10 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { Alert, Box, Button, Center, Loader, Stack, Text, ThemeIcon } from "@mantine/core"
+import { Box, Center, Loader, Stack, Text, ThemeIcon } from "@mantine/core"
 import { IconPhoto } from "@tabler/icons-react"
 import { MediaGrid } from "./MediaGrid"
+import { ErrorState } from "@/components/ErrorState"
 import { LoadMoreSentinel } from "./LoadMoreSentinel"
 
 type GroupDetailMediaContentProps = {
@@ -36,20 +37,7 @@ export function GroupDetailMediaContent({
               </Stack>
             </Center>
           ) : mediaDetailState === "error" ? (
-            <Alert color="red" title="GroupのMediaを取得できませんでした">
-              <Stack gap="xs" align="flex-start">
-                <Text size="sm">
-                  最新のGroup情報を確認するため、再取得してください。
-                </Text>
-                <Button
-                  size="xs"
-                  variant="light"
-                  onClick={() => void onRetryGroupMedia?.()}
-                >
-                  再試行
-                </Button>
-              </Stack>
-            </Alert>
+            <ErrorState variant="full" title="GroupのMediaを取得できませんでした" description="最新のGroup情報を確認するため、再取得してください。" onRetry={() => void onRetryGroupMedia?.()} />
           ) : (selected?.mediaCount ?? 0) === 0 ? (
             <Center mih={360}>
               <Stack align="center" maw={420}>
