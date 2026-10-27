@@ -14,7 +14,7 @@ import {
   IconChartBar,
   IconAdjustments,
 } from "@tabler/icons-react"
-import { NavigationItem } from "@/components/NavigationItem"
+import { SettingsSectionLayout, SettingsSectionNavigation } from "@/components/SettingsSectionLayout"
 import {
   ActionIcon,
   Badge,
@@ -25,7 +25,6 @@ import {
   Stack,
   Text,
   TextInput,
-  Select,
 } from "@mantine/core"
 import { IconCopy } from "@tabler/icons-react"
 import { PageHeader } from "@/components/PageHeader"
@@ -398,57 +397,24 @@ export function CommunitySettings({
           : preferencesContent
 
   return (
-    <Box maw={1120} mx="auto" w="100%">
-      {compact ? (
-        <Stack gap="xl">
-          <Box>
-            <Text size="xs" c="dimmed" mb={6}>
-              設定
-            </Text>
-            <Select
-              aria-label="Community設定画面"
-              value={currentSection}
-              allowDeselect={false}
-              data={sections.map(({ id, label }) => ({ value: id, label }))}
-              onChange={(value) => {
-                const target = sections.find((item) => item.id === value)
-                if (target && target.id !== currentSection) navigate(target)
-              }}
-            />
-          </Box>
-          {content}
-        </Stack>
-      ) : (
-        <Group align="flex-start" gap={56} wrap="nowrap">
-          <Box
-            component="nav"
-            aria-label="Community設定"
-            w={200}
-            style={{ flexShrink: 0 }}
-          >
-            <Text size="xs" fw={700} c="dimmed" mb="xs">
-              設定
-            </Text>
-            <Stack gap={0}>
-              {sections.map((item) => (
-                <NavigationItem
-                  key={item.id}
-                  label={item.label}
-                  icon={item.icon}
-                  active={item.id === currentSection}
-                  accentColor="var(--mantine-color-violet-6)"
-                  onClick={() => {
-                    if (item.id !== currentSection) navigate(item)
-                  }}
-                />
-              ))}
-            </Stack>
-          </Box>
-          <Box style={{ flex: 1 }} maw={760} miw={0}>
-            {content}
-          </Box>
-        </Group>
-      )}
-    </Box>
+    <SettingsSectionLayout
+      compact={compact}
+      navigation={
+        <SettingsSectionNavigation
+          section={currentSection}
+          sections={sections}
+          compact={compact}
+          ariaLabel="Community設定画面"
+          desktopAriaLabel="Community設定"
+          accentColor="var(--mantine-color-violet-6)"
+          onSectionChange={(value) => {
+            const target = sections.find((item) => item.id === value)
+            if (target && target.id !== currentSection) navigate(target)
+          }}
+        />
+      }
+    >
+      {content}
+    </SettingsSectionLayout>
   )
 }
