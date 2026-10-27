@@ -32,7 +32,7 @@ type MediaBrowserListContentProps = {
 export function MediaBrowserListContent({ activeState, context, communityId, items: stateItems, hasRemoteItems, selecting, selected, onToggle: toggle, onOpenDetail, navigate, onClearTags, onRetry, onLoadMore, hasMore, loadingMore, loadMoreError }: MediaBrowserListContentProps) {
  return <>
             {activeState === "loading" && (
-              <LoadingState message="Mediaを読み込んでいます" />
+              <LoadingState title="Mediaを読み込んでいます" />
             )}
             {activeState === "error" && (
               <ErrorState variant="full" title="Mediaを読み込めませんでした" description="通信状態を確認して、もう一度お試しください。" onRetry={onRetry} />
@@ -108,7 +108,7 @@ export function MediaBrowserListContent({ activeState, context, communityId, ite
                 </Center>
               )}
             {(loadingMore || activeState === "loading-more") && (
-              <LoadingState variant="inline" layout="row" message="さらに読み込んでいます" />
+              <LoadingState variant="inline" inlineLayout="row" title="さらに読み込んでいます" />
             )}
             {(loadMoreError || activeState === "load-more-error") && (
               <Box p="sm">
