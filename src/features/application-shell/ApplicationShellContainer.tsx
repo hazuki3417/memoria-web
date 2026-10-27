@@ -11,7 +11,6 @@ import {
 import { showNotification } from "@/components/Feedback"
 import {
   ApplicationAccountMenu,
-  ApplicationContentScroll,
   ApplicationContextSwitcher,
   ApplicationHeader,
   ApplicationNavigation,
@@ -296,7 +295,7 @@ export function ApplicationShellContainer({
           ) : undefined
         }
       >
-        <ApplicationContentScroll>{children}</ApplicationContentScroll>
+        {children}
       </ApplicationShell>
     </>
   )
