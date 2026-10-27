@@ -1,3 +1,4 @@
+import { ApplicationContentScroll } from "@/components/ApplicationShell"
 "use client"
 
 import { Box, Paper, Stack, Text } from "@mantine/core"
@@ -72,6 +73,7 @@ export function ApplicationShellPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
+      <ApplicationContentScroll>
       <Box maw={1120} mx="auto" w="100%">
         <h1
           style={{
@@ -98,6 +100,7 @@ export function ApplicationShellPrototype({
           </Stack>
         </Paper>
       </Box>
-    </PrototypeApplicationShell>
+          </ApplicationContentScroll>
+</PrototypeApplicationShell>
   )
 }
