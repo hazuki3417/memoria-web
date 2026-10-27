@@ -1,3 +1,4 @@
+import { ApplicationContentScroll } from "@/components/ApplicationShell"
 "use client"
 
 import {
@@ -424,6 +425,7 @@ export function MediaUploadPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
+      <ApplicationContentScroll>
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
           <Paper
@@ -653,7 +655,8 @@ export function MediaUploadPrototype({
           </Group>
         </Stack>
       </Modal>
-    </PrototypeApplicationShell>
+          </ApplicationContentScroll>
+</PrototypeApplicationShell>
   )
 }
 
