@@ -89,7 +89,7 @@ export function SettingsUsage({
               {
                 value: "size",
                 label: (
-                                      <span
+                  <span
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -103,13 +103,13 @@ export function SettingsUsage({
                         style={{ display: "block" }}
                       />
                       <VisuallyHidden>容量</VisuallyHidden>
-                    </span>
+                  </span>
                 ),
               },
               {
                 value: "percent",
                 label: (
-                                      <span
+                  <span
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -124,7 +124,7 @@ export function SettingsUsage({
                         style={{ display: "block" }}
                       />
                       <VisuallyHidden>割合</VisuallyHidden>
-                    </span>
+                  </span>
                 ),
               },
             ]}
