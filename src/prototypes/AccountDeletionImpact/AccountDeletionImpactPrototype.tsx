@@ -1,5 +1,6 @@
-import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
+
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 
 import type { PropsWithChildren } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
