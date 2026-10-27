@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest"
-import type { ResponsiveViewport, ViewportCategory } from "./useResponsiveViewport"
+import { classifyViewport } from "./classifyViewport"
 
-describe("ResponsiveViewport contract", () => {
-  it("represents the unresolved viewport without guessing a category", () => {
-    const viewport: ResponsiveViewport = { category: null, isResolved: false }
-    expect(viewport.category).toBeNull()
-    expect(viewport.isResolved).toBe(false)
+describe("classifyViewport", () => {
+  it("returns compact below sm", () => {
+    expect(classifyViewport(false, false)).toBe("compact")
   })
 
-  it("supports all three resolved viewport categories", () => {
-    const categories: ViewportCategory[] = ["compact", "medium", "wide"]
-    expect(categories).toHaveLength(3)
+  it("returns medium between sm and xl", () => {
+    expect(classifyViewport(true, false)).toBe("medium")
+  })
+
+  it("returns wide at and above xl", () => {
+    expect(classifyViewport(true, true)).toBe("wide")
+  })
+
+  it("prioritizes xl if inconsistent media-query results are observed", () => {
+    expect(classifyViewport(false, true)).toBe("wide")
   })
 })
