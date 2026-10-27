@@ -2,8 +2,7 @@ import { Box, Button, Stack, Text } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 export function CommunityDangerZone({ communityId }: { communityId: string }) {
   return (
-    <>
-        <Box>
+    <Box>
           <Box c="red">
             <SectionHeader>Community削除</SectionHeader>
           </Box>
@@ -23,9 +22,6 @@ export function CommunityDangerZone({ communityId }: { communityId: string }) {
               </Button>
             </Box>
           </Stack>
-        </Box>
-      )}
-
-    </>
+    </Box>
   )
 }
