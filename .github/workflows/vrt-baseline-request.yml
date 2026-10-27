@@ -115,7 +115,7 @@ jobs:
             exit 1
           fi
       - name: Download candidate screenshots
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: vrt-candidate-baselines-unapproved
           path: e2e/storybook-visual/__screenshots__/
