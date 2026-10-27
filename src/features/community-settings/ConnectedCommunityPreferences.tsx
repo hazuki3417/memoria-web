@@ -56,13 +56,16 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
   const applyContextAccent = useCallback((value: string) => {
     const id = client.cache.identify({ __typename: "Community", id: communityId })
     if (!id) return
-    client.cache.modify({
+    client.cache.writeFragment({
       id,
-      fields: {
-        mySettings(existing: { __typename?: string; accentColor: string } | undefined) {
-          if (!existing) return existing
-          return { ...existing, accentColor: value }
-        },
+      fragment: gql`
+        fragment CommunityAccentCache on Community {
+          mySettings { accentColor }
+        }
+      `,
+      data: {
+        __typename: "Community",
+        mySettings: { __typename: "CommunitySettings", accentColor: value },
       },
     })
   }, [client, communityId])
