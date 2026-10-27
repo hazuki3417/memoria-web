@@ -89,9 +89,11 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
       if (active.current) setSaveError(false)
     } catch {
       desired.current = null
+      // The Shell can outlive this route: always restore shared cache even
+      // if the preferences screen was unmounted while saving.
+      if (saved.current) applyContextAccent(saved.current)
       if (active.current) {
         setAccent(saved.current)
-        if (saved.current) applyContextAccent(saved.current)
         setSaveError(true)
       }
     } finally {
