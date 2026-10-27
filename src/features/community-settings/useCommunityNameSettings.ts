@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react"
 import { showNotification } from "@/components/Feedback"
 
-export function useCommunityNameSettings({ communityName, onSaveName }: {
+export function useCommunityNameSettings({
+  communityName,
+  onSaveName,
+}: {
   communityName?: string
   onSaveName?: (name: string) => Promise<boolean>
 }) {
