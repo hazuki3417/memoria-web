@@ -10,12 +10,13 @@
 
 ## Application main scroll ownership
 
-- `ApplicationShell` owns the fixed main viewport and does not impose a `ScrollArea` or content padding on its children.
-- Standard route/page layouts explicitly own their Mantine `ScrollArea` through `StandardPageScroll`, retaining `type="hover"`, 100% width/height, contained overscroll, and `lg` top padding. No scroll wrapper is added by a shared ApplicationShell consumer.
-- Feature-managed scrollports (such as Media Browser and Group Browser) opt out of the standard route scrollport. Their routes retain top spacing without introducing a second scroll region. Media edit/upload pages opt into standard scrolling at their own leaf route layouts.
-- Use Mantine `ScrollArea` for all newly implemented scroll regions to keep visual treatment consistent. Do not introduce independent CSS `overflow-y: auto` scrolling as an alternative.
-- `ApplicationContentScroll` is retired; Production and Prototype consumers own their scrolling policies independently. Maintain visual, responsive, and behavioral contracts during this migration.
-- The notification offset is derived from the fixed shell header height and is unaffected by the content scroll choice.
+- `ApplicationShell` owns the fixed Main viewport (including its available height), Header and Navigation, but **never inserts a scroll area** or page-content padding.
+- Route Layouts do not select or impose a scroll area. Feature route layouts may preserve viewport geometry and spacing without creating a scrollport.
+- Each Page / Feature owns the Mantine `ScrollArea` enclosing precisely the content intended to scroll. Dashboard scrolls as page content; Media Browser and Group Browser leave their toolbars outside their list scrollports; shared Settings presentation keeps navigation outside the settings-content scrollport.
+- Use Mantine `ScrollArea` for every newly implemented scroll area to keep appearance consistent; do not add an independent CSS `overflow-y: auto` scrolling implementation.
+- `ApplicationContentScroll` and `StandardPageScroll` are retired. Do not replace either with a common ApplicationShell/Route Layout wrapper that forces all pages to scroll.
+- Preserve the existing scroll range, scrollbar interaction, height, `lg` top spacing, focus/navigation behavior and responsive layout. Avoid nested scrollports and duplicate padding, including Media edit/upload routes.
+- The notification offset comes from the fixed shell header height and is independent of page / feature scrolling.
 
 ## Media Detail consumers and contracts
 
