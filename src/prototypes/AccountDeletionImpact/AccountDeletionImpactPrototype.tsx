@@ -1,4 +1,4 @@
-import { ApplicationContentScroll } from "@/components/ApplicationShell"
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
 
 import type { PropsWithChildren } from "react"
@@ -25,9 +25,9 @@ function PrototypeShell({ children }: PropsWithChildren) {
       contexts={[personalContext]}
       navigationItems={getApplicationNavigation({ contextKind: "personal" })}
     >
-      <ApplicationContentScroll>
+      <StandardPageScroll>
       {children}
-          </ApplicationContentScroll>
+          </StandardPageScroll>
 </PrototypeApplicationShell>
   )
 }
