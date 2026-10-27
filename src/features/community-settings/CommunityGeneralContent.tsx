@@ -2,8 +2,14 @@
 
 import { Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
-import { CommunityNameSection, type CommunityNameSectionProps } from "./CommunityNameSection"
-import { CommunityInvitationSection, type CommunityInvitationSectionProps } from "./CommunityInvitationSection"
+import {
+  CommunityNameSection,
+  type CommunityNameSectionProps,
+} from "./CommunityNameSection"
+import {
+  CommunityInvitationSection,
+  type CommunityInvitationSectionProps,
+} from "./CommunityInvitationSection"
 import { CommunityDangerZone } from "./CommunityDangerZone"
 
 export type CommunityGeneralContentProps = {
