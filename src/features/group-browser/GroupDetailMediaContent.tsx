@@ -30,7 +30,7 @@ export function GroupDetailMediaContent({
  return (
         <Box p="sm">
           {mediaDetailState === "loading" ? (
-            <LoadingState message="Mediaを読み込んでいます" />
+            <LoadingState title="Mediaを読み込んでいます" />
           ) : mediaDetailState === "error" ? (
             <ErrorState variant="full" title="GroupのMediaを取得できませんでした" description="最新のGroup情報を確認するため、再取得してください。" onRetry={() => void onRetryGroupMedia?.()} />
           ) : (selected?.mediaCount ?? 0) === 0 ? (
