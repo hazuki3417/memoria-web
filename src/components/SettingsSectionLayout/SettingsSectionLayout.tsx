@@ -6,7 +6,6 @@ import type { ReactNode } from "react"
 export type SettingsSectionLayoutProps = {
   compact: boolean
   navigation: ReactNode
-  wrapCompactContent?: boolean
   children: ReactNode
 }
 
@@ -17,7 +16,6 @@ export type SettingsSectionLayoutProps = {
 export function SettingsSectionLayout({
   compact,
   navigation,
-  wrapCompactContent = true,
   children,
 }: SettingsSectionLayoutProps) {
   return (
@@ -25,7 +23,7 @@ export function SettingsSectionLayout({
       {compact ? (
         <Stack gap="xl">
           {navigation}
-          {wrapCompactContent ? <Box>{children}</Box> : children}
+          <Box>{children}</Box>
         </Stack>
       ) : (
         <Group align="flex-start" gap={56} wrap="nowrap">
