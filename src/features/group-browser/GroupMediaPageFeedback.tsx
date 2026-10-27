@@ -16,6 +16,6 @@ export function GroupMediaPageFeedback({
       <ErrorState variant="inline" title="追加のMediaを取得できませんでした" description="取得済みのMediaは引き続き閲覧できます。" onRetry={onRetry} />
     </Box>
   ) : state === "loading" ? (
-    <LoadingState variant="inline" inlinePadding="md" inlineGap="xs" status title="追加のMediaを取得しています" />
+    <LoadingState variant="inline" title="追加のMediaを取得しています" />
   ) : null
 }
