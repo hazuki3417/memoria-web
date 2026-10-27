@@ -1,6 +1,5 @@
 "use client"
 
-import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 
 import { useState, type ReactNode } from "react"
 import {
@@ -36,9 +35,9 @@ export function StorybookApplicationShell({ children }: { children: ReactNode })
       }}
       onSelectNavigation={(id) => setSection(id as ApplicationSection)}
     >
-      <StandardPageScroll>
+      <>
       {children}
-          </StandardPageScroll>
+          </>
 </PrototypeApplicationShell>
   )
 }
