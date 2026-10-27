@@ -14,6 +14,7 @@ export type StateDisplayProps = {
   /** Inlineの既存表示で使う、中央寄せの読み込み配置。 */
   inlineCentered?: boolean
   inlinePadding?: "md" | "lg"
+  inlineLayout?: "row" | "column"
   inlineGap?: "xs" | number
   /** Loadingのテキストは既存の控えめな表現を維持する。 */
   loading?: boolean
@@ -29,6 +30,7 @@ export function StateDisplay({
   role,
   inlineCentered = false,
   inlinePadding = "md",
+  inlineLayout = "row",
   inlineGap,
   loading = false,
 }: StateDisplayProps) {
@@ -54,7 +56,7 @@ export function StateDisplay({
   if (variant === "inline") {
     return (
       <Center py={inlinePadding} role={role}>
-        {inlineGap === "xs" || typeof inlineGap === "number" ? (
+        {inlineLayout === "column" ? (
           <Stack align="center" gap={inlineGap}>
             {icon}
             <Text size="xs" c="dimmed">{title}</Text>
