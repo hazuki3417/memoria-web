@@ -51,11 +51,11 @@ export function CommunityPreferencesContent({
               }}
             />
           </SettingRow>
-          <Text size="sm" c="dimmed">
-            {isPreview
-              ? "色の選択はプレビューです。保存・Contextへの反映はまだ行われません。"
-              : "選んだ色は自分のCommunity設定に自動保存されます。"}
-          </Text>
+          {isPreview && (
+            <Text size="sm" c="dimmed">
+              色の選択はプレビューです。保存・Contextへの反映はまだ行われません。
+            </Text>
+          )}
         </Stack>
       </Box>
     </Stack>
