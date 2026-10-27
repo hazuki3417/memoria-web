@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Button, Loader, Stack } from "@mantine/core"
-import { gql, useMutation, useQuery } from "@apollo/client"
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 
 const COMMUNITY_SETTINGS = gql`
@@ -29,6 +29,7 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
     variables: { communityId },
     fetchPolicy: "cache-and-network",
   })
+  const client = useApolloClient()
   const [save] = useMutation<SaveResult>(SAVE_COMMUNITY_SETTINGS)
   const [accent, setAccent] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -52,6 +53,20 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
     }
   }, [data])
 
+  const applyContextAccent = useCallback((value: string) => {
+    const id = client.cache.identify({ __typename: "Community", id: communityId })
+    if (!id) return
+    client.cache.modify({
+      id,
+      fields: {
+        mySettings(existing: { __typename?: string; accentColor: string } | undefined) {
+          if (!existing) return existing
+          return { ...existing, accentColor: value }
+        },
+      },
+    })
+  }, [client, communityId])
+
   const flush = useCallback(async () => {
     if (inFlight.current || desired.current === null) return
     inFlight.current = true
@@ -66,24 +81,27 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
         const confirmed = result.data?.updateCommunitySettings?.settings?.accentColor
         if (!confirmed || !isHex(confirmed)) throw new Error("Save unconfirmed")
         saved.current = confirmed
+        if (desired.current === null) applyContextAccent(confirmed)
       }
       if (active.current) setSaveError(false)
     } catch {
       desired.current = null
       if (active.current) {
         setAccent(saved.current)
+        if (saved.current) applyContextAccent(saved.current)
         setSaveError(true)
       }
     } finally {
       inFlight.current = false
       if (active.current) setSaving(false)
     }
-  }, [communityId, save])
+  }, [communityId, save, applyContextAccent])
 
   const choose = (value: string) => {
     if (!isHex(value)) return
     const normalized = value.toUpperCase()
     setAccent(normalized)
+    applyContextAccent(normalized)
     desired.current = normalized
     setSaveError(false)
     void flush()
