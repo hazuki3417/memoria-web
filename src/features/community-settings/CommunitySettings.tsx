@@ -7,18 +7,13 @@ import {
 } from "./CommunityMembersContent"
 import { useMediaQuery } from "@mantine/hooks"
 import {
-  IconSettings,
-  IconUsers,
-  IconChartBar,
-  IconAdjustments,
-} from "@tabler/icons-react"
-import {
   SettingsSectionLayout,
   SettingsSectionNavigation,
 } from "@/components/SettingsSectionLayout"
 import { CommunityGeneralContent } from "./CommunityGeneralContent"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 import { useCommunityGeneralSettings } from "./useCommunityGeneralSettings"
+import { getCommunitySettingsSections } from "./communitySettingsSections"
 
 export type CommunitySettingsSection =
   | "general"
@@ -72,32 +67,7 @@ export function CommunitySettings({
     onSaveName,
   })
 
-  const sections = [
-    {
-      id: "general",
-      label: "一般",
-      icon: IconAdjustments,
-      href: `/communities/${encodeURIComponent(communityId)}/settings`,
-    },
-    {
-      id: "members",
-      label: "メンバー",
-      icon: IconUsers,
-      href: `/communities/${encodeURIComponent(communityId)}/members`,
-    },
-    {
-      id: "preferences",
-      label: "環境設定",
-      icon: IconSettings,
-      href: `/communities/${encodeURIComponent(communityId)}/preferences`,
-    },
-    {
-      id: "usage",
-      label: "利用状況",
-      icon: IconChartBar,
-      href: `/communities/${encodeURIComponent(communityId)}/usage`,
-    },
-  ]
+  const sections = getCommunitySettingsSections(communityId)
 
   const generalContent = (
     <CommunityGeneralContent
