@@ -107,6 +107,7 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
       )}
       <CommunityPreferencesContent
         accent={accent ?? data.community.mySettings.accentColor}
+        isPreview={false}
         setAccent={(next) => {
           const current = accent ?? data.community!.mySettings.accentColor
           choose(typeof next === "function" ? next(current) : next)
