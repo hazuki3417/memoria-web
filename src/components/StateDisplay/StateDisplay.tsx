@@ -11,11 +11,6 @@ export type StateDisplayProps = {
   action?: ReactNode
   iconColor?: string
   role?: AriaRole
-  /** Inlineの既存表示で使う、中央寄せの読み込み配置。 */
-  inlineCentered?: boolean
-  inlinePadding?: "md" | "lg"
-  inlineLayout?: "row" | "column"
-  inlineGap?: "xs" | number
   /** Loadingのテキストは既存の控えめな表現を維持する。 */
   loading?: boolean
 }
@@ -28,13 +23,9 @@ export function StateDisplay({
   action,
   iconColor,
   role,
-  inlineCentered = false,
-  inlinePadding = "md",
-  inlineLayout = "row",
-  inlineGap,
   loading = false,
 }: StateDisplayProps) {
-  if (variant === "inline" && !inlineCentered) {
+  if (variant === "inline" && !loading) {
     return (
       <Box role={role}>
         <Group gap="xs" align="flex-start" wrap="nowrap">
@@ -55,22 +46,13 @@ export function StateDisplay({
 
   if (variant === "inline") {
     return (
-      <Center py={inlinePadding} role={role}>
-        {inlineLayout === "column" ? (
-          <Stack align="center" gap={inlineGap}>
-            {icon}
-            <Text size="xs" c="dimmed">{title}</Text>
-            {description}
-            {action}
-          </Stack>
-        ) : (
-          <Group gap="xs">
-            {icon}
-            <Text size="sm" c="dimmed">{title}</Text>
-            {description}
-            {action}
-          </Group>
-        )}
+      <Center py="md" role={role}>
+        <Group gap="xs">
+          {icon}
+          <Text size="sm" c="dimmed">{title}</Text>
+          {description}
+          {action}
+        </Group>
       </Center>
     )
   }
