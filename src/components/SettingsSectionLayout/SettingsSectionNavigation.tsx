@@ -43,7 +43,7 @@ export function SettingsSectionNavigation<Section extends string>({
           aria-label={ariaLabel}
           value={section}
           onChange={(value) => {
-            if (value) onSectionChange(value as Section)
+            if (value && value !== section) onSectionChange(value as Section)
           }}
           data={sections.map((item) => ({
             value: item.id,
@@ -73,7 +73,9 @@ export function SettingsSectionNavigation<Section extends string>({
             icon={item.icon}
             active={section === item.id}
             accentColor={accentColor}
-            onClick={() => onSectionChange(item.id)}
+            onClick={() => {
+              if (item.id !== section) onSectionChange(item.id)
+            }}
           />
         ))}
       </Stack>
