@@ -73,7 +73,7 @@ export function GroupBrowserListContent({
 
   const discoveryFeedback =
     discoveryState === "loading" ? (
-      <LoadingState message="Groupを読み込んでいます" />
+      <LoadingState title="Groupを読み込んでいます" />
     ) : discoveryState === "error" ? (
       <Box p="sm">
         <ErrorState variant="full" title="Group一覧を取得できませんでした" description="Group一覧の取得に失敗しました。再試行できます。" onRetry={onRetryDiscovery} />
@@ -81,7 +81,7 @@ export function GroupBrowserListContent({
     ) : null
   const discoveryPageFeedback =
     discoveryPageState === "loading" ? (
-      <LoadingState variant="inline" padding="lg" gap={6} message="追加のGroupを取得しています" />
+      <LoadingState variant="inline" inlinePadding="lg" inlineGap={6} title="追加のGroupを取得しています" />
     ) : discoveryPageState === "error" ? (
       <Box p="sm">
         <ErrorState variant="inline" title="追加のGroupを取得できませんでした" onRetry={onRetryDiscoveryPage} />
