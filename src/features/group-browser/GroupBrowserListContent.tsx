@@ -1,7 +1,8 @@
 "use client"
 
-import type { ReactNode, RefObject } from "react"
-import { Box, Stack, Text, UnstyledButton } from "@mantine/core"
+import type { RefObject } from "react"
+import { Alert, Box, Button, Center, Loader, Stack, Text, ThemeIcon, UnstyledButton } from "@mantine/core"
+import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
 import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
 import { LoadMoreSentinel } from "./LoadMoreSentinel"
 import type { GroupBrowserGroup } from "./GroupBrowser"
@@ -15,15 +16,123 @@ type GroupBrowserListContentProps = {
  mediaItemsData?: Array<{ id: string; label: string; src: string | null }>
  compactGroupItemRefs: RefObject<Map<string, HTMLButtonElement>>
  onOpenDetail: (id: string) => void
- discoveryFeedback: ReactNode
- emptyGroupState: ReactNode
- searchEmptyState: ReactNode
- discoveryPageFeedback: ReactNode
+ groupCount: number
+ appliedQuery: string
+ hideManagementActions: boolean
+ canManage: boolean
+ onCreate: () => void
+ onClearSearch: () => void
+ onRetryDiscovery?: () => void
+ onRetryDiscoveryPage?: () => void
  discoveryPageState: "idle" | "loading" | "error"
  onDiscoveryEndVisible?: () => void
 }
 
-export function GroupBrowserListContent({compact,visibleGroups,discoveryState,groupsLoaded,selectedId,mediaItemsData,compactGroupItemRefs,onOpenDetail:openDetail,discoveryFeedback,emptyGroupState,searchEmptyState,discoveryPageFeedback,discoveryPageState,onDiscoveryEndVisible}:GroupBrowserListContentProps) {
+export function GroupBrowserListContent({compact,visibleGroups,discoveryState,groupsLoaded,selectedId,mediaItemsData,compactGroupItemRefs,onOpenDetail:openDetail,groupCount,appliedQuery,hideManagementActions,canManage,onCreate,onClearSearch,onRetryDiscovery,onRetryDiscoveryPage,discoveryPageState,onDiscoveryEndVisible}:GroupBrowserListContentProps) {
+  const emptyGroupState =
+    discoveryState === "ready" &&
+    groupCount === 0 &&
+    !appliedQuery.trim() ? (
+      <Center mih={360}>
+        <Stack align="center" maw={420}>
+          <ThemeIcon size={48} radius="xl" variant="light">
+            <IconFolderPlus size={24} />
+          </ThemeIcon>
+          <Text fw={700} size="lg">
+            まだGroupがありません
+          </Text>
+          <Text size="sm" c="dimmed" ta="center">
+            最初のGroupを作成すると、ここからMediaを整理できます。
+          </Text>
+          {!hideManagementActions && (
+            <Button
+              leftSection={<IconFolderPlus size={16} />}
+              onClick={onCreate}
+              disabled={!canManage}
+            >
+              Groupを作成
+            </Button>
+          )}
+        </Stack>
+      </Center>
+    ) : null
+
+  const discoveryFeedback =
+    discoveryState === "loading" ? (
+      <Center mih={360}>
+        <Stack align="center">
+          <Loader />
+          <Text size="sm" c="dimmed">
+            Groupを読み込んでいます
+          </Text>
+        </Stack>
+      </Center>
+    ) : discoveryState === "error" ? (
+      <Box p="sm">
+        <Alert color="red" title="Group一覧を取得できませんでした">
+          <Stack gap="xs" align="flex-start">
+            <Text size="sm">
+              Group一覧の取得に失敗しました。再試行できます。
+            </Text>
+            <Button size="xs" variant="light" onClick={onRetryDiscovery}>
+              再試行
+            </Button>
+          </Stack>
+        </Alert>
+      </Box>
+    ) : null
+  const discoveryPageFeedback =
+    discoveryPageState === "loading" ? (
+      <Center py="lg">
+        <Stack align="center" gap={6}>
+          <Loader size="sm" />
+          <Text size="xs" c="dimmed">
+            追加のGroupを取得しています
+          </Text>
+        </Stack>
+      </Center>
+    ) : discoveryPageState === "error" ? (
+      <Box p="sm">
+        <Alert color="red" title="追加のGroupを取得できませんでした">
+          <Button
+            size="xs"
+            variant="light"
+            mt="xs"
+            onClick={onRetryDiscoveryPage}
+          >
+            再試行
+          </Button>
+        </Alert>
+      </Box>
+    ) : null
+  const searchEmptyState =
+    discoveryState === "ready" &&
+    groupCount > 0 &&
+    visibleGroups.length === 0 &&
+    appliedQuery.trim() ? (
+      <Center mih={360}>
+        <Stack align="center" maw={420}>
+          <ThemeIcon size={48} radius="xl" variant="light" color="gray">
+            <IconSearch size={24} />
+          </ThemeIcon>
+          <Text fw={700} size="lg">
+            一致するGroupがありません
+          </Text>
+          <Text size="sm" c="dimmed" ta="center">
+            検索条件を変更するか、検索を解除してください。
+          </Text>
+          <Button
+            variant="default"
+            onClick={() => {
+              onClearSearch()
+            }}
+          >
+            検索を解除
+          </Button>
+        </Stack>
+      </Center>
+    ) : null
+
  return <>
  {compact ? (<>
 
