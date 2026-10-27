@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
 import {
   MyCommunitiesDocument,
+  useMyCommunitiesQuery,
   CommunityMembersDocument,
   CommunityMemberRole,
   useRenameCommunityMutation,
@@ -31,6 +32,8 @@ export function CommunitySettingsRoute({
   usageContent?: ReactNode
 }) {
   const router = useRouter()
+  const { data: accentData } = useMyCommunitiesQuery()
+  const communityAccentColor = accentData?.myCommunities.find((item) => item.id === communityId)?.mySettings.accentColor
   // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
   const requiresMembers = section === "members" || section === "general"
   const { name, members, loadError, membersError } = useCommunity({
@@ -69,6 +72,7 @@ export function CommunitySettingsRoute({
   return (
     <CommunitySettings
       communityId={communityId}
+      communityAccentColor={communityAccentColor}
       communityName={name}
       members={members ?? undefined}
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
