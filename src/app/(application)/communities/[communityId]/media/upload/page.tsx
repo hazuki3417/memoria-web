@@ -8,7 +8,7 @@ export default async function Page({
 }) {
   const { communityId } = await params
   return (
-    <ScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><Box pt="lg">
+    <ScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><Box>
     <MediaUpload
       scenario="empty"
       context="community"
