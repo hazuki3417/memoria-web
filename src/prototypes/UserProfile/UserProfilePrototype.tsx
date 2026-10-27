@@ -1,4 +1,4 @@
-import { ApplicationContentScroll } from "@/components/ApplicationShell"
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
 
 import {
@@ -92,7 +92,7 @@ export function UserProfilePrototype({
         contexts={[personalContext]}
         navigationItems={getApplicationNavigation({ contextKind: "personal" })}
       >
-        <ApplicationContentScroll>
+        <StandardPageScroll>
         <Box maw={880} mx="auto" w="100%">
           <Stack gap="xl">
             <PageHeader
@@ -158,7 +158,7 @@ export function UserProfilePrototype({
             </Box>
           </Stack>
         </Box>
-              </ApplicationContentScroll>
+              </StandardPageScroll>
 </PrototypeApplicationShell>
       <Modal
         opened={discardOpened}
