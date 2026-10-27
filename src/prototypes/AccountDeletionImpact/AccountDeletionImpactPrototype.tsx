@@ -1,3 +1,4 @@
+import { ApplicationContentScroll } from "@/components/ApplicationShell"
 "use client"
 
 import type { PropsWithChildren } from "react"
@@ -24,8 +25,10 @@ function PrototypeShell({ children }: PropsWithChildren) {
       contexts={[personalContext]}
       navigationItems={getApplicationNavigation({ contextKind: "personal" })}
     >
+      <ApplicationContentScroll>
       {children}
-    </PrototypeApplicationShell>
+          </ApplicationContentScroll>
+</PrototypeApplicationShell>
   )
 }
 
