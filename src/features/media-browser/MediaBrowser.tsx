@@ -1,6 +1,6 @@
 "use client"
 
-
+import { useMediaQuery } from "@mantine/hooks"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { showNotification } from "@/components/Feedback"
