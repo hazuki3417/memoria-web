@@ -14,7 +14,10 @@ import { CommunityGeneralContent } from "./CommunityGeneralContent"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 import { useCommunityNameSettings } from "./useCommunityNameSettings"
 import { useCommunityInvitation } from "./useCommunityInvitation"
-import { getCommunitySettingsSections, type CommunitySettingsSection } from "./communitySettingsSections"
+import {
+  getCommunitySettingsSections,
+  type CommunitySettingsSection,
+} from "./communitySettingsSections"
 
 export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
