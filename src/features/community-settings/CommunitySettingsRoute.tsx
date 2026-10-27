@@ -1,12 +1,14 @@
 "use client"
 
 import { Text } from "@mantine/core"
-import type { ReactNode } from "react"
+import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
+import { useEffect, type ReactNode } from "react"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
 import {
   MyCommunitiesDocument,
+  useMyCommunitiesQuery,
   CommunityMembersDocument,
   CommunityMemberRole,
   useRenameCommunityMutation,
@@ -30,8 +32,15 @@ export function CommunitySettingsRoute({
   usageContent?: ReactNode
 }) {
   const router = useRouter()
+  const { data: accentData, loading: accentLoading, error: accentError } = useMyCommunitiesQuery()
+  const activeMembership = accentData?.myCommunities.find((item) => item.id === communityId)
+  const communityAccentColor = activeMembership?.mySettings.accentColor
+  const membershipLost = section === "preferences" && !accentLoading && !accentError && !!accentData && !activeMembership
+  useEffect(() => {
+    if (membershipLost) router.replace("/dashboard")
+  }, [membershipLost, router])
   // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
-  const requiresMembers = section !== "usage"
+  const requiresMembers = section === "members" || section === "general"
   const { name, members, loadError, membersError } = useCommunity({
     includeMembers: requiresMembers,
   })
@@ -45,6 +54,8 @@ export function CommunitySettingsRoute({
     !(requiresMembers && membersError) &&
     (name === null || (requiresMembers && members === null))
 
+  if (membershipLost)
+    return <LoadingBoundary loading label="Communityの利用権限を確認中">{null}</LoadingBoundary>
   if (loadError)
     return (
       <Text c="red">
@@ -68,11 +79,13 @@ export function CommunitySettingsRoute({
   return (
     <CommunitySettings
       communityId={communityId}
+      communityAccentColor={communityAccentColor}
       communityName={name}
       members={members ?? undefined}
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
       usageContent={usageContent}
+      preferencesContent={section === "preferences" ? <ConnectedCommunityPreferences communityId={communityId} /> : undefined}
       onRemoveMember={async (userId) => {
         try {
           const result = await removeMember({

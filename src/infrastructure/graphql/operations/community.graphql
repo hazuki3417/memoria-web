@@ -1,5 +1,5 @@
 query MyCommunities {
-  myCommunities { id name createdAt updatedAt }
+  myCommunities { id name createdAt updatedAt mySettings { accentColor } }
 }
 
 query CommunityDetails($communityId: ID!) {
@@ -43,5 +43,18 @@ query CommunityUsage($communityId: ID!) {
     mediaCount
     storage { usedBytes effectiveLimitBytes }
     formatBreakdown { format mediaCount usedBytes }
+  }
+}
+
+query CommunityMySettings($communityId: ID!) {
+  community(communityId: $communityId) {
+    id
+    mySettings { accentColor }
+  }
+}
+
+mutation UpdateCommunitySettings($input: UpdateCommunitySettingsInput!) {
+  updateCommunitySettings(input: $input) {
+    settings { accentColor }
   }
 }

@@ -16,7 +16,10 @@ input RegisterUserInput { nickname: String! }
 type RegisterUserPayload { user: User! }
 input UpdateUserProfileInput { nickname: String! }
 type UpdateUserProfilePayload { user: User! }
-type Community { id: ID! name: String! createdAt: DateTime! updatedAt: DateTime! }
+type Community { id: ID! name: String! createdAt: DateTime! updatedAt: DateTime! mySettings: CommunitySettings! }
+type CommunitySettings { accentColor: String! }
+input UpdateCommunitySettingsInput { communityId: ID! accentColor: String! }
+type UpdateCommunitySettingsPayload { settings: CommunitySettings! }
 input CreateCommunityInput { name: String! }
 type CreateCommunityPayload { community: Community! }
 type PageInfo { hasNextPage: Boolean! hasPreviousPage: Boolean! startCursor: String endCursor: String }
@@ -368,3 +371,5 @@ type MediaFormatUsage { format: OriginalImageFormat! mediaCount: Int! usedBytes:
 type StorageUsage { usedBytes: Int64! effectiveLimitBytes: Int64! }
 type UserUsage { mediaCount: Int! storage: StorageUsage! formatBreakdown: [MediaFormatUsage!]! }
 type CommunityUsage { mediaCount: Int! storage: StorageUsage! formatBreakdown: [MediaFormatUsage!]! }
+
+extend type Mutation { updateCommunitySettings(input: UpdateCommunitySettingsInput!): UpdateCommunitySettingsPayload! }

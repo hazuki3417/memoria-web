@@ -36,6 +36,8 @@ export function CommunitySettings({
   onLeaveSuccess,
   fileSizeUnit = "DECIMAL",
   usageContent,
+  preferencesContent,
+  communityAccentColor,
 }: {
   role?: Role
   communityId?: string
@@ -50,6 +52,8 @@ export function CommunitySettings({
   onLeaveSuccess?: () => void
   fileSizeUnit?: "DECIMAL" | "BINARY"
   usageContent?: ReactNode
+  preferencesContent?: ReactNode
+  communityAccentColor?: string
 }) {
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
@@ -84,7 +88,7 @@ export function CommunitySettings({
       onLeaveSuccess={onLeaveSuccess}
     />
   )
-  const preferencesContent = (
+  const resolvedPreferencesContent = preferencesContent ?? (
     <CommunityPreferencesContent accent={accent} setAccent={setAccent} />
   )
   const content =
@@ -94,7 +98,7 @@ export function CommunitySettings({
         ? membersContent
         : currentSection === "usage"
           ? usageContent
-          : preferencesContent
+          : resolvedPreferencesContent
 
   return (
     <SettingsSectionLayout
@@ -106,7 +110,7 @@ export function CommunitySettings({
           compact={compact}
           ariaLabel="Community設定画面"
           desktopAriaLabel="Community設定"
-          accentColor="var(--mantine-color-violet-6)"
+          accentColor={communityAccentColor ?? "var(--mantine-color-violet-6)"}
           onSectionChange={(value) => {
             const target = sections.find((item) => item.id === value)
             if (target) navigate(target)

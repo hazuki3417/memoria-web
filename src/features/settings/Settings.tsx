@@ -26,6 +26,7 @@ export function Settings({
   initialPreferences,
   savePreferences,
   usageContent,
+  personalAccentColor,
 }: {
   section: Section
   saveProfile?: SaveProfile
@@ -33,6 +34,7 @@ export function Settings({
   initialPreferences?: UserPreferences
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
   usageContent?: ReactNode
+  personalAccentColor?: string
 }) {
   const router = useRouter()
   const compact = useMediaQuery("(max-width: 48em)")
@@ -78,6 +80,7 @@ export function Settings({
 
   return (
     <SettingsLayout
+      accentColor={personalAccentColor}
       section={section}
       onSectionChange={(next) => router.push(`/settings/${next}`)}
     >

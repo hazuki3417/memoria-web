@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Group, Menu, Text } from "@mantine/core"
+import { Box, Button, Group, Menu, Text } from "@mantine/core"
 import { IconCheck, IconPlus, IconUsers } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "../types"
 
@@ -62,6 +62,19 @@ export function ApplicationContextSwitcher({
           <Menu.Item
             key={context.id}
             onClick={() => onSelect(context.id)}
+            leftSection={
+              <Box
+                w={12}
+                h={12}
+                style={{
+                  backgroundColor: context.accentColor,
+                  border: "1px solid var(--mantine-color-default-border)",
+                  borderRadius: "var(--mantine-radius-xs)",
+                  flexShrink: 0,
+                }}
+                aria-hidden="true"
+              />
+            }
             rightSection={
               context.id === currentContext.id ? <IconCheck size={14} /> : null
             }
