@@ -1,6 +1,7 @@
 "use client"
 
-import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
+import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
+
 
 import type { PropsWithChildren } from "react"
 import { getApplicationNavigation } from "@/components/ApplicationShell"
@@ -26,9 +27,9 @@ function PrototypeShell({ children }: PropsWithChildren) {
       contexts={[personalContext]}
       navigationItems={getApplicationNavigation({ contextKind: "personal" })}
     >
-      <StandardPageScroll>
+      <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
       {children}
-          </StandardPageScroll>
+          </ScrollPaddingBox></PageScrollArea>
 </PrototypeApplicationShell>
   )
 }
