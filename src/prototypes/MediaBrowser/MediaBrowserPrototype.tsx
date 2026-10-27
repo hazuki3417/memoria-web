@@ -1,3 +1,4 @@
+import { ApplicationContentScroll } from "@/components/ApplicationShell"
 "use client"
 
 import {
@@ -534,6 +535,7 @@ export function MediaBrowserPrototype({
       onOpenSettings={() => {}}
       onLogout={() => {}}
     >
+      <ApplicationContentScroll>
       {!detailOnlyItems && (
         <Stack gap={0} w="100%">
           <Box
@@ -1749,6 +1751,7 @@ export function MediaBrowserPrototype({
           </Group>
         </Stack>
       </Modal>
-    </PrototypeApplicationShell>
+          </ApplicationContentScroll>
+</PrototypeApplicationShell>
   )
 }
