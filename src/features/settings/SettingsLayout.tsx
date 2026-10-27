@@ -1,11 +1,26 @@
 "use client"
 
-import { Box, Group, Stack } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
+import {
+  IconChartBar,
+  IconSettings,
+  IconUser,
+  IconUserCircle,
+} from "@tabler/icons-react"
 import type { ReactNode } from "react"
-import { SettingsNavigation, type SettingsSection } from "./SettingsNavigation"
+import {
+  SettingsSectionLayout,
+  SettingsSectionNavigation,
+} from "@/components/SettingsSectionLayout"
 
-export type Section = SettingsSection
+export type Section = "profile" | "account" | "preferences" | "usage"
+
+const sections = [
+  { id: "profile", label: "プロフィール", icon: IconUser },
+  { id: "account", label: "アカウント", icon: IconUserCircle },
+  { id: "preferences", label: "環境設定", icon: IconSettings },
+  { id: "usage", label: "利用状況", icon: IconChartBar },
+] satisfies { id: Section; label: string; icon: typeof IconUser }[]
 
 type SettingsLayoutProps = {
   section: Section
@@ -21,28 +36,21 @@ export function SettingsLayout({
   const compact = useMediaQuery("(max-width: 48em)")
 
   return (
-    <Box maw={1120} mx="auto" w="100%">
-      {compact ? (
-        <Stack gap="xl">
-          <SettingsNavigation
-            section={section}
-            compact
-            onSectionChange={onSectionChange}
-          />
-          <Box>{children}</Box>
-        </Stack>
-      ) : (
-        <Group align="flex-start" gap={56} wrap="nowrap">
-          <SettingsNavigation
-            section={section}
-            compact={false}
-            onSectionChange={onSectionChange}
-          />
-          <Box style={{ flex: 1 }} maw={760} miw={0}>
-            {children}
-          </Box>
-        </Group>
-      )}
-    </Box>
+    <SettingsSectionLayout
+      compact={compact}
+      navigation={
+        <SettingsSectionNavigation
+          section={section}
+          sections={sections}
+          compact={compact}
+          ariaLabel="設定画面"
+          desktopAriaLabel="設定"
+          accentColor="var(--mantine-color-blue-6)"
+          onSectionChange={onSectionChange}
+        />
+      }
+    >
+      {children}
+    </SettingsSectionLayout>
   )
 }
