@@ -83,6 +83,7 @@ export function CommunityMembersContent({
   )
   const visibleRowCount = 4
   const tableRowHeight = 48
+  const tableHeaderHeight = 44
   const changeSort = (key: SortKey) => {
     setSort((current) => {
       if (current?.key !== key) return { key, direction: "asc" }
@@ -185,7 +186,24 @@ export function CommunityMembersContent({
         <Box>
           <Box style={{ overflowX: "auto" }}>
             <Box miw={400}>
-              <Table striped highlightOnHover style={{ tableLayout: "fixed" }}>
+              <ScrollArea
+                type="hover"
+                scrollbarSize={8}
+                h={tableHeaderHeight + visibleRowCount * tableRowHeight}
+              >
+                <Table
+                  striped
+                  highlightOnHover
+                  stickyHeader
+                  style={{
+                    tableLayout: "fixed",
+                    borderBottom: "1px solid var(--mantine-color-default-border)",
+                  }}
+                  styles={{
+                    th: { height: tableHeaderHeight, boxSizing: "border-box" },
+                    td: { height: tableRowHeight, boxSizing: "border-box" },
+                  }}
+                >
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th w="45%" aria-sort={ariaSort("name")}>
@@ -213,26 +231,6 @@ export function CommunityMembersContent({
                     )}
                   </Table.Tr>
                 </Table.Thead>
-              </Table>
-              <ScrollArea
-                type="hover"
-                scrollbarSize={8}
-                h={visibleRowCount * tableRowHeight}
-              >
-                <Table
-                  striped
-                  highlightOnHover
-                  style={{
-                    tableLayout: "fixed",
-                    borderBottom: "1px solid var(--mantine-color-default-border)",
-                  }}
-                  styles={{
-                    td: {
-                      height: tableRowHeight,
-                      boxSizing: "border-box",
-                    },
-                  }}
-                >
                   <Table.Tbody>
                     {rows.map((member) => (
                       <Table.Tr key={member.id}>
