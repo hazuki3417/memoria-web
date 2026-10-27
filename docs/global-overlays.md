@@ -11,8 +11,10 @@
 ## Application main scroll ownership
 
 - `ApplicationShell` owns the fixed main viewport and does not impose a `ScrollArea` or content padding on its children.
-- Each consumer explicitly chooses whether to use `ApplicationContentScroll`. This wrapper preserves the previous `ScrollArea` behavior (`type="hover"`, 100% width/height, contained overscroll, and `lg` top padding).
-- The production Application Shell container and existing production/prototype consumers currently opt in to preserve existing scrolling and layout. Future consumers may omit the wrapper and manage scrolling themselves; existing consumers should only change this after visual/behavioral regression review.
+- Standard route/page layouts explicitly own their Mantine `ScrollArea` through `StandardPageScroll`, retaining `type="hover"`, 100% width/height, contained overscroll, and `lg` top padding. No scroll wrapper is added by a shared ApplicationShell consumer.
+- Feature-managed scrollports (such as Media Browser and Group Browser) opt out of the standard route scrollport. Their routes retain top spacing without introducing a second scroll region. Media edit/upload pages opt into standard scrolling at their own leaf route layouts.
+- Use Mantine `ScrollArea` for all newly implemented scroll regions to keep visual treatment consistent. Do not introduce independent CSS `overflow-y: auto` scrolling as an alternative.
+- `ApplicationContentScroll` is retired; Production and Prototype consumers own their scrolling policies independently. Maintain visual, responsive, and behavioral contracts during this migration.
 - The notification offset is derived from the fixed shell header height and is unaffected by the content scroll choice.
 
 ## Media Detail consumers and contracts
