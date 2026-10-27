@@ -201,22 +201,6 @@ export function GroupBrowser({
     <GroupMediaPageFeedback state={mediaPageState} onRetry={onRetryMediaPage} />
   )
 
-  const createDialog = (
-    <GroupCreateDialog
-      opened={createOpened}
-      name={createName}
-      parents={createParents}
-      children={createChildren}
-      candidates={candidates ?? []}
-      canManage={canManage}
-      saving={saving}
-      onNameChange={setCreateName}
-      onParentsChange={setCreateParents}
-      onChildrenChange={setCreateChildren}
-      onClose={closeCreate}
-      onSubmit={submitCreate}
-    />
-  )
 
   const submitEdit = async () => {
     if (!selected || !validGroupName(draftName)) return
@@ -256,27 +240,6 @@ export function GroupBrowser({
     if (result === "ok") edit.close()
   }
 
-  const editDialog = (
-    <GroupEditDialog
-      opened={editOpened}
-      name={draftName}
-      parents={draftParents}
-      children={draftChildren}
-      candidates={candidates ?? []}
-      currentGroupName={selected?.name ?? ""}
-      availability={relationAvailability}
-      canManage={canManage}
-      detailsReady={detailsReady}
-      conflictNeedsReview={conflictNeedsReview}
-      saving={saving}
-      onNameChange={setDraftName}
-      onParentsChange={setDraftParents}
-      onChildrenChange={setDraftChildren}
-      onDelete={deletion.open}
-      onClose={edit.close}
-      onSubmit={submitEdit}
-    />
-  )
 
   const confirmDelete = async () => {
     if (!selected) return
@@ -304,8 +267,45 @@ export function GroupBrowser({
     })
   }
 
-  const deleteDialog = (
-    <GroupDeleteDialog
+
+  return (
+    <>
+      <GroupCreateDialog
+      opened={createOpened}
+      name={createName}
+      parents={createParents}
+      children={createChildren}
+      candidates={candidates ?? []}
+      canManage={canManage}
+      saving={saving}
+      onNameChange={setCreateName}
+      onParentsChange={setCreateParents}
+      onChildrenChange={setCreateChildren}
+      onClose={closeCreate}
+      onSubmit={submitCreate}
+    />
+
+      <GroupEditDialog
+      opened={editOpened}
+      name={draftName}
+      parents={draftParents}
+      children={draftChildren}
+      candidates={candidates ?? []}
+      currentGroupName={selected?.name ?? ""}
+      availability={relationAvailability}
+      canManage={canManage}
+      detailsReady={detailsReady}
+      conflictNeedsReview={conflictNeedsReview}
+      saving={saving}
+      onNameChange={setDraftName}
+      onParentsChange={setDraftParents}
+      onChildrenChange={setDraftChildren}
+      onDelete={deletion.open}
+      onClose={edit.close}
+      onSubmit={submitEdit}
+    />
+
+      <GroupDeleteDialog
       opened={deleteOpened}
       name={selected?.name ?? ""}
       saving={saving}
@@ -313,13 +313,7 @@ export function GroupBrowser({
       onClose={deletion.close}
       onConfirm={confirmDelete}
     />
-  )
 
-  return (
-    <>
-      {createDialog}
-      {editDialog}
-      {deleteDialog}
       {compact ? (
         <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
           {compactView === "groups" ? (
