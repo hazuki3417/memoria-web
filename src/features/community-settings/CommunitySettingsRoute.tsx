@@ -1,6 +1,7 @@
 "use client"
 
 import { Text } from "@mantine/core"
+import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
 import type { ReactNode } from "react"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
@@ -73,6 +74,7 @@ export function CommunitySettingsRoute({
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
       usageContent={usageContent}
+      preferencesContent={section === "preferences" ? <ConnectedCommunityPreferences communityId={communityId} /> : undefined}
       onRemoveMember={async (userId) => {
         try {
           const result = await removeMember({
