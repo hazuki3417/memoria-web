@@ -312,7 +312,7 @@ export function CommunityMembersContent({
         <Box c="red">
           <SectionHeader>Communityから退会</SectionHeader>
         </Box>
-        <Stack gap="sm" maw={620}>
+        <Stack gap="sm">
           <Text size="sm">
             退会すると、このCommunityへのアクセスと、自分が管理するMediaのこのCommunityへの共有・分類が解除されます。アカウントやCommunity管理Mediaは削除されません。
           </Text>
