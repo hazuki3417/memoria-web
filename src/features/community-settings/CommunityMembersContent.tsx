@@ -229,7 +229,7 @@ export function CommunityMembersContent({
                 >
                   <Table.Tbody>
                     {rows.map((member) => (
-                      <Table.Tr key={member.id}>
+                      <Table.Tr key={member.id} style={{ height: tableRowHeight }}>
                         <Table.Td w="45%">
                           {member.name}{" "}
                           {member.isSelf && (
