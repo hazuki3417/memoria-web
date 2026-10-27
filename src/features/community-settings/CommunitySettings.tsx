@@ -100,7 +100,6 @@ export function CommunitySettings({
   return (
     <SettingsSectionLayout
       compact={compact}
-      wrapCompactContent={false}
       navigation={
         <SettingsSectionNavigation
           section={currentSection}
@@ -111,7 +110,7 @@ export function CommunitySettings({
           accentColor="var(--mantine-color-violet-6)"
           onSectionChange={(value) => {
             const target = sections.find((item) => item.id === value)
-            if (target && target.id !== currentSection) navigate(target)
+            if (target) navigate(target)
           }}
         />
       }
