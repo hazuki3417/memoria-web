@@ -1,6 +1,5 @@
 "use client"
 
-import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 
 import { useState, type ReactNode } from "react"
 import { Button, Text } from "@mantine/core"
@@ -208,7 +207,7 @@ export function SettingsPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <StandardPageScroll>
+      <>
       <SettingsLayout section={section} onSectionChange={setSection}>
         {content}
       </SettingsLayout>
@@ -223,7 +222,7 @@ export function SettingsPrototype({
       >
         現在の設定: {currentLabel}
       </Text>
-          </StandardPageScroll>
+          </>
 </PrototypeApplicationShell>
   )
 }
