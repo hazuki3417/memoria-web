@@ -32,7 +32,7 @@ export function CommunitySettingsRoute({
 }) {
   const router = useRouter()
   // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
-  const requiresMembers = section !== "usage"
+  const requiresMembers = section === "members" || section === "general"
   const { name, members, loadError, membersError } = useCommunity({
     includeMembers: requiresMembers,
   })
