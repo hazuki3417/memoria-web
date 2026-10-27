@@ -20,7 +20,13 @@ export function GroupBrowserListPane({compact,query,onQueryChange,onSearch,searc
   <GroupBrowserToolbar compact={compact} query={query} onQueryChange={onQueryChange} onSearch={onSearch} searchRef={searchRef} hideManagementActions={hideManagementActions} canManage={canManage} onCreate={onCreate} />
   <Divider />
   <ScrollArea flex={1}>
-   <GroupBrowserListContent compact={compact} {...contentProps} />
+   <GroupBrowserListContent
+      compact={compact}
+      hideManagementActions={hideManagementActions}
+      canManage={canManage}
+      onCreate={onCreate}
+      {...contentProps}
+    />
   </ScrollArea>
  </Box>
 }
