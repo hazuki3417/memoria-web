@@ -47,6 +47,7 @@ export function MediaBrowserToolbar({
         display: "grid",
         gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto",
         alignItems: "center",
+        minHeight: "calc(32px + var(--mantine-spacing-xs))",
         gap: "var(--mantine-spacing-xs)",
       }}
     >
@@ -87,10 +88,6 @@ export function MediaBrowserToolbar({
         )}
         <SegmentedControl
           size="xs"
-          styles={{
-            root: { height: 28, padding: 2 },
-            label: { height: 24, paddingBlock: 0, display: "flex", alignItems: "center" },
-          }}
           value={selecting ? "select" : "view"}
           onChange={(value) => {
             if (value === "select") {
