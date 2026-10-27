@@ -14,12 +14,12 @@ import {
   Table,
   Text,
   TextInput,
-  UnstyledButton,
 } from "@mantine/core"
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { showNotification } from "@/components/Feedback"
+import { UsageSortHeader } from "@/features/usage/UsageSortHeader"
 
 import type { CommunityMember } from "@/features/community/CommunityProvider"
 export type { CommunityMember } from "@/features/community/CommunityProvider"
@@ -32,9 +32,8 @@ const previewMembers: CommunityMember[] = [
   { id: "m3", name: "鈴木 太郎", role: "member" },
 ]
 type SortKey = "name" | "role"
-// Members start with a single-column, Japanese-locale name ascending sort.
-const INITIAL_SORT_KEY: SortKey = "name"
-const INITIAL_SORT_DESCENDING = false
+type MemberSort = { key: SortKey; direction: "asc" | "desc" } | null
+// No explicit sort retains a deterministic name-ascending order.
 export function CommunityMembersContent({
   members = previewMembers,
   onLeave,
@@ -49,8 +48,7 @@ export function CommunityMembersContent({
   onRemoveMember?: (userId: string) => Promise<boolean>
 }) {
   const [query, setQuery] = useState("")
-  const [sortKey, setSortKey] = useState<SortKey>(INITIAL_SORT_KEY)
-  const [descending, setDescending] = useState(INITIAL_SORT_DESCENDING)
+  const [sort, setSort] = useState<MemberSort>({ key: "name", direction: "asc" })
   const [opened, setOpened] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
@@ -74,23 +72,26 @@ export function CommunityMembersContent({
             .includes(query.trim().toLocaleLowerCase("ja-JP")),
         )
         .sort((a, b) => {
-          const aValue = sortKey === "role" ? a.role : a.name
-          const bValue = sortKey === "role" ? b.role : b.name
-          const result = aValue.localeCompare(bValue, "ja-JP")
-          return descending ? -result : result
+          const byName = a.name.localeCompare(b.name, "ja-JP", { numeric: true })
+          if (!sort || sort.key === "name") {
+            return (sort?.direction === "desc" ? -1 : 1) * byName
+          }
+          const byRole = a.role.localeCompare(b.role, "ja-JP")
+          return (sort.direction === "desc" ? -1 : 1) * byRole || byName
         }),
-    [members, query, sortKey, descending],
+    [members, query, sort],
   )
   const visibleRowCount = 4
   const tableRowHeight = 48
-  const tableHeaderHeight = 44
   const changeSort = (key: SortKey) => {
-    if (key === sortKey) setDescending((value) => !value)
-    else {
-      setSortKey(key)
-      setDescending(false)
-    }
+    setSort((current) => {
+      if (current?.key !== key) return { key, direction: "asc" }
+      if (current.direction === "asc") return { key, direction: "desc" }
+      return null
+    })
   }
+  const ariaSort = (key: SortKey): "ascending" | "descending" | "none" =>
+    sort?.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"
   const close = () => {
     if (!busy) {
       setOpened(false)
@@ -181,35 +182,29 @@ export function CommunityMembersContent({
           onChange={(event) => setQuery(event.currentTarget.value)}
           mb="md"
         />
-        <Box
-          style={{
-            borderRadius: "var(--mantine-radius-md)",
-            overflow: "hidden",
-            border: "1px solid var(--mantine-color-default-border)",
-          }}
-        >
+        <Box>
           <Box style={{ overflowX: "auto" }}>
             <Box miw={400}>
-              <Table striped withRowBorders style={{ tableLayout: "fixed" }}>
+              <Table striped highlightOnHover style={{ tableLayout: "fixed" }}>
                 <Table.Thead>
-                  <Table.Tr style={{ height: tableHeaderHeight }}>
-                    <Table.Th w="45%">
-                      <UnstyledButton
-                        onClick={() => changeSort("name")}
-                        aria-label="名前で並び替え"
-                      >
-                        名前{" "}
-                        {sortKey === "name" ? (descending ? "↓" : "↑") : "↕"}
-                      </UnstyledButton>
+                  <Table.Tr>
+                    <Table.Th w="45%" aria-sort={ariaSort("name")}>
+                      <UsageSortHeader
+                        label="名前"
+                        direction={sort?.key === "name" ? sort.direction : null}
+                        align="left"
+                        disabled={false}
+                        onSort={() => changeSort("name")}
+                      />
                     </Table.Th>
-                    <Table.Th>
-                      <UnstyledButton
-                        onClick={() => changeSort("role")}
-                        aria-label="役割で並び替え"
-                      >
-                        役割{" "}
-                        {sortKey === "role" ? (descending ? "↓" : "↑") : "↕"}
-                      </UnstyledButton>
+                    <Table.Th aria-sort={ariaSort("role")}>
+                      <UsageSortHeader
+                        label="役割"
+                        direction={sort?.key === "role" ? sort.direction : null}
+                        align="left"
+                        disabled={false}
+                        onSort={() => changeSort("role")}
+                      />
                     </Table.Th>
                     {self?.role === "admin" && (
                       <Table.Th w={52}>
@@ -227,15 +222,7 @@ export function CommunityMembersContent({
                 <Table
                   striped
                   highlightOnHover
-                  withRowBorders
                   style={{ tableLayout: "fixed" }}
-                  styles={{
-                    td: {
-                      height: tableRowHeight,
-                      borderBottom:
-                        "1px solid var(--mantine-color-default-border)",
-                    },
-                  }}
                 >
                   <Table.Tbody>
                     {rows.map((member) => (
