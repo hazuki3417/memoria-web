@@ -227,7 +227,13 @@ export function CommunityMembersContent({
                 <Table
                   striped
                   highlightOnHover
-                  style={{ tableLayout: "fixed" }}
+                  style={{
+                    tableLayout: "fixed",
+                    borderBottom:
+                      rows.length < visibleRowCount
+                        ? "1px solid var(--mantine-color-default-border)"
+                        : undefined,
+                  }}
                 >
                   <Table.Tbody>
                     {rows.map((member) => (
