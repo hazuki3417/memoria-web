@@ -1,6 +1,7 @@
 "use client"
 
 import { Text } from "@mantine/core"
+import type { ReactNode } from "react"
 import { Settings } from "./Settings"
 import type { UserPreferencesPatch } from "./preferences/userPreferences"
 import {
@@ -56,6 +57,24 @@ export function ConnectedSettings({
           result.data.updateUserPreferences.preferences,
         )
       }}
+    />
+  )
+}
+
+/** Keep account and usage pages rendered while resolving the personal accent color. */
+export function ConnectedPersonalSettingsSection({
+  section,
+  usageContent,
+}: {
+  section: "account" | "usage"
+  usageContent?: ReactNode
+}) {
+  const { data } = useCurrentUserQuery()
+  return (
+    <Settings
+      section={section}
+      usageContent={usageContent}
+      personalAccentColor={data?.me?.preferences.personalAccentColor}
     />
   )
 }
