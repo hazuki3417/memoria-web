@@ -1,7 +1,7 @@
 "use client"
 
 import { Box, Button, Center } from "@mantine/core"
-import { IconCloudUpload } from "@tabler/icons-react"
+import { IconCloudUpload, IconPhoto, IconTags } from "@tabler/icons-react"
 import type { MediaItem } from "@/features/media-detail"
 import { MediaTile } from "./MediaTile"
 import { ErrorState } from "@/components/ErrorState"
@@ -39,7 +39,7 @@ export function MediaBrowserListContent({ activeState, context, communityId, ite
             )}
             {activeState === "true-empty" && (
               <EmptyState
-                kind="media"
+                icon={<IconPhoto size={24} />}
                 title="まだMediaがありません"
                 description={context === "personal"
                   ? "最初のMediaをアップロードすると、ここから閲覧・整理できます。"
@@ -60,7 +60,8 @@ export function MediaBrowserListContent({ activeState, context, communityId, ite
             )}
             {activeState === "filtered-empty" && (
               <EmptyState
-                kind="tags"
+                icon={<IconTags size={24} />}
+                iconColor="gray"
                 title="一致するMediaがありません"
                 description="選択中のTagを変更するか、filterを解除してください。"
                 action={<Button variant="default" onClick={onClearTags}>Filterを解除</Button>}
