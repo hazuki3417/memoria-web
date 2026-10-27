@@ -26,8 +26,10 @@ const meta = {
         })}
         user={{ displayName: "ユーザー" }}
       >
+        <>
         <Story />
-      </PrototypeApplicationShell>
+              </>
+</PrototypeApplicationShell>
     ),
   ],
 } satisfies Meta<typeof CommunitySettings>

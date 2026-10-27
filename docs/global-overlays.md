@@ -10,10 +10,13 @@
 
 ## Application main scroll ownership
 
-- `ApplicationShell` owns the fixed main viewport and does not impose a `ScrollArea` or content padding on its children.
-- Each consumer explicitly chooses whether to use `ApplicationContentScroll`. This wrapper preserves the previous `ScrollArea` behavior (`type="hover"`, 100% width/height, contained overscroll, and `lg` top padding).
-- The production Application Shell container and existing production/prototype consumers currently opt in to preserve existing scrolling and layout. Future consumers may omit the wrapper and manage scrolling themselves; existing consumers should only change this after visual/behavioral regression review.
-- The notification offset is derived from the fixed shell header height and is unaffected by the content scroll choice.
+- `ApplicationShell` owns the fixed Main viewport (including its available height), Header and Navigation, but **never inserts a scroll area** or page-content padding.
+- Route Layouts do not select or impose a scroll area. Feature route layouts may preserve viewport geometry and spacing without creating a scrollport.
+- Each Page / Feature owns the Mantine `ScrollArea` enclosing precisely the content intended to scroll. Dashboard scrolls as page content; Media Browser and Group Browser leave their toolbars outside their list scrollports; shared Settings presentation keeps navigation outside the settings-content scrollport.
+- Use Mantine `ScrollArea` for every newly implemented scroll area to keep appearance consistent; do not add an independent CSS `overflow-y: auto` scrolling implementation.
+- `ApplicationContentScroll` and `StandardPageScroll` are retired. Do not replace either with a common ApplicationShell/Route Layout wrapper that forces all pages to scroll.
+- Preserve the existing scroll range, scrollbar interaction, height, `lg` top spacing, focus/navigation behavior and responsive layout. Avoid nested scrollports and duplicate padding, including Media edit/upload routes.
+- The notification offset comes from the fixed shell header height and is independent of page / feature scrolling.
 
 ## Media Detail consumers and contracts
 

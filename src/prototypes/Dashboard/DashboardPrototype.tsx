@@ -1,5 +1,8 @@
 "use client"
 
+import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
+
+
 import { GroupItem } from "@/components/GroupItem"
 
 import {
@@ -430,6 +433,7 @@ export function DashboardPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
+      <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
       <PageWidth variant="contained">
         <Stack gap="xl" w="100%">
           <Stack gap="sm">
@@ -540,6 +544,7 @@ export function DashboardPrototype({
           </Stack>
         </Stack>
       </PageWidth>
-    </PrototypeApplicationShell>
+          </ScrollPaddingBox></PageScrollArea>
+</PrototypeApplicationShell>
   )
 }

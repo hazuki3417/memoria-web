@@ -1,6 +1,6 @@
 "use client"
 
-import { Alert, Button, Stack } from "@mantine/core"
+import { Alert, Box, Button, ScrollArea, Stack } from "@mantine/core"
 import { useParams } from "next/navigation"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { CommunityDeletionConfirmation } from "@/features/community-settings/CommunityDeletionConfirmation"
@@ -10,7 +10,7 @@ import {
   useCommunityDeletionSnapshotQuery,
 } from "@/infrastructure/graphql/generated"
 
-export default function CommunityDeletePage() {
+function CommunityDeletePageContent() {
   const { communityId } = useParams<{ communityId: string }>()
   const { data, loading, error, refetch } = useCommunityDeletionSnapshotQuery({
     variables: { communityId },
@@ -69,5 +69,13 @@ export default function CommunityDeletePage() {
       }}
       onReviewChanged={() => void refetch()}
     />
+  )
+}
+
+export default function CommunityDeletePage() {
+  return (
+    <ScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}>
+      <Box pt="lg"><CommunityDeletePageContent /></Box>
+    </ScrollArea>
   )
 }

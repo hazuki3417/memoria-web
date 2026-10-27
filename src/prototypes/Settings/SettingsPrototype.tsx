@@ -1,5 +1,6 @@
 "use client"
 
+
 import { useState, type ReactNode } from "react"
 import { Button, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
@@ -206,6 +207,7 @@ export function SettingsPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
+      <>
       <SettingsLayout section={section} onSectionChange={setSection}>
         {content}
       </SettingsLayout>
@@ -220,6 +222,7 @@ export function SettingsPrototype({
       >
         現在の設定: {currentLabel}
       </Text>
-    </PrototypeApplicationShell>
+          </>
+</PrototypeApplicationShell>
   )
 }

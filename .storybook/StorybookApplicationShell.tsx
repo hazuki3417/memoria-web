@@ -1,5 +1,6 @@
 "use client"
 
+
 import { useState, type ReactNode } from "react"
 import {
   getApplicationNavigation,
@@ -34,7 +35,9 @@ export function StorybookApplicationShell({ children }: { children: ReactNode })
       }}
       onSelectNavigation={(id) => setSection(id as ApplicationSection)}
     >
+      <>
       {children}
-    </PrototypeApplicationShell>
+          </>
+</PrototypeApplicationShell>
   )
 }

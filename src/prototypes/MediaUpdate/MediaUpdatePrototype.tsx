@@ -1,5 +1,8 @@
 "use client"
 
+import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
+
+
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
@@ -66,6 +69,7 @@ export function MediaUpdatePrototype({
         activeSection: "media",
       })}
     >
+      <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
           {scenario === "load-failure" ? (
@@ -264,6 +268,7 @@ export function MediaUpdatePrototype({
           </Group>
         </Stack>
       </Modal>
-    </PrototypeApplicationShell>
+          </ScrollPaddingBox></PageScrollArea>
+</PrototypeApplicationShell>
   )
 }

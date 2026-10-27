@@ -1,5 +1,8 @@
 "use client"
 
+import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
+
+
 import { Box, Paper, Stack, Text } from "@mantine/core"
 import { useState } from "react"
 import {
@@ -72,6 +75,7 @@ export function ApplicationShellPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
+      <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
       <Box maw={1120} mx="auto" w="100%">
         <h1
           style={{
@@ -98,6 +102,7 @@ export function ApplicationShellPrototype({
           </Stack>
         </Paper>
       </Box>
-    </PrototypeApplicationShell>
+          </ScrollPaddingBox></PageScrollArea>
+</PrototypeApplicationShell>
   )
 }

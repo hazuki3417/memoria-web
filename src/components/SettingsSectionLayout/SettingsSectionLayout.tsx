@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Group, Stack } from "@mantine/core"
+import { Box, Group, ScrollArea, Stack } from "@mantine/core"
 import type { ReactNode } from "react"
 
 export type SettingsSectionLayoutProps = {
@@ -9,28 +9,27 @@ export type SettingsSectionLayoutProps = {
   children: ReactNode
 }
 
-/**
- * Shared Personal / Community settings presentation.
- * Preserve the existing two layouts without redefining responsive behavior.
- */
+/** Navigation stays outside the page-content scrollport in both responsive layouts. */
 export function SettingsSectionLayout({
   compact,
   navigation,
   children,
 }: SettingsSectionLayoutProps) {
   return (
-    <Box maw={1120} mx="auto" w="100%">
+    <Box maw={1120} mx="auto" w="100%" h="100%" pt="lg" style={{ minHeight: 0 }}>
       {compact ? (
-        <Stack gap="xl">
+        <Stack gap="xl" h="100%" style={{ minHeight: 0, overflow: "hidden" }}>
           {navigation}
-          <Box>{children}</Box>
+          <ScrollArea type="hover" flex={1} style={{ minHeight: 0, overscrollBehavior: "contain" }}>
+            {children}
+          </ScrollArea>
         </Stack>
       ) : (
-        <Group align="flex-start" gap={56} wrap="nowrap">
+        <Group align="flex-start" gap={56} wrap="nowrap" h="100%" style={{ minHeight: 0, overflow: "hidden" }}>
           {navigation}
-          <Box style={{ flex: 1 }} maw={760} miw={0}>
+          <ScrollArea type="hover" h="100%" style={{ flex: 1, minWidth: 0, overscrollBehavior: "contain" }} maw={760}>
             {children}
-          </Box>
+          </ScrollArea>
         </Group>
       )}
     </Box>

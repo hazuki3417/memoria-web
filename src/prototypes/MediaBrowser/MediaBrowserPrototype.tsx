@@ -534,6 +534,7 @@ export function MediaBrowserPrototype({
       onOpenSettings={() => {}}
       onLogout={() => {}}
     >
+      <Box h="100%" pt="lg" style={{ minHeight: 0 }}>
       {!detailOnlyItems && (
         <Stack gap={0} w="100%">
           <Box
@@ -1749,6 +1750,7 @@ export function MediaBrowserPrototype({
           </Group>
         </Stack>
       </Modal>
-    </PrototypeApplicationShell>
+          </Box>
+</PrototypeApplicationShell>
   )
 }

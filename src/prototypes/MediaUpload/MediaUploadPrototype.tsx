@@ -1,5 +1,8 @@
 "use client"
 
+import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
+
+
 import {
   Badge,
   Box,
@@ -424,6 +427,7 @@ export function MediaUploadPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
+      <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
           <Paper
@@ -653,7 +657,8 @@ export function MediaUploadPrototype({
           </Group>
         </Stack>
       </Modal>
-    </PrototypeApplicationShell>
+          </ScrollPaddingBox></PageScrollArea>
+</PrototypeApplicationShell>
   )
 }
 

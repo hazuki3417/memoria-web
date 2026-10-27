@@ -1,5 +1,4 @@
 export { ApplicationAccountMenu } from "./ApplicationAccountMenu/index"
-export { ApplicationContentScroll } from "./ApplicationContentScroll/index"
 export { ApplicationContextSwitcher } from "./ApplicationContextSwitcher/index"
 export { ApplicationHeader } from "./ApplicationHeader/index"
 export { ApplicationNavigation } from "./ApplicationNavigation/index"
