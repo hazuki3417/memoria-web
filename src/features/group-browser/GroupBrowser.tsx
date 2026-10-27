@@ -1,18 +1,10 @@
 "use client"
 
 import {
-  Alert,
   Box,
-  Button,
   Group,
-  Center,
-  Loader,
-  Stack,
-  Text,
-  ThemeIcon,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useMemo, useState } from "react"
 import { showNotification } from "@/components/Feedback"
@@ -179,111 +171,6 @@ export function GroupBrowser({
       filterVisibleGroups(allGroups, appliedQuery, groupsData !== undefined),
     [allGroups, appliedQuery, groupsData],
   )
-
-  const emptyGroupState =
-    discoveryState === "ready" &&
-    allGroups.length === 0 &&
-    !appliedQuery.trim() ? (
-      <Center mih={360}>
-        <Stack align="center" maw={420}>
-          <ThemeIcon size={48} radius="xl" variant="light">
-            <IconFolderPlus size={24} />
-          </ThemeIcon>
-          <Text fw={700} size="lg">
-            まだGroupがありません
-          </Text>
-          <Text size="sm" c="dimmed" ta="center">
-            最初のGroupを作成すると、ここからMediaを整理できます。
-          </Text>
-          {!hideManagementActions && (
-            <Button
-              leftSection={<IconFolderPlus size={16} />}
-              onClick={openCreate}
-              disabled={!canManage}
-            >
-              Groupを作成
-            </Button>
-          )}
-        </Stack>
-      </Center>
-    ) : null
-
-  const discoveryFeedback =
-    discoveryState === "loading" ? (
-      <Center mih={360}>
-        <Stack align="center">
-          <Loader />
-          <Text size="sm" c="dimmed">
-            Groupを読み込んでいます
-          </Text>
-        </Stack>
-      </Center>
-    ) : discoveryState === "error" ? (
-      <Box p="sm">
-        <Alert color="red" title="Group一覧を取得できませんでした">
-          <Stack gap="xs" align="flex-start">
-            <Text size="sm">
-              Group一覧の取得に失敗しました。再試行できます。
-            </Text>
-            <Button size="xs" variant="light" onClick={onRetryDiscovery}>
-              再試行
-            </Button>
-          </Stack>
-        </Alert>
-      </Box>
-    ) : null
-  const discoveryPageFeedback =
-    discoveryPageState === "loading" ? (
-      <Center py="lg">
-        <Stack align="center" gap={6}>
-          <Loader size="sm" />
-          <Text size="xs" c="dimmed">
-            追加のGroupを取得しています
-          </Text>
-        </Stack>
-      </Center>
-    ) : discoveryPageState === "error" ? (
-      <Box p="sm">
-        <Alert color="red" title="追加のGroupを取得できませんでした">
-          <Button
-            size="xs"
-            variant="light"
-            mt="xs"
-            onClick={onRetryDiscoveryPage}
-          >
-            再試行
-          </Button>
-        </Alert>
-      </Box>
-    ) : null
-  const searchEmptyState =
-    discoveryState === "ready" &&
-    allGroups.length > 0 &&
-    visibleGroups.length === 0 &&
-    appliedQuery.trim() ? (
-      <Center mih={360}>
-        <Stack align="center" maw={420}>
-          <ThemeIcon size={48} radius="xl" variant="light" color="gray">
-            <IconSearch size={24} />
-          </ThemeIcon>
-          <Text fw={700} size="lg">
-            一致するGroupがありません
-          </Text>
-          <Text size="sm" c="dimmed" ta="center">
-            検索条件を変更するか、検索を解除してください。
-          </Text>
-          <Button
-            variant="default"
-            onClick={() => {
-              setQuery("")
-              setAppliedQuery("")
-            }}
-          >
-            検索を解除
-          </Button>
-        </Stack>
-      </Center>
-    ) : null
 
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
@@ -456,10 +343,11 @@ export function GroupBrowser({
                 mediaItemsData={mediaItemsData}
                 compactGroupItemRefs={compactGroupItemRefs}
                 onOpenDetail={openDetail}
-                discoveryFeedback={discoveryFeedback}
-                emptyGroupState={emptyGroupState}
-                searchEmptyState={searchEmptyState}
-                discoveryPageFeedback={discoveryPageFeedback}
+                groupCount={allGroups.length}
+                appliedQuery={appliedQuery}
+                onClearSearch={() => { setQuery(""); setAppliedQuery("") }}
+                onRetryDiscovery={onRetryDiscovery}
+                onRetryDiscoveryPage={onRetryDiscoveryPage}
                 discoveryPageState={discoveryPageState}
                 onDiscoveryEndVisible={onDiscoveryEndVisible}
               />
@@ -508,10 +396,11 @@ export function GroupBrowser({
                 mediaItemsData={mediaItemsData}
                 compactGroupItemRefs={compactGroupItemRefs}
                 onOpenDetail={openDetail}
-                discoveryFeedback={discoveryFeedback}
-                emptyGroupState={emptyGroupState}
-                searchEmptyState={searchEmptyState}
-                discoveryPageFeedback={discoveryPageFeedback}
+                groupCount={allGroups.length}
+                appliedQuery={appliedQuery}
+                onClearSearch={() => { setQuery(""); setAppliedQuery("") }}
+                onRetryDiscovery={onRetryDiscovery}
+                onRetryDiscoveryPage={onRetryDiscoveryPage}
                 discoveryPageState={discoveryPageState}
                 onDiscoveryEndVisible={onDiscoveryEndVisible}
               />
