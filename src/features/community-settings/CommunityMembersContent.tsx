@@ -226,10 +226,16 @@ export function CommunityMembersContent({
                     tableLayout: "fixed",
                     borderBottom: "1px solid var(--mantine-color-default-border)",
                   }}
+                  styles={{
+                    td: {
+                      height: tableRowHeight,
+                      boxSizing: "border-box",
+                    },
+                  }}
                 >
                   <Table.Tbody>
                     {rows.map((member) => (
-                      <Table.Tr key={member.id} style={{ height: tableRowHeight }}>
+                      <Table.Tr key={member.id}>
                         <Table.Td w="45%">
                           {member.name}{" "}
                           {member.isSelf && (
