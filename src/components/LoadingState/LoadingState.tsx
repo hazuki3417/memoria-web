@@ -39,7 +39,8 @@ export function LoadingState({
       loading
       inlineCentered={variant === "inline"}
       inlinePadding={inlinePadding}
-      inlineGap={inlineLayout === "row" ? undefined : inlineGap ?? "xs"}
+      inlineLayout={inlineLayout}
+      inlineGap={inlineGap ?? "xs"}
     />
   )
 }
