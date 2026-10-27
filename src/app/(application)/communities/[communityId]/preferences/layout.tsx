@@ -1,7 +1,6 @@
 import type { ReactNode } from "react"
-import { ApplicationContentScroll } from "@/components/ApplicationShell"
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 
-/** Route-owned scroll region; the shared ApplicationShell does not prescribe page scrolling. */
-export default function PageScrollLayout({ children }: { children: ReactNode }) {
-  return <ApplicationContentScroll>{children}</ApplicationContentScroll>
+export default function PageLayout({ children }: { children: ReactNode }) {
+  return <StandardPageScroll>{children}</StandardPageScroll>
 }
