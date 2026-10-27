@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode, Ref } from "react"
-import { Box, Divider } from "@mantine/core"
+import { Box, Divider, ScrollArea } from "@mantine/core"
 import { GroupDetailToolbar } from "./GroupDetailToolbar"
 import { GroupDetailMediaContent } from "./GroupDetailMediaContent"
 
@@ -59,6 +59,7 @@ export function GroupDetailPane({
       {relationCandidateFeedback}
       {relationDetailSection}
       <Divider />
+      <ScrollArea flex={1}>
       <GroupDetailMediaContent
         selected={selected}
         mediaDetailState={mediaDetailState}
@@ -68,6 +69,7 @@ export function GroupDetailPane({
         mediaPageFeedback={mediaPageFeedback}
         onMediaEndVisible={onMediaEndVisible}
       />
+      </ScrollArea>
     </Box>
   ) : (
     <Box
@@ -95,6 +97,7 @@ export function GroupDetailPane({
       {relationDetailSection}
       <Divider />
 
+      <ScrollArea flex={1}>
       <GroupDetailMediaContent
         selected={selected}
         mediaDetailState={mediaDetailState}
@@ -104,6 +107,7 @@ export function GroupDetailPane({
         mediaPageFeedback={mediaPageFeedback}
         onMediaEndVisible={onMediaEndVisible}
       />
+      </ScrollArea>
     </Box>
   )
 }
