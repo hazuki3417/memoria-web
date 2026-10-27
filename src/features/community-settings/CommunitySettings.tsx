@@ -1,8 +1,6 @@
 "use client"
 
-import type { ReactNode } from "react"
-
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import {
   CommunityMembersContent,
   type CommunityMember,
@@ -14,7 +12,10 @@ import {
   IconChartBar,
   IconAdjustments,
 } from "@tabler/icons-react"
-import { SettingsSectionLayout, SettingsSectionNavigation } from "@/components/SettingsSectionLayout"
+import {
+  SettingsSectionLayout,
+  SettingsSectionNavigation,
+} from "@/components/SettingsSectionLayout"
 import { CommunityGeneralContent } from "./CommunityGeneralContent"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 import { useCommunityGeneralSettings } from "./useCommunityGeneralSettings"
