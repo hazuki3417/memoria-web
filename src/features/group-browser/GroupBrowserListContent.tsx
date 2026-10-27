@@ -1,10 +1,11 @@
 "use client"
 
 import type { RefObject } from "react"
-import { Alert, Box, Button, Center, Loader, Stack, Text, ThemeIcon, UnstyledButton } from "@mantine/core"
+import { Box, Button, Center, Loader, Stack, Text, ThemeIcon, UnstyledButton } from "@mantine/core"
 import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
 import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
 import { LoadMoreSentinel } from "./LoadMoreSentinel"
+import { ErrorState } from "@/components/ErrorState"
 import type { GroupBrowserGroup } from "./GroupBrowser"
 
 type GroupBrowserListContentProps = {
@@ -88,16 +89,7 @@ export function GroupBrowserListContent({
       </Center>
     ) : discoveryState === "error" ? (
       <Box p="sm">
-        <Alert color="red" title="Group一覧を取得できませんでした">
-          <Stack gap="xs" align="flex-start">
-            <Text size="sm">
-              Group一覧の取得に失敗しました。再試行できます。
-            </Text>
-            <Button size="xs" variant="light" onClick={onRetryDiscovery}>
-              再試行
-            </Button>
-          </Stack>
-        </Alert>
+        <ErrorState variant="full" title="Group一覧を取得できませんでした" description="Group一覧の取得に失敗しました。再試行できます。" onRetry={onRetryDiscovery} />
       </Box>
     ) : null
   const discoveryPageFeedback =
@@ -112,16 +104,7 @@ export function GroupBrowserListContent({
       </Center>
     ) : discoveryPageState === "error" ? (
       <Box p="sm">
-        <Alert color="red" title="追加のGroupを取得できませんでした">
-          <Button
-            size="xs"
-            variant="light"
-            mt="xs"
-            onClick={onRetryDiscoveryPage}
-          >
-            再試行
-          </Button>
-        </Alert>
+        <ErrorState variant="inline" title="追加のGroupを取得できませんでした" onRetry={onRetryDiscoveryPage} />
       </Box>
     ) : null
   const searchEmptyState =
