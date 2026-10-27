@@ -33,7 +33,7 @@ const previewMembers: CommunityMember[] = [
 ]
 type SortKey = "name" | "role"
 type MemberSort = { key: SortKey; direction: "asc" | "desc" } | null
-// No explicit sort retains a deterministic name-ascending order.
+// The API defines the default order: self first, then nickname ascending.
 export function CommunityMembersContent({
   members = previewMembers,
   onLeave,
@@ -48,7 +48,7 @@ export function CommunityMembersContent({
   onRemoveMember?: (userId: string) => Promise<boolean>
 }) {
   const [query, setQuery] = useState("")
-  const [sort, setSort] = useState<MemberSort>({ key: "name", direction: "asc" })
+  const [sort, setSort] = useState<MemberSort>(null)
   const [opened, setOpened] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
@@ -72,12 +72,11 @@ export function CommunityMembersContent({
             .includes(query.trim().toLocaleLowerCase("ja-JP")),
         )
         .sort((a, b) => {
-          const byName = a.name.localeCompare(b.name, "ja-JP", { numeric: true })
-          if (!sort || sort.key === "name") {
-            return (sort?.direction === "desc" ? -1 : 1) * byName
-          }
-          const byRole = a.role.localeCompare(b.role, "ja-JP")
-          return (sort.direction === "desc" ? -1 : 1) * byRole || byName
+          if (!sort) return 0 // Preserve the API's self-first, then name order.
+          const left = sort.key === "name" ? a.name : a.role
+          const right = sort.key === "name" ? b.name : b.role
+          const result = left.localeCompare(right, "ja-JP", { numeric: true })
+          return sort.direction === "asc" ? result : -result
         }),
     [members, query, sort],
   )
