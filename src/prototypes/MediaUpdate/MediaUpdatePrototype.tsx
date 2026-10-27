@@ -1,5 +1,6 @@
-import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
+
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
