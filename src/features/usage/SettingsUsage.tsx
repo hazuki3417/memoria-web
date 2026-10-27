@@ -9,7 +9,6 @@ import {
   SegmentedControl,
   Stack,
   Text,
-  Tooltip,
   VisuallyHidden,
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
@@ -90,8 +89,7 @@ export function SettingsUsage({
               {
                 value: "size",
                 label: (
-                  <Tooltip label="容量で表示" withArrow>
-                    <span
+                  <span
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -105,15 +103,13 @@ export function SettingsUsage({
                         style={{ display: "block" }}
                       />
                       <VisuallyHidden>容量</VisuallyHidden>
-                    </span>
-                  </Tooltip>
+                  </span>
                 ),
               },
               {
                 value: "percent",
                 label: (
-                  <Tooltip label="割合で表示" withArrow>
-                    <span
+                  <span
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -128,8 +124,7 @@ export function SettingsUsage({
                         style={{ display: "block" }}
                       />
                       <VisuallyHidden>割合</VisuallyHidden>
-                    </span>
-                  </Tooltip>
+                  </span>
                 ),
               },
             ]}

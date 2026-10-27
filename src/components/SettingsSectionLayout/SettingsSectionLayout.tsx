@@ -20,14 +20,14 @@ export function SettingsSectionLayout({
       {compact ? (
         <Stack gap="xl" h="100%" style={{ minHeight: 0, overflow: "hidden" }}>
           {navigation}
-          <ScrollArea type="hover" offsetScrollbars="present" flex={1} style={{ minHeight: 0, overscrollBehavior: "contain" }}>
+          <ScrollArea type="hover" offsetScrollbars={true} flex={1} style={{ minHeight: 0, overscrollBehavior: "contain" }}>
             {children}
           </ScrollArea>
         </Stack>
       ) : (
         <Group align="flex-start" gap={56} wrap="nowrap" h="100%" style={{ minHeight: 0, overflow: "hidden" }}>
           {navigation}
-          <ScrollArea type="hover" offsetScrollbars="present" h="100%" style={{ flex: 1, minWidth: 0, overscrollBehavior: "contain" }} maw={760}>
+          <ScrollArea type="hover" offsetScrollbars={true} h="100%" style={{ flex: 1, minWidth: 0, overscrollBehavior: "contain" }} maw={760}>
             {children}
           </ScrollArea>
         </Group>
