@@ -15,9 +15,9 @@ import {
   canEnterGroupName,
   countGroupNameGraphemes,
   validGroupName,
-} from "./groupName"
-import { RelationEditor } from "./RelationEditor"
-import type { GroupRelationAvailability } from "./GroupBrowser"
+} from "../groupName"
+import { RelationEditor } from "../RelationEditor"
+import type { GroupRelationAvailability } from "../GroupBrowser"
 
 export function GroupEditDialog({
   opened,

@@ -44,7 +44,9 @@ function Separator({ style, ...props }: SplitViewSeparatorProps) {
       style={{
         position: "relative",
         width: 17,
-        flex: "0 0 17px",
+        flexGrow: 0,
+        flexShrink: 0,
+        flexBasis: 17,
         cursor: "col-resize",
         touchAction: "none",
         outline: "none",

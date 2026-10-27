@@ -1,6 +1,8 @@
 "use client"
 
-import { Alert, Button, Center, Loader, Stack, Text } from "@mantine/core"
+import { Box } from "@mantine/core"
+import { LoadingState } from "@/components/LoadingState"
+import { ErrorState } from "@/components/ErrorState"
 
 export function GroupMediaPageFeedback({
   state,
@@ -10,22 +12,10 @@ export function GroupMediaPageFeedback({
   onRetry?: () => void
 }) {
   return state === "error" ? (
-    <Alert color="red" title="追加のMediaを取得できませんでした" mt="sm">
-      <Stack gap="xs" align="flex-start">
-        <Text size="sm">取得済みのMediaは引き続き閲覧できます。</Text>
-        <Button size="xs" variant="light" onClick={onRetry}>
-          再試行
-        </Button>
-      </Stack>
-    </Alert>
+    <Box mt="sm">
+      <ErrorState variant="inline" title="追加のMediaを取得できませんでした" description="取得済みのMediaは引き続き閲覧できます。" onRetry={onRetry} />
+    </Box>
   ) : state === "loading" ? (
-    <Center py="md" role="status">
-      <Stack align="center" gap="xs">
-        <Loader size="sm" />
-        <Text size="xs" c="dimmed">
-          追加のMediaを取得しています
-        </Text>
-      </Stack>
-    </Center>
+    <LoadingState variant="inline" title="追加のMediaを取得しています" />
   ) : null
 }

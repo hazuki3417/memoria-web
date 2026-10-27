@@ -1,44 +1,26 @@
 "use client"
 
-import {
-  Alert,
-  Box,
-  Button,
-  Divider,
-  Group,
-  Center,
-  Loader,
-  ScrollArea,
-  SimpleGrid,
-  Stack,
-  Text,
-  TextInput,
-  ThemeIcon,
-  UnstyledButton,
-} from "@mantine/core"
+import { Box } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useMemo, useState } from "react"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
 import { MediaDetailDialog } from "@/features/media-detail"
 import { validGroupName } from "./groupName"
-import { MediaGrid } from "./MediaGrid"
 import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupDetailPane } from "./GroupDetailPane"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
-import { LoadMoreSentinel } from "./LoadMoreSentinel"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
 import { GroupDeleteDialog } from "./GroupDeleteDialog"
 import { GroupCreateDialog } from "./GroupCreateDialog"
 import { GroupEditDialog } from "./GroupEditDialog"
+import { GroupBrowserListPane } from "./GroupBrowserListPane"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { filterVisibleGroups } from "./groupSearch"
 import { useGroupSearchState } from "./useGroupSearchState"
 import { useGroupNavigation } from "./useGroupNavigation"
 import { useGroupCreateController } from "./useGroupCreateController"
-import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
 
 export type GroupBrowserGroup = {
   id: string
@@ -186,111 +168,6 @@ export function GroupBrowser({
     [allGroups, appliedQuery, groupsData],
   )
 
-  const emptyGroupState =
-    discoveryState === "ready" &&
-    allGroups.length === 0 &&
-    !appliedQuery.trim() ? (
-      <Center mih={360}>
-        <Stack align="center" maw={420}>
-          <ThemeIcon size={48} radius="xl" variant="light">
-            <IconFolderPlus size={24} />
-          </ThemeIcon>
-          <Text fw={700} size="lg">
-            まだGroupがありません
-          </Text>
-          <Text size="sm" c="dimmed" ta="center">
-            最初のGroupを作成すると、ここからMediaを整理できます。
-          </Text>
-          {!hideManagementActions && (
-            <Button
-              leftSection={<IconFolderPlus size={16} />}
-              onClick={openCreate}
-              disabled={!canManage}
-            >
-              Groupを作成
-            </Button>
-          )}
-        </Stack>
-      </Center>
-    ) : null
-
-  const discoveryFeedback =
-    discoveryState === "loading" ? (
-      <Center mih={360}>
-        <Stack align="center">
-          <Loader />
-          <Text size="sm" c="dimmed">
-            Groupを読み込んでいます
-          </Text>
-        </Stack>
-      </Center>
-    ) : discoveryState === "error" ? (
-      <Box p="sm">
-        <Alert color="red" title="Group一覧を取得できませんでした">
-          <Stack gap="xs" align="flex-start">
-            <Text size="sm">
-              Group一覧の取得に失敗しました。再試行できます。
-            </Text>
-            <Button size="xs" variant="light" onClick={onRetryDiscovery}>
-              再試行
-            </Button>
-          </Stack>
-        </Alert>
-      </Box>
-    ) : null
-  const discoveryPageFeedback =
-    discoveryPageState === "loading" ? (
-      <Center py="lg">
-        <Stack align="center" gap={6}>
-          <Loader size="sm" />
-          <Text size="xs" c="dimmed">
-            追加のGroupを取得しています
-          </Text>
-        </Stack>
-      </Center>
-    ) : discoveryPageState === "error" ? (
-      <Box p="sm">
-        <Alert color="red" title="追加のGroupを取得できませんでした">
-          <Button
-            size="xs"
-            variant="light"
-            mt="xs"
-            onClick={onRetryDiscoveryPage}
-          >
-            再試行
-          </Button>
-        </Alert>
-      </Box>
-    ) : null
-  const searchEmptyState =
-    discoveryState === "ready" &&
-    allGroups.length > 0 &&
-    visibleGroups.length === 0 &&
-    appliedQuery.trim() ? (
-      <Center mih={360}>
-        <Stack align="center" maw={420}>
-          <ThemeIcon size={48} radius="xl" variant="light" color="gray">
-            <IconSearch size={24} />
-          </ThemeIcon>
-          <Text fw={700} size="lg">
-            一致するGroupがありません
-          </Text>
-          <Text size="sm" c="dimmed" ta="center">
-            検索条件を変更するか、検索を解除してください。
-          </Text>
-          <Button
-            variant="default"
-            onClick={() => {
-              setQuery("")
-              setAppliedQuery("")
-            }}
-          >
-            検索を解除
-          </Button>
-        </Stack>
-      </Center>
-    ) : null
-
   const selected = allGroups.find((group) => group.id === selectedId) ?? null
 
   const openEdit = () => {
@@ -324,22 +201,6 @@ export function GroupBrowser({
     <GroupMediaPageFeedback state={mediaPageState} onRetry={onRetryMediaPage} />
   )
 
-  const createDialog = (
-    <GroupCreateDialog
-      opened={createOpened}
-      name={createName}
-      parents={createParents}
-      children={createChildren}
-      candidates={candidates ?? []}
-      canManage={canManage}
-      saving={saving}
-      onNameChange={setCreateName}
-      onParentsChange={setCreateParents}
-      onChildrenChange={setCreateChildren}
-      onClose={closeCreate}
-      onSubmit={submitCreate}
-    />
-  )
 
   const submitEdit = async () => {
     if (!selected || !validGroupName(draftName)) return
@@ -379,27 +240,6 @@ export function GroupBrowser({
     if (result === "ok") edit.close()
   }
 
-  const editDialog = (
-    <GroupEditDialog
-      opened={editOpened}
-      name={draftName}
-      parents={draftParents}
-      children={draftChildren}
-      candidates={candidates ?? []}
-      currentGroupName={selected?.name ?? ""}
-      availability={relationAvailability}
-      canManage={canManage}
-      detailsReady={detailsReady}
-      conflictNeedsReview={conflictNeedsReview}
-      saving={saving}
-      onNameChange={setDraftName}
-      onParentsChange={setDraftParents}
-      onChildrenChange={setDraftChildren}
-      onDelete={deletion.open}
-      onClose={edit.close}
-      onSubmit={submitEdit}
-    />
-  )
 
   const confirmDelete = async () => {
     if (!selected) return
@@ -427,143 +267,80 @@ export function GroupBrowser({
     })
   }
 
-  const deleteDialog = (
-    <GroupDeleteDialog
-      opened={deleteOpened}
-      name={selected?.name ?? ""}
-      saving={saving}
-      canManage={canManage}
-      onClose={deletion.close}
-      onConfirm={confirmDelete}
-    />
-  )
-
   return (
     <>
-      {createDialog}
-      {editDialog}
-      {deleteDialog}
+      <GroupCreateDialog
+        opened={createOpened}
+        name={createName}
+        parents={createParents}
+        children={createChildren}
+        candidates={candidates ?? []}
+        canManage={canManage}
+        saving={saving}
+        onNameChange={setCreateName}
+        onParentsChange={setCreateParents}
+        onChildrenChange={setCreateChildren}
+        onClose={closeCreate}
+        onSubmit={submitCreate}
+      />
+      <GroupEditDialog
+        opened={editOpened}
+        name={draftName}
+        parents={draftParents}
+        children={draftChildren}
+        candidates={candidates ?? []}
+        currentGroupName={selected?.name ?? ""}
+        availability={relationAvailability}
+        canManage={canManage}
+        detailsReady={detailsReady}
+        conflictNeedsReview={conflictNeedsReview}
+        saving={saving}
+        onNameChange={setDraftName}
+        onParentsChange={setDraftParents}
+        onChildrenChange={setDraftChildren}
+        onDelete={deletion.open}
+        onClose={edit.close}
+        onSubmit={submitEdit}
+      />
+      <GroupDeleteDialog
+        opened={deleteOpened}
+        name={selected?.name ?? ""}
+        saving={saving}
+        canManage={canManage}
+        onClose={deletion.close}
+        onConfirm={confirmDelete}
+      />
+
       {compact ? (
         <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
           {compactView === "groups" ? (
-            <Box
-              h="100%"
-              style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
-            >
-              <Box
-                pb="xs"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: compact
-                    ? "minmax(0, 1fr)"
-                    : "minmax(0, 1fr) auto",
-                  alignItems: "center",
-                  gap: "var(--mantine-spacing-xs)",
+            <GroupBrowserListPane
+                compact={true}
+                query={query}
+                onQueryChange={setQuery}
+                onSearch={() => setAppliedQuery(query)}
+                searchRef={compactSearchRef}
+                hideManagementActions={hideManagementActions}
+                canManage={canManage}
+                onCreate={openCreate}
+                visibleGroups={visibleGroups}
+                discoveryState={discoveryState}
+                groupsLoaded={groupsData !== undefined}
+                selectedId={selectedId}
+                mediaItemsData={mediaItemsData}
+                compactGroupItemRefs={compactGroupItemRefs}
+                onOpenDetail={openDetail}
+                groupCount={allGroups.length}
+                appliedQuery={appliedQuery}
+                onClearSearch={() => {
+                  setQuery("")
+                  setAppliedQuery("")
                 }}
-              >
-                <Box style={{ minWidth: 0 }}>
-                  <Group
-                    component="form"
-                    onSubmit={(event) => {
-                      event.preventDefault()
-                      setAppliedQuery(query)
-                    }}
-                    gap="xs"
-                    wrap="nowrap"
-                    style={{ minWidth: 0 }}
-                  >
-                    <TextInput
-                      w={compact ? "100%" : 280}
-                      maw="100%"
-                      size="xs"
-                      ref={compactSearchRef}
-                      value={query}
-                      onChange={(event) => setQuery(event.currentTarget.value)}
-                      placeholder="Groupを検索"
-                      leftSection={<IconSearch size={16} />}
-                      style={{ flex: compact ? "1 1 auto" : undefined }}
-                    />
-                    <Button size="xs" type="submit">
-                      検索
-                    </Button>
-                  </Group>
-                </Box>
-                <Group
-                  gap="xs"
-                  wrap="nowrap"
-                  justify="flex-end"
-                  style={{ gridColumn: compact ? "1" : undefined }}
-                >
-                  {!hideManagementActions && (
-                    <Button
-                      size="xs"
-                      leftSection={<IconFolderPlus size={16} />}
-                      onClick={openCreate}
-                      disabled={!canManage}
-                    >
-                      Groupを作成
-                    </Button>
-                  )}
-                </Group>
-              </Box>
-              <Divider />
-              <ScrollArea flex={1}>
-                {discoveryFeedback}
-                {emptyGroupState}
-                {searchEmptyState}
-                <Box
-                  p="sm"
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "var(--mantine-spacing-sm)",
-                  }}
-                >
-                  {(discoveryState === "ready" ? visibleGroups : []).map(
-                    (group) => (
-                      <UnstyledButton
-                        key={group.id}
-                        ref={(element) => {
-                          if (element)
-                            compactGroupItemRefs.current.set(group.id, element)
-                          else compactGroupItemRefs.current.delete(group.id)
-                        }}
-                        onClick={() => openDetail(group.id)}
-                        p="xs"
-                        bdrs="sm"
-                        w={240}
-                      >
-                        <Stack gap={6}>
-                          <Text
-                            fw={600}
-                            size="sm"
-                            truncate="end"
-                            title={group.name}
-                          >
-                            {group.name}
-                          </Text>
-                          <PreviewGrid
-                            count={group.previewCount}
-                            remote={groupsData !== undefined}
-                            sources={
-                              group.id === selectedId
-                                ? (mediaItemsData ?? []).flatMap((item) =>
-                                    item.src ? [item.src] : [],
-                                  )
-                                : []
-                            }
-                          />
-                        </Stack>
-                      </UnstyledButton>
-                    ),
-                  )}
-                </Box>
-                {discoveryPageFeedback}
-                {onDiscoveryEndVisible && discoveryPageState !== "error" && (
-                  <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />
-                )}
-              </ScrollArea>
-            </Box>
+                onRetryDiscovery={onRetryDiscovery}
+                onRetryDiscoveryPage={onRetryDiscoveryPage}
+                discoveryPageState={discoveryPageState}
+                onDiscoveryEndVisible={onDiscoveryEndVisible}
+              />
           ) : (
             <GroupDetailPane
               compact
@@ -593,133 +370,38 @@ export function GroupBrowser({
           style={{ height: "calc(100vh - 88px)" }}
         >
           <SplitView.Pane id="groups" minWidth={264}>
-            <Box
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
-                minHeight: 0,
-              }}
-            >
-              <Box
-                pb="xs"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: compact
-                    ? "minmax(0, 1fr)"
-                    : "minmax(0, 1fr) auto",
-                  alignItems: "center",
-                  gap: "var(--mantine-spacing-xs)",
-                }}
-              >
-                <Box style={{ minWidth: 0 }}>
-                  <Group
-                    component="form"
-                    onSubmit={(event) => {
-                      event.preventDefault()
-                      setAppliedQuery(query)
-                    }}
-                    gap="xs"
-                    wrap="nowrap"
-                    style={{ minWidth: 0 }}
-                  >
-                    <TextInput
-                      w={compact ? "100%" : 280}
-                      maw="100%"
-                      size="xs"
-                      value={query}
-                      onChange={(event) => setQuery(event.currentTarget.value)}
-                      placeholder="Groupを検索"
-                      leftSection={<IconSearch size={16} />}
-                      style={{ flex: compact ? "1 1 auto" : undefined }}
-                    />
-                    <Button size="xs" type="submit">
-                      検索
-                    </Button>
-                  </Group>
-                </Box>
-                <Group
-                  gap="xs"
-                  wrap="nowrap"
-                  justify="flex-end"
-                  style={{ gridColumn: compact ? "1" : undefined }}
-                >
-                  {!hideManagementActions && (
-                    <Button
-                      size="xs"
-                      leftSection={<IconFolderPlus size={16} />}
-                      onClick={openCreate}
-                      disabled={!canManage}
-                    >
-                      Groupを作成
-                    </Button>
-                  )}
-                </Group>
-              </Box>
-              <Divider />
-              <ScrollArea flex={1}>
-                {discoveryFeedback}
-                {emptyGroupState}
-                {searchEmptyState}
-                <Box
-                  p="sm"
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "var(--mantine-spacing-sm)",
-                  }}
-                >
-                  {(discoveryState === "ready" ? visibleGroups : []).map(
-                    (group) => {
-                      const selectedItem = group.id === selectedId
-                      return (
-                        <UnstyledButton
-                          key={group.id}
-                          onClick={() => openDetail(group.id)}
-                          aria-pressed={selectedItem}
-                          w={240}
-                          p="xs"
-                          bdrs="sm"
-                          bg={
-                            selectedItem
-                              ? "var(--mantine-color-default-hover)"
-                              : undefined
-                          }
-                          style={{
-                            border: selectedItem
-                              ? "1px solid var(--mantine-primary-color-filled)"
-                              : "1px solid transparent",
-                          }}
-                        >
-                          <Stack gap={6}>
-                            <Text
-                              fw={600}
-                              size="sm"
-                              truncate="end"
-                              title={group.name}
-                            >
-                              {group.name}
-                            </Text>
-                            <PreviewGrid
-                              count={group.previewCount}
-                              remote={groupsData !== undefined}
-                            />
-                          </Stack>
-                        </UnstyledButton>
-                      )
-                    },
-                  )}
-                </Box>
-                {discoveryPageFeedback}
-                {onDiscoveryEndVisible && discoveryPageState !== "error" && (
-                  <LoadMoreSentinel onVisible={onDiscoveryEndVisible} />
-                )}
-              </ScrollArea>
-            </Box>
+            <GroupBrowserListPane
+                compact={false}
+                query={query}
+                onQueryChange={setQuery}
+                onSearch={() => setAppliedQuery(query)}
+                
+                hideManagementActions={hideManagementActions}
+                canManage={canManage}
+                onCreate={openCreate}
+                visibleGroups={visibleGroups}
+                discoveryState={discoveryState}
+                groupsLoaded={groupsData !== undefined}
+                selectedId={selectedId}
+                mediaItemsData={mediaItemsData}
+                compactGroupItemRefs={compactGroupItemRefs}
+                onOpenDetail={openDetail}
+                groupCount={allGroups.length}
+                appliedQuery={appliedQuery}
+                onClearSearch={() => { setQuery(""); setAppliedQuery("") }}
+                onRetryDiscovery={onRetryDiscovery}
+                onRetryDiscoveryPage={onRetryDiscoveryPage}
+                discoveryPageState={discoveryPageState}
+                onDiscoveryEndVisible={onDiscoveryEndVisible}
+              />
           </SplitView.Pane>
 
           <SplitView.Separator
-            style={{ visibility: selectedId ? "visible" : "hidden" }}
+            style={{
+              visibility: selectedId ? "visible" : "hidden",
+              width: selectedId ? 17 : 0,
+              flexBasis: selectedId ? 17 : 0,
+            }}
           />
 
           <SplitView.Pane
