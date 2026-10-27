@@ -15,7 +15,7 @@ export function SettingsAccount({
         <Box c="red">
           <SectionHeader>アカウント削除</SectionHeader>
         </Box>
-        <Stack gap="md" maw={620}>
+        <Stack gap="md">
           <Text size="sm">
             アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。
           </Text>
