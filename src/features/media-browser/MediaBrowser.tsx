@@ -1,32 +1,11 @@
 "use client"
 
-import {
-  Alert,
-  Box,
-  Button,
-  Center,
-  Divider,
-  Group,
-  Loader,
-  Paper,
-  ScrollArea,
-  Stack,
-  Text,
-  ThemeIcon,
-} from "@mantine/core"
-import { useMediaQuery } from "@mantine/hooks"
-import {
-  IconAlertCircle,
-  IconCloudUpload,
-  IconPhoto,
-  IconTags,
-} from "@tabler/icons-react"
+
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { showNotification } from "@/components/Feedback"
 import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
-import { MediaTile } from "./MediaTile"
-import { MediaBrowserToolbar } from "./MediaBrowserToolbar"
+import { MediaBrowserPane } from "./MediaBrowserPane"
 import { MediaBrowserGroupDialog } from "./MediaBrowserGroupDialog"
 import { MediaBrowserShareDialog } from "./MediaBrowserShareDialog"
 import { MediaBrowserDeleteDialog } from "./MediaBrowserDeleteDialog"
@@ -92,7 +71,7 @@ const _contexts = [
   },
 ]
 
-function MediaBrowserContent({
+function MediaBrowserController({
   initialState = "default",
   contextKind = "personal",
   initialDialog = null,
@@ -221,190 +200,39 @@ function MediaBrowserContent({
 
   return (
     <>
-      {
-        <Box
-          w="100%"
-          h="calc(100vh - 88px)"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            minWidth: 0,
-            minHeight: 0,
-            overflow: "hidden",
-          }}
-        >
-          <MediaBrowserToolbar
-            compact={compact}
-            selecting={selecting}
-            selected={selected}
-            tags={tags}
-            setTags={setTags}
-            onSubmitTags={() => {
-              setAppliedTags([...tags])
-              onApplyTags?.([...tags])
-            }}
-            tagOptions={tagOptions}
-            context={context}
-            communityId={communityId}
-            hasRemoteItems={Boolean(items)}
-            navigate={navigate}
-            onSelectionDialog={setSelectionDialog}
-            onStartSelection={() => setSelecting(true)}
-            onEndSelection={endSelection}
-          />
-          <Divider />
-          <ScrollArea flex={1} style={{ minHeight: 0 }}>
-            {activeState === "loading" && (
-              <Center mih={360}>
-                <Stack align="center">
-                  <Loader />
-                  <Text size="sm" c="dimmed">
-                    Mediaを読み込んでいます
-                  </Text>
-                </Stack>
-              </Center>
-            )}
-            {activeState === "error" && (
-              <Alert
-                icon={<IconAlertCircle size={18} />}
-                title="Mediaを読み込めませんでした"
-                color="red"
-              >
-                <Group justify="space-between">
-                  <Text size="sm">
-                    通信状態を確認して、もう一度お試しください。
-                  </Text>
-                  <Button size="xs" variant="default" onClick={onRetry}>
-                    再試行
-                  </Button>
-                </Group>
-              </Alert>
-            )}
-            {activeState === "true-empty" && (
-              <Center mih={360}>
-                <Stack align="center" maw={420}>
-                  <ThemeIcon size={48} radius="xl" variant="light">
-                    <IconPhoto size={24} />
-                  </ThemeIcon>
-                  <Text fw={700} size="lg">
-                    まだMediaがありません
-                  </Text>
-                  <Text size="sm" c="dimmed" ta="center">
-                    {context === "personal"
-                      ? "最初のMediaをアップロードすると、ここから閲覧・整理できます。"
-                      : "CommunityへMediaを追加すると、ここから閲覧・整理できます。"}
-                  </Text>
-                  <Button
-                    leftSection={<IconCloudUpload size={16} />}
-                    onClick={
-                      items
-                        ? () =>
-                            navigate(
-                              context === "personal"
-                                ? "/media/upload"
-                                : `/communities/${communityId}/media/upload`,
-                            )
-                        : undefined
-                    }
-                  >
-                    {context === "personal"
-                      ? "Mediaをアップロード"
-                      : "Mediaを追加"}
-                  </Button>
-                </Stack>
-              </Center>
-            )}
-            {activeState === "filtered-empty" && (
-              <Center mih={360}>
-                <Stack align="center" maw={420}>
-                  <ThemeIcon size={48} radius="xl" variant="light" color="gray">
-                    <IconTags size={24} />
-                  </ThemeIcon>
-                  <Text fw={700} size="lg">
-                    一致するMediaがありません
-                  </Text>
-                  <Text size="sm" c="dimmed" ta="center">
-                    選択中のTagを変更するか、filterを解除してください。
-                  </Text>
-                  <Button
-                    variant="default"
-                    onClick={() => {
-                      setTags([])
-                      setAppliedTags([])
-                      onApplyTags?.([])
-                    }}
-                  >
-                    Filterを解除
-                  </Button>
-                </Stack>
-              </Center>
-            )}
-
-            {activeState !== "error" &&
-              activeState !== "loading" &&
-              stateItems.length > 0 && (
-                <Box
-                  p={3}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(min(168px, 100%), 1fr))",
-                    gap: "var(--mantine-spacing-xs)",
-                  }}
-                >
-                  {stateItems.map((item) => (
-                    <MediaTile
-                      key={item.id}
-                      item={item}
-                      selecting={selecting}
-                      selected={selected.has(item.id)}
-                      onClick={() => {
-                        if (selecting) {
-                          toggle(item.id)
-                          return
-                        }
-                        if (!items) setDetail(item)
-                      }}
-                    />
-                  ))}
-                </Box>
-              )}
-            {activeState !== "error" &&
-              hasMore &&
-              !loadingMore &&
-              !loadMoreError && (
-                <Center py="md">
-                  <Button size="xs" variant="default" onClick={onLoadMore}>
-                    さらに読み込む
-                  </Button>
-                </Center>
-              )}
-            {(loadingMore || activeState === "loading-more") && (
-              <Center py="md">
-                <Group gap="xs">
-                  <Loader size="sm" />
-                  <Text size="sm" c="dimmed">
-                    さらに読み込んでいます
-                  </Text>
-                </Group>
-              </Center>
-            )}
-            {(loadMoreError || activeState === "load-more-error") && (
-              <Paper withBorder radius="md" p="sm">
-                <Group justify="space-between">
-                  <Group gap="xs">
-                    <IconAlertCircle size={18} />
-                    <Text size="sm">続きのMediaを読み込めませんでした</Text>
-                  </Group>
-                  <Button size="xs" variant="default" onClick={onLoadMore}>
-                    再試行
-                  </Button>
-                </Group>
-              </Paper>
-            )}
-          </ScrollArea>
-        </Box>
-      }
+      <MediaBrowserPane
+        compact={compact}
+        selecting={selecting}
+        selected={selected}
+        tags={tags}
+        setTags={setTags}
+        onSubmitTags={() => {
+          setAppliedTags([...tags])
+          onApplyTags?.([...tags])
+        }}
+        tagOptions={tagOptions}
+        context={context}
+        communityId={communityId}
+        hasRemoteItems={Boolean(items)}
+        navigate={navigate}
+        onSelectionDialog={setSelectionDialog}
+        onStartSelection={() => setSelecting(true)}
+        onEndSelection={endSelection}
+        activeState={activeState}
+        items={stateItems}
+        onToggle={toggle}
+        onOpenDetail={setDetail}
+        onClearTags={() => {
+          setTags([])
+          setAppliedTags([])
+          onApplyTags?.([])
+        }}
+        onRetry={onRetry}
+        onLoadMore={onLoadMore}
+        hasMore={hasMore}
+        loadingMore={loadingMore}
+        loadMoreError={loadMoreError}
+      />
 
       <MediaBrowserGroupDialog
         opened={selectionDialog === "group"}
@@ -450,10 +278,10 @@ function MediaBrowserContent({
 
 /** Route integration for the Media listing. */
 export function MediaBrowser(
-  props: Omit<Parameters<typeof MediaBrowserContent>[0], "navigate">,
+  props: Omit<Parameters<typeof MediaBrowserController>[0], "navigate">,
 ) {
   const router = useRouter()
   return (
-    <MediaBrowserContent {...props} navigate={(path) => router.push(path)} />
+    <MediaBrowserController {...props} navigate={(path) => router.push(path)} />
   )
 }
