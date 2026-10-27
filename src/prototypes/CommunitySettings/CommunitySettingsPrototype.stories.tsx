@@ -1,4 +1,4 @@
-import { ApplicationContentScroll } from "@/components/ApplicationShell"
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 import type { Meta, StoryObj } from "@storybook/react"
 import { CommunitySettings } from "@/features/community-settings/CommunitySettings"
 import { SettingsUsage } from "@/features/usage"
@@ -27,9 +27,9 @@ const meta = {
         })}
         user={{ displayName: "ユーザー" }}
       >
-        <ApplicationContentScroll>
+        <StandardPageScroll>
         <Story />
-              </ApplicationContentScroll>
+              </StandardPageScroll>
 </PrototypeApplicationShell>
     ),
   ],
