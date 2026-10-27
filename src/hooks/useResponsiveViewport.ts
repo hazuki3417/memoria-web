@@ -3,6 +3,7 @@
 import { useMantineTheme } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { useEffect, useState } from "react"
+import { classifyViewport } from "./classifyViewport"
 
 export type ViewportCategory = "compact" | "medium" | "wide"
 
@@ -32,11 +33,7 @@ export function useResponsiveViewport(): ResponsiveViewport {
     return { category: null, isResolved: false }
   }
 
-  const category: ViewportCategory = isAtLeastXl
-    ? "wide"
-    : isAtLeastSm
-      ? "medium"
-      : "compact"
+  const category = classifyViewport(isAtLeastSm, isAtLeastXl)
 
   return { category, isResolved: true }
 }
