@@ -1,4 +1,4 @@
-import { ApplicationContentScroll } from "@/components/ApplicationShell"
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
 
 import {
@@ -425,7 +425,7 @@ export function MediaUploadPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <ApplicationContentScroll>
+      <StandardPageScroll>
       <Box maw={1120} mx="auto" w="100%" pb={88}>
         <Stack gap="lg">
           <Paper
@@ -655,7 +655,7 @@ export function MediaUploadPrototype({
           </Group>
         </Stack>
       </Modal>
-          </ApplicationContentScroll>
+          </StandardPageScroll>
 </PrototypeApplicationShell>
   )
 }
