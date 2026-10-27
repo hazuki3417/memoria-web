@@ -1,3 +1,4 @@
+import { ApplicationContentScroll } from "@/components/ApplicationShell"
 "use client"
 
 import { useState, type ReactNode } from "react"
@@ -34,7 +35,9 @@ export function StorybookApplicationShell({ children }: { children: ReactNode })
       }}
       onSelectNavigation={(id) => setSection(id as ApplicationSection)}
     >
+      <ApplicationContentScroll>
       {children}
-    </PrototypeApplicationShell>
+          </ApplicationContentScroll>
+</PrototypeApplicationShell>
   )
 }
