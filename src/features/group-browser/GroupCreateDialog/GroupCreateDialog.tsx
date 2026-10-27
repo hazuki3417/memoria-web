@@ -13,8 +13,8 @@ import {
   canEnterGroupName,
   countGroupNameGraphemes,
   validGroupName,
-} from "./groupName"
-import { RelationEditor } from "./RelationEditor"
+} from "../groupName"
+import { RelationEditor } from "../RelationEditor"
 
 export function GroupCreateDialog({
   opened,
