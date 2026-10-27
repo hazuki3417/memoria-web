@@ -1,3 +1,4 @@
+import { ApplicationContentScroll } from "@/components/ApplicationShell"
 "use client"
 
 import { GroupItem } from "@/components/GroupItem"
@@ -430,6 +431,7 @@ export function DashboardPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
+      <ApplicationContentScroll>
       <PageWidth variant="contained">
         <Stack gap="xl" w="100%">
           <Stack gap="sm">
@@ -540,6 +542,7 @@ export function DashboardPrototype({
           </Stack>
         </Stack>
       </PageWidth>
-    </PrototypeApplicationShell>
+          </ApplicationContentScroll>
+</PrototypeApplicationShell>
   )
 }
