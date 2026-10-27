@@ -87,6 +87,10 @@ export function MediaBrowserToolbar({
         )}
         <SegmentedControl
           size="xs"
+          styles={{
+            root: { height: 28, padding: 2 },
+            label: { height: 24, paddingBlock: 0, display: "flex", alignItems: "center" },
+          }}
           value={selecting ? "select" : "view"}
           onChange={(value) => {
             if (value === "select") {
