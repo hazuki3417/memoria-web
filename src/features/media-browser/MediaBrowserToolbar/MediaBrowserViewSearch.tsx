@@ -37,6 +37,7 @@ export function MediaBrowserViewSearch({
         clearable
         leftSection={<IconSearch size={16} />}
         size="xs"
+        styles={{ input: { minHeight: 28, paddingBlock: 0 } }}
         w={compact ? "100%" : 280}
         maw="100%"
         style={{ flex: compact ? "1 1 auto" : undefined }}
