@@ -47,6 +47,7 @@ export function MediaBrowserToolbar({
         display: "grid",
         gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto",
         alignItems: "center",
+        minHeight: "calc(32px + var(--mantine-spacing-xs))",
         gap: "var(--mantine-spacing-xs)",
       }}
     >
