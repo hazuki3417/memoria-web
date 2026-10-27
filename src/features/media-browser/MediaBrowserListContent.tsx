@@ -1,10 +1,12 @@
 "use client"
 
-import { Box, Button, Center, Group, Loader, Stack, Text, ThemeIcon } from "@mantine/core"
+import { Box, Button, Center } from "@mantine/core"
 import { IconCloudUpload, IconPhoto, IconTags } from "@tabler/icons-react"
 import type { MediaItem } from "@/features/media-detail"
 import { MediaTile } from "./MediaTile"
 import { ErrorState } from "@/components/ErrorState"
+import { LoadingState } from "@/components/LoadingState"
+import { EmptyState } from "@/components/EmptyState"
 
 export type MediaBrowserListState = "default" | "tag-filtered" | "true-empty" | "filtered-empty" | "loading" | "error" | "loading-more" | "load-more-error" | "processing-failure" | "selection"
 
@@ -30,72 +32,40 @@ type MediaBrowserListContentProps = {
 export function MediaBrowserListContent({ activeState, context, communityId, items: stateItems, hasRemoteItems, selecting, selected, onToggle: toggle, onOpenDetail, navigate, onClearTags, onRetry, onLoadMore, hasMore, loadingMore, loadMoreError }: MediaBrowserListContentProps) {
  return <>
             {activeState === "loading" && (
-              <Center mih={360}>
-                <Stack align="center">
-                  <Loader />
-                  <Text size="sm" c="dimmed">
-                    Mediaを読み込んでいます
-                  </Text>
-                </Stack>
-              </Center>
+              <LoadingState message="Mediaを読み込んでいます" />
             )}
             {activeState === "error" && (
               <ErrorState variant="full" title="Mediaを読み込めませんでした" description="通信状態を確認して、もう一度お試しください。" onRetry={onRetry} />
             )}
             {activeState === "true-empty" && (
-              <Center mih={360}>
-                <Stack align="center" maw={420}>
-                  <ThemeIcon size={48} radius="xl" variant="light">
-                    <IconPhoto size={24} />
-                  </ThemeIcon>
-                  <Text fw={700} size="lg">
-                    まだMediaがありません
-                  </Text>
-                  <Text size="sm" c="dimmed" ta="center">
-                    {context === "personal"
-                      ? "最初のMediaをアップロードすると、ここから閲覧・整理できます。"
-                      : "CommunityへMediaを追加すると、ここから閲覧・整理できます。"}
-                  </Text>
+              <EmptyState
+                icon={<IconPhoto size={24} />}
+                title="まだMediaがありません"
+                description={context === "personal"
+                  ? "最初のMediaをアップロードすると、ここから閲覧・整理できます。"
+                  : "CommunityへMediaを追加すると、ここから閲覧・整理できます。"}
+                action={
                   <Button
                     leftSection={<IconCloudUpload size={16} />}
-                    onClick={
-                      hasRemoteItems
-                        ? () =>
-                            navigate(
-                              context === "personal"
-                                ? "/media/upload"
-                                : `/communities/${communityId}/media/upload`,
-                            )
-                        : undefined
-                    }
+                    onClick={hasRemoteItems
+                      ? () => navigate(context === "personal"
+                        ? "/media/upload"
+                        : `/communities/${communityId}/media/upload`)
+                      : undefined}
                   >
-                    {context === "personal"
-                      ? "Mediaをアップロード"
-                      : "Mediaを追加"}
+                    {context === "personal" ? "Mediaをアップロード" : "Mediaを追加"}
                   </Button>
-                </Stack>
-              </Center>
+                }
+              />
             )}
             {activeState === "filtered-empty" && (
-              <Center mih={360}>
-                <Stack align="center" maw={420}>
-                  <ThemeIcon size={48} radius="xl" variant="light" color="gray">
-                    <IconTags size={24} />
-                  </ThemeIcon>
-                  <Text fw={700} size="lg">
-                    一致するMediaがありません
-                  </Text>
-                  <Text size="sm" c="dimmed" ta="center">
-                    選択中のTagを変更するか、filterを解除してください。
-                  </Text>
-                  <Button
-                    variant="default"
-                    onClick={onClearTags}
-                  >
-                    Filterを解除
-                  </Button>
-                </Stack>
-              </Center>
+              <EmptyState
+                icon={<IconTags size={24} />}
+                iconColor="gray"
+                title="一致するMediaがありません"
+                description="選択中のTagを変更するか、filterを解除してください。"
+                action={<Button variant="default" onClick={onClearTags}>Filterを解除</Button>}
+              />
             )}
 
             {activeState !== "error" &&
@@ -138,14 +108,7 @@ export function MediaBrowserListContent({ activeState, context, communityId, ite
                 </Center>
               )}
             {(loadingMore || activeState === "loading-more") && (
-              <Center py="md">
-                <Group gap="xs">
-                  <Loader size="sm" />
-                  <Text size="sm" c="dimmed">
-                    さらに読み込んでいます
-                  </Text>
-                </Group>
-              </Center>
+              <LoadingState variant="inline" layout="row" message="さらに読み込んでいます" />
             )}
             {(loadMoreError || activeState === "load-more-error") && (
               <Box p="sm">
