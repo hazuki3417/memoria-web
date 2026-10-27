@@ -1,3 +1,4 @@
+import { ApplicationContentScroll } from "@/components/ApplicationShell"
 import type { Meta, StoryObj } from "@storybook/react"
 import { CommunitySettings } from "@/features/community-settings/CommunitySettings"
 import { SettingsUsage } from "@/features/usage"
@@ -26,8 +27,10 @@ const meta = {
         })}
         user={{ displayName: "ユーザー" }}
       >
+        <ApplicationContentScroll>
         <Story />
-      </PrototypeApplicationShell>
+              </ApplicationContentScroll>
+</PrototypeApplicationShell>
     ),
   ],
 } satisfies Meta<typeof CommunitySettings>
