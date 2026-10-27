@@ -28,7 +28,26 @@ type GroupBrowserListContentProps = {
  onDiscoveryEndVisible?: () => void
 }
 
-export function GroupBrowserListContent({compact,visibleGroups,discoveryState,groupsLoaded,selectedId,mediaItemsData,compactGroupItemRefs,onOpenDetail:openDetail,groupCount,appliedQuery,hideManagementActions,canManage,onCreate,onClearSearch,onRetryDiscovery,onRetryDiscoveryPage,discoveryPageState,onDiscoveryEndVisible}:GroupBrowserListContentProps) {
+export function GroupBrowserListContent({
+  compact,
+  visibleGroups,
+  discoveryState,
+  groupsLoaded,
+  selectedId,
+  mediaItemsData,
+  compactGroupItemRefs,
+  onOpenDetail: openDetail,
+  groupCount,
+  appliedQuery,
+  hideManagementActions,
+  canManage,
+  onCreate,
+  onClearSearch,
+  onRetryDiscovery,
+  onRetryDiscoveryPage,
+  discoveryPageState,
+  onDiscoveryEndVisible,
+}: GroupBrowserListContentProps) {
   const emptyGroupState =
     discoveryState === "ready" &&
     groupCount === 0 &&
