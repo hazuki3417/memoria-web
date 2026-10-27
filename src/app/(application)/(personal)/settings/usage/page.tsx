@@ -1,9 +1,9 @@
-import { Settings } from "@/features/settings"
+import { ConnectedPersonalSettingsSection } from "@/features/settings/ConnectedSettings"
 import { ConnectedUsage } from "@/features/usage"
 
 export default function Page() {
   return (
-    <Settings
+    <ConnectedPersonalSettingsSection
       section="usage"
       usageContent={<ConnectedUsage scope="personal" />}
     />
