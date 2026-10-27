@@ -399,6 +399,7 @@ export function CommunitySettings({
   return (
     <SettingsSectionLayout
       compact={compact}
+      wrapCompactContent={false}
       navigation={
         <SettingsSectionNavigation
           section={currentSection}
