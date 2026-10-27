@@ -17,7 +17,6 @@ import {
 import { SettingsSectionLayout, SettingsSectionNavigation } from "@/components/SettingsSectionLayout"
 import { CommunityGeneralContent } from "./CommunityGeneralContent"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
-import { Box } from "@mantine/core"
 import { showNotification } from "@/components/Feedback"
 
 export type CommunitySettingsSection =
