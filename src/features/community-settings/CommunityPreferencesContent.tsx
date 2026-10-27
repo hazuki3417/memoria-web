@@ -55,7 +55,7 @@ export function CommunityPreferencesContent({
             <Text size="sm" c="dimmed">
               色の選択はプレビューです。保存・Contextへの反映はまだ行われません。
             </Text>
-          )
+          )}
         </Stack>
       </Box>
     </Stack>
