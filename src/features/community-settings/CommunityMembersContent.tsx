@@ -229,10 +229,7 @@ export function CommunityMembersContent({
                   highlightOnHover
                   style={{
                     tableLayout: "fixed",
-                    borderBottom:
-                      rows.length < visibleRowCount
-                        ? "1px solid var(--mantine-color-default-border)"
-                        : undefined,
+                    borderBottom: "1px solid var(--mantine-color-default-border)",
                   }}
                 >
                   <Table.Tbody>
