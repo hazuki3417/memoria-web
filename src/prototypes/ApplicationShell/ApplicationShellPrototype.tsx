@@ -1,5 +1,6 @@
-import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 "use client"
+
+import { StandardPageScroll } from "@/components/StandardPageScroll/StandardPageScroll"
 
 import { Box, Paper, Stack, Text } from "@mantine/core"
 import { useState } from "react"
