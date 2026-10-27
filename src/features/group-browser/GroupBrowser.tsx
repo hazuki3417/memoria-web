@@ -7,7 +7,6 @@ import {
   Group,
   Center,
   Loader,
-  SimpleGrid,
   Stack,
   Text,
   ThemeIcon,
