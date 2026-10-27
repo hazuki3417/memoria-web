@@ -13,9 +13,11 @@ type InvitationState = "none" | "active" | "expired" | "revoked"
 export function useCommunityGeneralSettings({
   communityId,
   communityName,
+  onSaveName,
 }: {
   communityId: string
   communityName?: string
+  onSaveName?: (name: string) => Promise<boolean>
 }) {
   const [name, setName] = useState(communityName ?? "家族のアルバム")
   const [draft, setDraft] = useState(name)
@@ -34,6 +36,34 @@ export function useCommunityGeneralSettings({
   const active = invitation === "active"
   const dirty = draft.trim() !== name
   const invalid = !draft.trim()
+
+  const saveName = () => {
+    if (savingName) return
+    const updated = draft.trim()
+    if (!onSaveName) {
+      setName(updated)
+      setDraft(updated)
+      showNotification({
+        kind: "success",
+        title: "Community名を変更",
+        description: "Community名を変更しました。",
+      })
+      return
+    }
+    setSavingName(true)
+    void onSaveName(updated)
+      .then((saved) => {
+        if (!saved) return
+        setName(updated)
+        setDraft(updated)
+        showNotification({
+          kind: "success",
+          title: "Community名を変更",
+          description: "Community名を変更しました。",
+        })
+      })
+      .finally(() => setSavingName(false))
+  }
 
   const issue = () => {
     setBusy(true)
@@ -94,7 +124,7 @@ export function useCommunityGeneralSettings({
     invalid,
     savingName,
     setSavingName,
-    setName,
+    saveName,
     invitation,
     invitationUrl,
     expiresAt,
