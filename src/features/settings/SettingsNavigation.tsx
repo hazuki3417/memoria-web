@@ -1,13 +1,12 @@
 "use client"
 
-import { Box, Select, Stack, Text } from "@mantine/core"
 import {
   IconChartBar,
   IconSettings,
   IconUser,
   IconUserCircle,
 } from "@tabler/icons-react"
-import { NavigationItem } from "@/components/NavigationItem"
+import { SettingsSectionNavigation } from "@/components/SettingsSectionLayout"
 
 export type SettingsSection = "profile" | "account" | "preferences" | "usage"
 
@@ -29,45 +28,15 @@ export function SettingsNavigation({
   compact,
   onSectionChange,
 }: SettingsNavigationProps) {
-  if (compact) {
-    return (
-      <Box>
-        <Text size="xs" c="dimmed" mb={6}>
-          設定
-        </Text>
-        <Select
-          aria-label="設定画面"
-          value={section}
-          onChange={(value) => {
-            if (value) onSectionChange(value as SettingsSection)
-          }}
-          data={sections.map((item) => ({
-            value: item.id,
-            label: item.label,
-          }))}
-          allowDeselect={false}
-        />
-      </Box>
-    )
-  }
-
   return (
-    <Box component="nav" aria-label="設定" w={200} style={{ flexShrink: 0 }}>
-      <Text size="xs" fw={700} c="dimmed" mb="xs">
-        設定
-      </Text>
-      <Stack gap={0}>
-        {sections.map((item) => (
-          <NavigationItem
-            key={item.id}
-            label={item.label}
-            icon={item.icon}
-            active={section === item.id}
-            accentColor="var(--mantine-color-blue-6)"
-            onClick={() => onSectionChange(item.id)}
-          />
-        ))}
-      </Stack>
-    </Box>
+    <SettingsSectionNavigation
+      section={section}
+      sections={sections}
+      compact={compact}
+      ariaLabel="設定画面"
+      desktopAriaLabel="設定"
+      accentColor="var(--mantine-color-blue-6)"
+      onSectionChange={onSectionChange}
+    />
   )
 }
