@@ -1,10 +1,12 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { Box, Center, Loader, Stack, Text, ThemeIcon } from "@mantine/core"
+import { Box } from "@mantine/core"
 import { IconPhoto } from "@tabler/icons-react"
 import { MediaGrid } from "./MediaGrid"
 import { ErrorState } from "@/components/ErrorState"
+import { LoadingState } from "@/components/LoadingState"
+import { EmptyState } from "@/components/EmptyState"
 import { LoadMoreSentinel } from "./LoadMoreSentinel"
 
 type GroupDetailMediaContentProps = {
@@ -28,30 +30,15 @@ export function GroupDetailMediaContent({
  return (
         <Box p="sm">
           {mediaDetailState === "loading" ? (
-            <Center mih={360}>
-              <Stack align="center">
-                <Loader />
-                <Text size="sm" c="dimmed">
-                  Mediaを読み込んでいます
-                </Text>
-              </Stack>
-            </Center>
+            <LoadingState message="Mediaを読み込んでいます" />
           ) : mediaDetailState === "error" ? (
             <ErrorState variant="full" title="GroupのMediaを取得できませんでした" description="最新のGroup情報を確認するため、再取得してください。" onRetry={() => void onRetryGroupMedia?.()} />
           ) : (selected?.mediaCount ?? 0) === 0 ? (
-            <Center mih={360}>
-              <Stack align="center" maw={420}>
-                <ThemeIcon size={48} radius="xl" variant="light">
-                  <IconPhoto size={24} />
-                </ThemeIcon>
-                <Text fw={700} size="lg">
-                  Mediaがありません
-                </Text>
-                <Text size="sm" c="dimmed" ta="center">
-                  このGroupまたはその下位Groupに分類されたMediaはありません。
-                </Text>
-              </Stack>
-            </Center>
+            <EmptyState
+              icon={<IconPhoto size={24} />}
+              title="Mediaがありません"
+              description="このGroupまたはその下位Groupに分類されたMediaはありません。"
+            />
           ) : (
             <>
               <MediaGrid onOpen={openMediaAt} items={mediaItemsData} />
