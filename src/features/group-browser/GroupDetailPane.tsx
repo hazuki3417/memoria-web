@@ -24,7 +24,7 @@ export type GroupDetailPaneProps = {
   onClose: () => void
 }
 
-/** Existing compact and wide detail layouts are preserved as separate variants. */
+/** Compact / Desktopの表示内容を共通化し、従来の高さ制約を維持する。 */
 export function GroupDetailPane({
   compact = false,
   selected,
@@ -73,15 +73,15 @@ export function GroupDetailPane({
       {relationDetailSection}
       <Divider />
       <ScrollArea flex={1}>
-      <GroupDetailMediaContent
-        selected={selected}
-        mediaDetailState={mediaDetailState}
-        mediaItemsData={mediaItemsData}
-        onRetryGroupMedia={onRetryGroupMedia}
-        onOpenMedia={openMediaAt}
-        mediaPageFeedback={mediaPageFeedback}
-        onMediaEndVisible={onMediaEndVisible}
-      />
+        <GroupDetailMediaContent
+          selected={selected}
+          mediaDetailState={mediaDetailState}
+          mediaItemsData={mediaItemsData}
+          onRetryGroupMedia={onRetryGroupMedia}
+          onOpenMedia={openMediaAt}
+          mediaPageFeedback={mediaPageFeedback}
+          onMediaEndVisible={onMediaEndVisible}
+        />
       </ScrollArea>
     </Box>
   )
