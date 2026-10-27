@@ -15,7 +15,15 @@ type GroupDetailMediaContentProps = {
  mediaPageFeedback: ReactNode
  onMediaEndVisible?: () => void
 }
-export function GroupDetailMediaContent({selected,mediaDetailState,mediaItemsData,onRetryGroupMedia,onOpenMedia:openMediaAt,mediaPageFeedback,onMediaEndVisible}:GroupDetailMediaContentProps) {
+export function GroupDetailMediaContent({
+  selected,
+  mediaDetailState,
+  mediaItemsData,
+  onRetryGroupMedia,
+  onOpenMedia: openMediaAt,
+  mediaPageFeedback,
+  onMediaEndVisible,
+}: GroupDetailMediaContentProps) {
  return (
       <ScrollArea flex={1}>
         <Box p="sm">
