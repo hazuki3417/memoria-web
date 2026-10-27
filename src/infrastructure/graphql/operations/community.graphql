@@ -1,5 +1,5 @@
 query MyCommunities {
-  myCommunities { id name createdAt updatedAt }
+  myCommunities { id name createdAt updatedAt mySettings { accentColor } }
 }
 
 query CommunityDetails($communityId: ID!) {
