@@ -71,7 +71,7 @@ export function MediaBrowserListContent({ activeState, context, communityId, ite
                   <Button
                     leftSection={<IconCloudUpload size={16} />}
                     onClick={
-                      items
+                      hasRemoteItems
                         ? () =>
                             navigate(
                               context === "personal"
