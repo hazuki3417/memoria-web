@@ -2,7 +2,7 @@
 
 import type { RefObject } from "react"
 import { Box, Button, Stack, Text, UnstyledButton } from "@mantine/core"
-import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
+import { IconFolderPlus } from "@tabler/icons-react"
 import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
 import { LoadMoreSentinel } from "./LoadMoreSentinel"
 import { ErrorState } from "@/components/ErrorState"
@@ -56,7 +56,7 @@ export function GroupBrowserListContent({
     groupCount === 0 &&
     !appliedQuery.trim() ? (
       <EmptyState
-        icon={<IconFolderPlus size={24} />}
+        kind="group"
         title="まだGroupがありません"
         description="最初のGroupを作成すると、ここからMediaを整理できます。"
         action={!hideManagementActions ? (
@@ -81,7 +81,7 @@ export function GroupBrowserListContent({
     ) : null
   const discoveryPageFeedback =
     discoveryPageState === "loading" ? (
-      <LoadingState variant="inline" inlinePadding="lg" inlineGap={6} title="追加のGroupを取得しています" />
+      <LoadingState variant="inline" title="追加のGroupを取得しています" />
     ) : discoveryPageState === "error" ? (
       <Box p="sm">
         <ErrorState variant="inline" title="追加のGroupを取得できませんでした" onRetry={onRetryDiscoveryPage} />
@@ -93,8 +93,7 @@ export function GroupBrowserListContent({
     visibleGroups.length === 0 &&
     appliedQuery.trim() ? (
       <EmptyState
-        icon={<IconSearch size={24} />}
-        iconColor="gray"
+        kind="search"
         title="一致するGroupがありません"
         description="検索条件を変更するか、検索を解除してください。"
         action={<Button variant="default" onClick={onClearSearch}>検索を解除</Button>}
