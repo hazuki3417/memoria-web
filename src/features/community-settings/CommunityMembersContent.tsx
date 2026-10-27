@@ -218,6 +218,11 @@ export function CommunityMembersContent({
                 type="hover"
                 scrollbarSize={8}
                 h={visibleRowCount * tableRowHeight}
+                styles={{
+                  viewport: {
+                    backgroundColor: "var(--mantine-color-default-hover)",
+                  },
+                }}
               >
                 <Table
                   striped
