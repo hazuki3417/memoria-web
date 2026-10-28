@@ -155,7 +155,7 @@ export function ApplicationContextSwitcher({
   const status = (
     <>
       {loading && communities.length === 0 && (
-        <Center w="100%" mih={80}>
+        <Center w="100%" mih={64}>
           <Loader size="sm" aria-label="Community一覧を読み込み中" />
         </Center>
       )}
