@@ -221,12 +221,18 @@ export function ApplicationContextSwitcher({
             </Group>
           </Menu.Label>
           {personal && menuOption(personal)}
-          <Box px={8} py={4}>{searchInput}</Box>
-          {pinned && menuOption(pinned)}
-          <ScrollArea.Autosize mah={360} type="auto">
-            {status}
-            {shown.map(menuOption)}
-          </ScrollArea.Autosize>
+          <Box
+            mt={4}
+            pt={4}
+            style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
+          >
+            <Box px={8} py={4}>{searchInput}</Box>
+            {pinned && menuOption(pinned)}
+            <ScrollArea.Autosize mah={360} type="auto">
+              {status}
+              {shown.map(menuOption)}
+            </ScrollArea.Autosize>
+          </Box>
           {onCreateCommunity && (
             <>
               <Menu.Divider />
@@ -252,12 +258,18 @@ export function ApplicationContextSwitcher({
       >
         <Stack gap={4}>
           {personal && modalOption(personal)}
-          <Box px={8} py={4}>{searchInput}</Box>
-          {pinned && modalOption(pinned)}
-          <ScrollArea.Autosize mah="50vh" type="auto">
-            {status}
-            {shown.map(modalOption)}
-          </ScrollArea.Autosize>
+          <Box
+            mt={4}
+            pt={4}
+            style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
+          >
+            <Box px={8} py={4}>{searchInput}</Box>
+            {pinned && modalOption(pinned)}
+            <ScrollArea.Autosize mah="50vh" type="auto">
+              {status}
+              {shown.map(modalOption)}
+            </ScrollArea.Autosize>
+          </Box>
           {onCreateCommunity && (
             <>
               <Divider />
