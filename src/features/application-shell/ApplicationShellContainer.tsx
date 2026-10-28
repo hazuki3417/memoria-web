@@ -10,6 +10,7 @@ import {
   useCreateCommunityMutation,
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
+import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -57,11 +58,11 @@ export function ApplicationShellContainer({
   const { data: currentUserData } = useCurrentUserQuery()
   const [createMutation] = useCreateCommunityMutation()
   const created =
-    communityData?.myCommunities.map((item) => ({
+    sortCommunitiesByDisplayName(communityData?.myCommunities.map((item) => ({
       id: item.id,
-      label: item.name,
+      label: getCommunityDisplayName(item),
       accentColor: item.mySettings.accentColor,
-    })) ?? []
+    })) ?? [])
   const communitiesLoaded = !communitiesLoading && !!communityData
   const [createBusy, setCreateBusy] = useState(false)
   const [rememberedContextKind, setRememberedContextKind] = useState<
