@@ -43,7 +43,7 @@ export function CommunityAliasControl({
   return (
     <Stack gap="md" maw={540}>
       <TextInput
-        label="Community別名（任意）"
+        label="Community別名"
         description="自分だけに表示される名前です。空欄で保存すると正式名称が表示されます。"
         aria-label="Community別名"
         placeholder="別名を入力"
