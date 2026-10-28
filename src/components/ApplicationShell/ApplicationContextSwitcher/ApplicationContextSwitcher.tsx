@@ -161,7 +161,7 @@ export function ApplicationContextSwitcher({
       {error && (
         <Group px="sm" py="xs" gap="xs" wrap="nowrap" justify="space-between">
           <Text size="xs" c="red" role="alert">
-            Communityを取得できませんでした。
+            取得できませんでした。
           </Text>
           {onRetry && (
             <Button
