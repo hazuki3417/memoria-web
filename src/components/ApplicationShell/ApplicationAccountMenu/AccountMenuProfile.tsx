@@ -1,50 +1,50 @@
 import { Avatar, Box, Group, Skeleton, Text } from "@mantine/core"
 import { IconUser } from "@tabler/icons-react"
 
+export type AccountMenuProfileState =
+  | { status: "loading" }
+  | {
+      status: "ready"
+      displayName: string
+      avatarLabel?: string
+      contextLabel: string
+    }
+  | { status: "error" }
+
 type AccountMenuProfileProps = {
-  displayName: string
-  avatarLabel?: string
-  contextLabel: string
-  status?: "ready" | "loading" | "error"
+  state: AccountMenuProfileState
 }
 
-export function AccountMenuProfile({
-  displayName,
-  avatarLabel,
-  contextLabel,
-  status = "ready",
-}: AccountMenuProfileProps) {
+export function AccountMenuProfile({ state }: AccountMenuProfileProps) {
+  const loading = state.status === "loading"
+  const ready = state.status === "ready"
+
   return (
-    <Group gap="sm" px="xs" py="xs" wrap="nowrap">
-      {status === "loading" ? (
-        <Skeleton circle height={32} aria-label="ユーザー情報を読み込み中" />
-      ) : (
+    <Group gap="sm" px="xs" py="xs" wrap="nowrap" aria-busy={loading}>
+      <Skeleton visible={loading} circle>
         <Avatar size={32} radius="xl">
-          {status === "error" ? (
-            <IconUser size={18} aria-hidden="true" />
+          {ready ? (
+            state.avatarLabel ?? state.displayName.slice(0, 1)
           ) : (
-            avatarLabel ?? displayName.slice(0, 1)
+            <IconUser size={18} aria-hidden="true" />
           )}
         </Avatar>
-      )}
+      </Skeleton>
       <Box>
-        {status === "loading" ? (
-          <Skeleton
-            height={14}
-            width={112}
-            mb={6}
-            aria-label="ユーザー名を読み込み中"
-          />
-        ) : (
-          <Text size="sm" fw={600} lh={1.2}>
-            {status === "error"
-              ? "ユーザー情報を取得できませんでした"
-              : displayName}
+        <Skeleton visible={loading}>
+          <Text size="sm" fw={600} lh={1.2} w={loading ? 112 : undefined}>
+            {ready
+              ? state.displayName
+              : loading
+                ? "\u00a0"
+                : "ユーザー情報を取得できませんでした"}
           </Text>
-        )}
-        <Text size="xs" c="dimmed" lh={1.2}>
-          {contextLabel}
-        </Text>
+        </Skeleton>
+        <Skeleton visible={loading}>
+          <Text size="xs" c="dimmed" lh={1.2} w={loading ? 68 : undefined}>
+            {ready ? state.contextLabel : loading ? "\u00a0" : "再読み込みしてお試しください"}
+          </Text>
+        </Skeleton>
       </Box>
     </Group>
   )
