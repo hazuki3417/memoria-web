@@ -20,7 +20,14 @@ export function AccountMenuProfile({ state }: AccountMenuProfileProps) {
   const ready = state.status === "ready"
 
   return (
-    <Group gap="sm" px="xs" py="xs" wrap="nowrap" aria-busy={loading}>
+    <Group
+      gap="sm"
+      px="xs"
+      py="xs"
+      wrap="nowrap"
+      aria-busy={loading}
+      aria-label={loading ? "プロフィールを読み込み中" : undefined}
+    >
       <Skeleton visible={loading} circle>
         <Avatar size={32} radius="xl">
           {ready ? (
@@ -42,7 +49,11 @@ export function AccountMenuProfile({ state }: AccountMenuProfileProps) {
         </Skeleton>
         <Skeleton visible={loading}>
           <Text size="xs" c="dimmed" lh={1.2} w={loading ? 68 : undefined}>
-            {ready ? state.contextLabel : loading ? "\u00a0" : "再読み込みしてお試しください"}
+            {ready
+              ? state.contextLabel
+              : loading
+                ? "\u00a0"
+                : "再読み込みしてお試しください"}
           </Text>
         </Skeleton>
       </Box>
