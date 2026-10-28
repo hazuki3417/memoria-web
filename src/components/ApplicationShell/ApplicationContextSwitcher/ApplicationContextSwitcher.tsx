@@ -64,13 +64,12 @@ export function ApplicationContextSwitcher({
   const communities = contexts.filter((item) => item.kind === "community")
   const currentCommunity = communities.find((item) => item.id === currentContext.id)
   const term = search.trim().toLocaleLowerCase("ja")
-  const matching = communities.filter((item) =>
-    item.label.toLocaleLowerCase("ja").includes(term),
+  const pinned = currentCommunity
+  const shown = communities.filter(
+    (item) =>
+      item.id !== currentCommunity?.id &&
+      item.label.toLocaleLowerCase("ja").includes(term),
   )
-  const pinned = !term ? currentCommunity : undefined
-  const shown = pinned
-    ? matching.filter((item) => item.id !== pinned.id)
-    : matching
 
   const changeOpened = (next: boolean) => {
     if (next && !opened) onOpen?.()
@@ -223,8 +222,8 @@ export function ApplicationContextSwitcher({
             pt={4}
             style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
           >
-            <Box px={8} py={4}>{searchInput}</Box>
             {!error && pinned && menuOption(pinned)}
+            <Box px={8} py={4}>{searchInput}</Box>
             <ScrollArea.Autosize mah={360} type="auto">
               {status}
               {!error && shown.map(menuOption)}
@@ -260,8 +259,8 @@ export function ApplicationContextSwitcher({
             pt={4}
             style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
           >
-            <Box px={8} py={4}>{searchInput}</Box>
             {!error && pinned && modalOption(pinned)}
+            <Box px={8} py={4}>{searchInput}</Box>
             <ScrollArea.Autosize mah="50vh" type="auto">
               {status}
               {!error && shown.map(modalOption)}
