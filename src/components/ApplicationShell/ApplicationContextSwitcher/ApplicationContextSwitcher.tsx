@@ -81,20 +81,19 @@ export function ApplicationContextSwitcher({
     onSelect(id)
   }
 
-  // NavigationItemと同様、選択状態は左側のAccent Lineで示す。
-  const accent = (item: ApplicationContextOption) =>
-    item.id === currentContext.id ? (
-      <Box
-        pos="absolute"
-        top={3}
-        bottom={3}
-        left={0}
-        w={3}
-        bg={item.accentColor}
-        style={{ borderRadius: "var(--mantine-radius-xl)", pointerEvents: "none" }}
-        aria-hidden="true"
-      />
-    ) : null
+  // Accent Lineは選択状態とは独立して、各Contextの色を示す。
+  const accent = (item: ApplicationContextOption) => (
+    <Box
+      pos="absolute"
+      top={3}
+      bottom={3}
+      left={0}
+      w={3}
+      bg={item.accentColor}
+      style={{ borderRadius: "var(--mantine-radius-xl)", pointerEvents: "none" }}
+      aria-hidden="true"
+    />
+  )
 
   const menuOption = (item: ApplicationContextOption) => (
     <Box key={item.id} pos="relative" pl={8}>
