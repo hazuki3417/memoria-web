@@ -3,7 +3,7 @@
 import { Avatar, Button, Menu, Skeleton } from "@mantine/core"
 import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "../types"
-import { AccountMenuProfile } from "./AccountMenuProfile"
+import { AccountMenuProfile, type AccountMenuProfileState } from "./AccountMenuProfile"
 
 export function ApplicationAccountMenu({
   user,
@@ -18,6 +18,18 @@ export function ApplicationAccountMenu({
   onLogout: () => void
   profileStatus?: "ready" | "loading" | "error"
 }) {
+  const profile: AccountMenuProfileState =
+    profileStatus === "loading"
+      ? { status: "loading" }
+      : profileStatus === "error"
+        ? { status: "error" }
+        : {
+            status: "ready",
+            displayName: user.displayName,
+            avatarLabel: user.avatarLabel,
+            contextLabel: currentContext.label,
+          }
+
   return (
     <Menu position="bottom-end" withinPortal>
       <Menu.Target>
@@ -29,26 +41,19 @@ export function ApplicationAccountMenu({
           aria-label="アカウントメニュー"
           title="アカウントメニュー"
         >
-          {profileStatus === "loading" ? (
-            <Skeleton circle height={24} aria-label="ユーザー情報を読み込み中" />
-          ) : (
+          <Skeleton visible={profile.status === "loading"} circle>
             <Avatar size={24} radius="xl">
-              {profileStatus === "error" ? (
-                <IconUser size={16} aria-hidden="true" />
+              {profile.status === "ready" ? (
+                profile.avatarLabel ?? profile.displayName.slice(0, 1)
               ) : (
-                user.avatarLabel ?? user.displayName.slice(0, 1)
+                <IconUser size={16} aria-hidden="true" />
               )}
             </Avatar>
-          )}
+          </Skeleton>
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <AccountMenuProfile
-          displayName={user.displayName}
-          avatarLabel={user.avatarLabel}
-          contextLabel={currentContext.label}
-          status={profileStatus}
-        />
+        <AccountMenuProfile state={profile} />
         <Menu.Divider />
         <Menu.Item
           leftSection={<IconSettings size={16} stroke={1.6} />}
