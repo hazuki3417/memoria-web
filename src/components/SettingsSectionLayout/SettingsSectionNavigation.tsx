@@ -1,8 +1,8 @@
 "use client"
 
-import { Box, Select, Stack, Text } from "@mantine/core"
+import { Box, Select, Text } from "@mantine/core"
 import type { ComponentType } from "react"
-import { NavigationItem } from "@/components/NavigationItem"
+import { NavigationList } from "@/components/NavigationItem/NavigationList"
 
 export type SettingsSectionItem<Section extends string> = {
   id: Section
@@ -65,20 +65,16 @@ export function SettingsSectionNavigation<Section extends string>({
       <Text size="xs" fw={700} c="dimmed" mb="xs">
         設定
       </Text>
-      <Stack gap={0}>
-        {sections.map((item) => (
-          <NavigationItem
-            key={item.id}
-            label={item.label}
-            icon={item.icon}
-            active={section === item.id}
-            accentColor={accentColor}
-            onClick={() => {
-              if (item.id !== section) onSectionChange(item.id)
-            }}
-          />
-        ))}
-      </Stack>
+      <NavigationList
+        items={sections.map((item) => ({
+          ...item,
+          active: section === item.id,
+        }))}
+        accentColor={accentColor}
+        onSelect={(id, active) => {
+          if (!active) onSectionChange(id)
+        }}
+      />
     </Box>
   )
 }
