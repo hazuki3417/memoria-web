@@ -1,6 +1,6 @@
 "use client"
 
-import type { Ref } from "react"
+import { useState, type Ref } from "react"
 import { Box, Button, Group, TextInput } from "@mantine/core"
 import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
 
@@ -25,6 +25,7 @@ export function GroupBrowserToolbar({
   canManage,
   onCreate,
 }: GroupBrowserToolbarProps) {
+  const [searchError, setSearchError] = useState<string | null>(null)
   return (
     <Box
       pb="xs"
@@ -41,6 +42,11 @@ export function GroupBrowserToolbar({
           component="form"
           onSubmit={(event) => {
             event.preventDefault()
+            if (new TextEncoder().encode(query).length > 255) {
+              setSearchError("検索文字列は255バイト以内で入力してください")
+              return
+            }
+            setSearchError(null)
             onSearch()
           }}
           gap="xs"
@@ -53,8 +59,11 @@ export function GroupBrowserToolbar({
             size="xs"
             ref={searchRef}
             value={query}
-            maxLength={255}
-            onChange={(event) => onQueryChange(event.currentTarget.value)}
+            error={searchError}
+            onChange={(event) => {
+              setSearchError(null)
+              onQueryChange(event.currentTarget.value)
+            }}
             placeholder="Groupを検索"
             leftSection={<IconSearch size={16} />}
             style={{ flex: compact ? "1 1 auto" : undefined }}
