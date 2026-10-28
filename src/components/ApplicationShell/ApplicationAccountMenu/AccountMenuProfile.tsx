@@ -29,10 +29,17 @@ export function AccountMenuProfile({
       )}
       <Box>
         {status === "loading" ? (
-          <Skeleton height={14} width={112} mb={6} aria-label="ユーザー名を読み込み中" />
+          <Skeleton
+            height={14}
+            width={112}
+            mb={6}
+            aria-label="ユーザー名を読み込み中"
+          />
         ) : (
           <Text size="sm" fw={600} lh={1.2}>
-            {status === "error" ? "ユーザー情報を取得できませんでした" : displayName}
+            {status === "error"
+              ? "ユーザー情報を取得できませんでした"
+              : displayName}
           </Text>
         )}
         <Text size="xs" c="dimmed" lh={1.2}>
