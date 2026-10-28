@@ -1,8 +1,9 @@
 "use client"
 
-import { Avatar, Box, Button, Group, Menu, Text } from "@mantine/core"
+import { Avatar, Button, Menu } from "@mantine/core"
 import { IconLogout, IconSettings } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "../types"
+import { AccountMenuProfile } from "./AccountMenuProfile"
 
 export function ApplicationAccountMenu({
   user,
@@ -32,19 +33,11 @@ export function ApplicationAccountMenu({
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <Group gap="sm" px="xs" py="xs" wrap="nowrap">
-          <Avatar size={32} radius="xl">
-            {user.avatarLabel ?? user.displayName.slice(0, 1)}
-          </Avatar>
-          <Box>
-            <Text size="sm" fw={600} lh={1.2}>
-              {user.displayName}
-            </Text>
-            <Text size="xs" c="dimmed" lh={1.2}>
-              {currentContext.label}
-            </Text>
-          </Box>
-        </Group>
+        <AccountMenuProfile
+          displayName={user.displayName}
+          avatarLabel={user.avatarLabel}
+          contextLabel={currentContext.label}
+        />
         <Menu.Divider />
         <Menu.Item
           leftSection={<IconSettings size={16} stroke={1.6} />}
