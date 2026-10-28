@@ -102,10 +102,14 @@ export const InitialError: Story = {
 }
 
 export const RefreshError: Story = {
-  name: "Visual · 再取得失敗と既存候補",
+  name: "Visual · 再取得失敗時は候補を非表示",
   tags: ["visual"],
   args: { error: true },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    const page = await openSwitcher()
+    await expect(page.getByRole("alert")).toHaveTextContent("取得できませんでした。")
+    await expect(page.queryByRole("menuitem", { name: "家族のアルバム" })).not.toBeInTheDocument()
+  },
 }
 
 export const DuplicateDisplayNames: Story = {
