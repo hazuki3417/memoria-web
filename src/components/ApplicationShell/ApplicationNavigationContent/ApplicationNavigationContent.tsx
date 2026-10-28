@@ -1,6 +1,6 @@
 import type { ComponentType } from "react"
 import { Box, Divider, ScrollArea, Stack, Text } from "@mantine/core"
-import { NavigationItem } from "@/components/NavigationItem"
+import { NavigationList } from "@/components/NavigationItem/NavigationList"
 
 export type ApplicationNavigationItem = {
   id: string
@@ -17,7 +17,7 @@ export type ApplicationNavigationItem = {
 export type ApplicationNavigationContentProps = {
   items: ApplicationNavigationItem[]
   accentColor: string
-  onSelect: (itemId: string) => void
+  onSelect: (itemId: string, active: boolean) => void
 }
 
 /** Drawerを所有せず、親から与えられる高さの中でナビゲーション内容を表示する。 */
@@ -34,19 +34,11 @@ export function ApplicationNavigationContent({
           id="application-context-navigation"
           aria-label="現在のコンテキスト内のナビゲーション"
         >
-          <Stack gap={0}>
-            {items.map((item) => (
-              <NavigationItem
-                key={item.id}
-                label={item.label}
-                icon={item.icon}
-                active={item.active}
-                disabled={item.disabled}
-                accentColor={accentColor}
-                onClick={() => onSelect(item.id)}
-              />
-            ))}
-          </Stack>
+          <NavigationList
+            items={items}
+            accentColor={accentColor}
+            onSelect={onSelect}
+          />
         </Box>
       </ScrollArea>
       <Box mt="auto">
