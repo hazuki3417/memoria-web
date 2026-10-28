@@ -54,10 +54,8 @@ export function ApplicationShellContainer({
     loading: communitiesLoading,
     error: communitiesError,
   } = useMyCommunitiesQuery()
-  const {
-    data: currentUserData,
-    loading: currentUserLoading,
-  } = useCurrentUserQuery()
+  const { data: currentUserData, loading: currentUserLoading } =
+    useCurrentUserQuery()
   const profileStatus = currentUserData?.me
     ? "ready"
     : currentUserLoading
@@ -289,7 +287,9 @@ export function ApplicationShellContainer({
             account={
               isApplicationShellFeatureVisible(shellMode, "account-menu") ? (
                 <ApplicationAccountMenu
-                  user={{ displayName: currentUserData?.me?.profile.nickname ?? "" }}
+                  user={{
+                    displayName: currentUserData?.me?.profile.nickname ?? "",
+                  }}
                   profileStatus={profileStatus}
                   currentContext={currentContext}
                   onOpenSettings={() => router.push("/settings/profile")}
