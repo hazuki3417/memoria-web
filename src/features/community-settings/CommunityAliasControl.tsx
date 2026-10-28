@@ -1,6 +1,6 @@
 "use client"
 
-import { Alert, Box, Button, Stack, Text, TextInput } from "@mantine/core"
+import { Alert, Box, Button, Stack, TextInput } from "@mantine/core"
 import { useState } from "react"
 import { showNotification } from "@/components/Feedback"
 
@@ -55,9 +55,6 @@ export function CommunityAliasControl({
         }}
         error={invalid ? "100文字以内で入力してください。" : undefined}
       />
-      {changed && !invalid && (
-        <Text size="xs" c="dimmed">未保存の変更があります。</Text>
-      )}
       {error && (
         <Alert color="red" title="保存できませんでした">
           入力内容を保持しています。再度保存してください。
