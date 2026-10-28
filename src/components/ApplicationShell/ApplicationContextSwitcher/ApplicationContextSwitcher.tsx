@@ -4,6 +4,7 @@ import {
   Alert,
   Box,
   Button,
+  Center,
   Divider,
   Group,
   Loader,
@@ -153,7 +154,11 @@ export function ApplicationContextSwitcher({
 
   const status = (
     <>
-      {loading && communities.length === 0 && <Loader size="sm" />}
+      {loading && communities.length === 0 && (
+        <Center w="100%" mih={80}>
+          <Loader size="sm" aria-label="Community一覧を読み込み中" />
+        </Center>
+      )}
       {error && (
         <Alert color="red" title="Community一覧を取得できませんでした">
           <Text size="sm">
