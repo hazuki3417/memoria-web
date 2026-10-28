@@ -124,7 +124,7 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
   }
 
   if (loading && !data?.community) return <Loader aria-label="Community環境設定を読み込み中" />
-  if (error || !data?.community)
+  if (!data?.community)
     return (
       <Stack>
         <Alert color="red">Community環境設定を取得できませんでした。</Alert>
