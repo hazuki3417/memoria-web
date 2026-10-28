@@ -35,10 +35,15 @@ export function CommunityPreferencesContent({
         title="環境設定"
         description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
       />
+      {aliasControl && (
+        <Box>
+          <SectionHeader>表示名</SectionHeader>
+          {aliasControl}
+        </Box>
+      )}
       <Box>
         <SectionHeader>表示</SectionHeader>
         <Stack gap="xl">
-          {aliasControl}
           <SettingRow
             compact={compact}
             label="Community Accent Color"
