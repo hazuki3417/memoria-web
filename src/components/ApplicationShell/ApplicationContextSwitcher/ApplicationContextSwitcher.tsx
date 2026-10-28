@@ -224,10 +224,10 @@ export function ApplicationContextSwitcher({
             style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
           >
             <Box px={8} py={4}>{searchInput}</Box>
-            {pinned && menuOption(pinned)}
+            {!error && pinned && menuOption(pinned)}
             <ScrollArea.Autosize mah={360} type="auto">
               {status}
-              {shown.map(menuOption)}
+              {!error && shown.map(menuOption)}
             </ScrollArea.Autosize>
           </Box>
           {onCreateCommunity && (
@@ -261,10 +261,10 @@ export function ApplicationContextSwitcher({
             style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
           >
             <Box px={8} py={4}>{searchInput}</Box>
-            {pinned && modalOption(pinned)}
+            {!error && pinned && modalOption(pinned)}
             <ScrollArea.Autosize mah="50vh" type="auto">
               {status}
-              {shown.map(modalOption)}
+              {!error && shown.map(modalOption)}
             </ScrollArea.Autosize>
           </Box>
           {onCreateCommunity && (
