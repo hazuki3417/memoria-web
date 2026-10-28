@@ -4,23 +4,25 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Button, Loader, Stack } from "@mantine/core"
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
+import { CommunityAliasControl } from "./CommunityAliasControl"
+import { MyCommunitiesDocument } from "@/infrastructure/graphql/generated"
 
 const COMMUNITY_SETTINGS = gql`
   query CommunityAccentSettings($communityId: ID!) {
-    community(communityId: $communityId) { id mySettings { accentColor } }
+    community(communityId: $communityId) { id mySettings { accentColor alias } }
   }
 `
 const SAVE_COMMUNITY_SETTINGS = gql`
   mutation SaveCommunityAccent($input: UpdateCommunitySettingsInput!) {
-    updateCommunitySettings(input: $input) { settings { accentColor } }
+    updateCommunitySettings(input: $input) { settings { accentColor alias } }
   }
 `
 
 type SettingsResult = {
-  community: { id: string; mySettings: { accentColor: string } } | null
+  community: { id: string; mySettings: { accentColor: string; alias: string | null } } | null
 }
 type SaveResult = {
-  updateCommunitySettings: { settings: { accentColor: string } }
+  updateCommunitySettings: { settings: { accentColor: string; alias: string | null } }
 }
 const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 
@@ -131,6 +133,22 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
       <CommunityPreferencesContent
         accent={accent ?? data.community.mySettings.accentColor}
         isPreview={false}
+        aliasControl={
+          <CommunityAliasControl
+            savedAlias={data.community.mySettings.alias}
+            onSave={async (alias) => {
+              const result = await save({
+                variables: { input: { communityId, alias } },
+                refetchQueries: [MyCommunitiesDocument, COMMUNITY_SETTINGS],
+                awaitRefetchQueries: true,
+              })
+              const settings = result.data?.updateCommunitySettings?.settings
+              if (!settings || settings.alias !== alias) {
+                throw new Error("Community alias save unconfirmed")
+              }
+            }}
+          />
+        }
         setAccent={(next) => {
           const current = accent ?? data.community!.mySettings.accentColor
           choose(typeof next === "function" ? next(current) : next)
