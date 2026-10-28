@@ -107,7 +107,7 @@ export const RefreshError: Story = {
   args: { error: true },
   play: async () => {
     const page = await openSwitcher()
-    await expect(page.getByRole("alert")).toHaveTextContent("取得できませんでした。")
+    await expect(await page.findByRole("alert")).toHaveTextContent("取得できませんでした。")
     await expect(page.queryByRole("menuitem", { name: "家族のアルバム" })).not.toBeInTheDocument()
   },
 }
@@ -192,8 +192,8 @@ export const SearchSelectedCommunity: Story = {
   args: { currentContext: family },
   play: async () => {
     const page = await openSwitcher()
-    const search = page.getByRole("textbox", { name: "Communityを検索" })
-    const selected = page.getByRole("menuitem", { name: "家族のアルバム" })
+    const search = await page.findByRole("textbox", { name: "Communityを検索" })
+    const selected = await page.findByRole("menuitem", { name: "家族のアルバム" })
     await expect(selected).toBeVisible()
     await expect(selected.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     await userEvent.type(search, "旅行")
