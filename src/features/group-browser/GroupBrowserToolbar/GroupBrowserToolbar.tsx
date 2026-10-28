@@ -53,6 +53,7 @@ export function GroupBrowserToolbar({
             size="xs"
             ref={searchRef}
             value={query}
+            maxLength={255}
             onChange={(event) => onQueryChange(event.currentTarget.value)}
             placeholder="Groupを検索"
             leftSection={<IconSearch size={16} />}
