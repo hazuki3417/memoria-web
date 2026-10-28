@@ -4,7 +4,7 @@
  */
 export function getCommunityDisplayName(community: {
   name: string
-  mySettings?: { alias?: string | null } | null
+  mySettings?: { accentColor?: string; alias?: string | null } | null
 }): string {
   return community.mySettings?.alias ?? community.name
 }
