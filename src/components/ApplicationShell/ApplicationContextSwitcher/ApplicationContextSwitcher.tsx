@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  Alert,
   Box,
   Button,
   Center,
@@ -159,18 +158,22 @@ export function ApplicationContextSwitcher({
         </Center>
       )}
       {error && (
-        <Alert color="red" title="Community一覧を取得できませんでした">
-          <Text size="sm">
-            {communities.length > 0
-              ? "取得済みの一覧を表示しています。"
-              : "再試行するかPersonalへ切り替えてください。"}
+        <Box px="sm" py="xs">
+          <Text size="xs" c="red" role="alert">
+            Communityを取得できませんでした。
           </Text>
           {onRetry && (
-            <Button size="xs" variant="outline" mt="xs" onClick={onRetry}>
+            <Button
+              size="compact-xs"
+              variant="subtle"
+              color="red"
+              mt={4}
+              onClick={onRetry}
+            >
               再試行
             </Button>
           )}
-        </Alert>
+        </Box>
       )}
       {!loading && !error && communities.length === 0 && (
         <Text size="xs" c="dimmed" px="sm" py="xs">
