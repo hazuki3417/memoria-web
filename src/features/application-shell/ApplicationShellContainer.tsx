@@ -273,7 +273,11 @@ export function ApplicationShellContainer({
                   onSelect={(id) => {
                     if (id !== "personal") {
                       router.push(
-                        `/communities/${encodeURIComponent(id)}/dashboard`,
+                        getContextSwitchPath({
+                          currentPathname: pathname,
+                          targetContextKind: "community",
+                          communityId: encodeURIComponent(id),
+                        }),
                       )
                       navigation.close()
                       return
