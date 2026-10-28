@@ -189,8 +189,7 @@ export const SearchSelectedCommunity: Story = {
   play: async () => {
     const page = await openSwitcher()
     await userEvent.type(page.getByRole("textbox", { name: "Communityを検索" }), "家族")
-    await expect(page.getAllByText("家族のアルバム")).toHaveLength(1)
-    await expect(page.getByText("家族のアルバム")).toBeVisible()
+    await expect(page.getByRole("menuitem", { name: "家族のアルバム" })).toBeVisible()
   },
 }
 
