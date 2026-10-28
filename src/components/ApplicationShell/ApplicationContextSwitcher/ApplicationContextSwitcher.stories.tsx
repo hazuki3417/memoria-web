@@ -187,13 +187,22 @@ export const SearchNoMatches: Story = {
 }
 
 export const SearchSelectedCommunity: Story = {
-  name: "Interaction · 検索中の選択状態",
+  name: "Interaction · 選択中Communityは検索欄の上に固定",
   tags: ["interaction"],
   args: { currentContext: family },
   play: async () => {
     const page = await openSwitcher()
-    await userEvent.type(page.getByRole("textbox", { name: "Communityを検索" }), "家族")
-    await expect(page.getByRole("menuitem", { name: "家族のアルバム" })).toBeVisible()
+    const search = page.getByRole("textbox", { name: "Communityを検索" })
+    const selected = page.getByRole("menuitem", { name: "家族のアルバム" })
+    await expect(selected).toBeVisible()
+    await expect(selected.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    await userEvent.type(search, "旅行")
+    await expect(selected).toBeVisible()
+    await expect(page.getByRole("menuitem", { name: "旅行の思い出" })).toBeVisible()
+    await userEvent.clear(search)
+    await userEvent.type(search, "家族")
+    await expect(page.getAllByRole("menuitem", { name: "家族のアルバム" })).toHaveLength(1)
+    await expect(page.getByText("一致するCommunityはありません。")).toBeVisible()
   },
 }
 
