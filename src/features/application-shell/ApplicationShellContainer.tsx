@@ -54,7 +54,15 @@ export function ApplicationShellContainer({
     loading: communitiesLoading,
     error: communitiesError,
   } = useMyCommunitiesQuery()
-  const { data: currentUserData, loading: currentUserLoading } = useCurrentUserQuery()
+  const {
+    data: currentUserData,
+    loading: currentUserLoading,
+  } = useCurrentUserQuery()
+  const profileStatus = currentUserData?.me
+    ? "ready"
+    : currentUserLoading
+      ? "loading"
+      : "error"
   const [createMutation] = useCreateCommunityMutation()
   const created =
     communityData?.myCommunities.map((item) => ({
@@ -281,11 +289,8 @@ export function ApplicationShellContainer({
             account={
               isApplicationShellFeatureVisible(shellMode, "account-menu") ? (
                 <ApplicationAccountMenu
-                  user={{
-                    displayName:
-                      currentUserData?.me?.profile.nickname ??
-                      (currentUserLoading ? "読み込み中" : "取得できませんでした"),
-                  }}
+                  user={{ displayName: currentUserData?.me?.profile.nickname ?? "" }}
+                  profileStatus={profileStatus}
                   currentContext={currentContext}
                   onOpenSettings={() => router.push("/settings/profile")}
                   onLogout={() => {
