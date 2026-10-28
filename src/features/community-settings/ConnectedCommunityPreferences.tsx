@@ -148,13 +148,41 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
             onSave={async (alias) => {
               const result = await save({
                 variables: { input: { communityId, alias } },
-                refetchQueries: [MyCommunitiesDocument, COMMUNITY_SETTINGS],
-                awaitRefetchQueries: true,
               })
               const settings = result.data?.updateCommunitySettings?.settings
               if (!settings || settings.alias !== alias) {
                 throw new Error("Community alias save unconfirmed")
               }
+              // Mutationの成立を確認した時点で、ShellとPreferencesの同じ参照元を更新する。
+              const id = client.cache.identify({ __typename: "Community", id: communityId })
+              if (id) {
+                const fragment = gql`
+                  fragment CommunityAliasCache on Community {
+                    mySettings { accentColor alias }
+                  }
+                `
+                const previous = client.cache.readFragment<{
+                  mySettings: { accentColor: string; alias: string | null }
+                }>({ id, fragment })
+                if (previous) {
+                  client.cache.writeFragment({
+                    id,
+                    fragment,
+                    data: {
+                      __typename: "Community",
+                      mySettings: {
+                        __typename: "CommunitySettings",
+                        accentColor: previous.mySettings.accentColor,
+                        alias: settings.alias,
+                      },
+                    },
+                  })
+                }
+              }
+              // 再取得の通信失敗は確定済みMutationを失敗扱いしない。
+              void client.refetchQueries({
+                include: [MyCommunitiesDocument, COMMUNITY_SETTINGS],
+              }).catch(() => undefined)
             }}
           />
         }
