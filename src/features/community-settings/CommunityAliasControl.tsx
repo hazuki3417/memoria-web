@@ -54,6 +54,7 @@ export function CommunityAliasControl({
           aria-label="Community別名"
           placeholder="別名を入力"
           value={text}
+          disabled={saving}
           onChange={(event) => {
             setDraft(event.currentTarget.value)
             setError(false)
