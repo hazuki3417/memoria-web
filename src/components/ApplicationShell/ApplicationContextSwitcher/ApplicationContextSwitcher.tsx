@@ -6,7 +6,6 @@ import {
   Button,
   Center,
   Divider,
-  Group,
   Loader,
   Menu,
   Modal,
@@ -17,7 +16,7 @@ import {
   TextInput,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { IconCheck, IconPlus, IconSearch, IconUsers } from "@tabler/icons-react"
+import { IconCheck, IconPlus, IconSearch } from "@tabler/icons-react"
 import { useState } from "react"
 import type { ApplicationContextOption } from "../types"
 
@@ -214,12 +213,6 @@ export function ApplicationContextSwitcher({
       >
         <Menu.Target>{trigger}</Menu.Target>
         <Menu.Dropdown>
-          <Menu.Label>
-            <Group gap={6} wrap="nowrap">
-              <IconUsers size={14} stroke={1.6} aria-hidden="true" />
-              <Text size="xs">切り替え先</Text>
-            </Group>
-          </Menu.Label>
           {personal && menuOption(personal)}
           <Box
             mt={4}
