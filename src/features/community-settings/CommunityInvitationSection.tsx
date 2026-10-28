@@ -50,7 +50,7 @@ export function CommunityInvitationSection({
       <Box>
         <SectionHeader>招待URL</SectionHeader>
         <Stack gap="md" maw={540}>
-          <Group gap="sm" wrap="nowrap">
+          <Group gap="sm" wrap="nowrap" justify="space-between">
             <Badge variant="light" style={{ flexShrink: 0 }}>
               {active
                 ? "有効"
