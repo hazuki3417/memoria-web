@@ -5,6 +5,7 @@ import {
   Button,
   Center,
   Divider,
+  Group,
   Loader,
   Menu,
   Modal,
@@ -158,7 +159,7 @@ export function ApplicationContextSwitcher({
         </Center>
       )}
       {error && (
-        <Box px="sm" py="xs">
+        <Group px="sm" py="xs" gap="xs" wrap="nowrap" justify="space-between">
           <Text size="xs" c="red" role="alert">
             Communityを取得できませんでした。
           </Text>
@@ -167,13 +168,13 @@ export function ApplicationContextSwitcher({
               size="compact-xs"
               variant="subtle"
               color="red"
-              mt={4}
               onClick={onRetry}
+              style={{ flexShrink: 0 }}
             >
               再試行
             </Button>
           )}
-        </Box>
+        </Group>
       )}
       {!loading && !error && communities.length === 0 && (
         <Text size="xs" c="dimmed" px="sm" py="xs">
