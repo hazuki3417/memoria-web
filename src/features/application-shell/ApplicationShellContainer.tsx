@@ -56,11 +56,6 @@ export function ApplicationShellContainer({
   } = useMyCommunitiesQuery()
   const { data: currentUserData, loading: currentUserLoading } =
     useCurrentUserQuery()
-  const profileStatus = currentUserData?.me
-    ? "ready"
-    : currentUserLoading
-      ? "loading"
-      : "error"
   const [createMutation] = useCreateCommunityMutation()
   const created =
     communityData?.myCommunities.map((item) => ({
@@ -102,6 +97,18 @@ export function ApplicationShellContainer({
           accentColor: currentCreated?.accentColor ?? communityContext.accentColor,
         }
       : resolvedPersonalContext
+  const contextLoading =
+    contextKind === "community" &&
+    !currentCreated &&
+    !communitiesLoaded &&
+    !communitiesError
+  const contextError =
+    contextKind === "community" && !currentCreated && !!communitiesError
+  const profileStatus = currentUserData?.me && !contextLoading && !contextError
+    ? "ready"
+    : (currentUserLoading && !currentUserData?.me) || contextLoading
+      ? "loading"
+      : "error"
   const activeSection = getApplicationSection(pathname)
   const navigationItems = getApplicationNavigation({
     contextKind,
