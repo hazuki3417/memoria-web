@@ -2,7 +2,7 @@
 
 import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { usePathname, useRouter } from "next/navigation"
-import { type ReactNode, useEffect, useState } from "react"
+import { type ReactNode, useEffect, useRef, useState } from "react"
 import {
   MyCommunitiesDocument,
   useCurrentUserQuery,
@@ -54,7 +54,20 @@ export function ApplicationShellContainer({
     data: communityData,
     loading: communitiesLoading,
     error: communitiesError,
+    refetch: refetchCommunities,
   } = useMyCommunitiesQuery()
+  const communityRefreshInFlight = useRef(false)
+  const refreshCommunities = async () => {
+    if (communityRefreshInFlight.current || (communitiesLoading && !communityData)) return
+    communityRefreshInFlight.current = true
+    try {
+      await refetchCommunities()
+    } catch {
+      // useMyCommunitiesQueryのerrorをSwitcherが表示する。
+    } finally {
+      communityRefreshInFlight.current = false
+    }
+  }
   const { data: currentUserData } = useCurrentUserQuery()
   const [createMutation] = useCreateCommunityMutation()
   const created =
@@ -276,6 +289,10 @@ export function ApplicationShellContainer({
                     navigation.close()
                   }}
                   onCreateCommunity={() => setCreateOpened(true)}
+                  onOpen={() => void refreshCommunities()}
+                  onRetry={() => void refreshCommunities()}
+                  loading={communitiesLoading}
+                  error={Boolean(communitiesError)}
                 />
               ) : undefined
             }
