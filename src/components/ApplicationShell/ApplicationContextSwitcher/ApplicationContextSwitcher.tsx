@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  ActionIcon,
   Box,
   Button,
   Center,
@@ -16,7 +17,7 @@ import {
   TextInput,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { IconCheck, IconPlus, IconSearch } from "@tabler/icons-react"
+import { IconCheck, IconPlus, IconSearch, IconX } from "@tabler/icons-react"
 import { useState } from "react"
 import type { ApplicationContextOption } from "../types"
 
@@ -144,6 +145,18 @@ export function ApplicationContextSwitcher({
       placeholder="Communityを検索"
       size="xs"
       leftSection={<IconSearch size={14} aria-hidden="true" />}
+      rightSection={search ? (
+        <ActionIcon
+          size="xs"
+          variant="subtle"
+          color="gray"
+          aria-label="検索をクリア"
+          onClick={() => setSearch("")}
+        >
+          <IconX size={12} aria-hidden="true" />
+        </ActionIcon>
+      ) : undefined}
+      rightSectionPointerEvents="all"
       value={search}
       onChange={(event) => setSearch(event.currentTarget.value)}
     />
