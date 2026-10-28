@@ -1,7 +1,7 @@
 "use client"
 
-import { Avatar, Button, Menu } from "@mantine/core"
-import { IconLogout, IconSettings } from "@tabler/icons-react"
+import { Avatar, Button, Menu, Skeleton } from "@mantine/core"
+import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "../types"
 import { AccountMenuProfile } from "./AccountMenuProfile"
 
@@ -10,11 +10,13 @@ export function ApplicationAccountMenu({
   currentContext,
   onOpenSettings,
   onLogout,
+  profileStatus = "ready",
 }: {
   user: { displayName: string; avatarLabel?: string }
   currentContext: ApplicationContextOption
   onOpenSettings: () => void
   onLogout: () => void
+  profileStatus?: "ready" | "loading" | "error"
 }) {
   return (
     <Menu position="bottom-end" withinPortal>
@@ -27,9 +29,17 @@ export function ApplicationAccountMenu({
           aria-label="アカウントメニュー"
           title="アカウントメニュー"
         >
-          <Avatar size={24} radius="xl">
-            {user.avatarLabel ?? user.displayName.slice(0, 1)}
-          </Avatar>
+          {profileStatus === "loading" ? (
+            <Skeleton circle height={24} aria-label="ユーザー情報を読み込み中" />
+          ) : (
+            <Avatar size={24} radius="xl">
+              {profileStatus === "error" ? (
+                <IconUser size={16} aria-hidden="true" />
+              ) : (
+                user.avatarLabel ?? user.displayName.slice(0, 1)
+              )}
+            </Avatar>
+          )}
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
@@ -37,6 +47,7 @@ export function ApplicationAccountMenu({
           displayName={user.displayName}
           avatarLabel={user.avatarLabel}
           contextLabel={currentContext.label}
+          status={profileStatus}
         />
         <Menu.Divider />
         <Menu.Item
