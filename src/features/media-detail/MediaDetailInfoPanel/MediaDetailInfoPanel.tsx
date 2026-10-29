@@ -8,6 +8,8 @@ import { MediaDetailGroupsSection } from "../MediaDetailGroupsSection"
 import { MediaDetailMetadata } from "../MediaDetailMetadata"
 import { MediaDetailTagsSection } from "../MediaDetailTagsSection"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
+import type { DetailReadState, CollectionReadState } from "../mediaDetailReadState"
+import { DetailMetadataStatus, DetailCollectionStatus } from "../MediaDetailReadFeedback"
 
 export type MediaDetailInfoPanelProps = Pick<
   MediaDetailViewerProps,
@@ -23,7 +25,12 @@ export type MediaDetailInfoPanelProps = Pick<
   | "context"
   | "downloadMock"
   | "onRequestDelete"
->
+> & {
+  detailReadState?: DetailReadState
+  groupsReadState?: CollectionReadState
+  tagsReadState?: CollectionReadState
+  onRetryDetail?: () => void
+}
 
 export function MediaDetailInfoPanel({
   compact,
@@ -38,6 +45,10 @@ export function MediaDetailInfoPanel({
   context: contextKind,
   downloadMock,
   onRequestDelete,
+  detailReadState,
+  groupsReadState,
+  tagsReadState,
+  onRetryDetail,
 }: MediaDetailInfoPanelProps) {
   return (
     <AnimatePresence initial={false}>
@@ -76,24 +87,40 @@ export function MediaDetailInfoPanel({
             }}
           >
             <Stack gap="md" p="md" style={{ flex: 1, overflowY: "auto" }}>
-              <MediaDetailMetadata downloadMock={downloadMock} />
+              {detailReadState ? (
+                <DetailMetadataStatus state={detailReadState} onRetry={onRetryDetail} />
+              ) : (
+                <MediaDetailMetadata downloadMock={downloadMock} />
+              )}
               <Divider
                 style={{
                   marginInline: "calc(-1 * var(--mantine-spacing-md))",
                 }}
               />
+              {groupsReadState && groupsReadState.kind !== "ready" ? (
+                <DetailCollectionStatus title="Groups" state={groupsReadState} />
+              ) : detailReadState && detailReadState.kind !== "ready" ? (
+                <DetailCollectionStatus title="Groups" state={{ kind: "pending" }} />
+              ) : (
               <MediaDetailGroupsSection
                 detailValues={detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
               />
+              )}
+              {tagsReadState && tagsReadState.kind !== "ready" ? (
+                <DetailCollectionStatus title="Tags" state={tagsReadState} />
+              ) : detailReadState && detailReadState.kind !== "ready" ? (
+                <DetailCollectionStatus title="Tags" state={{ kind: "pending" }} />
+              ) : (
               <MediaDetailTagsSection
                 detailValues={detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
               />
+              )}
               <Divider
                 style={{
                   marginInline: "calc(-1 * var(--mantine-spacing-md))",
@@ -109,7 +136,7 @@ export function MediaDetailInfoPanel({
                 context={contextKind}
               />
             </Stack>
-            <Box
+            {!detailReadState && <Box
               p="md"
               style={{
                 borderTop: "1px solid var(--mantine-color-default-border)",
@@ -127,7 +154,7 @@ export function MediaDetailInfoPanel({
                   削除
                 </Button>
               </Group>
-            </Box>
+            </Box>}
           </Box>
         </motion.div>
       )}
