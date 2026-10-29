@@ -35,11 +35,6 @@ export function ApplicationContextSwitcher({
     setOpened(next)
     if (!next) setSearch("")
   }
-  const select = (id: string) => {
-    changeOpened(false)
-    onSelect(id)
-  }
-
   const trigger = (
     <Button
       variant="subtle"
