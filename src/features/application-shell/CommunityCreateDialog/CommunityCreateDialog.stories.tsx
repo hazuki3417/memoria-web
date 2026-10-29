@@ -5,6 +5,7 @@ import { CommunityCreateDialog } from "./CommunityCreateDialog"
 const meta = {
   title: "Features/Application Shell/Community Create Dialog",
   component: CommunityCreateDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     opened: true,
     onClose: fn(),

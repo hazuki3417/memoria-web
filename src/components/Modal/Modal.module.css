@@ -1,0 +1,19 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.layout > * + * {
+  margin-block-start: var(--mantine-spacing-lg);
+}
+
+.layout > .divider,
+.layout > .divider + * {
+  margin-block-start: var(--mantine-spacing-sm);
+}
+
+.body,
+.footer {
+  min-width: 0;
+}

@@ -5,6 +5,7 @@ import { GroupDeleteDialog } from "./GroupDeleteDialog"
 const meta = {
   title: "Features/Group Browser/Delete Dialog",
   component: GroupDeleteDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     opened: true,
     name: "アルバムA",

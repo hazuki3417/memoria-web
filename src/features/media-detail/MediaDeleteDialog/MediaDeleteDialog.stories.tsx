@@ -11,6 +11,7 @@ const media: MediaItem = {
 const meta = {
   title: "Features/Media Detail/MediaDeleteDialog",
   component: MediaDeleteDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     target: media,
     onCancel: () => undefined,

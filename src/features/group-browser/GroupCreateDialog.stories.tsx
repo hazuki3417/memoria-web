@@ -5,6 +5,7 @@ import { GroupCreateDialog } from "./GroupCreateDialog"
 const meta = {
   title: "Features/Group Browser/Create Dialog",
   component: GroupCreateDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     opened: true,
     name: "",

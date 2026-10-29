@@ -4,6 +4,7 @@ import { CommunityUnshareDialog } from "./CommunityUnshareDialog"
 const meta = {
   title: "Features/Media Detail/CommunityUnshareDialog",
   component: CommunityUnshareDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     unshareTarget: "Photo Club",
     setUnshareTarget: () => undefined,

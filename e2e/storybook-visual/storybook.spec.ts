@@ -1,18 +1,20 @@
 import { expect, test } from "@playwright/test"
+import { responsiveViewports } from "../../.storybook/responsiveViewports"
 
-type StoryEntry = { id: string; type: string; tags?: string[]; parameters?: Record<string, unknown> }
+type StoryEntry = { id: string; type: string; tags?: string[] }
 type StoryIndex = { entries: Record<string, StoryEntry> }
 
-// StorybookのCanvasのみを対象とする。Docs/MDXは撮影しない。
-// 撮影対象はStory側でvrtタグを明示したものに限定する。
-// @see https://storybook.js.org/docs/writing-stories/tags
+// StorybookのCanvasのみを撮影する（vrtタグでOpt-in）。
+// 全対象Storyに対しCompact / Medium / Wideを固定の代表幅で撮影する。
+// vrt-modalタグはPortal上のDialogの可視性確認にのみ使用する。
 const viewports = [
-  { name: "desktop", width: 1440, height: 900 },
-  { name: "mobile", width: 375, height: 812 },
+  responsiveViewports.compact,
+  responsiveViewports.medium,
+  responsiveViewports.wide,
 ] as const
 
 test("Storybook visual snapshots", async ({ page, request }) => {
-  // 全VRT対象Story × Desktop/Mobileを1テストで撮影するため、既定の30秒では不足する。
+  // 全VRT対象Story × 3領域を1テストで撮影するため、既定の30秒では不足する。
   test.setTimeout(180_000)
   const response = await request.get("/index.json")
   expect(response.ok()).toBeTruthy()
@@ -28,7 +30,57 @@ test("Storybook visual snapshots", async ({ page, request }) => {
       await test.step(`${story.id} / ${viewport.name}`, async () => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height })
         await page.goto(`/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story`)
-        await expect(page.locator("#storybook-root")).toBeVisible()
+        // Storybook's root must exist, but it need not be visible when a story
+        // renders its content into a Portal (for example Mantine Modal).
+        await expect(page.locator("#storybook-root")).toBeAttached()
+
+        // Verify the visible capture target separately from the Storybook mount point.
+        // Modal stories must prove that the actual modal content is visible.
+        if (story.tags?.includes("vrt-modal")) {
+          const dialog = page.getByRole("dialog")
+          await expect(dialog).toBeVisible()
+
+          // Diagnose centering separately from full-page screenshot framing.
+          // Log computed geometry without changing the image capture contract.
+          const geometry = await dialog.evaluate((element) => {
+            const rect = element.getBoundingClientRect()
+            const inner = element.parentElement
+            const root = element.closest("[data-centered]")
+            const box = (node: Element | null) => {
+              if (!node) return null
+              const r = node.getBoundingClientRect()
+              const css = getComputedStyle(node)
+              return {
+                x: r.x, y: r.y, width: r.width, height: r.height,
+                position: css.position, paddingLeft: css.paddingLeft,
+                paddingRight: css.paddingRight, marginLeft: css.marginLeft,
+                marginRight: css.marginRight, justifyContent: css.justifyContent,
+                alignItems: css.alignItems,
+              }
+            }
+            return {
+              viewport: { width: window.innerWidth, height: window.innerHeight },
+              documentHeight: document.documentElement.scrollHeight,
+              scrollbarGap: window.innerWidth - document.documentElement.clientWidth,
+              scrollLock: {
+                bodyAttribute: document.body.getAttribute("data-scroll-locked"),
+                htmlAttribute: document.documentElement.getAttribute("data-scroll-locked"),
+                removedScrollbarSize: getComputedStyle(document.body)
+                  .getPropertyValue("--removed-body-scroll-bar-size"),
+              },
+              body: box(document.body),
+              html: box(document.documentElement),
+              root: box(root),
+              inner: box(inner),
+              modal: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+              offsetX: rect.left + rect.width / 2 - window.innerWidth / 2,
+              offsetY: rect.top + rect.height / 2 - window.innerHeight / 2,
+            }
+          })
+          console.log(`[VRT Modal geometry] ${story.id} / ${viewport.name}: ${JSON.stringify(geometry)}`)
+        } else {
+          await expect(page.locator("#storybook-root")).toBeVisible()
+        }
         await page.evaluate(async () => {
           await document.fonts.ready
           await Promise.all(
