@@ -24,17 +24,17 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   name: "Visual · Default",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
 }
 export const WithAvatarLabel: Story = {
   name: "Visual · With Avatar Label",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: { user: { displayName: "ユーザー", avatarLabel: "M" } },
 }
 
 export const Loading: Story = {
   name: "Visual · Loading",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     user: { displayName: "" },
     profileStatus: "loading",
@@ -43,7 +43,7 @@ export const Loading: Story = {
 
 export const Error: Story = {
   name: "Visual · Error",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     user: { displayName: "" },
     profileStatus: "error",
@@ -52,7 +52,7 @@ export const Error: Story = {
 
 export const Community: Story = {
   name: "Visual · Community Context",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     currentContext: {
       id: "family",

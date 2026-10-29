@@ -19,7 +19,7 @@ type Story = StoryObj<typeof meta>
 
 export const Ready: Story = {
   name: "Visual · Ready",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   play: async ({ canvasElement }) => {
     await expect(within(canvasElement).getByText("ユーザー")).toBeVisible()
     await expect(within(canvasElement).getByText("Personal")).toBeVisible()
@@ -28,7 +28,7 @@ export const Ready: Story = {
 
 export const AvatarLabel: Story = {
   name: "Visual · Avatar Label",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     state: { status: "ready", displayName: "Memoria", avatarLabel: "M", contextLabel: "旅行の思い出" },
   },
@@ -36,7 +36,7 @@ export const AvatarLabel: Story = {
 
 export const Loading: Story = {
   name: "Visual · Loading Skeleton",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: { state: { status: "loading" } },
   play: async ({ canvasElement }) => {
     await expect(within(canvasElement).getByLabelText("プロフィールを読み込み中")).toHaveAttribute("aria-busy", "true")
@@ -45,7 +45,7 @@ export const Loading: Story = {
 
 export const Error: Story = {
   name: "Visual · Error",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: { state: { status: "error" } },
   play: async ({ canvasElement }) => {
     await expect(within(canvasElement).getByText("ユーザー情報を取得できませんでした")).toBeVisible()

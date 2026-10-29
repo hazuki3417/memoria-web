@@ -15,11 +15,11 @@ type Story = StoryObj<typeof meta>
 
 export const Closed: Story = {
   name: "Visual · Closed",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
 }
 export const Opened: Story = {
   name: "Visual · Opened",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: { opened: true },
 }
 export const Hidden: Story = {

@@ -112,12 +112,12 @@ type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
   name: "Visual · Personal",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
 }
 
 export const Community: Story = {
   name: "Visual · Community",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     header: (
       <ApplicationHeader
@@ -145,13 +145,13 @@ export const Community: Story = {
 
 export const Compact: Story = {
   name: "Visual · Compact",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
 export const WithLocalNavigation: Story = {
   name: "Visual · With Local Navigation",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     children: (
       <Box maw={1120} mx="auto" w="100%">
