@@ -13,11 +13,29 @@ npm run test:visual
 
 Storybookはテスト起動時に自動起動します。基準画像は `e2e/storybook-visual/__screenshots__` に保存し、表示変更の意図を確認したうえでコミットしてください。
 
-`index.json` の `type: story` のうち、`vrt` タグが明示的に付いたStoryだけを撮影します（Opt-in方式）。Storyを追加するだけではVRT対象になりません。初期対象としてDashboard Prototypeの`Personal`と`Empty`にタグを指定しています。既存VRT対象は従来のスクリーンショット名を維持し、desktop (1440×900; Wide代表値) とmobile (375×812; Compact代表値) の2幅で撮影します。新規 `vrt-modal` 対象のStoryに限り、Medium代表値 (1024×768) を追加して3幅で撮影します。代表値は `.storybook/responsiveViewports.ts` を単一の設定元とし、正式なViewport分類の境界は Compact: 768px未満 / Medium: 768px以上1408px未満 / Wide: 1408px以上です。代表撮影幅は分類境界や各Componentのレイアウト切替点を意味しません。Storybook画面内のViewport選択ツールは今回導入しません（後続Issue #216）。そのためPreview側にアドオン専用の `viewport.options` は設定せず、代表サイズはVRTから参照します。手動Visual Reviewでは `iframe.html` を直接開き、ブラウザの開発者ツールで対象幅へ変更します。
+`index.json` の `type: story` のうち、`vrt` タグが明示的に付いたStoryだけを撮影します（Opt-in方式）。Storyを追加するだけではVRT対象になりません。初期対象としてDashboard Prototypeの`Personal`と`Empty`にタグを指定しています。既存VRT対象は従来のスクリーンショット名を維持し、desktop (1440×900; Wide代表値) とmobile (375×812; Compact代表値) の2幅で撮影します。Story側の `parameters.vrt.viewports` で撮影幅を明示した場合は、その指定に従います。現在のModal Storyには `viewports: ["wide", "compact", "medium"]` を設定しており、Medium代表値 (1024×768) を含む3幅で撮影します。`vrt-modal` タグは撮影幅の選択ではなく、Portal上のModalの表示確認方法にのみ使用します。代表値は `.storybook/responsiveViewports.ts` を単一の設定元とし、正式なViewport分類の境界は Compact: 768px未満 / Medium: 768px以上1408px未満 / Wide: 1408px以上です。代表撮影幅は分類境界や各Componentのレイアウト切替点を意味しません。Storybook画面内のViewport選択ツールは今回導入しません（後続Issue #216）。そのためPreview側にアドオン専用の `viewport.options` は設定せず、代表サイズはVRTから参照します。手動Visual Reviewでは `iframe.html` を直接開き、ブラウザの開発者ツールで対象幅へ変更します。
 
 画面幅、時刻、乱数、外部API、アニメーション、画像などの安定化が必要なStoryは、再現可能なfixtureやmockをStory側に用意します。テストはフォント・画像読み込みを待ち、アニメーションを無効化します。環境依存の差分を防ぐため、基準画像は同一のOS・ブラウザ・フォント環境で作成・比較してください。
 
 **現時点では基準画像の生成と実行成功は未検証です。** 基準画像がない状態では比較テストは成功しません。
+
+## Storyごとの撮影幅の指定
+
+`vrt`タグは撮影対象の選定、`vrt-modal`タグはPortal上のDialog（`role="dialog"`）の可視性確認に使用する。**撮影幅はこれらのタグと独立**させ、Storyの`parameters.vrt.viewports`で任意に指定できる。指定がないStoryは既存Baselineとの互換性を保ち、`wide`（撮影ファイル名`desktop`）と`compact`（`mobile`）を従来どおり撮影する。
+
+```tsx
+export const Example: Story = {
+  tags: ["visual", "vrt"],
+  parameters: {
+    vrt: { viewports: ["wide", "compact", "medium"] },
+  },
+  // ...
+}
+```
+
+設定値は`wide`、`compact`、`medium`のいずれかを指定し、順序は撮影順となる。重複・未知の値はVRTでエラーにする。値のサイズは`.storybook/responsiveViewports.ts`を正本とし、`desktop`・`mobile`という従来のBaseline名は変更しない。
+
+Storybookの`index.json`には解決済みStory parametersが含まれないため、`.storybook/preview.tsx`のDecoratorが非表示の`data-vrt-viewports`要素へ有効な撮影幅設定を公開し、Playwrightが撮影前に読み取る。この要素は表示やModal Portalの配置に影響しない。撮影時のブラウザViewport自体は従来どおりPlaywrightが`page.setViewportSize()`で指定する。
 
 ## 撮影前の表示確認（Portalを含む）
 
