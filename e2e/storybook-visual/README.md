@@ -23,6 +23,19 @@ Storybook画面内のViewportアドオンは今回導入しません（後続Iss
 
 **3幅構成の候補画像生成・実行成功は未検証です。** 承認済みBaselineが登録されるまで比較テストは成功しません。
 
+## Storybook Canvasのレイアウト規則
+
+Storybook公式の[Story layout](https://storybook.js.org/docs/configure/story-layout)に従い、`.storybook/preview.tsx`の既定を`layout: "padded"`と明記する。これはStorybook標準の既定値と同じであり、単体Componentの従来の表示余白を維持する。単体表示で独自のDecoratorやComponent内部にプレビュー専用の余白を追加しない。
+
+- **Component単体**：`padded`を既定とする。必要ならStory単位で`centered`を使う。
+- **ページ / ApplicationShell**：Canvas全体を表示基準とするため、metaで`layout: "fullscreen"`を明示する。
+- **Dialog / Modal等のViewport基準Overlay**：Portal / fixed配置の基準がStorybookのpadded Canvasにずれないよう、metaで`layout: "fullscreen"`を明示する。
+- **既存のVisual / Behavioral Contract**：Storyの`args`、操作、Portalの挙動、Responsive表示は変更しない。Storyの用途に応じた表示基準のみ設定する。
+
+DecoratorはThemeProviderやApplicationShellのfixture、Modal用Portal root等のアプリ固有のContextを提供する責務に限定する。Storybook標準の`layout`を置き換えるための余白Decoratorは導入しない。VRTはStoryの`layout`設定とは独立し、全`vrt` StoryをCompact / Medium / Wideの固定3幅で撮影する。
+
+今回の変更で既存Baselineが変わり得るため、実際の変更が意図したCanvas基準の補正に限られるか候補画像をHuman Visual Reviewで確認し、承認前に自動マージしない。Modalについては座標診断で水平方向の中心ずれが0px付近へ戻ることも確認する。
+
 ## 撮影Viewportの共通設定
 
 VRTのViewportは `e2e/storybook-visual/storybook.spec.ts` で一律に走査する。代表値は `.storybook/responsiveViewports.ts` を参照する。設定はStoryの `parameters` やDecorator、StorybookのViewportアドオンに依存しない。 `page.setViewportSize()` によりブラウザViewportを変更した後、同じStoryの `iframe.html` を開いて撮影する。
