@@ -81,3 +81,17 @@ export const DeleteAction: Story = {
     await expect(args.onDelete).toHaveBeenCalledTimes(1)
   },
 }
+
+/** 3領域をCompactでも1行維持し、ボタン・ラベルを省略しない。 */
+export const CompactThreeActions: Story = {
+  name: "Visual · Compact three actions",
+  tags: ["visual", "vrt", "vrt-modal"],
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+  play: async () => {
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const buttons = ["削除", "キャンセル", "保存"].map((name) => dialog.getByRole("button", { name }))
+    const rects = buttons.map((button) => button.getBoundingClientRect())
+    await expect(Math.max(...rects.map((rect) => rect.top)) - Math.min(...rects.map((rect) => rect.top))).toBeLessThan(2)
+    await expect(rects.every((rect) => rect.left >= 0 && rect.right <= window.innerWidth)).toBe(true)
+  },
+}
