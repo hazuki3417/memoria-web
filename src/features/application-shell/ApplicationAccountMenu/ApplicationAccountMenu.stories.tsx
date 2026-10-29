@@ -49,3 +49,17 @@ export const Error: Story = {
     profileStatus: "error",
   },
 }
+
+export const Community: Story = {
+  name: "Visual · Community Context",
+  tags: ["visual"],
+  args: {
+    currentContext: {
+      id: "family",
+      kind: "community",
+      label: "家族のアルバム",
+      accentColor: "var(--mantine-color-teal-6)",
+    },
+    user: { displayName: "Memoria User", avatarLabel: "M" },
+  },
+}

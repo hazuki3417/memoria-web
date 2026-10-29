@@ -1,4 +1,3 @@
-export * from "./ApplicationShell"
 export * from "./Dialog"
 export * from "./Feedback"
 export * from "./NavigationItem"

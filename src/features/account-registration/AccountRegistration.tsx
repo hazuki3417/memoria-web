@@ -15,7 +15,7 @@ import { useCallback, useEffect, useState } from "react"
 import {
   ApplicationHeader,
   ApplicationShell,
-} from "@/components/ApplicationShell"
+} from "@/features/application-shell"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"

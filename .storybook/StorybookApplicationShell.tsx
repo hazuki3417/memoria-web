@@ -7,7 +7,7 @@ import {
   getContextSwitchSection,
   type ApplicationContextOption,
   type ApplicationSection,
-} from "../src/components/ApplicationShell"
+} from "../src/features/application-shell"
 import { PrototypeApplicationShell } from "../src/prototypes/PrototypeApplicationShell"
 
 // Storybook共通のApplicationShell fixture。個別StoryはShellの構成を所有しない。

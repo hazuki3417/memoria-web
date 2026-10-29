@@ -1,8 +1,7 @@
 "use client"
 
-import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { usePathname, useRouter } from "next/navigation"
-import { type ReactNode, useEffect, useRef, useState } from "react"
+import { type ReactNode, useRef, useState } from "react"
 import {
   MyCommunitiesDocument,
   useCurrentUserQuery,
@@ -11,6 +10,8 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
 import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
+import { CommunityCreateDialog } from "./CommunityCreateDialog/CommunityCreateDialog"
+import { useApplicationContextSelection } from "./useApplicationContextSelection"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -23,7 +24,7 @@ import {
   getContextSwitchPath,
   isApplicationShellFeatureVisible,
   useApplicationNavigation,
-} from "@/components/ApplicationShell"
+} from "@/features/application-shell"
 
 const personalContext = {
   id: "personal",
@@ -79,22 +80,12 @@ export function ApplicationShellContainer({
     })) ?? [])
   const communitiesLoaded = !communitiesLoading && !!communityData
   const [createBusy, setCreateBusy] = useState(false)
-  const [rememberedContextKind, setRememberedContextKind] = useState<
-    "personal" | "community"
-  >("personal")
-  const [rememberedCommunityId, setRememberedCommunityId] = useState("")
-  const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
+  const { contextKind, communityId, setRememberedContextKind, setRememberedCommunityId } =
+    useApplicationContextSelection(pathname)
   const shellMode =
     pathname === "/settings/account/delete"
       ? "restricted-flow"
       : "authenticated"
-  const isSettingsRoute = pathname.startsWith("/settings")
-  const contextKind = communityMatch
-    ? "community"
-    : isSettingsRoute
-      ? rememberedContextKind
-      : "personal"
-  const communityId = communityMatch?.[1] ?? rememberedCommunityId
   const currentCreated = created.find((item) => item.id === communityId)
   const resolvedPersonalContext = {
     ...personalContext,
@@ -128,16 +119,6 @@ export function ApplicationShellContainer({
     contextKind,
     activeSection,
   })
-
-  useEffect(() => {
-    const routeCommunityMatch = pathname.match(/^\/communities\/([^/]+)/)
-    if (routeCommunityMatch) {
-      setRememberedContextKind("community")
-      setRememberedCommunityId(routeCommunityMatch[1])
-    } else if (!pathname.startsWith("/settings")) {
-      setRememberedContextKind("personal")
-    }
-  }, [pathname])
 
   const closeCreate = () => {
     if (createBusy) return
@@ -196,56 +177,17 @@ export function ApplicationShellContainer({
 
   return (
     <>
-      <Modal
+      <CommunityCreateDialog
         opened={createOpened}
         onClose={closeCreate}
-        title="Communityを作成"
-        centered
-      >
-        <Stack gap="md">
-          <TextInput
-            label="Community名"
-            required
-            autoFocus
-            value={draftName}
-            onChange={(event) => {
-              setDraftName(event.currentTarget.value)
-              setCreateError("")
-            }}
-            error={createError || undefined}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault()
-                void createCommunity()
-              }
-            }}
-          />
-          <Text size="xs" c="dimmed">
-            Communityを作成すると、メンバー管理と共有が利用できます。
-          </Text>
-          {communitiesError && (
-            <Text size="xs" c="red">
-              Community一覧を取得できませんでした。再読み込みしてお試しください。
-            </Text>
-          )}
-          <Group justify="flex-end">
-            <Button
-              variant="default"
-              onClick={closeCreate}
-              disabled={createBusy}
-            >
-              キャンセル
-            </Button>
-            <Button
-              disabled={!draftName.trim() || createBusy}
-              loading={createBusy}
-              onClick={() => void createCommunity()}
-            >
-              Communityを作成
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+        name={draftName}
+        onNameChange={setDraftName}
+        error={createError}
+        onErrorClear={() => setCreateError("")}
+        busy={createBusy}
+        communitiesError={Boolean(communitiesError)}
+        onCreate={() => void createCommunity()}
+      />
       <ApplicationShell
         header={
           <ApplicationHeader

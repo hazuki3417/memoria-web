@@ -38,3 +38,26 @@ export const CommunityAccent: Story = {
   tags: ["visual"],
   args: { accentColor: "var(--mantine-color-teal-6)" },
 }
+
+export const Closed: Story = {
+  name: "Visual · Closed",
+  tags: ["visual"],
+  args: { opened: false },
+}
+
+export const Empty: Story = {
+  name: "Visual · Empty Navigation",
+  tags: ["visual"],
+  args: { items: [] },
+}
+
+export const Disabled: Story = {
+  name: "Visual · Disabled Item",
+  tags: ["visual"],
+  args: {
+    items: [
+      ...items,
+      { id: "restricted", label: "アクセスできません", icon: IconPhoto, disabled: true },
+    ],
+  },
+}

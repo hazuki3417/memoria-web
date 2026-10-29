@@ -58,7 +58,7 @@ import {
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/features/application-shell"
 import { Dialog } from "@/components/Dialog"
 import { showNotification } from "@/components/Feedback"
 import { useMediaDetailViewport } from "@/features/media-detail/useMediaDetailViewport"

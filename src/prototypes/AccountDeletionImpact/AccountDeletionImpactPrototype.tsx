@@ -4,7 +4,7 @@ import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/
 
 
 import type { PropsWithChildren } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/features/application-shell"
 import {
   AccountDeletionFlow,
   type ReviewState,

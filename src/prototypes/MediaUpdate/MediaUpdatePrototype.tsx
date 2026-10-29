@@ -6,7 +6,7 @@ import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/features/application-shell"
 import { FeedbackAlert } from "@/components/Feedback"
 import {
   MediaTagBulkEditor,

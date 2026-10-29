@@ -12,7 +12,7 @@ import {
   type Section,
 } from "@/features/settings"
 import { SettingsUsage, type SettingsUsageData } from "@/features/usage"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 type ProfileSaveState = "idle" | "saving" | "retryable-error" | "blocked"

@@ -11,7 +11,7 @@ import {
   ApplicationNavigationTrigger,
   ApplicationShell,
   useApplicationNavigation,
-} from "@/components/ApplicationShell"
+} from "@/features/application-shell"
 
 export function PrototypeApplicationShell({
   children,
