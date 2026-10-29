@@ -1,4 +1,4 @@
-export * from "./Dialog"
+export * from "./Modal"
 export * from "./Feedback"
 export * from "./NavigationItem"
 export * from "./PageHeader"
