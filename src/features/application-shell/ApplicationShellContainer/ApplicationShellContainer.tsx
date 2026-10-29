@@ -10,7 +10,7 @@ import {
   useCreateCommunityMutation,
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
-import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
+import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "../communityDisplayName"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
