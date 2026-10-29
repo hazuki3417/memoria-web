@@ -72,7 +72,7 @@ export const CompactThreeRegionFooter: Story = {
 
 export const CompoundWithoutDivider: Story = {
   name: "Visual · Compound without divider",
-  tags: ["visual", "vrt"],
+  tags: ["visual", "vrt", "vrt-dialog"],
   args: {
     title: "内容の確認",
     footer: undefined,
@@ -97,7 +97,7 @@ export const CompoundWithoutDivider: Story = {
 
 export const CompoundWithDivider: Story = {
   name: "Visual · Compound with divider",
-  tags: ["visual", "vrt"],
+  tags: ["visual", "vrt", "vrt-dialog"],
   args: {
     title: "Groupを編集",
     footer: undefined,
