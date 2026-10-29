@@ -31,11 +31,11 @@ export function AccountMenuProfile({ state }: AccountMenuProfileProps) {
       <Box style={{ flex: "0 0 32px" }}>
         <Skeleton visible={loading} circle>
           <Avatar size={32} radius="xl">
-          {ready ? (
-            state.avatarLabel ?? state.displayName.slice(0, 1)
-          ) : (
-            <IconUser size={18} aria-hidden="true" />
-          )}
+            {ready ? (
+              state.avatarLabel ?? state.displayName.slice(0, 1)
+            ) : (
+              <IconUser size={18} aria-hidden="true" />
+            )}
           </Avatar>
         </Skeleton>
       </Box>
