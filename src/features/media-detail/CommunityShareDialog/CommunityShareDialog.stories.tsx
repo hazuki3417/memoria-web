@@ -4,6 +4,7 @@ import { CommunityShareDialog } from "./CommunityShareDialog"
 const meta = {
   title: "Features/Media Detail/CommunityShareDialog",
   component: CommunityShareDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     detailEditor: "communities",
     setDetailEditor: () => undefined,
