@@ -8,7 +8,6 @@ import {
   Divider,
   Group,
   Loader,
-  Menu,
   Modal,
   NavLink,
   ScrollArea,
