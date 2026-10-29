@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { fn } from "storybook/test"
+import { expect, fn, userEvent, within } from "storybook/test"
 import { MediaBrowserViewSearch } from "./MediaBrowserViewSearch"
 
 const meta = {
@@ -12,5 +12,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = { tags: ["visual"] }
-export const WithTags: Story = { args: { tags: ["旅行", "風景"] }, tags: ["visual"] }
+export const WithTags: Story = {
+  args: { tags: ["旅行", "風景"] },
+  tags: ["visual"],
+  play: async ({ canvasElement, args }) => {
+    await userEvent.click(within(canvasElement).getByRole("button", { name: "検索条件をクリア" }))
+    await expect(args.onTagsChange).toHaveBeenCalledWith([])
+  },
+}
 export const Compact: Story = { args: { compact: true }, tags: ["visual"] }
