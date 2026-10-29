@@ -78,6 +78,8 @@ test("Storybook visual snapshots", async ({ page, request }) => {
             }
           })
           console.log(`[VRT Modal geometry] ${story.id} / ${viewport.name}: ${JSON.stringify(geometry)}`)
+        } else if (story.tags?.includes("vrt-drawer")) {
+          await expect(page.getByRole("dialog")).toBeVisible()
         } else if (story.tags?.includes("vrt-menu")) {
           await expect(page.getByRole("menu")).toBeVisible()
         } else {
