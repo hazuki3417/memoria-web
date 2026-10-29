@@ -1,7 +1,8 @@
 "use client"
 
-import { Button, Group, TagsInput } from "@mantine/core"
-import { IconSearch } from "@tabler/icons-react"
+import { ActionIcon, Button, Group, TagsInput } from "@mantine/core"
+import { useState } from "react"
+import { IconSearch, IconX } from "@tabler/icons-react"
 
 type MediaBrowserViewSearchProps = {
   compact: boolean
@@ -18,6 +19,8 @@ export function MediaBrowserViewSearch({
   onSubmitTags,
   tagOptions,
 }: MediaBrowserViewSearchProps) {
+  const [searchValue, setSearchValue] = useState("")
+
   return (
     <Group
       component="form"
@@ -35,6 +38,23 @@ export function MediaBrowserViewSearch({
         onChange={onTagsChange}
         data={tagOptions}
         clearable
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        rightSection={
+          searchValue ? (
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              size="xs"
+              aria-label="検索入力をクリア"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => setSearchValue("")}
+            >
+              <IconX size={14} />
+            </ActionIcon>
+          ) : undefined
+        }
+        rightSectionPointerEvents="all"
         leftSection={<IconSearch size={16} />}
         size="xs"
         w={compact ? "100%" : 280}
