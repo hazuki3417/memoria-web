@@ -16,6 +16,27 @@ describe("ActionPanel", () => {
     expect(markup.indexOf("Cancel")).toBeLessThan(markup.indexOf("Save"))
   })
 
+  it("supports start-only and multiple actions within one end region", () => {
+    const startOnly = renderToStaticMarkup(
+      <ActionPanel>
+        <ActionPanel.Start><button type="button">Back</button></ActionPanel.Start>
+      </ActionPanel>,
+    )
+    const endOnly = renderToStaticMarkup(
+      <ActionPanel>
+        <ActionPanel.End>
+          <button type="button">Cancel</button>
+          <button type="button">Save</button>
+        </ActionPanel.End>
+      </ActionPanel>,
+    )
+
+    expect(startOnly).toContain("Back")
+    expect(startOnly).not.toContain("Save")
+    expect(endOnly.indexOf("Cancel")).toBeLessThan(endOnly.indexOf("Save"))
+    expect((endOnly.match(/<button/g) ?? [])).toHaveLength(2)
+  })
+
   it("renders only provided regions and passes through className and style", () => {
     const markup = renderToStaticMarkup(
       <ActionPanel className="consumer-layout" style={{ width: "100%" }}>
