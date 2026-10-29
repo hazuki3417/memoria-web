@@ -12,7 +12,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const ThreeRegions: Story = {
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   render: () => (
     <ActionPanel>
       <ActionPanel.Start><Button color="red" variant="subtle">削除</Button></ActionPanel.Start>
@@ -23,7 +23,7 @@ export const ThreeRegions: Story = {
 }
 
 export const StartAndEnd: Story = {
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   render: () => (
     <ActionPanel>
       <ActionPanel.Start><Button variant="default">戻る</Button></ActionPanel.Start>
@@ -33,7 +33,7 @@ export const StartAndEnd: Story = {
 }
 
 export const CenterOnly: Story = {
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   render: () => (
     <ActionPanel>
       <ActionPanel.Center><Button>閉じる</Button></ActionPanel.Center>
@@ -42,7 +42,7 @@ export const CenterOnly: Story = {
 }
 
 export const EndWithTwoButtons: Story = {
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   render: () => (
     <ActionPanel>
       <ActionPanel.End>
