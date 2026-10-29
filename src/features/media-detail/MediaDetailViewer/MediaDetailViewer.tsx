@@ -1,13 +1,13 @@
 "use client"
 
-import { Box, Modal } from "@mantine/core"
-
 import type { Dispatch, SetStateAction } from "react"
 import type { MediaItem } from "@/features/media-detail/types"
 import type { useMediaDetailEditing } from "@/features/media-detail/useMediaDetailEditing"
 import type { useMediaDetailViewport } from "@/features/media-detail/useMediaDetailViewport"
 import { MediaDetailInfoPanel } from "../MediaDetailInfoPanel"
 import { MediaDetailPreview } from "../MediaDetailPreview"
+import { MediaDetailViewerHost } from "./MediaDetailViewerHost"
+import { MediaDetailLayout } from "./MediaDetailLayout"
 
 type Editing = ReturnType<typeof useMediaDetailEditing>
 type Viewport = ReturnType<typeof useMediaDetailViewport>
@@ -44,22 +44,14 @@ export type MediaDetailViewerProps = Pick<
     downloadMock: "available" | "forbidden" | "processing"
   }
 
-/** Original MediaBrowser detail viewport markup, preserved for visual parity. */
+/** Composes the existing Media Detail preview and info panel without owning the overlay/layout mechanics. */
 export function MediaDetailViewer(props: MediaDetailViewerProps) {
   const { detail, stateItems, compact, detailInfoOpened, closeMediaDetail } =
     props
   return (
-    <Modal
+    <MediaDetailViewerHost
       opened={detail !== null}
       onClose={closeMediaDetail}
-      fullScreen
-      portalProps={{ target: "#application-modal-root" }}
-      padding={0}
-      withCloseButton={false}
-      styles={{
-        content: { background: "transparent" },
-        body: { height: "100dvh", padding: 0, background: "transparent" },
-      }}
     >
       {detail &&
         (() => {
@@ -72,57 +64,50 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
               ? stateItems[detailIndex + 1]
               : null
           return (
-            <Box
-              h="100%"
-              style={{
-                display: "grid",
-                gridTemplateColumns: compact
-                  ? "minmax(0, 1fr)"
-                  : "minmax(0, 1fr) auto",
-                gridTemplateRows:
-                  compact && detailInfoOpened
-                    ? "minmax(0, 1fr) auto"
-                    : "minmax(0, 1fr)",
-                background: "transparent",
-              }}
-            >
-              <MediaDetailPreview
-                detail={detail}
-                stateItems={stateItems}
-                prev={prev}
-                next={next}
-                closeMediaDetail={closeMediaDetail}
-                setDetail={props.setDetail}
-                prepareNavigation={props.prepareNavigation}
-                compact={compact}
-                detailZoom={props.detailZoom}
-                setDetailZoom={props.setDetailZoom}
-                detailRotate={props.detailRotate}
-                setDetailRotate={props.setDetailRotate}
-                detailRotateAnimated={props.detailRotateAnimated}
-                setDetailRotateAnimated={props.setDetailRotateAnimated}
-                detailDirection={props.detailDirection}
-                detailInfoOpened={detailInfoOpened}
-                setDetailInfoOpened={props.setDetailInfoOpened}
-              />
-
-              <MediaDetailInfoPanel
-                compact={compact}
-                detailInfoOpened={detailInfoOpened}
-                detailValues={props.detailValues}
-                detailSectionsExpanded={props.detailSectionsExpanded}
-                toggleDetailSection={props.toggleDetailSection}
-                openDetailEditor={props.openDetailEditor}
-                setUnshareTarget={props.setUnshareTarget}
-                setShareTarget={props.setShareTarget}
-                setDetailEditor={props.setDetailEditor}
-                context={props.context}
-                downloadMock={props.downloadMock}
-                onRequestDelete={props.onRequestDelete}
-              />
-            </Box>
+            <MediaDetailLayout
+              compact={compact}
+              detailInfoOpened={detailInfoOpened}
+              preview={
+                <MediaDetailPreview
+                  detail={detail}
+                  stateItems={stateItems}
+                  prev={prev}
+                  next={next}
+                  closeMediaDetail={closeMediaDetail}
+                  setDetail={props.setDetail}
+                  prepareNavigation={props.prepareNavigation}
+                  compact={compact}
+                  detailZoom={props.detailZoom}
+                  setDetailZoom={props.setDetailZoom}
+                  detailRotate={props.detailRotate}
+                  setDetailRotate={props.setDetailRotate}
+                  detailRotateAnimated={props.detailRotateAnimated}
+                  setDetailRotateAnimated={props.setDetailRotateAnimated}
+                  detailDirection={props.detailDirection}
+                  detailInfoOpened={detailInfoOpened}
+                  setDetailInfoOpened={props.setDetailInfoOpened}
+                />
+              }
+              infoPanel={
+                <MediaDetailInfoPanel
+                  compact={compact}
+                  detailInfoOpened={detailInfoOpened}
+                  detailValues={props.detailValues}
+                  detailSectionsExpanded={props.detailSectionsExpanded}
+                  toggleDetailSection={props.toggleDetailSection}
+                  openDetailEditor={props.openDetailEditor}
+                  setUnshareTarget={props.setUnshareTarget}
+                  setShareTarget={props.setShareTarget}
+                  setDetailEditor={props.setDetailEditor}
+                  context={props.context}
+                  downloadMock={props.downloadMock}
+                  onRequestDelete={props.onRequestDelete}
+                />
+              }
+            />
           )
         })()}
-    </Modal>
+    </MediaDetailViewerHost>
+
   )
 }
