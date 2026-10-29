@@ -5,6 +5,7 @@ import { GroupEditDialog } from "./GroupEditDialog"
 const meta = {
   title: "Features/Group Browser/Edit Dialog",
   component: GroupEditDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     opened: true,
     name: "アルバムA",
