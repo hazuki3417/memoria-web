@@ -16,8 +16,3 @@ export const Default: Story = {
   tags: ["visual"],
 }
 
-export const Compact: Story = {
-  name: "Compact",
-  tags: ["visual"],
-  parameters: { viewport: { defaultViewport: "mobile1" } },
-}
