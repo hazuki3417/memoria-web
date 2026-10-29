@@ -49,9 +49,9 @@ export function CommunityInvitationSection({
     <>
       <Box>
         <SectionHeader>招待URL</SectionHeader>
-        <Stack gap="md" maw={540}>
-          <Box>
-            <Badge variant="light">
+        <Stack gap="md">
+          <Group gap="sm" wrap="nowrap" justify="space-between">
+            <Badge variant="light" style={{ flexShrink: 0 }}>
               {active
                 ? "有効"
                 : invitation === "expired"
@@ -60,7 +60,10 @@ export function CommunityInvitationSection({
                     ? "無効化済み"
                     : "未発行"}
             </Badge>
-          </Box>
+            <Text size="sm" c="dimmed">
+              有効期限: {active ? expiresAt : "----/--/-- --:--:--"}
+            </Text>
+          </Group>
           <TextInput
             label="招待URL"
             value={active ? invitationUrl : "-"}
@@ -80,9 +83,6 @@ export function CommunityInvitationSection({
             }
             rightSectionPointerEvents="all"
           />
-          <Text size="sm" c="dimmed">
-            有効期限: {active ? expiresAt : "----/--/-- --:--:--"}
-          </Text>
           {isAdmin ? (
             <Group gap="sm">
               {!active ? (
