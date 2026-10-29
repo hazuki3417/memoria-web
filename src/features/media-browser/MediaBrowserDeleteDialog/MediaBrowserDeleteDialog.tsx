@@ -1,6 +1,7 @@
 "use client"
 
 import { Button, Text } from "@mantine/core"
+import { ActionPanel } from "@/components/ActionPanel"
 import { Dialog } from "@/components/Dialog"
 
 type MediaBrowserDeleteDialogProps = {
@@ -17,36 +18,20 @@ export function MediaBrowserDeleteDialog({
   onDelete,
 }: MediaBrowserDeleteDialogProps) {
   return (
-    <Dialog
-            opened={opened}
-            onClose={() => onClose()}
-            title="Mediaを削除"
-            size="md"
-            footer={
-              <Dialog.Footer
-                secondary={
-                  <Button
-                    variant="default"
-                    onClick={() => onClose()}
-                  >
-                    キャンセル
-                  </Button>
-                }
-                primary={
-                  <Button
-                    color="red"
-                    onClick={() => onDelete()}
-                  >
-                    削除
-                  </Button>
-                }
-              />
-            }
-          >
-            <Text size="sm">
-              選択した{selectedCount}
-              件のMediaを削除します。削除したMediaは復元できません。
-            </Text>
-          </Dialog>
+    <Dialog opened={opened} onClose={onClose} title="Mediaを削除" size="md">
+      <Dialog.Body>
+        <Text size="sm">
+          選択した{selectedCount}件のMediaを削除します。削除したMediaは復元できません。
+        </Text>
+      </Dialog.Body>
+      <Dialog.Footer>
+        <ActionPanel>
+          <ActionPanel.End>
+            <Button variant="default" onClick={onClose}>キャンセル</Button>
+            <Button color="red" onClick={onDelete}>削除</Button>
+          </ActionPanel.End>
+        </ActionPanel>
+      </Dialog.Footer>
+    </Dialog>
   )
 }
