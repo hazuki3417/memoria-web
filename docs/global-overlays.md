@@ -4,9 +4,9 @@
 
 - The Next.js root layout mounts one Mantine `<Notifications position="top-right" />` inside `ThemeProvider`. The top-right position is the system-wide notification placement. This supports notifications from authenticated and unauthenticated routes. The Mantine `Notifications.styles.root` API sets its top offset and disables pointer events on the empty container; `styles.notification` retains interactive notification cards. The root notification container reads `--memoria-notification-top`, falling back to the standard Mantine top inset outside the application.
 - `ApplicationShell` currently passes numeric `40` to Mantine's `header.height` and `main.top` to preserve its working interaction/layout behavior. The CSS `--memoria-app-header-height` token mirrors that value for notification positioning; this duplication is temporary pending verification of a safe shared source of truth. CSS `:root:has([data-memoria-application-main])` sets `--memoria-notification-top` to that token plus 12px only while the shell exists. No DOM measurement or effect is required; outside the shell the notification uses the standard Mantine top inset. Notifications remain viewport-fixed and outside content scrolling.
-- The shared `ApplicationShell` renders `#application-modal-root` outside the scrollable page content. Media Detail's full-screen Mantine Modal uses `portalProps={{ target: "#application-modal-root" }}`, keeping its visual overlay outside page scrolling.
+- Media Detail uses the standard Mantine Modal portal (no dedicated ApplicationShell portal target), with its fullscreen and transparent presentation configured through supported Mantine props/styles.
 - Browser features call `showNotification` but must not mount another `<Notifications />` in their page content.
-- Do not override Mantine internal CSS classes for notifications or assign arbitrary z-index values to standard Menu/Drawer/Header. Use supported component props/styles and rely on library-managed stacking. The Media Detail portal remains an intentional custom exception.
+- Do not override Mantine internal CSS classes for notifications or assign arbitrary z-index values to standard Menu/Drawer/Header. Use supported component props/styles and rely on library-managed stacking. No custom portal root is required for Media Detail.
 
 ## Application main scroll ownership
 
@@ -21,10 +21,10 @@
 ## Media Detail consumers and contracts
 
 - Media Browser opens Media Detail from its media list; Group Browser opens the same viewer from Group Detail thumbnails.
-- The current `MediaDetailDialog` wrapper delegates to `MediaBrowser` in detail-only mode. The shared portal **does not yet imply shared state ownership**: the viewer, editing dialogs, and state still reside in `MediaBrowser`.
+- The current `MediaDetailDialog` wrapper delegates to `MediaBrowser` in detail-only mode. The overlay mount location **does not imply shared state ownership**: the viewer, editing dialogs, and state still reside in `MediaBrowser`.
 - Preserve the full existing Media Detail visual/behavioral/responsive contract, including previous/next media scope, edit/share dialogs, zoom/rotation, closing behavior, and Group Detail pane state.
 - Do not relocate all dialogs indiscriminately: feature-specific dialogs retain their feature state. Global mount points are separate from state ownership.
 
 ## Outstanding extraction
 
-[Web Issue #91](https://github.com/hazuki3417/memoria-web/issues/91) tracks extracting the full Media Detail implementation into a reusable dialog, with visual and behavioral regression validation. Do not mark that extraction complete solely because its modal already uses the shared shell portal.
+[Web Issue #91](https://github.com/hazuki3417/memoria-web/issues/91) tracks extracting the full Media Detail implementation into a reusable dialog, with visual and behavioral regression validation. Do not mark that extraction complete solely because its modal already uses the standard portal.
