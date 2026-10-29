@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { ApplicationShellContainer } from "@/features/application-shell/ApplicationShellContainer"
+import { ApplicationShellContainer } from "@/features/application-shell/ApplicationShellContainer/ApplicationShellContainer"
 import { getCurrentMemoriaUser } from "@/infrastructure/graphql"
 import { auth0 } from "@/lib/auth0"
 
