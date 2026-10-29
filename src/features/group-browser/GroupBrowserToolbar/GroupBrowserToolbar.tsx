@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, type Ref } from "react"
-import { Box, Button, Group, TextInput } from "@mantine/core"
-import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
+import { ActionIcon, Box, Button, Group, TextInput } from "@mantine/core"
+import { IconFolderPlus, IconSearch, IconX } from "@tabler/icons-react"
 
 type GroupBrowserToolbarProps = {
   compact: boolean
@@ -66,6 +66,23 @@ export function GroupBrowserToolbar({
             }}
             placeholder="Groupを検索"
             leftSection={<IconSearch size={16} />}
+            rightSection={
+              query ? (
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  size="xs"
+                  aria-label="検索入力をクリア"
+                  onClick={() => {
+                    setSearchError(null)
+                    onQueryChange("")
+                  }}
+                >
+                  <IconX size={14} />
+                </ActionIcon>
+              ) : null
+            }
+            rightSectionPointerEvents="all"
             style={{ flex: compact ? "1 1 auto" : undefined }}
           />
           <Button size="xs" type="submit">
