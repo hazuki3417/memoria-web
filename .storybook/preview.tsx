@@ -28,7 +28,6 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const applicationShell = context.parameters.applicationShell === true;
-      const portalOwnedByStory = context.parameters.applicationShellOwnsPortal === true;
       return (
         <ThemeProvider theme={theme}>
           {applicationShell ? (
@@ -36,13 +35,7 @@ const preview: Preview = {
               <Story />
             </StorybookApplicationShell>
           ) : (
-            <>
-              {/* ApplicationShell非使用Storyにも本番と同じModal Portal先を提供する */}
-              {!portalOwnedByStory && (
-                <div id="application-modal-root" style={{ position: "relative", zIndex: 400 }} />
-              )}
-              <Story />
-            </>
+            <Story />
           )}
         </ThemeProvider>
       );
