@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, SimpleGrid, Text, TextInput, , Stack, Group } from "@mantine/core"
+import { Button, SimpleGrid, Text, TextInput, Stack, Group } from "@mantine/core"
 import { Modal } from "@/components/Modal"
 import { ActionPanel } from "@/components/ActionPanel"
 import {
