@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Center, Loader, Skeleton, Stack, Text } from "@mantine/core"
+import { Button, Center, Group, Loader, Skeleton, Stack, Text } from "@mantine/core"
 import type {
   CollectionReadState,
   DetailReadState,
@@ -63,12 +63,20 @@ export function DetailMetadataStatus({
     )
   }
   const { media } = state
+  const rows = [
+    ["ファイルサイズ", `${media.fileSize.toLocaleString()} B`],
+    ["サイズ", media.image ? `${media.image.width} × ${media.image.height}` : "-"],
+    ["アップロード", media.uploadedAt],
+    ["Uploader", media.uploader?.nickname ?? "-"],
+  ]
   return (
     <Stack gap="xs">
-      <Text size="xs" c="dimmed">ファイルサイズ: {media.fileSize.toLocaleString()} B</Text>
-      <Text size="xs" c="dimmed">サイズ: {media.image ? `${media.image.width} × ${media.image.height}` : "-"}</Text>
-      <Text size="xs" c="dimmed">アップロード: {media.uploadedAt}</Text>
-      <Text size="xs" c="dimmed">Uploader: {media.uploader?.nickname ?? "-"}</Text>
+      {rows.map(([label, value]) => (
+        <Group key={label} justify="space-between">
+          <Text size="xs" c="dimmed">{label}</Text>
+          <Text size="xs">{value}</Text>
+        </Group>
+      ))}
     </Stack>
   )
 }
