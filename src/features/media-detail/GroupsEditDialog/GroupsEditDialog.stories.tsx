@@ -4,6 +4,7 @@ import { GroupsEditDialog } from "./GroupsEditDialog"
 const meta = {
   title: "Features/Media Detail/GroupsEditDialog",
   component: GroupsEditDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     detailEditor: "groups",
     setDetailEditor: () => undefined,
