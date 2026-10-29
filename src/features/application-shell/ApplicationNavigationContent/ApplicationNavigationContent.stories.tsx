@@ -81,3 +81,9 @@ export const Disabled: Story = {
     ],
   },
 }
+
+export const NoItems: Story = {
+  name: "Visual · No Items",
+  tags: ["visual"],
+  args: { items: [] },
+}

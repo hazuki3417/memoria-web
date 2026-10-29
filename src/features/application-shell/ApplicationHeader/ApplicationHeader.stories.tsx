@@ -32,3 +32,22 @@ export const Composed: Story = {
     account: <Text size="sm">Account</Text>,
   },
 }
+
+export const CommunityAccent: Story = {
+  name: "Visual · Community Accent",
+  tags: ["visual"],
+  args: {
+    accentColor: "var(--mantine-color-teal-6)",
+    leading: <Text size="sm">Navigation</Text>,
+    context: <Text size="sm">家族のアルバム</Text>,
+    account: <Text size="sm">Account</Text>,
+  },
+}
+
+export const LongContext: Story = {
+  name: "Visual · Long Context",
+  tags: ["visual"],
+  args: {
+    context: <Text size="sm">家族の思い出を長い名前で管理するCommunity</Text>,
+  },
+}
