@@ -15,7 +15,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useCallback, useEffect, useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/features/application-shell"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"

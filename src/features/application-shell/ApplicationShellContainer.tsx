@@ -23,7 +23,7 @@ import {
   getContextSwitchPath,
   isApplicationShellFeatureVisible,
   useApplicationNavigation,
-} from "@/components/ApplicationShell"
+} from "@/features/application-shell"
 
 const personalContext = {
   id: "personal",

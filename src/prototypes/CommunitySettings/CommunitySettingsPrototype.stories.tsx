@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { CommunitySettings } from "@/features/community-settings/CommunitySettings"
 import { SettingsUsage } from "@/features/usage"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
 const communityContext = {
