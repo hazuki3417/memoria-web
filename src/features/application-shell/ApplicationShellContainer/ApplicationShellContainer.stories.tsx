@@ -25,7 +25,7 @@ const success = [
 const meta = {
   title: "Features/Application Shell/Connected Container",
   component: ApplicationShellContainer,
-  parameters: { layout: "fullscreen", nextjs: { navigation: { pathname: "/dashboard" } } },
+  parameters: { layout: "fullscreen", nextjs: { appDirectory: true, navigation: { pathname: "/dashboard" } } },
   decorators: [
     (Story) => (
       <MockedProvider mocks={success} addTypename={false}>
