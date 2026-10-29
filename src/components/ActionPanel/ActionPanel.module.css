@@ -1,0 +1,32 @@
+.root {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--mantine-spacing-sm);
+  row-gap: var(--mantine-spacing-sm);
+  min-width: 0;
+}
+
+.start,
+.center,
+.end {
+  display: flex;
+  align-items: center;
+  gap: var(--mantine-spacing-sm);
+  min-width: 0;
+}
+
+.start {
+  grid-column: 1;
+  justify-content: flex-start;
+}
+
+.center {
+  grid-column: 2;
+  justify-content: center;
+}
+
+.end {
+  grid-column: 3;
+  justify-content: flex-end;
+}
