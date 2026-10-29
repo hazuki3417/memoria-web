@@ -1,6 +1,5 @@
 "use client"
 
-import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { usePathname, useRouter } from "next/navigation"
 import { type ReactNode, useEffect, useRef, useState } from "react"
 import {
@@ -11,6 +10,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
 import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "../communityDisplayName"
+import { CommunityCreateDialog } from "../CommunityCreateDialog/CommunityCreateDialog"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -196,56 +196,17 @@ export function ApplicationShellContainer({
 
   return (
     <>
-      <Modal
+      <CommunityCreateDialog
         opened={createOpened}
         onClose={closeCreate}
-        title="Communityを作成"
-        centered
-      >
-        <Stack gap="md">
-          <TextInput
-            label="Community名"
-            required
-            autoFocus
-            value={draftName}
-            onChange={(event) => {
-              setDraftName(event.currentTarget.value)
-              setCreateError("")
-            }}
-            error={createError || undefined}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault()
-                void createCommunity()
-              }
-            }}
-          />
-          <Text size="xs" c="dimmed">
-            Communityを作成すると、メンバー管理と共有が利用できます。
-          </Text>
-          {communitiesError && (
-            <Text size="xs" c="red">
-              Community一覧を取得できませんでした。再読み込みしてお試しください。
-            </Text>
-          )}
-          <Group justify="flex-end">
-            <Button
-              variant="default"
-              onClick={closeCreate}
-              disabled={createBusy}
-            >
-              キャンセル
-            </Button>
-            <Button
-              disabled={!draftName.trim() || createBusy}
-              loading={createBusy}
-              onClick={() => void createCommunity()}
-            >
-              Communityを作成
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+        name={draftName}
+        onNameChange={setDraftName}
+        error={createError}
+        onErrorClear={() => setCreateError("")}
+        busy={createBusy}
+        communitiesError={Boolean(communitiesError)}
+        onCreate={() => void createCommunity()}
+      />
       <ApplicationShell
         header={
           <ApplicationHeader
