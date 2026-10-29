@@ -24,7 +24,7 @@ import {
   IconPhoto,
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
-import { getApplicationNavigation } from "@/components/ApplicationShell"
+import { getApplicationNavigation } from "@/features/application-shell"
 import { PageWidth } from "@/components/PageWidth/PageWidth"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
