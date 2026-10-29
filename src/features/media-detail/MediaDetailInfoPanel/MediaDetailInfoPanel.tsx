@@ -97,25 +97,29 @@ export function MediaDetailInfoPanel({
                   marginInline: "calc(-1 * var(--mantine-spacing-md))",
                 }}
               />
-              {groupsReadState && groupsReadState.kind !== "ready" ? (
+              {detailReadState && !groupsReadState ? (
+                <DetailCollectionStatus title="Groups" state={{ kind: "pending" }} />
+              ) : groupsReadState && groupsReadState.kind !== "ready" ? (
                 <DetailCollectionStatus title="Groups" state={groupsReadState} />
               ) : detailReadState && detailReadState.kind !== "ready" ? (
                 <DetailCollectionStatus title="Groups" state={{ kind: "pending" }} />
               ) : (
               <MediaDetailGroupsSection
-                detailValues={detailValues}
+                detailValues={groupsReadState?.kind === "ready" ? { ...detailValues, groups: groupsReadState.values.map((item) => item.name) } : detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
               />
               )}
-              {tagsReadState && tagsReadState.kind !== "ready" ? (
+              {detailReadState && !tagsReadState ? (
+                <DetailCollectionStatus title="Tags" state={{ kind: "pending" }} />
+              ) : tagsReadState && tagsReadState.kind !== "ready" ? (
                 <DetailCollectionStatus title="Tags" state={tagsReadState} />
               ) : detailReadState && detailReadState.kind !== "ready" ? (
                 <DetailCollectionStatus title="Tags" state={{ kind: "pending" }} />
               ) : (
               <MediaDetailTagsSection
-                detailValues={detailValues}
+                detailValues={tagsReadState?.kind === "ready" ? { ...detailValues, tags: tagsReadState.values.map((item) => item.name) } : detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
@@ -126,7 +130,7 @@ export function MediaDetailInfoPanel({
                   marginInline: "calc(-1 * var(--mantine-spacing-md))",
                 }}
               />
-              <MediaDetailCommunitySection
+              {!detailReadState && <MediaDetailCommunitySection
                 detailValues={detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
@@ -134,7 +138,7 @@ export function MediaDetailInfoPanel({
                 setShareTarget={setShareTarget}
                 setDetailEditor={setDetailEditor}
                 context={contextKind}
-              />
+              />}
             </Stack>
             {!detailReadState && <Box
               p="md"
