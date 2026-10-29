@@ -28,16 +28,6 @@ const preview: Preview = {
       const portalOwnedByStory = context.parameters.applicationShellOwnsPortal === true;
       return (
         <ThemeProvider theme={theme}>
-          {/* VRT reads effective Story parameters through this hidden marker.
-              Storybook index.json does not expose resolved parameters. */}
-          <span
-            hidden
-            data-vrt-viewports={
-              Array.isArray(context.parameters.vrt?.viewports)
-                ? context.parameters.vrt.viewports.join(",")
-                : ""
-            }
-          />
           {applicationShell ? (
             <StorybookApplicationShell>
               <Story />
