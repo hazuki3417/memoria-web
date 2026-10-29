@@ -37,7 +37,22 @@ test("Storybook visual snapshots", async ({ page, request }) => {
         // Verify the visible capture target separately from the Storybook mount point.
         // Modal stories must prove that the actual modal content is visible.
         if (story.tags?.includes("vrt-modal")) {
-          await expect(page.getByRole("dialog")).toBeVisible()
+          const dialog = page.getByRole("dialog")
+          await expect(dialog).toBeVisible()
+
+          // Diagnose centering separately from full-page screenshot framing.
+          // Log computed geometry without changing the image capture contract.
+          const geometry = await dialog.evaluate((element) => {
+            const rect = element.getBoundingClientRect()
+            return {
+              viewport: { width: window.innerWidth, height: window.innerHeight },
+              documentHeight: document.documentElement.scrollHeight,
+              modal: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+              offsetX: rect.left + rect.width / 2 - window.innerWidth / 2,
+              offsetY: rect.top + rect.height / 2 - window.innerHeight / 2,
+            }
+          })
+          console.log(`[VRT Modal geometry] ${story.id} / ${viewport.name}: ${JSON.stringify(geometry)}`)
         } else {
           await expect(page.locator("#storybook-root")).toBeVisible()
         }
