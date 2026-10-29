@@ -10,7 +10,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
 import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
-import { CommunityCreateDialog } from "./CommunityCreateDialog/CommunityCreateDialog"
+import { CommunityCreateModal } from "./CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from "./useApplicationContextSelection"
 import {
   ApplicationAccountMenu,
@@ -177,7 +177,7 @@ export function ApplicationShellContainer({
 
   return (
     <>
-      <CommunityCreateDialog
+      <CommunityCreateModal
         opened={createOpened}
         onClose={closeCreate}
         name={draftName}
