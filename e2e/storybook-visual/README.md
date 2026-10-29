@@ -13,7 +13,7 @@ npm run test:visual
 
 Storybookはテスト起動時に自動起動します。基準画像は `e2e/storybook-visual/__screenshots__` に保存し、表示変更の意図を確認したうえでコミットしてください。
 
-`index.json` の `type: story` のうち、`vrt` タグが明示的に付いたStoryだけを撮影します（Opt-in方式）。Storyを追加するだけではVRT対象になりません。初期対象としてDashboard Prototypeの`Personal`と`Empty`にタグを指定しています。既存VRT対象は従来のスクリーンショット名を維持し、desktop (1440×900; Wide代表値) とmobile (375×812; Compact代表値) の2幅で撮影します。新規 `vrt-modal` 対象のStoryに限り、Medium代表値 (1024×768) を追加して3幅で撮影します。代表値は `.storybook/responsiveViewports.ts` を単一の設定元とし、正式なViewport分類の境界は Compact: 768px未満 / Medium: 768px以上1408px未満 / Wide: 1408px以上です。代表撮影幅は分類境界や各Componentのレイアウト切替点を意味しません。Storybook Previewの `viewport.options` も同じ代表値を参照しますが、現状 `@storybook/addon-viewport` が未導入のため画面内のViewport選択ツールは利用可能と確認できていません。
+`index.json` の `type: story` のうち、`vrt` タグが明示的に付いたStoryだけを撮影します（Opt-in方式）。Storyを追加するだけではVRT対象になりません。初期対象としてDashboard Prototypeの`Personal`と`Empty`にタグを指定しています。既存VRT対象は従来のスクリーンショット名を維持し、desktop (1440×900; Wide代表値) とmobile (375×812; Compact代表値) の2幅で撮影します。新規 `vrt-modal` 対象のStoryに限り、Medium代表値 (1024×768) を追加して3幅で撮影します。代表値は `.storybook/responsiveViewports.ts` を単一の設定元とし、正式なViewport分類の境界は Compact: 768px未満 / Medium: 768px以上1408px未満 / Wide: 1408px以上です。代表撮影幅は分類境界や各Componentのレイアウト切替点を意味しません。Storybook画面内のViewport選択ツールは今回導入しません（後続Issue #216）。そのためPreview側にアドオン専用の `viewport.options` は設定せず、代表サイズはVRTから参照します。手動Visual Reviewでは `iframe.html` を直接開き、ブラウザの開発者ツールで対象幅へ変更します。
 
 画面幅、時刻、乱数、外部API、アニメーション、画像などの安定化が必要なStoryは、再現可能なfixtureやmockをStory側に用意します。テストはフォント・画像読み込みを待ち、アニメーションを無効化します。環境依存の差分を防ぐため、基準画像は同一のOS・ブラウザ・フォント環境で作成・比較してください。
 
