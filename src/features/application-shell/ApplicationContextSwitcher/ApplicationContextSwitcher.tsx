@@ -19,24 +19,8 @@ import {
 import { useMediaQuery } from "@mantine/hooks"
 import { IconCheck, IconPlus, IconSearch, IconX } from "@tabler/icons-react"
 import { useState } from "react"
+import { ContextSwitcherMenu } from "./ContextSwitcherMenu"
 import type { ApplicationContextOption } from "../types"
-
-const menuStyles = {
-  dropdown: {
-    border: "1px solid var(--mantine-color-default-border)",
-    borderRadius: "var(--mantine-radius-md)",
-    boxShadow: "var(--mantine-shadow-md)",
-    padding: 4,
-    minWidth: 200,
-  },
-  item: {
-    borderRadius: "var(--mantine-radius-sm)",
-    fontSize: "var(--mantine-font-size-sm)",
-    minHeight: 32,
-    padding: "5px 8px",
-  },
-  label: { padding: "8px 8px 4px", fontSize: "var(--mantine-font-size-xs)" },
-} as const
 
 export function ApplicationContextSwitcher({
   currentContext,
@@ -94,24 +78,6 @@ export function ApplicationContextSwitcher({
       style={{ borderRadius: "var(--mantine-radius-xl)", pointerEvents: "none" }}
       aria-hidden="true"
     />
-  )
-
-  const menuOption = (item: ApplicationContextOption) => (
-    <Box key={item.id} pos="relative" pl={8}>
-      {accent(item)}
-      <Menu.Item
-        onClick={() => select(item.id)}
-        rightSection={item.id === currentContext.id ? <IconCheck size={14} /> : null}
-        style={{
-          background: item.id === currentContext.id
-            ? "var(--mantine-color-default-hover)"
-            : undefined,
-          fontWeight: item.id === currentContext.id ? 600 : 400,
-        }}
-      >
-        {item.label}
-      </Menu.Item>
-    </Box>
   )
 
   const modalOption = (item: ApplicationContextOption) => (
@@ -217,46 +183,20 @@ export function ApplicationContextSwitcher({
 
   return (
     <>
-      <Menu
+      <ContextSwitcherMenu
         opened={opened && !compact}
-        onChange={changeOpened}
-        withinPortal
-        position="bottom-start"
-        styles={menuStyles}
-        width={280}
-        closeOnItemClick={false}
-      >
-        <Menu.Target>{trigger}</Menu.Target>
-        <Menu.Dropdown>
-          {personal && menuOption(personal)}
-          <Box
-            mt={4}
-            pt={4}
-            style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
-          >
-            {!error && pinned && menuOption(pinned)}
-            <Box px={8} py={4}>{searchInput}</Box>
-            <ScrollArea.Autosize mah={360} type="auto">
-              {status}
-              {!error && shown.map(menuOption)}
-            </ScrollArea.Autosize>
-          </Box>
-          {onCreateCommunity && (
-            <>
-              <Menu.Divider />
-              <Menu.Item
-                leftSection={<IconPlus size={16} stroke={1.6} aria-hidden="true" />}
-                onClick={() => {
-                  changeOpened(false)
-                  onCreateCommunity()
-                }}
-              >
-                Communityを作成
-              </Menu.Item>
-            </>
-          )}
-        </Menu.Dropdown>
-      </Menu>
+        onOpenedChange={changeOpened}
+        trigger={trigger}
+        currentContext={currentContext}
+        contexts={contexts}
+        search={search}
+        onSearchChange={setSearch}
+        onSelect={onSelect}
+        onCreateCommunity={onCreateCommunity}
+        onRetry={onRetry}
+        loading={loading}
+        error={error}
+      />
       <Modal
         opened={opened && !!compact}
         onClose={() => changeOpened(false)}
