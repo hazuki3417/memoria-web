@@ -1,5 +1,5 @@
 query MyCommunities {
-  myCommunities { id name createdAt updatedAt mySettings { accentColor } }
+  myCommunities { id name createdAt updatedAt mySettings { accentColor alias } }
 }
 
 query CommunityDetails($communityId: ID!) {
@@ -49,12 +49,12 @@ query CommunityUsage($communityId: ID!) {
 query CommunityMySettings($communityId: ID!) {
   community(communityId: $communityId) {
     id
-    mySettings { accentColor }
+    mySettings { accentColor alias }
   }
 }
 
 mutation UpdateCommunitySettings($input: UpdateCommunitySettingsInput!) {
   updateCommunitySettings(input: $input) {
-    settings { accentColor }
+    settings { accentColor alias }
   }
 }

@@ -44,8 +44,8 @@ export function ApplicationNavigation({
       <ApplicationNavigationContent
         items={items}
         accentColor={accentColor}
-        onSelect={(itemId) => {
-          onSelect(itemId)
+        onSelect={(itemId, active) => {
+          if (!active) onSelect(itemId)
           onClose()
         }}
       />

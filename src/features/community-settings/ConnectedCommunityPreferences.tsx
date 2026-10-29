@@ -4,23 +4,25 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Button, Loader, Stack } from "@mantine/core"
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
+import { CommunityAliasControl } from "./CommunityAliasControl"
+import { MyCommunitiesDocument } from "@/infrastructure/graphql/generated"
 
 const COMMUNITY_SETTINGS = gql`
   query CommunityAccentSettings($communityId: ID!) {
-    community(communityId: $communityId) { id mySettings { accentColor } }
+    community(communityId: $communityId) { id mySettings { accentColor alias } }
   }
 `
 const SAVE_COMMUNITY_SETTINGS = gql`
   mutation SaveCommunityAccent($input: UpdateCommunitySettingsInput!) {
-    updateCommunitySettings(input: $input) { settings { accentColor } }
+    updateCommunitySettings(input: $input) { settings { accentColor alias } }
   }
 `
 
 type SettingsResult = {
-  community: { id: string; mySettings: { accentColor: string } } | null
+  community: { id: string; mySettings: { accentColor: string; alias: string | null } } | null
 }
 type SaveResult = {
-  updateCommunitySettings: { settings: { accentColor: string } }
+  updateCommunitySettings: { settings: { accentColor: string; alias: string | null } }
 }
 const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 
@@ -56,16 +58,25 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
   const applyContextAccent = useCallback((value: string) => {
     const id = client.cache.identify({ __typename: "Community", id: communityId })
     if (!id) return
+    const fragment = gql`
+      fragment CommunityAccentCache on Community {
+        mySettings { accentColor alias }
+      }
+    `
+    const previous = client.cache.readFragment<{
+      mySettings: { accentColor: string; alias: string | null }
+    }>({ id, fragment })
+    if (!previous) return
     client.cache.writeFragment({
       id,
-      fragment: gql`
-        fragment CommunityAccentCache on Community {
-          mySettings { accentColor }
-        }
-      `,
+      fragment,
       data: {
         __typename: "Community",
-        mySettings: { __typename: "CommunitySettings", accentColor: value },
+        mySettings: {
+          __typename: "CommunitySettings",
+          accentColor: value,
+          alias: previous.mySettings.alias,
+        },
       },
     })
   }, [client, communityId])
@@ -113,7 +124,7 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
   }
 
   if (loading && !data?.community) return <Loader aria-label="Community環境設定を読み込み中" />
-  if (error || !data?.community)
+  if (!data?.community)
     return (
       <Stack>
         <Alert color="red">Community環境設定を取得できませんでした。</Alert>
@@ -131,6 +142,50 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
       <CommunityPreferencesContent
         accent={accent ?? data.community.mySettings.accentColor}
         isPreview={false}
+        aliasControl={
+          <CommunityAliasControl
+            savedAlias={data.community.mySettings.alias}
+            onSave={async (alias) => {
+              const result = await save({
+                variables: { input: { communityId, alias } },
+              })
+              const settings = result.data?.updateCommunitySettings?.settings
+              if (!settings || settings.alias !== alias) {
+                throw new Error("Community alias save unconfirmed")
+              }
+              // Mutationの成立を確認した時点で、ShellとPreferencesの同じ参照元を更新する。
+              const id = client.cache.identify({ __typename: "Community", id: communityId })
+              if (id) {
+                const fragment = gql`
+                  fragment CommunityAliasCache on Community {
+                    mySettings { accentColor alias }
+                  }
+                `
+                const previous = client.cache.readFragment<{
+                  mySettings: { accentColor: string; alias: string | null }
+                }>({ id, fragment })
+                if (previous) {
+                  client.cache.writeFragment({
+                    id,
+                    fragment,
+                    data: {
+                      __typename: "Community",
+                      mySettings: {
+                        __typename: "CommunitySettings",
+                        accentColor: previous.mySettings.accentColor,
+                        alias: settings.alias,
+                      },
+                    },
+                  })
+                }
+              }
+              // 再取得の通信失敗は確定済みMutationを失敗扱いしない。
+              void client.refetchQueries({
+                include: [MyCommunitiesDocument, COMMUNITY_SETTINGS],
+              }).catch(() => undefined)
+            }}
+          />
+        }
         setAccent={(next) => {
           const current = accent ?? data.community!.mySettings.accentColor
           choose(typeof next === "function" ? next(current) : next)

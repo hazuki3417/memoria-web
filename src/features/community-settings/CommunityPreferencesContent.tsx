@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react"
+import { useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"
@@ -13,10 +13,12 @@ export function CommunityPreferencesContent({
   accent,
   setAccent,
   isPreview = true,
+  aliasControl,
 }: {
   accent: string
   setAccent: Dispatch<SetStateAction<string>>
   isPreview?: boolean
+  aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const [draft, setDraft] = useState(accent)
@@ -33,6 +35,12 @@ export function CommunityPreferencesContent({
         title="環境設定"
         description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
       />
+      {aliasControl && (
+        <Box>
+          <SectionHeader>表示名</SectionHeader>
+          {aliasControl}
+        </Box>
+      )}
       <Box>
         <SectionHeader>表示</SectionHeader>
         <Stack gap="xl">

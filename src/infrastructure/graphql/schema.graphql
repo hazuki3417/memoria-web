@@ -17,8 +17,8 @@ type RegisterUserPayload { user: User! }
 input UpdateUserProfileInput { nickname: String! }
 type UpdateUserProfilePayload { user: User! }
 type Community { id: ID! name: String! createdAt: DateTime! updatedAt: DateTime! mySettings: CommunitySettings! }
-type CommunitySettings { accentColor: String! }
-input UpdateCommunitySettingsInput { communityId: ID! accentColor: String! }
+type CommunitySettings { accentColor: String! alias: String }
+input UpdateCommunitySettingsInput { communityId: ID! accentColor: String alias: String }
 type UpdateCommunitySettingsPayload { settings: CommunitySettings! }
 input CreateCommunityInput { name: String! }
 type CreateCommunityPayload { community: Community! }
