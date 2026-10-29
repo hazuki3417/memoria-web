@@ -8,6 +8,9 @@ import { StorybookApplicationShell } from "./StorybookApplicationShell";
 
 const preview: Preview = {
   parameters: {
+    // Storybook standard: component previews have breathing room by default.
+    // Viewport-based UI (pages, dialogs and overlays) opts into fullscreen in its meta.
+    layout: "padded",
     controls: {
       matchers: {
         color: /(background|color)$/i,
