@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation"
-import { type ReactNode, useEffect, useRef, useState } from "react"
+import { type ReactNode, useRef, useState } from "react"
 import {
   MyCommunitiesDocument,
   useCurrentUserQuery,
@@ -11,6 +11,7 @@ import {
 import { showNotification } from "@/components/Feedback"
 import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
 import { CommunityCreateDialog } from "./CommunityCreateDialog/CommunityCreateDialog"
+import { useApplicationContextSelection } from "./useApplicationContextSelection"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -79,22 +80,12 @@ export function ApplicationShellContainer({
     })) ?? [])
   const communitiesLoaded = !communitiesLoading && !!communityData
   const [createBusy, setCreateBusy] = useState(false)
-  const [rememberedContextKind, setRememberedContextKind] = useState<
-    "personal" | "community"
-  >("personal")
-  const [rememberedCommunityId, setRememberedCommunityId] = useState("")
-  const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
+  const { contextKind, communityId, setRememberedContextKind, setRememberedCommunityId } =
+    useApplicationContextSelection(pathname)
   const shellMode =
     pathname === "/settings/account/delete"
       ? "restricted-flow"
       : "authenticated"
-  const isSettingsRoute = pathname.startsWith("/settings")
-  const contextKind = communityMatch
-    ? "community"
-    : isSettingsRoute
-      ? rememberedContextKind
-      : "personal"
-  const communityId = communityMatch?.[1] ?? rememberedCommunityId
   const currentCreated = created.find((item) => item.id === communityId)
   const resolvedPersonalContext = {
     ...personalContext,
@@ -128,16 +119,6 @@ export function ApplicationShellContainer({
     contextKind,
     activeSection,
   })
-
-  useEffect(() => {
-    const routeCommunityMatch = pathname.match(/^\/communities\/([^/]+)/)
-    if (routeCommunityMatch) {
-      setRememberedContextKind("community")
-      setRememberedCommunityId(routeCommunityMatch[1])
-    } else if (!pathname.startsWith("/settings")) {
-      setRememberedContextKind("personal")
-    }
-  }, [pathname])
 
   const closeCreate = () => {
     if (createBusy) return
