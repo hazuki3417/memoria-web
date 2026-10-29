@@ -52,3 +52,26 @@ export const EndWithTwoButtons: Story = {
     </ActionPanel>
   ),
 }
+
+export const StartOnly: Story = {
+  tags: ["visual", "vrt"],
+  render: () => (
+    <ActionPanel>
+      <ActionPanel.Start>
+        <Button variant="default">戻る</Button>
+      </ActionPanel.Start>
+    </ActionPanel>
+  ),
+}
+
+export const StartWithTwoButtons: Story = {
+  tags: ["visual", "vrt"],
+  render: () => (
+    <ActionPanel>
+      <ActionPanel.Start>
+        <Button variant="default">キャンセル</Button>
+        <Button>続ける</Button>
+      </ActionPanel.Start>
+    </ActionPanel>
+  ),
+}
