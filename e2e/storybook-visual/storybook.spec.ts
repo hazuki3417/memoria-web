@@ -44,9 +44,34 @@ test("Storybook visual snapshots", async ({ page, request }) => {
           // Log computed geometry without changing the image capture contract.
           const geometry = await dialog.evaluate((element) => {
             const rect = element.getBoundingClientRect()
+            const inner = element.parentElement
+            const root = element.closest("[data-centered]")
+            const box = (node: Element | null) => {
+              if (!node) return null
+              const r = node.getBoundingClientRect()
+              const css = getComputedStyle(node)
+              return {
+                x: r.x, y: r.y, width: r.width, height: r.height,
+                position: css.position, paddingLeft: css.paddingLeft,
+                paddingRight: css.paddingRight, marginLeft: css.marginLeft,
+                marginRight: css.marginRight, justifyContent: css.justifyContent,
+                alignItems: css.alignItems,
+              }
+            }
             return {
               viewport: { width: window.innerWidth, height: window.innerHeight },
               documentHeight: document.documentElement.scrollHeight,
+              scrollbarGap: window.innerWidth - document.documentElement.clientWidth,
+              scrollLock: {
+                bodyAttribute: document.body.getAttribute("data-scroll-locked"),
+                htmlAttribute: document.documentElement.getAttribute("data-scroll-locked"),
+                removedScrollbarSize: getComputedStyle(document.body)
+                  .getPropertyValue("--removed-body-scroll-bar-size"),
+              },
+              body: box(document.body),
+              html: box(document.documentElement),
+              root: box(root),
+              inner: box(inner),
               modal: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
               offsetX: rect.left + rect.width / 2 - window.innerWidth / 2,
               offsetY: rect.top + rect.height / 2 - window.innerHeight / 2,
