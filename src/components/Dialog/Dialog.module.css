@@ -1,0 +1,21 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Keep the regular body-to-footer separation consistent across dialogs. */
+.layout > * + * {
+  margin-block-start: var(--mantine-spacing-lg);
+}
+
+/* A divider communicates the separation itself, so its surrounding space is smaller. */
+.layout > .divider,
+.layout > .divider + * {
+  margin-block-start: var(--mantine-spacing-sm);
+}
+
+.body,
+.footer {
+  min-width: 0;
+}
