@@ -16,26 +16,3 @@ export const Default: Story = {
   tags: ["visual"],
 }
 
-export const Compact: Story = {
-  name: "Compact",
-  tags: ["visual"],
-  parameters: { viewport: { defaultViewport: "mobile1" } },
-}
-
-export const Saving: Story = {
-  name: "Saving",
-  tags: ["visual"],
-  args: { initialProfileSaveState: "saving" },
-}
-
-export const RetryableFailure: Story = {
-  name: "Retryable Failure",
-  tags: ["visual"],
-  args: { initialProfileSaveState: "retryable-error" },
-}
-
-export const BlockingError: Story = {
-  name: "Blocking Error",
-  tags: ["visual"],
-  args: { initialProfileSaveState: "blocked" },
-}

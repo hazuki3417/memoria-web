@@ -6,8 +6,8 @@ import { useEffect, useState } from "react"
 import { showNotification } from "@/components/Feedback"
 import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
 import { MediaBrowserPane } from "./MediaBrowserPane"
-import { MediaBrowserGroupDialog } from "./MediaBrowserGroupDialog"
-import { MediaBrowserShareDialog } from "./MediaBrowserShareDialog"
+import { MediaBrowserGroupModal } from "./MediaBrowserGroupModal"
+import { MediaBrowserShareModal } from "./MediaBrowserShareModal"
 import { MediaBrowserDeleteModal } from "./MediaBrowserDeleteModal"
 
 type MediaBrowserState =
@@ -234,7 +234,7 @@ function MediaBrowserController({
         loadMoreError={loadMoreError}
       />
 
-      <MediaBrowserGroupDialog
+      <MediaBrowserGroupModal
         opened={selectionDialog === "group"}
         selected={selected}
         groupActionPending={groupActionPending}
@@ -249,7 +249,7 @@ function MediaBrowserController({
         onClose={() => setSelectionDialog(null)}
         onAddToGroups={addToGroups}
       />
-      <MediaBrowserShareDialog
+      <MediaBrowserShareModal
         opened={selectionDialog === "share"}
         selectedCount={selected.size}
         communityTarget={communityTarget}

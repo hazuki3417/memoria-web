@@ -24,13 +24,8 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Wide: Story = {
-  name: "Wide",
+export const Default: Story = {
+  name: "Default",
   tags: ["visual"],
 }
 
-export const Compact: Story = {
-  name: "Compact",
-  tags: ["visual"],
-  parameters: { viewport: { defaultViewport: "mobile1" } },
-}

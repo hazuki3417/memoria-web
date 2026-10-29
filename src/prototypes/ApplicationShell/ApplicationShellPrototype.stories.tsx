@@ -10,19 +10,9 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Personal: Story = {
-  name: "Personal",
+export const Default: Story = {
+  name: "Default",
   tags: ["visual"],
   args: { initialContext: "personal" },
 }
-export const Community: Story = {
-  name: "Community",
-  tags: ["visual"],
-  args: { initialContext: "community" },
-}
-export const Compact: Story = {
-  name: "Compact",
-  tags: ["visual"],
-  args: { initialContext: "personal" },
-  parameters: { viewport: { defaultViewport: "mobile1" } },
-}
+

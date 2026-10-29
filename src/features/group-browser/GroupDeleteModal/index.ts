@@ -1,0 +1,1 @@
+export { GroupDeleteModal } from "./GroupDeleteModal"

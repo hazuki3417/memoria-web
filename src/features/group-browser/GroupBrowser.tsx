@@ -12,9 +12,9 @@ import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupDetailPane } from "./GroupDetailPane"
 import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
 import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
-import { GroupDeleteDialog } from "./GroupDeleteDialog"
-import { GroupCreateDialog } from "./GroupCreateDialog"
-import { GroupEditDialog } from "./GroupEditDialog"
+import { GroupDeleteModal } from "./GroupDeleteModal"
+import { GroupCreateModal } from "./GroupCreateModal"
+import { GroupEditModal } from "./GroupEditModal"
 import { GroupBrowserListPane } from "./GroupBrowserListPane"
 import { useGroupMutationAction } from "./useGroupMutationAction"
 import { filterVisibleGroups } from "./groupSearch"
@@ -269,7 +269,7 @@ export function GroupBrowser({
 
   return (
     <>
-      <GroupCreateDialog
+      <GroupCreateModal
         opened={createOpened}
         name={createName}
         parents={createParents}
@@ -283,7 +283,7 @@ export function GroupBrowser({
         onClose={closeCreate}
         onSubmit={submitCreate}
       />
-      <GroupEditDialog
+      <GroupEditModal
         opened={editOpened}
         name={draftName}
         parents={draftParents}
@@ -302,7 +302,7 @@ export function GroupBrowser({
         onClose={edit.close}
         onSubmit={submitEdit}
       />
-      <GroupDeleteDialog
+      <GroupDeleteModal
         opened={deleteOpened}
         name={selected?.name ?? ""}
         saving={saving}
