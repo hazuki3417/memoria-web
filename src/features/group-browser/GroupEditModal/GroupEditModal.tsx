@@ -61,8 +61,6 @@ export function GroupEditModal({
       onClose={onClose}
       title="Groupを編集"
       size="lg"
-      centered
-      withCloseButton={false}
     >
       <Modal.Body>
               <Stack gap="lg">
