@@ -4,10 +4,29 @@ import type { Preview } from '@storybook/nextjs-vite';
 import { theme } from "../src//lib/theme";
 import { ThemeProvider } from "../src/providers/ThemeProvider";
 import { StorybookApplicationShell } from "./StorybookApplicationShell";
+import { responsiveViewports } from "./responsiveViewports";
 
 
 const preview: Preview = {
   parameters: {
+    // Shared representative review sizes. An interactive viewport toolbar
+    // requires the separate Storybook viewport addon to be installed/enabled.
+    viewport: {
+      options: {
+        compact: {
+          name: "Compact",
+          styles: { width: `${responsiveViewports.compact.width}px`, height: `${responsiveViewports.compact.height}px` },
+        },
+        medium: {
+          name: "Medium",
+          styles: { width: `${responsiveViewports.medium.width}px`, height: `${responsiveViewports.medium.height}px` },
+        },
+        wide: {
+          name: "Wide",
+          styles: { width: `${responsiveViewports.wide.width}px`, height: `${responsiveViewports.wide.height}px` },
+        },
+      },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
