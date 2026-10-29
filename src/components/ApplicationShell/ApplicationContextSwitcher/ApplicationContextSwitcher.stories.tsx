@@ -50,8 +50,11 @@ type Story = StoryObj<typeof meta>
 const openSwitcher = async () => {
   const page = within(document.body)
   await userEvent.click(page.getByRole("button", { name: "コンテキストを切り替える" }))
-  // Mantine MenuのPortal描画と開閉Transitionが完了してから検証する。
-  await waitFor(() => expect(page.getByRole("menu")).toBeVisible())
+  // DesktopはMenu、CompactはModal。いずれも表示完了を待つ。
+  await waitFor(() => {
+    const opened = page.queryByRole("menu") ?? page.queryByRole("dialog")
+    expect(opened).toBeVisible()
+  })
   return page
 }
 
