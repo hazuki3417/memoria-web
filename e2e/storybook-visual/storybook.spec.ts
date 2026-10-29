@@ -1,38 +1,20 @@
 import { expect, test } from "@playwright/test"
 import { responsiveViewports } from "../../.storybook/responsiveViewports"
 
-type StoryEntry = { id: string; type: string; tags?: string[]; parameters?: Record<string, unknown> }
+type StoryEntry = { id: string; type: string; tags?: string[] }
 type StoryIndex = { entries: Record<string, StoryEntry> }
 
-// StorybookのCanvasのみを対象とする。Docs/MDXは撮影しない。
-// 撮影対象はStory側でvrtタグを明示したものに限定する。
-// @see https://storybook.js.org/docs/writing-stories/tags
-// Screenshot filenames for existing baselines must not change.
-const captureViewports = {
-  wide: { name: "desktop", width: responsiveViewports.wide.width, height: responsiveViewports.wide.height },
-  compact: { name: "mobile", width: responsiveViewports.compact.width, height: responsiveViewports.compact.height },
-  medium: { name: "medium", width: responsiveViewports.medium.width, height: responsiveViewports.medium.height },
-} as const
-
-type CaptureViewport = keyof typeof captureViewports
-const defaultViewports: CaptureViewport[] = ["wide", "compact"]
-
-function resolveCaptureViewports(parameterValue: string | null): CaptureViewport[] {
-  if (!parameterValue) return defaultViewports
-  const values = parameterValue.split(",")
-  if (values.length === 0 || new Set(values).size !== values.length) {
-    throw new Error(`Invalid VRT viewport configuration: ${parameterValue}`)
-  }
-  for (const value of values) {
-    if (!Object.prototype.hasOwnProperty.call(captureViewports, value)) {
-      throw new Error(`Unknown VRT viewport: ${value}`)
-    }
-  }
-  return values as CaptureViewport[]
-}
+// StorybookのCanvasのみを撮影する（vrtタグでOpt-in）。
+// 全対象Storyに対しCompact / Medium / Wideを固定の代表幅で撮影する。
+// vrt-modalタグはPortal上のDialogの可視性確認にのみ使用する。
+const viewports = [
+  responsiveViewports.compact,
+  responsiveViewports.medium,
+  responsiveViewports.wide,
+] as const
 
 test("Storybook visual snapshots", async ({ page, request }) => {
-  // 全VRT対象Story × Desktop/Mobileを1テストで撮影するため、既定の30秒では不足する。
+  // 全VRT対象Story × 3領域を1テストで撮影するため、既定の30秒では不足する。
   test.setTimeout(180_000)
   const response = await request.get("/index.json")
   expect(response.ok()).toBeTruthy()
@@ -44,15 +26,7 @@ test("Storybook visual snapshots", async ({ page, request }) => {
   expect(stories.length).toBeGreaterThan(0)
 
   for (const story of stories) {
-    // Storybook's index.json does not include resolved Story parameters.
-    // Read the effective parameters from a hidden decorator marker instead.
-    await page.goto(`/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story`)
-    const marker = page.locator("[data-vrt-viewports]")
-    await expect(marker).toBeAttached()
-    const configuredViewports = resolveCaptureViewports(await marker.getAttribute("data-vrt-viewports"))
-
-    for (const viewportName of configuredViewports) {
-      const viewport = captureViewports[viewportName]
+    for (const viewport of viewports) {
       await test.step(`${story.id} / ${viewport.name}`, async () => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height })
         await page.goto(`/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story`)
