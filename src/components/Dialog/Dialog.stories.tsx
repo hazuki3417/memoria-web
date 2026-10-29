@@ -5,6 +5,7 @@ import { Dialog } from "./Dialog"
 const meta = {
   title: "Components/Dialog",
   component: Dialog,
+  parameters: { layout: "fullscreen" },
   args: {
     opened: true,
     onClose: () => undefined,
