@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { ApplicationHeader } from "./ApplicationHeader"
 
 const meta = {
-  title: "Components/Application Shell/Header",
+  title: "Features/Application Shell/Header",
   component: ApplicationHeader,
   parameters: { layout: "fullscreen" },
   decorators: [
@@ -21,11 +21,11 @@ type Story = StoryObj<typeof meta>
 
 export const BrandOnly: Story = {
   name: "Visual · Brand Only",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
 }
 export const Composed: Story = {
   name: "Visual · Composed",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     leading: <Text size="sm">Navigation</Text>,
     context: <Text size="sm">Context</Text>,
@@ -35,7 +35,7 @@ export const Composed: Story = {
 
 export const CommunityAccent: Story = {
   name: "Visual · Community Accent",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     accentColor: "var(--mantine-color-teal-6)",
     leading: <Text size="sm">Navigation</Text>,
@@ -46,7 +46,7 @@ export const CommunityAccent: Story = {
 
 export const LongContext: Story = {
   name: "Visual · Long Context",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: {
     context: <Text size="sm">家族の思い出を長い名前で管理するCommunity</Text>,
   },

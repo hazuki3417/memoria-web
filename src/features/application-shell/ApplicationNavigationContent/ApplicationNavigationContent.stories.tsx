@@ -15,7 +15,7 @@ const items = [
 ]
 
 const meta = {
-  title: "Components/Application Shell/Navigation Content",
+  title: "Features/Application Shell/Navigation Content",
   component: ApplicationNavigationContent,
   parameters: { layout: "fullscreen" },
   decorators: [

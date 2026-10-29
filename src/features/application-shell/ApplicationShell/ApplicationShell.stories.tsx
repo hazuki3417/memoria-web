@@ -63,7 +63,7 @@ const content = (
 )
 
 const meta = {
-  title: "Components/Application Shell",
+  title: "Features/Application Shell",
   component: ApplicationShell,
   parameters: { layout: "fullscreen" },
   args: {

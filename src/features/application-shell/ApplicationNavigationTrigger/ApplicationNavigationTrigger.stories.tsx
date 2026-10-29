@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { ApplicationNavigationTrigger } from "./ApplicationNavigationTrigger"
 
 const meta = {
-  title: "Components/Application Shell/Navigation Trigger",
+  title: "Features/Application Shell/Navigation Trigger",
   component: ApplicationNavigationTrigger,
   args: {
     opened: false,
@@ -24,6 +24,6 @@ export const Opened: Story = {
 }
 export const Hidden: Story = {
   name: "Visual · Hidden",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: { hidden: true },
 }
