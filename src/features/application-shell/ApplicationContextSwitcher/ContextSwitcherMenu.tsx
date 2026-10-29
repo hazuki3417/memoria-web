@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Box, Button, Group, Loader, Menu, ScrollArea, Text, TextInput } from "@mantine/core"
+import { ActionIcon, Box, Button, Group, Menu, ScrollArea, Text, TextInput } from "@mantine/core"
 import { IconCheck, IconPlus, IconSearch, IconX } from "@tabler/icons-react"
 import type { ReactNode } from "react"
 import type { ApplicationContextOption } from "../types"
@@ -103,10 +103,9 @@ export function ContextSwitcherMenu({ opened, onOpenedChange, trigger, currentCo
   const status = (
     <>
       {loading && communities.length === 0 && (
-        <Group px="sm" py="xs" gap="xs" wrap="nowrap">
-          <Loader size="xs" aria-label="Community一覧を読み込み中" />
-          <Text size="xs" c="dimmed">読み込み中です。</Text>
-        </Group>
+        <Text size="xs" c="dimmed" px="sm" py="xs" role="status">
+          読み込み中です。
+        </Text>
       )}
       {error && (
         <Group px="sm" py="xs" gap="xs" wrap="nowrap" justify="space-between">
