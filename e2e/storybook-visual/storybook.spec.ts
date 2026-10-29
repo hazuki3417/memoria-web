@@ -33,8 +33,8 @@ test("Storybook visual snapshots", async ({ page, request }) => {
         await expect(page.locator("#storybook-root")).toBeAttached()
 
         // Verify the visible capture target separately from the Storybook mount point.
-        // Dialog stories must prove that the actual modal content is visible.
-        if (story.tags?.includes("vrt-dialog")) {
+        // Modal stories must prove that the actual modal content is visible.
+        if (story.tags?.includes("vrt-modal")) {
           await expect(page.getByRole("dialog")).toBeVisible()
         } else {
           await expect(page.locator("#storybook-root")).toBeVisible()
