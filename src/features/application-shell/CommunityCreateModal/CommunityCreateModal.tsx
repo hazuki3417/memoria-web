@@ -1,4 +1,4 @@
-import { Button, Text, TextInput } from "@mantine/core"
+import { Button, Text, TextInput, Stack } from "@mantine/core"
 import { Modal } from "@/components/Modal"
 import { ActionPanel } from "@/components/ActionPanel"
 
@@ -30,6 +30,7 @@ export function CommunityCreateModal({
             opened={opened}
             onClose={onClose}
             title="Communityを作成"
+            withCloseButton
           >
             <Modal.Body>
         <Stack gap="md">
