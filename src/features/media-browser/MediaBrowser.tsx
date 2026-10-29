@@ -8,7 +8,7 @@ import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
 import { MediaBrowserPane } from "./MediaBrowserPane"
 import { MediaBrowserGroupDialog } from "./MediaBrowserGroupDialog"
 import { MediaBrowserShareDialog } from "./MediaBrowserShareDialog"
-import { MediaBrowserDeleteDialog } from "./MediaBrowserDeleteDialog"
+import { MediaBrowserDeleteModal } from "./MediaBrowserDeleteModal"
 
 type MediaBrowserState =
   | "default"
@@ -256,7 +256,7 @@ function MediaBrowserController({
         onTargetChange={setCommunityTarget}
         onClose={() => setSelectionDialog(null)}
       />
-      <MediaBrowserDeleteDialog
+      <MediaBrowserDeleteModal
         opened={selectionDialog === "delete"}
         selectedCount={selected.size}
         onClose={() => setSelectionDialog(null)}
