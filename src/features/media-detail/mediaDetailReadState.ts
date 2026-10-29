@@ -76,8 +76,8 @@ export function projectCollection(
   hasPartialError: boolean,
 ): CollectionReadState {
   if (detail.kind !== "ready") return { kind: "pending" }
-  if (hasPartialError || detail.media[collection] == null) return { kind: "error" }
   const result = detail.media[collection]
+  if (hasPartialError || result == null) return { kind: "error" }
   if (result.pageInfo.hasNextPage) return { kind: "incomplete" }
   return { kind: "ready", values: result.edges.map((edge) => edge.node) }
 }
