@@ -850,7 +850,6 @@ export function MediaBrowserPrototype({
         opened={detail !== null}
         onClose={closeMediaDetail}
         fullScreen
-        portalProps={{ target: "#application-modal-root" }}
         padding={0}
         withCloseButton={false}
         styles={{
