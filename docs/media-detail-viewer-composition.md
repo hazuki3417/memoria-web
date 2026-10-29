@@ -42,3 +42,18 @@ Status: **A案合意済み・構造分離実装中**（2026-10-29）。実装の
 4. **Human Visual Review**: 375×812 / 1024×768 / 1440×900、Panel open/closed、Portrait/Landscape、Scroll、Zoom/Rotate、Nested Modal、Keyboard/Focus、既存baselineとの差分を確認。
 
 Host/Layout分離は合意済みだが、Compact時のPanel最大高さ、Skeletonの詳細、GraphQL Result Type/Props、標準Portalへの移行によるNested Overlayの重なり順など、既存UI変更を伴う事項はここでは決定しない。検証で仕様判断が必要な場合はユーザーと合意する。
+
+## Stage 2 — URL / History Controller基盤（2026-10-29、実装途中）
+
+`src/features/media-detail/mediaDetailNavigation.ts` に純関数として `mediaId`の厳密なQuery読取、他Query/Hash保持URL生成、duplicateのないimmutable Navigation ID Snapshot、前後位置/Wrap判定、許可route判定を追加した。対応するUnit Testで境界ケースを検証する。
+
+`MediaDetailUrlProvider` はApplicationShell内に一つ配置し、URLのMedia ID、in-app Origin Snapshot、Historyのpush（初回open）/replace（prev-next）/back（安全なoriginに限る）/replace-close（direct access等）を所有する。Next App Routerが持つ`window.history.state`の値を保持して識別用markerを追加し、別画面へのroute changeやBack操作でin-memory sessionを無効化する。GraphQL Queryや画像・編集stateは保持しない。
+
+### 未接続・未検証
+
+- **Controller契約の基盤だけを実装**。Media Browser / Group Browser / Dashboardの既存`MediaDetailDialog`ローカルstateは維持され、Consumerを共通Controllerに接続した段階とは扱わない。
+- 共通HostでURL-selected Mediaを表示するには、Stage 3のID独立Detail Query・必須/補助情報のViewModelが必要。Loading/Errorを仮表示して既存Media表示を置換しない。
+- Next App Routerのnative History APIでpush/replace後の`usePathname`/searchParams整合、Back/Forward、reload、bfcache、cross-route、close時origin保護、scroll/no-remountのE2E検証が残る。特にSession markerを使ったsafe-back判定が実Router動作で妥当か確認する。
+- `mediaDetailNavigationWrap` User Settingsの実接続、DashboardのMedia ID付きCarousel、Group BrowserのAggregate CollectionのSnapshotと実際の閲覧順、URL-only/invalid URL fallbackのUIは未完成。
+- Stage 2全体のHuman Review完了とみなさず、追加Consumer接続に伴う設計判断はユーザーと合意してから進む。
+
