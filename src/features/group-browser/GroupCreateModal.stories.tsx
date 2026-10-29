@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from "storybook/test"
 import { GroupCreateModal } from "./GroupCreateModal"
 
 const meta = {
-  title: "Features/Group Browser/Create Dialog",
+  title: "Features/Group Browser/Create Modal",
   component: GroupCreateModal,
   parameters: { layout: "fullscreen" },
   args: {
@@ -61,5 +61,17 @@ export const Cancel: Story = {
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await expect(args.onClose).toHaveBeenCalledTimes(1)
     await expect(args.onSubmit).not.toHaveBeenCalled()
+  },
+}
+
+export const Submit: Story = {
+  name: "Interaction · Submit",
+  tags: ["interaction"],
+  args: { name: "新しいGroup" },
+  play: async ({ args }) => {
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    await userEvent.click(dialog.getByRole("button", { name: "作成" }))
+    await expect(args.onSubmit).toHaveBeenCalledTimes(1)
+    await expect(args.onClose).not.toHaveBeenCalled()
   },
 }
