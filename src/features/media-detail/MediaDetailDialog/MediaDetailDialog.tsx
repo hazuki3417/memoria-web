@@ -3,12 +3,12 @@
 import { useMediaQuery } from "@mantine/hooks"
 import { useEffect, useState } from "react"
 import { showNotification } from "@/components/Feedback"
-import { CommunityShareDialog } from "../CommunityShareDialog"
-import { CommunityUnshareDialog } from "../CommunityUnshareDialog"
-import { GroupsEditDialog } from "../GroupsEditDialog"
-import { MediaDeleteDialog } from "../MediaDeleteDialog"
+import { CommunityShareModal } from "../CommunityShareModal"
+import { CommunityUnshareModal } from "../CommunityUnshareModal"
+import { GroupsEditModal } from "../GroupsEditModal"
+import { MediaDeleteModal } from "../MediaDeleteModal"
 import { MediaDetailViewer } from "../MediaDetailViewer"
-import { TagsEditDialog } from "../TagsEditDialog"
+import { TagsEditModal } from "../TagsEditModal"
 import type { MediaItem } from "../types"
 import { useMediaDetailEditing } from "../useMediaDetailEditing"
 import { useMediaDetailViewport } from "../useMediaDetailViewport"
@@ -124,17 +124,17 @@ export function MediaDetailDialog({
         setDetailRotateAnimated={setDetailRotateAnimated}
         detailDirection={detailDirection}
       />
-      <MediaDeleteDialog
+      <MediaDeleteModal
         target={deleteTarget}
         onCancel={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
       />
-      <CommunityUnshareDialog
+      <CommunityUnshareModal
         unshareTarget={unshareTarget}
         setUnshareTarget={setUnshareTarget}
         removeCommunityShare={removeCommunityShare}
       />
-      <CommunityShareDialog
+      <CommunityShareModal
         detailEditor={detailEditor}
         setDetailEditor={setDetailEditor}
         detailValues={detailValues}
@@ -142,14 +142,14 @@ export function MediaDetailDialog({
         setShareTarget={setShareTarget}
         addCommunityShare={addCommunityShare}
       />
-      <TagsEditDialog
+      <TagsEditModal
         detailEditor={detailEditor}
         setDetailEditor={setDetailEditor}
         detailDraft={detailDraft}
         setDetailDraft={setDetailDraft}
         saveDetailDraft={saveDetailDraft}
       />
-      <GroupsEditDialog
+      <GroupsEditModal
         groupOptions={groupOptions}
         detailEditor={detailEditor}
         setDetailEditor={setDetailEditor}
