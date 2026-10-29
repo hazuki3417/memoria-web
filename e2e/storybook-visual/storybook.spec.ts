@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { responsiveViewports } from "../../.storybook/responsiveViewports"
 
 type StoryEntry = { id: string; type: string; tags?: string[]; parameters?: Record<string, unknown> }
 type StoryIndex = { entries: Record<string, StoryEntry> }
@@ -6,10 +7,14 @@ type StoryIndex = { entries: Record<string, StoryEntry> }
 // StorybookのCanvasのみを対象とする。Docs/MDXは撮影しない。
 // 撮影対象はStory側でvrtタグを明示したものに限定する。
 // @see https://storybook.js.org/docs/writing-stories/tags
+// Preserve existing screenshot filenames for all established VRT targets.
 const viewports = [
-  { name: "desktop", width: 1440, height: 900 },
-  { name: "mobile", width: 375, height: 812 },
+  { name: "desktop", width: responsiveViewports.wide.width, height: responsiveViewports.wide.height },
+  { name: "mobile", width: responsiveViewports.compact.width, height: responsiveViewports.compact.height },
 ] as const
+
+// The new Modal is reviewed in all three adopted responsive regions.
+const mediumViewport = { name: "medium", width: responsiveViewports.medium.width, height: responsiveViewports.medium.height } as const
 
 test("Storybook visual snapshots", async ({ page, request }) => {
   // 全VRT対象Story × Desktop/Mobileを1テストで撮影するため、既定の30秒では不足する。
@@ -24,7 +29,8 @@ test("Storybook visual snapshots", async ({ page, request }) => {
   expect(stories.length).toBeGreaterThan(0)
 
   for (const story of stories) {
-    for (const viewport of viewports) {
+    const captureViewports = story.tags?.includes("vrt-modal") ? [...viewports, mediumViewport] : viewports
+    for (const viewport of captureViewports) {
       await test.step(`${story.id} / ${viewport.name}`, async () => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height })
         await page.goto(`/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story`)
