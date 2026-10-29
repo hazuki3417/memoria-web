@@ -19,7 +19,7 @@ type Story = StoryObj<typeof meta>
 
 export const Confirmation: Story = {
   name: "Visual · Delete confirmation",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-modal"],
 }
 
 export const Cancel: Story = {
