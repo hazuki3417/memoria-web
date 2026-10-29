@@ -25,6 +25,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 import { ZoomInput } from "../ZoomInput"
+import type { PreviewReadState } from "../mediaDetailReadState"
+import { PreviewStatus } from "../MediaDetailReadFeedback"
 
 export type MediaDetailPreviewProps = Pick<
   MediaDetailViewerProps,
@@ -46,6 +48,8 @@ export type MediaDetailPreviewProps = Pick<
   detail: NonNullable<MediaDetailViewerProps["detail"]>
   prev: NonNullable<MediaDetailViewerProps["detail"]> | null
   next: NonNullable<MediaDetailViewerProps["detail"]> | null
+  readState?: PreviewReadState
+  onRetryImage?: () => void
 }
 
 export function MediaDetailPreview(props: MediaDetailPreviewProps) {
@@ -67,6 +71,8 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
     detailDirection,
     detailInfoOpened,
     setDetailInfoOpened,
+    readState,
+    onRetryImage,
   } = props
   const detailIndex = stateItems.findIndex((item) => item.id === detail.id)
   return (
@@ -136,14 +142,16 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                 justifyContent: "center",
               }}
             >
-              {detail.failed ? (
+              {readState && readState.kind !== "ready" ? (
+                <PreviewStatus state={readState} onRetry={onRetryImage} />
+              ) : detail.failed ? (
                 <Stack align="center" c="dimmed">
                   <IconPhotoOff size={48} />
                   <Text size="sm">画像を表示できません</Text>
                 </Stack>
               ) : (
                 <Image
-                  src={detail.src}
+                  src={readState?.kind === "ready" ? readState.url : detail.src}
                   alt={detail.label}
                   w="100%"
                   h="100%"
