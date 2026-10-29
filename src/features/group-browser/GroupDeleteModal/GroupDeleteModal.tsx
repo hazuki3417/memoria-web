@@ -28,8 +28,6 @@ export function GroupDeleteModal({
       closeOnEscape={!saving}
       closeOnClickOutside={!saving}
       title="Groupを削除"
-      centered
-      withCloseButton={false}
     >
       <Modal.Body>
         <Text size="sm">
