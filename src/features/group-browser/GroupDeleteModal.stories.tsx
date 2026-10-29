@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from "storybook/test"
 import { GroupDeleteModal } from "./GroupDeleteModal"
 
 const meta = {
-  title: "Features/Group Browser/Delete Dialog",
+  title: "Features/Group Browser/Delete Modal",
   component: GroupDeleteModal,
   parameters: { layout: "fullscreen" },
   args: {
@@ -43,5 +43,16 @@ export const Cancel: Story = {
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await expect(args.onClose).toHaveBeenCalledTimes(1)
     await expect(args.onConfirm).not.toHaveBeenCalled()
+  },
+}
+
+export const ConfirmDelete: Story = {
+  name: "Interaction · Confirm delete",
+  tags: ["interaction"],
+  play: async ({ args }) => {
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを削除" }))
+    await userEvent.click(dialog.getByRole("button", { name: "削除" }))
+    await expect(args.onConfirm).toHaveBeenCalledTimes(1)
+    await expect(args.onClose).not.toHaveBeenCalled()
   },
 }
