@@ -24,8 +24,8 @@ Storybookはテスト起動時に自動起動します。基準画像は `e2e/st
 VRTはStorybookのCanvasを `iframe.html` で読み込む。まず `#storybook-root` がDOMに存在することを `toBeAttached()` で確認し、その後に**撮影対象自体の可視性**を確認する。RootのDOM上の存在と撮影対象の可視性は別の条件として扱う。
 
 - 通常のStoryでは従来どおり `#storybook-root` の `toBeVisible()` を確認する。これは最小限の表示確認であり、非同期データ取得や `play` の完了を保証するものではない。
-- Mantine `Modal` 等、Portal上にDialogを描画するStoryには `tags: ["visual", "vrt", "vrt-dialog"]` を明示する。この場合は `#storybook-root` 自身の可視性を要求せず、`getByRole("dialog").toBeVisible()` を確認する。Portalが `document.body` 直下のどの位置に挿入されても要素の役割から判定できる。
-- `vrt-dialog` は**可視性確認方法を選ぶ補助タグ**であり、撮影対象に含めるための `vrt` タグを代替しない。追加のPortal型UI（Popover / Tooltip等）は、そのUIに適した確認方法を個別に設計する。単にRootの存在だけを成功条件に緩めない。
+- Mantine `Modal` 等、Portal上にModalを描画するStoryには `tags: ["visual", "vrt", "vrt-modal"]` を明示する。この場合は `#storybook-root` 自身の可視性を要求せず、`getByRole("dialog").toBeVisible()` を確認する。Portalが `document.body` 直下のどの位置に挿入されても要素の役割から判定できる。
+- `vrt-modal` は**可視性確認方法を選ぶ補助タグ**であり、撮影対象に含めるための `vrt` タグを代替しない。追加のPortal型UI（Popover / Tooltip等）は、そのUIに適した確認方法を個別に設計する。単にRootの存在だけを成功条件に緩めない。
 - フォント・画像読み込みの待機、スクリーンショットの比較と、Baseline更新の承認フローは変更しない。撮影前の可視性確認が通過しても、実際の描画品質は候補画像でレビューする。
 
 ## Docker Composeでの撮影（Phase 1）
