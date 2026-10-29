@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Group, TagsInput } from "@mantine/core"
+import { Button, CloseButton, Group, TagsInput } from "@mantine/core"
 import { IconSearch } from "@tabler/icons-react"
 
 type MediaBrowserViewSearchProps = {
@@ -34,7 +34,16 @@ export function MediaBrowserViewSearch({
         value={tags}
         onChange={onTagsChange}
         data={tagOptions}
-        clearable
+        rightSection={
+          tags.length > 0 ? (
+            <CloseButton
+              type="button"
+              size="xs"
+              aria-label="検索条件をクリア"
+              onClick={() => onTagsChange([])}
+            />
+          ) : undefined
+        }
         leftSection={<IconSearch size={16} />}
         size="xs"
         w={compact ? "100%" : 280}
