@@ -23,7 +23,6 @@ export function MediaDetailViewerHost({
       opened={opened}
       onClose={onClose}
       fullScreen
-      portalProps={{ target: "#application-modal-root" }}
       padding={0}
       withCloseButton={false}
       styles={{
