@@ -8,6 +8,7 @@ import { MediaDetailInfoPanel } from "../MediaDetailInfoPanel"
 import { MediaDetailPreview } from "../MediaDetailPreview"
 import { MediaDetailViewerHost } from "./MediaDetailViewerHost"
 import { MediaDetailLayout } from "./MediaDetailLayout"
+import type { DetailReadState, PreviewReadState, CollectionReadState } from "../mediaDetailReadState"
 
 type Editing = ReturnType<typeof useMediaDetailEditing>
 type Viewport = ReturnType<typeof useMediaDetailViewport>
@@ -42,6 +43,14 @@ export type MediaDetailViewerProps = Pick<
     compact: boolean | undefined
     context: "personal" | "community"
     downloadMock: "available" | "forbidden" | "processing"
+    read?: {
+      detail: DetailReadState
+      preview: PreviewReadState
+      groups: CollectionReadState
+      tags: CollectionReadState
+      retryDetail?: () => void
+      retryImage?: () => void
+    }
   }
 
 /** Composes the existing Media Detail preview and info panel without owning the overlay/layout mechanics. */
@@ -70,6 +79,8 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
               preview={
                 <MediaDetailPreview
                   detail={detail}
+                  readState={props.read?.preview}
+                  onRetryImage={props.read?.retryImage}
                   stateItems={stateItems}
                   prev={prev}
                   next={next}
@@ -90,6 +101,10 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
               }
               infoPanel={
                 <MediaDetailInfoPanel
+                  detailReadState={props.read?.detail}
+                  groupsReadState={props.read?.groups}
+                  tagsReadState={props.read?.tags}
+                  onRetryDetail={props.read?.retryDetail}
                   compact={compact}
                   detailInfoOpened={detailInfoOpened}
                   detailValues={props.detailValues}
