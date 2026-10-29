@@ -1,3 +1,5 @@
+"use client"
+
 import { Button, Text, TextInput, Stack } from "@mantine/core"
 import { Modal } from "@/components/Modal"
 import { ActionPanel } from "@/components/ActionPanel"
