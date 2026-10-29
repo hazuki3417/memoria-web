@@ -6,6 +6,10 @@ import { Modal } from "./Modal"
 const meta = {
   title: "Components/Modal",
   component: Modal,
+  // Capture all three representative regions; vrt-modal only selects the visibility check.
+  parameters: {
+    vrt: { viewports: ["wide", "compact", "medium"] },
+  },
   args: {
     opened: true,
     onClose: () => undefined,
