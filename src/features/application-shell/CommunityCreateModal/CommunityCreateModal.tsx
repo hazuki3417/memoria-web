@@ -30,7 +30,6 @@ export function CommunityCreateModal({
             opened={opened}
             onClose={onClose}
             title="Communityを作成"
-            withCloseButton
           >
             <Modal.Body>
         <Stack gap="md">
