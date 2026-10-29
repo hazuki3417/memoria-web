@@ -6,6 +6,7 @@ import { Modal } from "./Modal"
 const meta = {
   title: "Components/Modal",
   component: Modal,
+  parameters: { layout: "fullscreen" },
   args: {
     opened: true,
     onClose: () => undefined,
