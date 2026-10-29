@@ -21,11 +21,11 @@ type Story = StoryObj<typeof meta>
 
 export const BrandOnly: Story = {
   name: "Visual · Brand Only",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
 }
 export const Composed: Story = {
   name: "Visual · Composed",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: {
     leading: <Text size="sm">Navigation</Text>,
     context: <Text size="sm">Context</Text>,
@@ -35,7 +35,7 @@ export const Composed: Story = {
 
 export const CommunityAccent: Story = {
   name: "Visual · Community Accent",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: {
     accentColor: "var(--mantine-color-teal-6)",
     leading: <Text size="sm">Navigation</Text>,
@@ -46,7 +46,7 @@ export const CommunityAccent: Story = {
 
 export const LongContext: Story = {
   name: "Visual · Long Context",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: {
     context: <Text size="sm">家族の思い出を長い名前で管理するCommunity</Text>,
   },
