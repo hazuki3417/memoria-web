@@ -49,3 +49,32 @@ export const ForbiddenDownload: Story = {
   tags: ["visual"],
   args: { downloadMock: "forbidden" },
 }
+
+export const DetailLoading: Story = {
+  name: "Visual · Detail Loading",
+  tags: ["visual"],
+  args: {
+    detailReadState: { kind: "loading" },
+    groupsReadState: { kind: "pending" },
+    tagsReadState: { kind: "pending" },
+  },
+}
+export const PartialError: Story = {
+  name: "Visual · Partial Error",
+  tags: ["visual"],
+  args: {
+    detailReadState: { kind: "loading" },
+    groupsReadState: { kind: "error" },
+    tagsReadState: { kind: "incomplete" },
+  },
+}
+export const DetailError: Story = {
+  name: "Visual · Detail Error",
+  tags: ["visual"],
+  args: {
+    detailReadState: { kind: "retryable-error" },
+    groupsReadState: { kind: "pending" },
+    tagsReadState: { kind: "pending" },
+    onRetryDetail: () => undefined,
+  },
+}
