@@ -49,7 +49,7 @@ function DialogFooter(props: DialogFooterProps) {
   const compact = useMediaQuery("(max-width: 47.99em)")
 
   if ("children" in props && props.children !== undefined) {
-    const { className, children, ...rest } = props
+    const { className, children, ...rest } = props as RegionProps
     return (
       <div className={[styles.footer, className].filter(Boolean).join(" ")} {...rest}>
         {children}
