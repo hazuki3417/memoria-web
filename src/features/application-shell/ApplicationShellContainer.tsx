@@ -2,7 +2,7 @@
 
 import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core"
 import { usePathname, useRouter } from "next/navigation"
-import { type ReactNode, useEffect, useState } from "react"
+import { type ReactNode, useEffect, useRef, useState } from "react"
 import {
   MyCommunitiesDocument,
   useCurrentUserQuery,
@@ -10,6 +10,7 @@ import {
   useCreateCommunityMutation,
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
+import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -53,16 +54,29 @@ export function ApplicationShellContainer({
     data: communityData,
     loading: communitiesLoading,
     error: communitiesError,
+    refetch: refetchCommunities,
   } = useMyCommunitiesQuery()
+  const communityRefreshInFlight = useRef(false)
+  const refreshCommunities = async () => {
+    if (communityRefreshInFlight.current || (communitiesLoading && !communityData)) return
+    communityRefreshInFlight.current = true
+    try {
+      await refetchCommunities()
+    } catch {
+      // useMyCommunitiesQueryのerrorをSwitcherが表示する。
+    } finally {
+      communityRefreshInFlight.current = false
+    }
+  }
   const { data: currentUserData, loading: currentUserLoading } =
     useCurrentUserQuery()
   const [createMutation] = useCreateCommunityMutation()
   const created =
-    communityData?.myCommunities.map((item) => ({
+    sortCommunitiesByDisplayName(communityData?.myCommunities.map((item) => ({
       id: item.id,
-      label: item.name,
+      label: getCommunityDisplayName(item),
       accentColor: item.mySettings.accentColor,
-    })) ?? []
+    })) ?? [])
   const communitiesLoaded = !communitiesLoading && !!communityData
   const [createBusy, setCreateBusy] = useState(false)
   const [rememberedContextKind, setRememberedContextKind] = useState<
@@ -272,7 +286,11 @@ export function ApplicationShellContainer({
                   onSelect={(id) => {
                     if (id !== "personal") {
                       router.push(
-                        `/communities/${encodeURIComponent(id)}/dashboard`,
+                        getContextSwitchPath({
+                          currentPathname: pathname,
+                          targetContextKind: "community",
+                          communityId: encodeURIComponent(id),
+                        }),
                       )
                       navigation.close()
                       return
@@ -288,6 +306,10 @@ export function ApplicationShellContainer({
                     navigation.close()
                   }}
                   onCreateCommunity={() => setCreateOpened(true)}
+                  onOpen={() => void refreshCommunities()}
+                  onRetry={() => void refreshCommunities()}
+                  loading={communitiesLoading}
+                  error={Boolean(communitiesError)}
                 />
               ) : undefined
             }
