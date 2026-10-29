@@ -1570,14 +1570,14 @@ export function MediaBrowserPrototype({
         setDetailEditor={setDetailEditor}
         detailDraft={detailDraft}
         setDetailDraft={setDetailDraft}
-        saveDetailDraft={saveDetailDraft}
+        saveDetailDraft={async () => { saveDetailDraft() }}
       />
       <GroupsEditModal
         detailEditor={detailEditor}
         setDetailEditor={setDetailEditor}
         detailDraft={detailDraft}
         setDetailDraft={setDetailDraft}
-        saveDetailDraft={saveDetailDraft}
+        saveDetailDraft={async () => { saveDetailDraft() }}
       />
           </Box>
 </PrototypeApplicationShell>
