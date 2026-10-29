@@ -67,3 +67,15 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 - **補助Collection**: Groups/TagsのPageInfoで全件性を確認。確定0件のみempty、未取得・GraphQL部分エラー・hasNextPageならemptyにしない。partial errorがある場合は安全側に倒して補助Collectionを未確定扱いにする。将来必要な個別field queryと全件paginationは未接続。
 - **Query lifecycle**: `network-only`、`errorPolicy: all`。GraphQL/RouterをFullscreen Viewer Host・Responsive Layoutへ持ち込まない。retry callbackを用意するが、UIボタン・Processing Polling・独立画像Retryの導線は未実装。
 - **Stage境界**: HookをBrowser/Group/Dashboardにはまだ接続していない。共通Hostに未完成データを流して既存の操作・表示を失わせない。実Consumer移行と独立Loading/Skeleton/Error/Retry UIは次のレビュー対象。
+
+## Stage 3 — Preview / InfoPanel 非同期表示のUI境界（2026-10-30）
+
+- `MediaDetailReadFeedback.tsx`: PreviewのLoading / Processing / Detail Error / Image Delivery Error / Unavailableと手動Retry、InfoのMetadata Skeleton・Error・Retry、Groups/TagsのPending / Error / Incompleteを独立した表示責務へ抽出。
+- `MediaDetailPreview` はoptional `readState` と `onRetryImage` を受け取る。未指定時は現在の画像・Zoom・回転・Navigation・Error表示をそのまま維持。非Ready時もViewerのHeader/Navigation/Footerの領域を消さない。
+- `MediaDetailInfoPanel` はoptional `detailReadState / groupsReadState / tagsReadState / onRetryDetail` を受け取る。未指定時は現行Info UIを完全に維持。非同期モードでは取得前を「未設定/未共有」とみなさず、Section単位のPending/Error/Incompleteを描画する。
+- `MediaDetailViewer` はoptional `read` objectを受け取り、PreviewとInfoPanelへそれぞれの状態とRetry callbackを渡す。Viewer Host/Responsive LayoutへGraphQL依存を追加しない。
+- Feature StoryにPreview Loading / Processing / Delivery Error、InfoPanel Loading / Partial Error / Detail Errorを追加。Prototype Story数は増やさない。
+
+**未接続事項**：実Application Controllerが`read`を組み立てる実際のConsumer結線は未実施。GraphQL Read Hook自体の取得成功だけでは画像Browser load/decode成功としないため、load/decodeエラー監視と手動署名URL更新・再試行、Polling停止中UIは別途実装が必要。Community共有情報とDelete許可は現在のRead Queryに含まれないため、非同期モードで未確認の操作を有効化せず、既存Local Modal modeのCapabilityは維持する。Groups/Tagsの編集DraftとRead Data同期もConsumer統合時に検証する。
+
+**検証Gate**：Typecheck / Build / Unit / Interaction / VRTで既存表示が変わらないこと、新Storyで状態別の描画を確認すること。新しいVRT Baselineの正式採用とmergeは別途レビュー・承認する。
