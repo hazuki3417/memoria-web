@@ -75,7 +75,7 @@ export const CommunitySelection: Story = {
 
 export const GroupDialog: Story = {
   name: "Group Dialog",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-modal"],
   args: {
     initialState: "selection",
     contextKind: "personal",
@@ -84,7 +84,7 @@ export const GroupDialog: Story = {
 }
 export const ShareDialog: Story = {
   name: "Share Dialog",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-modal"],
   args: {
     initialState: "selection",
     contextKind: "personal",
@@ -93,7 +93,7 @@ export const ShareDialog: Story = {
 }
 export const DeleteDialog: Story = {
   name: "Delete Dialog",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-modal"],
   args: {
     initialState: "selection",
     contextKind: "personal",
@@ -102,7 +102,7 @@ export const DeleteDialog: Story = {
 }
 export const CompactDeleteDialog: Story = {
   name: "Compact Delete Dialog",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-modal"],
   args: {
     initialState: "selection",
     contextKind: "personal",
