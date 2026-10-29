@@ -5,7 +5,7 @@ import type {
   CollectionReadState,
   DetailReadState,
   PreviewReadState,
-} from "../mediaDetailReadState"
+} from "./mediaDetailReadState"
 
 export function PreviewStatus({
   state,
