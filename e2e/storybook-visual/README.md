@@ -63,7 +63,7 @@ Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-no
 
 GitHubの「Actions」→「VRT Docker Compose smoke test」→「Run workflow」で対象branchを選び、`mode: generate`を選択する。**GitHubの手動実行UIはworkflow定義がデフォルトブランチに存在する必要がある**ため、このPRが未マージの間は手動実行を利用できない場合がある。PRの自動実行は比較のみであり、Baseline未登録の失敗は想定どおりとする。
 
-生成Artifactを取得して4枚の表示を設計と照合し、レビューを通過した画像だけを`e2e/storybook-visual/__screenshots__/`に登録する。その後`mode: compare`またはPR比較で成功を確認する。Artifactの取得だけではBaseline承認やGit反映は完了しない。**候補画像を自動的にコミットしない。**
+生成Artifactを取得してVRT対象Story×3領域の画像を設計と照合し、レビューを通過した画像だけを`e2e/storybook-visual/__screenshots__/`に登録する。その後`mode: compare`またはPR比較で成功を確認する。Artifactの取得だけではBaseline承認やGit反映は完了しない。**候補画像を自動的にコミットしない。**
 
 ## Issue・GitHubプラグインからのBaseline生成PR依頼
 
@@ -84,7 +84,7 @@ GitHubプラグイン経由でも、明示された対象ブランチを用い�
 Baselineの生成・更新と、通常の比較実行は**異なる操作**です。通常比較でBaselineを自動更新してはいけません。
 
 1. `vrt`タグ付きStoryを選定し、表示状態・Viewport・Fixtureが再現可能であることを確認する。
-2. 固定した実行環境で `npm run test:visual:update` を**明示的に**実行し、新規Baselineを生成する（既存分も再生成され得るためGit差分を必ず確認する）。
+2. 固定した実行環境で `npm run test:visual:update` を**明示的に**実行し、新規Baselineを生成する（今回の移行では旧Baselineを削除済みで、全VRT対象Storyの3幅分を新規生成する。Git差分を必ず確認する）。
 3. Gitの画像差分と画面設計を照合し、意図した表示であることをレビューする。生成できただけでは承認済みにならない。
 4. 承認したBaselineをGitへ登録し、`npm run test:visual` で通常比較を行う。
 5. 通常の画面変更では比較のみを行い、差分が意図したものと確認された場合に限ってBaselineを明示的に再生成・レビュー・更新する。
@@ -102,7 +102,7 @@ npm run test:visual:report
 
 **Dockerイメージ方針（合意済み）**: Phase 1ではMemoria専用イメージ・GHCR配布を導入せず、Microsoft公式Playwright DockerイメージをBaseline生成・比較で共通利用する。将来のCIでも同じイメージを使用する。特定のPlaywrightバージョンに対応する固定タグと、検証後はdigestでの固定を基本とする。リポジトリのNode.js 24要求を満たすか、コンテナ内の日本語フォント・Chromium・権限・描画が一致するかは**未検証**であり、適合確認前に公式イメージをそのまま利用可能と断定しない。もし満たせなければ、専用イメージ化の必要性を再協議する。イメージ更新時には既存Baselineでの比較・差分確認を行い、Baseline更新とは別にレビューする。
 
-**共通撮影環境**: Playwright / Chromium、OS、フォント、DPR、Locale、Viewportを揃える。現状のPlaywright設定はDesktop Chrome、DPR=1、ja-JP、light、1440×900 / 375×812を指定しているが、OS・フォントの固定コンテナは未導入である。異なる環境で撮影したBaselineの差分をUI回帰と断定しない。基準画像生成および実行成功は未検証であり、安定化と共通実行環境の検証はPhase 1の未完了作業とする。
+**共通撮影環境**: Playwright / Chromium、OS、フォント、DPR、Locale、Viewportを揃える。現状のPlaywright設定はDesktop Chrome、DPR=1、ja-JP、light、375×812 / 1024×768 / 1440×900の3幅を指定しているが、OS・フォントの固定コンテナは未導入である。異なる環境で撮影したBaselineの差分をUI回帰と断定しない。基準画像生成および実行成功は未検証であり、安定化と共通実行環境の検証はPhase 1の未完了作業とする。
 
 **失敗時**はPlaywrightのHTML ReportとExpected / Actual / Diff画像を確認し、原因を調査する。Baseline欠落は未登録として扱い、通常比較から更新処理を呼ばない。 `play`付きStoryの撮影同期は未実装のため、対象に追加する前に完了待機・描画安定を検証する。
 
