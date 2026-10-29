@@ -9,6 +9,7 @@ import {
   useCreateCommunityMutation,
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
+import { MediaDetailUrlProvider } from "@/features/media-detail/MediaDetailUrlProvider"
 import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
 import { CommunityCreateModal } from "./CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from "./useApplicationContextSelection"
@@ -284,7 +285,7 @@ export function ApplicationShellContainer({
           ) : undefined
         }
       >
-        {children}
+        <MediaDetailUrlProvider>{children}</MediaDetailUrlProvider>
       </ApplicationShell>
     </>
   )
