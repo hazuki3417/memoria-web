@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { fn } from "storybook/test"
+import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunityCreateModal } from "./CommunityCreateModal"
 
 const meta = {
-  title: "Features/Application Shell/Community Create Dialog",
+  title: "Features/Application Shell/Community Create Modal",
   component: CommunityCreateModal,
   parameters: { layout: "fullscreen" },
   args: {
@@ -45,4 +45,27 @@ export const Creating: Story = {
   name: "Visual · Creating",
   tags: ["visual", "vrt", "vrt-modal"],
   args: { name: "家族のアルバム", busy: true },
+}
+
+export const Cancel: Story = {
+  name: "Interaction · Cancel",
+  tags: ["interaction"],
+  play: async ({ args }) => {
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Communityを作成" }))
+    await expect(dialog.queryByRole("button", { name: "Close modal" })).not.toBeInTheDocument()
+    await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
+    await expect(args.onClose).toHaveBeenCalledTimes(1)
+    await expect(args.onCreate).not.toHaveBeenCalled()
+  },
+}
+export const Submit: Story = {
+  name: "Interaction · Submit",
+  tags: ["interaction"],
+  args: { name: "家族のアルバム" },
+  play: async ({ args }) => {
+    const dialog = within(await within(document.body).findByRole("dialog", { name: "Communityを作成" }))
+    await userEvent.click(dialog.getByRole("button", { name: "Communityを作成" }))
+    await expect(args.onCreate).toHaveBeenCalledTimes(1)
+    await expect(args.onClose).not.toHaveBeenCalled()
+  },
 }
