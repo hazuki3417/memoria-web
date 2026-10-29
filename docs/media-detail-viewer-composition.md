@@ -57,3 +57,13 @@ Host/Layout分離は合意済みだが、Compact時のPanel最大高さ、Skelet
 - `mediaDetailNavigationWrap` User Settingsの実接続、DashboardのMedia ID付きCarousel、Group BrowserのAggregate CollectionのSnapshotと実際の閲覧順、URL-only/invalid URL fallbackのUIは未完成。
 - Stage 2全体のHuman Review完了とみなさず、追加Consumer接続に伴う設計判断はユーザーと合意してから進む。
 
+
+## Stage 3 — Detail取得のread-only基盤（2026-10-30、未統合）
+
+GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `media(id:)` によるID独立取得を追加。具体実装は `useMediaDetailRead.ts` と、純関数の `mediaDetailReadState.ts` およびUnit Test。
+
+- **必須identity**: Media IDが選択中URLと一致しない古いQuery resultをReady表示しない。取得中、再試行可能な通信失敗、対象不在、取得成功を区別する。
+- **画像**: READYかつ利用可能なVariantがある場合のみ表示可能。PROCESSING、FAILED、Variantなし・processing不整合、詳細取得失敗を独立の表示状態へ写像する。現在は最大幅Variantを暫定選択するread-modelであり、最適なdelivery variant/署名URL更新・load/decode完了は後続の責務として残す。
+- **補助Collection**: Groups/TagsのPageInfoで全件性を確認。確定0件のみempty、未取得・GraphQL部分エラー・hasNextPageならemptyにしない。partial errorがある場合は安全側に倒して補助Collectionを未確定扱いにする。将来必要な個別field queryと全件paginationは未接続。
+- **Query lifecycle**: `network-only`、`errorPolicy: all`。GraphQL/RouterをFullscreen Viewer Host・Responsive Layoutへ持ち込まない。retry callbackを用意するが、UIボタン・Processing Polling・独立画像Retryの導線は未実装。
+- **Stage境界**: HookをBrowser/Group/Dashboardにはまだ接続していない。共通Hostに未完成データを流して既存の操作・表示を失わせない。実Consumer移行と独立Loading/Skeleton/Error/Retry UIは次のレビュー対象。
