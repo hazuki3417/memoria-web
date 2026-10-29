@@ -3,7 +3,7 @@
 import { Avatar, Button, Menu, Skeleton } from "@mantine/core"
 import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "../types"
-import { AccountMenuProfile, type AccountMenuProfileState } from "./AccountMenuProfile"
+import { AccountMenuProfile, type AccountMenuProfileState } from "./AccountMenuProfile/AccountMenuProfile"
 
 export function ApplicationAccountMenu({
   user,
