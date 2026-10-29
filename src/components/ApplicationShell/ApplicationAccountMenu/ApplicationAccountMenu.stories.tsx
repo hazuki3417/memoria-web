@@ -31,3 +31,21 @@ export const WithAvatarLabel: Story = {
   tags: ["visual"],
   args: { user: { displayName: "ユーザー", avatarLabel: "M" } },
 }
+
+export const Loading: Story = {
+  name: "Visual · Loading",
+  tags: ["visual"],
+  args: {
+    user: { displayName: "" },
+    profileStatus: "loading",
+  },
+}
+
+export const Error: Story = {
+  name: "Visual · Error",
+  tags: ["visual"],
+  args: {
+    user: { displayName: "" },
+    profileStatus: "error",
+  },
+}

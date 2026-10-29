@@ -68,7 +68,8 @@ export function ApplicationShellContainer({
       communityRefreshInFlight.current = false
     }
   }
-  const { data: currentUserData } = useCurrentUserQuery()
+  const { data: currentUserData, loading: currentUserLoading } =
+    useCurrentUserQuery()
   const [createMutation] = useCreateCommunityMutation()
   const created =
     sortCommunitiesByDisplayName(communityData?.myCommunities.map((item) => ({
@@ -110,6 +111,18 @@ export function ApplicationShellContainer({
           accentColor: currentCreated?.accentColor ?? communityContext.accentColor,
         }
       : resolvedPersonalContext
+  const contextLoading =
+    contextKind === "community" &&
+    !currentCreated &&
+    !communitiesLoaded &&
+    !communitiesError
+  const contextError =
+    contextKind === "community" && !currentCreated && !!communitiesError
+  const profileStatus = currentUserData?.me && !contextLoading && !contextError
+    ? "ready"
+    : (currentUserLoading && !currentUserData?.me) || contextLoading
+      ? "loading"
+      : "error"
   const activeSection = getApplicationSection(pathname)
   const navigationItems = getApplicationNavigation({
     contextKind,
@@ -303,7 +316,10 @@ export function ApplicationShellContainer({
             account={
               isApplicationShellFeatureVisible(shellMode, "account-menu") ? (
                 <ApplicationAccountMenu
-                  user={{ displayName: "ユーザー" }}
+                  user={{
+                    displayName: currentUserData?.me?.profile.nickname ?? "",
+                  }}
+                  profileStatus={profileStatus}
                   currentContext={currentContext}
                   onOpenSettings={() => router.push("/settings/profile")}
                   onLogout={() => {

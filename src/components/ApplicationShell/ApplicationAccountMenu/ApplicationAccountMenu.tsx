@@ -1,20 +1,35 @@
 "use client"
 
-import { Avatar, Box, Button, Group, Menu, Text } from "@mantine/core"
-import { IconLogout, IconSettings } from "@tabler/icons-react"
+import { Avatar, Button, Menu, Skeleton } from "@mantine/core"
+import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "../types"
+import { AccountMenuProfile, type AccountMenuProfileState } from "./AccountMenuProfile"
 
 export function ApplicationAccountMenu({
   user,
   currentContext,
   onOpenSettings,
   onLogout,
+  profileStatus = "ready",
 }: {
   user: { displayName: string; avatarLabel?: string }
   currentContext: ApplicationContextOption
   onOpenSettings: () => void
   onLogout: () => void
+  profileStatus?: "ready" | "loading" | "error"
 }) {
+  const profile: AccountMenuProfileState =
+    profileStatus === "loading"
+      ? { status: "loading" }
+      : profileStatus === "error"
+        ? { status: "error" }
+        : {
+            status: "ready",
+            displayName: user.displayName,
+            avatarLabel: user.avatarLabel,
+            contextLabel: currentContext.label,
+          }
+
   return (
     <Menu position="bottom-end" withinPortal>
       <Menu.Target>
@@ -26,25 +41,19 @@ export function ApplicationAccountMenu({
           aria-label="アカウントメニュー"
           title="アカウントメニュー"
         >
-          <Avatar size={24} radius="xl">
-            {user.avatarLabel ?? user.displayName.slice(0, 1)}
-          </Avatar>
+          <Skeleton visible={profile.status === "loading"} circle>
+            <Avatar size={24} radius="xl">
+              {profile.status === "ready" ? (
+                profile.avatarLabel ?? profile.displayName.slice(0, 1)
+              ) : (
+                <IconUser size={16} aria-hidden="true" />
+              )}
+            </Avatar>
+          </Skeleton>
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <Group gap="sm" px="xs" py="xs" wrap="nowrap">
-          <Avatar size={32} radius="xl">
-            {user.avatarLabel ?? user.displayName.slice(0, 1)}
-          </Avatar>
-          <Box>
-            <Text size="sm" fw={600} lh={1.2}>
-              {user.displayName}
-            </Text>
-            <Text size="xs" c="dimmed" lh={1.2}>
-              {currentContext.label}
-            </Text>
-          </Box>
-        </Group>
+        <AccountMenuProfile state={profile} />
         <Menu.Divider />
         <Menu.Item
           leftSection={<IconSettings size={16} stroke={1.6} />}
