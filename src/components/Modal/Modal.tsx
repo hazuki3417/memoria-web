@@ -11,9 +11,9 @@ type ModalProps = Omit<MantineModalProps, "children"> & {
 
 type RegionProps = ComponentPropsWithoutRef<"div">
 
-function ModalRoot({ children, withCloseButton = false, ...props }: ModalProps) {
+function ModalRoot({ children, ...props }: ModalProps) {
   return (
-    <MantineModal {...props} centered withCloseButton={withCloseButton}>
+    <MantineModal {...props} centered withCloseButton={false}>
       <Box tabIndex={-1} data-autofocus style={{ position: "absolute" }} />
       <div className={styles.layout}>{children}</div>
     </MantineModal>
