@@ -59,7 +59,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { getApplicationNavigation } from "@/features/application-shell"
-import { Dialog } from "@/components/Dialog"
+import { Modal as CompoundModal } from "@/components/Modal"
+import { ActionPanel } from "@/components/ActionPanel"
 import { showNotification } from "@/components/Feedback"
 import { useMediaDetailViewport } from "@/features/media-detail/useMediaDetailViewport"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -816,121 +817,62 @@ export function MediaBrowserPrototype({
         </Stack>
       )}
 
-      <Dialog
-        opened={selectionDialog === "group"}
-        onClose={() => setSelectionDialog(null)}
-        title="Groupに追加"
-        size="md"
-        footer={
-          <Dialog.Footer
-            secondary={
-              <Button
-                variant="default"
-                onClick={() => setSelectionDialog(null)}
-              >
-                キャンセル
-              </Button>
-            }
-            primary={
-              <Button
-                disabled={groupTargets.length === 0}
-                onClick={() => setSelectionDialog(null)}
-              >
-                追加
-              </Button>
-            }
-          />
-        }
-      >
-        <Stack gap="xs">
-          <Text size="sm">
-            {selected.size}件のMediaを選択したすべてのGroupに追加します。
-          </Text>
-          <MultiSelect
-            label="Group"
-            placeholder="Groupを選択"
-            searchable
-            data={["旅行", "家族", "風景写真", "お気に入り"]}
-            value={groupTargets}
-            onChange={setGroupTargets}
-          />
-        </Stack>
-      </Dialog>
-
-      <Dialog
-        opened={selectionDialog === "share"}
-        onClose={() => setSelectionDialog(null)}
-        title="Communityへ共有"
-        size="md"
-        footer={
-          <Dialog.Footer
-            secondary={
-              <Button
-                variant="default"
-                onClick={() => setSelectionDialog(null)}
-              >
-                キャンセル
-              </Button>
-            }
-            primary={
-              <Button
-                disabled={!communityTarget}
-                onClick={() => setSelectionDialog(null)}
-              >
-                共有
-              </Button>
-            }
-          />
-        }
-      >
-        <Stack gap="xs">
-          <Stack gap={4}>
-            <Text size="sm">
-              {selected.size}
-              件の選択Mediaから、共有可能なUser管理Mediaを1つのCommunityへ共有します。
-            </Text>
-            <Text size="xs" c="dimmed">
-              Community管理Mediaや、選択した共有先へすでに共有済みのMediaには新しい共有関係を作成しません。
-            </Text>
+      <CompoundModal opened={selectionDialog === "group"} onClose={() => setSelectionDialog(null)} title="Groupに追加" size="md">
+        <CompoundModal.Body>
+          <Stack gap="xs">
+            <Text size="sm">{selected.size}件のMediaを選択したすべてのGroupに追加します。</Text>
+            <MultiSelect label="Group" placeholder="Groupを選択" searchable
+              data={["旅行", "家族", "風景写真", "お気に入り"]}
+              value={groupTargets} onChange={setGroupTargets} />
           </Stack>
-          <Select
-            label="Community"
-            placeholder="Communityを選択"
-            data={["Photo Club", "Family Archive", "Travel Team"]}
-            value={communityTarget}
-            onChange={setCommunityTarget}
-          />
-        </Stack>
-      </Dialog>
+        </CompoundModal.Body>
+        <CompoundModal.Divider />
+        <CompoundModal.Footer>
+          <ActionPanel><ActionPanel.End>
+            <Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>
+            <Button disabled={groupTargets.length === 0} onClick={() => setSelectionDialog(null)}>追加</Button>
+          </ActionPanel.End></ActionPanel>
+        </CompoundModal.Footer>
+      </CompoundModal>
 
-      <Dialog
-        opened={selectionDialog === "delete"}
-        onClose={() => setSelectionDialog(null)}
-        title="Mediaを削除"
-        size="md"
-        footer={
-          <Dialog.Footer
-            secondary={
-              <Button
-                variant="default"
-                onClick={() => setSelectionDialog(null)}
-              >
-                キャンセル
-              </Button>
-            }
-            primary={
-              <Button color="red" onClick={() => setSelectionDialog(null)}>
-                削除
-              </Button>
-            }
-          />
-        }
-      >
-        <Text size="sm">
-          選択した{selected.size}
-          件のMediaを削除します。削除したMediaは復元できません。
-        </Text>
-      </Dialog>
+      <CompoundModal opened={selectionDialog === "share"} onClose={() => setSelectionDialog(null)} title="Communityへ共有" size="md">
+        <CompoundModal.Body>
+          <Stack gap="xs">
+            <Stack gap={4}>
+              <Text size="sm">
+                {selected.size}件の選択Mediaから、共有可能なUser管理Mediaを1つのCommunityへ共有します。
+              </Text>
+              <Text size="xs" c="dimmed">
+                Community管理Mediaや、選択した共有先へすでに共有済みのMediaには新しい共有関係を作成しません。
+              </Text>
+            </Stack>
+            <Select label="Community" placeholder="Communityを選択"
+              data={["Photo Club", "Family Archive", "Travel Team"]}
+              value={communityTarget} onChange={setCommunityTarget} />
+          </Stack>
+        </CompoundModal.Body>
+        <CompoundModal.Divider />
+        <CompoundModal.Footer>
+          <ActionPanel><ActionPanel.End>
+            <Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>
+            <Button disabled={!communityTarget} onClick={() => setSelectionDialog(null)}>共有</Button>
+          </ActionPanel.End></ActionPanel>
+        </CompoundModal.Footer>
+      </CompoundModal>
+
+      <CompoundModal opened={selectionDialog === "delete"} onClose={() => setSelectionDialog(null)} title="Mediaを削除" size="md">
+        <CompoundModal.Body>
+          <Text size="sm">
+            選択した{selected.size}件のMediaを削除します。削除したMediaは復元できません。
+          </Text>
+        </CompoundModal.Body>
+        <CompoundModal.Footer>
+          <ActionPanel><ActionPanel.End>
+            <Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>
+            <Button color="red" onClick={() => setSelectionDialog(null)}>削除</Button>
+          </ActionPanel.End></ActionPanel>
+        </CompoundModal.Footer>
+      </CompoundModal>
 
       <Modal
         opened={detail !== null}
