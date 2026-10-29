@@ -1,6 +1,6 @@
 .root {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: minmax(max-content, 1fr) max-content minmax(max-content, 1fr);
   align-items: center;
   column-gap: var(--mantine-spacing-sm);
   row-gap: var(--mantine-spacing-sm);
@@ -13,7 +13,12 @@
   display: flex;
   align-items: center;
   gap: var(--mantine-spacing-sm);
-  min-width: 0;
+  min-width: max-content;
+}
+
+/* A single region owns the full panel width, regardless of its position. */
+.root > :only-child {
+  grid-column: 1 / -1;
 }
 
 .start {
