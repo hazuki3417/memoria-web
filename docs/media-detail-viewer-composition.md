@@ -14,7 +14,7 @@ Status: **A案合意済み・構造分離実装中**（2026-10-29）。実装の
 | --- | --- | --- |
 | `MediaDetailDialog` | Viewer/編集/共有/削除Modalのcomposition、既存のlocal editing/viewport state | RouterやGraphQLへの直接接続 |
 | `MediaDetailViewer` | PreviewとInfoPanelへのProps接続、prev/nextの現行配列からの導出 | Fullscreen Modal設定、Gridの寸法 |
-| `MediaDetailViewerHost` | Mantine fullscreen Modal、`#application-modal-root`、既存のPortal/Focus/Dismissとviewport `100dvh` | Media ID、Loading状態、Preview/Info layout |
+| `MediaDetailViewerHost` | Mantine fullscreen Modalの標準Portal、Focus/Dismissとviewport `100dvh` | Media ID、Loading状態、Preview/Info layout |
 | `MediaDetailLayout` | Preview/InfoPanelの二領域Grid、Compact縦配置・それ以外の横配置 | 画像/Metadata取得、Panel内の操作とアニメーション |
 | `MediaDetailPreview` | 既存Preview操作、image/zoom/rotate、前後移動表示 | URL history、GraphQL、Modal host |
 | `MediaDetailInfoPanel` | 既存Sections/Download/Delete、幅340pxの開閉、内部スクロール | URL history、GraphQL、Modal host |
@@ -24,7 +24,7 @@ Status: **A案合意済み・構造分離実装中**（2026-10-29）。実装の
 
 `MediaDetailViewerHost` は `opened / onClose / children`、`MediaDetailLayout` は `compact / detailInfoOpened / preview / infoPanel` を受け取る。これは**React実装の現行境界**であり、Design Systemが固定するAPIではない。
 
-既存Visual Contractを保持するため、`MediaDetailViewerHost` のMantine Modal propsとstyleは抽出前から変更しない。LayoutのGrid CSSも元の式を維持する。Panelの340px幅/0.3秒 transition、Previewのheader/footer・zoom・rotate・navigation、Nested Modal、compact判定は今回変更しない。UI状態を一律に初期化するkeyはHost/Layoutへ設定しない。
+既存Visual Contractを保持するため、`MediaDetailViewerHost` のMantine Modalのfullscreen/transparent propsとstyleを維持し、専用`portalProps.target`は廃止して標準Portalへ移行する。LayoutのGrid CSSも元の式を維持する。Panelの340px幅/0.3秒 transition、Previewのheader/footer・zoom・rotate・navigation、Nested Modal、compact判定は今回変更しない。UI状態を一律に初期化するkeyはHost/Layoutへ設定しない。
 
 ## Controller統合時のViewModel受け渡し（次段階・未実装）
 
@@ -41,4 +41,4 @@ Status: **A案合意済み・構造分離実装中**（2026-10-29）。実装の
 3. **Async UI（次段階）**: Loading/Processing/READY/FAILED、画像load/decode error、独立InfoPanel Loading/Error、Polling 3回停止、手動retry、Compact/Medium/Wide VRT。
 4. **Human Visual Review**: 375×812 / 1024×768 / 1440×900、Panel open/closed、Portrait/Landscape、Scroll、Zoom/Rotate、Nested Modal、Keyboard/Focus、既存baselineとの差分を確認。
 
-Host/Layout分離は合意済みだが、Compact時のPanel最大高さ、Skeletonの詳細、GraphQL Result Type/Props、Portal root撤去の時期など、既存UI変更を伴う事項はここでは決定しない。検証で仕様判断が必要な場合はユーザーと合意する。
+Host/Layout分離は合意済みだが、Compact時のPanel最大高さ、Skeletonの詳細、GraphQL Result Type/Props、標準Portalへの移行によるNested Overlayの重なり順など、既存UI変更を伴う事項はここでは決定しない。検証で仕様判断が必要な場合はユーザーと合意する。
