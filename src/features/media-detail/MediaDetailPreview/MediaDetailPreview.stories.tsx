@@ -60,3 +60,19 @@ export const Zoomed: Story = {
   tags: ["visual"],
   args: { detailZoom: 200 },
 }
+
+export const DetailLoading: Story = {
+  name: "Visual · Detail Loading",
+  tags: ["visual"],
+  args: { readState: { kind: "detail-loading" } },
+}
+export const Processing: Story = {
+  name: "Visual · Processing",
+  tags: ["visual"],
+  args: { readState: { kind: "processing" } },
+}
+export const DeliveryError: Story = {
+  name: "Visual · Image Error",
+  tags: ["visual"],
+  args: { readState: { kind: "delivery-error", retryable: true }, onRetryImage: () => undefined },
+}
