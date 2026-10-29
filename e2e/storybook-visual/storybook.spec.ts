@@ -28,7 +28,17 @@ test("Storybook visual snapshots", async ({ page, request }) => {
       await test.step(`${story.id} / ${viewport.name}`, async () => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height })
         await page.goto(`/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story`)
-        await expect(page.locator("#storybook-root")).toBeVisible()
+        // Storybook's root must exist, but it need not be visible when a story
+        // renders its content into a Portal (for example Mantine Modal).
+        await expect(page.locator("#storybook-root")).toBeAttached()
+
+        // Verify the visible capture target separately from the Storybook mount point.
+        // Dialog stories must prove that the actual modal content is visible.
+        if (story.tags?.includes("vrt-dialog")) {
+          await expect(page.getByRole("dialog")).toBeVisible()
+        } else {
+          await expect(page.locator("#storybook-root")).toBeVisible()
+        }
         await page.evaluate(async () => {
           await document.fonts.ready
           await Promise.all(
