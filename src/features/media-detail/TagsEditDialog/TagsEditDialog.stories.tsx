@@ -4,6 +4,7 @@ import { TagsEditDialog } from "./TagsEditDialog"
 const meta = {
   title: "Features/Media Detail/TagsEditDialog",
   component: TagsEditDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     detailEditor: "tags",
     setDetailEditor: () => undefined,
