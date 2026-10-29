@@ -59,8 +59,13 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { getApplicationNavigation } from "@/features/application-shell"
-import { Modal as CompoundModal } from "@/components/Modal"
-import { ActionPanel } from "@/components/ActionPanel"
+import { MediaBrowserGroupModal } from "@/features/media-browser/MediaBrowserGroupModal"
+import { MediaBrowserShareModal } from "@/features/media-browser/MediaBrowserShareModal"
+import { MediaBrowserDeleteModal } from "@/features/media-browser/MediaBrowserDeleteModal"
+import { CommunityUnshareModal } from "@/features/media-detail/CommunityUnshareModal"
+import { CommunityShareModal } from "@/features/media-detail/CommunityShareModal"
+import { TagsEditModal } from "@/features/media-detail/TagsEditModal"
+import { GroupsEditModal } from "@/features/media-detail/GroupsEditModal"
 import { showNotification } from "@/components/Feedback"
 import { useMediaDetailViewport } from "@/features/media-detail/useMediaDetailViewport"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -817,62 +822,29 @@ export function MediaBrowserPrototype({
         </Stack>
       )}
 
-      <CompoundModal opened={selectionDialog === "group"} onClose={() => setSelectionDialog(null)} title="Groupに追加" size="md">
-        <CompoundModal.Body>
-          <Stack gap="xs">
-            <Text size="sm">{selected.size}件のMediaを選択したすべてのGroupに追加します。</Text>
-            <MultiSelect label="Group" placeholder="Groupを選択" searchable
-              data={["旅行", "家族", "風景写真", "お気に入り"]}
-              value={groupTargets} onChange={setGroupTargets} />
-          </Stack>
-        </CompoundModal.Body>
-        <CompoundModal.Divider />
-        <CompoundModal.Footer>
-          <ActionPanel><ActionPanel.End>
-            <Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>
-            <Button disabled={groupTargets.length === 0} onClick={() => setSelectionDialog(null)}>追加</Button>
-          </ActionPanel.End></ActionPanel>
-        </CompoundModal.Footer>
-      </CompoundModal>
-
-      <CompoundModal opened={selectionDialog === "share"} onClose={() => setSelectionDialog(null)} title="Communityへ共有" size="md">
-        <CompoundModal.Body>
-          <Stack gap="xs">
-            <Stack gap={4}>
-              <Text size="sm">
-                {selected.size}件の選択Mediaから、共有可能なUser管理Mediaを1つのCommunityへ共有します。
-              </Text>
-              <Text size="xs" c="dimmed">
-                Community管理Mediaや、選択した共有先へすでに共有済みのMediaには新しい共有関係を作成しません。
-              </Text>
-            </Stack>
-            <Select label="Community" placeholder="Communityを選択"
-              data={["Photo Club", "Family Archive", "Travel Team"]}
-              value={communityTarget} onChange={setCommunityTarget} />
-          </Stack>
-        </CompoundModal.Body>
-        <CompoundModal.Divider />
-        <CompoundModal.Footer>
-          <ActionPanel><ActionPanel.End>
-            <Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>
-            <Button disabled={!communityTarget} onClick={() => setSelectionDialog(null)}>共有</Button>
-          </ActionPanel.End></ActionPanel>
-        </CompoundModal.Footer>
-      </CompoundModal>
-
-      <CompoundModal opened={selectionDialog === "delete"} onClose={() => setSelectionDialog(null)} title="Mediaを削除" size="md">
-        <CompoundModal.Body>
-          <Text size="sm">
-            選択した{selected.size}件のMediaを削除します。削除したMediaは復元できません。
-          </Text>
-        </CompoundModal.Body>
-        <CompoundModal.Footer>
-          <ActionPanel><ActionPanel.End>
-            <Button variant="default" onClick={() => setSelectionDialog(null)}>キャンセル</Button>
-            <Button color="red" onClick={() => setSelectionDialog(null)}>削除</Button>
-          </ActionPanel.End></ActionPanel>
-        </CompoundModal.Footer>
-      </CompoundModal>
+      <MediaBrowserGroupModal
+        opened={selectionDialog === "group"}
+        selected={selected}
+        groupActionPending={false}
+        groupTargets={groupTargets}
+        onTargetsChange={setGroupTargets}
+        items={stateItems}
+        onClose={() => setSelectionDialog(null)}
+        onAddToGroups={async () => { setSelectionDialog(null) }}
+      />
+      <MediaBrowserShareModal
+        opened={selectionDialog === "share"}
+        selectedCount={selected.size}
+        communityTarget={communityTarget}
+        onTargetChange={setCommunityTarget}
+        onClose={() => setSelectionDialog(null)}
+      />
+      <MediaBrowserDeleteModal
+        opened={selectionDialog === "delete"}
+        selectedCount={selected.size}
+        onClose={() => setSelectionDialog(null)}
+        onDelete={() => setSelectionDialog(null)}
+      />
 
       <Modal
         opened={detail !== null}
@@ -1580,118 +1552,33 @@ export function MediaBrowserPrototype({
           })()}
       </Modal>
       <Notifications position="top-right" />
-      <Modal
-        withCloseButton={false}
-        opened={unshareTarget !== null}
-        onClose={() => setUnshareTarget(null)}
-        title="Communityの共有を解除"
-        centered
-        zIndex={410}
-      >
-        <Stack gap="md">
-          <Text size="sm">
-            {unshareTarget} への共有を解除しますか？
-            このCommunityからMediaを閲覧できなくなります。他の共有先やMedia本体は削除されません。
-          </Text>
-
-          <Group justify="flex-end">
-            <Button variant="default" onClick={() => setUnshareTarget(null)}>
-              キャンセル
-            </Button>
-            <Button color="red" onClick={removeCommunityShare}>
-              共有解除
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <Modal
-        withCloseButton={false}
-        opened={detailEditor === "communities"}
-        onClose={() => setDetailEditor(null)}
-        title="Communityへ共有"
-        centered
-        zIndex={400}
-      >
-        <Stack gap="md">
-          <Text size="sm" c="dimmed">
-            このMediaを共有するCommunityを1つ選択します。
-          </Text>
-          <Select
-            label="共有先Community"
-            searchable
-            data={["Photo Club", "Family", "Travel"].filter(
-              (name) => !detailValues.communities.includes(name),
-            )}
-            value={shareTarget}
-            onChange={setShareTarget}
-            placeholder="Communityを選択"
-          />
-
-          <Group justify="flex-end">
-            <Button variant="default" onClick={() => setDetailEditor(null)}>
-              キャンセル
-            </Button>
-            <Button disabled={!shareTarget} onClick={addCommunityShare}>
-              共有する
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <Modal
-        withCloseButton={false}
-        opened={detailEditor === "tags"}
-        onClose={() => setDetailEditor(null)}
-        title="Tagsを編集"
-        centered
-        zIndex={400}
-      >
-        <Stack gap="md">
-          <Text size="sm" c="dimmed">
-            このMediaのTagを追加・除外できます。
-          </Text>
-          <TagsInput
-            label="Tags"
-            data={["旅行", "風景", "家族", "お気に入り"]}
-            value={detailDraft}
-            onChange={setDetailDraft}
-          />
-
-          <Group justify="flex-end">
-            <Button variant="default" onClick={() => setDetailEditor(null)}>
-              キャンセル
-            </Button>
-            <Button onClick={saveDetailDraft}>変更を反映</Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <Modal
-        withCloseButton={false}
-        opened={detailEditor === "groups"}
-        onClose={() => setDetailEditor(null)}
-        title="Groupsを編集"
-        centered
-        zIndex={400}
-      >
-        <Stack gap="md">
-          <Text size="sm" c="dimmed">
-            現在の所属Groupを追加・除外できます。
-          </Text>
-          <MultiSelect
-            label="Groups"
-            searchable
-            data={["旅行", "家族", "風景写真", "お気に入り"]}
-            value={detailDraft}
-            onChange={setDetailDraft}
-          />
-
-          <Group justify="flex-end">
-            <Button variant="default" onClick={() => setDetailEditor(null)}>
-              キャンセル
-            </Button>
-            <Button onClick={saveDetailDraft}>変更を反映</Button>
-          </Group>
-        </Stack>
-      </Modal>
+      <CommunityUnshareModal
+        unshareTarget={unshareTarget}
+        setUnshareTarget={setUnshareTarget}
+        removeCommunityShare={removeCommunityShare}
+      />
+      <CommunityShareModal
+        detailEditor={detailEditor}
+        setDetailEditor={setDetailEditor}
+        detailValues={detailValues}
+        shareTarget={shareTarget}
+        setShareTarget={setShareTarget}
+        addCommunityShare={addCommunityShare}
+      />
+      <TagsEditModal
+        detailEditor={detailEditor}
+        setDetailEditor={setDetailEditor}
+        detailDraft={detailDraft}
+        setDetailDraft={setDetailDraft}
+        saveDetailDraft={saveDetailDraft}
+      />
+      <GroupsEditModal
+        detailEditor={detailEditor}
+        setDetailEditor={setDetailEditor}
+        detailDraft={detailDraft}
+        setDetailDraft={setDetailDraft}
+        saveDetailDraft={saveDetailDraft}
+      />
           </Box>
 </PrototypeApplicationShell>
   )
