@@ -289,9 +289,9 @@ export function ApplicationShellContainer({
         <MediaDetailUrlProvider>
           {children}
           {contextKind === "community" && communityId ? (
-            <MediaDetailUrlController scope={{ type: "COMMUNITY", communityId }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} />
+            <MediaDetailUrlController scope={{ type: "COMMUNITY", communityId }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} dateFormat={currentUserData?.me?.preferences.dateFormat} fileSizeUnit={currentUserData?.me?.preferences.fileSizeUnit} />
           ) : contextKind === "personal" ? (
-            <MediaDetailUrlController scope={{ type: "PERSONAL" }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} />
+            <MediaDetailUrlController scope={{ type: "PERSONAL" }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} dateFormat={currentUserData?.me?.preferences.dateFormat} fileSizeUnit={currentUserData?.me?.preferences.fileSizeUnit} />
           ) : null}
         </MediaDetailUrlProvider>
       </ApplicationShell>
