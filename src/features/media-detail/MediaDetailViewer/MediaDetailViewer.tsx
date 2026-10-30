@@ -53,6 +53,7 @@ export type MediaDetailViewerProps = Pick<
       tags: CollectionReadState
       retryDetail?: () => void
       retryImage?: () => void
+      pollingStopped?: boolean
     }
   }
 
@@ -87,6 +88,7 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
                   navigateById={props.navigateById}
                   readState={props.read?.preview}
                   onRetryImage={props.read?.retryImage}
+                  pollingStopped={props.read?.pollingStopped}
                   stateItems={stateItems}
                   prev={prev}
                   next={next}
