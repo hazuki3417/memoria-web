@@ -1,6 +1,5 @@
 "use client"
 
-
 import { useState, type ReactNode } from "react"
 import { Button, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
@@ -208,21 +207,21 @@ export function SettingsPrototype({
       onLogout={() => undefined}
     >
       <>
-      <SettingsLayout section={section} onSectionChange={setSection}>
-        {content}
-      </SettingsLayout>
-      <Text
-        pos="absolute"
-        style={{
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-        }}
-      >
-        現在の設定: {currentLabel}
-      </Text>
-          </>
-</PrototypeApplicationShell>
+        <SettingsLayout section={section} onSectionChange={setSection}>
+          {content}
+        </SettingsLayout>
+        <Text
+          pos="absolute"
+          style={{
+            width: 1,
+            height: 1,
+            overflow: "hidden",
+            clip: "rect(0 0 0 0)",
+          }}
+        >
+          現在の設定: {currentLabel}
+        </Text>
+      </>
+    </PrototypeApplicationShell>
   )
 }

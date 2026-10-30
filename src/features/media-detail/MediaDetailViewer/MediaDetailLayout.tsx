@@ -25,9 +25,7 @@ export function MediaDetailLayout({
       h="100%"
       style={{
         display: "grid",
-        gridTemplateColumns: compact
-          ? "minmax(0, 1fr)"
-          : "minmax(0, 1fr) auto",
+        gridTemplateColumns: compact ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto",
         gridTemplateRows:
           compact && detailInfoOpened
             ? "minmax(0, 1fr) auto"

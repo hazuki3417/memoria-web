@@ -48,18 +48,37 @@ function MediaPage({
       {items.map((src, index) => (
         <Box
           key={page * pageSize + index}
-          component={onOpenMedia && mediaIds?.[page * pageSize + index] ? "button" : "div"}
-          type={onOpenMedia && mediaIds?.[page * pageSize + index] ? "button" : undefined}
-          onClick={onOpenMedia ? () => {
-            const id = mediaIds?.[page * pageSize + index]
-            if (id) onOpenMedia(id)
-          } : undefined}
-          aria-label={onOpenMedia && mediaIds?.[page * pageSize + index] ? `Mediaを表示: ${page * pageSize + index + 1}` : undefined}
+          component={
+            onOpenMedia && mediaIds?.[page * pageSize + index]
+              ? "button"
+              : "div"
+          }
+          type={
+            onOpenMedia && mediaIds?.[page * pageSize + index]
+              ? "button"
+              : undefined
+          }
+          onClick={
+            onOpenMedia
+              ? () => {
+                  const id = mediaIds?.[page * pageSize + index]
+                  if (id) onOpenMedia(id)
+                }
+              : undefined
+          }
+          aria-label={
+            onOpenMedia && mediaIds?.[page * pageSize + index]
+              ? `Mediaを表示: ${page * pageSize + index + 1}`
+              : undefined
+          }
           bdrs="md"
           style={{
             aspectRatio: "1 / 1",
             padding: 0,
-            cursor: onOpenMedia && mediaIds?.[page * pageSize + index] ? "pointer" : "default",
+            cursor:
+              onOpenMedia && mediaIds?.[page * pageSize + index]
+                ? "pointer"
+                : "default",
             overflow: "hidden",
             border: "1px solid var(--mantine-color-default-border)",
             background: "var(--mantine-color-default-hover)",
@@ -89,7 +108,15 @@ function MediaPage({
   )
 }
 
-function RecentMediaCarousel({ items, mediaIds, onOpenMedia }: { items: string[]; mediaIds?: readonly string[]; onOpenMedia?: (id: string) => void }) {
+function RecentMediaCarousel({
+  items,
+  mediaIds,
+  onOpenMedia,
+}: {
+  items: string[]
+  mediaIds?: readonly string[]
+  onOpenMedia?: (id: string) => void
+}) {
   const [page, setPage] = useState(0)
   const [fromPage, setFromPage] = useState<number | null>(null)
   const [direction, setDirection] = useState<"previous" | "next">("next")
@@ -168,7 +195,13 @@ function RecentMediaCarousel({ items, mediaIds, onOpenMedia }: { items: string[]
       `}</style>
 
       {fromPage === null ? (
-        <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} mediaIds={mediaIds} onOpenMedia={onOpenMedia} />
+        <MediaPage
+          items={itemsFor(page)}
+          page={page}
+          pageSize={pageSize}
+          mediaIds={mediaIds}
+          onOpenMedia={onOpenMedia}
+        />
       ) : (
         <Box
           className={`dashboard-carousel-track ${direction} ${sliding ? "sliding" : ""}`}

@@ -45,8 +45,12 @@ export function ApplicationContextSwitcher({
       maw={{ base: 144, sm: 240 }}
       onClick={compact ? () => changeOpened(true) : undefined}
     >
-      <Text size="xs" mr={6} aria-hidden="true">▾</Text>
-      <Text size="sm" truncate>{currentContext.label}</Text>
+      <Text size="xs" mr={6} aria-hidden="true">
+        ▾
+      </Text>
+      <Text size="sm" truncate>
+        {currentContext.label}
+      </Text>
     </Button>
   )
 

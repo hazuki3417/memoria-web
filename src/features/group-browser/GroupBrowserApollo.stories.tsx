@@ -51,7 +51,13 @@ const meta = {
   component: GroupBrowserContainer,
   args: { contextKind: "personal" },
   // Containers use the same URL context that ApplicationShell provides in production.
-  decorators: [(Story) => <MediaDetailUrlProvider><Story /></MediaDetailUrlProvider>],
+  decorators: [
+    (Story) => (
+      <MediaDetailUrlProvider>
+        <Story />
+      </MediaDetailUrlProvider>
+    ),
+  ],
   parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof GroupBrowserContainer>
 export default meta

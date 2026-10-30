@@ -14,8 +14,14 @@ export type DetailRecord = {
     variants: { width: number; height: number; url: string }[]
   } | null
   processing: { status: "PROCESSING" | "READY" | "FAILED" } | null
-  groups?: { edges: { node: { id: string; name: string } }[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } } | null
-  tags?: { edges: { node: { id: string; name: string } }[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } } | null
+  groups?: {
+    edges: { node: { id: string; name: string } }[]
+    pageInfo: { hasNextPage: boolean; endCursor?: string | null }
+  } | null
+  tags?: {
+    edges: { node: { id: string; name: string } }[]
+    pageInfo: { hasNextPage: boolean; endCursor?: string | null }
+  } | null
 }
 export type MediaDetailResult = { media: DetailRecord | null }
 export type DetailReadState =
@@ -25,7 +31,15 @@ export type DetailReadState =
   | { kind: "unavailable" }
   | { kind: "ready"; media: DetailRecord }
 export type PreviewReadState =
-  | { kind: "idle" | "detail-loading" | "processing" | "processing-failed" | "image-loading" | "unavailable" }
+  | {
+      kind:
+        | "idle"
+        | "detail-loading"
+        | "processing"
+        | "processing-failed"
+        | "image-loading"
+        | "unavailable"
+    }
   | { kind: "detail-error" | "delivery-error"; retryable: true }
   | { kind: "ready"; url: string; width: number; height: number }
 export type CollectionReadState =
@@ -44,27 +58,43 @@ export function projectMediaDetail(
   if (loading && !data?.media) return { kind: "loading" }
   if (hasError && !data?.media) return { kind: "retryable-error" }
   if (!data) return { kind: "loading" }
-  if (!data.media) return hasError ? { kind: "retryable-error" } : { kind: "unavailable" }
+  if (!data.media)
+    return hasError ? { kind: "retryable-error" } : { kind: "unavailable" }
   return { kind: "ready", media: data.media }
 }
 
 export function projectPreview(detail: DetailReadState): PreviewReadState {
   switch (detail.kind) {
-    case "idle": return { kind: "idle" }
-    case "loading": return { kind: "detail-loading" }
-    case "retryable-error": return { kind: "detail-error", retryable: true }
-    case "unavailable": return { kind: "unavailable" }
+    case "idle":
+      return { kind: "idle" }
+    case "loading":
+      return { kind: "detail-loading" }
+    case "retryable-error":
+      return { kind: "detail-error", retryable: true }
+    case "unavailable":
+      return { kind: "unavailable" }
     case "ready": {
       const { media } = detail
-      if (media.processing?.status === "PROCESSING") return { kind: "processing" }
-      if (media.processing?.status === "FAILED") return { kind: "processing-failed" }
-      if (media.processing?.status !== "READY") return { kind: "delivery-error", retryable: true }
+      if (media.processing?.status === "PROCESSING")
+        return { kind: "processing" }
+      if (media.processing?.status === "FAILED")
+        return { kind: "processing-failed" }
+      if (media.processing?.status !== "READY")
+        return { kind: "delivery-error", retryable: true }
       const variants = media.image?.variants
-        .filter((variant) => variant.url.length > 0 && variant.width > 0 && variant.height > 0)
+        .filter(
+          (variant) =>
+            variant.url.length > 0 && variant.width > 0 && variant.height > 0,
+        )
         .sort((a, b) => a.width - b.width)
       const selected = variants?.at(-1)
       return selected
-        ? { kind: "ready", url: selected.url, width: selected.width, height: selected.height }
+        ? {
+            kind: "ready",
+            url: selected.url,
+            width: selected.width,
+            height: selected.height,
+          }
         : { kind: "delivery-error", retryable: true }
     }
   }
@@ -82,9 +112,11 @@ export function projectCollection(
   return { kind: "ready", values: result.edges.map((edge) => edge.node) }
 }
 
-
 /** Polling contract: 5s normally, 10s after transport errors, stop on third failure. */
-export function nextProcessingPollFailures(previous: number, transportFailed: boolean): number {
+export function nextProcessingPollFailures(
+  previous: number,
+  transportFailed: boolean,
+): number {
   return transportFailed ? Math.min(3, previous + 1) : 0
 }
 
@@ -104,8 +136,14 @@ export function mediaDetailPollingIdentity(
 
 /** Merge a Relay page without duplicating nodes on retry or overlapping pages. */
 export function mergeDetailCollectionPages<T extends { node: { id: string } }>(
-  prior: { edges: T[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } },
-  next: { edges: T[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } },
+  prior: {
+    edges: T[]
+    pageInfo: { hasNextPage: boolean; endCursor?: string | null }
+  },
+  next: {
+    edges: T[]
+    pageInfo: { hasNextPage: boolean; endCursor?: string | null }
+  },
 ) {
   const seen = new Set(prior.edges.map((edge) => edge.node.id))
   return {

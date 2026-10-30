@@ -121,7 +121,10 @@ function MediaBrowserController({
   groupActionResult?: GroupActionResult | null
   onDismissGroupActionResult?: () => void
   /** Optional URL-controller handoff; absent for existing local Modal consumers. */
-  onOpenMediaDetail?: (mediaId: string, orderedLoadedMediaIds: readonly string[]) => void
+  onOpenMediaDetail?: (
+    mediaId: string,
+    orderedLoadedMediaIds: readonly string[],
+  ) => void
 }) {
   const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -226,7 +229,10 @@ function MediaBrowserController({
         onToggle={toggle}
         onOpenDetail={(item) => {
           if (onOpenMediaDetail) {
-            onOpenMediaDetail(item.id, stateItems.map(({ id }) => id))
+            onOpenMediaDetail(
+              item.id,
+              stateItems.map(({ id }) => id),
+            )
           } else {
             setDetail(item)
           }

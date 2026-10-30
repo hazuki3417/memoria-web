@@ -26,9 +26,9 @@ const meta = {
         user={{ displayName: "ユーザー" }}
       >
         <>
-        <Story />
-              </>
-</PrototypeApplicationShell>
+          <Story />
+        </>
+      </PrototypeApplicationShell>
     ),
   ],
 } satisfies Meta<typeof CommunitySettings>
@@ -41,4 +41,3 @@ export const Default: Story = {
   tags: ["visual"],
   args: { role: "admin" },
 }
-

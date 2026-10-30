@@ -15,9 +15,17 @@ export const ThreeRegions: Story = {
   tags: ["visual", "vrt"],
   render: () => (
     <ActionPanel>
-      <ActionPanel.Start><Button color="red" variant="subtle">削除</Button></ActionPanel.Start>
-      <ActionPanel.Center><Button variant="default">キャンセル</Button></ActionPanel.Center>
-      <ActionPanel.End><Button>保存</Button></ActionPanel.End>
+      <ActionPanel.Start>
+        <Button color="red" variant="subtle">
+          削除
+        </Button>
+      </ActionPanel.Start>
+      <ActionPanel.Center>
+        <Button variant="default">キャンセル</Button>
+      </ActionPanel.Center>
+      <ActionPanel.End>
+        <Button>保存</Button>
+      </ActionPanel.End>
     </ActionPanel>
   ),
 }
@@ -26,8 +34,12 @@ export const StartAndEnd: Story = {
   tags: ["visual", "vrt"],
   render: () => (
     <ActionPanel>
-      <ActionPanel.Start><Button variant="default">戻る</Button></ActionPanel.Start>
-      <ActionPanel.End><Button>次へ</Button></ActionPanel.End>
+      <ActionPanel.Start>
+        <Button variant="default">戻る</Button>
+      </ActionPanel.Start>
+      <ActionPanel.End>
+        <Button>次へ</Button>
+      </ActionPanel.End>
     </ActionPanel>
   ),
 }
@@ -36,7 +48,9 @@ export const CenterOnly: Story = {
   tags: ["visual", "vrt"],
   render: () => (
     <ActionPanel>
-      <ActionPanel.Center><Button>閉じる</Button></ActionPanel.Center>
+      <ActionPanel.Center>
+        <Button>閉じる</Button>
+      </ActionPanel.Center>
     </ActionPanel>
   ),
 }

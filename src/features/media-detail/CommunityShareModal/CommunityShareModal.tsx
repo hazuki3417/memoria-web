@@ -34,36 +34,34 @@ export function CommunityShareModal({
     >
       <Modal.Body>
         <Stack gap="md">
-        <Text size="sm" c="dimmed">
-          このMediaを共有するCommunityを1つ選択します。
-        </Text>
-        <Select
-          label="共有先Community"
-          searchable
-          data={["Photo Club", "Family", "Travel"].filter(
-            (name) => !detailValues.communities.includes(name),
-          )}
-          value={shareTarget}
-          onChange={setShareTarget}
-          placeholder="Communityを選択"
-        />
-
+          <Text size="sm" c="dimmed">
+            このMediaを共有するCommunityを1つ選択します。
+          </Text>
+          <Select
+            label="共有先Community"
+            searchable
+            data={["Photo Club", "Family", "Travel"].filter(
+              (name) => !detailValues.communities.includes(name),
+            )}
+            value={shareTarget}
+            onChange={setShareTarget}
+            placeholder="Communityを選択"
+          />
         </Stack>
       </Modal.Body>
       <Modal.Divider />
       <Modal.Footer>
         <ActionPanel>
           <ActionPanel.End>
-          <Button variant="default" onClick={() => setDetailEditor(null)}>
-            キャンセル
-          </Button>
-          <Button disabled={!shareTarget} onClick={addCommunityShare}>
-            共有する
-          </Button>
+            <Button variant="default" onClick={() => setDetailEditor(null)}>
+              キャンセル
+            </Button>
+            <Button disabled={!shareTarget} onClick={addCommunityShare}>
+              共有する
+            </Button>
           </ActionPanel.End>
         </ActionPanel>
       </Modal.Footer>
-
     </Modal>
   )
 }

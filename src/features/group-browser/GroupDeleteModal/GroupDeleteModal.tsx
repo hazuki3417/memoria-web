@@ -36,18 +36,20 @@ export function GroupDeleteModal({
         </Text>
       </Modal.Body>
       <Modal.Footer>
-        <ActionPanel><ActionPanel.End>
-          <Button variant="default" onClick={onClose} disabled={saving}>
-            キャンセル
-          </Button>
-          <Button
-            color="red"
-            disabled={!canManage || saving}
-            onClick={() => void onConfirm()}
-          >
-            削除
-          </Button>
-        </ActionPanel.End></ActionPanel>
+        <ActionPanel>
+          <ActionPanel.End>
+            <Button variant="default" onClick={onClose} disabled={saving}>
+              キャンセル
+            </Button>
+            <Button
+              color="red"
+              disabled={!canManage || saving}
+              onClick={() => void onConfirm()}
+            >
+              削除
+            </Button>
+          </ActionPanel.End>
+        </ActionPanel>
       </Modal.Footer>
     </Modal>
   )

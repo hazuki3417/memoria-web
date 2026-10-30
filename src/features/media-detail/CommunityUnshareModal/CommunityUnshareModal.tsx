@@ -26,26 +26,24 @@ export function CommunityUnshareModal({
     >
       <Modal.Body>
         <Stack gap="md">
-        <Text size="sm">
-          {unshareTarget} への共有を解除しますか？
-          このCommunityからMediaを閲覧できなくなります。他の共有先やMedia本体は削除されません。
-        </Text>
-
+          <Text size="sm">
+            {unshareTarget} への共有を解除しますか？
+            このCommunityからMediaを閲覧できなくなります。他の共有先やMedia本体は削除されません。
+          </Text>
         </Stack>
       </Modal.Body>
       <Modal.Footer>
         <ActionPanel>
           <ActionPanel.End>
-          <Button variant="default" onClick={() => setUnshareTarget(null)}>
-            キャンセル
-          </Button>
-          <Button color="red" onClick={removeCommunityShare}>
-            共有解除
-          </Button>
+            <Button variant="default" onClick={() => setUnshareTarget(null)}>
+              キャンセル
+            </Button>
+            <Button color="red" onClick={removeCommunityShare}>
+              共有解除
+            </Button>
           </ActionPanel.End>
         </ActionPanel>
       </Modal.Footer>
-
     </Modal>
   )
 }

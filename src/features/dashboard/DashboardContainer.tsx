@@ -110,7 +110,13 @@ function ScopedDashboard({
       communityId={communityId}
       mediaIds={mediaNodes.slice(0, 32).map((node) => node.id)}
       onOpenMedia={(mediaId) => {
-        if (!skip) openMediaDetail({ mediaId, orderedLoadedMediaIds: mediaNodes.slice(0, 32).map((node) => node.id) })
+        if (!skip)
+          openMediaDetail({
+            mediaId,
+            orderedLoadedMediaIds: mediaNodes
+              .slice(0, 32)
+              .map((node) => node.id),
+          })
       }}
       mediaItems={mediaNodes.map((node) =>
         selectDashboardThumbnail(node.image?.variants),

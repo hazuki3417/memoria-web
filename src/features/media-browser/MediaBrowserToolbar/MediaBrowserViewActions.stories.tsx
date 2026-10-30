@@ -12,4 +12,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Personal: Story = { tags: ["visual"] }
-export const Community: Story = { args: { context: "community" }, tags: ["visual"] }
+export const Community: Story = {
+  args: { context: "community" },
+  tags: ["visual"],
+}

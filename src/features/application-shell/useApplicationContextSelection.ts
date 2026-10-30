@@ -6,9 +6,8 @@ import type { ApplicationContextOption } from "./types"
  * Routerの遷移とデータ取得は呼び出し元が担当する。
  */
 export function useApplicationContextSelection(pathname: string) {
-  const [rememberedContextKind, setRememberedContextKind] = useState<
-    ApplicationContextOption["kind"]
-  >("personal")
+  const [rememberedContextKind, setRememberedContextKind] =
+    useState<ApplicationContextOption["kind"]>("personal")
   const [rememberedCommunityId, setRememberedCommunityId] = useState("")
   const communityMatch = pathname.match(/^\/communities\/([^/]+)/)
   const isSettingsRoute = pathname.startsWith("/settings")

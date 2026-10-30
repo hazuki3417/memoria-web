@@ -9,10 +9,20 @@ export default async function Page({
 }) {
   const { communityId } = await params
   return (
-    <ScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><Box pt="lg">
-    <PageWidth variant="contained">
-      <DashboardContainer contextKind="community" communityId={communityId} />
-    </PageWidth>
-    </Box></ScrollArea>
+    <ScrollArea
+      type="hover"
+      h="100%"
+      w="100%"
+      style={{ overscrollBehavior: "contain" }}
+    >
+      <Box pt="lg">
+        <PageWidth variant="contained">
+          <DashboardContainer
+            contextKind="community"
+            communityId={communityId}
+          />
+        </PageWidth>
+      </Box>
+    </ScrollArea>
   )
 }

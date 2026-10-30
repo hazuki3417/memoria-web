@@ -24,10 +24,15 @@ export const Searching: Story = {
   args: { query: "旅行" },
   tags: ["visual"],
   play: async ({ canvasElement, args }) => {
-    await userEvent.click(within(canvasElement).getByRole("button", { name: "検索文字列をクリア" }))
+    await userEvent.click(
+      within(canvasElement).getByRole("button", { name: "検索文字列をクリア" }),
+    )
     await expect(args.onQueryChange).toHaveBeenCalledWith("")
   },
 }
 export const Compact: Story = { args: { compact: true }, tags: ["visual"] }
 export const ReadOnly: Story = { args: { canManage: false }, tags: ["visual"] }
-export const HiddenManagement: Story = { args: { hideManagementActions: true }, tags: ["visual"] }
+export const HiddenManagement: Story = {
+  args: { hideManagementActions: true },
+  tags: ["visual"],
+}

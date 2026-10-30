@@ -49,22 +49,37 @@ export type MediaDetailScope = {
   communityId?: string
 }
 
-export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailScope) {
-  const query = useQuery<MediaDetailResult, { id: string; scope: MediaDetailScope; groupsAfter?: string; tagsAfter?: string }>(
-    MEDIA_DETAIL_READ,
+export function useMediaDetailRead(
+  mediaId: string | null,
+  scope: MediaDetailScope,
+) {
+  const query = useQuery<
+    MediaDetailResult,
     {
-      variables: { id: mediaId ?? "", scope },
-      skip: mediaId === null,
-      fetchPolicy: "network-only",
-      errorPolicy: "all",
-      notifyOnNetworkStatusChange: true,
-    },
-  )
+      id: string
+      scope: MediaDetailScope
+      groupsAfter?: string
+      tagsAfter?: string
+    }
+  >(MEDIA_DETAIL_READ, {
+    variables: { id: mediaId ?? "", scope },
+    skip: mediaId === null,
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+    notifyOnNetworkStatusChange: true,
+  })
 
   const pollKey = mediaDetailPollingIdentity(mediaId, scope)
   const [visible, setVisible] = useState(true)
-  const [pollState, setPollState] = useState<{ id: string | null; failures: number; stopped: boolean }>({ id: null, failures: 0, stopped: false })
-  const activePoll = pollState.id === pollKey ? pollState : { id: pollKey, failures: 0, stopped: false }
+  const [pollState, setPollState] = useState<{
+    id: string | null
+    failures: number
+    stopped: boolean
+  }>({ id: null, failures: 0, stopped: false })
+  const activePoll =
+    pollState.id === pollKey
+      ? pollState
+      : { id: pollKey, failures: 0, stopped: false }
   const requestInFlight = useRef<string | null>(null)
 
   useEffect(() => {
@@ -72,13 +87,20 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     const syncVisibility = () => setVisible(!document.hidden)
     syncVisibility()
     document.addEventListener("visibilitychange", syncVisibility)
-    return () => document.removeEventListener("visibilitychange", syncVisibility)
+    return () =>
+      document.removeEventListener("visibilitychange", syncVisibility)
   }, [pollKey])
 
   // A scope change may retain the same media ID but must never expose previous-scope data.
   const variablesChanging = query.networkStatus === NetworkStatus.setVariables
   const detail = useMemo(
-    () => projectMediaDetail(mediaId, query.loading, variablesChanging ? undefined : query.data, Boolean(query.error)),
+    () =>
+      projectMediaDetail(
+        mediaId,
+        query.loading,
+        variablesChanging ? undefined : query.data,
+        Boolean(query.error),
+      ),
     [mediaId, query.loading, query.data, query.error, variablesChanging],
   )
   const preview = useMemo(() => projectPreview(detail), [detail])
@@ -109,15 +131,27 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     if (!mediaId || !readyVariant || !visible) return
     let cancelled = false
     const refreshIfNeeded = () => {
-      if (cancelled || variantRefreshInFlight.current ||
-          !shouldRefreshVariantUrl(lastVariantRefresh.current, Date.now(), readyVariant, !document.hidden)) return
+      if (
+        cancelled ||
+        variantRefreshInFlight.current ||
+        !shouldRefreshVariantUrl(
+          lastVariantRefresh.current,
+          Date.now(),
+          readyVariant,
+          !document.hidden,
+        )
+      )
+        return
       variantRefreshInFlight.current = true
       lastVariantRefresh.current = Date.now()
-      void query.refetch().catch(() => {
-        // Keep the existing detail error/retry controls; no automatic loop.
-      }).finally(() => {
-        variantRefreshInFlight.current = false
-      })
+      void query
+        .refetch()
+        .catch(() => {
+          // Keep the existing detail error/retry controls; no automatic loop.
+        })
+        .finally(() => {
+          variantRefreshInFlight.current = false
+        })
     }
     const interval = window.setInterval(refreshIfNeeded, 60 * 1000)
     refreshIfNeeded()
@@ -133,7 +167,8 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
   // Each result belongs to the currently selected media and relation scope.
   // A failed/malformed cursor keeps the collection incomplete; no false empty.
   useEffect(() => {
-    if (detail.kind !== "ready" || query.loading || query.error || !pollKey) return
+    if (detail.kind !== "ready" || query.loading || query.error || !pollKey)
+      return
     for (const field of ["groups", "tags"] as const) {
       const collection = detail.media[field]
       if (!collection?.pageInfo.hasNextPage) continue
@@ -144,33 +179,55 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
       pageInFlight.current = requestKey
       const variables: { groupsAfter?: string; tagsAfter?: string } =
         field === "groups" ? { groupsAfter: cursor } : { tagsAfter: cursor }
-      void query.fetchMore({
-        variables,
-        updateQuery(previous, { fetchMoreResult }) {
-          if (!fetchMoreResult?.media || fetchMoreResult.media.id !== previous.media?.id || !previous.media) return previous
-          const incoming = fetchMoreResult.media[field]
-          const existing = previous.media[field]
-          if (!incoming || !existing || (incoming.pageInfo.hasNextPage && incoming.pageInfo.endCursor === cursor)) {
-            setPageFailure(requestKey)
-            return previous
-          }
-          return {
-            media: {
-              ...previous.media,
-              [field]: mergeDetailCollectionPages(existing, incoming),
-            },
-          }
-        },
-      }).catch(() => setPageFailure(requestKey))
+      void query
+        .fetchMore({
+          variables,
+          updateQuery(previous, { fetchMoreResult }) {
+            if (
+              !fetchMoreResult?.media ||
+              fetchMoreResult.media.id !== previous.media?.id ||
+              !previous.media
+            )
+              return previous
+            const incoming = fetchMoreResult.media[field]
+            const existing = previous.media[field]
+            if (
+              !incoming ||
+              !existing ||
+              (incoming.pageInfo.hasNextPage &&
+                incoming.pageInfo.endCursor === cursor)
+            ) {
+              setPageFailure(requestKey)
+              return previous
+            }
+            return {
+              media: {
+                ...previous.media,
+                [field]: mergeDetailCollectionPages(existing, incoming),
+              },
+            }
+          },
+        })
+        .catch(() => setPageFailure(requestKey))
         .finally(() => {
           if (pageInFlight.current === requestKey) pageInFlight.current = null
         })
       return
     }
-  }, [detail, pollKey, pageFailure, query.loading, query.error, query.fetchMore])
+  }, [
+    detail,
+    pollKey,
+    pageFailure,
+    query.loading,
+    query.error,
+    query.fetchMore,
+  ])
 
-  const processing = detail.kind === "ready" && detail.media.processing?.status === "PROCESSING"
-  const shouldPoll = Boolean(mediaId && visible && processing && !activePoll.stopped)
+  const processing =
+    detail.kind === "ready" && detail.media.processing?.status === "PROCESSING"
+  const shouldPoll = Boolean(
+    mediaId && visible && processing && !activePoll.stopped,
+  )
   const pollDelay = processingPollDelay(activePoll.failures)
 
   useEffect(() => {
@@ -179,25 +236,38 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     const timer = window.setInterval(() => {
       if (cancelled || requestInFlight.current === pollKey) return
       requestInFlight.current = pollKey
-      void query.refetch().then(
-        (result) => {
-          if (cancelled) return
-          if (result.error?.networkError) {
-            setPollState((current) => {
-              const failures = nextProcessingPollFailures(current.id === pollKey ? current.failures : 0, true)
-              return { id: pollKey, failures, stopped: failures >= 3 }
-            })
-          } else {
-            setPollState({ id: pollKey, failures: 0, stopped: false })
-          }
-        },
-        () => {
-          if (!cancelled) setPollState((current) => {
-            const failures = nextProcessingPollFailures(current.id === pollKey ? current.failures : 0, true)
-            return { id: pollKey, failures, stopped: failures >= 3 }
-          })
-        },
-      ).finally(() => { if (requestInFlight.current === pollKey) requestInFlight.current = null })
+      void query
+        .refetch()
+        .then(
+          (result) => {
+            if (cancelled) return
+            if (result.error?.networkError) {
+              setPollState((current) => {
+                const failures = nextProcessingPollFailures(
+                  current.id === pollKey ? current.failures : 0,
+                  true,
+                )
+                return { id: pollKey, failures, stopped: failures >= 3 }
+              })
+            } else {
+              setPollState({ id: pollKey, failures: 0, stopped: false })
+            }
+          },
+          () => {
+            if (!cancelled)
+              setPollState((current) => {
+                const failures = nextProcessingPollFailures(
+                  current.id === pollKey ? current.failures : 0,
+                  true,
+                )
+                return { id: pollKey, failures, stopped: failures >= 3 }
+              })
+          },
+        )
+        .finally(() => {
+          if (requestInFlight.current === pollKey)
+            requestInFlight.current = null
+        })
     }, pollDelay)
     return () => {
       cancelled = true

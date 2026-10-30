@@ -34,7 +34,10 @@ export const NameEntered: Story = {
 export const ValidationError: Story = {
   name: "Visual · Validation Error",
   tags: ["visual", "vrt", "vrt-modal"],
-  args: { name: "家族", error: "Communityを作成できませんでした。再度お試しください。" },
+  args: {
+    name: "家族",
+    error: "Communityを作成できませんでした。再度お試しください。",
+  },
 }
 export const CommunitiesError: Story = {
   name: "Visual · Communities Error",
@@ -51,8 +54,14 @@ export const Cancel: Story = {
   name: "Interaction · Cancel",
   tags: ["interaction"],
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Communityを作成" }))
-    await expect(dialog.queryByRole("button", { name: "Close modal" })).not.toBeInTheDocument()
+    const dialog = within(
+      await within(document.body).findByRole("dialog", {
+        name: "Communityを作成",
+      }),
+    )
+    await expect(
+      dialog.queryByRole("button", { name: "Close modal" }),
+    ).not.toBeInTheDocument()
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await expect(args.onClose).toHaveBeenCalledTimes(1)
     await expect(args.onCreate).not.toHaveBeenCalled()
@@ -63,8 +72,14 @@ export const Submit: Story = {
   tags: ["interaction"],
   args: { name: "家族のアルバム" },
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Communityを作成" }))
-    await userEvent.click(dialog.getByRole("button", { name: "Communityを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", {
+        name: "Communityを作成",
+      }),
+    )
+    await userEvent.click(
+      dialog.getByRole("button", { name: "Communityを作成" }),
+    )
     await expect(args.onCreate).toHaveBeenCalledTimes(1)
     await expect(args.onClose).not.toHaveBeenCalled()
   },

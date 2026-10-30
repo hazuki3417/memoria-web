@@ -14,22 +14,34 @@ export function MediaDetailRotationControls({
 }) {
   return (
     <>
-      <ActionIcon variant="subtle" aria-label="回転をリセット" onClick={() => {
-        setAnimated(false)
-        setRotate(0)
-      }}>
+      <ActionIcon
+        variant="subtle"
+        aria-label="回転をリセット"
+        onClick={() => {
+          setAnimated(false)
+          setRotate(0)
+        }}
+      >
         <IconRotate2 size={18} />
       </ActionIcon>
-      <ActionIcon variant="subtle" aria-label="左へ回転" onClick={() => {
-        setAnimated(true)
-        setRotate((value) => value - 90)
-      }}>
+      <ActionIcon
+        variant="subtle"
+        aria-label="左へ回転"
+        onClick={() => {
+          setAnimated(true)
+          setRotate((value) => value - 90)
+        }}
+      >
         <IconRotate size={18} />
       </ActionIcon>
-      <ActionIcon variant="subtle" aria-label="右へ回転" onClick={() => {
-        setAnimated(true)
-        setRotate((value) => value + 90)
-      }}>
+      <ActionIcon
+        variant="subtle"
+        aria-label="右へ回転"
+        onClick={() => {
+          setAnimated(true)
+          setRotate((value) => value + 90)
+        }}
+      >
         <IconRotate size={18} style={{ transform: "scaleX(-1)" }} />
       </ActionIcon>
     </>

@@ -20,8 +20,14 @@ export function MediaDetailInfoPanelFrame({
     <AnimatePresence initial={false}>
       {opened && (
         <motion.div
-          initial={compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
-          animate={compact ? { height: "auto", opacity: 1 } : { width: 340, opacity: 1 }}
+          initial={
+            compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }
+          }
+          animate={
+            compact
+              ? { height: "auto", opacity: 1 }
+              : { width: 340, opacity: 1 }
+          }
           exit={compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
           transition={{ duration: 0.3 }}
           style={{
@@ -35,8 +41,12 @@ export function MediaDetailInfoPanelFrame({
             h="100%"
             bg="var(--mantine-color-body)"
             style={{
-              borderLeft: compact ? undefined : "1px solid var(--mantine-color-default-border)",
-              borderTop: compact ? "1px solid var(--mantine-color-default-border)" : undefined,
+              borderLeft: compact
+                ? undefined
+                : "1px solid var(--mantine-color-default-border)",
+              borderTop: compact
+                ? "1px solid var(--mantine-color-default-border)"
+                : undefined,
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",

@@ -30,7 +30,12 @@ export const AvatarLabel: Story = {
   name: "Visual · Avatar Label",
   tags: ["visual", "vrt"],
   args: {
-    state: { status: "ready", displayName: "Memoria", avatarLabel: "M", contextLabel: "旅行の思い出" },
+    state: {
+      status: "ready",
+      displayName: "Memoria",
+      avatarLabel: "M",
+      contextLabel: "旅行の思い出",
+    },
   },
 }
 
@@ -39,7 +44,9 @@ export const Loading: Story = {
   tags: ["visual", "vrt"],
   args: { state: { status: "loading" } },
   play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByLabelText("プロフィールを読み込み中")).toHaveAttribute("aria-busy", "true")
+    await expect(
+      within(canvasElement).getByLabelText("プロフィールを読み込み中"),
+    ).toHaveAttribute("aria-busy", "true")
   },
 }
 
@@ -48,6 +55,8 @@ export const Error: Story = {
   tags: ["visual", "vrt"],
   args: { state: { status: "error" } },
   play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByText("ユーザー情報を取得できませんでした")).toBeVisible()
+    await expect(
+      within(canvasElement).getByText("ユーザー情報を取得できませんでした"),
+    ).toBeVisible()
   },
 }

@@ -617,7 +617,8 @@ export function GroupBrowserContainer({
   return (
     <GroupBrowser
       onOpenMediaDetail={(mediaId, orderedLoadedMediaIds) => {
-        if (contextKind === "personal" || communityId) openMediaDetail({ mediaId, orderedLoadedMediaIds })
+        if (contextKind === "personal" || communityId)
+          openMediaDetail({ mediaId, orderedLoadedMediaIds })
       }}
       discoveryState={
         listing.error && !listingSnapshot

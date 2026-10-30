@@ -1,7 +1,9 @@
 "use client"
 
-import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
-
+import {
+  Box as ScrollPaddingBox,
+  ScrollArea as PageScrollArea,
+} from "@mantine/core"
 
 import {
   Box,
@@ -94,74 +96,86 @@ export function UserProfilePrototype({
         contexts={[personalContext]}
         navigationItems={getApplicationNavigation({ contextKind: "personal" })}
       >
-        <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
-        <Box maw={880} mx="auto" w="100%">
-          <Stack gap="xl">
-            <PageHeader
-              title="プロフィール"
-              description="Memoriaで使用するプロフィール情報を管理します。"
-            />
-            <Box>
-              <SectionHeader>基本情報</SectionHeader>
-              <Stack gap="md" maw={540}>
-                <Box maw={440}>
-                  <TextInput
-                    label="ニックネーム"
-                    description="Memoria内で表示される名前です。"
-                    value={nickname}
-                    onChange={(event) => {
-                      setNickname(event.currentTarget.value)
-                      setStatus("default")
-                    }}
-                    error={invalid}
-                    aria-describedby="nickname-error"
-                    disabled={saving || blocking}
-                    required
-                  />
-                  <Box mih={22} mt={4} id="nickname-error" aria-live="polite">
-                    {invalid && (
-                      <Text size="xs" c="red">
-                        ニックネームを入力してください。
-                      </Text>
-                    )}
-                  </Box>
-                </Box>
-                <Group gap="sm">
-                  <Button
-                    size="sm"
-                    onClick={save}
-                    disabled={!dirty || invalid || saving || blocking}
-                    loading={saving}
-                  >
-                    保存
-                  </Button>
-                  {dirty && (
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={openDiscard}
-                      disabled={saving || blocking}
-                    >
-                      キャンセル
-                    </Button>
-                  )}
-                </Group>
-                <Box mih={92} aria-live="polite">
-                  {blocking && (
-                    <FeedbackAlert
-                      kind="error"
-                      title="プロフィールを更新できませんでした"
-                    >
-                      現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
-                    </FeedbackAlert>
-                  )}
+        <PageScrollArea
+          type="hover"
+          h="100%"
+          w="100%"
+          style={{ overscrollBehavior: "contain" }}
+        >
+          <ScrollPaddingBox pt="lg">
+            <Box maw={880} mx="auto" w="100%">
+              <Stack gap="xl">
+                <PageHeader
+                  title="プロフィール"
+                  description="Memoriaで使用するプロフィール情報を管理します。"
+                />
+                <Box>
+                  <SectionHeader>基本情報</SectionHeader>
+                  <Stack gap="md" maw={540}>
+                    <Box maw={440}>
+                      <TextInput
+                        label="ニックネーム"
+                        description="Memoria内で表示される名前です。"
+                        value={nickname}
+                        onChange={(event) => {
+                          setNickname(event.currentTarget.value)
+                          setStatus("default")
+                        }}
+                        error={invalid}
+                        aria-describedby="nickname-error"
+                        disabled={saving || blocking}
+                        required
+                      />
+                      <Box
+                        mih={22}
+                        mt={4}
+                        id="nickname-error"
+                        aria-live="polite"
+                      >
+                        {invalid && (
+                          <Text size="xs" c="red">
+                            ニックネームを入力してください。
+                          </Text>
+                        )}
+                      </Box>
+                    </Box>
+                    <Group gap="sm">
+                      <Button
+                        size="sm"
+                        onClick={save}
+                        disabled={!dirty || invalid || saving || blocking}
+                        loading={saving}
+                      >
+                        保存
+                      </Button>
+                      {dirty && (
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={openDiscard}
+                          disabled={saving || blocking}
+                        >
+                          キャンセル
+                        </Button>
+                      )}
+                    </Group>
+                    <Box mih={92} aria-live="polite">
+                      {blocking && (
+                        <FeedbackAlert
+                          kind="error"
+                          title="プロフィールを更新できませんでした"
+                        >
+                          現在のアカウント状態ではプロフィールを更新できません。アカウントの状態を確認してください。
+                        </FeedbackAlert>
+                      )}
+                    </Box>
+                  </Stack>
                 </Box>
               </Stack>
             </Box>
-          </Stack>
-        </Box>
-              </ScrollPaddingBox></PageScrollArea>
-</PrototypeApplicationShell>
+          </ScrollPaddingBox>
+        </PageScrollArea>
+      </PrototypeApplicationShell>
       <Modal
         opened={discardOpened}
         onClose={closeDiscard}

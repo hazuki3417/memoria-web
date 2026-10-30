@@ -67,7 +67,9 @@ export const Save: Story = {
   name: "Interaction · Save",
   tags: ["interaction"],
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "保存" }))
     await expect(args.onSubmit).toHaveBeenCalledTimes(1)
   },
@@ -76,7 +78,9 @@ export const DeleteAction: Story = {
   name: "Interaction · Delete",
   tags: ["interaction"],
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "削除" }))
     await expect(args.onDelete).toHaveBeenCalledTimes(1)
   },
@@ -88,10 +92,19 @@ export const CompactThreeActions: Story = {
   tags: ["visual", "vrt", "vrt-modal"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
   play: async () => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを編集" }))
-    const buttons = ["削除", "キャンセル", "保存"].map((name) => dialog.getByRole("button", { name }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを編集" }),
+    )
+    const buttons = ["削除", "キャンセル", "保存"].map((name) =>
+      dialog.getByRole("button", { name }),
+    )
     const rects = buttons.map((button) => button.getBoundingClientRect())
-    await expect(Math.max(...rects.map((rect) => rect.top)) - Math.min(...rects.map((rect) => rect.top))).toBeLessThan(2)
-    await expect(rects.every((rect) => rect.left >= 0 && rect.right <= window.innerWidth)).toBe(true)
+    await expect(
+      Math.max(...rects.map((rect) => rect.top)) -
+        Math.min(...rects.map((rect) => rect.top)),
+    ).toBeLessThan(2)
+    await expect(
+      rects.every((rect) => rect.left >= 0 && rect.right <= window.innerWidth),
+    ).toBe(true)
   },
 }

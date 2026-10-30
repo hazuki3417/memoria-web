@@ -30,7 +30,9 @@ export function CommunityAliasControl({
       showNotification({
         kind: "success",
         title: "Community別名を保存",
-        description: normalized ? "別名を変更しました。" : "別名を解除しました。",
+        description: normalized
+          ? "別名を変更しました。"
+          : "別名を解除しました。",
       })
     } catch {
       // 未保存のDraftを保持し、再試行可能にする。

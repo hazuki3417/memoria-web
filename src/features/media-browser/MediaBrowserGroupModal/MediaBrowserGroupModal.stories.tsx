@@ -25,13 +25,26 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = { name: "Visual · Group selection", tags: ["visual", "vrt", "vrt-modal"] }
-export const Pending: Story = { name: "Visual · Processing", tags: ["visual", "vrt", "vrt-modal"], args: { groupActionPending: true, groupTargets: ["family"] } }
-export const ErrorState: Story = { name: "Visual · Error", tags: ["visual", "vrt", "vrt-modal"], args: { groupActionError: "Groupを読み込めませんでした。" } }
+export const Default: Story = {
+  name: "Visual · Group selection",
+  tags: ["visual", "vrt", "vrt-modal"],
+}
+export const Pending: Story = {
+  name: "Visual · Processing",
+  tags: ["visual", "vrt", "vrt-modal"],
+  args: { groupActionPending: true, groupTargets: ["family"] },
+}
+export const ErrorState: Story = {
+  name: "Visual · Error",
+  tags: ["visual", "vrt", "vrt-modal"],
+  args: { groupActionError: "Groupを読み込めませんでした。" },
+}
 export const Cancel: Story = {
   tags: ["interaction"],
   play: async ({ args }) => {
-    const modal = within(await within(document.body).findByRole("dialog", { name: "Groupに追加" }))
+    const modal = within(
+      await within(document.body).findByRole("dialog", { name: "Groupに追加" }),
+    )
     await userEvent.click(modal.getByRole("button", { name: "キャンセル" }))
     await expect(args.onClose).toHaveBeenCalledTimes(1)
     await expect(args.onDismissGroupActionResult).toHaveBeenCalledTimes(1)

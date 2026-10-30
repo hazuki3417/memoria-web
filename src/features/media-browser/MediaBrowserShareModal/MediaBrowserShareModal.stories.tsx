@@ -17,12 +17,23 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = { name: "Visual · Choose community", tags: ["visual", "vrt", "vrt-modal"] }
-export const Selected: Story = { name: "Visual · Community selected", tags: ["visual", "vrt", "vrt-modal"], args: { communityTarget: "Photo Club" } }
+export const Default: Story = {
+  name: "Visual · Choose community",
+  tags: ["visual", "vrt", "vrt-modal"],
+}
+export const Selected: Story = {
+  name: "Visual · Community selected",
+  tags: ["visual", "vrt", "vrt-modal"],
+  args: { communityTarget: "Photo Club" },
+}
 export const Cancel: Story = {
   tags: ["interaction"],
   play: async ({ args }) => {
-    const modal = within(await within(document.body).findByRole("dialog", { name: "Communityへ共有" }))
+    const modal = within(
+      await within(document.body).findByRole("dialog", {
+        name: "Communityへ共有",
+      }),
+    )
     await userEvent.click(modal.getByRole("button", { name: "キャンセル" }))
     await expect(args.onClose).toHaveBeenCalledTimes(1)
   },

@@ -49,7 +49,9 @@ type Story = StoryObj<typeof meta>
 // Menu / ModalはPortalを使うため、Canvasではなくdocument.bodyから確認する。
 const openSwitcher = async () => {
   const page = within(document.body)
-  await userEvent.click(page.getByRole("button", { name: "コンテキストを切り替える" }))
+  await userEvent.click(
+    page.getByRole("button", { name: "コンテキストを切り替える" }),
+  )
   // DesktopはMenu、CompactはModal。いずれも表示完了を待つ。
   await waitFor(() => {
     const opened = page.queryByRole("menu") ?? page.queryByRole("dialog")
@@ -61,49 +63,63 @@ const openSwitcher = async () => {
 export const Personal: Story = {
   name: "Visual · Personalを選択",
   tags: ["visual"],
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const Community: Story = {
   name: "Visual · Communityを選択",
   tags: ["visual"],
   args: { currentContext: family },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const WithoutCreateCommunity: Story = {
   name: "Visual · Community作成なし",
   tags: ["visual"],
   args: { onCreateCommunity: undefined },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const NoCommunities: Story = {
   name: "Visual · 参加Communityなし",
   tags: ["visual"],
   args: { contexts: [personal] },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const Loading: Story = {
   name: "Visual · 初期取得中",
   tags: ["visual"],
   args: { contexts: [personal], loading: true },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const Refreshing: Story = {
   name: "Visual · 再取得中も候補を維持",
   tags: ["visual"],
   args: { loading: true },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const InitialError: Story = {
   name: "Visual · 初期取得失敗",
   tags: ["visual"],
   args: { contexts: [personal], error: true },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const RefreshError: Story = {
@@ -112,8 +128,12 @@ export const RefreshError: Story = {
   args: { error: true },
   play: async () => {
     const page = await openSwitcher()
-    await expect(await page.findByRole("alert")).toHaveTextContent("取得できませんでした。")
-    await expect(page.queryByRole("menuitem", { name: "家族のアルバム" })).not.toBeInTheDocument()
+    await expect(await page.findByRole("alert")).toHaveTextContent(
+      "取得できませんでした。",
+    )
+    await expect(
+      page.queryByRole("menuitem", { name: "家族のアルバム" }),
+    ).not.toBeInTheDocument()
   },
 }
 
@@ -121,15 +141,12 @@ export const DuplicateDisplayNames: Story = {
   name: "Visual · 同じ表示名のCommunity",
   tags: ["visual"],
   args: {
-    contexts: [
-      personal,
-      family,
-      { ...travel, label: family.label },
-      friends,
-    ],
+    contexts: [personal, family, { ...travel, label: family.label }, friends],
     currentContext: travel,
   },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const LongCommunityNames: Story = {
@@ -138,12 +155,18 @@ export const LongCommunityNames: Story = {
   args: {
     contexts: [
       personal,
-      { ...family, label: "家族旅行と日々の思い出を保存するための長いCommunity名を設定した場合の表示確認" },
+      {
+        ...family,
+        label:
+          "家族旅行と日々の思い出を保存するための長いCommunity名を設定した場合の表示確認",
+      },
       travel,
     ],
     currentContext: family,
   },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const ManyCommunities: Story = {
@@ -160,14 +183,18 @@ export const ManyCommunities: Story = {
       })),
     ],
   },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const Compact: Story = {
   name: "Visual · CompactのDialog",
   tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
-  play: async () => { await openSwitcher() },
+  play: async () => {
+    await openSwitcher()
+  },
 }
 
 export const SearchMatches: Story = {
@@ -175,7 +202,10 @@ export const SearchMatches: Story = {
   tags: ["interaction"],
   play: async () => {
     const page = await openSwitcher()
-    await userEvent.type(page.getByRole("textbox", { name: "Communityを検索" }), "旅行")
+    await userEvent.type(
+      page.getByRole("textbox", { name: "Communityを検索" }),
+      "旅行",
+    )
     await expect(page.getByText("旅行の思い出")).toBeVisible()
     await expect(page.queryByText("家族のアルバム")).not.toBeInTheDocument()
   },
@@ -186,8 +216,13 @@ export const SearchNoMatches: Story = {
   tags: ["visual"],
   play: async () => {
     const page = await openSwitcher()
-    await userEvent.type(page.getByRole("textbox", { name: "Communityを検索" }), "存在しない名前")
-    await expect(page.getByText("一致するCommunityはありません。")).toBeVisible()
+    await userEvent.type(
+      page.getByRole("textbox", { name: "Communityを検索" }),
+      "存在しない名前",
+    )
+    await expect(
+      page.getByText("一致するCommunityはありません。"),
+    ).toBeVisible()
   },
 }
 
@@ -198,16 +233,27 @@ export const SearchSelectedCommunity: Story = {
   play: async () => {
     const page = await openSwitcher()
     const search = await page.findByRole("textbox", { name: "Communityを検索" })
-    const selected = await page.findByRole("menuitem", { name: "家族のアルバム" })
+    const selected = await page.findByRole("menuitem", {
+      name: "家族のアルバム",
+    })
     await expect(selected).toBeVisible()
-    await expect(selected.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    await expect(
+      selected.compareDocumentPosition(search) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     await userEvent.type(search, "旅行")
     await expect(selected).toBeVisible()
-    await expect(page.getByRole("menuitem", { name: "旅行の思い出" })).toBeVisible()
+    await expect(
+      page.getByRole("menuitem", { name: "旅行の思い出" }),
+    ).toBeVisible()
     await userEvent.clear(search)
     await userEvent.type(search, "家族")
-    await expect(page.getAllByRole("menuitem", { name: "家族のアルバム" })).toHaveLength(1)
-    await expect(page.getByText("一致するCommunityはありません。")).toBeVisible()
+    await expect(
+      page.getAllByRole("menuitem", { name: "家族のアルバム" }),
+    ).toHaveLength(1)
+    await expect(
+      page.getByText("一致するCommunityはありません。"),
+    ).toBeVisible()
   },
 }
 

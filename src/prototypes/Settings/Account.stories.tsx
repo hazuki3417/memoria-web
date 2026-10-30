@@ -15,4 +15,3 @@ export const Default: Story = {
   name: "Default",
   tags: ["visual"],
 }
-

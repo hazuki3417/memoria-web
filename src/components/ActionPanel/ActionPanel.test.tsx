@@ -6,9 +6,15 @@ describe("ActionPanel", () => {
   it("preserves the declared action order", () => {
     const markup = renderToStaticMarkup(
       <ActionPanel>
-        <ActionPanel.Start><button type="button">Delete</button></ActionPanel.Start>
-        <ActionPanel.Center><button type="button">Cancel</button></ActionPanel.Center>
-        <ActionPanel.End><button type="button">Save</button></ActionPanel.End>
+        <ActionPanel.Start>
+          <button type="button">Delete</button>
+        </ActionPanel.Start>
+        <ActionPanel.Center>
+          <button type="button">Cancel</button>
+        </ActionPanel.Center>
+        <ActionPanel.End>
+          <button type="button">Save</button>
+        </ActionPanel.End>
       </ActionPanel>,
     )
 
@@ -19,7 +25,9 @@ describe("ActionPanel", () => {
   it("supports start-only and multiple actions within one end region", () => {
     const startOnly = renderToStaticMarkup(
       <ActionPanel>
-        <ActionPanel.Start><button type="button">Back</button></ActionPanel.Start>
+        <ActionPanel.Start>
+          <button type="button">Back</button>
+        </ActionPanel.Start>
       </ActionPanel>,
     )
     const endOnly = renderToStaticMarkup(
@@ -34,13 +42,16 @@ describe("ActionPanel", () => {
     expect(startOnly).toContain("Back")
     expect(startOnly).not.toContain("Save")
     expect(endOnly.indexOf("Cancel")).toBeLessThan(endOnly.indexOf("Save"))
-    expect((endOnly.match(/<button/g) ?? [])).toHaveLength(2)
+    expect(endOnly.match(/<button/g) ?? []).toHaveLength(2)
   })
 
   it("renders only provided regions and passes through className and style", () => {
     const markup = renderToStaticMarkup(
       <ActionPanel className="consumer-layout" style={{ width: "100%" }}>
-        <ActionPanel.End className="consumer-end" style={{ justifyContent: "flex-end" }}>
+        <ActionPanel.End
+          className="consumer-end"
+          style={{ justifyContent: "flex-end" }}
+        >
           <button type="button">Confirm</button>
         </ActionPanel.End>
       </ActionPanel>,

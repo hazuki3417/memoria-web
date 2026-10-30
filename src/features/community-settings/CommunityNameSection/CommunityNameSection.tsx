@@ -24,31 +24,30 @@ export function CommunityNameSection({
   saveName,
 }: CommunityNameSectionProps) {
   return (
-      <Box>
-        <SectionHeader>基本情報</SectionHeader>
-        <Stack gap="md" maw={540}>
-          <TextInput
-            label="Community名"
-            value={draft}
-            onChange={(event) => setDraft(event.currentTarget.value)}
-            error={invalid ? "Community名を入力してください" : undefined}
-            disabled={!isAdmin}
-            required
-          />
-          {isAdmin && (
-            <Box>
-              <Button
-                size="sm"
-                disabled={!dirty || invalid || savingName}
-                loading={savingName}
-                onClick={saveName}
-              >
-                保存
-              </Button>
-            </Box>
-          )}
-        </Stack>
-      </Box>
-
+    <Box>
+      <SectionHeader>基本情報</SectionHeader>
+      <Stack gap="md" maw={540}>
+        <TextInput
+          label="Community名"
+          value={draft}
+          onChange={(event) => setDraft(event.currentTarget.value)}
+          error={invalid ? "Community名を入力してください" : undefined}
+          disabled={!isAdmin}
+          required
+        />
+        {isAdmin && (
+          <Box>
+            <Button
+              size="sm"
+              disabled={!dirty || invalid || savingName}
+              loading={savingName}
+              onClick={saveName}
+            >
+              保存
+            </Button>
+          </Box>
+        )}
+      </Stack>
+    </Box>
   )
 }

@@ -21,6 +21,12 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = { tags: ["visual"] }
 export const Compact: Story = { args: { compact: true }, tags: ["visual"] }
-export const Loading: Story = { args: { detailsReady: false }, tags: ["visual"] }
+export const Loading: Story = {
+  args: { detailsReady: false },
+  tags: ["visual"],
+}
 export const ReadOnly: Story = { args: { canManage: false }, tags: ["visual"] }
-export const HiddenManagement: Story = { args: { hideManagementActions: true }, tags: ["visual"] }
+export const HiddenManagement: Story = {
+  args: { hideManagementActions: true },
+  tags: ["visual"],
+}

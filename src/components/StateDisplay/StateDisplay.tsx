@@ -35,8 +35,14 @@ export function StateDisplay({
             </ThemeIcon>
           )}
           <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
-            <Text size="sm" fw={600}>{title}</Text>
-            {description && <Text size="xs" c="dimmed">{description}</Text>}
+            <Text size="sm" fw={600}>
+              {title}
+            </Text>
+            {description && (
+              <Text size="xs" c="dimmed">
+                {description}
+              </Text>
+            )}
             {action && <Box>{action}</Box>}
           </Stack>
         </Group>
@@ -49,7 +55,9 @@ export function StateDisplay({
       <Center py="md" role={role}>
         <Group gap="xs">
           {icon}
-          <Text size="sm" c="dimmed">{title}</Text>
+          <Text size="sm" c="dimmed">
+            {title}
+          </Text>
           {description}
           {action}
         </Group>
@@ -60,11 +68,18 @@ export function StateDisplay({
   return (
     <Center mih={360} role={role}>
       <Stack align="center" maw={loading ? undefined : 420}>
-        {loading ? icon : icon && (
-          <ThemeIcon size={48} radius="xl" variant="light" color={iconColor}>
-            {icon}
-          </ThemeIcon>
-        )}
+        {loading
+          ? icon
+          : icon && (
+              <ThemeIcon
+                size={48}
+                radius="xl"
+                variant="light"
+                color={iconColor}
+              >
+                {icon}
+              </ThemeIcon>
+            )}
         <Text
           fw={loading ? undefined : 700}
           size={loading ? "sm" : "lg"}
@@ -73,7 +88,11 @@ export function StateDisplay({
         >
           {title}
         </Text>
-        {description && <Text size="sm" c="dimmed" ta="center">{description}</Text>}
+        {description && (
+          <Text size="sm" c="dimmed" ta="center">
+            {description}
+          </Text>
+        )}
         {action}
       </Stack>
     </Center>

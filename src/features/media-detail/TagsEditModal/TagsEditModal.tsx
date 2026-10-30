@@ -34,40 +34,58 @@ export function TagsEditModal({
   return (
     <Modal
       opened={detailEditor === "tags"}
-      onClose={() => { if (!pending) setDetailEditor(null) }}
+      onClose={() => {
+        if (!pending) setDetailEditor(null)
+      }}
       title="Tagsを編集"
       centered
       zIndex={400}
     >
       <Modal.Body>
         <Stack gap="md">
-        <Text size="sm" c="dimmed">
-          このMediaのTagを追加・除外できます。
-        </Text>
-        {loadError && <Text size="sm" c="red" role="alert">Tagの編集状態を取得できませんでした。</Text>}
-        {loadError && <Button variant="default" onClick={onRetryLoad}>再試行</Button>}
-        <TagsInput
-          label="Tags"
-          data={options ?? ["旅行", "風景", "家族", "お気に入り"]}
-          value={detailDraft}
-          onChange={setDetailDraft}
-          disabled={pending || loadError}
-        />
-
+          <Text size="sm" c="dimmed">
+            このMediaのTagを追加・除外できます。
+          </Text>
+          {loadError && (
+            <Text size="sm" c="red" role="alert">
+              Tagの編集状態を取得できませんでした。
+            </Text>
+          )}
+          {loadError && (
+            <Button variant="default" onClick={onRetryLoad}>
+              再試行
+            </Button>
+          )}
+          <TagsInput
+            label="Tags"
+            data={options ?? ["旅行", "風景", "家族", "お気に入り"]}
+            value={detailDraft}
+            onChange={setDetailDraft}
+            disabled={pending || loadError}
+          />
         </Stack>
       </Modal.Body>
       <Modal.Divider />
       <Modal.Footer>
         <ActionPanel>
           <ActionPanel.End>
-          <Button variant="default" disabled={pending} onClick={() => setDetailEditor(null)}>
-            キャンセル
-          </Button>
-          <Button loading={pending} disabled={pending || loadError} onClick={saveDetailDraft}>変更を反映</Button>
+            <Button
+              variant="default"
+              disabled={pending}
+              onClick={() => setDetailEditor(null)}
+            >
+              キャンセル
+            </Button>
+            <Button
+              loading={pending}
+              disabled={pending || loadError}
+              onClick={saveDetailDraft}
+            >
+              変更を反映
+            </Button>
           </ActionPanel.End>
         </ActionPanel>
       </Modal.Footer>
-
     </Modal>
   )
 }

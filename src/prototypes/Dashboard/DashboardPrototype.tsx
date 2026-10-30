@@ -1,7 +1,9 @@
 "use client"
 
-import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
-
+import {
+  Box as ScrollPaddingBox,
+  ScrollArea as PageScrollArea,
+} from "@mantine/core"
 
 import { GroupItem } from "@/components/GroupItem"
 
@@ -433,118 +435,125 @@ export function DashboardPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
-      <PageWidth variant="contained">
-        <Stack gap="xl" w="100%">
-          <Stack gap="sm">
-            <Group justify="space-between" align="center" wrap="nowrap">
-              <Title order={3} size="h4">
-                最近のメディア
-              </Title>
-              {initialState === "default" && (
-                <Button
-                  component="a"
-                  href={collectionHref("media")}
-                  disabled={!collectionHref("media")}
-                  variant="subtle"
-                  size="compact-sm"
-                >
-                  すべて見る
-                </Button>
-              )}
-            </Group>
-            {initialState === "default" ? (
-              <RecentMediaCarousel />
-            ) : (
-              <Center
-                mih={132}
-                px="md"
-                style={{
-                  border: "1px solid var(--mantine-color-default-border)",
-                  borderRadius: "var(--mantine-radius-md)",
-                }}
-              >
-                <Stack align="center" gap={8}>
-                  <Group gap={6}>
-                    <IconPhoto
-                      size={20}
-                      stroke={1.5}
-                      color="var(--mantine-color-dimmed)"
-                      aria-hidden="true"
-                    />
-                    <Text size="sm" c="dimmed" fw={500}>
-                      メディアはまだありません
-                    </Text>
-                  </Group>
-                  <Button
-                    component="a"
-                    href={collectionHref("media")}
-                    disabled={!collectionHref("media")}
-                    variant="subtle"
-                    size="compact-sm"
+      <PageScrollArea
+        type="hover"
+        h="100%"
+        w="100%"
+        style={{ overscrollBehavior: "contain" }}
+      >
+        <ScrollPaddingBox pt="lg">
+          <PageWidth variant="contained">
+            <Stack gap="xl" w="100%">
+              <Stack gap="sm">
+                <Group justify="space-between" align="center" wrap="nowrap">
+                  <Title order={3} size="h4">
+                    最近のメディア
+                  </Title>
+                  {initialState === "default" && (
+                    <Button
+                      component="a"
+                      href={collectionHref("media")}
+                      disabled={!collectionHref("media")}
+                      variant="subtle"
+                      size="compact-sm"
+                    >
+                      すべて見る
+                    </Button>
+                  )}
+                </Group>
+                {initialState === "default" ? (
+                  <RecentMediaCarousel />
+                ) : (
+                  <Center
+                    mih={132}
+                    px="md"
+                    style={{
+                      border: "1px solid var(--mantine-color-default-border)",
+                      borderRadius: "var(--mantine-radius-md)",
+                    }}
                   >
-                    メディアへ移動
-                  </Button>
-                </Stack>
-              </Center>
-            )}
-          </Stack>
-          <Stack gap="sm">
-            <Group justify="space-between" align="center" wrap="nowrap">
-              <Title order={3} size="h4">
-                最近のGroup
-              </Title>
-              {initialState === "default" && (
-                <Button
-                  component="a"
-                  href={collectionHref("groups")}
-                  disabled={!collectionHref("groups")}
-                  variant="subtle"
-                  size="compact-sm"
-                >
-                  すべて見る
-                </Button>
-              )}
-            </Group>
-            {initialState === "default" ? (
-              <RecentGroups />
-            ) : (
-              <Center
-                mih={132}
-                px="md"
-                style={{
-                  border: "1px solid var(--mantine-color-default-border)",
-                  borderRadius: "var(--mantine-radius-md)",
-                }}
-              >
-                <Stack align="center" gap={8}>
-                  <Group gap={6}>
-                    <IconFolder
-                      size={20}
-                      stroke={1.5}
-                      color="var(--mantine-color-dimmed)"
-                      aria-hidden="true"
-                    />
-                    <Text size="sm" c="dimmed" fw={500}>
-                      Groupはまだありません
-                    </Text>
-                  </Group>
-                  <Button
-                    component="a"
-                    href={collectionHref("groups")}
-                    disabled={!collectionHref("groups")}
-                    variant="subtle"
-                    size="compact-sm"
+                    <Stack align="center" gap={8}>
+                      <Group gap={6}>
+                        <IconPhoto
+                          size={20}
+                          stroke={1.5}
+                          color="var(--mantine-color-dimmed)"
+                          aria-hidden="true"
+                        />
+                        <Text size="sm" c="dimmed" fw={500}>
+                          メディアはまだありません
+                        </Text>
+                      </Group>
+                      <Button
+                        component="a"
+                        href={collectionHref("media")}
+                        disabled={!collectionHref("media")}
+                        variant="subtle"
+                        size="compact-sm"
+                      >
+                        メディアへ移動
+                      </Button>
+                    </Stack>
+                  </Center>
+                )}
+              </Stack>
+              <Stack gap="sm">
+                <Group justify="space-between" align="center" wrap="nowrap">
+                  <Title order={3} size="h4">
+                    最近のGroup
+                  </Title>
+                  {initialState === "default" && (
+                    <Button
+                      component="a"
+                      href={collectionHref("groups")}
+                      disabled={!collectionHref("groups")}
+                      variant="subtle"
+                      size="compact-sm"
+                    >
+                      すべて見る
+                    </Button>
+                  )}
+                </Group>
+                {initialState === "default" ? (
+                  <RecentGroups />
+                ) : (
+                  <Center
+                    mih={132}
+                    px="md"
+                    style={{
+                      border: "1px solid var(--mantine-color-default-border)",
+                      borderRadius: "var(--mantine-radius-md)",
+                    }}
                   >
-                    Groupへ移動
-                  </Button>
-                </Stack>
-              </Center>
-            )}
-          </Stack>
-        </Stack>
-      </PageWidth>
-          </ScrollPaddingBox></PageScrollArea>
-</PrototypeApplicationShell>
+                    <Stack align="center" gap={8}>
+                      <Group gap={6}>
+                        <IconFolder
+                          size={20}
+                          stroke={1.5}
+                          color="var(--mantine-color-dimmed)"
+                          aria-hidden="true"
+                        />
+                        <Text size="sm" c="dimmed" fw={500}>
+                          Groupはまだありません
+                        </Text>
+                      </Group>
+                      <Button
+                        component="a"
+                        href={collectionHref("groups")}
+                        disabled={!collectionHref("groups")}
+                        variant="subtle"
+                        size="compact-sm"
+                      >
+                        Groupへ移動
+                      </Button>
+                    </Stack>
+                  </Center>
+                )}
+              </Stack>
+            </Stack>
+          </PageWidth>
+        </ScrollPaddingBox>
+      </PageScrollArea>
+    </PrototypeApplicationShell>
   )
 }

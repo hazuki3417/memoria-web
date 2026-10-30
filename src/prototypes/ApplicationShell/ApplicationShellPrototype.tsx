@@ -1,7 +1,9 @@
 "use client"
 
-import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
-
+import {
+  Box as ScrollPaddingBox,
+  ScrollArea as PageScrollArea,
+} from "@mantine/core"
 
 import { Box, Paper, Stack, Text } from "@mantine/core"
 import { useState } from "react"
@@ -75,34 +77,41 @@ export function ApplicationShellPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
-      <Box maw={1120} mx="auto" w="100%">
-        <h1
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            padding: 0,
-            margin: -1,
-            overflow: "hidden",
-            clip: "rect(0, 0, 0, 0)",
-            whiteSpace: "nowrap",
-            border: 0,
-          }}
-        >
-          {navigationItems.find((item) => item.id === section)?.label}
-        </h1>
-        <Paper withBorder radius="md" p="xl" mih={320}>
-          <Stack align="center" justify="center" mih={260} gap="xs">
-            <Text fw={600}>コンテンツ領域</Text>
-            <Text c="dimmed" ta="center" size="sm">
-              このStoryでは共通Application
-              Shellのみを検討します。画面固有のデータや操作は接続していません。
-            </Text>
-          </Stack>
-        </Paper>
-      </Box>
-          </ScrollPaddingBox></PageScrollArea>
-</PrototypeApplicationShell>
+      <PageScrollArea
+        type="hover"
+        h="100%"
+        w="100%"
+        style={{ overscrollBehavior: "contain" }}
+      >
+        <ScrollPaddingBox pt="lg">
+          <Box maw={1120} mx="auto" w="100%">
+            <h1
+              style={{
+                position: "absolute",
+                width: 1,
+                height: 1,
+                padding: 0,
+                margin: -1,
+                overflow: "hidden",
+                clip: "rect(0, 0, 0, 0)",
+                whiteSpace: "nowrap",
+                border: 0,
+              }}
+            >
+              {navigationItems.find((item) => item.id === section)?.label}
+            </h1>
+            <Paper withBorder radius="md" p="xl" mih={320}>
+              <Stack align="center" justify="center" mih={260} gap="xs">
+                <Text fw={600}>コンテンツ領域</Text>
+                <Text c="dimmed" ta="center" size="sm">
+                  このStoryでは共通Application
+                  Shellのみを検討します。画面固有のデータや操作は接続していません。
+                </Text>
+              </Stack>
+            </Paper>
+          </Box>
+        </ScrollPaddingBox>
+      </PageScrollArea>
+    </PrototypeApplicationShell>
   )
 }

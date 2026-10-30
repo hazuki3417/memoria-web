@@ -21,7 +21,11 @@ export function ErrorState({
   onRetry,
 }: ErrorStateProps) {
   const retryAction = onRetry ? (
-    <Button size={variant === "inline" ? "xs" : undefined} variant="default" onClick={onRetry}>
+    <Button
+      size={variant === "inline" ? "xs" : undefined}
+      variant="default"
+      onClick={onRetry}
+    >
       再試行
     </Button>
   ) : undefined

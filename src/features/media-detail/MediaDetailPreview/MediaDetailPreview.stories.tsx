@@ -74,7 +74,10 @@ export const Processing: Story = {
 export const DeliveryError: Story = {
   name: "Visual · Image Error",
   tags: ["visual"],
-  args: { readState: { kind: "delivery-error", retryable: true }, onRetryImage: () => undefined },
+  args: {
+    readState: { kind: "delivery-error", retryable: true },
+    onRetryImage: () => undefined,
+  },
 }
 
 /** The canonical Preview must render ID-only loading without a listing MediaItem. */

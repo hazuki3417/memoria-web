@@ -19,18 +19,30 @@ const SAVE_COMMUNITY_SETTINGS = gql`
 `
 
 type SettingsResult = {
-  community: { id: string; mySettings: { accentColor: string; alias: string | null } } | null
+  community: {
+    id: string
+    mySettings: { accentColor: string; alias: string | null }
+  } | null
 }
 type SaveResult = {
-  updateCommunitySettings: { settings: { accentColor: string; alias: string | null } }
+  updateCommunitySettings: {
+    settings: { accentColor: string; alias: string | null }
+  }
 }
 const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 
-export function ConnectedCommunityPreferences({ communityId }: { communityId: string }) {
-  const { data, loading, error, refetch } = useQuery<SettingsResult>(COMMUNITY_SETTINGS, {
-    variables: { communityId },
-    fetchPolicy: "cache-and-network",
-  })
+export function ConnectedCommunityPreferences({
+  communityId,
+}: {
+  communityId: string
+}) {
+  const { data, loading, error, refetch } = useQuery<SettingsResult>(
+    COMMUNITY_SETTINGS,
+    {
+      variables: { communityId },
+      fetchPolicy: "cache-and-network",
+    },
+  )
   const client = useApolloClient()
   const [save] = useMutation<SaveResult>(SAVE_COMMUNITY_SETTINGS)
   const [accent, setAccent] = useState<string | null>(null)
@@ -43,7 +55,9 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
 
   useEffect(() => {
     active.current = true
-    return () => { active.current = false }
+    return () => {
+      active.current = false
+    }
   }, [])
 
   // A server refresh must not replace a newer unsaved user selection.
@@ -55,31 +69,37 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
     }
   }, [data])
 
-  const applyContextAccent = useCallback((value: string) => {
-    const id = client.cache.identify({ __typename: "Community", id: communityId })
-    if (!id) return
-    const fragment = gql`
+  const applyContextAccent = useCallback(
+    (value: string) => {
+      const id = client.cache.identify({
+        __typename: "Community",
+        id: communityId,
+      })
+      if (!id) return
+      const fragment = gql`
       fragment CommunityAccentCache on Community {
         mySettings { accentColor alias }
       }
     `
-    const previous = client.cache.readFragment<{
-      mySettings: { accentColor: string; alias: string | null }
-    }>({ id, fragment })
-    if (!previous) return
-    client.cache.writeFragment({
-      id,
-      fragment,
-      data: {
-        __typename: "Community",
-        mySettings: {
-          __typename: "CommunitySettings",
-          accentColor: value,
-          alias: previous.mySettings.alias,
+      const previous = client.cache.readFragment<{
+        mySettings: { accentColor: string; alias: string | null }
+      }>({ id, fragment })
+      if (!previous) return
+      client.cache.writeFragment({
+        id,
+        fragment,
+        data: {
+          __typename: "Community",
+          mySettings: {
+            __typename: "CommunitySettings",
+            accentColor: value,
+            alias: previous.mySettings.alias,
+          },
         },
-      },
-    })
-  }, [client, communityId])
+      })
+    },
+    [client, communityId],
+  )
 
   const flush = useCallback(async () => {
     if (inFlight.current || desired.current === null) return
@@ -90,9 +110,12 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
         const next = desired.current
         desired.current = null
         const result = await save({
-          variables: { input: { communityId, accentColor: next.toUpperCase() } },
+          variables: {
+            input: { communityId, accentColor: next.toUpperCase() },
+          },
         })
-        const confirmed = result.data?.updateCommunitySettings?.settings?.accentColor
+        const confirmed =
+          result.data?.updateCommunitySettings?.settings?.accentColor
         if (!confirmed || !isHex(confirmed)) throw new Error("Save unconfirmed")
         saved.current = confirmed
         if (desired.current === null) applyContextAccent(confirmed)
@@ -123,7 +146,8 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
     void flush()
   }
 
-  if (loading && !data?.community) return <Loader aria-label="Community環境設定を読み込み中" />
+  if (loading && !data?.community)
+    return <Loader aria-label="Community環境設定を読み込み中" />
   if (!data?.community)
     return (
       <Stack>
@@ -154,7 +178,10 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
                 throw new Error("Community alias save unconfirmed")
               }
               // Mutationの成立を確認した時点で、ShellとPreferencesの同じ参照元を更新する。
-              const id = client.cache.identify({ __typename: "Community", id: communityId })
+              const id = client.cache.identify({
+                __typename: "Community",
+                id: communityId,
+              })
               if (id) {
                 const fragment = gql`
                   fragment CommunityAliasCache on Community {
@@ -180,9 +207,11 @@ export function ConnectedCommunityPreferences({ communityId }: { communityId: st
                 }
               }
               // 再取得の通信失敗は確定済みMutationを失敗扱いしない。
-              void client.refetchQueries({
-                include: [MyCommunitiesDocument, COMMUNITY_SETTINGS],
-              }).catch(() => undefined)
+              void client
+                .refetchQueries({
+                  include: [MyCommunitiesDocument, COMMUNITY_SETTINGS],
+                })
+                .catch(() => undefined)
             }}
           />
         }

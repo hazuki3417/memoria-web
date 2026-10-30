@@ -21,7 +21,12 @@ function ModalRoot({ children, ...props }: ModalProps) {
 }
 
 function ModalBody({ className, ...props }: RegionProps) {
-  return <div className={[styles.body, className].filter(Boolean).join(" ")} {...props} />
+  return (
+    <div
+      className={[styles.body, className].filter(Boolean).join(" ")}
+      {...props}
+    />
+  )
 }
 
 function ModalDivider() {
@@ -29,7 +34,12 @@ function ModalDivider() {
 }
 
 function ModalFooter({ className, ...props }: RegionProps) {
-  return <div className={[styles.footer, className].filter(Boolean).join(" ")} {...props} />
+  return (
+    <div
+      className={[styles.footer, className].filter(Boolean).join(" ")}
+      {...props}
+    />
+  )
 }
 
 export const Modal = Object.assign(ModalRoot, {

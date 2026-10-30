@@ -3,7 +3,10 @@
 import { Avatar, Button, Menu, Skeleton } from "@mantine/core"
 import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react"
 import type { ApplicationContextOption } from "../types"
-import { AccountMenuProfile, type AccountMenuProfileState } from "./AccountMenuProfile/AccountMenuProfile"
+import {
+  AccountMenuProfile,
+  type AccountMenuProfileState,
+} from "./AccountMenuProfile/AccountMenuProfile"
 
 export function ApplicationAccountMenu({
   user,
@@ -44,7 +47,7 @@ export function ApplicationAccountMenu({
           <Skeleton visible={profile.status === "loading"} circle>
             <Avatar size={24} radius="xl">
               {profile.status === "ready" ? (
-                profile.avatarLabel ?? profile.displayName.slice(0, 1)
+                (profile.avatarLabel ?? profile.displayName.slice(0, 1))
               ) : (
                 <IconUser size={16} aria-hidden="true" />
               )}

@@ -15,4 +15,3 @@ export const Default: Story = {
   tags: ["visual"],
   args: { initialContext: "personal" },
 }
-

@@ -20,7 +20,16 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = { tags: ["visual"] }
-export const Edited: Story = { args: { draft: "新しいCommunity名", dirty: true }, tags: ["visual"] }
-export const Invalid: Story = { args: { draft: "", invalid: true, dirty: true }, tags: ["visual"] }
-export const Saving: Story = { args: { dirty: true, savingName: true }, tags: ["visual"] }
+export const Edited: Story = {
+  args: { draft: "新しいCommunity名", dirty: true },
+  tags: ["visual"],
+}
+export const Invalid: Story = {
+  args: { draft: "", invalid: true, dirty: true },
+  tags: ["visual"],
+}
+export const Saving: Story = {
+  args: { dirty: true, savingName: true },
+  tags: ["visual"],
+}
 export const ReadOnly: Story = { args: { isAdmin: false }, tags: ["visual"] }

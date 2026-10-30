@@ -1,6 +1,12 @@
 "use client"
 
-import { useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react"
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from "react"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"

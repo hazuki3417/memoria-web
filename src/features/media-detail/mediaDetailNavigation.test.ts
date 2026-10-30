@@ -7,14 +7,20 @@ import {
   mediaDetailUrl,
 } from "./mediaDetailNavigation"
 
-const origin = { pathname: "/media", searchWithoutMediaId: "?tag=travel", hash: "#gallery" }
+const origin = {
+  pathname: "/media",
+  searchWithoutMediaId: "?tag=travel",
+  hash: "#gallery",
+}
 
 describe("Media Detail URL contract", () => {
   it("adds or replaces only mediaId while preserving other query and fragment", () => {
-    expect(mediaDetailUrl("/media", "?tag=a&mediaId=old&tag=b", "#foo", "next")).toBe(
-      "/media?tag=a&tag=b&mediaId=next#foo",
+    expect(
+      mediaDetailUrl("/media", "?tag=a&mediaId=old&tag=b", "#foo", "next"),
+    ).toBe("/media?tag=a&tag=b&mediaId=next#foo")
+    expect(mediaDetailUrl("/media", "?tag=a&mediaId=old", "#foo", null)).toBe(
+      "/media?tag=a#foo",
     )
-    expect(mediaDetailUrl("/media", "?tag=a&mediaId=old", "#foo", null)).toBe("/media?tag=a#foo")
   })
   it("ignores missing, repeated, or invalid selected identifiers", () => {
     expect(getMediaDetailId("?mediaId=id")).toBe("id")
@@ -39,7 +45,10 @@ describe("Media navigation immutable snapshot", () => {
     ids.push("d")
     expect(snapshot.ids).toEqual(["a", "b", "c"])
     expect(getMediaNavigation(snapshot, "b", false)).toEqual({
-      position: 1, count: 3, previousId: "a", nextId: "c",
+      position: 1,
+      count: 3,
+      previousId: "a",
+      nextId: "c",
     })
     expect(getMediaNavigation(snapshot, "a", false).previousId).toBeNull()
     expect(getMediaNavigation(snapshot, "c", false).nextId).toBeNull()
@@ -47,7 +56,9 @@ describe("Media navigation immutable snapshot", () => {
     expect(getMediaNavigation(snapshot, "a", true).previousId).toBe("c")
   })
   it("disallows repeated IDs, absent selected IDs and empty inputs", () => {
-    expect(() => createMediaNavigationSnapshot(["a", "a"], "a", origin)).toThrow()
+    expect(() =>
+      createMediaNavigationSnapshot(["a", "a"], "a", origin),
+    ).toThrow()
     expect(() => createMediaNavigationSnapshot(["a"], "b", origin)).toThrow()
     expect(() => createMediaNavigationSnapshot([""], "", origin)).toThrow()
   })

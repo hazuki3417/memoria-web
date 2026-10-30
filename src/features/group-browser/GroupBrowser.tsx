@@ -76,7 +76,10 @@ export type GroupBrowserProps = {
   onRetryDiscoveryPage?: () => void
   onDiscoveryEndVisible?: () => void
   onMediaEndVisible?: () => void
-  onOpenMediaDetail?: (mediaId: string, orderedLoadedMediaIds: readonly string[]) => void
+  onOpenMediaDetail?: (
+    mediaId: string,
+    orderedLoadedMediaIds: readonly string[],
+  ) => void
 }
 
 export function GroupBrowser({
@@ -155,7 +158,10 @@ export function GroupBrowser({
     const availableIndex = groupMediaItems.findIndex((item) => item.id === id)
     if (availableIndex < 0) return
     if (onOpenMediaDetail) {
-      onOpenMediaDetail(groupMediaItems[availableIndex].id, groupMediaItems.map(({ id }) => id))
+      onOpenMediaDetail(
+        groupMediaItems[availableIndex].id,
+        groupMediaItems.map(({ id }) => id),
+      )
     } else {
       setMediaDetailIndex(availableIndex)
     }
@@ -208,7 +214,6 @@ export function GroupBrowser({
     <GroupMediaPageFeedback state={mediaPageState} onRetry={onRetryMediaPage} />
   )
 
-
   const submitEdit = async () => {
     if (!selected || !validGroupName(draftName)) return
     if (conflictNeedsReview || !detailsReady) return
@@ -246,7 +251,6 @@ export function GroupBrowser({
     }
     if (result === "ok") edit.close()
   }
-
 
   const confirmDelete = async () => {
     if (!selected) return
@@ -322,32 +326,32 @@ export function GroupBrowser({
         <Box h="calc(100vh - 88px)" style={{ overflow: "hidden" }}>
           {compactView === "groups" ? (
             <GroupBrowserListPane
-                compact={true}
-                query={query}
-                onQueryChange={setQuery}
-                onSearch={() => setAppliedQuery(query)}
-                searchRef={compactSearchRef}
-                hideManagementActions={hideManagementActions}
-                canManage={canManage}
-                onCreate={openCreate}
-                visibleGroups={visibleGroups}
-                discoveryState={discoveryState}
-                groupsLoaded={groupsData !== undefined}
-                selectedId={selectedId}
-                mediaItemsData={mediaItemsData}
-                compactGroupItemRefs={compactGroupItemRefs}
-                onOpenDetail={openDetail}
-                groupCount={allGroups.length}
-                appliedQuery={appliedQuery}
-                onClearSearch={() => {
-                  setQuery("")
-                  setAppliedQuery("")
-                }}
-                onRetryDiscovery={onRetryDiscovery}
-                onRetryDiscoveryPage={onRetryDiscoveryPage}
-                discoveryPageState={discoveryPageState}
-                onDiscoveryEndVisible={onDiscoveryEndVisible}
-              />
+              compact={true}
+              query={query}
+              onQueryChange={setQuery}
+              onSearch={() => setAppliedQuery(query)}
+              searchRef={compactSearchRef}
+              hideManagementActions={hideManagementActions}
+              canManage={canManage}
+              onCreate={openCreate}
+              visibleGroups={visibleGroups}
+              discoveryState={discoveryState}
+              groupsLoaded={groupsData !== undefined}
+              selectedId={selectedId}
+              mediaItemsData={mediaItemsData}
+              compactGroupItemRefs={compactGroupItemRefs}
+              onOpenDetail={openDetail}
+              groupCount={allGroups.length}
+              appliedQuery={appliedQuery}
+              onClearSearch={() => {
+                setQuery("")
+                setAppliedQuery("")
+              }}
+              onRetryDiscovery={onRetryDiscovery}
+              onRetryDiscoveryPage={onRetryDiscoveryPage}
+              discoveryPageState={discoveryPageState}
+              onDiscoveryEndVisible={onDiscoveryEndVisible}
+            />
           ) : (
             <GroupDetailPane
               compact
@@ -378,29 +382,31 @@ export function GroupBrowser({
         >
           <SplitView.Pane id="groups" minWidth={264}>
             <GroupBrowserListPane
-                compact={false}
-                query={query}
-                onQueryChange={setQuery}
-                onSearch={() => setAppliedQuery(query)}
-                
-                hideManagementActions={hideManagementActions}
-                canManage={canManage}
-                onCreate={openCreate}
-                visibleGroups={visibleGroups}
-                discoveryState={discoveryState}
-                groupsLoaded={groupsData !== undefined}
-                selectedId={selectedId}
-                mediaItemsData={mediaItemsData}
-                compactGroupItemRefs={compactGroupItemRefs}
-                onOpenDetail={openDetail}
-                groupCount={allGroups.length}
-                appliedQuery={appliedQuery}
-                onClearSearch={() => { setQuery(""); setAppliedQuery("") }}
-                onRetryDiscovery={onRetryDiscovery}
-                onRetryDiscoveryPage={onRetryDiscoveryPage}
-                discoveryPageState={discoveryPageState}
-                onDiscoveryEndVisible={onDiscoveryEndVisible}
-              />
+              compact={false}
+              query={query}
+              onQueryChange={setQuery}
+              onSearch={() => setAppliedQuery(query)}
+              hideManagementActions={hideManagementActions}
+              canManage={canManage}
+              onCreate={openCreate}
+              visibleGroups={visibleGroups}
+              discoveryState={discoveryState}
+              groupsLoaded={groupsData !== undefined}
+              selectedId={selectedId}
+              mediaItemsData={mediaItemsData}
+              compactGroupItemRefs={compactGroupItemRefs}
+              onOpenDetail={openDetail}
+              groupCount={allGroups.length}
+              appliedQuery={appliedQuery}
+              onClearSearch={() => {
+                setQuery("")
+                setAppliedQuery("")
+              }}
+              onRetryDiscovery={onRetryDiscovery}
+              onRetryDiscoveryPage={onRetryDiscoveryPage}
+              discoveryPageState={discoveryPageState}
+              onDiscoveryEndVisible={onDiscoveryEndVisible}
+            />
           </SplitView.Pane>
 
           <SplitView.Separator
@@ -448,19 +454,21 @@ export function GroupBrowser({
           </SplitView.Pane>
         </SplitView.Root>
       )}
-      {!onOpenMediaDetail && <MediaDetailModal
-        items={groupMediaItems}
-        groupOptions={candidates}
-        groupMemberships={groupMemberships}
-        onSaveGroups={onSaveMediaGroups}
-        initialId={
-          imageDetailIndex !== null
-            ? groupMediaItems[imageDetailIndex]?.id
-            : undefined
-        }
-        onClose={() => setMediaDetailIndex(null)}
-        contextKind={contextKind}
-      />}
+      {!onOpenMediaDetail && (
+        <MediaDetailModal
+          items={groupMediaItems}
+          groupOptions={candidates}
+          groupMemberships={groupMemberships}
+          onSaveGroups={onSaveMediaGroups}
+          initialId={
+            imageDetailIndex !== null
+              ? groupMediaItems[imageDetailIndex]?.id
+              : undefined
+          }
+          onClose={() => setMediaDetailIndex(null)}
+          contextKind={contextKind}
+        />
+      )}
     </>
   )
 }

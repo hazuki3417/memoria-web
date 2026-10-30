@@ -57,7 +57,12 @@ export const Disabled: Story = {
   args: {
     items: [
       ...items,
-      { id: "restricted", label: "アクセスできません", icon: IconPhoto, disabled: true },
+      {
+        id: "restricted",
+        label: "アクセスできません",
+        icon: IconPhoto,
+        disabled: true,
+      },
     ],
   },
 }

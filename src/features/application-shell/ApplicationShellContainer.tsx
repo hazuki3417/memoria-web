@@ -11,7 +11,10 @@ import {
 import { showNotification } from "@/components/Feedback"
 import { MediaDetailUrlProvider } from "@/features/media-detail/MediaDetailUrlProvider"
 import { MediaDetailUrlController } from "@/features/media-detail/MediaDetailUrlController"
-import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
+import {
+  getCommunityDisplayName,
+  sortCommunitiesByDisplayName,
+} from "./communityDisplayName"
 import { CommunityCreateModal } from "./CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from "./useApplicationContextSelection"
 import {
@@ -61,7 +64,11 @@ export function ApplicationShellContainer({
   } = useMyCommunitiesQuery()
   const communityRefreshInFlight = useRef(false)
   const refreshCommunities = async () => {
-    if (communityRefreshInFlight.current || (communitiesLoading && !communityData)) return
+    if (
+      communityRefreshInFlight.current ||
+      (communitiesLoading && !communityData)
+    )
+      return
     communityRefreshInFlight.current = true
     try {
       await refetchCommunities()
@@ -74,16 +81,21 @@ export function ApplicationShellContainer({
   const { data: currentUserData, loading: currentUserLoading } =
     useCurrentUserQuery()
   const [createMutation] = useCreateCommunityMutation()
-  const created =
-    sortCommunitiesByDisplayName(communityData?.myCommunities.map((item) => ({
+  const created = sortCommunitiesByDisplayName(
+    communityData?.myCommunities.map((item) => ({
       id: item.id,
       label: getCommunityDisplayName(item),
       accentColor: item.mySettings.accentColor,
-    })) ?? [])
+    })) ?? [],
+  )
   const communitiesLoaded = !communitiesLoading && !!communityData
   const [createBusy, setCreateBusy] = useState(false)
-  const { contextKind, communityId, setRememberedContextKind, setRememberedCommunityId } =
-    useApplicationContextSelection(pathname)
+  const {
+    contextKind,
+    communityId,
+    setRememberedContextKind,
+    setRememberedCommunityId,
+  } = useApplicationContextSelection(pathname)
   const shellMode =
     pathname === "/settings/account/delete"
       ? "restricted-flow"
@@ -91,7 +103,9 @@ export function ApplicationShellContainer({
   const currentCreated = created.find((item) => item.id === communityId)
   const resolvedPersonalContext = {
     ...personalContext,
-    accentColor: currentUserData?.me?.preferences.personalAccentColor ?? personalContext.accentColor,
+    accentColor:
+      currentUserData?.me?.preferences.personalAccentColor ??
+      personalContext.accentColor,
   }
   const currentContext =
     contextKind === "community"
@@ -101,7 +115,8 @@ export function ApplicationShellContainer({
           label:
             currentCreated?.label ??
             (communitiesLoaded ? "Community" : "読み込み中"),
-          accentColor: currentCreated?.accentColor ?? communityContext.accentColor,
+          accentColor:
+            currentCreated?.accentColor ?? communityContext.accentColor,
         }
       : resolvedPersonalContext
   const contextLoading =
@@ -111,11 +126,12 @@ export function ApplicationShellContainer({
     !communitiesError
   const contextError =
     contextKind === "community" && !currentCreated && !!communitiesError
-  const profileStatus = currentUserData?.me && !contextLoading && !contextError
-    ? "ready"
-    : (currentUserLoading && !currentUserData?.me) || contextLoading
-      ? "loading"
-      : "error"
+  const profileStatus =
+    currentUserData?.me && !contextLoading && !contextError
+      ? "ready"
+      : (currentUserLoading && !currentUserData?.me) || contextLoading
+        ? "loading"
+        : "error"
   const activeSection = getApplicationSection(pathname)
   const navigationItems = getApplicationNavigation({
     contextKind,
@@ -289,9 +305,37 @@ export function ApplicationShellContainer({
         <MediaDetailUrlProvider>
           {children}
           {contextKind === "community" && communityId ? (
-            <MediaDetailUrlController scope={{ type: "COMMUNITY", communityId }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} dateFormat={currentUserData?.me?.preferences.dateFormat} fileSizeUnit={currentUserData?.me?.preferences.fileSizeUnit} />
+            <MediaDetailUrlController
+              scope={{ type: "COMMUNITY", communityId }}
+              wrap={
+                currentUserData?.me?.preferences.mediaDetailNavigationWrap ??
+                false
+              }
+              initialInfoWide={
+                currentUserData?.me?.preferences.mediaDetailInitialInfoWide
+              }
+              initialInfoMedium={
+                currentUserData?.me?.preferences.mediaDetailInitialInfoMedium
+              }
+              dateFormat={currentUserData?.me?.preferences.dateFormat}
+              fileSizeUnit={currentUserData?.me?.preferences.fileSizeUnit}
+            />
           ) : contextKind === "personal" ? (
-            <MediaDetailUrlController scope={{ type: "PERSONAL" }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} dateFormat={currentUserData?.me?.preferences.dateFormat} fileSizeUnit={currentUserData?.me?.preferences.fileSizeUnit} />
+            <MediaDetailUrlController
+              scope={{ type: "PERSONAL" }}
+              wrap={
+                currentUserData?.me?.preferences.mediaDetailNavigationWrap ??
+                false
+              }
+              initialInfoWide={
+                currentUserData?.me?.preferences.mediaDetailInitialInfoWide
+              }
+              initialInfoMedium={
+                currentUserData?.me?.preferences.mediaDetailInitialInfoMedium
+              }
+              dateFormat={currentUserData?.me?.preferences.dateFormat}
+              fileSizeUnit={currentUserData?.me?.preferences.fileSizeUnit}
+            />
           ) : null}
         </MediaDetailUrlProvider>
       </ApplicationShell>

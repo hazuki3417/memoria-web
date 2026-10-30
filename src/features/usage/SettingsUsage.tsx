@@ -90,19 +90,19 @@ export function SettingsUsage({
                 value: "size",
                 label: (
                   <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <IconDatabase
-                        size={15}
-                        stroke={1.75}
-                        aria-hidden="true"
-                        style={{ display: "block" }}
-                      />
-                      <VisuallyHidden>容量</VisuallyHidden>
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <IconDatabase
+                      size={15}
+                      stroke={1.75}
+                      aria-hidden="true"
+                      style={{ display: "block" }}
+                    />
+                    <VisuallyHidden>容量</VisuallyHidden>
                   </span>
                 ),
               },
@@ -110,20 +110,20 @@ export function SettingsUsage({
                 value: "percent",
                 label: (
                   <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        minWidth: 18,
-                      }}
-                    >
-                      <IconPercentage
-                        size={15}
-                        stroke={1.75}
-                        aria-hidden="true"
-                        style={{ display: "block" }}
-                      />
-                      <VisuallyHidden>割合</VisuallyHidden>
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 18,
+                    }}
+                  >
+                    <IconPercentage
+                      size={15}
+                      stroke={1.75}
+                      aria-hidden="true"
+                      style={{ display: "block" }}
+                    />
+                    <VisuallyHidden>割合</VisuallyHidden>
                   </span>
                 ),
               },

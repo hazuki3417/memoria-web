@@ -32,7 +32,7 @@ export function AccountMenuProfile({ state }: AccountMenuProfileProps) {
         <Skeleton visible={loading} circle>
           <Avatar size={32} radius="xl">
             {ready ? (
-              state.avatarLabel ?? state.displayName.slice(0, 1)
+              (state.avatarLabel ?? state.displayName.slice(0, 1))
             ) : (
               <IconUser size={18} aria-hidden="true" />
             )}

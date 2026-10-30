@@ -11,7 +11,11 @@ const meta = {
     opened: true,
     onClose: () => undefined,
     title: "Modal title",
-    children: <Modal.Body><Text size="sm">Modal content</Text></Modal.Body>,
+    children: (
+      <Modal.Body>
+        <Text size="sm">Modal content</Text>
+      </Modal.Body>
+    ),
     transitionProps: { duration: 0 },
   },
 } satisfies Meta<typeof Modal>
@@ -56,7 +60,9 @@ export const WithDivider: Story = {
         <Modal.Footer>
           <ActionPanel>
             <ActionPanel.Start>
-              <Button variant="subtle" color="red">削除</Button>
+              <Button variant="subtle" color="red">
+                削除
+              </Button>
             </ActionPanel.Start>
             <ActionPanel.Center>
               <Button variant="default">キャンセル</Button>

@@ -69,7 +69,9 @@ export const Submit: Story = {
   tags: ["interaction"],
   args: { name: "新しいGroup" },
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Groupを作成" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Groupを作成" }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "作成" }))
     await expect(args.onSubmit).toHaveBeenCalledTimes(1)
     await expect(args.onClose).not.toHaveBeenCalled()

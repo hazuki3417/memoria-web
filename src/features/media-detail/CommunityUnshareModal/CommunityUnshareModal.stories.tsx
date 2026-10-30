@@ -25,7 +25,11 @@ export const Cancel: Story = {
   name: "Interaction · Cancel",
   tags: ["interaction"],
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Communityの共有を解除" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", {
+        name: "Communityの共有を解除",
+      }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await expect(args.setUnshareTarget).toHaveBeenCalledTimes(1)
     await expect(args.removeCommunityShare).not.toHaveBeenCalled()
@@ -35,9 +39,13 @@ export const Cancel: Story = {
 export const Confirm: Story = {
   name: "Interaction · Confirm",
   tags: ["interaction"],
-  args: {  },
+  args: {},
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Communityの共有を解除" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", {
+        name: "Communityの共有を解除",
+      }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "共有解除" }))
     await expect(args.removeCommunityShare).toHaveBeenCalledTimes(1)
     await expect(args.setUnshareTarget).not.toHaveBeenCalled()

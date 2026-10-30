@@ -32,10 +32,21 @@ export function CommunitySettingsRoute({
   usageContent?: ReactNode
 }) {
   const router = useRouter()
-  const { data: accentData, loading: accentLoading, error: accentError } = useMyCommunitiesQuery()
-  const activeMembership = accentData?.myCommunities.find((item) => item.id === communityId)
+  const {
+    data: accentData,
+    loading: accentLoading,
+    error: accentError,
+  } = useMyCommunitiesQuery()
+  const activeMembership = accentData?.myCommunities.find(
+    (item) => item.id === communityId,
+  )
   const communityAccentColor = activeMembership?.mySettings.accentColor
-  const membershipLost = section === "preferences" && !accentLoading && !accentError && !!accentData && !activeMembership
+  const membershipLost =
+    section === "preferences" &&
+    !accentLoading &&
+    !accentError &&
+    !!accentData &&
+    !activeMembership
   useEffect(() => {
     if (membershipLost) router.replace("/dashboard")
   }, [membershipLost, router])
@@ -55,7 +66,11 @@ export function CommunitySettingsRoute({
     (name === null || (requiresMembers && members === null))
 
   if (membershipLost)
-    return <LoadingBoundary loading label="Communityの利用権限を確認中">{null}</LoadingBoundary>
+    return (
+      <LoadingBoundary loading label="Communityの利用権限を確認中">
+        {null}
+      </LoadingBoundary>
+    )
   if (loadError)
     return (
       <Text c="red">
@@ -85,7 +100,11 @@ export function CommunitySettingsRoute({
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
       usageContent={usageContent}
-      preferencesContent={section === "preferences" ? <ConnectedCommunityPreferences communityId={communityId} /> : undefined}
+      preferencesContent={
+        section === "preferences" ? (
+          <ConnectedCommunityPreferences communityId={communityId} />
+        ) : undefined
+      }
       onRemoveMember={async (userId) => {
         try {
           const result = await removeMember({

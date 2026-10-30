@@ -43,13 +43,17 @@ export function MediaDetailGroupsSection({
             ({values.length})
           </Text>
         </Group>
-        {(!readOnly || onEditGroups) && <Button
-          size="compact-xs"
-          variant="subtle"
-          onClick={() => onEditGroups ? onEditGroups() : openDetailEditor("groups")}
-        >
-          編集
-        </Button>}
+        {(!readOnly || onEditGroups) && (
+          <Button
+            size="compact-xs"
+            variant="subtle"
+            onClick={() =>
+              onEditGroups ? onEditGroups() : openDetailEditor("groups")
+            }
+          >
+            編集
+          </Button>
+        )}
       </Group>
       <Group gap={6}>
         {values.length === 0 ? (

@@ -19,7 +19,9 @@ export type MediaDetailNavigation = Readonly<{
 }>
 
 export function getMediaDetailId(search: string): string | null {
-  const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search)
+  const params = new URLSearchParams(
+    search.startsWith("?") ? search.slice(1) : search,
+  )
   const ids = params.getAll("mediaId")
   if (ids.length !== 1) return null
   const id = ids[0].trim()
@@ -32,7 +34,9 @@ export function mediaDetailUrl(
   hash: string,
   mediaId: string | null,
 ): string {
-  const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search)
+  const params = new URLSearchParams(
+    search.startsWith("?") ? search.slice(1) : search,
+  )
   params.delete("mediaId")
   if (mediaId) params.set("mediaId", mediaId)
   const query = params.toString()
@@ -54,7 +58,10 @@ export function createMediaNavigationSnapshot(
   if (unique.size !== orderedLoadedMediaIds.length) {
     throw new Error("Media navigation IDs must be unique")
   }
-  return Object.freeze({ ids: Object.freeze([...orderedLoadedMediaIds]), origin: Object.freeze({ ...origin }) })
+  return Object.freeze({
+    ids: Object.freeze([...orderedLoadedMediaIds]),
+    origin: Object.freeze({ ...origin }),
+  })
 }
 
 export function getMediaNavigation(
@@ -67,18 +74,35 @@ export function getMediaNavigation(
   }
   const position = snapshot.ids.indexOf(currentId)
   if (position < 0) {
-    return { position: null, count: snapshot.ids.length, previousId: null, nextId: null }
+    return {
+      position: null,
+      count: snapshot.ids.length,
+      previousId: null,
+      nextId: null,
+    }
   }
   const count = snapshot.ids.length
   return {
     position,
     count,
-    previousId: position > 0 ? snapshot.ids[position - 1] : wrap && count > 1 ? snapshot.ids[count - 1] : null,
-    nextId: position < count - 1 ? snapshot.ids[position + 1] : wrap && count > 1 ? snapshot.ids[0] : null,
+    previousId:
+      position > 0
+        ? snapshot.ids[position - 1]
+        : wrap && count > 1
+          ? snapshot.ids[count - 1]
+          : null,
+    nextId:
+      position < count - 1
+        ? snapshot.ids[position + 1]
+        : wrap && count > 1
+          ? snapshot.ids[0]
+          : null,
   }
 }
 
 export function isMediaDetailRoute(pathname: string): boolean {
-  return /^\/(?:dashboard|media|groups)(?:\/|$)/.test(pathname) ||
+  return (
+    /^\/(?:dashboard|media|groups)(?:\/|$)/.test(pathname) ||
     /^\/communities\/[^/]+\/(?:dashboard|media|groups)(?:\/|$)/.test(pathname)
+  )
 }

@@ -21,7 +21,8 @@ export function MediaBrowserDeleteModal({
     <Modal opened={opened} onClose={onClose} title="Mediaを削除" size="md">
       <Modal.Body>
         <Text size="sm">
-          選択した{selectedCount}件のMediaを削除します。削除したMediaは復元できません。
+          選択した{selectedCount}
+          件のMediaを削除します。削除したMediaは復元できません。
         </Text>
       </Modal.Body>
       <Modal.Footer>

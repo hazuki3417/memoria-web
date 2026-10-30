@@ -1,7 +1,9 @@
 "use client"
 
-import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
-
+import {
+  Box as ScrollPaddingBox,
+  ScrollArea as PageScrollArea,
+} from "@mantine/core"
 
 import {
   Badge,
@@ -427,238 +429,253 @@ export function MediaUploadPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <PageScrollArea type="hover" h="100%" w="100%" style={{ overscrollBehavior: "contain" }}><ScrollPaddingBox pt="lg">
-      <Box maw={1120} mx="auto" w="100%" pb={88}>
-        <Stack gap="lg">
-          <Paper
-            withBorder
-            radius="md"
-            p={files.length === 0 ? "xl" : "md"}
-            style={{ borderStyle: "dashed" }}
-          >
-            <Stack align="center" gap="sm" py={files.length === 0 ? 36 : 4}>
-              <ThemeIcon
-                variant="light"
-                size={files.length === 0 ? 52 : 36}
-                radius="xl"
+      <PageScrollArea
+        type="hover"
+        h="100%"
+        w="100%"
+        style={{ overscrollBehavior: "contain" }}
+      >
+        <ScrollPaddingBox pt="lg">
+          <Box maw={1120} mx="auto" w="100%" pb={88}>
+            <Stack gap="lg">
+              <Paper
+                withBorder
+                radius="md"
+                p={files.length === 0 ? "xl" : "md"}
+                style={{ borderStyle: "dashed" }}
               >
-                <IconPhotoPlus size={files.length === 0 ? 28 : 20} />
-              </ThemeIcon>
-              <Box ta="center">
-                <Text fw={600}>
-                  {files.length === 0
-                    ? "画像をここにドロップ"
-                    : "画像をさらに追加"}
-                </Text>
-                <Text size="sm" c="dimmed" mt={2}>
-                  JPEG / PNG / WebP / HEIC・HEIF ・ 最大100件 ・ 1件128 MiBまで
-                </Text>
-              </Box>
-              <Button variant="default" size="sm">
-                ファイルを選択
-              </Button>
-            </Stack>
-          </Paper>
+                <Stack align="center" gap="sm" py={files.length === 0 ? 36 : 4}>
+                  <ThemeIcon
+                    variant="light"
+                    size={files.length === 0 ? 52 : 36}
+                    radius="xl"
+                  >
+                    <IconPhotoPlus size={files.length === 0 ? 28 : 20} />
+                  </ThemeIcon>
+                  <Box ta="center">
+                    <Text fw={600}>
+                      {files.length === 0
+                        ? "画像をここにドロップ"
+                        : "画像をさらに追加"}
+                    </Text>
+                    <Text size="sm" c="dimmed" mt={2}>
+                      JPEG / PNG / WebP / HEIC・HEIF ・ 最大100件 ・ 1件128
+                      MiBまで
+                    </Text>
+                  </Box>
+                  <Button variant="default" size="sm">
+                    ファイルを選択
+                  </Button>
+                </Stack>
+              </Paper>
 
-          {
-            <>
-              {invalidCount > 0 && (
-                <FeedbackAlert
-                  kind="warning"
-                  title="アップロードできないファイルがあります"
-                >
-                  問題のあるファイルは選択できません。修正または削除してからアップロードしてください。
-                </FeedbackAlert>
-              )}
-              {failedCount > 0 && (
-                <FeedbackAlert
-                  kind="warning"
-                  title={
-                    failedCount === files.length
-                      ? "アップロードに失敗しました"
-                      : "一部のアップロードに失敗しました"
-                  }
-                >
-                  成功済みのMediaは保持されています。再試行できるファイルだけを選択して送信できます。
-                </FeedbackAlert>
-              )}
-              {unknownCount > 0 && (
-                <FeedbackAlert
-                  kind="warning"
-                  title="送信結果を確認しているMediaがあります"
-                >
-                  結果が確定するまで再送信しません。重複登録を防ぐため、このMediaは選択できません。
-                </FeedbackAlert>
-              )}
-              {scenario === "processing-failure" && (
-                <FeedbackAlert
-                  kind="error"
-                  title="画像処理に失敗したMediaがあります"
-                >
-                  Media登録は完了しています。再アップロードせず、Media
-                  Browserで状態を確認できます。
-                </FeedbackAlert>
-              )}
-              {scenario === "completed" && (
-                <FeedbackAlert
-                  kind="success"
-                  title="アップロードが完了しました"
-                >
-                  すべての画像をMediaとして利用できます。
-                </FeedbackAlert>
-              )}
-
-              <Stack gap="sm">
-                <MediaTagBulkEditor
-                  selectedCount={selectedFiles.length}
-                  allSelected={
-                    selectableFiles.length > 0 &&
-                    selectedFiles.length === selectableFiles.length
-                  }
-                  indeterminate={
-                    selectedFiles.length > 0 &&
-                    selectedFiles.length !== selectableFiles.length
-                  }
-                  selectionDisabled={selectableFiles.length === 0}
-                  summaryItems={[
-                    { label: "Media登録済み", value: `${registeredCount}件` },
-                    { label: "画像処理中", value: `${processingCount}件` },
-                    { label: "完了", value: `${completedCount}件` },
-                  ]}
-                  value={bulkTag}
-                  placeholder={
-                    files.length === 0
-                      ? "追加するMediaの共通Tag"
-                      : "選択したMediaのTag"
-                  }
-                  actionDisabled={!bulkTag.trim() || selectedFiles.length === 0}
-                  selectAllLabel="アップロード可能なMediaをすべて選択"
-                  headerAction={
-                    <Button
-                      variant="subtle"
-                      color="gray"
-                      size="compact-sm"
-                      onClick={removeAll}
-                      disabled={
-                        !files.some((file) =>
-                          removableStatuses.includes(file.status),
-                        )
-                      }
-                      aria-label="すべて削除"
+              {
+                <>
+                  {invalidCount > 0 && (
+                    <FeedbackAlert
+                      kind="warning"
+                      title="アップロードできないファイルがあります"
                     >
-                      <IconTrash size={16} />
-                    </Button>
-                  }
-                  onToggleAll={() =>
-                    setSelectedIds(
-                      selectableFiles.length > 0 &&
+                      問題のあるファイルは選択できません。修正または削除してからアップロードしてください。
+                    </FeedbackAlert>
+                  )}
+                  {failedCount > 0 && (
+                    <FeedbackAlert
+                      kind="warning"
+                      title={
+                        failedCount === files.length
+                          ? "アップロードに失敗しました"
+                          : "一部のアップロードに失敗しました"
+                      }
+                    >
+                      成功済みのMediaは保持されています。再試行できるファイルだけを選択して送信できます。
+                    </FeedbackAlert>
+                  )}
+                  {unknownCount > 0 && (
+                    <FeedbackAlert
+                      kind="warning"
+                      title="送信結果を確認しているMediaがあります"
+                    >
+                      結果が確定するまで再送信しません。重複登録を防ぐため、このMediaは選択できません。
+                    </FeedbackAlert>
+                  )}
+                  {scenario === "processing-failure" && (
+                    <FeedbackAlert
+                      kind="error"
+                      title="画像処理に失敗したMediaがあります"
+                    >
+                      Media登録は完了しています。再アップロードせず、Media
+                      Browserで状態を確認できます。
+                    </FeedbackAlert>
+                  )}
+                  {scenario === "completed" && (
+                    <FeedbackAlert
+                      kind="success"
+                      title="アップロードが完了しました"
+                    >
+                      すべての画像をMediaとして利用できます。
+                    </FeedbackAlert>
+                  )}
+
+                  <Stack gap="sm">
+                    <MediaTagBulkEditor
+                      selectedCount={selectedFiles.length}
+                      allSelected={
+                        selectableFiles.length > 0 &&
                         selectedFiles.length === selectableFiles.length
-                        ? []
-                        : selectableFiles.map((file) => file.id),
-                    )
-                  }
-                  onChange={setBulkTag}
-                  onAction={applyTagAction}
-                />
-                <MediaTagEditorList>
-                  {files.map((file) => (
-                    <MediaTagEditorRow
-                      key={file.id}
-                      label={file.name}
-                      detail={file.size}
-                      tags={file.tags}
-                      selected={selectedIds.includes(file.id)}
-                      selectable={selectableStatuses.includes(file.status)}
-                      tagEditable={selectableStatuses.includes(file.status)}
-                      supplementary={<UploadStatus file={file} />}
-                      action={
+                      }
+                      indeterminate={
+                        selectedFiles.length > 0 &&
+                        selectedFiles.length !== selectableFiles.length
+                      }
+                      selectionDisabled={selectableFiles.length === 0}
+                      summaryItems={[
+                        {
+                          label: "Media登録済み",
+                          value: `${registeredCount}件`,
+                        },
+                        { label: "画像処理中", value: `${processingCount}件` },
+                        { label: "完了", value: `${completedCount}件` },
+                      ]}
+                      value={bulkTag}
+                      placeholder={
+                        files.length === 0
+                          ? "追加するMediaの共通Tag"
+                          : "選択したMediaのTag"
+                      }
+                      actionDisabled={
+                        !bulkTag.trim() || selectedFiles.length === 0
+                      }
+                      selectAllLabel="アップロード可能なMediaをすべて選択"
+                      headerAction={
                         <Button
                           variant="subtle"
                           color="gray"
                           size="compact-sm"
-                          disabled={!removableStatuses.includes(file.status)}
-                          onClick={() => {
-                            setFiles((current) =>
-                              current.filter((item) => item.id !== file.id),
+                          onClick={removeAll}
+                          disabled={
+                            !files.some((file) =>
+                              removableStatuses.includes(file.status),
                             )
-                            setSelectedIds((current) =>
-                              current.filter((id) => id !== file.id),
-                            )
-                          }}
-                          aria-label={`${file.name}を削除`}
+                          }
+                          aria-label="すべて削除"
                         >
                           <IconTrash size={16} />
                         </Button>
                       }
-                      onSelect={(checked) =>
-                        setSelectedIds((current) =>
-                          checked
-                            ? [...new Set([...current, file.id])]
-                            : current.filter((id) => id !== file.id),
+                      onToggleAll={() =>
+                        setSelectedIds(
+                          selectableFiles.length > 0 &&
+                            selectedFiles.length === selectableFiles.length
+                            ? []
+                            : selectableFiles.map((file) => file.id),
                         )
                       }
-                      onTagsChange={(tags) => updateTags(file.id, tags)}
+                      onChange={setBulkTag}
+                      onAction={applyTagAction}
                     />
-                  ))}
-                </MediaTagEditorList>
-              </Stack>
-            </>
-          }
-        </Stack>
-      </Box>
+                    <MediaTagEditorList>
+                      {files.map((file) => (
+                        <MediaTagEditorRow
+                          key={file.id}
+                          label={file.name}
+                          detail={file.size}
+                          tags={file.tags}
+                          selected={selectedIds.includes(file.id)}
+                          selectable={selectableStatuses.includes(file.status)}
+                          tagEditable={selectableStatuses.includes(file.status)}
+                          supplementary={<UploadStatus file={file} />}
+                          action={
+                            <Button
+                              variant="subtle"
+                              color="gray"
+                              size="compact-sm"
+                              disabled={
+                                !removableStatuses.includes(file.status)
+                              }
+                              onClick={() => {
+                                setFiles((current) =>
+                                  current.filter((item) => item.id !== file.id),
+                                )
+                                setSelectedIds((current) =>
+                                  current.filter((id) => id !== file.id),
+                                )
+                              }}
+                              aria-label={`${file.name}を削除`}
+                            >
+                              <IconTrash size={16} />
+                            </Button>
+                          }
+                          onSelect={(checked) =>
+                            setSelectedIds((current) =>
+                              checked
+                                ? [...new Set([...current, file.id])]
+                                : current.filter((id) => id !== file.id),
+                            )
+                          }
+                          onTagsChange={(tags) => updateTags(file.id, tags)}
+                        />
+                      ))}
+                    </MediaTagEditorList>
+                  </Stack>
+                </>
+              }
+            </Stack>
+          </Box>
 
-      <Box
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 100,
-          borderTop: "1px solid var(--mantine-color-default-border)",
-          background: "var(--mantine-color-body)",
-        }}
-      >
-        <Box maw={1120} mx="auto" px="lg" py="sm">
-          <Group justify="flex-end" wrap="nowrap">
-            <Text size="sm" c="dimmed">
-              {selectedFiles.length}件選択中
-            </Text>
-            {registeredCount > 0 &&
-            selectedFiles.length === 0 &&
-            !activeUpload ? (
-              <Button variant="default">Media Browserへ戻る</Button>
-            ) : (
-              <Button disabled={activeUpload || selectedFiles.length === 0}>
-                {activeUpload ? "アップロード中" : "アップロード"}
-              </Button>
-            )}
-          </Group>
-        </Box>
-      </Box>
+          <Box
+            style={{
+              position: "fixed",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 100,
+              borderTop: "1px solid var(--mantine-color-default-border)",
+              background: "var(--mantine-color-body)",
+            }}
+          >
+            <Box maw={1120} mx="auto" px="lg" py="sm">
+              <Group justify="flex-end" wrap="nowrap">
+                <Text size="sm" c="dimmed">
+                  {selectedFiles.length}件選択中
+                </Text>
+                {registeredCount > 0 &&
+                selectedFiles.length === 0 &&
+                !activeUpload ? (
+                  <Button variant="default">Media Browserへ戻る</Button>
+                ) : (
+                  <Button disabled={activeUpload || selectedFiles.length === 0}>
+                    {activeUpload ? "アップロード中" : "アップロード"}
+                  </Button>
+                )}
+              </Group>
+            </Box>
+          </Box>
 
-      <Modal
-        opened={
-          scenario === "leave-confirmation" ||
-          scenario === "leave-uploading-confirmation"
-        }
-        onClose={() => undefined}
-        title="アップロード画面を離れますか？"
-        centered
-      >
-        <Stack>
-          <Text size="sm">
-            {scenario === "leave-uploading-confirmation"
-              ? "アップロード中または待機中の画像があります。この画面を離れると未完了の送信が中断される可能性があります。すでに登録されたMediaは削除されません。"
-              : "まだアップロードしていない画像があります。この画面を離れると、未送信の画像と編集内容は失われます。"}
-          </Text>
-          <Group justify="flex-end">
-            <Button variant="default">この画面に残る</Button>
-            <Button color="red">移動する</Button>
-          </Group>
-        </Stack>
-      </Modal>
-          </ScrollPaddingBox></PageScrollArea>
-</PrototypeApplicationShell>
+          <Modal
+            opened={
+              scenario === "leave-confirmation" ||
+              scenario === "leave-uploading-confirmation"
+            }
+            onClose={() => undefined}
+            title="アップロード画面を離れますか？"
+            centered
+          >
+            <Stack>
+              <Text size="sm">
+                {scenario === "leave-uploading-confirmation"
+                  ? "アップロード中または待機中の画像があります。この画面を離れると未完了の送信が中断される可能性があります。すでに登録されたMediaは削除されません。"
+                  : "まだアップロードしていない画像があります。この画面を離れると、未送信の画像と編集内容は失われます。"}
+              </Text>
+              <Group justify="flex-end">
+                <Button variant="default">この画面に残る</Button>
+                <Button color="red">移動する</Button>
+              </Group>
+            </Stack>
+          </Modal>
+        </ScrollPaddingBox>
+      </PageScrollArea>
+    </PrototypeApplicationShell>
   )
 }
 

@@ -91,7 +91,11 @@ export function CommunityMembersContent({
     })
   }
   const ariaSort = (key: SortKey): "ascending" | "descending" | "none" =>
-    sort?.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"
+    sort?.key === key
+      ? sort.direction === "asc"
+        ? "ascending"
+        : "descending"
+      : "none"
   const close = () => {
     if (!busy) {
       setOpened(false)
@@ -196,40 +200,45 @@ export function CommunityMembersContent({
                   stickyHeader
                   style={{
                     tableLayout: "fixed",
-                    borderBottom: "1px solid var(--mantine-color-default-border)",
+                    borderBottom:
+                      "1px solid var(--mantine-color-default-border)",
                   }}
                   styles={{
                     th: { height: tableHeaderHeight, boxSizing: "border-box" },
                     td: { height: tableRowHeight, boxSizing: "border-box" },
                   }}
                 >
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th w="45%" aria-sort={ariaSort("name")}>
-                      <UsageSortHeader
-                        label="名前"
-                        direction={sort?.key === "name" ? sort.direction : null}
-                        align="left"
-                        disabled={false}
-                        onSort={() => changeSort("name")}
-                      />
-                    </Table.Th>
-                    <Table.Th aria-sort={ariaSort("role")}>
-                      <UsageSortHeader
-                        label="役割"
-                        direction={sort?.key === "role" ? sort.direction : null}
-                        align="left"
-                        disabled={false}
-                        onSort={() => changeSort("role")}
-                      />
-                    </Table.Th>
-                    {self?.role === "admin" && (
-                      <Table.Th w={52}>
-                        <Text size="xs">操作</Text>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th w="45%" aria-sort={ariaSort("name")}>
+                        <UsageSortHeader
+                          label="名前"
+                          direction={
+                            sort?.key === "name" ? sort.direction : null
+                          }
+                          align="left"
+                          disabled={false}
+                          onSort={() => changeSort("name")}
+                        />
                       </Table.Th>
-                    )}
-                  </Table.Tr>
-                </Table.Thead>
+                      <Table.Th aria-sort={ariaSort("role")}>
+                        <UsageSortHeader
+                          label="役割"
+                          direction={
+                            sort?.key === "role" ? sort.direction : null
+                          }
+                          align="left"
+                          disabled={false}
+                          onSort={() => changeSort("role")}
+                        />
+                      </Table.Th>
+                      {self?.role === "admin" && (
+                        <Table.Th w={52}>
+                          <Text size="xs">操作</Text>
+                        </Table.Th>
+                      )}
+                    </Table.Tr>
+                  </Table.Thead>
                   <Table.Tbody>
                     {rows.map((member) => (
                       <Table.Tr key={member.id}>

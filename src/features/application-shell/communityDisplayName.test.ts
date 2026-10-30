@@ -16,7 +16,12 @@ describe("getCommunityDisplayName", () => {
 
   it("別名がない場合は正式名称を使用する", () => {
     expect(getCommunityDisplayName({ name: "正式名称" })).toBe("正式名称")
-    expect(getCommunityDisplayName({ name: "正式名称", mySettings: { alias: null } })).toBe("正式名称")
+    expect(
+      getCommunityDisplayName({
+        name: "正式名称",
+        mySettings: { alias: null },
+      }),
+    ).toBe("正式名称")
   })
 })
 
@@ -27,11 +32,9 @@ describe("sortCommunitiesByDisplayName", () => {
       { id: "b", label: "あおぞら" },
       { id: "a", label: "かぞく" },
     ]
-    expect(sortCommunitiesByDisplayName(candidates).map((item) => item.id)).toEqual([
-      "b",
-      "a",
-      "c",
-    ])
+    expect(
+      sortCommunitiesByDisplayName(candidates).map((item) => item.id),
+    ).toEqual(["b", "a", "c"])
     expect(candidates[0].id).toBe("c")
   })
 

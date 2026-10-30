@@ -61,7 +61,13 @@ const meta = {
   component: DashboardContainer,
   args: { contextKind: "personal" },
   // Containers use the same URL context that ApplicationShell provides in production.
-  decorators: [(Story) => <MediaDetailUrlProvider><Story /></MediaDetailUrlProvider>],
+  decorators: [
+    (Story) => (
+      <MediaDetailUrlProvider>
+        <Story />
+      </MediaDetailUrlProvider>
+    ),
+  ],
 } satisfies Meta<typeof DashboardContainer>
 export default meta
 type Story = StoryObj<typeof meta>

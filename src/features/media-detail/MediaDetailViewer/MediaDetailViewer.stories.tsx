@@ -39,12 +39,20 @@ function ViewerStory({
     <MediaDetailViewer
       detail={idOnly ? null : detail}
       selectedId={idOnly ? initialId : undefined}
-      read={idOnly ? {
-        detail: unavailable ? { kind: "unavailable" } : { kind: "loading" },
-        preview: unavailable ? { kind: "unavailable" } : { kind: "detail-loading" },
-        groups: { kind: "pending" },
-        tags: { kind: "pending" },
-      } : undefined}
+      read={
+        idOnly
+          ? {
+              detail: unavailable
+                ? { kind: "unavailable" }
+                : { kind: "loading" },
+              preview: unavailable
+                ? { kind: "unavailable" }
+                : { kind: "detail-loading" },
+              groups: { kind: "pending" },
+              tags: { kind: "pending" },
+            }
+          : undefined
+      }
       setDetail={setDetail}
       closeMediaDetail={() => setDetail(null)}
       onRequestDelete={() => undefined}
@@ -62,7 +70,12 @@ const meta = {
   title: "Features/Media Detail/MediaDetailViewer",
   component: ViewerStory,
   parameters: { layout: "fullscreen" },
-  args: { initialId: "portrait-01", compact: false, idOnly: false, unavailable: false },
+  args: {
+    initialId: "portrait-01",
+    compact: false,
+    idOnly: false,
+    unavailable: false,
+  },
 } satisfies Meta<typeof ViewerStory>
 
 export default meta

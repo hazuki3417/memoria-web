@@ -18,15 +18,31 @@ export function MediaDeleteModal({
   onConfirm,
 }: MediaDeleteModalProps) {
   return (
-    <Modal opened={target !== null} onClose={onCancel} title="Mediaを削除" size="md" zIndex={410}>
+    <Modal
+      opened={target !== null}
+      onClose={onCancel}
+      title="Mediaを削除"
+      size="md"
+      zIndex={410}
+    >
       <Modal.Body>
-        <Text size="sm">このMediaを削除します。削除したMediaは復元できません。</Text>
+        <Text size="sm">
+          このMediaを削除します。削除したMediaは復元できません。
+        </Text>
       </Modal.Body>
       <Modal.Footer>
         <ActionPanel>
           <ActionPanel.End>
-            <Button variant="default" onClick={onCancel}>キャンセル</Button>
-            <Button color="red" disabled={!target} onClick={() => { if (target) onConfirm(target) }}>
+            <Button variant="default" onClick={onCancel}>
+              キャンセル
+            </Button>
+            <Button
+              color="red"
+              disabled={!target}
+              onClick={() => {
+                if (target) onConfirm(target)
+              }}
+            >
               削除
             </Button>
           </ActionPanel.End>

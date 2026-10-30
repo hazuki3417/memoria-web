@@ -32,7 +32,9 @@ export const Cancel: Story = {
   name: "Interaction · Cancel",
   tags: ["interaction"],
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Mediaを削除" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Mediaを削除" }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await expect(args.onCancel).toHaveBeenCalledTimes(1)
     await expect(args.onConfirm).not.toHaveBeenCalled()
@@ -42,9 +44,11 @@ export const Cancel: Story = {
 export const Confirm: Story = {
   name: "Interaction · Confirm",
   tags: ["interaction"],
-  args: {  },
+  args: {},
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Mediaを削除" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", { name: "Mediaを削除" }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "削除" }))
     await expect(args.onConfirm).toHaveBeenCalledTimes(1)
     await expect(args.onCancel).not.toHaveBeenCalled()

@@ -13,7 +13,12 @@ export function GroupMediaPageFeedback({
 }) {
   return state === "error" ? (
     <Box mt="sm">
-      <ErrorState variant="inline" title="追加のMediaを取得できませんでした" description="取得済みのMediaは引き続き閲覧できます。" onRetry={onRetry} />
+      <ErrorState
+        variant="inline"
+        title="追加のMediaを取得できませんでした"
+        description="取得済みのMediaは引き続き閲覧できます。"
+        onRetry={onRetry}
+      />
     </Box>
   ) : state === "loading" ? (
     <LoadingState variant="inline" title="追加のMediaを取得しています" />

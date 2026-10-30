@@ -35,13 +35,17 @@ export function MediaDetailTagsSection({
             ({values.length})
           </Text>
         </Group>
-        {(!readOnly || onEditTags) && <Button
-          size="compact-xs"
-          variant="subtle"
-          onClick={() => onEditTags ? onEditTags() : openDetailEditor("tags")}
-        >
-          編集
-        </Button>}
+        {(!readOnly || onEditTags) && (
+          <Button
+            size="compact-xs"
+            variant="subtle"
+            onClick={() =>
+              onEditTags ? onEditTags() : openDetailEditor("tags")
+            }
+          >
+            編集
+          </Button>
+        )}
       </Group>
       <Group gap={6}>
         {values.length === 0 ? (

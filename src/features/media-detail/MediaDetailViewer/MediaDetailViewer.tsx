@@ -8,7 +8,11 @@ import { MediaDetailInfoPanel } from "../MediaDetailInfoPanel"
 import { MediaDetailPreview } from "../MediaDetailPreview"
 import { MediaDetailViewerHost } from "./MediaDetailViewerHost"
 import { MediaDetailLayout } from "./MediaDetailLayout"
-import type { DetailReadState, PreviewReadState, CollectionReadState } from "../mediaDetailReadState"
+import type {
+  DetailReadState,
+  PreviewReadState,
+  CollectionReadState,
+} from "../mediaDetailReadState"
 
 type Editing = ReturnType<typeof useMediaDetailEditing>
 type Viewport = ReturnType<typeof useMediaDetailViewport>
@@ -37,7 +41,12 @@ export type MediaDetailViewerProps = Pick<
   > & {
     detail: MediaItem | null
     selectedId?: string | null
-    navigation?: { previousId: string | null; nextId: string | null; position: number | null; count: number | null }
+    navigation?: {
+      previousId: string | null
+      nextId: string | null
+      position: number | null
+      count: number | null
+    }
     navigateById?: (direction: -1 | 1) => void
     setDetail: Dispatch<SetStateAction<MediaItem | null>>
     closeMediaDetail: () => void
@@ -142,6 +151,5 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
           )
         })()}
     </MediaDetailViewerHost>
-
   )
 }

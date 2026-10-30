@@ -32,7 +32,11 @@ export const Cancel: Story = {
   name: "Interaction · Cancel",
   tags: ["interaction"],
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Communityへ共有" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", {
+        name: "Communityへ共有",
+      }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "キャンセル" }))
     await expect(args.setDetailEditor).toHaveBeenCalledTimes(1)
     await expect(args.addCommunityShare).not.toHaveBeenCalled()
@@ -42,9 +46,13 @@ export const Cancel: Story = {
 export const Confirm: Story = {
   name: "Interaction · Confirm",
   tags: ["interaction"],
-  args: { shareTarget: "Family", },
+  args: { shareTarget: "Family" },
   play: async ({ args }) => {
-    const dialog = within(await within(document.body).findByRole("dialog", { name: "Communityへ共有" }))
+    const dialog = within(
+      await within(document.body).findByRole("dialog", {
+        name: "Communityへ共有",
+      }),
+    )
     await userEvent.click(dialog.getByRole("button", { name: "共有する" }))
     await expect(args.addCommunityShare).toHaveBeenCalledTimes(1)
     await expect(args.setDetailEditor).not.toHaveBeenCalled()

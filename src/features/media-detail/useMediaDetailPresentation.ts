@@ -2,7 +2,11 @@
 
 import { useMediaDetailUrl } from "./MediaDetailUrlProvider"
 import { useMediaDetailRead, type MediaDetailScope } from "./useMediaDetailRead"
-import type { DetailReadState, PreviewReadState, CollectionReadState } from "./mediaDetailReadState"
+import type {
+  DetailReadState,
+  PreviewReadState,
+  CollectionReadState,
+} from "./mediaDetailReadState"
 
 /**
  * Read-only connection between URL selection and independently fetched media.
@@ -22,7 +26,9 @@ export type MediaDetailPresentation = {
   pollingStopped: boolean
 }
 
-export function useMediaDetailPresentation(scope: MediaDetailScope): MediaDetailPresentation {
+export function useMediaDetailPresentation(
+  scope: MediaDetailScope,
+): MediaDetailPresentation {
   const { selectedMediaId } = useMediaDetailUrl()
   const read = useMediaDetailRead(selectedMediaId, scope)
   return {

@@ -9,11 +9,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core"
-import {
-  IconInfoCircle,
-  IconPhotoOff,
-  IconX,
-} from "@tabler/icons-react"
+import { IconInfoCircle, IconPhotoOff, IconX } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useRef, useState } from "react"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
@@ -42,7 +38,12 @@ export type MediaDetailPreviewProps = Pick<
 > & {
   detail: MediaDetailViewerProps["detail"]
   selectedId?: string | null
-  navigation?: { previousId: string | null; nextId: string | null; position: number | null; count: number | null }
+  navigation?: {
+    previousId: string | null
+    nextId: string | null
+    position: number | null
+    count: number | null
+  }
   navigateById?: (direction: -1 | 1) => void
   prev: NonNullable<MediaDetailViewerProps["detail"]> | null
   next: NonNullable<MediaDetailViewerProps["detail"]> | null
@@ -79,19 +80,32 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
   } = props
   const activeId = selectedId ?? detail?.id ?? null
   const detailIndex = stateItems.findIndex((item) => item.id === activeId)
-  const imageKey = readState?.kind === "ready" ? `${activeId}:${readState.url}` : null
+  const imageKey =
+    readState?.kind === "ready" ? `${activeId}:${readState.url}` : null
   // Render-time identity guard: reject callbacks from an image that is no longer selected.
   const currentImageKey = useRef(imageKey)
   currentImageKey.current = imageKey
-  const [imageStatus, setImageStatus] = useState<{ key: string; status: "loading" | "ready" | "error"; attempt: number } | null>(null)
-  const activeImageStatus = imageKey && imageStatus?.key === imageKey ? imageStatus.status : "loading"
-  const imageAttempt = imageKey && imageStatus?.key === imageKey ? imageStatus.attempt : 0
+  const [imageStatus, setImageStatus] = useState<{
+    key: string
+    status: "loading" | "ready" | "error"
+    attempt: number
+  } | null>(null)
+  const activeImageStatus =
+    imageKey && imageStatus?.key === imageKey ? imageStatus.status : "loading"
+  const imageAttempt =
+    imageKey && imageStatus?.key === imageKey ? imageStatus.attempt : 0
   const retryImage = () => {
     if (!imageKey) return
-    setImageStatus({ key: imageKey, status: "loading", attempt: imageAttempt + 1 })
+    setImageStatus({
+      key: imageKey,
+      status: "loading",
+      attempt: imageAttempt + 1,
+    })
     onRetryImage?.()
   }
-  const previousAvailable = navigation ? navigation.previousId !== null : prev !== null
+  const previousAvailable = navigation
+    ? navigation.previousId !== null
+    : prev !== null
   const nextAvailable = navigation ? navigation.nextId !== null : next !== null
   return (
     <Box
@@ -123,7 +137,14 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
       >
         <Center>
           {previousAvailable && (
-            <MediaDetailNavigationButton direction={-1} onNavigate={() => { prepareNavigation(-1); if (navigateById) navigateById(-1); else if (prev) setDetail(prev) }} />
+            <MediaDetailNavigationButton
+              direction={-1}
+              onNavigate={() => {
+                prepareNavigation(-1)
+                if (navigateById) navigateById(-1)
+                else if (prev) setDetail(prev)
+              }}
+            />
           )}
         </Center>
         <Center h="100%" style={{ minWidth: 0, overflow: "hidden" }}>
@@ -150,7 +171,11 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
               }}
             >
               {readState && readState.kind !== "ready" ? (
-                <PreviewStatus state={readState} onRetry={onRetryImage} pollingStopped={pollingStopped} />
+                <PreviewStatus
+                  state={readState}
+                  onRetry={onRetryImage}
+                  pollingStopped={pollingStopped}
+                />
               ) : detail?.failed ? (
                 <Stack align="center" c="dimmed">
                   <IconPhotoOff size={48} />
@@ -168,31 +193,63 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                     onLoad={(event) => {
                       const image = event.currentTarget
                       void image.decode().then(
-                        () => setImageStatus((current) =>
-                          currentImageKey.current !== imageKey || (current?.key === imageKey && (current.attempt !== imageAttempt || current.status === "error"))
-                            ? current : { key: imageKey, status: "ready", attempt: imageAttempt }),
-                        () => setImageStatus((current) =>
-                          currentImageKey.current !== imageKey || (current?.key === imageKey && current.attempt !== imageAttempt)
-                            ? current : { key: imageKey, status: "error", attempt: imageAttempt }),
+                        () =>
+                          setImageStatus((current) =>
+                            currentImageKey.current !== imageKey ||
+                            (current?.key === imageKey &&
+                              (current.attempt !== imageAttempt ||
+                                current.status === "error"))
+                              ? current
+                              : {
+                                  key: imageKey,
+                                  status: "ready",
+                                  attempt: imageAttempt,
+                                },
+                          ),
+                        () =>
+                          setImageStatus((current) =>
+                            currentImageKey.current !== imageKey ||
+                            (current?.key === imageKey &&
+                              current.attempt !== imageAttempt)
+                              ? current
+                              : {
+                                  key: imageKey,
+                                  status: "error",
+                                  attempt: imageAttempt,
+                                },
+                          ),
                       )
                     }}
-                    onError={() => setImageStatus((current) =>
-                      currentImageKey.current !== imageKey || (current?.key === imageKey && current.attempt !== imageAttempt)
-                        ? current : { key: imageKey, status: "error", attempt: imageAttempt },
-                    )}
+                    onError={() =>
+                      setImageStatus((current) =>
+                        currentImageKey.current !== imageKey ||
+                        (current?.key === imageKey &&
+                          current.attempt !== imageAttempt)
+                          ? current
+                          : {
+                              key: imageKey,
+                              status: "error",
+                              attempt: imageAttempt,
+                            },
+                      )
+                    }
                     style={{
                       objectFit: "contain",
                       opacity: activeImageStatus === "ready" ? 1 : 0,
                       transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`,
-                      transition: detailRotateAnimated ? "transform 180ms ease" : "none",
+                      transition: detailRotateAnimated
+                        ? "transform 180ms ease"
+                        : "none",
                     }}
                   />
                   {activeImageStatus !== "ready" && (
                     <Box style={{ position: "absolute", inset: 0 }}>
                       <PreviewStatus
-                        state={activeImageStatus === "error"
-                          ? { kind: "delivery-error", retryable: true }
-                          : { kind: "image-loading" }}
+                        state={
+                          activeImageStatus === "error"
+                            ? { kind: "delivery-error", retryable: true }
+                            : { kind: "image-loading" }
+                        }
                         onRetry={retryImage}
                       />
                     </Box>
@@ -208,7 +265,9 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                   style={{
                     objectFit: "contain",
                     transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`,
-                    transition: detailRotateAnimated ? "transform 180ms ease" : "none",
+                    transition: detailRotateAnimated
+                      ? "transform 180ms ease"
+                      : "none",
                   }}
                 />
               ) : (
@@ -219,7 +278,14 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         </Center>
         <Center>
           {nextAvailable && (
-            <MediaDetailNavigationButton direction={1} onNavigate={() => { prepareNavigation(1); if (navigateById) navigateById(1); else if (next) setDetail(next) }} />
+            <MediaDetailNavigationButton
+              direction={1}
+              onNavigate={() => {
+                prepareNavigation(1)
+                if (navigateById) navigateById(1)
+                else if (next) setDetail(next)
+              }}
+            />
           )}
         </Center>
       </Box>
@@ -235,15 +301,27 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         }}
       >
         <Group gap={4} wrap="nowrap" justify="flex-start">
-          {!compact && <MediaDetailRotationControls setRotate={setDetailRotate} setAnimated={setDetailRotateAnimated} />}
+          {!compact && (
+            <MediaDetailRotationControls
+              setRotate={setDetailRotate}
+              setAnimated={setDetailRotateAnimated}
+            />
+          )}
         </Group>
         <Text size="xs" c="dimmed" ta="center" style={{ whiteSpace: "nowrap" }}>
-          {navigation ? (navigation.position === null || navigation.count === null ? "—" : `${navigation.position + 1} / ${navigation.count}`) : `${detailIndex + 1} / ${stateItems.length}`}
+          {navigation
+            ? navigation.position === null || navigation.count === null
+              ? "—"
+              : `${navigation.position + 1} / ${navigation.count}`
+            : `${detailIndex + 1} / ${stateItems.length}`}
         </Text>
         <Group gap={4} wrap="nowrap" justify="flex-end" style={{ minWidth: 0 }}>
           {!compact && (
             <>
-              <MediaDetailZoomControls zoom={detailZoom} setZoom={setDetailZoom} />
+              <MediaDetailZoomControls
+                zoom={detailZoom}
+                setZoom={setDetailZoom}
+              />
             </>
           )}
           <ActionIcon

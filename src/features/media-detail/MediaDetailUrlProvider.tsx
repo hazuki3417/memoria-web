@@ -62,9 +62,12 @@ export function MediaDetailUrlProvider({ children }: { children: ReactNode }) {
       }
       const selected = getMediaDetailId(current.search)
       setSelectedMediaId(selected)
-      if (!selected || !session.current ||
-          session.current.snapshot.origin.pathname !== current.pathname ||
-          window.history.state?.[SESSION_MARKER] !== session.current.token) {
+      if (
+        !selected ||
+        !session.current ||
+        session.current.snapshot.origin.pathname !== current.pathname ||
+        window.history.state?.[SESSION_MARKER] !== session.current.token
+      ) {
         session.current = null
         setSnapshot(null)
       }
@@ -74,35 +77,40 @@ export function MediaDetailUrlProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("popstate", syncUrl)
   }, [pathname])
 
-  const openMediaDetail = useCallback((input: {
-    mediaId: string
-    orderedLoadedMediaIds: readonly string[]
-  }) => {
-    const { pathname, search, hash } = window.location
-    if (!isMediaDetailRoute(pathname) || new URLSearchParams(search).has("mediaId")) return
-    const origin = { pathname, searchWithoutMediaId: search, hash }
-    const nextSnapshot = createMediaNavigationSnapshot(
-      input.orderedLoadedMediaIds,
-      input.mediaId,
-      origin,
-    )
-    const token = crypto.randomUUID()
-    session.current = { token, snapshot: nextSnapshot }
-    setSnapshot(nextSnapshot)
-    const href = mediaDetailUrl(pathname, search, hash, input.mediaId)
-    // Preserve Next.js history metadata rather than replacing its history state.
-    window.history.pushState(
-      { ...window.history.state, [SESSION_MARKER]: token },
-      "",
-      href,
-    )
-    setSelectedMediaId(input.mediaId)
-  }, [])
+  const openMediaDetail = useCallback(
+    (input: { mediaId: string; orderedLoadedMediaIds: readonly string[] }) => {
+      const { pathname, search, hash } = window.location
+      if (
+        !isMediaDetailRoute(pathname) ||
+        new URLSearchParams(search).has("mediaId")
+      )
+        return
+      const origin = { pathname, searchWithoutMediaId: search, hash }
+      const nextSnapshot = createMediaNavigationSnapshot(
+        input.orderedLoadedMediaIds,
+        input.mediaId,
+        origin,
+      )
+      const token = crypto.randomUUID()
+      session.current = { token, snapshot: nextSnapshot }
+      setSnapshot(nextSnapshot)
+      const href = mediaDetailUrl(pathname, search, hash, input.mediaId)
+      // Preserve Next.js history metadata rather than replacing its history state.
+      window.history.pushState(
+        { ...window.history.state, [SESSION_MARKER]: token },
+        "",
+        href,
+      )
+      setSelectedMediaId(input.mediaId)
+    },
+    [],
+  )
 
   const closeMediaDetail = useCallback(() => {
     const { pathname, search, hash } = window.location
     const active = session.current
-    const safeBack = active !== null &&
+    const safeBack =
+      active !== null &&
       active.snapshot.origin.pathname === pathname &&
       window.history.state?.[SESSION_MARKER] === active.token
     session.current = null
@@ -123,8 +131,11 @@ export function MediaDetailUrlProvider({ children }: { children: ReactNode }) {
     const active = session.current
     if (!active) return
     const { pathname, search, hash } = window.location
-    if (pathname !== active.snapshot.origin.pathname ||
-        window.history.state?.[SESSION_MARKER] !== active.token) return
+    if (
+      pathname !== active.snapshot.origin.pathname ||
+      window.history.state?.[SESSION_MARKER] !== active.token
+    )
+      return
     const currentId = getMediaDetailId(search)
     const nav = getMediaNavigation(active.snapshot, currentId, wrap)
     const nextId = direction === -1 ? nav.previousId : nav.nextId
@@ -150,7 +161,14 @@ export function MediaDetailUrlProvider({ children }: { children: ReactNode }) {
       closeMediaDetail,
       navigateMediaDetail,
     }),
-    [selectedMediaId, snapshot, navigation, openMediaDetail, closeMediaDetail, navigateMediaDetail],
+    [
+      selectedMediaId,
+      snapshot,
+      navigation,
+      openMediaDetail,
+      closeMediaDetail,
+      navigateMediaDetail,
+    ],
   )
   return <Context.Provider value={value}>{children}</Context.Provider>
 }
