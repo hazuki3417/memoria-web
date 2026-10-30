@@ -1,10 +1,11 @@
 "use client"
 
 import { ActionIcon, Box, Group, Image, Stack, Text } from "@mantine/core"
-import { IconChevronLeft, IconChevronRight, IconInfoCircle, IconX } from "@tabler/icons-react"
+import { IconInfoCircle, IconX } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import { useMediaDetailUrl } from "./MediaDetailUrlProvider"
 import { useMediaDetailViewport } from "./useMediaDetailViewport"
+import { MediaDetailNavigationButton } from "./MediaDetailNavigationButton"
 import { DetailCollectionStatus, DetailMetadataStatus, PreviewStatus } from "./MediaDetailReadFeedback"
 import { MediaDetailLayout } from "./MediaDetailViewer/MediaDetailLayout"
 import { MediaDetailViewerHost } from "./MediaDetailViewer/MediaDetailViewerHost"
@@ -61,7 +62,7 @@ export function MediaDetailIdViewer({
               </ActionIcon>
             </Group>
             <Box style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "grid", gridTemplateColumns: "44px minmax(0,1fr) 44px", alignItems: "center" }}>
-              <Group justify="center">{navigation.previousId && <ActionIcon aria-label="前のMedia" variant="subtle" onClick={() => move(-1)}><IconChevronLeft /></ActionIcon>}</Group>
+              <Group justify="center">{navigation.previousId && <MediaDetailNavigationButton direction={-1} onNavigate={() => move(-1)} />}</Group>
               <Box h="100%" style={{ minWidth: 0, overflow: "hidden" }}>
               {preview.kind === "ready" ? (
                 <Image
@@ -79,7 +80,7 @@ export function MediaDetailIdViewer({
                 />
               )}
               </Box>
-              <Group justify="center">{navigation.nextId && <ActionIcon aria-label="次のMedia" variant="subtle" onClick={() => move(1)}><IconChevronRight /></ActionIcon>}</Group>
+              <Group justify="center">{navigation.nextId && <MediaDetailNavigationButton direction={1} onNavigate={() => move(1)} />}</Group>
             </Box>
             <Group h={48} px="sm" justify="space-between" wrap="nowrap" style={{ flexShrink: 0 }}>
               <Group gap={4} wrap="nowrap">
