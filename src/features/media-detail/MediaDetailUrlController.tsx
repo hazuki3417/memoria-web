@@ -128,7 +128,7 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       url.closeMediaDetail()
       // The mutation acknowledges DELETING; refresh visible lists separately.
       // A list-refresh failure must not reinterpret an accepted deletion as failure.
-      void apollo.refetchQueries({ include: ["MediaBrowserList", "DashboardRecentMedia"] }).catch(() => {
+      void apollo.refetchQueries({ include: ["MediaBrowserList", "DashboardRecentMedia", "BrowseGroupDetail"] }).catch(() => {
         showNotification({
           kind: "error",
           title: "一覧を更新できませんでした",
