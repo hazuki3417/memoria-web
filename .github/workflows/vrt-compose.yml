@@ -14,6 +14,11 @@ on:
       - "src/app/layout.tsx"
       - "package.json"
       - "package-lock.json"
+      - "tests/vrt/**"
+      - "scripts/vrt/**"
+      - "playwright.vrt.config.ts"
+      - "compose.yaml"
+      - ".storybook/**"
   workflow_dispatch:
     inputs:
       mode:
@@ -54,7 +59,7 @@ jobs:
         with:
           name: vrt-compose-diagnostics
           path: |
-            e2e/storybook-visual/report/
+            tests/vrt/report/
             test-results/
           if-no-files-found: warn
           retention-days: 7
@@ -63,6 +68,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: vrt-candidate-baselines-unapproved
-          path: e2e/storybook-visual/__screenshots__/
+          path: tests/vrt/baselines/
           if-no-files-found: error
           retention-days: 14
