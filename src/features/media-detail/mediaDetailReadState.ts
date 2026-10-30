@@ -14,8 +14,8 @@ export type DetailRecord = {
     variants: { width: number; height: number; url: string }[]
   } | null
   processing: { status: "PROCESSING" | "READY" | "FAILED" } | null
-  groups?: { edges: { node: { id: string; name: string } }[]; pageInfo: { hasNextPage: boolean } } | null
-  tags?: { edges: { node: { id: string; name: string } }[]; pageInfo: { hasNextPage: boolean } } | null
+  groups?: { edges: { node: { id: string; name: string } }[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } } | null
+  tags?: { edges: { node: { id: string; name: string } }[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } } | null
 }
 export type MediaDetailResult = { media: DetailRecord | null }
 export type DetailReadState =
@@ -100,4 +100,23 @@ export function mediaDetailPollingIdentity(
 ): string | null {
   if (mediaId === null) return null
   return JSON.stringify([mediaId, scope.type, scope.communityId ?? null])
+}
+
+/** Merge a Relay page without duplicating nodes on retry or overlapping pages. */
+export function mergeDetailCollectionPages<T extends { node: { id: string } }>(
+  prior: { edges: T[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } },
+  next: { edges: T[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } },
+) {
+  const seen = new Set(prior.edges.map((edge) => edge.node.id))
+  return {
+    edges: [
+      ...prior.edges,
+      ...next.edges.filter((edge) => {
+        if (seen.has(edge.node.id)) return false
+        seen.add(edge.node.id)
+        return true
+      }),
+    ],
+    pageInfo: next.pageInfo,
+  }
 }
