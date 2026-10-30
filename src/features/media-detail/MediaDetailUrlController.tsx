@@ -6,15 +6,17 @@ import { useMediaDetailEditing } from "./useMediaDetailEditing"
 import { useMediaDetailViewport } from "./useMediaDetailViewport"
 import { useMediaDetailPresentation } from "./useMediaDetailPresentation"
 import { useMediaDetailUrl } from "./MediaDetailUrlProvider"
+import { getMediaNavigation } from "./mediaDetailNavigation"
 import type { MediaDetailScope } from "./useMediaDetailRead"
 
 /**
  * Application-level controller for the ORIGINAL Viewer, not an alternative UI.
  * Never enable fixture-only mutation actions for URL/GraphQL selections.
  */
-export function MediaDetailUrlController({ scope }: { scope: MediaDetailScope }) {
+export function MediaDetailUrlController({ scope, wrap = false }: { scope: MediaDetailScope; wrap?: boolean }) {
   const url = useMediaDetailUrl()
   const presentation = useMediaDetailPresentation(scope)
+  const navigation = getMediaNavigation(url.snapshot, url.selectedMediaId, wrap)
   const viewport = useMediaDetailViewport()
   const editing = useMediaDetailEditing(null)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -23,8 +25,8 @@ export function MediaDetailUrlController({ scope }: { scope: MediaDetailScope })
     <MediaDetailViewer
       detail={null}
       selectedId={presentation.selectedMediaId}
-      navigation={url.navigation}
-      navigateById={url.navigateMediaDetail}
+      navigation={navigation}
+      navigateById={(direction) => url.navigateMediaDetail(direction, wrap)}
       setDetail={() => undefined}
       closeMediaDetail={url.closeMediaDetail}
       onRequestDelete={() => undefined}
