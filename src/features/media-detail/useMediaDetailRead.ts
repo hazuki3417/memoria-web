@@ -124,7 +124,7 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
       cancelled = true
       window.clearInterval(timer)
     }
-  }, [shouldPoll, pollDelay, pollKey, mediaId, query.refetch]
+  }, [shouldPoll, pollDelay, pollKey, mediaId, query.refetch])
 
   const retryDetail = useCallback(() => {
     if (mediaId) setPollState({ id: pollKey, failures: 0, stopped: false })
