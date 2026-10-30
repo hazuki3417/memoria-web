@@ -7,6 +7,11 @@ const output = join(root, "tests/vrt/generated");
 const url = "http://127.0.0.1:6006/index.json";
 const groupFilter = process.env.VRT_GROUP?.toLowerCase();
 const update = process.argv.includes("--update-snapshots");
+const allowSubsetUpdate = process.env.VRT_ALLOW_SUBSET_UPDATE === "1";
+if (update && groupFilter && !allowSubsetUpdate) {
+  console.error("Refusing subset baseline update. Set VRT_ALLOW_SUBSET_UPDATE=1 after explicit review.");
+  process.exit(1);
+}
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function start(command, args) {
@@ -38,6 +43,7 @@ let server;
 try {
   // A single Storybook instance serves both index discovery and all Playwright cases.
   server = start("npm", ["run", "dev:storybook", "--", "--ci", "--no-open"]);
+  server.on("error", (error) => console.error("Storybook failed to start:", error));
   const index = await indexReady();
   const stories = Object.values(index.entries ?? {})
     .filter((entry) => entry.type === "story" && entry.tags?.includes("vrt"))
@@ -53,7 +59,11 @@ try {
   if (!groups.size) throw new Error(`No VRT cases for group: ${groupFilter || "(all)"}`);
   await rm(output, { recursive: true, force: true });
   await mkdir(output, { recursive: true });
+  const filenames = new Set();
   for (const [group, entries] of groups) {
+    const filename = safeName(group) + ".spec.ts";
+    if (filenames.has(filename)) throw new Error(`VRT group filename collision: ${filename}`);
+    filenames.add(filename);
     const source = `import { test } from "@playwright/test";
 import { captureStory } from "../capture";
 import { responsiveViewports } from "../../../.storybook/responsiveViewports";
@@ -70,17 +80,24 @@ test.describe(${JSON.stringify(group)}, () => {
   }
 });
 `;
-    await writeFile(join(output, safeName(group) + ".spec.ts"), source);
+    await writeFile(join(output, filename), source);
   }
   console.log(`VRT: ${[...groups.values()].flat().length} stories in ${groups.size} groups`);
   const args = ["playwright", "test", "--config=playwright.vrt.config.ts"];
   if (update) args.push("--update-snapshots");
   const playwright = start("npx", args);
-  const code = await new Promise((resolve) => playwright.on("exit", (code) => resolve(code ?? 1)));
+  const code = await new Promise((resolve) => {
+    playwright.once("error", (error) => { console.error(error); resolve(1); });
+    playwright.once("exit", (code) => resolve(code ?? 1));
+  });
   process.exitCode = code;
 } catch (error) {
   console.error(error);
   process.exitCode = 1;
 } finally {
-  if (server) server.kill("SIGTERM");
+  if (server && server.exitCode === null) {
+    server.kill("SIGTERM");
+    // The npm process may have spawned Storybook as a child process.
+    // Explicit process-tree cleanup is required before runtime verification.
+  }
 }
