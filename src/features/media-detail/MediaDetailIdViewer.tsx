@@ -2,7 +2,7 @@
 
 import { ActionIcon, Box, Group, Image, Stack, Text } from "@mantine/core"
 import { IconChevronLeft, IconChevronRight, IconInfoCircle, IconX } from "@tabler/icons-react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useMediaDetailUrl } from "./MediaDetailUrlProvider"
 import { useMediaDetailViewport } from "./useMediaDetailViewport"
 import { DetailCollectionStatus, DetailMetadataStatus, PreviewStatus } from "./MediaDetailReadFeedback"
@@ -15,7 +15,7 @@ import type { MediaDetailPresentation } from "./useMediaDetailPresentation"
  *
  * This is deliberately not a replacement for the existing interactive
  * MediaDetailViewer: permissions, mutation flows, image decode/retry and
- * navigation must be wired before consumers can switch.
+ * consumer-level integration must be verified before consumers can switch.
  */
 export function MediaDetailIdViewer({
   presentation,
@@ -29,6 +29,7 @@ export function MediaDetailIdViewer({
   const [infoOpened, setInfoOpened] = useState(true)
   const { navigation, navigateMediaDetail } = useMediaDetailUrl()
   const viewport = useMediaDetailViewport()
+  const priorId = useRef<string | null>(null)
   const move = (direction: -1 | 1) => {
     viewport.prepareNavigation(direction)
     navigateMediaDetail(direction)
@@ -36,6 +37,16 @@ export function MediaDetailIdViewer({
   const { selectedMediaId, preview, detail, groups, tags, retryDetail } = presentation
   // Never mount a detail for an unrelated URL selection.
   const opened = selectedMediaId !== null
+  useEffect(() => {
+    if (priorId.current !== selectedMediaId) {
+      if (priorId.current !== null) {
+        viewport.setDetailZoom(100)
+        viewport.setDetailRotate(0)
+        viewport.setDetailRotateAnimated(false)
+      }
+      priorId.current = selectedMediaId
+    }
+  }, [selectedMediaId, viewport.setDetailZoom, viewport.setDetailRotate, viewport.setDetailRotateAnimated])
 
   return (
     <MediaDetailViewerHost opened={opened} onClose={onClose}>
@@ -59,6 +70,7 @@ export function MediaDetailIdViewer({
                   w="100%"
                   h="100%"
                   fit="contain"
+                  style={{ objectFit: "contain", transform: `rotate(${viewport.detailRotate}deg) scale(${viewport.detailZoom / 100})`, transition: viewport.detailRotateAnimated ? "transform 180ms ease" : "none" }}
                 />
               ) : (
                 <PreviewStatus
