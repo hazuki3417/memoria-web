@@ -12,7 +12,7 @@ Status: **A案合意済み・構造分離実装中**（2026-10-29）。実装の
 
 | 要素 | 所有する責務 | 所有しない責務 |
 | --- | --- | --- |
-| `MediaDetailDialog` | Viewer/編集/共有/削除Modalのcomposition、既存のlocal editing/viewport state | RouterやGraphQLへの直接接続 |
+| `MediaDetailModal` | Viewer/編集/共有/削除Modalのcomposition、既存のlocal editing/viewport state | RouterやGraphQLへの直接接続 |
 | `MediaDetailViewer` | PreviewとInfoPanelへのProps接続、prev/nextの現行配列からの導出 | Fullscreen Modal設定、Gridの寸法 |
 | `MediaDetailViewerHost` | Mantine fullscreen Modalの標準Portal、Focus/Dismissとviewport `100dvh` | Media ID、Loading状態、Preview/Info layout |
 | `MediaDetailLayout` | Preview/InfoPanelの二領域Grid、Compact縦配置・それ以外の横配置 | 画像/Metadata取得、Panel内の操作とアニメーション |
@@ -51,7 +51,7 @@ Host/Layout分離は合意済みだが、Compact時のPanel最大高さ、Skelet
 
 ### 未接続・未検証
 
-- **Controller契約の基盤だけを実装**。Media Browser / Group Browser / Dashboardの既存`MediaDetailDialog`ローカルstateは維持され、Consumerを共通Controllerに接続した段階とは扱わない。
+- **Controller契約の基盤だけを実装**。Media Browser / Group Browser / Dashboardの既存`MediaDetailModal`ローカルstateは維持され、Consumerを共通Controllerに接続した段階とは扱わない。
 - 共通HostでURL-selected Mediaを表示するには、Stage 3のID独立Detail Query・必須/補助情報のViewModelが必要。Loading/Errorを仮表示して既存Media表示を置換しない。
 - Next App Routerのnative History APIでpush/replace後の`usePathname`/searchParams整合、Back/Forward、reload、bfcache、cross-route、close時origin保護、scroll/no-remountのE2E検証が残る。特にSession markerを使ったsafe-back判定が実Router動作で妥当か確認する。
 - `mediaDetailNavigationWrap` User Settingsの実接続、DashboardのMedia ID付きCarousel、Group BrowserのAggregate CollectionのSnapshotと実際の閲覧順、URL-only/invalid URL fallbackのUIは未完成。
@@ -143,7 +143,7 @@ Agreed approach: inventory existing components first, relocate/reuse as appropri
 
 | Existing code | Responsibility | Review direction (not yet final) |
 | --- | --- | --- |
-| `MediaDetailDialog` | local selection, editing and nested Modal composition | retain feature actions while revisiting controller boundary |
+| `MediaDetailModal` | local selection, editing and nested Modal composition | retain feature actions while revisiting controller boundary |
 | `MediaDetailViewer` | established Preview / InfoPanel composition | consolidate the ID-based consumer here instead of duplicating composition |
 | `MediaDetailPreview` | preview, animations and viewport controls | reuse original visual component; abstract navigation/data source only as needed |
 | `MediaDetailInfoPanel` | Metadata, Groups, Tags, Community, delete | keep as the sole existing panel; express permissions and data as inputs |
@@ -170,7 +170,7 @@ Current branch's prior changes remain subject to CI and Human Visual Review; no 
 
 **User-confirmed design constraint:** Existing Media Detail components are the implementation to refactor directly. Maintaining the original Viewer while rebuilding a parallel ID-only Viewer was **not** the intended approach. The temporary `MediaDetailIdViewer.tsx` has been deleted; its provisional alternative toolbar/layout/panel must not be carried forward as a second implementation.
 
-- The established `MediaDetailViewer`, `MediaDetailPreview`, `MediaDetailInfoPanel`, and `MediaDetailDialog` remain the canonical components. Adapt their data/navigation/controller inputs in place, preserving their visual, interactive, responsive and action capabilities.
+- The established `MediaDetailViewer`, `MediaDetailPreview`, `MediaDetailInfoPanel`, and `MediaDetailModal` remain the canonical components. Adapt their data/navigation/controller inputs in place, preserving their visual, interactive, responsive and action capabilities.
 - `MediaDetailNavigationButton`, `MediaDetailRotationControls`, `MediaDetailZoomControls` were relocated under `MediaDetailPreview/` rather than duplicated. `MediaDetailInfoPanelFrame` is used inside the existing InfoPanel.
 - The URL/history and GraphQL reading hooks are controller/data responsibilities, not alternative visual components; connect them to the original composition only after the original Viewer can represent ID-only loading/unavailable/error without fabricating a listing MediaItem.
 - Prior sections of this document describing ID-only Viewer's planned migration are historical checkpoint records and **superseded** by this correction. Do not reintroduce a parallel Viewer without an explicit new design agreement.
@@ -229,3 +229,8 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 
 - Polling stream identityは区切り文字連結ではなく `mediaDetailPollingIdentity` のJSON tupleで構成し、Media ID・Scope Type・Community IDの組を安全に区別する。純関数のUnit TestでScope切替、Media切替、区切り文字の衝突防止を固定する。
 - 前回コミットで生じたHookの`useEffect`依存配列の閉じ括弧不足を修正済み。CI利用上限のためこれらのコミットには`[skip ci]`を指定し、ローカルTypecheck/Unit/Build/Interaction/VRTは未実行・要確認とする。
+
+
+## Modal命名への統一（2026-10-30）
+
+`develop`の命名方針に合わせ、Media Detail fullscreen Mantine Modal の公開Component・Props・実装フォルダ・Storybookタイトルを `MediaDetailDialog` から `MediaDetailModal` に改名した。Media BrowserとGroup Browserのconsumer importも変更した。表示・操作・layout・responsive behaviorは変更せず、VRTのStory ID変更に伴うbaselineの取り扱いとローカルTypecheck/Build/VRT確認を後続Gateに残す。CI利用上限によりcommitは `[skip ci]` を利用する。
