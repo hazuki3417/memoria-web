@@ -8,7 +8,7 @@ node_modules
 storybook-static
 /public/__dev-assets
 test-results/*
-e2e/storybook-visual/report/*
+tests/vrt/report/*
 
 # Generated VRT test registration (not source of truth)
-e2e/storybook-visual/generated/
+tests/vrt/generated/
