@@ -249,3 +249,10 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - DashboardのRecent Media Carouselにoptional Media ID/クリックCallbackを追加し、`DashboardContainer`の実GraphQLデータでIDと表示順（最大32件）を対応付けてURL Controllerへ委譲する。IDのないPrototype表示は従来どおり非クリック。
 - 同じApplication Shellの`MediaDetailUrlController`が共通Viewerを所有する。編集・共有・削除などBackend契約未接続の操作はURL read-only modeで有効化しない。
 - ローカルTypecheck/Build/Unit/Interaction/VRT/E2E（Back/Forward、Carouselページ送り、Scope切替、no-remount、Focus）が必要。GitHub Actions上限中は`[skip ci]`を継続し、PRはDraftを維持する。
+
+
+## Stage 3 — Media Detail Groups / TagsのRelay全件取得（2026-10-30）
+
+- Detail Queryに`groupsAfter`/`tagsAfter`と`pageInfo.endCursor`を追加。各Collectionで`hasNextPage`が真なら、選択中Media IDとScopeに紐づくCursorを使って`fetchMore`し、ID重複を排除して既存edgesに結合する。
+- 次Cursorが欠落・同一、通信が失敗する場合は自動取得を止め、`hasNextPage`を真のまま維持する。未完了Collectionを「空/全件」とみなさない。処理の動作・React/Apollo型整合と中断後の手動復旧はローカルテストで確認が必要。
+- 既存ViewerのVisual/Behavioral Contractは変更しない。利用枠上限中は`[skip ci]`、PR Draftを維持する。
