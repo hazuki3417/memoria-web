@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test"
 
 export default defineConfig({
-  testDir: "./tests/vrt/generated",
+  testDir: "./tests/vrt",
   fullyParallel: true,
   reporter: [["list"], ["html", { outputFolder: "tests/vrt/report", open: "never" }]],
   snapshotPathTemplate: "tests/vrt/baselines/{arg}{ext}",
