@@ -60,3 +60,48 @@ export const Zoomed: Story = {
   tags: ["visual"],
   args: { detailZoom: 200 },
 }
+
+export const DetailLoading: Story = {
+  name: "Visual · Detail Loading",
+  tags: ["visual"],
+  args: { readState: { kind: "detail-loading" } },
+}
+export const Processing: Story = {
+  name: "Visual · Processing",
+  tags: ["visual"],
+  args: { readState: { kind: "processing" } },
+}
+export const DeliveryError: Story = {
+  name: "Visual · Image Error",
+  tags: ["visual"],
+  args: { readState: { kind: "delivery-error", retryable: true }, onRetryImage: () => undefined },
+}
+
+/** The canonical Preview must render ID-only loading without a listing MediaItem. */
+export const DirectUrlLoading: Story = {
+  name: "Visual · Direct URL Loading (No Listing Item)",
+  tags: ["visual"],
+  args: {
+    detail: null,
+    selectedId: "direct-media-id",
+    stateItems: [],
+    prev: null,
+    next: null,
+    navigation: { previousId: null, nextId: null, position: null, count: null },
+    readState: { kind: "detail-loading" },
+  },
+}
+
+export const DirectUrlUnavailable: Story = {
+  name: "Visual · Direct URL Unavailable",
+  tags: ["visual"],
+  args: {
+    detail: null,
+    selectedId: "deleted-media-id",
+    stateItems: [],
+    prev: null,
+    next: null,
+    navigation: { previousId: null, nextId: null, position: null, count: null },
+    readState: { kind: "unavailable" },
+  },
+}

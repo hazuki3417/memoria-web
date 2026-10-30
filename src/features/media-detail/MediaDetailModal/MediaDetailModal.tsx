@@ -13,7 +13,7 @@ import type { MediaItem } from "../types"
 import { useMediaDetailEditing } from "../useMediaDetailEditing"
 import { useMediaDetailViewport } from "../useMediaDetailViewport"
 
-export type MediaDetailDialogProps = {
+export type MediaDetailModalProps = {
   items: MediaItem[]
   initialId?: string
   onClose: () => void
@@ -24,7 +24,7 @@ export type MediaDetailDialogProps = {
   onSaveGroups?: (mediaId: string, groupNames: string[]) => Promise<void>
 }
 
-export function MediaDetailDialog({
+export function MediaDetailModal({
   items,
   initialId,
   onClose,
@@ -33,7 +33,7 @@ export function MediaDetailDialog({
   groupOptions,
   groupMemberships,
   onSaveGroups,
-}: MediaDetailDialogProps) {
+}: MediaDetailModalProps) {
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [deleteTarget, setDeleteTarget] = useState<MediaItem | null>(null)
   const [detail, setDetail] = useState<MediaItem | null>(

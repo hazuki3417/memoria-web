@@ -1,6 +1,6 @@
 "use client"
 
-import { AppShell, Box } from "@mantine/core"
+import { AppShell } from "@mantine/core"
 import type { ReactNode } from "react"
 
 export type ApplicationShellProps = {
@@ -38,10 +38,6 @@ export function ApplicationShell({
       {header}
       {navigation}
       <AppShell.Main data-memoria-application-main>{children}</AppShell.Main>
-      <Box
-        id="application-modal-root"
-        style={{ position: "relative", zIndex: 400 }}
-      />
     </AppShell>
   )
 }

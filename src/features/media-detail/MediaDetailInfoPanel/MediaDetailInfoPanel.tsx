@@ -1,13 +1,15 @@
 "use client"
 
-import { Box, Button, Divider, Group, Stack } from "@mantine/core"
+import { Box, Button, Divider, Group } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
-import { AnimatePresence, motion } from "framer-motion"
+import { MediaDetailInfoPanelFrame } from "./MediaDetailInfoPanelFrame"
 import { MediaDetailCommunitySection } from "../MediaDetailCommunitySection"
 import { MediaDetailGroupsSection } from "../MediaDetailGroupsSection"
 import { MediaDetailMetadata } from "../MediaDetailMetadata"
 import { MediaDetailTagsSection } from "../MediaDetailTagsSection"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
+import type { DetailReadState, CollectionReadState } from "../mediaDetailReadState"
+import { DetailMetadataStatus, DetailCollectionStatus } from "../MediaDetailReadFeedback"
 
 export type MediaDetailInfoPanelProps = Pick<
   MediaDetailViewerProps,
@@ -23,7 +25,18 @@ export type MediaDetailInfoPanelProps = Pick<
   | "context"
   | "downloadMock"
   | "onRequestDelete"
->
+> & {
+  dateFormat?: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
+  fileSizeUnit?: "DECIMAL" | "BINARY"
+  detailReadState?: DetailReadState
+  groupsReadState?: CollectionReadState
+  tagsReadState?: CollectionReadState
+  onRetryDetail?: () => void
+  readOnly?: boolean
+  allowDelete?: boolean
+  onEditTags?: () => void
+  onEditGroups?: () => void
+}
 
 export function MediaDetailInfoPanel({
   compact,
@@ -38,68 +51,85 @@ export function MediaDetailInfoPanel({
   context: contextKind,
   downloadMock,
   onRequestDelete,
+  detailReadState,
+  dateFormat,
+  fileSizeUnit,
+  groupsReadState,
+  tagsReadState,
+  onRetryDetail,
+  readOnly = false,
+  allowDelete = false,
+  onEditTags,
+  onEditGroups,
 }: MediaDetailInfoPanelProps) {
   return (
-    <AnimatePresence initial={false}>
-      {detailInfoOpened && (
-        <motion.div
-          initial={
-            compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }
-          }
-          animate={
-            compact
-              ? { height: "auto", opacity: 1 }
-              : { width: 340, opacity: 1 }
-          }
-          exit={compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
-          transition={{ duration: 0.3 }}
+    <MediaDetailInfoPanelFrame
+      compact={compact}
+      opened={detailInfoOpened}
+      footer={(!readOnly && !detailReadState || allowDelete && detailReadState?.kind === "ready") && (
+        <Box
+          p="md"
           style={{
-            overflow: "hidden",
-            minWidth: 0,
-            gridColumn: compact ? "1" : "2",
-            gridRow: compact ? "2" : "1",
+            borderTop: "1px solid var(--mantine-color-default-border)",
+            flexShrink: 0,
           }}
         >
-          <Box
-            h="100%"
-            bg="var(--mantine-color-body)"
-            style={{
-              borderLeft: compact
-                ? undefined
-                : "1px solid var(--mantine-color-default-border)",
-              borderTop: compact
-                ? "1px solid var(--mantine-color-default-border)"
-                : undefined,
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-            }}
-          >
-            <Stack gap="md" p="md" style={{ flex: 1, overflowY: "auto" }}>
-              <MediaDetailMetadata downloadMock={downloadMock} />
+          <Group justify="flex-end">
+            <Button size="xs" variant="subtle" color="red" leftSection={<IconTrash size={15} />} onClick={onRequestDelete}>
+              削除
+            </Button>
+          </Group>
+        </Box>
+      )}
+    >
+              {detailReadState ? (
+                <DetailMetadataStatus state={detailReadState} onRetry={onRetryDetail} dateFormat={dateFormat} fileSizeUnit={fileSizeUnit} />
+              ) : (
+                <MediaDetailMetadata downloadMock={downloadMock} />
+              )}
               <Divider
                 style={{
                   marginInline: "calc(-1 * var(--mantine-spacing-md))",
                 }}
               />
+              {detailReadState && !groupsReadState ? (
+                <DetailCollectionStatus title="Groups" state={{ kind: "pending" }} />
+              ) : groupsReadState && groupsReadState.kind !== "ready" ? (
+                <DetailCollectionStatus title="Groups" state={groupsReadState} onRetry={onRetryDetail} />
+              ) : detailReadState && detailReadState.kind !== "ready" ? (
+                <DetailCollectionStatus title="Groups" state={{ kind: "pending" }} />
+              ) : (
               <MediaDetailGroupsSection
-                detailValues={detailValues}
+                detailValues={groupsReadState?.kind === "ready" ? { ...detailValues, groups: groupsReadState.values.map((item) => item.name) } : detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
+                readOnly={readOnly}
+                onEditGroups={onEditGroups}
               />
+              )}
+              {detailReadState && !tagsReadState ? (
+                <DetailCollectionStatus title="Tags" state={{ kind: "pending" }} />
+              ) : tagsReadState && tagsReadState.kind !== "ready" ? (
+                <DetailCollectionStatus title="Tags" state={tagsReadState} onRetry={onRetryDetail} />
+              ) : detailReadState && detailReadState.kind !== "ready" ? (
+                <DetailCollectionStatus title="Tags" state={{ kind: "pending" }} />
+              ) : (
               <MediaDetailTagsSection
-                detailValues={detailValues}
+                detailValues={tagsReadState?.kind === "ready" ? { ...detailValues, tags: tagsReadState.values.map((item) => item.name) } : detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
+                readOnly={readOnly}
+                onEditTags={onEditTags}
               />
+              )}
               <Divider
                 style={{
                   marginInline: "calc(-1 * var(--mantine-spacing-md))",
                 }}
               />
-              <MediaDetailCommunitySection
+              {!readOnly && !detailReadState && <MediaDetailCommunitySection
                 detailValues={detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
@@ -107,30 +137,7 @@ export function MediaDetailInfoPanel({
                 setShareTarget={setShareTarget}
                 setDetailEditor={setDetailEditor}
                 context={contextKind}
-              />
-            </Stack>
-            <Box
-              p="md"
-              style={{
-                borderTop: "1px solid var(--mantine-color-default-border)",
-                flexShrink: 0,
-              }}
-            >
-              <Group justify="flex-end">
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  color="red"
-                  leftSection={<IconTrash size={15} />}
-                  onClick={onRequestDelete}
-                >
-                  削除
-                </Button>
-              </Group>
-            </Box>
-          </Box>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              />}
+    </MediaDetailInfoPanelFrame>
   )
 }

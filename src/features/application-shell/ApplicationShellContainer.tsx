@@ -9,6 +9,8 @@ import {
   useCreateCommunityMutation,
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
+import { MediaDetailUrlProvider } from "@/features/media-detail/MediaDetailUrlProvider"
+import { MediaDetailUrlController } from "@/features/media-detail/MediaDetailUrlController"
 import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
 import { CommunityCreateModal } from "./CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from "./useApplicationContextSelection"
@@ -284,7 +286,14 @@ export function ApplicationShellContainer({
           ) : undefined
         }
       >
-        {children}
+        <MediaDetailUrlProvider>
+          {children}
+          {contextKind === "community" && communityId ? (
+            <MediaDetailUrlController scope={{ type: "COMMUNITY", communityId }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} dateFormat={currentUserData?.me?.preferences.dateFormat} fileSizeUnit={currentUserData?.me?.preferences.fileSizeUnit} />
+          ) : contextKind === "personal" ? (
+            <MediaDetailUrlController scope={{ type: "PERSONAL" }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} dateFormat={currentUserData?.me?.preferences.dateFormat} fileSizeUnit={currentUserData?.me?.preferences.fileSizeUnit} />
+          ) : null}
+        </MediaDetailUrlProvider>
       </ApplicationShell>
     </>
   )

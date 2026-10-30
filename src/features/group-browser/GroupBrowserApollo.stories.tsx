@@ -1,4 +1,5 @@
 import { MockedProvider, type MockedResponse } from "@apollo/client/testing"
+import { MediaDetailUrlProvider } from "@/features/media-detail/MediaDetailUrlProvider"
 import type { Meta, StoryObj } from "@storybook/react"
 import { GraphQLError } from "graphql"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
@@ -49,6 +50,8 @@ const meta = {
   title: "Features/Group Browser/Apollo Integration",
   component: GroupBrowserContainer,
   args: { contextKind: "personal" },
+  // Containers use the same URL context that ApplicationShell provides in production.
+  decorators: [(Story) => <MediaDetailUrlProvider><Story /></MediaDetailUrlProvider>],
   parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof GroupBrowserContainer>
 export default meta

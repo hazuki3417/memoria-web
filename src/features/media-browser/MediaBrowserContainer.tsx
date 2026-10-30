@@ -14,6 +14,7 @@ import { MediaBrowser, type GroupActionResult } from "./MediaBrowser"
 import { selectBrowserThumbnail } from "./selectBrowserThumbnail"
 import { resolveTagFilter } from "./resolveTagFilter"
 import type { MediaItem } from "@/features/media-detail"
+import { useMediaDetailUrl } from "@/features/media-detail/MediaDetailUrlProvider"
 import { showNotification } from "@/components/Feedback"
 
 export function MediaBrowserContainer({
@@ -23,6 +24,7 @@ export function MediaBrowserContainer({
   contextKind?: "personal" | "community"
   communityId?: string
 }) {
+  const { openMediaDetail } = useMediaDetailUrl()
   const scope = useMemo(
     () =>
       contextKind === "personal"
@@ -416,6 +418,9 @@ export function MediaBrowserContainer({
       )}
       <MediaBrowser
         key={scopeKey}
+        onOpenMediaDetail={(mediaId, orderedLoadedMediaIds) => {
+          if (!skip) openMediaDetail({ mediaId, orderedLoadedMediaIds })
+        }}
         contextKind={contextKind}
         communityId={communityId}
         items={items}

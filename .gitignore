@@ -8,5 +8,6 @@ node_modules
 storybook-static
 /public/__dev-assets
 test-results/*
+/next-env.d.ts
+/tsconfig.tsbuildinfo
 tests/vrt/report/*
-

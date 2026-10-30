@@ -5,7 +5,12 @@ import { Modal } from "@/components/Modal"
 import { ActionPanel } from "@/components/ActionPanel"
 import type { useMediaDetailEditing } from "@/features/media-detail/useMediaDetailEditing"
 
-type Props = Pick<
+type Props = {
+  pending?: boolean
+  options?: string[]
+  loadError?: boolean
+  onRetryLoad?: () => void
+} & Pick<
   ReturnType<typeof useMediaDetailEditing>,
   | "detailEditor"
   | "setDetailEditor"
@@ -21,11 +26,15 @@ export function TagsEditModal({
   detailDraft,
   setDetailDraft,
   saveDetailDraft,
+  pending = false,
+  options,
+  loadError = false,
+  onRetryLoad,
 }: Props) {
   return (
     <Modal
       opened={detailEditor === "tags"}
-      onClose={() => setDetailEditor(null)}
+      onClose={() => { if (!pending) setDetailEditor(null) }}
       title="Tagsを編集"
       centered
       zIndex={400}
@@ -35,11 +44,14 @@ export function TagsEditModal({
         <Text size="sm" c="dimmed">
           このMediaのTagを追加・除外できます。
         </Text>
+        {loadError && <Text size="sm" c="red" role="alert">Tagの編集状態を取得できませんでした。</Text>}
+        {loadError && <Button variant="default" onClick={onRetryLoad}>再試行</Button>}
         <TagsInput
           label="Tags"
-          data={["旅行", "風景", "家族", "お気に入り"]}
+          data={options ?? ["旅行", "風景", "家族", "お気に入り"]}
           value={detailDraft}
           onChange={setDetailDraft}
+          disabled={pending || loadError}
         />
 
         </Stack>
@@ -48,10 +60,10 @@ export function TagsEditModal({
       <Modal.Footer>
         <ActionPanel>
           <ActionPanel.End>
-          <Button variant="default" onClick={() => setDetailEditor(null)}>
+          <Button variant="default" disabled={pending} onClick={() => setDetailEditor(null)}>
             キャンセル
           </Button>
-          <Button onClick={saveDetailDraft}>変更を反映</Button>
+          <Button loading={pending} disabled={pending || loadError} onClick={saveDetailDraft}>変更を反映</Button>
           </ActionPanel.End>
         </ActionPanel>
       </Modal.Footer>

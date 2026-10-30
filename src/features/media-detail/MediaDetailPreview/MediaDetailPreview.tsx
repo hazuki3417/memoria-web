@@ -6,25 +6,22 @@ import {
   Center,
   Group,
   Image,
-  Slider,
   Stack,
   Text,
 } from "@mantine/core"
 import {
-  IconChevronLeft,
-  IconChevronRight,
   IconInfoCircle,
   IconPhotoOff,
-  IconRotate,
-  IconRotate2,
   IconX,
-  IconZoomIn,
-  IconZoomOut,
-  IconZoomReset,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
+import { useRef, useState } from "react"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
-import { ZoomInput } from "../ZoomInput"
+import { MediaDetailZoomControls } from "./MediaDetailZoomControls"
+import type { PreviewReadState } from "../mediaDetailReadState"
+import { PreviewStatus } from "../MediaDetailReadFeedback"
+import { MediaDetailNavigationButton } from "./MediaDetailNavigationButton"
+import { MediaDetailRotationControls } from "./MediaDetailRotationControls"
 
 export type MediaDetailPreviewProps = Pick<
   MediaDetailViewerProps,
@@ -43,14 +40,23 @@ export type MediaDetailPreviewProps = Pick<
   | "detailInfoOpened"
   | "setDetailInfoOpened"
 > & {
-  detail: NonNullable<MediaDetailViewerProps["detail"]>
+  detail: MediaDetailViewerProps["detail"]
+  selectedId?: string | null
+  navigation?: { previousId: string | null; nextId: string | null; position: number | null; count: number | null }
+  navigateById?: (direction: -1 | 1) => void
   prev: NonNullable<MediaDetailViewerProps["detail"]> | null
   next: NonNullable<MediaDetailViewerProps["detail"]> | null
+  readState?: PreviewReadState
+  onRetryImage?: () => void
+  pollingStopped?: boolean
 }
 
 export function MediaDetailPreview(props: MediaDetailPreviewProps) {
   const {
     detail,
+    selectedId,
+    navigation,
+    navigateById,
     stateItems,
     prev,
     next,
@@ -67,8 +73,26 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
     detailDirection,
     detailInfoOpened,
     setDetailInfoOpened,
+    readState,
+    onRetryImage,
+    pollingStopped,
   } = props
-  const detailIndex = stateItems.findIndex((item) => item.id === detail.id)
+  const activeId = selectedId ?? detail?.id ?? null
+  const detailIndex = stateItems.findIndex((item) => item.id === activeId)
+  const imageKey = readState?.kind === "ready" ? `${activeId}:${readState.url}` : null
+  // Render-time identity guard: reject callbacks from an image that is no longer selected.
+  const currentImageKey = useRef(imageKey)
+  currentImageKey.current = imageKey
+  const [imageStatus, setImageStatus] = useState<{ key: string; status: "loading" | "ready" | "error"; attempt: number } | null>(null)
+  const activeImageStatus = imageKey && imageStatus?.key === imageKey ? imageStatus.status : "loading"
+  const imageAttempt = imageKey && imageStatus?.key === imageKey ? imageStatus.attempt : 0
+  const retryImage = () => {
+    if (!imageKey) return
+    setImageStatus({ key: imageKey, status: "loading", attempt: imageAttempt + 1 })
+    onRetryImage?.()
+  }
+  const previousAvailable = navigation ? navigation.previousId !== null : prev !== null
+  const nextAvailable = navigation ? navigation.nextId !== null : next !== null
   return (
     <Box
       style={{
@@ -98,25 +122,14 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         }}
       >
         <Center>
-          {prev && (
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              size="lg"
-              aria-label="前のMedia"
-              onClick={() => {
-                prepareNavigation(-1)
-                setDetail(prev)
-              }}
-            >
-              <IconChevronLeft />
-            </ActionIcon>
+          {previousAvailable && (
+            <MediaDetailNavigationButton direction={-1} onNavigate={() => { prepareNavigation(-1); if (navigateById) navigateById(-1); else if (prev) setDetail(prev) }} />
           )}
         </Center>
         <Center h="100%" style={{ minWidth: 0, overflow: "hidden" }}>
           <AnimatePresence mode="wait" initial={false} custom={detailDirection}>
             <motion.div
-              key={detail.id}
+              key={activeId}
               custom={detailDirection}
               initial={{
                 x: detailDirection > 0 ? 32 : -32,
@@ -136,12 +149,56 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                 justifyContent: "center",
               }}
             >
-              {detail.failed ? (
+              {readState && readState.kind !== "ready" ? (
+                <PreviewStatus state={readState} onRetry={onRetryImage} pollingStopped={pollingStopped} />
+              ) : detail?.failed ? (
                 <Stack align="center" c="dimmed">
                   <IconPhotoOff size={48} />
                   <Text size="sm">画像を表示できません</Text>
                 </Stack>
-              ) : (
+              ) : readState?.kind === "ready" && imageKey ? (
+                <Box w="100%" h="100%" style={{ position: "relative" }}>
+                  <Image
+                    key={`${imageKey}:${imageAttempt}`}
+                    src={readState.url}
+                    alt={detail?.label ?? "Media"}
+                    w="100%"
+                    h="100%"
+                    fit="contain"
+                    onLoad={(event) => {
+                      const image = event.currentTarget
+                      void image.decode().then(
+                        () => setImageStatus((current) =>
+                          currentImageKey.current !== imageKey || (current?.key === imageKey && (current.attempt !== imageAttempt || current.status === "error"))
+                            ? current : { key: imageKey, status: "ready", attempt: imageAttempt }),
+                        () => setImageStatus((current) =>
+                          currentImageKey.current !== imageKey || (current?.key === imageKey && current.attempt !== imageAttempt)
+                            ? current : { key: imageKey, status: "error", attempt: imageAttempt }),
+                      )
+                    }}
+                    onError={() => setImageStatus((current) =>
+                      currentImageKey.current !== imageKey || (current?.key === imageKey && current.attempt !== imageAttempt)
+                        ? current : { key: imageKey, status: "error", attempt: imageAttempt },
+                    )}
+                    style={{
+                      objectFit: "contain",
+                      opacity: activeImageStatus === "ready" ? 1 : 0,
+                      transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`,
+                      transition: detailRotateAnimated ? "transform 180ms ease" : "none",
+                    }}
+                  />
+                  {activeImageStatus !== "ready" && (
+                    <Box style={{ position: "absolute", inset: 0 }}>
+                      <PreviewStatus
+                        state={activeImageStatus === "error"
+                          ? { kind: "delivery-error", retryable: true }
+                          : { kind: "image-loading" }}
+                        onRetry={retryImage}
+                      />
+                    </Box>
+                  )}
+                </Box>
+              ) : detail ? (
                 <Image
                   src={detail.src}
                   alt={detail.label}
@@ -151,29 +208,18 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                   style={{
                     objectFit: "contain",
                     transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`,
-                    transition: detailRotateAnimated
-                      ? "transform 180ms ease"
-                      : "none",
+                    transition: detailRotateAnimated ? "transform 180ms ease" : "none",
                   }}
                 />
+              ) : (
+                <PreviewStatus state={{ kind: "detail-loading" }} />
               )}
             </motion.div>
           </AnimatePresence>
         </Center>
         <Center>
-          {next && (
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              size="lg"
-              aria-label="次のMedia"
-              onClick={() => {
-                prepareNavigation(1)
-                setDetail(next)
-              }}
-            >
-              <IconChevronRight />
-            </ActionIcon>
+          {nextAvailable && (
+            <MediaDetailNavigationButton direction={1} onNavigate={() => { prepareNavigation(1); if (navigateById) navigateById(1); else if (next) setDetail(next) }} />
           )}
         </Center>
       </Box>
@@ -189,85 +235,15 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         }}
       >
         <Group gap={4} wrap="nowrap" justify="flex-start">
-          {!compact && (
-            <>
-              <ActionIcon
-                variant="subtle"
-                aria-label="回転をリセット"
-                onClick={() => {
-                  setDetailRotateAnimated(false)
-                  setDetailRotate(0)
-                }}
-              >
-                <IconRotate2 size={18} />
-              </ActionIcon>
-              <ActionIcon
-                variant="subtle"
-                aria-label="左へ回転"
-                onClick={() => {
-                  setDetailRotateAnimated(true)
-                  setDetailRotate((value) => value - 90)
-                }}
-              >
-                <IconRotate size={18} />
-              </ActionIcon>
-              <ActionIcon
-                variant="subtle"
-                aria-label="右へ回転"
-                onClick={() => {
-                  setDetailRotateAnimated(true)
-                  setDetailRotate((value) => value + 90)
-                }}
-              >
-                <IconRotate size={18} style={{ transform: "scaleX(-1)" }} />
-              </ActionIcon>
-            </>
-          )}
+          {!compact && <MediaDetailRotationControls setRotate={setDetailRotate} setAnimated={setDetailRotateAnimated} />}
         </Group>
         <Text size="xs" c="dimmed" ta="center" style={{ whiteSpace: "nowrap" }}>
-          {detailIndex + 1} / {stateItems.length}
+          {navigation ? (navigation.position === null || navigation.count === null ? "—" : `${navigation.position + 1} / ${navigation.count}`) : `${detailIndex + 1} / ${stateItems.length}`}
         </Text>
         <Group gap={4} wrap="nowrap" justify="flex-end" style={{ minWidth: 0 }}>
           {!compact && (
             <>
-              <ActionIcon
-                variant="subtle"
-                aria-label="拡大率をリセット"
-                onClick={() => setDetailZoom(100)}
-              >
-                <IconZoomReset size={18} />
-              </ActionIcon>
-              <ActionIcon
-                variant="subtle"
-                aria-label="縮小"
-                disabled={detailZoom <= 50}
-                onClick={() =>
-                  setDetailZoom((value) => Math.max(50, value - 10))
-                }
-              >
-                <IconZoomOut size={18} />
-              </ActionIcon>
-              <Slider
-                w={100}
-                size="xs"
-                min={50}
-                max={300}
-                step={10}
-                value={detailZoom}
-                onChange={setDetailZoom}
-                label={null}
-              />
-              <ActionIcon
-                variant="subtle"
-                aria-label="拡大"
-                disabled={detailZoom >= 300}
-                onClick={() =>
-                  setDetailZoom((value) => Math.min(300, value + 10))
-                }
-              >
-                <IconZoomIn size={18} />
-              </ActionIcon>
-              <ZoomInput value={detailZoom} onChange={setDetailZoom} />
+              <MediaDetailZoomControls zoom={detailZoom} setZoom={setDetailZoom} />
             </>
           )}
           <ActionIcon

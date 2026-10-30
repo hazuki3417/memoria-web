@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaDetailDialog } from "./MediaDetailDialog"
+import { MediaDetailModal } from "./MediaDetailModal"
 
 const items = [
   {
@@ -15,8 +15,8 @@ const items = [
 ]
 
 const meta = {
-  title: "Features/Media Detail/MediaDetailDialog",
-  component: MediaDetailDialog,
+  title: "Features/Media Detail/MediaDetailModal",
+  component: MediaDetailModal,
   parameters: { layout: "fullscreen" },
   args: {
     items,
@@ -24,7 +24,7 @@ const meta = {
     onClose: () => undefined,
     contextKind: "personal",
   },
-} satisfies Meta<typeof MediaDetailDialog>
+} satisfies Meta<typeof MediaDetailModal>
 
 export default meta
 type Story = StoryObj<typeof meta>

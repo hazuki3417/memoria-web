@@ -12,7 +12,10 @@ import {
 import { IconChevronDown } from "@tabler/icons-react"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 
-export type MediaDetailGroupsSectionProps = Pick<
+export type MediaDetailGroupsSectionProps = {
+  readOnly?: boolean
+  onEditGroups?: () => void
+} & Pick<
   MediaDetailViewerProps,
   | "detailValues"
   | "detailSectionsExpanded"
@@ -25,6 +28,8 @@ export function MediaDetailGroupsSection({
   detailSectionsExpanded,
   toggleDetailSection,
   openDetailEditor,
+  readOnly = false,
+  onEditGroups,
 }: MediaDetailGroupsSectionProps) {
   const values = detailValues.groups
   return (
@@ -38,13 +43,13 @@ export function MediaDetailGroupsSection({
             ({values.length})
           </Text>
         </Group>
-        <Button
+        {(!readOnly || onEditGroups) && <Button
           size="compact-xs"
           variant="subtle"
-          onClick={() => openDetailEditor("groups")}
+          onClick={() => onEditGroups ? onEditGroups() : openDetailEditor("groups")}
         >
           編集
-        </Button>
+        </Button>}
       </Group>
       <Group gap={6}>
         {values.length === 0 ? (

@@ -4,7 +4,7 @@ import { useMediaQuery } from "@mantine/hooks"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { showNotification } from "@/components/Feedback"
-import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
+import { MediaDetailModal, type MediaItem } from "@/features/media-detail"
 import { MediaBrowserPane } from "./MediaBrowserPane"
 import { MediaBrowserGroupModal } from "./MediaBrowserGroupModal"
 import { MediaBrowserShareModal } from "./MediaBrowserShareModal"
@@ -95,6 +95,7 @@ function MediaBrowserController({
   onRetryGroupOptions,
   groupActionResult,
   onDismissGroupActionResult,
+  onOpenMediaDetail,
 }: {
   initialState?: MediaBrowserState
   contextKind?: ContextKind
@@ -119,6 +120,8 @@ function MediaBrowserController({
   onRetryGroupOptions?: () => void
   groupActionResult?: GroupActionResult | null
   onDismissGroupActionResult?: () => void
+  /** Optional URL-controller handoff; absent for existing local Modal consumers. */
+  onOpenMediaDetail?: (mediaId: string, orderedLoadedMediaIds: readonly string[]) => void
 }) {
   const [context, _setContext] = useState(contextKind)
   const compact = useMediaQuery("(max-width: 47.99em)")
@@ -221,7 +224,13 @@ function MediaBrowserController({
         activeState={activeState}
         items={stateItems}
         onToggle={toggle}
-        onOpenDetail={setDetail}
+        onOpenDetail={(item) => {
+          if (onOpenMediaDetail) {
+            onOpenMediaDetail(item.id, stateItems.map(({ id }) => id))
+          } else {
+            setDetail(item)
+          }
+        }}
         onClearTags={() => {
           setTags([])
           setAppliedTags([])
@@ -264,7 +273,7 @@ function MediaBrowserController({
       />
 
       {detail && (
-        <MediaDetailDialog
+        <MediaDetailModal
           items={stateItems}
           initialId={detail.id}
           onClose={() => setDetail(null)}

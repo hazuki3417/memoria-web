@@ -4,7 +4,7 @@ import { ApplicationShellPrototype } from "./ApplicationShellPrototype"
 const meta = {
   title: "Design Prototypes/Application Shell",
   component: ApplicationShellPrototype,
-  parameters: { layout: "fullscreen", applicationShellOwnsPortal: true },
+  parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof ApplicationShellPrototype>
 
 export default meta
