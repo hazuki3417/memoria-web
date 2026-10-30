@@ -5,6 +5,7 @@ import {
   projectPreview,
   nextProcessingPollFailures,
   processingPollDelay,
+  mediaDetailPollingIdentity,
   type DetailRecord,
 } from "./mediaDetailReadState"
 
@@ -72,5 +73,22 @@ describe("processing polling contract", () => {
     expect(three).toBe(3)
     expect(processingPollDelay(three)).toBeNull()
     expect(nextProcessingPollFailures(two, false)).toBe(0)
+  })
+})
+
+
+describe("processing polling identity", () => {
+  it("separates media and scope without retaining prior failure state", () => {
+    const personal = mediaDetailPollingIdentity("media-a", { type: "PERSONAL" })
+    const community = mediaDetailPollingIdentity("media-a", { type: "COMMUNITY", communityId: "community-1" })
+    expect(personal).not.toBe(community)
+    expect(community).not.toBe(mediaDetailPollingIdentity("media-a", { type: "COMMUNITY", communityId: "community-2" }))
+    expect(community).not.toBe(mediaDetailPollingIdentity("media-b", { type: "COMMUNITY", communityId: "community-1" }))
+    expect(personal).toBe(mediaDetailPollingIdentity("media-a", { type: "PERSONAL" }))
+    expect(mediaDetailPollingIdentity(null, { type: "PERSONAL" })).toBeNull()
+  })
+  it("does not permit delimiter collisions in IDs", () => {
+    expect(mediaDetailPollingIdentity("a:b", { type: "COMMUNITY", communityId: "c" }))
+      .not.toBe(mediaDetailPollingIdentity("a", { type: "COMMUNITY", communityId: "b:c" }))
   })
 })
