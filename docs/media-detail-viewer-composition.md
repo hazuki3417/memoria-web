@@ -219,3 +219,10 @@ Open tracking Issue: [#178](https://github.com/hazuki3417/memoria-web/issues/178
 ### Additional scope-safety correction (2026-10-30)
 
 On a change of GraphQL variables (especially Personal ↔ Community scope with the *same* Media ID), Apollo may retain a preceding response. `useMediaDetailRead` now masks that response during `NetworkStatus.setVariables`, so neither the Preview nor the InfoPanel renders old-scope data as ready while the new scope is resolving. Existing media-ID mismatch protection remains. This is a safety guard; authorization E2E and server enforcement remain required.
+
+
+## Stage 4 — Scope-aware Processing Polling checkpoint (2026-10-30)
+
+- `useMediaDetailRead` のPolling停止状態、連続通信失敗数、通信中ガードを、Media IDだけでなくScope（PERSONAL/COMMUNITY とCommunity ID）の組で隔離する。同じMedia IDでScopeが変更されても、前Scopeの3回失敗による停止状態を持ち越さない。
+- 旧Scopeの通信が遅延完了しても、新Scopeの通信中ガードを解除しない。既存の可視タブ時のみPolling・5秒/10秒間隔・3回連続失敗停止・手動再試行の振る舞いは維持する。
+- これはHookの局所的な安全性修正であり、URL Controller/Consumer結線やViewerのUI契約を変更しない。ユーザー合意の暫定運用で `[skip ci]` を指定し、Typecheck/Build/Unit/Interaction/VRTは未検証として管理する。
