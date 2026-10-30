@@ -60,7 +60,7 @@ const MEDIA_DETAIL_REMOVE_GROUP = gql`
  * Application-level controller for the ORIGINAL Viewer, not an alternative UI.
  * Never enable fixture-only mutation actions for URL/GraphQL selections.
  */
-export function MediaDetailUrlController({ scope, wrap = false, initialInfoWide, initialInfoMedium }: { scope: MediaDetailScope; wrap?: boolean; initialInfoWide?: boolean; initialInfoMedium?: boolean }) {
+export function MediaDetailUrlController({ scope, wrap = false, initialInfoWide, initialInfoMedium, dateFormat, fileSizeUnit }: { scope: MediaDetailScope; wrap?: boolean; initialInfoWide?: boolean; initialInfoMedium?: boolean; dateFormat?: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"; fileSizeUnit?: "DECIMAL" | "BINARY" }) {
   const url = useMediaDetailUrl()
   const apollo = useApolloClient()
   const presentation = useMediaDetailPresentation(scope)
@@ -353,6 +353,8 @@ export function MediaDetailUrlController({ scope, wrap = false, initialInfoWide,
         retryDetail: presentation.retryDetail,
         retryImage: presentation.retryDetail,
         pollingStopped: presentation.pollingStopped,
+        dateFormat,
+        fileSizeUnit,
       }}
     />
     <GroupsEditModal
