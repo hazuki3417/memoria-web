@@ -16,7 +16,7 @@ import {
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
-import { MediaDetailZoomControls } from "../MediaDetailZoomControls"
+import { MediaDetailZoomControls } from "./MediaDetailZoomControls"
 import type { PreviewReadState } from "../mediaDetailReadState"
 import { PreviewStatus } from "../MediaDetailReadFeedback"
 import { MediaDetailNavigationButton } from "../MediaDetailNavigationButton"
