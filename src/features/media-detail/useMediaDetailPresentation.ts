@@ -19,6 +19,7 @@ export type MediaDetailPresentation = {
   groups: CollectionReadState
   tags: CollectionReadState
   retryDetail: () => void
+  pollingStopped: boolean
 }
 
 export function useMediaDetailPresentation(scope: MediaDetailScope): MediaDetailPresentation {
@@ -31,5 +32,6 @@ export function useMediaDetailPresentation(scope: MediaDetailScope): MediaDetail
     groups: read.groups,
     tags: read.tags,
     retryDetail: read.retryDetail,
+    pollingStopped: read.pollingStopped,
   }
 }
