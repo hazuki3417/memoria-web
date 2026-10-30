@@ -76,6 +76,7 @@ export type GroupBrowserProps = {
   onRetryDiscoveryPage?: () => void
   onDiscoveryEndVisible?: () => void
   onMediaEndVisible?: () => void
+  onOpenMediaDetail?: (mediaId: string, orderedLoadedMediaIds: readonly string[]) => void
 }
 
 export function GroupBrowser({
@@ -105,6 +106,7 @@ export function GroupBrowser({
   onRetryDiscoveryPage,
   onDiscoveryEndVisible,
   onMediaEndVisible,
+  onOpenMediaDetail,
 }: GroupBrowserProps) {
   const { saving, runAction } = useGroupMutationAction()
   const {
@@ -151,7 +153,12 @@ export function GroupBrowser({
   const openMediaAt = (index: number) => {
     const id = mediaItemsData?.[index]?.id
     const availableIndex = groupMediaItems.findIndex((item) => item.id === id)
-    if (availableIndex >= 0) setMediaDetailIndex(availableIndex)
+    if (availableIndex < 0) return
+    if (onOpenMediaDetail) {
+      onOpenMediaDetail(groupMediaItems[availableIndex].id, groupMediaItems.map(({ id }) => id))
+    } else {
+      setMediaDetailIndex(availableIndex)
+    }
   }
 
   const [relationsOpened, relations] = useDisclosure(false)
@@ -441,7 +448,7 @@ export function GroupBrowser({
           </SplitView.Pane>
         </SplitView.Root>
       )}
-      <MediaDetailModal
+      {!onOpenMediaDetail && <MediaDetailModal
         items={groupMediaItems}
         groupOptions={candidates}
         groupMemberships={groupMemberships}
@@ -453,7 +460,7 @@ export function GroupBrowser({
         }
         onClose={() => setMediaDetailIndex(null)}
         contextKind={contextKind}
-      />
+      />}
     </>
   )
 }
