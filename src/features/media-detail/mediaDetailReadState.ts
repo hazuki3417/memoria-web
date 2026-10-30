@@ -92,3 +92,12 @@ export function processingPollDelay(failures: number): number | null {
   if (failures >= 3) return null
   return failures > 0 ? 10000 : 5000
 }
+
+/** Identifies the polling stream by both Media and explicit relation scope. */
+export function mediaDetailPollingIdentity(
+  mediaId: string | null,
+  scope: { type: "PERSONAL" | "COMMUNITY"; communityId?: string },
+): string | null {
+  if (mediaId === null) return null
+  return JSON.stringify([mediaId, scope.type, scope.communityId ?? null])
+}
