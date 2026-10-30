@@ -91,7 +91,7 @@ export function MediaBrowserListContent({ activeState, context, communityId, ite
                           toggle(item.id)
                           return
                         }
-                        if (!hasRemoteItems) onOpenDetail(item)
+                        onOpenDetail(item)
                       }}
                     />
                   ))}
