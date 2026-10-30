@@ -156,3 +156,11 @@ Agreed approach: inventory existing components first, relocate/reuse as appropri
 The final folder layout and component ownership remain under review. Before moving files, inspect imports, Stories, and all consumers; verify visual and behavioral parity after changes. The ID-only viewer and the existing Viewer must not be kept as two independently implemented permanent interfaces.
 
 Current branch's prior changes remain subject to CI and Human Visual Review; no baseline approval or merge is implied.
+
+
+## Placement checkpoint — Preview-owned Zoom controls (2026-10-30)
+
+- Moved the *existing* `MediaDetailZoomControls` into `MediaDetailPreview/MediaDetailZoomControls.tsx`. Retained the control JSX, zoom limits, slider, and `ZoomInput` behavior; adjusted only its relative import.
+- Updated imports in both `MediaDetailPreview` and temporary `MediaDetailIdViewer`, then removed the old top-level component file. Verified the new path and both import sites from the branch and confirmed the old path is absent.
+- Responsibility boundary: Preview owns its viewport control presentation. The Viewer composes Preview and InfoPanel; URL/history and data fetching remain outside. Additional relocation of Navigation/Rotation/InfoPanel sections requires an import/consumer review rather than automatic moving.
+- The temporary ID Viewer remains an unapproved transitional component, not the intended final UI. No existing consumer migration in this checkpoint. New head CI and Human Visual Review remain mandatory; Draft PR and baseline policy unchanged.
