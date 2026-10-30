@@ -95,8 +95,16 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
       if (cancelled || requestInFlight.current) return
       requestInFlight.current = true
       void query.refetch().then(
-        () => {
-          if (!cancelled) setPollState((current) => ({ id: mediaId, failures: 0, stopped: false }))
+        (result) => {
+          if (cancelled) return
+          if (result.error?.networkError) {
+            setPollState((current) => {
+              const failures = (current.id === mediaId ? current.failures : 0) + 1
+              return { id: mediaId, failures, stopped: failures >= 3 }
+            })
+          } else {
+            setPollState({ id: mediaId, failures: 0, stopped: false })
+          }
         },
         () => {
           if (!cancelled) setPollState((current) => {
