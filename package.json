@@ -15,7 +15,7 @@
     "dev:assets": "node scripts/link-dev-assets.mjs",
     "format": "biome format --write",
     "check:format": "biome check --changed --since=${BIOME_BASE_REF:-origin/develop} --no-errors-on-unmatched",
-    "check:lint": "next lint",
+    "check:lint": "biome lint .",
     "check:type": "tsc --noEmit",
     "test:unit": "vitest run",
     "test:interaction": "vitest run --config vitest.storybook.config.ts",
