@@ -1,6 +1,6 @@
 "use client"
 
-import { gql, useQuery } from "@apollo/client"
+import { gql, NetworkStatus, useQuery } from "@apollo/client"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   projectCollection,
@@ -71,9 +71,11 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     return () => document.removeEventListener("visibilitychange", syncVisibility)
   }, [mediaId])
 
+  // A scope change may retain the same media ID but must never expose previous-scope data.
+  const variablesChanging = query.networkStatus === NetworkStatus.setVariables
   const detail = useMemo(
-    () => projectMediaDetail(mediaId, query.loading, query.data, Boolean(query.error)),
-    [mediaId, query.loading, query.data, query.error],
+    () => projectMediaDetail(mediaId, query.loading, variablesChanging ? undefined : query.data, Boolean(query.error)),
+    [mediaId, query.loading, query.data, query.error, variablesChanging],
   )
   const preview = useMemo(() => projectPreview(detail), [detail])
   // Any partial GraphQL error is conservatively not treated as a confirmed empty list.
