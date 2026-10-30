@@ -209,7 +209,7 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       }}
       detailDraft={tagDraft}
       setDetailDraft={setTagDraft}
-      saveDetailDraft={() => { void saveTags() }}
+      saveDetailDraft={saveTags}
       pending={savingTags || tagEdit.loading || (!tagEdit.data && !tagEdit.error)}
       loadError={Boolean(tagEdit.error)}
       onRetryLoad={() => { void tagEdit.refetch() }}
