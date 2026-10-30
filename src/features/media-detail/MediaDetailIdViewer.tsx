@@ -1,8 +1,10 @@
 "use client"
 
 import { ActionIcon, Box, Group, Image, Stack, Text } from "@mantine/core"
-import { IconInfoCircle, IconX } from "@tabler/icons-react"
+import { IconChevronLeft, IconChevronRight, IconInfoCircle, IconX } from "@tabler/icons-react"
 import { useState } from "react"
+import { useMediaDetailUrl } from "./MediaDetailUrlProvider"
+import { useMediaDetailViewport } from "./useMediaDetailViewport"
 import { DetailCollectionStatus, DetailMetadataStatus, PreviewStatus } from "./MediaDetailReadFeedback"
 import { MediaDetailLayout } from "./MediaDetailViewer/MediaDetailLayout"
 import { MediaDetailViewerHost } from "./MediaDetailViewer/MediaDetailViewerHost"
@@ -25,6 +27,12 @@ export function MediaDetailIdViewer({
   compact: boolean | undefined
 }) {
   const [infoOpened, setInfoOpened] = useState(true)
+  const { navigation, navigateMediaDetail } = useMediaDetailUrl()
+  const viewport = useMediaDetailViewport()
+  const move = (direction: -1 | 1) => {
+    viewport.prepareNavigation(direction)
+    navigateMediaDetail(direction)
+  }
   const { selectedMediaId, preview, detail, groups, tags, retryDetail } = presentation
   // Never mount a detail for an unrelated URL selection.
   const opened = selectedMediaId !== null
@@ -41,7 +49,9 @@ export function MediaDetailIdViewer({
                 <IconX size={18} />
               </ActionIcon>
             </Group>
-            <Box style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
+            <Box style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "grid", gridTemplateColumns: "44px minmax(0,1fr) 44px", alignItems: "center" }}>
+              <Group justify="center">{navigation.previousId && <ActionIcon aria-label="前のMedia" variant="subtle" onClick={() => move(-1)}><IconChevronLeft /></ActionIcon>}</Group>
+              <Box h="100%" style={{ minWidth: 0, overflow: "hidden" }}>
               {preview.kind === "ready" ? (
                 <Image
                   src={preview.url}
@@ -56,8 +66,20 @@ export function MediaDetailIdViewer({
                   onRetry={preview.kind === "detail-error" || preview.kind === "delivery-error" ? retryDetail : undefined}
                 />
               )}
+              </Box>
+              <Group justify="center">{navigation.nextId && <ActionIcon aria-label="次のMedia" variant="subtle" onClick={() => move(1)}><IconChevronRight /></ActionIcon>}</Group>
             </Box>
-            <Group h={48} px="sm" justify="flex-end" style={{ flexShrink: 0 }}>
+            <Group h={48} px="sm" justify="space-between" wrap="nowrap" style={{ flexShrink: 0 }}>
+              <Group gap={4} wrap="nowrap">
+                {!compact && <>
+                  <ActionIcon aria-label="左へ回転" variant="subtle" onClick={() => viewport.setDetailRotate((value) => value - 90)}>↶</ActionIcon>
+                  <ActionIcon aria-label="右へ回転" variant="subtle" onClick={() => viewport.setDetailRotate((value) => value + 90)}>↷</ActionIcon>
+                  <ActionIcon aria-label="拡大率をリセット" variant="subtle" onClick={() => viewport.setDetailZoom(100)}>100%</ActionIcon>
+                  <ActionIcon aria-label="縮小" variant="subtle" disabled={viewport.detailZoom <= 50} onClick={() => viewport.setDetailZoom((value) => Math.max(50, value - 10))}>−</ActionIcon>
+                  <ActionIcon aria-label="拡大" variant="subtle" disabled={viewport.detailZoom >= 300} onClick={() => viewport.setDetailZoom((value) => Math.min(300, value + 10))}>＋</ActionIcon>
+                </>}
+              </Group>
+              <Text size="xs">{navigation.position === null || navigation.count === null ? "—" : `${navigation.position + 1} / ${navigation.count}`}</Text>
               <ActionIcon
                 variant={infoOpened ? "light" : "subtle"}
                 aria-label={infoOpened ? "情報を閉じる" : "情報を開く"}
