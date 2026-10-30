@@ -97,3 +97,10 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 - This component is **not yet a production replacement** for `MediaDetailViewer`: the established Preview navigation/zoom/rotate and InfoPanel edit/share/delete actions are not wired here. Its information panel currently has basic read-only presentation, not the full legacy visual/behavior contract. Do not migrate existing consumers until these contracts are preserved and visual changes are reviewed.
 - Image `load`/`decode` success, signed URL refresh, Processing Polling and retry, forward/back, scope permissions, transitions, and responsive panel motion are still outstanding.
 - Work on the existing Viewer/Consumer paths is intentionally deferred; changing consumers now would cause a capability regression. CI/VRT and Human Visual Review on this new commit remain necessary. PR remains Draft, no baseline approval or merge.
+
+
+## Stage 3 — URL navigation / viewport interaction checkpoint (2026-10-30)
+
+- The isolated `MediaDetailIdViewer` now uses `useMediaDetailUrl().navigation` for previous/next controls and `navigateMediaDetail` for URL transitions. `useMediaDetailViewport` owns zoom/rotation state; controls are disabled on Compact consistently with the existing Compact design intent. URL selection changes reset zoom/rotation, including Back/Forward-driven changes.
+- The ID-only read-only path remains **unmounted in application consumers**. Its current controls are preliminary and **not a visual/behavioral parity claim**: existing zoom slider/direct entry, animated InfoPanel, navigation transitions, edit/share/delete and all source-specific actions remain in the legacy Viewer and are not replicated here. Reuse or refactor existing Preview/InfoPanel before consumer migration to preserve them rather than substituting this reduced UI.
+- Gate required: Typecheck, Build, Unit, Interaction, VRT and Human Visual Review after this commit; validate next/previous, Back/Forward, no-remount, stale ID and image, Compact/Medium/Wide, and zoom reset before any production wiring. PR remains Draft.
