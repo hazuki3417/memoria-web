@@ -9,3 +9,6 @@ storybook-static
 /public/__dev-assets
 test-results/*
 e2e/storybook-visual/report/*
+
+# Generated VRT test registration (not source of truth)
+e2e/storybook-visual/generated/
