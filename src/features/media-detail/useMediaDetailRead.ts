@@ -87,6 +87,7 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
 
   const processing = detail.kind === "ready" && detail.media.processing?.status === "PROCESSING"
   const shouldPoll = Boolean(mediaId && visible && processing && !activePoll.stopped)
+  const pollDelay = activePoll.failures > 0 ? 10000 : 5000
 
   useEffect(() => {
     if (!shouldPoll || !mediaId) return
@@ -113,12 +114,12 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
           })
         },
       ).finally(() => { requestInFlight.current = false })
-    }, 5000)
+    }, pollDelay)
     return () => {
       cancelled = true
       window.clearInterval(timer)
     }
-  }, [shouldPoll, mediaId, query.refetch])
+  }, [shouldPoll, pollDelay, mediaId, query.refetch])
 
   const retryDetail = useCallback(() => {
     if (mediaId) setPollState({ id: mediaId, failures: 0, stopped: false })
