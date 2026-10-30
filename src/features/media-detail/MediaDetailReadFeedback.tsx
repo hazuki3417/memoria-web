@@ -67,7 +67,7 @@ export function DetailMetadataStatus({
     ["ファイルサイズ", `${media.fileSize.toLocaleString()} B`],
     ["サイズ", media.image ? `${media.image.width} × ${media.image.height}` : "-"],
     ["アップロード", media.uploadedAt],
-    ["Uploader", media.uploader?.nickname ?? "-"],
+    ["Uploader", media.uploadedBy?.nickname ?? "-"],
   ]
   return (
     <Stack gap="xs">
