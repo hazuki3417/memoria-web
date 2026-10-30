@@ -263,3 +263,10 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - `MediaDetailReadFeedback.DetailCollectionStatus` の `incomplete` / `error` で再試行ボタンを表示し、既存のInfoPanelから `retryDetail` へ接続する。
 - 手動再試行では失敗したCursorの停止状態を解除してDetailを再取得し、最初のページから安全に再構築する。未取得Collectionを確定0件とみなさない。
 - この経路のローカルTypecheck/Unit/InteractionおよびApollo実動作検証は未完了。特にCursor失敗、Scope変更、再試行の競合は確認が必要。暫定 `[skip ci]` 運用を継続する。
+
+
+### Stage 4 — Variant署名URLの期限前更新（2026-10-30）
+
+- READYかつURLを表示可能なMediaでのみ、署名付きVariant URL（有効期限15分）を12分経過後に`media(id:)`再取得する。表示中は1分間隔で経過を確認し、非表示タブでは更新しない。再表示時は経過時間を評価して必要なら再取得する。
+- Media ID・Scope変更時は更新基準をリセットし、同時再取得を抑止する。画像load/decodeエラー時の再試行は自動化せず、既存のユーザー操作によるGraphQL再取得と画像remountを使う。
+- 12分の境界、非表示タブと非READY状態をUnit Testで固定した。実ブラウザでの期限切れ、GraphQL通信競合、画像decode、VRTとローカルTypecheck/Buildは未検証。GitHub Actions上限期間中は`[skip ci]`を継続する。
