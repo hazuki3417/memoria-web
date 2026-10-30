@@ -241,3 +241,11 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - `MediaBrowser`へoptional `onOpenMediaDetail(mediaId, orderedLoadedMediaIds)`を追加。指定時はMedia選択を外部URL Controllerへ委譲し、未指定時は従来どおりローカル`MediaDetailModal`を開く。順序は現在読み込まれた`stateItems`の表示順に固定する。
 - `MediaBrowserContainer`ではまだこのcallbackを渡さない。URL Controllerのread-only Modeには編集・共有・削除の実操作が未接続であり、Consumerを切り替えるとCapability regressionになるため。既存Prototype/Group Browserも変更しない。
 - 次段階でApplication ShellのURL Hostの単一所有者、Scope検証、実操作のpermission/pending/unknown contract、Back/Forward/no-remountを整えてからConsumerを移行する。変更のTypecheck、Build、Interaction、VRTはローカルで検証する。CIの実行上限中は `[skip ci]` を適用する。
+
+
+## Stage 2 — 実ConsumerのURL Viewer接続（2026-10-30）
+
+- Media Browser/Group Browserの実データ経路は`openMediaDetail`で共通URL Viewerへ委譲する。Prototype等でCallbackがない場合は従来のlocal Modalを維持する。
+- DashboardのRecent Media Carouselにoptional Media ID/クリックCallbackを追加し、`DashboardContainer`の実GraphQLデータでIDと表示順（最大32件）を対応付けてURL Controllerへ委譲する。IDのないPrototype表示は従来どおり非クリック。
+- 同じApplication Shellの`MediaDetailUrlController`が共通Viewerを所有する。編集・共有・削除などBackend契約未接続の操作はURL read-only modeで有効化しない。
+- ローカルTypecheck/Build/Unit/Interaction/VRT/E2E（Back/Forward、Carouselページ送り、Scope切替、no-remount、Focus）が必要。GitHub Actions上限中は`[skip ci]`を継続し、PRはDraftを維持する。
