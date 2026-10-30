@@ -8,6 +8,8 @@ import type { useMediaDetailEditing } from "@/features/media-detail/useMediaDeta
 type Props = {
   pending?: boolean
   options?: string[]
+  loadError?: boolean
+  onRetryLoad?: () => void
 } & Pick<
   ReturnType<typeof useMediaDetailEditing>,
   | "detailEditor"
@@ -26,6 +28,8 @@ export function TagsEditModal({
   saveDetailDraft,
   pending = false,
   options,
+  loadError = false,
+  onRetryLoad,
 }: Props) {
   return (
     <Modal
@@ -40,12 +44,14 @@ export function TagsEditModal({
         <Text size="sm" c="dimmed">
           このMediaのTagを追加・除外できます。
         </Text>
+        {loadError && <Text size="sm" c="red" role="alert">Tagの編集状態を取得できませんでした。</Text>}
+        {loadError && <Button variant="default" onClick={onRetryLoad}>再試行</Button>}
         <TagsInput
           label="Tags"
           data={options ?? ["旅行", "風景", "家族", "お気に入り"]}
           value={detailDraft}
           onChange={setDetailDraft}
-          disabled={pending}
+          disabled={pending || loadError}
         />
 
         </Stack>
@@ -57,7 +63,7 @@ export function TagsEditModal({
           <Button variant="default" disabled={pending} onClick={() => setDetailEditor(null)}>
             キャンセル
           </Button>
-          <Button loading={pending} disabled={pending} onClick={saveDetailDraft}>変更を反映</Button>
+          <Button loading={pending} disabled={pending || loadError} onClick={saveDetailDraft}>変更を反映</Button>
           </ActionPanel.End>
         </ActionPanel>
       </Modal.Footer>
