@@ -289,9 +289,9 @@ export function ApplicationShellContainer({
         <MediaDetailUrlProvider>
           {children}
           {contextKind === "community" && communityId ? (
-            <MediaDetailUrlController scope={{ type: "COMMUNITY", communityId }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} />
+            <MediaDetailUrlController scope={{ type: "COMMUNITY", communityId }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} />
           ) : contextKind === "personal" ? (
-            <MediaDetailUrlController scope={{ type: "PERSONAL" }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} />
+            <MediaDetailUrlController scope={{ type: "PERSONAL" }} wrap={currentUserData?.me?.preferences.mediaDetailNavigationWrap ?? false} initialInfoWide={currentUserData?.me?.preferences.mediaDetailInitialInfoWide} initialInfoMedium={currentUserData?.me?.preferences.mediaDetailInitialInfoMedium} />
           ) : null}
         </MediaDetailUrlProvider>
       </ApplicationShell>
