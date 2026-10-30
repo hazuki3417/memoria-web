@@ -31,6 +31,7 @@ export type MediaDetailInfoPanelProps = Pick<
   tagsReadState?: CollectionReadState
   onRetryDetail?: () => void
   readOnly?: boolean
+  allowDelete?: boolean
 }
 
 export function MediaDetailInfoPanel({
@@ -51,12 +52,13 @@ export function MediaDetailInfoPanel({
   tagsReadState,
   onRetryDetail,
   readOnly = false,
+  allowDelete = false,
 }: MediaDetailInfoPanelProps) {
   return (
     <MediaDetailInfoPanelFrame
       compact={compact}
       opened={detailInfoOpened}
-      footer={!readOnly && !detailReadState && (
+      footer={(!readOnly && !detailReadState || allowDelete && detailReadState?.kind === "ready") && (
         <Box
           p="md"
           style={{
