@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useMemo, useState } from "react"
 import { showNotification } from "@/components/Feedback"
 import { SplitView } from "@/components/SplitView"
-import { MediaDetailDialog } from "@/features/media-detail"
+import { MediaDetailModal } from "@/features/media-detail"
 import { validGroupName } from "./groupName"
 import { GroupRelationSection } from "./GroupRelationSection"
 import { GroupDetailPane } from "./GroupDetailPane"
@@ -441,7 +441,7 @@ export function GroupBrowser({
           </SplitView.Pane>
         </SplitView.Root>
       )}
-      <MediaDetailDialog
+      <MediaDetailModal
         items={groupMediaItems}
         groupOptions={candidates}
         groupMemberships={groupMemberships}
