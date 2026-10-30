@@ -199,3 +199,18 @@ After user authorization to execute implementation without per-step design confi
 **Review decisions reserved for final discussion:** scope of live mutation authorization, fallback on invalid direct URLs, wrap preference ownership, remote pagination completeness, original download action, and exact image retry/URL-renewal boundary. No silent simplification of legacy functionality is approved.
 
 Current implementation is an integration checkpoint and **not** a claim that all end-to-end behavior is complete or that latest CI has passed. Keep PR Draft.
+
+
+## Follow-up implementation and verification ledger (2026-10-30)
+
+The existing (canonical) `MediaDetailViewer` is mounted through a controller-only `MediaDetailUrlController`, never through a replacement visual Viewer. Current branch also implements:
+
+- Existing Preview: ID-only Loading/Error/Unavailable rendering; browser image `load`/`decode` readiness and delivery error state; manually invoked retry via image remount and GraphQL refetch; the local-item path continues to render its existing image.
+- Processing read: while the URL-selected Dialog is visible and tab is visible, poll at 5s; after transport failure retry at 10s; stop after 3 consecutive failures; show manual restart. Poll state is keyed to ID, and tested pure helpers enforce the thresholds. Apollo partial GraphQL errors are not counted as transport failures.
+- Navigation: route controller uses the saved `mediaDetailNavigationWrap` preference; ID changes through previous/next or browser History reset Zoom/Rotate. The original Preview remains the common visual component.
+- Read model: `uploadedBy` matches the checked GraphQL SDL. GraphQL `ScopeInput`, `Media.processing.status`, `Image.variants` and group/tag field names were read from repository SDL.
+- Storybook: original Preview and original Viewer include ID-only Loading/Unavailable states; no separate Viewer Story exists.
+
+**Important known gaps:** Existing Media Browser/Group Browser/Dashboard click flows have NOT yet been migrated; preserving their real/mocked editing/group-share/delete actions requires a final permission/mutation contract. Image retry currently reuses refetch/remount, but signed URL refresh semantics and real-browser image decode tests are not yet verified. Back/Forward/bfcache, visibility changes, three-error sequencing, focus/nested dialog, and exact visual/behavioral parity remain E2E/Human Review gates. Groups/Tags Connection pagination beyond the first 100 edges is not implemented and must not be represented as complete. The User Preferences for initial InfoPanel state and full data formatting are not fully connected. No VRT baseline is accepted. No PR merge.
+
+Open tracking Issue: [#178](https://github.com/hazuki3417/memoria-web/issues/178) remains the cross-cutting specification/integration gate. This checkpoint is not the final completion of the issue or the PR.
