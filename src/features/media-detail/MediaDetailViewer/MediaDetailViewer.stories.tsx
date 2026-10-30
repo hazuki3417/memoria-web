@@ -21,9 +21,13 @@ const items: MediaItem[] = [
 function ViewerStory({
   initialId,
   compact = false,
+  idOnly = false,
+  unavailable = false,
 }: {
   initialId: string
   compact?: boolean
+  idOnly?: boolean
+  unavailable?: boolean
 }) {
   const [detail, setDetail] = useState<MediaItem | null>(
     () => items.find((item) => item.id === initialId) ?? null,
@@ -33,7 +37,14 @@ function ViewerStory({
 
   return (
     <MediaDetailViewer
-      detail={detail}
+      detail={idOnly ? null : detail}
+      selectedId={idOnly ? initialId : undefined}
+      read={idOnly ? {
+        detail: unavailable ? { kind: "unavailable" } : { kind: "loading" },
+        preview: unavailable ? { kind: "unavailable" } : { kind: "detail-loading" },
+        groups: { kind: "pending" },
+        tags: { kind: "pending" },
+      } : undefined}
       setDetail={setDetail}
       closeMediaDetail={() => setDetail(null)}
       onRequestDelete={() => undefined}
@@ -51,7 +62,7 @@ const meta = {
   title: "Features/Media Detail/MediaDetailViewer",
   component: ViewerStory,
   parameters: { layout: "fullscreen" },
-  args: { initialId: "portrait-01", compact: false },
+  args: { initialId: "portrait-01", compact: false, idOnly: false, unavailable: false },
 } satisfies Meta<typeof ViewerStory>
 
 export default meta
@@ -70,4 +81,16 @@ export const Compact: Story = {
   name: "Visual · Compact",
   tags: ["visual"],
   args: { compact: true },
+}
+
+export const DirectUrlLoading: Story = {
+  name: "Visual · Direct URL / ID-only Loading",
+  tags: ["visual"],
+  args: { initialId: "remote-id", idOnly: true },
+}
+
+export const DirectUrlUnavailable: Story = {
+  name: "Visual · Direct URL / ID-only Unavailable",
+  tags: ["visual"],
+  args: { initialId: "missing-id", idOnly: true, unavailable: true },
 }
