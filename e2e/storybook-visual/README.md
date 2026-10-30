@@ -2,6 +2,21 @@
 
 StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較します。MDXのDocsは対象外です。既存のVRTとは独立した環境で、既存Quality Gateには組み込まず、Phase 1では独立したCompose動作確認用のGitHub Actionsを利用します。
 
+## VRT実行構造（Issue #223 改修ブランチ）
+
+`npm run test:visual` と `npm run test:visual:update` は `scripts/vrt/run.mjs` を起動する。このRunnerはStorybookを1回起動し、`index.json` から `vrt` タグ付きStoryを選定、Storybook Meta `title` によって `components/<第2階層>` / `features/<第2階層>` / `other/<第1階層>` へ分類し、`e2e/storybook-visual/generated/` にグループ別のPlaywright Specを生成する。
+
+- `generated/` は実行時生成物でGit管理しない。手動編集しない。
+- 各Story × Viewportは独立した `test()` として登録する。グループはテストの整理単位であり、巨大な一つのテストにまとめない。
+- 共通撮影処理は `e2e/storybook-visual/capture.ts` に集約。従来のStory ID + Viewport名によるPNG名を維持。
+- `VRT_GROUP=components/modal npm run test:visual` で特定グループのみ実行可能。親の `components` も指定可能。対象0件はエラー。
+- 現段階ではViewportは従来の3幅を維持する。Story別の選択方式は未決定であり、このブランチで暗黙に導入しない。
+- Baseline比較と明示的な候補生成を分離し、人間のVisual Review後にのみ採用する。
+
+`playwright.storybook-visual.config.ts` は生成済みテストだけを収集する。旧 `storybook.spec.ts` と `playwright.vrt.config.ts` はこの実行経路で参照しない。旧ファイルの削除は既存保証と参照先の棚卸し後に行う。
+
+**検証状態**: このブランチでのGitHub更新はコードの実行成功を意味しない。Storybook起動、Playwrightテスト列挙、Baseline比較、CI動作、特にグループ別の分割実行と環境再現性は実行検証が必要。
+
 ## 実行
 
 ```bash
@@ -38,7 +53,7 @@ DecoratorはThemeProviderやApplicationShellのfixture、Modal用Portal root等�
 
 ## 撮影Viewportの共通設定
 
-VRTのViewportは `e2e/storybook-visual/storybook.spec.ts` で一律に走査する。代表値は `.storybook/responsiveViewports.ts` を参照する。設定はStoryの `parameters` やDecorator、StorybookのViewportアドオンに依存しない。 `page.setViewportSize()` によりブラウザViewportを変更した後、同じStoryの `iframe.html` を開いて撮影する。
+VRTのViewportは `e2e/storybook-visual/generated/*.spec.ts` でテスト単位ごとに設定する（生成元は `scripts/vrt/run.mjs`）。代表値は `.storybook/responsiveViewports.ts` を参照する。設定はStoryの `parameters` やDecorator、StorybookのViewportアドオンに依存しない。 `page.setViewportSize()` によりブラウザViewportを変更した後、同じStoryの `iframe.html` を開いて撮影する。
 
 撮影ファイル名のSuffixは `compact`、`medium`、`wide` とする。旧 `mobile` / `desktop` 名のBaselineとの併存・再利用は行わず、候補画像のVisual Review後に全3幅のBaselineを生成する。 `vrt` は撮影対象選定、`vrt-modal` はPortal上のDialogの可視性確認に限る。
 
@@ -119,7 +134,7 @@ npm run test:visual:report
 
 **失敗時**はPlaywrightのHTML ReportとExpected / Actual / Diff画像を確認し、原因を調査する。Baseline欠落は未登録として扱い、通常比較から更新処理を呼ばない。 `play`付きStoryの撮影同期は未実装のため、対象に追加する前に完了待機・描画安定を検証する。
 
-**CI / Quality Gate**: Compose検証用Workflowだけを追加し、既存Quality Gateには組み込まない。旧VRT実装のnpmコマンドは削除済み。旧VRTテスト・設定ファイル自体の整理は別途判断する。
+**CI / Quality Gate**: Compose検証用Workflowだけを追加し、既存Quality Gateには組み込まない。旧VRT実装のnpmコマンドは削除済み。旧VRTテスト・設定ファイルの整理は、参照と保証内容の棚卸し後に判断する。
 
 ## VRT対象Storyの指定
 
