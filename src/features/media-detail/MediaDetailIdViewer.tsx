@@ -7,6 +7,7 @@ import { useMediaDetailUrl } from "./MediaDetailUrlProvider"
 import { useMediaDetailViewport } from "./useMediaDetailViewport"
 import { MediaDetailNavigationButton } from "./MediaDetailNavigationButton"
 import { MediaDetailRotationControls } from "./MediaDetailRotationControls"
+import { MediaDetailZoomControls } from "./MediaDetailZoomControls"
 import { DetailCollectionStatus, DetailMetadataStatus, PreviewStatus } from "./MediaDetailReadFeedback"
 import { MediaDetailLayout } from "./MediaDetailViewer/MediaDetailLayout"
 import { MediaDetailViewerHost } from "./MediaDetailViewer/MediaDetailViewerHost"
@@ -87,9 +88,7 @@ export function MediaDetailIdViewer({
               <Group gap={4} wrap="nowrap">
                 {!compact && <>
                   <MediaDetailRotationControls setRotate={viewport.setDetailRotate} setAnimated={viewport.setDetailRotateAnimated} />
-                  <ActionIcon aria-label="拡大率をリセット" variant="subtle" onClick={() => viewport.setDetailZoom(100)}>100%</ActionIcon>
-                  <ActionIcon aria-label="縮小" variant="subtle" disabled={viewport.detailZoom <= 50} onClick={() => viewport.setDetailZoom((value) => Math.max(50, value - 10))}>−</ActionIcon>
-                  <ActionIcon aria-label="拡大" variant="subtle" disabled={viewport.detailZoom >= 300} onClick={() => viewport.setDetailZoom((value) => Math.min(300, value + 10))}>＋</ActionIcon>
+                  <MediaDetailZoomControls zoom={viewport.detailZoom} setZoom={viewport.setDetailZoom} />
                 </>}
               </Group>
               <Text size="xs">{navigation.position === null || navigation.count === null ? "—" : `${navigation.position + 1} / ${navigation.count}`}</Text>
