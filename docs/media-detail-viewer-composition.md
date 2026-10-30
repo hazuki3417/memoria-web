@@ -299,3 +299,9 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - `mediaGroups(scope:)`のRelayページをCursorで取得し、候補一覧が完結するまで保存させない。取得失敗は再試行を表示。候補のIDを用い、`removeMediaFromGroup`と`addMediaToGroup`を逐次実行する。
 - MutationのSUCCEEDED/ALREADY_APPLIEDのみ受付を確認する。途中で失敗・結果不明になった場合は部分成功を想定して成功表示せず、Media DetailとアクティブなGroup一覧/詳細を再取得する。
 - Media移動時はGroups編集のDraftを破棄。**未検証**: 実APIの権限判定、分類操作の部分成功・不明結果、複数ページ、Scope切替、Typecheck/Build/Interaction/VRT/E2E。CI Gate/Human Visual Review前のcheckpointであり、PR #221のmergeはしない。
+
+### Priority split and InfoPanel Initial Preferences (2026-10-30)
+
+- ユーザー合意：すでに実装済みの機能の安定化・境界条件・回帰テストは当面保留し、[Issue #227](https://github.com/hazuki3417/memoria-web/issues/227) で一括追跡する。今回優先するのは、現行Backendだけで対応できる**未実装の機能**。Processing Pollingの変更、Backend未対応のShare/Downloadは対象外。
+- URL Viewerの未接続だった `me.preferences.mediaDetailInitialInfoWide` / `mediaDetailInitialInfoMedium` をApplicationShellから渡し、既存の`useResponsiveViewport`によるWide/Medium判定で**Viewerを開いた時に一度だけ**InfoPanelの初期開閉へ適用する。Mediaページ送りや手動開閉で設定を上書きしない。Compactは既存の開いた初期表示を維持する。設定情報が未取得の場合も既存の開いた初期表示を維持する。
+- CI/実ブラウザ検証は保留Issue #227へ。PRはDraftを維持し、Mergeしない。
