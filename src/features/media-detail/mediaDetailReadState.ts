@@ -120,3 +120,15 @@ export function mergeDetailCollectionPages<T extends { node: { id: string } }>(
     pageInfo: next.pageInfo,
   }
 }
+
+/** Refresh a 15-minute signed Variant URL before expiry, including tab resume. */
+export const VARIANT_URL_REFRESH_MS = 12 * 60 * 1000
+
+export function shouldRefreshVariantUrl(
+  lastIssuedAt: number,
+  now: number,
+  ready: boolean,
+  visible: boolean,
+): boolean {
+  return ready && visible && now - lastIssuedAt >= VARIANT_URL_REFRESH_MS
+}
