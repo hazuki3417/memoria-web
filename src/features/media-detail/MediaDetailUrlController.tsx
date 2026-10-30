@@ -9,6 +9,7 @@ import { showNotification } from "@/components/Feedback"
 import { useEffect, useRef } from "react"
 import { MediaDetailViewer } from "./MediaDetailViewer"
 import { TagsEditModal } from "./TagsEditModal"
+import { GroupsEditModal } from "./GroupsEditModal"
 import { useMediaDetailEditing } from "./useMediaDetailEditing"
 import { useMediaDetailViewport } from "./useMediaDetailViewport"
 import { useMediaDetailPresentation } from "./useMediaDetailPresentation"
@@ -31,6 +32,26 @@ const TAG_EDIT_STATE = gql`
 const UPDATE_MEDIA_TAGS = gql`
   mutation MediaDetailUpdateTags($input: UpdateMediaTagsInput!) {
     updateMediaTags(input: $input) { mediaId stateToken }
+  }
+`
+
+
+const MEDIA_DETAIL_GROUP_OPTIONS = gql`
+  query MediaDetailGroupOptions($scope: ScopeInput!, $after: String) {
+    mediaGroups(scope: $scope, first: 100, after: $after) {
+      edges { node { id name } }
+      pageInfo { hasNextPage endCursor }
+    }
+  }
+`
+const MEDIA_DETAIL_ADD_GROUP = gql`
+  mutation MediaDetailAddToGroup($input: ChangeMediaGroupClassificationInput!) {
+    addMediaToGroup(input: $input) { results { mediaId status errorCode } }
+  }
+`
+const MEDIA_DETAIL_REMOVE_GROUP = gql`
+  mutation MediaDetailRemoveFromGroup($input: ChangeMediaGroupClassificationInput!) {
+    removeMediaFromGroup(input: $input) { results { mediaId status errorCode } }
   }
 `
 
@@ -100,6 +121,74 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       setSavingTags(false)
     }
   }
+
+  const [groupTarget, setGroupTarget] = useState<string | null>(null)
+  const [groupDraft, setGroupDraft] = useState<string[]>([])
+  const [savingGroups, setSavingGroups] = useState(false)
+  const groupOptions = useQuery<{
+    mediaGroups: {
+      edges: { node: { id: string; name: string } }[]
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
+    }
+  }>(MEDIA_DETAIL_GROUP_OPTIONS, {
+    variables: { scope },
+    skip: groupTarget === null,
+    fetchPolicy: "network-only",
+  })
+  const [addToGroup] = useMutation<{
+    addMediaToGroup: { results: { mediaId: string; status: string }[] }
+  }>(MEDIA_DETAIL_ADD_GROUP)
+  const [removeFromGroup] = useMutation<{
+    removeMediaFromGroup: { results: { mediaId: string; status: string }[] }
+  }>(MEDIA_DETAIL_REMOVE_GROUP)
+  const openGroupEditor = () => {
+    const id = presentation.selectedMediaId
+    if (!id || presentation.groups.kind !== "ready") return
+    setGroupDraft(presentation.groups.values.map((item) => item.name))
+    setGroupTarget(id)
+  }
+  const saveGroups = async () => {
+    const id = groupTarget
+    const groups = presentation.groups
+    const catalog = groupOptions.data?.mediaGroups
+    if (!id || savingGroups || presentation.selectedMediaId !== id ||
+        groups.kind !== "ready" || !catalog || catalog.pageInfo.hasNextPage ||
+        groupOptions.error) return
+    const byName = new Map(catalog.edges.map(({ node }) => [node.name, node.id]))
+    const original = new Map(groups.values.map((item) => [item.name, item.id]))
+    const desired = [...new Set(groupDraft)]
+    if (desired.some((name) => !byName.has(name))) {
+      showNotification({ kind: "error", title: "Groupsを保存できませんでした", description: "Group候補が変更されました。最新の一覧を取得してください。" })
+      return
+    }
+    const removed = [...original.values()].filter((groupId) => !desired.some((name) => byName.get(name) === groupId))
+    const added = desired.map((name) => byName.get(name)!).filter((groupId) => ![...original.values()].includes(groupId))
+    setSavingGroups(true)
+    try {
+      for (const [groupIds, mutate, field] of [
+        [removed, removeFromGroup, "removeMediaFromGroup"],
+        [added, addToGroup, "addMediaToGroup"],
+      ] as const) {
+        for (const groupId of groupIds) {
+          const result = await mutate({ variables: { input: { groupId, mediaIds: [id] } } })
+          const data = result.data?.[field]
+          if (!data || data.results.length !== 1 || data.results[0].mediaId !== id ||
+              !["SUCCEEDED", "ALREADY_APPLIED"].includes(data.results[0].status)) {
+            throw new Error("Classification result was not confirmed")
+          }
+        }
+      }
+      setGroupTarget(null)
+      showNotification({ kind: "success", title: "Groupsを更新", description: "MediaのGroup分類を保存しました。" })
+    } catch {
+      setGroupTarget(null)
+      showNotification({ kind: "error", title: "Groupsの変更結果を確認できませんでした", description: "一部の変更が反映された可能性があります。最新の所属状態を確認してください。" })
+    } finally {
+      setSavingGroups(false)
+      void presentation.retryDetail()
+      void apollo.refetchQueries({ include: ["BrowseGroupDetail", "BrowseGroups"] }).catch(() => {})
+    }
+  }
   const compact = useMediaQuery("(max-width: 47.99em)")
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState(false)
@@ -147,6 +236,8 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       if (previousId.current !== null) {
         setTagTarget(null)
         setTagDraft([])
+        setGroupTarget(null)
+        setGroupDraft([])
         viewport.setDetailZoom(100)
         viewport.setDetailRotate(0)
         viewport.setDetailRotateAnimated(false)
@@ -172,6 +263,7 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       }}
       allowDelete={scope.type === "PERSONAL"}
       onEditTags={openTagEditor}
+      onEditGroups={openGroupEditor}
       stateItems={[]}
       compact={compact}
       context={scope.type === "COMMUNITY" ? "community" : "personal"}
@@ -202,6 +294,20 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
         retryImage: presentation.retryDetail,
         pollingStopped: presentation.pollingStopped,
       }}
+    />
+    <GroupsEditModal
+      detailEditor={groupTarget ? "groups" : null}
+      setDetailEditor={(value) => {
+        if (savingGroups || typeof value === "function") return
+        if (value === null) setGroupTarget(null)
+      }}
+      detailDraft={groupDraft}
+      setDetailDraft={setGroupDraft}
+      saveDetailDraft={saveGroups}
+      groupOptions={groupOptions.data?.mediaGroups.edges.map(({ node }) => node.name)}
+      pending={savingGroups || groupOptions.loading || (!groupOptions.data && !groupOptions.error) || Boolean(groupOptions.data?.mediaGroups.pageInfo.hasNextPage)}
+      loadError={Boolean(groupOptions.error || (groupOptions.data?.mediaGroups.pageInfo.hasNextPage && !groupOptions.loading))}
+      onRetryLoad={() => { void groupOptions.refetch() }}
     />
     <TagsEditModal
       detailEditor={tagTarget ? "tags" : null}
