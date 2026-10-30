@@ -89,3 +89,11 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 - Scope is supplied by the consumer rather than inferred from URL; production wiring must validate scope and access rights before showing/editing/sharing/deleting.
 - Follow-up verification: correct ID on rapid transitions, independent Preview/InfoPanel errors, mounted Host continuity, URL Back/Forward/reload, nested overlays, Compact/Medium/Wide visual behavior, and real browser image load/decode.
 - This is an intermediate checkpoint. CI and Human Visual Review must be completed on the new commit. No baseline acceptance or merge is implied.
+
+
+## Stage 3 — ID-only read-only fullscreen composition (2026-10-30)
+
+- `MediaDetailIdViewer` was added as an **isolated, unconnected read-only checkpoint**. It consumes `MediaDetailPresentation`, opens `MediaDetailViewerHost` from the selected URL ID, reuses `MediaDetailLayout`, and displays independent Preview and Metadata/Groups/Tags read states. It does not require a listing `MediaItem` to display loading/error/unavailable.
+- This component is **not yet a production replacement** for `MediaDetailViewer`: the established Preview navigation/zoom/rotate and InfoPanel edit/share/delete actions are not wired here. Its information panel currently has basic read-only presentation, not the full legacy visual/behavior contract. Do not migrate existing consumers until these contracts are preserved and visual changes are reviewed.
+- Image `load`/`decode` success, signed URL refresh, Processing Polling and retry, forward/back, scope permissions, transitions, and responsive panel motion are still outstanding.
+- Work on the existing Viewer/Consumer paths is intentionally deferred; changing consumers now would cause a capability regression. CI/VRT and Human Visual Review on this new commit remain necessary. PR remains Draft, no baseline approval or merge.
