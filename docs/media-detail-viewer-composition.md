@@ -175,3 +175,27 @@ Current branch's prior changes remain subject to CI and Human Visual Review; no 
 - The URL/history and GraphQL reading hooks are controller/data responsibilities, not alternative visual components; connect them to the original composition only after the original Viewer can represent ID-only loading/unavailable/error without fabricating a listing MediaItem.
 - Prior sections of this document describing ID-only Viewer's planned migration are historical checkpoint records and **superseded** by this correction. Do not reintroduce a parallel Viewer without an explicit new design agreement.
 - Validate all original Preview controls, animated InfoPanel, original sections and edit/share/delete actions, Compact/Medium/Wide visuals, history navigation, stale data safety, and image retry/polling. Latest commit requires CI plus Human Visual Review before progression to consumer integration. PR remains Draft.
+
+
+## Consolidation checkpoint — canonical Viewer URL entry (2026-10-30)
+
+After user authorization to execute implementation without per-step design confirmation:
+
+- Removed the parallel `MediaDetailIdViewer` and relocated Preview controls under the **existing** `MediaDetailPreview/` directory.
+- Updated `MediaDetailPreview` to accept optional `selectedId`, URL-navigation state/callback, and a nullable listing item; it continues to own the *original* 44px header, 44px navigation columns, 48px footer, zoom/rotate controls, and animated image transitions. An ID-selected Loading/Error/Unavailable state can now render with no listing `MediaItem`.
+- Updated the **existing** `MediaDetailViewer` to open for `selectedId` as well as local `detail`. Read-mode InfoPanel is read-only while its original sections, frames, and animations are reused. Local-mode props are preserved.
+- Added **controller-only** `MediaDetailUrlController` (not an alternate Viewer) and mounted it below `MediaDetailUrlProvider` in ApplicationShell, passing `useMediaDetailPresentation`, URL navigation, viewport state, and scoped Personal/Community GraphQL reads into the canonical Viewer. No fixture-only edit/share/delete mutation is enabled in this ID-selected path.
+- Aligned read model and read feedback with the `uploadedBy` field selected by the GraphQL query instead of a mismatching `uploader` name.
+
+### Remaining end-to-end gates / unresolved design
+
+1. Consumer initiation: existing Media Browser, Group Browser and Dashboard opening actions are not yet connected to `openMediaDetail` and immutable loaded-ID snapshots; local dialog pathways remain until capability-preserving migration is tested.
+2. Image delivery: actual `load/decode` verification, manual image retry, signed URL renewal and stale-image protection remain unimplemented.
+3. Processing: dialog-only 5s polling, tab visibility pause, 3 consecutive transport failures followed by manual restart remain unimplemented.
+4. URL lifecycle: Next Router/History E2E, back/forward/dismiss, close on route changes, direct reload, and unique shared Host mounting require browser verification. The old local dialog and new ApplicationShell URL Host can coexist until consumer migration; duplicated overlays must be prevented before migration.
+5. Live permission/mutation paths: download, Groups/Tags editing, Community share/unshare, and delete cannot be enabled from fixture callbacks; map server authorization and real operations first.
+6. Human Visual Review: all Compact/Medium/Wide, 340px panel/animation, original Preview controls, nested overlays/focus, loading/error/partial state VRT and interaction review are required. Baseline acceptance and PR merge not authorized.
+
+**Review decisions reserved for final discussion:** scope of live mutation authorization, fallback on invalid direct URLs, wrap preference ownership, remote pagination completeness, original download action, and exact image retry/URL-renewal boundary. No silent simplification of legacy functionality is approved.
+
+Current implementation is an integration checkpoint and **not** a claim that all end-to-end behavior is complete or that latest CI has passed. Keep PR Draft.
