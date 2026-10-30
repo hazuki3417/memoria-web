@@ -2,27 +2,13 @@
 
 StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較します。MDXのDocsは対象外です。シナリオE2Eとは独立した環境で、既存Quality Gateには組み込まず、Phase 1では独立したCompose動作確認用のGitHub Actionsを利用します。
 
-## VRT実行構造（Issue #223 改修ブランチ）
+## VRT実行構造（Issue #223 最新方針）
 
-`npm run test:visual` と `npm run test:visual:update` は `scripts/vrt/run.mjs` を起動する。このRunnerはStorybookを1回起動し、`index.json` から `vrt` タグ付きStoryを選定、Storybook Meta `title` によって `components/<第2階層>` / `features/<第2階層>` / `other/<第1階層>` へ分類し、`tests/vrt/generated/` にグループ別のPlaywright Specを生成する。
+通常の `tests/vrt/storybook.spec.ts` でStorybook Indexの準備を待ち、`vrt` 対象Storyを収集する。各Story × 固定3Viewportについて独立した `test()` を登録し、`capture.ts` で撮影・比較する。Spec生成用Runnerは廃止する。
 
-- `generated/` は実行時生成物でGit管理しない。手動編集しない。
-- 各Story × Viewportは独立した `test()` として登録する。グループはテストの整理単位であり、巨大な一つのテストにまとめない。
-- 共通撮影処理は `tests/vrt/capture.ts` に集約。従来のStory ID + Viewport名によるPNG名を維持。
-- `VRT_GROUP=components/modal npm run test:visual` で特定グループのみ実行可能。親の `components` も指定可能。対象0件はエラー。
-- 現段階ではViewportは従来の3幅を維持する。Story別の選択方式は未決定であり、このブランチで暗黙に導入しない。
-- Baseline比較と明示的な候補生成を分離し、人間のVisual Review後にのみ採用する。
+旧Baseline 120件は内容を変更せず `tests/vrt/baselines/` に復元済み。旧ファイル名を維持し、比較を通して再利用を確認する。実行検証は未実施。
 
-`playwright.vrt.config.ts` は生成済みテストだけを収集する。旧単一テスト `storybook.spec.ts` と旧VRT設定は新構成へ置き換える。旧Baselineは新しいVRT方式に引き継がない（2026-10-30合意）。新しい保存先は `tests/vrt/baselines/` とし、撮影環境の整備・設計レビュー後、対象Storyを全件新規撮影してHuman Visual Reviewで承認された画像のみ登録する。旧画像の承認済み状態を継承しない。
-
-**検証状態**: このブランチでのGitHub更新はコードの実行成功を意味しない。Storybook起動、Playwrightテスト列挙、Baseline比較、CI動作、特にグループ別の分割実行と環境再現性は実行検証が必要。
-
-
-## Baselineの破棄・再作成（2026-10-30合意）
-
-旧 `e2e/storybook-visual/__screenshots__/` は新VRTの正本として扱わず、新しい `tests/vrt/baselines/` へコピー・移行しない。旧Baselineファイルは別途Git上で削除し、使用中のデータがない状態にしてから新規撮影する。Baseline生成は実装変更がない場合でも**新しい初期基準を承認する操作**であり、自動的に正しい画像になったとは扱わない。全対象Storyの候補画像を固定環境で作成してVisual Reviewを通した後に登録し、通常比較を開始する。
-
-この作業段階では撮影・テスト・CIを実行しない。旧画像のGit上の削除状況は別途確認する。
+方針の正本は `memoria-design/content/system/web/frontend-testing.mdx`、本書は実装固有の操作手順を所有する。
 
 ## 実行
 
