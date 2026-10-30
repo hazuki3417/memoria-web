@@ -63,6 +63,7 @@ export function ApplicationAccountMenu({
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item
+          color="red.5"
           leftSection={<IconLogout size={16} stroke={1.6} />}
           onClick={onLogout}
         >

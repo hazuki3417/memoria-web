@@ -1,42 +1,11 @@
 "use client"
 
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Center,
-  Divider,
-  Group,
-  Loader,
-  Menu,
-  Modal,
-  NavLink,
-  ScrollArea,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core"
+import { Button, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { IconCheck, IconPlus, IconSearch, IconX } from "@tabler/icons-react"
 import { useState } from "react"
+import { ContextSwitcherMenu } from "./ContextSwitcherMenu"
+import { ContextSwitcherDialog } from "./ContextSwitcherDialog"
 import type { ApplicationContextOption } from "../types"
-
-const menuStyles = {
-  dropdown: {
-    border: "1px solid var(--mantine-color-default-border)",
-    borderRadius: "var(--mantine-radius-md)",
-    boxShadow: "var(--mantine-shadow-md)",
-    padding: 4,
-    minWidth: 200,
-  },
-  item: {
-    borderRadius: "var(--mantine-radius-sm)",
-    fontSize: "var(--mantine-font-size-sm)",
-    minHeight: 32,
-    padding: "5px 8px",
-  },
-  label: { padding: "8px 8px 4px", fontSize: "var(--mantine-font-size-xs)" },
-} as const
 
 export function ApplicationContextSwitcher({
   currentContext,
@@ -61,145 +30,11 @@ export function ApplicationContextSwitcher({
   const [opened, setOpened] = useState(false)
   const [search, setSearch] = useState("")
 
-  const personal = contexts.find((item) => item.kind === "personal")
-  const communities = contexts.filter((item) => item.kind === "community")
-  const currentCommunity = communities.find((item) => item.id === currentContext.id)
-  const term = search.trim().toLocaleLowerCase("ja")
-  const pinned = currentCommunity
-  const shown = communities.filter(
-    (item) =>
-      item.id !== currentCommunity?.id &&
-      item.label.toLocaleLowerCase("ja").includes(term),
-  )
-
   const changeOpened = (next: boolean) => {
     if (next && !opened) onOpen?.()
     setOpened(next)
     if (!next) setSearch("")
   }
-  const select = (id: string) => {
-    changeOpened(false)
-    onSelect(id)
-  }
-
-  // Accent Lineは選択状態とは独立して、各Contextの色を示す。
-  const accent = (item: ApplicationContextOption) => (
-    <Box
-      pos="absolute"
-      top={3}
-      bottom={3}
-      left={0}
-      w={3}
-      bg={item.accentColor}
-      style={{ borderRadius: "var(--mantine-radius-xl)", pointerEvents: "none" }}
-      aria-hidden="true"
-    />
-  )
-
-  const menuOption = (item: ApplicationContextOption) => (
-    <Box key={item.id} pos="relative" pl={8}>
-      {accent(item)}
-      <Menu.Item
-        onClick={() => select(item.id)}
-        rightSection={item.id === currentContext.id ? <IconCheck size={14} /> : null}
-        style={{
-          background: item.id === currentContext.id
-            ? "var(--mantine-color-default-hover)"
-            : undefined,
-          fontWeight: item.id === currentContext.id ? 600 : 400,
-        }}
-      >
-        {item.label}
-      </Menu.Item>
-    </Box>
-  )
-
-  const modalOption = (item: ApplicationContextOption) => (
-    <Box key={item.id} pos="relative" pl={8}>
-      {accent(item)}
-      <NavLink
-        label={item.label}
-        onClick={() => select(item.id)}
-        rightSection={item.id === currentContext.id ? <IconCheck size={14} /> : null}
-        active={item.id === currentContext.id}
-        variant="subtle"
-        color="gray"
-        styles={{
-          root: {
-            borderRadius: "var(--mantine-radius-sm)",
-            background: item.id === currentContext.id
-              ? "var(--mantine-color-default-hover)"
-              : undefined,
-            padding: "5px 8px",
-            minHeight: 32,
-          },
-          label: { fontSize: "var(--mantine-font-size-sm)" },
-        }}
-      />
-    </Box>
-  )
-
-  const searchInput = (
-    <TextInput
-      aria-label="Communityを検索"
-      placeholder="Communityを検索"
-      size="xs"
-      leftSection={<IconSearch size={14} aria-hidden="true" />}
-      rightSection={search ? (
-        <ActionIcon
-          size="xs"
-          variant="subtle"
-          color="gray"
-          aria-label="検索をクリア"
-          onClick={() => setSearch("")}
-        >
-          <IconX size={12} aria-hidden="true" />
-        </ActionIcon>
-      ) : undefined}
-      rightSectionPointerEvents="all"
-      value={search}
-      onChange={(event) => setSearch(event.currentTarget.value)}
-    />
-  )
-
-  const status = (
-    <>
-      {loading && communities.length === 0 && (
-        <Center w="100%" mih={64}>
-          <Loader size="sm" aria-label="Community一覧を読み込み中" />
-        </Center>
-      )}
-      {error && (
-        <Group px="sm" py="xs" gap="xs" wrap="nowrap" justify="space-between">
-          <Text size="xs" c="red" role="alert">
-            取得できませんでした。
-          </Text>
-          {onRetry && (
-            <Button
-              size="compact-xs"
-              variant="subtle"
-              color="red"
-              onClick={onRetry}
-              style={{ flexShrink: 0 }}
-            >
-              再試行
-            </Button>
-          )}
-        </Group>
-      )}
-      {!loading && !error && communities.length === 0 && (
-        <Text size="xs" c="dimmed" px="sm" py="xs">
-          参加中のCommunityはありません。
-        </Text>
-      )}
-      {!loading && communities.length > 0 && shown.length === 0 && (
-        <Text size="xs" c="dimmed" px="sm" py="xs">
-          {term ? "一致するCommunityはありません。" : "他のCommunityはありません。"}
-        </Text>
-      )}
-    </>
-  )
-
   const trigger = (
     <Button
       variant="subtle"
@@ -217,82 +52,33 @@ export function ApplicationContextSwitcher({
 
   return (
     <>
-      <Menu
+      <ContextSwitcherMenu
         opened={opened && !compact}
-        onChange={changeOpened}
-        withinPortal
-        position="bottom-start"
-        styles={menuStyles}
-        width={280}
-        closeOnItemClick={false}
-      >
-        <Menu.Target>{trigger}</Menu.Target>
-        <Menu.Dropdown>
-          {personal && menuOption(personal)}
-          <Box
-            mt={4}
-            pt={4}
-            style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
-          >
-            {!error && pinned && menuOption(pinned)}
-            <Box px={8} py={4}>{searchInput}</Box>
-            <ScrollArea.Autosize mah={360} type="auto">
-              {status}
-              {!error && shown.map(menuOption)}
-            </ScrollArea.Autosize>
-          </Box>
-          {onCreateCommunity && (
-            <>
-              <Menu.Divider />
-              <Menu.Item
-                leftSection={<IconPlus size={16} stroke={1.6} aria-hidden="true" />}
-                onClick={() => {
-                  changeOpened(false)
-                  onCreateCommunity()
-                }}
-              >
-                Communityを作成
-              </Menu.Item>
-            </>
-          )}
-        </Menu.Dropdown>
-      </Menu>
-      <Modal
+        onOpenedChange={changeOpened}
+        trigger={trigger}
+        currentContext={currentContext}
+        contexts={contexts}
+        search={search}
+        onSearchChange={setSearch}
+        onSelect={onSelect}
+        onCreateCommunity={onCreateCommunity}
+        onRetry={onRetry}
+        loading={loading}
+        error={error}
+      />
+      <ContextSwitcherDialog
         opened={opened && !!compact}
         onClose={() => changeOpened(false)}
-        title="切り替え先"
-        centered
-        size="sm"
-      >
-        <Stack gap={4}>
-          {personal && modalOption(personal)}
-          <Box
-            mt={4}
-            pt={4}
-            style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
-          >
-            {!error && pinned && modalOption(pinned)}
-            <Box px={8} py={4}>{searchInput}</Box>
-            <ScrollArea.Autosize mah="50vh" type="auto">
-              {status}
-              {!error && shown.map(modalOption)}
-            </ScrollArea.Autosize>
-          </Box>
-          {onCreateCommunity && (
-            <>
-              <Divider />
-              <NavLink
-                label="Communityを作成"
-                leftSection={<IconPlus size={16} />}
-                onClick={() => {
-                  changeOpened(false)
-                  onCreateCommunity()
-                }}
-              />
-            </>
-          )}
-        </Stack>
-      </Modal>
+        currentContext={currentContext}
+        contexts={contexts}
+        search={search}
+        onSearchChange={setSearch}
+        onSelect={onSelect}
+        onCreateCommunity={onCreateCommunity}
+        onRetry={onRetry}
+        loading={loading}
+        error={error}
+      />
     </>
   )
 }

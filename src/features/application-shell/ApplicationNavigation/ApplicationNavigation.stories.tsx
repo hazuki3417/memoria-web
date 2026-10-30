@@ -14,7 +14,7 @@ const items = [
 ]
 
 const meta = {
-  title: "Components/Application Shell/Navigation",
+  title: "Features/Application Shell/Navigation",
   component: ApplicationNavigation,
   parameters: { layout: "fullscreen" },
   args: {
@@ -31,11 +31,11 @@ type Story = StoryObj<typeof meta>
 
 export const Opened: Story = {
   name: "Visual · Opened",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-drawer"],
 }
 export const CommunityAccent: Story = {
   name: "Visual · Community Accent",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-drawer"],
   args: { accentColor: "var(--mantine-color-teal-6)" },
 }
 
@@ -47,13 +47,13 @@ export const Closed: Story = {
 
 export const Empty: Story = {
   name: "Visual · Empty Navigation",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-drawer"],
   args: { items: [] },
 }
 
 export const Disabled: Story = {
   name: "Visual · Disabled Item",
-  tags: ["visual"],
+  tags: ["visual", "vrt", "vrt-drawer"],
   args: {
     items: [
       ...items,

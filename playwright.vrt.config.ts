@@ -1,17 +1,23 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test"
 
 export default defineConfig({
-  testDir: "./e2e/vrt",
+  testDir: "./tests/vrt",
+  fullyParallel: true,
+  reporter: [["list"], ["html", { outputFolder: "tests/vrt/report", open: "never" }]],
+  snapshotPathTemplate: "tests/vrt/baselines/{arg}{ext}",
   use: {
+    ...devices["Desktop Chrome"],
     baseURL: "http://127.0.0.1:6006",
-    headless: true,
+    viewport: { width: 1440, height: 900 },
+    deviceScaleFactor: 1,
+    locale: "ja-JP",
+    colorScheme: "light",
+    trace: "retain-on-failure",
   },
   webServer: {
-    command: "npx storybook dev -p 6006 --ci --no-open",
+    command: "npm run dev:storybook -- --ci --no-open",
     url: "http://127.0.0.1:6006/index.json",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 120_000,
   },
-  reporter: [["html", { outputFolder: "./e2e/vrt/report", open: "never" }]],
-  name: "VRT",
-});
+})

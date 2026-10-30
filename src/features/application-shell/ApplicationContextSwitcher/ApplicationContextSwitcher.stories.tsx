@@ -29,7 +29,7 @@ const friends = {
 const examples = [personal, family, travel, friends]
 
 const meta = {
-  title: "Components/Application Shell/Context Switcher",
+  title: "Features/Application Shell/Context Switcher",
   component: ApplicationContextSwitcher,
   args: {
     currentContext: personal,

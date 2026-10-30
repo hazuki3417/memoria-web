@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { ApplicationHeader } from "./ApplicationHeader"
 
 const meta = {
-  title: "Components/Application Shell/Header",
+  title: "Features/Application Shell/Header",
   component: ApplicationHeader,
   parameters: { layout: "fullscreen" },
   decorators: [

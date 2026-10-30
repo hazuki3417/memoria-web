@@ -63,7 +63,7 @@ const content = (
 )
 
 const meta = {
-  title: "Components/Application Shell",
+  title: "Features/Application Shell",
   component: ApplicationShell,
   parameters: { layout: "fullscreen" },
   args: {
@@ -112,12 +112,12 @@ type Story = StoryObj<typeof meta>
 
 export const Personal: Story = {
   name: "Visual · Personal",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
 }
 
 export const Community: Story = {
   name: "Visual · Community",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: {
     header: (
       <ApplicationHeader
@@ -145,13 +145,13 @@ export const Community: Story = {
 
 export const Compact: Story = {
   name: "Visual · Compact",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
 export const WithLocalNavigation: Story = {
   name: "Visual · With Local Navigation",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: {
     children: (
       <Box maw={1120} mx="auto" w="100%">

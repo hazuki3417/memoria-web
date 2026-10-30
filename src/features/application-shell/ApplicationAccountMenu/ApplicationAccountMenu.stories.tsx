@@ -9,7 +9,7 @@ const personal = {
 }
 
 const meta = {
-  title: "Components/Application Shell/Account Menu",
+  title: "Features/Application Shell/Account Menu",
   component: ApplicationAccountMenu,
   args: {
     user: { displayName: "ユーザー" },
@@ -24,17 +24,17 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   name: "Visual · Default",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
 }
 export const WithAvatarLabel: Story = {
   name: "Visual · With Avatar Label",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: { user: { displayName: "ユーザー", avatarLabel: "M" } },
 }
 
 export const Loading: Story = {
   name: "Visual · Loading",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: {
     user: { displayName: "" },
     profileStatus: "loading",
@@ -43,7 +43,7 @@ export const Loading: Story = {
 
 export const Error: Story = {
   name: "Visual · Error",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: {
     user: { displayName: "" },
     profileStatus: "error",
@@ -52,7 +52,7 @@ export const Error: Story = {
 
 export const Community: Story = {
   name: "Visual · Community Context",
-  tags: ["visual"],
+  tags: ["visual", "vrt"],
   args: {
     currentContext: {
       id: "family",
