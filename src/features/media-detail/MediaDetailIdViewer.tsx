@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Box, Group, Image, Stack, Text } from "@mantine/core"
+import { ActionIcon, Box, Group, Image, Text } from "@mantine/core"
 import { IconInfoCircle, IconX } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import { useMediaDetailUrl } from "./MediaDetailUrlProvider"
@@ -11,6 +11,7 @@ import { MediaDetailZoomControls } from "./MediaDetailZoomControls"
 import { DetailCollectionStatus, DetailMetadataStatus, PreviewStatus } from "./MediaDetailReadFeedback"
 import { MediaDetailLayout } from "./MediaDetailViewer/MediaDetailLayout"
 import { MediaDetailViewerHost } from "./MediaDetailViewer/MediaDetailViewerHost"
+import { MediaDetailInfoPanelFrame } from "./MediaDetailInfoPanel/MediaDetailInfoPanelFrame"
 import type { MediaDetailPresentation } from "./useMediaDetailPresentation"
 
 /**
@@ -103,30 +104,14 @@ export function MediaDetailIdViewer({
           </Box>
         }
         infoPanel={
-          infoOpened ? (
-            <Box
-              style={{
-                gridColumn: compact ? "1" : "2",
-                gridRow: compact ? "2" : "1",
-                width: compact ? "100%" : 340,
-                minWidth: 0,
-                minHeight: 0,
-                overflowY: "auto",
-                background: "var(--mantine-color-body)",
-                borderLeft: compact ? undefined : "1px solid var(--mantine-color-default-border)",
-                borderTop: compact ? "1px solid var(--mantine-color-default-border)" : undefined,
-              }}
-            >
-              <Stack gap="md" p="md">
+          <MediaDetailInfoPanelFrame compact={compact} opened={infoOpened}>
                 <Text fw={600} size="sm">Media情報</Text>
                 <DetailMetadataStatus state={detail} onRetry={retryDetail} />
                 <DetailCollectionStatus title="Groups" state={groups} />
                 {groups.kind === "ready" && <Text size="xs">{groups.values.map((item) => item.name).join(", ") || "なし"}</Text>}
                 <DetailCollectionStatus title="Tags" state={tags} />
                 {tags.kind === "ready" && <Text size="xs">{tags.values.map((item) => item.name).join(", ") || "なし"}</Text>}
-              </Stack>
-            </Box>
-          ) : null
+          </MediaDetailInfoPanelFrame>
         }
       />
     </MediaDetailViewerHost>
