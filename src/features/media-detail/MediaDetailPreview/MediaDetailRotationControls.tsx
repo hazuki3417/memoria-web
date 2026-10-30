@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Group } from "@mantine/core"
+import { ActionIcon } from "@mantine/core"
 import { IconRotate, IconRotate2 } from "@tabler/icons-react"
 import type { Dispatch, SetStateAction } from "react"
 
@@ -13,7 +13,7 @@ export function MediaDetailRotationControls({
   setAnimated: Dispatch<SetStateAction<boolean>>
 }) {
   return (
-    <Group gap={4} wrap="nowrap" justify="flex-start">
+    <>
       <ActionIcon variant="subtle" aria-label="回転をリセット" onClick={() => {
         setAnimated(false)
         setRotate(0)
@@ -32,6 +32,6 @@ export function MediaDetailRotationControls({
       }}>
         <IconRotate size={18} style={{ transform: "scaleX(-1)" }} />
       </ActionIcon>
-    </Group>
+    </>
   )
 }
