@@ -8,6 +8,7 @@ import {
   projectPreview,
   nextProcessingPollFailures,
   processingPollDelay,
+  mediaDetailPollingIdentity,
   type MediaDetailResult,
 } from "./mediaDetailReadState"
 
@@ -58,7 +59,7 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     },
   )
 
-  const pollKey = mediaId === null ? null : `${mediaId}:${scope.type}:${scope.communityId ?? ""}`
+  const pollKey = mediaDetailPollingIdentity(mediaId, scope)
   const [visible, setVisible] = useState(true)
   const [pollState, setPollState] = useState<{ id: string | null; failures: number; stopped: boolean }>({ id: null, failures: 0, stopped: false })
   const activePoll = pollState.id === pollKey ? pollState : { id: pollKey, failures: 0, stopped: false }
