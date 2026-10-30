@@ -6,6 +6,7 @@ import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailVie
 
 export type MediaDetailTagsSectionProps = {
   readOnly?: boolean
+  onEditTags?: () => void
 } & Pick<
   MediaDetailViewerProps,
   | "detailValues"
@@ -20,6 +21,7 @@ export function MediaDetailTagsSection({
   toggleDetailSection,
   openDetailEditor,
   readOnly = false,
+  onEditTags,
 }: MediaDetailTagsSectionProps) {
   const values = detailValues.tags
   return (
@@ -33,10 +35,10 @@ export function MediaDetailTagsSection({
             ({values.length})
           </Text>
         </Group>
-        {!readOnly && <Button
+        {(!readOnly || onEditTags) && <Button
           size="compact-xs"
           variant="subtle"
-          onClick={() => openDetailEditor("tags")}
+          onClick={() => onEditTags ? onEditTags() : openDetailEditor("tags")}
         >
           編集
         </Button>}
