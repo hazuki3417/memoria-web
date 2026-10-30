@@ -4,7 +4,9 @@ import { Badge, Box, Button, Collapse, Group, Text } from "@mantine/core"
 import { IconChevronDown } from "@tabler/icons-react"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 
-export type MediaDetailTagsSectionProps = Pick<
+export type MediaDetailTagsSectionProps = {
+  readOnly?: boolean
+} & Pick<
   MediaDetailViewerProps,
   | "detailValues"
   | "detailSectionsExpanded"
@@ -17,6 +19,7 @@ export function MediaDetailTagsSection({
   detailSectionsExpanded,
   toggleDetailSection,
   openDetailEditor,
+  readOnly = false,
 }: MediaDetailTagsSectionProps) {
   const values = detailValues.tags
   return (
@@ -30,13 +33,13 @@ export function MediaDetailTagsSection({
             ({values.length})
           </Text>
         </Group>
-        <Button
+        {!readOnly && <Button
           size="compact-xs"
           variant="subtle"
           onClick={() => openDetailEditor("tags")}
         >
           編集
-        </Button>
+        </Button>}
       </Group>
       <Group gap={6}>
         {values.length === 0 ? (
