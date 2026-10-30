@@ -39,7 +39,10 @@ export type MediaDetailPreviewProps = Pick<
   | "detailInfoOpened"
   | "setDetailInfoOpened"
 > & {
-  detail: NonNullable<MediaDetailViewerProps["detail"]>
+  detail: MediaDetailViewerProps["detail"]
+  selectedId?: string | null
+  navigation?: { previousId: string | null; nextId: string | null; position: number | null; count: number | null }
+  navigateById?: (direction: -1 | 1) => void
   prev: NonNullable<MediaDetailViewerProps["detail"]> | null
   next: NonNullable<MediaDetailViewerProps["detail"]> | null
   readState?: PreviewReadState
@@ -49,6 +52,9 @@ export type MediaDetailPreviewProps = Pick<
 export function MediaDetailPreview(props: MediaDetailPreviewProps) {
   const {
     detail,
+    selectedId,
+    navigation,
+    navigateById,
     stateItems,
     prev,
     next,
@@ -68,7 +74,10 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
     readState,
     onRetryImage,
   } = props
-  const detailIndex = stateItems.findIndex((item) => item.id === detail.id)
+  const activeId = selectedId ?? detail?.id ?? null
+  const detailIndex = stateItems.findIndex((item) => item.id === activeId)
+  const previousAvailable = navigation ? navigation.previousId !== null : prev !== null
+  const nextAvailable = navigation ? navigation.nextId !== null : next !== null
   return (
     <Box
       style={{
@@ -98,14 +107,14 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         }}
       >
         <Center>
-          {prev && (
-            <MediaDetailNavigationButton direction={-1} onNavigate={() => { prepareNavigation(-1); setDetail(prev) }} />
+          {previousAvailable && (
+            <MediaDetailNavigationButton direction={-1} onNavigate={() => { prepareNavigation(-1); if (navigateById) navigateById(-1); else if (prev) setDetail(prev) }} />
           )}
         </Center>
         <Center h="100%" style={{ minWidth: 0, overflow: "hidden" }}>
           <AnimatePresence mode="wait" initial={false} custom={detailDirection}>
             <motion.div
-              key={detail.id}
+              key={activeId}
               custom={detailDirection}
               initial={{
                 x: detailDirection > 0 ? 32 : -32,
@@ -127,15 +136,15 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
             >
               {readState && readState.kind !== "ready" ? (
                 <PreviewStatus state={readState} onRetry={onRetryImage} />
-              ) : detail.failed ? (
+              ) : detail?.failed ? (
                 <Stack align="center" c="dimmed">
                   <IconPhotoOff size={48} />
                   <Text size="sm">画像を表示できません</Text>
                 </Stack>
-              ) : (
+              ) : detail || readState?.kind === "ready" ? (
                 <Image
-                  src={readState?.kind === "ready" ? readState.url : detail.src}
-                  alt={detail.label}
+                  src={readState?.kind === "ready" ? readState.url : detail?.src ?? ""}
+                  alt={detail?.label ?? "Media"}
                   w="100%"
                   h="100%"
                   fit="contain"
@@ -147,13 +156,15 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                       : "none",
                   }}
                 />
+              ) : (
+                <PreviewStatus state={{ kind: "detail-loading" }} />
               )}
             </motion.div>
           </AnimatePresence>
         </Center>
         <Center>
-          {next && (
-            <MediaDetailNavigationButton direction={1} onNavigate={() => { prepareNavigation(1); setDetail(next) }} />
+          {nextAvailable && (
+            <MediaDetailNavigationButton direction={1} onNavigate={() => { prepareNavigation(1); if (navigateById) navigateById(1); else if (next) setDetail(next) }} />
           )}
         </Center>
       </Box>
@@ -172,7 +183,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
           {!compact && <MediaDetailRotationControls setRotate={setDetailRotate} setAnimated={setDetailRotateAnimated} />}
         </Group>
         <Text size="xs" c="dimmed" ta="center" style={{ whiteSpace: "nowrap" }}>
-          {detailIndex + 1} / {stateItems.length}
+          {navigation ? (navigation.position === null || navigation.count === null ? "—" : `${navigation.position + 1} / ${navigation.count}`) : `${detailIndex + 1} / ${stateItems.length}`}
         </Text>
         <Group gap={4} wrap="nowrap" justify="flex-end" style={{ minWidth: 0 }}>
           {!compact && (
