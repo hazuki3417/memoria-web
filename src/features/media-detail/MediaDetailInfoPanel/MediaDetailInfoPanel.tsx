@@ -1,8 +1,8 @@
 "use client"
 
-import { Box, Button, Divider, Group, Stack } from "@mantine/core"
+import { Box, Button, Divider, Group } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
-import { AnimatePresence, motion } from "framer-motion"
+import { MediaDetailInfoPanelFrame } from "./MediaDetailInfoPanelFrame"
 import { MediaDetailCommunitySection } from "../MediaDetailCommunitySection"
 import { MediaDetailGroupsSection } from "../MediaDetailGroupsSection"
 import { MediaDetailMetadata } from "../MediaDetailMetadata"
@@ -51,42 +51,25 @@ export function MediaDetailInfoPanel({
   onRetryDetail,
 }: MediaDetailInfoPanelProps) {
   return (
-    <AnimatePresence initial={false}>
-      {detailInfoOpened && (
-        <motion.div
-          initial={
-            compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }
-          }
-          animate={
-            compact
-              ? { height: "auto", opacity: 1 }
-              : { width: 340, opacity: 1 }
-          }
-          exit={compact ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
-          transition={{ duration: 0.3 }}
+    <MediaDetailInfoPanelFrame
+      compact={compact}
+      opened={detailInfoOpened}
+      footer={!detailReadState && (
+        <Box
+          p="md"
           style={{
-            overflow: "hidden",
-            minWidth: 0,
-            gridColumn: compact ? "1" : "2",
-            gridRow: compact ? "2" : "1",
+            borderTop: "1px solid var(--mantine-color-default-border)",
+            flexShrink: 0,
           }}
         >
-          <Box
-            h="100%"
-            bg="var(--mantine-color-body)"
-            style={{
-              borderLeft: compact
-                ? undefined
-                : "1px solid var(--mantine-color-default-border)",
-              borderTop: compact
-                ? "1px solid var(--mantine-color-default-border)"
-                : undefined,
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-            }}
-          >
-            <Stack gap="md" p="md" style={{ flex: 1, overflowY: "auto" }}>
+          <Group justify="flex-end">
+            <Button size="xs" variant="subtle" color="red" leftSection={<IconTrash size={15} />} onClick={onRequestDelete}>
+              削除
+            </Button>
+          </Group>
+        </Box>
+      )}
+    >
               {detailReadState ? (
                 <DetailMetadataStatus state={detailReadState} onRetry={onRetryDetail} />
               ) : (
@@ -140,28 +123,6 @@ export function MediaDetailInfoPanel({
                 context={contextKind}
               />}
             </Stack>
-            {!detailReadState && <Box
-              p="md"
-              style={{
-                borderTop: "1px solid var(--mantine-color-default-border)",
-                flexShrink: 0,
-              }}
-            >
-              <Group justify="flex-end">
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  color="red"
-                  leftSection={<IconTrash size={15} />}
-                  onClick={onRequestDelete}
-                >
-                  削除
-                </Button>
-              </Group>
-            </Box>}
-          </Box>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </MediaDetailInfoPanelFrame>
   )
 }
