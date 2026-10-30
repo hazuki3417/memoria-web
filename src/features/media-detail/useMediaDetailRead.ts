@@ -170,6 +170,9 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
 
   const retryDetail = useCallback(() => {
     if (mediaId) setPollState({ id: pollKey, failures: 0, stopped: false })
+    // A manual retry must also clear the failed pagination cursor.
+    // Refetch restarts from page one before fetchMore resumes.
+    setPageFailure(null)
     return query.refetch()
   }, [pollKey, mediaId, query.refetch])
 
