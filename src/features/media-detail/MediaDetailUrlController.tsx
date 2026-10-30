@@ -145,6 +145,8 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
     const nextId = presentation.selectedMediaId
     if (previousId.current !== nextId) {
       if (previousId.current !== null) {
+        setTagTarget(null)
+        setTagDraft([])
         viewport.setDetailZoom(100)
         viewport.setDetailRotate(0)
         viewport.setDetailRotateAnimated(false)
