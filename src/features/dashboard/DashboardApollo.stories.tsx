@@ -1,4 +1,5 @@
 import { MockedProvider, type MockedResponse } from "@apollo/client/testing"
+import { MediaDetailUrlProvider } from "@/features/media-detail/MediaDetailUrlProvider"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, waitFor, within } from "storybook/test"
 import {
@@ -59,6 +60,8 @@ const meta = {
   title: "Features/Dashboard/Apollo Integration",
   component: DashboardContainer,
   args: { contextKind: "personal" },
+  // Containers use the same URL context that ApplicationShell provides in production.
+  decorators: [(Story) => <MediaDetailUrlProvider><Story /></MediaDetailUrlProvider>],
 } satisfies Meta<typeof DashboardContainer>
 export default meta
 type Story = StoryObj<typeof meta>
