@@ -4,7 +4,7 @@ StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較�
 
 ## VRT実行構造（Issue #223 最新方針）
 
-通常の `tests/vrt/storybook.spec.ts` でStorybook Indexの準備を待ち、`vrt` 対象Storyを収集する。各Story × 固定3Viewportについて独立した `test()` を登録し、`capture.ts` で撮影・比較する。Spec生成用Runnerは廃止する。
+通常の `tests/vrt/storybook.spec.mts` でStorybook Indexの準備を待ち、`vrt` 対象Storyを収集する。各Story × 固定3Viewportについて独立した `test()` を登録し、`capture.ts` で撮影・比較する。Spec生成用Runnerは廃止する。
 
 旧Baseline 120件は内容を変更せず `tests/vrt/baselines/` に復元済み。旧ファイル名を維持し、比較を通して再利用を確認する。実行検証は未実施。
 
@@ -23,7 +23,7 @@ Storybookはテスト起動時に自動起動します。基準画像は `tests/
 
 `index.json` の `type: story` のうち、`vrt` タグが明示的に付いたStoryだけを撮影します（Opt-in方式）。すべてのVRT対象Storyを、固定の **Compact (375×812)、Medium (1024×768)、Wide (1440×900)** の3幅で撮影します。Storyごとの撮影幅設定は設けません。代表値の定義は `.storybook/responsiveViewports.ts` に置きます。正式な分類境界は Compact: 768px未満 / Medium: 768px以上1408px未満 / Wide: 1408px以上です。代表撮影幅はレイアウト切替点を意味しません。 `vrt-modal` タグはPortal上のModalの可視性確認にのみ使用します。
 
-旧2幅構成の`desktop`/`mobile` Baselineは廃止し、**新しい3幅構成で候補画像を再生成しHuman Visual Review後に登録**します。旧Baselineを使い回したり、未承認候補を自動登録したりしません。新しいBaselineが登録されるまでは通常比較のBaseline不足による失敗を予期します。新Baselineが登録されるまでは通常のVRT比較はBaseline不足で失敗します。候補生成には[Issue #147](https://github.com/hazuki3417/memoria-web/issues/147)のワークフローを用い、画像確認後に承認されたもののみ反映します。
+旧2幅構成の`desktop`/`mobile` Baselineは廃止し、**3幅Baselineは復元した画像を使って比較**します。既存の3幅Baselineを復元して再利用します。差分がある場合のみ確認し、意図した変更以外は更新しません。候補生成には[Issue #147](https://github.com/hazuki3417/memoria-web/issues/147)のワークフローを用い、画像確認後に承認されたもののみ反映します。
 
 Storybook画面内のViewportアドオンは今回導入しません（後続Issue #216）。手動Visual Reviewでは `iframe.html` を直接開き、ブラウザの開発者ツールで対象幅へ変更します。
 
@@ -46,7 +46,7 @@ DecoratorはThemeProviderやApplicationShellのfixture、Modal用Portal root等�
 
 ## 撮影Viewportの共通設定
 
-VRTのViewportは `tests/vrt/generated/*.spec.ts` でテスト単位ごとに設定する（生成元は `scripts/vrt/run.mjs`）。代表値は `.storybook/responsiveViewports.ts` を参照する。設定はStoryの `parameters` やDecorator、StorybookのViewportアドオンに依存しない。 `page.setViewportSize()` によりブラウザViewportを変更した後、同じStoryの `iframe.html` を開いて撮影する。
+VRTのViewportは `tests/vrt/storybook.spec.mts` でテスト単位ごとに設定する。代表値は `.storybook/responsiveViewports.ts` を参照する。設定はStoryの `parameters` やDecorator、StorybookのViewportアドオンに依存しない。 `page.setViewportSize()` によりブラウザViewportを変更した後、同じStoryの `iframe.html` を開いて撮影する。
 
 撮影ファイル名のSuffixは `compact`、`medium`、`wide` とする。旧 `mobile` / `desktop` 名のBaselineとの併存・再利用は行わず、候補画像のVisual Review後に全3幅のBaselineを生成する。 `vrt` は撮影対象選定、`vrt-modal` はPortal上のDialogの可視性確認に限る。
 
@@ -105,7 +105,7 @@ GitHubプラグイン経由でも、明示された対象ブランチを用い�
 Baselineの生成・更新と、通常の比較実行は**異なる操作**です。通常比較でBaselineを自動更新してはいけません。
 
 1. `vrt`タグ付きStoryを選定し、表示状態・Viewport・Fixtureが再現可能であることを確認する。
-2. 固定した実行環境で `npm run test:visual:update` を**明示的に**実行し、新規Baselineを生成する（今回の移行では旧Baselineを削除済みで、全VRT対象Storyの3幅分を新規生成する。Git差分を必ず確認する）。
+2. 固定した実行環境で `npm run test:visual:update` を**明示的に**実行し、新規Baselineを生成する（既存Baselineは復元済み。更新が必要なときに限りGit差分を確認する）。
 3. Gitの画像差分と画面設計を照合し、意図した表示であることをレビューする。生成できただけでは承認済みにならない。
 4. 承認したBaselineをGitへ登録し、`npm run test:visual` で通常比較を行う。
 5. 通常の画面変更では比較のみを行い、差分が意図したものと確認された場合に限ってBaselineを明示的に再生成・レビュー・更新する。
@@ -127,7 +127,7 @@ npm run test:visual:report
 
 **失敗時**はPlaywrightのHTML ReportとExpected / Actual / Diff画像を確認し、原因を調査する。Baseline欠落は未登録として扱い、通常比較から更新処理を呼ばない。 `play`付きStoryの撮影同期は未実装のため、対象に追加する前に完了待機・描画安定を検証する。
 
-**CI / Quality Gate**: Compose検証用Workflowだけを追加し、既存Quality Gateには組み込まない。旧VRT実装のnpmコマンドは削除済み。旧VRTテスト・設定ファイルの整理は、参照と保証内容の棚卸し後に判断する。
+**CI / Quality Gate**: Compose検証用Workflowだけを追加し、既存Quality Gateには組み込まない。旧VRT実装のnpmコマンドは削除済み。旧単一テストと設定は新構成に置き換え済み。
 
 ## VRT対象Storyの指定
 
