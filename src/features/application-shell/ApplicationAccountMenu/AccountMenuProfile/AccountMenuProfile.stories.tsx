@@ -3,7 +3,7 @@ import { expect, within } from "storybook/test"
 import { AccountMenuProfile } from "./AccountMenuProfile"
 
 const meta = {
-  title: "Components/Application Shell/Account Menu/Profile",
+  title: "Features/Application Shell/Account Menu/Profile",
   component: AccountMenuProfile,
   args: {
     state: {

@@ -28,16 +28,18 @@ export function AccountMenuProfile({ state }: AccountMenuProfileProps) {
       aria-busy={loading}
       aria-label={loading ? "プロフィールを読み込み中" : undefined}
     >
-      <Skeleton visible={loading} circle>
-        <Avatar size={32} radius="xl">
-          {ready ? (
-            state.avatarLabel ?? state.displayName.slice(0, 1)
-          ) : (
-            <IconUser size={18} aria-hidden="true" />
-          )}
-        </Avatar>
-      </Skeleton>
-      <Box>
+      <Box style={{ flex: "0 0 32px" }}>
+        <Skeleton visible={loading} circle>
+          <Avatar size={32} radius="xl">
+            {ready ? (
+              state.avatarLabel ?? state.displayName.slice(0, 1)
+            ) : (
+              <IconUser size={18} aria-hidden="true" />
+            )}
+          </Avatar>
+        </Skeleton>
+      </Box>
+      <Box style={{ flex: "1 1 0", minWidth: 0 }}>
         <Skeleton visible={loading}>
           <Text size="sm" fw={600} lh={1.2} w={loading ? 112 : undefined}>
             {ready

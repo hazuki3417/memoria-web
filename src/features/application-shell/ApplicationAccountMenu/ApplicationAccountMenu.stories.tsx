@@ -9,7 +9,7 @@ const personal = {
 }
 
 const meta = {
-  title: "Components/Application Shell/Account Menu",
+  title: "Features/Application Shell/Account Menu",
   component: ApplicationAccountMenu,
   args: {
     user: { displayName: "ユーザー" },
