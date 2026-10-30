@@ -6,7 +6,6 @@ import {
   Center,
   Group,
   Image,
-  Slider,
   Stack,
   Text,
 } from "@mantine/core"
@@ -14,13 +13,10 @@ import {
   IconInfoCircle,
   IconPhotoOff,
   IconX,
-  IconZoomIn,
-  IconZoomOut,
-  IconZoomReset,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
-import { ZoomInput } from "../ZoomInput"
+import { MediaDetailZoomControls } from "../MediaDetailZoomControls"
 import type { PreviewReadState } from "../mediaDetailReadState"
 import { PreviewStatus } from "../MediaDetailReadFeedback"
 import { MediaDetailNavigationButton } from "../MediaDetailNavigationButton"
@@ -181,44 +177,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         <Group gap={4} wrap="nowrap" justify="flex-end" style={{ minWidth: 0 }}>
           {!compact && (
             <>
-              <ActionIcon
-                variant="subtle"
-                aria-label="拡大率をリセット"
-                onClick={() => setDetailZoom(100)}
-              >
-                <IconZoomReset size={18} />
-              </ActionIcon>
-              <ActionIcon
-                variant="subtle"
-                aria-label="縮小"
-                disabled={detailZoom <= 50}
-                onClick={() =>
-                  setDetailZoom((value) => Math.max(50, value - 10))
-                }
-              >
-                <IconZoomOut size={18} />
-              </ActionIcon>
-              <Slider
-                w={100}
-                size="xs"
-                min={50}
-                max={300}
-                step={10}
-                value={detailZoom}
-                onChange={setDetailZoom}
-                label={null}
-              />
-              <ActionIcon
-                variant="subtle"
-                aria-label="拡大"
-                disabled={detailZoom >= 300}
-                onClick={() =>
-                  setDetailZoom((value) => Math.min(300, value + 10))
-                }
-              >
-                <IconZoomIn size={18} />
-              </ActionIcon>
-              <ZoomInput value={detailZoom} onChange={setDetailZoom} />
+              <MediaDetailZoomControls zoom={detailZoom} setZoom={setDetailZoom} />
             </>
           )}
           <ActionIcon
