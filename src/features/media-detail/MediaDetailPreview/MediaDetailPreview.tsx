@@ -15,6 +15,7 @@ import {
   IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
+import { useState } from "react"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 import { MediaDetailZoomControls } from "./MediaDetailZoomControls"
 import type { PreviewReadState } from "../mediaDetailReadState"
@@ -76,6 +77,15 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
   } = props
   const activeId = selectedId ?? detail?.id ?? null
   const detailIndex = stateItems.findIndex((item) => item.id === activeId)
+  const imageKey = readState?.kind === "ready" ? `${activeId}:${readState.url}` : null
+  const [imageStatus, setImageStatus] = useState<{ key: string; status: "loading" | "ready" | "error"; attempt: number } | null>(null)
+  const activeImageStatus = imageKey && imageStatus?.key === imageKey ? imageStatus.status : "loading"
+  const imageAttempt = imageKey && imageStatus?.key === imageKey ? imageStatus.attempt : 0
+  const retryImage = () => {
+    if (!imageKey) return
+    setImageStatus({ key: imageKey, status: "loading", attempt: imageAttempt + 1 })
+    onRetryImage?.()
+  }
   const previousAvailable = navigation ? navigation.previousId !== null : prev !== null
   const nextAvailable = navigation ? navigation.nextId !== null : next !== null
   return (
@@ -141,19 +151,53 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                   <IconPhotoOff size={48} />
                   <Text size="sm">画像を表示できません</Text>
                 </Stack>
-              ) : detail || readState?.kind === "ready" ? (
+              ) : readState?.kind === "ready" && imageKey ? (
+                <Box w="100%" h="100%" style={{ position: "relative" }}>
+                  <Image
+                    key={`${imageKey}:${imageAttempt}`}
+                    src={readState.url}
+                    alt={detail?.label ?? "Media"}
+                    w="100%"
+                    h="100%"
+                    fit="contain"
+                    onLoad={(event) => {
+                      const image = event.currentTarget
+                      void image.decode().then(
+                        () => setImageStatus((current) => current?.key === imageKey && current.status === "error"
+                          ? current : { key: imageKey, status: "ready", attempt: imageAttempt }),
+                        () => setImageStatus({ key: imageKey, status: "error", attempt: imageAttempt }),
+                      )
+                    }}
+                    onError={() => setImageStatus({ key: imageKey, status: "error", attempt: imageAttempt })}
+                    style={{
+                      objectFit: "contain",
+                      opacity: activeImageStatus === "ready" ? 1 : 0,
+                      transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`,
+                      transition: detailRotateAnimated ? "transform 180ms ease" : "none",
+                    }}
+                  />
+                  {activeImageStatus !== "ready" && (
+                    <Box style={{ position: "absolute", inset: 0 }}>
+                      <PreviewStatus
+                        state={activeImageStatus === "error"
+                          ? { kind: "delivery-error", retryable: true }
+                          : { kind: "image-loading" }}
+                        onRetry={retryImage}
+                      />
+                    </Box>
+                  )}
+                </Box>
+              ) : detail ? (
                 <Image
-                  src={readState?.kind === "ready" ? readState.url : detail?.src ?? ""}
-                  alt={detail?.label ?? "Media"}
+                  src={detail.src}
+                  alt={detail.label}
                   w="100%"
                   h="100%"
                   fit="contain"
                   style={{
                     objectFit: "contain",
                     transform: `rotate(${detailRotate}deg) scale(${detailZoom / 100})`,
-                    transition: detailRotateAnimated
-                      ? "transform 180ms ease"
-                      : "none",
+                    transition: detailRotateAnimated ? "transform 180ms ease" : "none",
                   }}
                 />
               ) : (
