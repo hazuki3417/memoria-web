@@ -10,6 +10,7 @@ import {
   processingPollDelay,
   mediaDetailPollingIdentity,
   mergeDetailCollectionPages,
+  shouldRefreshVariantUrl,
   type MediaDetailResult,
 } from "./mediaDetailReadState"
 
@@ -91,6 +92,40 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     () => projectCollection(detail, "tags", Boolean(query.error)),
     [detail, query.error],
   )
+
+  // A signed Variant URL is valid for 15 minutes. Refresh while the
+  // selected Media is READY, including on returning to a previously hidden tab.
+  // This is independent of Processing Polling and never retries image errors
+  // automatically (those continue to require a deliberate user action).
+  const lastVariantRefresh = useRef(Date.now())
+  const variantRefreshInFlight = useRef(false)
+  const readyVariant = preview.kind === "ready"
+  useEffect(() => {
+    lastVariantRefresh.current = Date.now()
+    variantRefreshInFlight.current = false
+  }, [pollKey])
+
+  useEffect(() => {
+    if (!mediaId || !readyVariant || !visible) return
+    let cancelled = false
+    const refreshIfNeeded = () => {
+      if (cancelled || variantRefreshInFlight.current ||
+          !shouldRefreshVariantUrl(lastVariantRefresh.current, Date.now(), readyVariant, !document.hidden)) return
+      variantRefreshInFlight.current = true
+      lastVariantRefresh.current = Date.now()
+      void query.refetch().catch(() => {
+        // Keep the existing detail error/retry controls; no automatic loop.
+      }).finally(() => {
+        variantRefreshInFlight.current = false
+      })
+    }
+    const interval = window.setInterval(refreshIfNeeded, 60 * 1000)
+    refreshIfNeeded()
+    return () => {
+      cancelled = true
+      window.clearInterval(interval)
+    }
+  }, [mediaId, pollKey, readyVariant, visible, query.refetch])
 
   const pageInFlight = useRef<string | null>(null)
   const [pageFailure, setPageFailure] = useState<string | null>(null)
