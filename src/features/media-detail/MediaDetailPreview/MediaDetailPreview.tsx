@@ -165,12 +165,18 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                     onLoad={(event) => {
                       const image = event.currentTarget
                       void image.decode().then(
-                        () => setImageStatus((current) => current?.key === imageKey && current.status === "error"
-                          ? current : { key: imageKey, status: "ready", attempt: imageAttempt }),
-                        () => setImageStatus({ key: imageKey, status: "error", attempt: imageAttempt }),
+                        () => setImageStatus((current) =>
+                          current && (current.key !== imageKey || current.attempt !== imageAttempt || current.status === "error")
+                            ? current : { key: imageKey, status: "ready", attempt: imageAttempt }),
+                        () => setImageStatus((current) =>
+                          current && (current.key !== imageKey || current.attempt !== imageAttempt)
+                            ? current : { key: imageKey, status: "error", attempt: imageAttempt }),
                       )
                     }}
-                    onError={() => setImageStatus({ key: imageKey, status: "error", attempt: imageAttempt })}
+                    onError={() => setImageStatus((current) =>
+                      current && (current.key !== imageKey || current.attempt !== imageAttempt)
+                        ? current : { key: imageKey, status: "error", attempt: imageAttempt },
+                    )}
                     style={{
                       objectFit: "contain",
                       opacity: activeImageStatus === "ready" ? 1 : 0,
