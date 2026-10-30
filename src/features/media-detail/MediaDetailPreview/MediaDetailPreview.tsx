@@ -13,8 +13,6 @@ import {
 import {
   IconInfoCircle,
   IconPhotoOff,
-  IconRotate,
-  IconRotate2,
   IconX,
   IconZoomIn,
   IconZoomOut,
@@ -26,6 +24,7 @@ import { ZoomInput } from "../ZoomInput"
 import type { PreviewReadState } from "../mediaDetailReadState"
 import { PreviewStatus } from "../MediaDetailReadFeedback"
 import { MediaDetailNavigationButton } from "../MediaDetailNavigationButton"
+import { MediaDetailRotationControls } from "../MediaDetailRotationControls"
 
 export type MediaDetailPreviewProps = Pick<
   MediaDetailViewerProps,
@@ -174,40 +173,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         }}
       >
         <Group gap={4} wrap="nowrap" justify="flex-start">
-          {!compact && (
-            <>
-              <ActionIcon
-                variant="subtle"
-                aria-label="回転をリセット"
-                onClick={() => {
-                  setDetailRotateAnimated(false)
-                  setDetailRotate(0)
-                }}
-              >
-                <IconRotate2 size={18} />
-              </ActionIcon>
-              <ActionIcon
-                variant="subtle"
-                aria-label="左へ回転"
-                onClick={() => {
-                  setDetailRotateAnimated(true)
-                  setDetailRotate((value) => value - 90)
-                }}
-              >
-                <IconRotate size={18} />
-              </ActionIcon>
-              <ActionIcon
-                variant="subtle"
-                aria-label="右へ回転"
-                onClick={() => {
-                  setDetailRotateAnimated(true)
-                  setDetailRotate((value) => value + 90)
-                }}
-              >
-                <IconRotate size={18} style={{ transform: "scaleX(-1)" }} />
-              </ActionIcon>
-            </>
-          )}
+          {!compact && <MediaDetailRotationControls setRotate={setDetailRotate} setAnimated={setDetailRotateAnimated} />}
         </Group>
         <Text size="xs" c="dimmed" ta="center" style={{ whiteSpace: "nowrap" }}>
           {detailIndex + 1} / {stateItems.length}
