@@ -346,9 +346,9 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       detailDraft={groupDraft}
       setDetailDraft={setGroupDraft}
       saveDetailDraft={saveGroups}
-      groupOptions={groupOptions.data?.mediaGroups.edges.map(({ node }) => node.name)}
-      pending={savingGroups || groupOptions.loading || (!groupOptions.data && !groupOptions.error) || Boolean(groupOptions.data?.mediaGroups.pageInfo.hasNextPage)}
-      loadError={Boolean(groupOptions.error || groupOptionsPageError)}
+      groupOptions={groupOptions.data?.mediaGroups.edges.map(({ node }) => node.name) ?? []}
+      pending={savingGroups || groupOptions.loading || (!groupOptions.data && !groupOptions.error) || Boolean(groupOptions.data?.mediaGroups.pageInfo.hasNextPage && !groupOptionsPageError && groupOptions.data.mediaGroups.pageInfo.endCursor)}
+      loadError={Boolean(groupOptions.error || groupOptionsPageError || (groupOptions.data?.mediaGroups.pageInfo.hasNextPage && !groupOptions.data.mediaGroups.pageInfo.endCursor))}
       onRetryLoad={retryGroupOptions}
     />
     <TagsEditModal
