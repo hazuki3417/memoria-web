@@ -142,8 +142,10 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
       const requestKey = JSON.stringify([pollKey, field, cursor])
       if (pageFailure === requestKey || pageInFlight.current !== null) return
       pageInFlight.current = requestKey
+      const variables: { groupsAfter?: string; tagsAfter?: string } =
+        field === "groups" ? { groupsAfter: cursor } : { tagsAfter: cursor }
       void query.fetchMore({
-        variables: field === "groups" ? { groupsAfter: cursor } : { tagsAfter: cursor },
+        variables,
         updateQuery(previous, { fetchMoreResult }) {
           if (!fetchMoreResult?.media || fetchMoreResult.media.id !== previous.media?.id || !previous.media) return previous
           const incoming = fetchMoreResult.media[field]
