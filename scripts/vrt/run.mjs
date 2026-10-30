@@ -3,7 +3,7 @@ import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const root = process.cwd();
-const output = join(root, "e2e/storybook-visual/generated");
+const output = join(root, "tests/vrt/generated");
 const url = "http://127.0.0.1:6006/index.json";
 const groupFilter = process.env.VRT_GROUP?.toLowerCase();
 const update = process.argv.includes("--update-snapshots");
@@ -73,7 +73,7 @@ test.describe(${JSON.stringify(group)}, () => {
     await writeFile(join(output, safeName(group) + ".spec.ts"), source);
   }
   console.log(`VRT: ${[...groups.values()].flat().length} stories in ${groups.size} groups`);
-  const args = ["playwright", "test", "--config=playwright.storybook-visual.config.ts"];
+  const args = ["playwright", "test", "--config=playwright.vrt.config.ts"];
   if (update) args.push("--update-snapshots");
   const playwright = start("npx", args);
   const code = await new Promise((resolve) => playwright.on("exit", (code) => resolve(code ?? 1)));
