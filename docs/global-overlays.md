@@ -21,7 +21,7 @@
 ## Media Detail consumers and contracts
 
 - Media Browser opens Media Detail from its media list; Group Browser opens the same viewer from Group Detail thumbnails.
-- The current `MediaDetailDialog` wrapper delegates to `MediaBrowser` in detail-only mode. The overlay mount location **does not imply shared state ownership**: the viewer, editing dialogs, and state still reside in `MediaBrowser`.
+- The current `MediaDetailModal` wrapper delegates to `MediaBrowser` in detail-only mode. The overlay mount location **does not imply shared state ownership**: the viewer, editing dialogs, and state still reside in `MediaBrowser`.
 - Preserve the full existing Media Detail visual/behavioral/responsive contract, including previous/next media scope, edit/share dialogs, zoom/rotation, closing behavior, and Group Detail pane state.
 - Do not relocate all dialogs indiscriminately: feature-specific dialogs retain their feature state. Global mount points are separate from state ownership.
 
