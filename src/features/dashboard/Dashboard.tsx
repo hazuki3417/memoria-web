@@ -28,10 +28,14 @@ function MediaPage({
   items,
   page,
   pageSize,
+  mediaIds,
+  onOpenMedia,
 }: {
   items: string[]
   page: number
   pageSize: number
+  mediaIds?: readonly string[]
+  onOpenMedia?: (id: string) => void
 }) {
   return (
     <SimpleGrid
@@ -44,9 +48,15 @@ function MediaPage({
       {items.map((src, index) => (
         <Box
           key={page * pageSize + index}
+          component={onOpenMedia && mediaIds?.[page * pageSize + index] ? "button" : "div"}
+          type={onOpenMedia && mediaIds?.[page * pageSize + index] ? "button" : undefined}
+          onClick={onOpenMedia && mediaIds?.[page * pageSize + index] ? () => onOpenMedia(mediaIds[page * pageSize + index]) : undefined}
+          aria-label={onOpenMedia && mediaIds?.[page * pageSize + index] ? `Mediaを表示: ${page * pageSize + index + 1}` : undefined}
           bdrs="md"
           style={{
             aspectRatio: "1 / 1",
+            padding: 0,
+            cursor: onOpenMedia && mediaIds?.[page * pageSize + index] ? "pointer" : "default",
             overflow: "hidden",
             border: "1px solid var(--mantine-color-default-border)",
             background: "var(--mantine-color-default-hover)",
@@ -76,7 +86,7 @@ function MediaPage({
   )
 }
 
-function RecentMediaCarousel({ items }: { items: string[] }) {
+function RecentMediaCarousel({ items, mediaIds, onOpenMedia }: { items: string[]; mediaIds?: readonly string[]; onOpenMedia?: (id: string) => void }) {
   const [page, setPage] = useState(0)
   const [fromPage, setFromPage] = useState<number | null>(null)
   const [direction, setDirection] = useState<"previous" | "next">("next")
@@ -155,7 +165,7 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
       `}</style>
 
       {fromPage === null ? (
-        <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} />
+        <MediaPage items={itemsFor(page)} page={page} pageSize={pageSize} mediaIds={mediaIds} onOpenMedia={onOpenMedia} />
       ) : (
         <Box
           className={`dashboard-carousel-track ${direction} ${sliding ? "sliding" : ""}`}
@@ -166,11 +176,15 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
                 items={itemsFor(oldPage)}
                 page={oldPage}
                 pageSize={pageSize}
+                mediaIds={mediaIds}
+                onOpenMedia={onOpenMedia}
               />
               <MediaPage
                 items={itemsFor(page)}
                 page={page}
                 pageSize={pageSize}
+                mediaIds={mediaIds}
+                onOpenMedia={onOpenMedia}
               />
             </>
           ) : (
@@ -179,11 +193,15 @@ function RecentMediaCarousel({ items }: { items: string[] }) {
                 items={itemsFor(page)}
                 page={page}
                 pageSize={pageSize}
+                mediaIds={mediaIds}
+                onOpenMedia={onOpenMedia}
               />
               <MediaPage
                 items={itemsFor(oldPage)}
                 page={oldPage}
                 pageSize={pageSize}
+                mediaIds={mediaIds}
+                onOpenMedia={onOpenMedia}
               />
             </>
           )}
@@ -360,6 +378,8 @@ export function Dashboard({
   contextKind = "personal",
   communityId = "photo-club",
   mediaItems,
+  mediaIds,
+  onOpenMedia,
   groupItems,
   mediaState,
   groupState,
@@ -370,6 +390,8 @@ export function Dashboard({
   contextKind?: "personal" | "community"
   communityId?: string
   mediaItems?: string[]
+  mediaIds?: readonly string[]
+  onOpenMedia?: (id: string) => void
   groupItems?: DashboardGroup[]
   mediaState?: "loading" | "error" | "ready"
   groupState?: "loading" | "error" | "ready"
@@ -433,6 +455,8 @@ export function Dashboard({
             <RecentMediaCarousel
               key={contextKind + communityId}
               items={media.slice(0, 32)}
+              mediaIds={mediaIds}
+              onOpenMedia={onOpenMedia}
             />
           )}
         </Stack>
