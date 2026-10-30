@@ -58,18 +58,19 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     },
   )
 
+  const pollKey = mediaId === null ? null : `${mediaId}:${scope.type}:${scope.communityId ?? ""}`
   const [visible, setVisible] = useState(true)
   const [pollState, setPollState] = useState<{ id: string | null; failures: number; stopped: boolean }>({ id: null, failures: 0, stopped: false })
-  const activePoll = pollState.id === mediaId ? pollState : { id: mediaId, failures: 0, stopped: false }
-  const requestInFlight = useRef(false)
+  const activePoll = pollState.id === pollKey ? pollState : { id: pollKey, failures: 0, stopped: false }
+  const requestInFlight = useRef<string | null>(null)
 
   useEffect(() => {
-    setPollState({ id: mediaId, failures: 0, stopped: false })
+    setPollState({ id: pollKey, failures: 0, stopped: false })
     const syncVisibility = () => setVisible(!document.hidden)
     syncVisibility()
     document.addEventListener("visibilitychange", syncVisibility)
     return () => document.removeEventListener("visibilitychange", syncVisibility)
-  }, [mediaId])
+  }, [pollKey])
 
   // A scope change may retain the same media ID but must never expose previous-scope data.
   const variablesChanging = query.networkStatus === NetworkStatus.setVariables
@@ -97,38 +98,38 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     if (!shouldPoll || !mediaId || pollDelay === null) return
     let cancelled = false
     const timer = window.setInterval(() => {
-      if (cancelled || requestInFlight.current) return
-      requestInFlight.current = true
+      if (cancelled || requestInFlight.current === pollKey) return
+      requestInFlight.current = pollKey
       void query.refetch().then(
         (result) => {
           if (cancelled) return
           if (result.error?.networkError) {
             setPollState((current) => {
-              const failures = nextProcessingPollFailures(current.id === mediaId ? current.failures : 0, true)
-              return { id: mediaId, failures, stopped: failures >= 3 }
+              const failures = nextProcessingPollFailures(current.id === pollKey ? current.failures : 0, true)
+              return { id: pollKey, failures, stopped: failures >= 3 }
             })
           } else {
-            setPollState({ id: mediaId, failures: 0, stopped: false })
+            setPollState({ id: pollKey, failures: 0, stopped: false })
           }
         },
         () => {
           if (!cancelled) setPollState((current) => {
-            const failures = nextProcessingPollFailures(current.id === mediaId ? current.failures : 0, true)
-            return { id: mediaId, failures, stopped: failures >= 3 }
+            const failures = nextProcessingPollFailures(current.id === pollKey ? current.failures : 0, true)
+            return { id: pollKey, failures, stopped: failures >= 3 }
           })
         },
-      ).finally(() => { requestInFlight.current = false })
+      ).finally(() => { if (requestInFlight.current === pollKey) requestInFlight.current = null })
     }, pollDelay)
     return () => {
       cancelled = true
       window.clearInterval(timer)
     }
-  }, [shouldPoll, pollDelay, mediaId, query.refetch])
+  }, [shouldPoll, pollDelay, pollKey, mediaId, query.refetch]
 
   const retryDetail = useCallback(() => {
-    if (mediaId) setPollState({ id: mediaId, failures: 0, stopped: false })
+    if (mediaId) setPollState({ id: pollKey, failures: 0, stopped: false })
     return query.refetch()
-  }, [mediaId, query.refetch])
+  }, [pollKey, mediaId, query.refetch]
 
   return {
     detail,
