@@ -164,3 +164,14 @@ Current branch's prior changes remain subject to CI and Human Visual Review; no 
 - Updated imports in both `MediaDetailPreview` and temporary `MediaDetailIdViewer`, then removed the old top-level component file. Verified the new path and both import sites from the branch and confirmed the old path is absent.
 - Responsibility boundary: Preview owns its viewport control presentation. The Viewer composes Preview and InfoPanel; URL/history and data fetching remain outside. Additional relocation of Navigation/Rotation/InfoPanel sections requires an import/consumer review rather than automatic moving.
 - The temporary ID Viewer remains an unapproved transitional component, not the intended final UI. No existing consumer migration in this checkpoint. New head CI and Human Visual Review remain mandatory; Draft PR and baseline policy unchanged.
+
+
+## Correction: refactor the original Viewer only (2026-10-30)
+
+**User-confirmed design constraint:** Existing Media Detail components are the implementation to refactor directly. Maintaining the original Viewer while rebuilding a parallel ID-only Viewer was **not** the intended approach. The temporary `MediaDetailIdViewer.tsx` has been deleted; its provisional alternative toolbar/layout/panel must not be carried forward as a second implementation.
+
+- The established `MediaDetailViewer`, `MediaDetailPreview`, `MediaDetailInfoPanel`, and `MediaDetailDialog` remain the canonical components. Adapt their data/navigation/controller inputs in place, preserving their visual, interactive, responsive and action capabilities.
+- `MediaDetailNavigationButton`, `MediaDetailRotationControls`, `MediaDetailZoomControls` were relocated under `MediaDetailPreview/` rather than duplicated. `MediaDetailInfoPanelFrame` is used inside the existing InfoPanel.
+- The URL/history and GraphQL reading hooks are controller/data responsibilities, not alternative visual components; connect them to the original composition only after the original Viewer can represent ID-only loading/unavailable/error without fabricating a listing MediaItem.
+- Prior sections of this document describing ID-only Viewer's planned migration are historical checkpoint records and **superseded** by this correction. Do not reintroduce a parallel Viewer without an explicit new design agreement.
+- Validate all original Preview controls, animated InfoPanel, original sections and edit/share/delete actions, Compact/Medium/Wide visuals, history navigation, stale data safety, and image retry/polling. Latest commit requires CI plus Human Visual Review before progression to consumer integration. PR remains Draft.
