@@ -9,6 +9,7 @@ import {
   nextProcessingPollFailures,
   processingPollDelay,
   mediaDetailPollingIdentity,
+  mergeDetailCollectionPages,
   type MediaDetailResult,
 } from "./mediaDetailReadState"
 
@@ -17,7 +18,7 @@ import {
  * Scope is explicit: only the matching Personal/Community relations are requested.
  */
 export const MEDIA_DETAIL_READ = gql`
-  query MediaDetailRead($id: ID!, $scope: ScopeInput!) {
+  query MediaDetailRead($id: ID!, $scope: ScopeInput!, $groupsAfter: String, $tagsAfter: String) {
     media(id: $id) {
       id
       originalFileName
@@ -30,13 +31,13 @@ export const MEDIA_DETAIL_READ = gql`
         height
         variants { width height url }
       }
-      groups(scope: $scope, first: 100) {
+      groups(scope: $scope, first: 100, after: $groupsAfter) {
         edges { node { id name } }
-        pageInfo { hasNextPage }
+        pageInfo { hasNextPage endCursor }
       }
-      tags(scope: $scope, first: 100) {
+      tags(scope: $scope, first: 100, after: $tagsAfter) {
         edges { node { id name } }
-        pageInfo { hasNextPage }
+        pageInfo { hasNextPage endCursor }
       }
     }
   }
@@ -48,7 +49,7 @@ export type MediaDetailScope = {
 }
 
 export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailScope) {
-  const query = useQuery<MediaDetailResult, { id: string; scope: MediaDetailScope }>(
+  const query = useQuery<MediaDetailResult, { id: string; scope: MediaDetailScope; groupsAfter?: string; tagsAfter?: string }>(
     MEDIA_DETAIL_READ,
     {
       variables: { id: mediaId ?? "", scope },
@@ -90,6 +91,43 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     () => projectCollection(detail, "tags", Boolean(query.error)),
     [detail, query.error],
   )
+
+  const pageInFlight = useRef<string | null>(null)
+  const [pageFailure, setPageFailure] = useState<string | null>(null)
+
+  // Each result belongs to the currently selected media and relation scope.
+  // A failed/malformed cursor keeps the collection incomplete; no false empty.
+  useEffect(() => {
+    if (detail.kind !== "ready" || query.loading || query.error || !pollKey) return
+    for (const field of ["groups", "tags"] as const) {
+      const collection = detail.media[field]
+      if (!collection?.pageInfo.hasNextPage) continue
+      const cursor = collection.pageInfo.endCursor
+      if (!cursor) continue
+      const requestKey = JSON.stringify([pollKey, field, cursor])
+      if (pageFailure === requestKey || pageInFlight.current !== null) return
+      pageInFlight.current = requestKey
+      void query.fetchMore({
+        variables: field === "groups" ? { groupsAfter: cursor } : { tagsAfter: cursor },
+        updateQuery(previous, { fetchMoreResult }) {
+          if (!fetchMoreResult?.media || fetchMoreResult.media.id !== previous.media?.id || !previous.media) return previous
+          const incoming = fetchMoreResult.media[field]
+          const existing = previous.media[field]
+          if (!incoming || !existing) return previous
+          return {
+            media: {
+              ...previous.media,
+              [field]: mergeDetailCollectionPages(existing, incoming),
+            },
+          }
+        },
+      }).catch(() => setPageFailure(requestKey))
+        .finally(() => {
+          if (pageInFlight.current === requestKey) pageInFlight.current = null
+        })
+      return
+    }
+  }, [detail, pollKey, pageFailure, query.loading, query.error, query.fetchMore])
 
   const processing = detail.kind === "ready" && detail.media.processing?.status === "PROCESSING"
   const shouldPoll = Boolean(mediaId && visible && processing && !activePoll.stopped)
