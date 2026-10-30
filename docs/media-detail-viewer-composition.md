@@ -256,3 +256,10 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - Detail Queryに`groupsAfter`/`tagsAfter`と`pageInfo.endCursor`を追加。各Collectionで`hasNextPage`が真なら、選択中Media IDとScopeに紐づくCursorを使って`fetchMore`し、ID重複を排除して既存edgesに結合する。
 - 次Cursorが欠落・同一、通信が失敗する場合は自動取得を止め、`hasNextPage`を真のまま維持する。未完了Collectionを「空/全件」とみなさない。処理の動作・React/Apollo型整合と中断後の手動復旧はローカルテストで確認が必要。
 - 既存ViewerのVisual/Behavioral Contractは変更しない。利用枠上限中は`[skip ci]`、PR Draftを維持する。
+
+
+### Groups / Tags Paginationの手動復旧導線（2026-10-30）
+
+- `MediaDetailReadFeedback.DetailCollectionStatus` の `incomplete` / `error` で再試行ボタンを表示し、既存のInfoPanelから `retryDetail` へ接続する。
+- 手動再試行では失敗したCursorの停止状態を解除してDetailを再取得し、最初のページから安全に再構築する。未取得Collectionを確定0件とみなさない。
+- この経路のローカルTypecheck/Unit/InteractionおよびApollo実動作検証は未完了。特にCursor失敗、Scope変更、再試行の競合は確認が必要。暫定 `[skip ci]` 運用を継続する。
