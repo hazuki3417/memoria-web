@@ -13,9 +13,16 @@ StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較�
 - 現段階ではViewportは従来の3幅を維持する。Story別の選択方式は未決定であり、このブランチで暗黙に導入しない。
 - Baseline比較と明示的な候補生成を分離し、人間のVisual Review後にのみ採用する。
 
-`playwright.vrt.config.ts` は生成済みテストだけを収集する。旧単一テスト `storybook.spec.ts` と旧VRT設定は新構成へ置き換える。Git管理済みBaselineは既存画像の保持を優先し、暫定的に `e2e/storybook-visual/__screenshots__/` を使用する。画像資産の移行時にBaseline名・件数・差分を照合し、承認なしに更新・削除しない。
+`playwright.vrt.config.ts` は生成済みテストだけを収集する。旧単一テスト `storybook.spec.ts` と旧VRT設定は新構成へ置き換える。旧Baselineは新しいVRT方式に引き継がない（2026-10-30合意）。新しい保存先は `tests/vrt/baselines/` とし、撮影環境の整備・設計レビュー後、対象Storyを全件新規撮影してHuman Visual Reviewで承認された画像のみ登録する。旧画像の承認済み状態を継承しない。
 
 **検証状態**: このブランチでのGitHub更新はコードの実行成功を意味しない。Storybook起動、Playwrightテスト列挙、Baseline比較、CI動作、特にグループ別の分割実行と環境再現性は実行検証が必要。
+
+
+## Baselineの破棄・再作成（2026-10-30合意）
+
+旧 `e2e/storybook-visual/__screenshots__/` は新VRTの正本として扱わず、新しい `tests/vrt/baselines/` へコピー・移行しない。旧Baselineファイルは別途Git上で削除し、使用中のデータがない状態にしてから新規撮影する。Baseline生成は実装変更がない場合でも**新しい初期基準を承認する操作**であり、自動的に正しい画像になったとは扱わない。全対象Storyの候補画像を固定環境で作成してVisual Reviewを通した後に登録し、通常比較を開始する。
+
+この作業段階では撮影・テスト・CIを実行しない。旧画像のGit上の削除状況は別途確認する。
 
 ## 実行
 
@@ -30,7 +37,7 @@ Storybookはテスト起動時に自動起動します。基準画像は `tests/
 
 `index.json` の `type: story` のうち、`vrt` タグが明示的に付いたStoryだけを撮影します（Opt-in方式）。すべてのVRT対象Storyを、固定の **Compact (375×812)、Medium (1024×768)、Wide (1440×900)** の3幅で撮影します。Storyごとの撮影幅設定は設けません。代表値の定義は `.storybook/responsiveViewports.ts` に置きます。正式な分類境界は Compact: 768px未満 / Medium: 768px以上1408px未満 / Wide: 1408px以上です。代表撮影幅はレイアウト切替点を意味しません。 `vrt-modal` タグはPortal上のModalの可視性確認にのみ使用します。
 
-旧2幅構成の`desktop`/`mobile` Baselineは廃止し、**新しい3幅構成で候補画像を再生成しHuman Visual Review後に登録**します。旧Baselineを使い回したり、未承認候補を自動登録したりしません。新Baselineが登録されるまでは通常のVRT比較はBaseline不足で失敗します。候補生成には[Issue #147](https://github.com/hazuki3417/memoria-web/issues/147)のワークフローを用い、画像確認後に承認されたもののみ反映します。
+旧2幅構成の`desktop`/`mobile` Baselineは廃止し、**新しい3幅構成で候補画像を再生成しHuman Visual Review後に登録**します。旧Baselineを使い回したり、未承認候補を自動登録したりしません。新しいBaselineが登録されるまでは通常比較のBaseline不足による失敗を予期します。新Baselineが登録されるまでは通常のVRT比較はBaseline不足で失敗します。候補生成には[Issue #147](https://github.com/hazuki3417/memoria-web/issues/147)のワークフローを用い、画像確認後に承認されたもののみ反映します。
 
 Storybook画面内のViewportアドオンは今回導入しません（後続Issue #216）。手動Visual Reviewでは `iframe.html` を直接開き、ブラウザの開発者ツールで対象幅へ変更します。
 
@@ -91,7 +98,7 @@ Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-no
 
 GitHubの「Actions」→「VRT Docker Compose smoke test」→「Run workflow」で対象branchを選び、`mode: generate`を選択する。**GitHubの手動実行UIはworkflow定義がデフォルトブランチに存在する必要がある**ため、このPRが未マージの間は手動実行を利用できない場合がある。PRの自動実行は比較のみであり、Baseline未登録の失敗は想定どおりとする。
 
-生成Artifactを取得してVRT対象Story×3領域の画像を設計と照合し、レビューを通過した画像だけを`e2e/storybook-visual/__screenshots__/`に登録する。その後`mode: compare`またはPR比較で成功を確認する。Artifactの取得だけではBaseline承認やGit反映は完了しない。**候補画像を自動的にコミットしない。**
+生成Artifactを取得してVRT対象Story×3領域の画像を設計と照合し、レビューを通過した画像だけを`tests/vrt/baselines/`に登録する。その後`mode: compare`またはPR比較で成功を確認する。Artifactの取得だけではBaseline承認やGit反映は完了しない。**候補画像を自動的にコミットしない。**
 
 ## Issue・GitHubプラグインからのBaseline生成PR依頼
 
