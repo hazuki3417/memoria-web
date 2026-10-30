@@ -15,7 +15,7 @@ import {
   IconX,
 } from "@tabler/icons-react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailViewer"
 import { MediaDetailZoomControls } from "./MediaDetailZoomControls"
 import type { PreviewReadState } from "../mediaDetailReadState"
@@ -80,6 +80,9 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
   const activeId = selectedId ?? detail?.id ?? null
   const detailIndex = stateItems.findIndex((item) => item.id === activeId)
   const imageKey = readState?.kind === "ready" ? `${activeId}:${readState.url}` : null
+  // Render-time identity guard: reject callbacks from an image that is no longer selected.
+  const currentImageKey = useRef(imageKey)
+  currentImageKey.current = imageKey
   const [imageStatus, setImageStatus] = useState<{ key: string; status: "loading" | "ready" | "error"; attempt: number } | null>(null)
   const activeImageStatus = imageKey && imageStatus?.key === imageKey ? imageStatus.status : "loading"
   const imageAttempt = imageKey && imageStatus?.key === imageKey ? imageStatus.attempt : 0
@@ -166,10 +169,10 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                       const image = event.currentTarget
                       void image.decode().then(
                         () => setImageStatus((current) =>
-                          current && (current.key !== imageKey || current.attempt !== imageAttempt || current.status === "error")
+                          currentImageKey.current !== imageKey || (current?.key === imageKey && (current.attempt !== imageAttempt || current.status === "error"))
                             ? current : { key: imageKey, status: "ready", attempt: imageAttempt }),
                         () => setImageStatus((current) =>
-                          current && (current.key !== imageKey || current.attempt !== imageAttempt)
+                          currentImageKey.current !== imageKey || (current?.key === imageKey && current.attempt !== imageAttempt)
                             ? current : { key: imageKey, status: "error", attempt: imageAttempt }),
                       )
                     }}
