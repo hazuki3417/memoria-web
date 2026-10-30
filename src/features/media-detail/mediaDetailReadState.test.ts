@@ -3,6 +3,8 @@ import {
   projectCollection,
   projectMediaDetail,
   projectPreview,
+  nextProcessingPollFailures,
+  processingPollDelay,
   type DetailRecord,
 } from "./mediaDetailReadState"
 
@@ -54,5 +56,21 @@ describe("Media detail read state", () => {
     expect(projectCollection({ kind: "ready", media: { ...media, tags: null } }, "tags", false).kind).toBe("error")
     expect(projectCollection({ kind: "ready", media: { ...media, groups: { edges: [], pageInfo: { hasNextPage: true } } } }, "groups", false).kind).toBe("incomplete")
     expect(projectCollection({ kind: "loading" }, "groups", false).kind).toBe("pending")
+  })
+})
+
+describe("processing polling contract", () => {
+  it("uses normal 5s / transport retry 10s, and stops on the third failure", () => {
+    expect(processingPollDelay(0)).toBe(5000)
+    const one = nextProcessingPollFailures(0, true)
+    expect(one).toBe(1)
+    expect(processingPollDelay(one)).toBe(10000)
+    const two = nextProcessingPollFailures(one, true)
+    expect(two).toBe(2)
+    expect(processingPollDelay(two)).toBe(10000)
+    const three = nextProcessingPollFailures(two, true)
+    expect(three).toBe(3)
+    expect(processingPollDelay(three)).toBeNull()
+    expect(nextProcessingPollFailures(two, false)).toBe(0)
   })
 })
