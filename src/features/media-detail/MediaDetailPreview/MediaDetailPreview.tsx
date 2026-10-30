@@ -177,7 +177,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                       )
                     }}
                     onError={() => setImageStatus((current) =>
-                      current && (current.key !== imageKey || current.attempt !== imageAttempt)
+                      currentImageKey.current !== imageKey || (current?.key === imageKey && current.attempt !== imageAttempt)
                         ? current : { key: imageKey, status: "error", attempt: imageAttempt },
                     )}
                     style={{
