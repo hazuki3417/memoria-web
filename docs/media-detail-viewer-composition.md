@@ -214,3 +214,8 @@ The existing (canonical) `MediaDetailViewer` is mounted through a controller-onl
 **Important known gaps:** Existing Media Browser/Group Browser/Dashboard click flows have NOT yet been migrated; preserving their real/mocked editing/group-share/delete actions requires a final permission/mutation contract. Image retry currently reuses refetch/remount, but signed URL refresh semantics and real-browser image decode tests are not yet verified. Back/Forward/bfcache, visibility changes, three-error sequencing, focus/nested dialog, and exact visual/behavioral parity remain E2E/Human Review gates. Groups/Tags Connection pagination beyond the first 100 edges is not implemented and must not be represented as complete. The User Preferences for initial InfoPanel state and full data formatting are not fully connected. No VRT baseline is accepted. No PR merge.
 
 Open tracking Issue: [#178](https://github.com/hazuki3417/memoria-web/issues/178) remains the cross-cutting specification/integration gate. This checkpoint is not the final completion of the issue or the PR.
+
+
+### Additional scope-safety correction (2026-10-30)
+
+On a change of GraphQL variables (especially Personal ↔ Community scope with the *same* Media ID), Apollo may retain a preceding response. `useMediaDetailRead` now masks that response during `NetworkStatus.setVariables`, so neither the Preview nor the InfoPanel renders old-scope data as ready while the new scope is resolving. Existing media-ID mismatch protection remains. This is a safety guard; authorization E2E and server enforcement remain required.
