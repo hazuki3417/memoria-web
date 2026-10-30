@@ -210,7 +210,9 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       detailDraft={tagDraft}
       setDetailDraft={setTagDraft}
       saveDetailDraft={() => { void saveTags() }}
-      pending={savingTags || tagEdit.loading || !tagEdit.data || Boolean(tagEdit.error)}
+      pending={savingTags || tagEdit.loading || (!tagEdit.data && !tagEdit.error)}
+      loadError={Boolean(tagEdit.error)}
+      onRetryLoad={() => { void tagEdit.refetch() }}
       options={presentation.tags.kind === "ready" ? presentation.tags.values.map((tag) => tag.name) : []}
     />
     <Modal opened={deleteTarget !== null} onClose={() => {
