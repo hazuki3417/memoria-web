@@ -18,7 +18,7 @@ export type MediaDetailPresentation = {
   preview: PreviewReadState
   groups: CollectionReadState
   tags: CollectionReadState
-  retryDetail: () => void
+  retryDetail: () => Promise<unknown>
   pollingStopped: boolean
 }
 
