@@ -11,8 +11,6 @@ import {
   Text,
 } from "@mantine/core"
 import {
-  IconChevronLeft,
-  IconChevronRight,
   IconInfoCircle,
   IconPhotoOff,
   IconRotate,
@@ -27,6 +25,7 @@ import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailVie
 import { ZoomInput } from "../ZoomInput"
 import type { PreviewReadState } from "../mediaDetailReadState"
 import { PreviewStatus } from "../MediaDetailReadFeedback"
+import { MediaDetailNavigationButton } from "../MediaDetailNavigationButton"
 
 export type MediaDetailPreviewProps = Pick<
   MediaDetailViewerProps,
@@ -105,18 +104,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
       >
         <Center>
           {prev && (
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              size="lg"
-              aria-label="前のMedia"
-              onClick={() => {
-                prepareNavigation(-1)
-                setDetail(prev)
-              }}
-            >
-              <IconChevronLeft />
-            </ActionIcon>
+            <MediaDetailNavigationButton direction={-1} onNavigate={() => { prepareNavigation(-1); setDetail(prev) }} />
           )}
         </Center>
         <Center h="100%" style={{ minWidth: 0, overflow: "hidden" }}>
@@ -170,18 +158,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         </Center>
         <Center>
           {next && (
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              size="lg"
-              aria-label="次のMedia"
-              onClick={() => {
-                prepareNavigation(1)
-                setDetail(next)
-              }}
-            >
-              <IconChevronRight />
-            </ActionIcon>
+            <MediaDetailNavigationButton direction={1} onNavigate={() => { prepareNavigation(1); setDetail(next) }} />
           )}
         </Center>
       </Box>
