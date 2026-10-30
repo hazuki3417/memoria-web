@@ -32,6 +32,7 @@ export type MediaDetailInfoPanelProps = Pick<
   onRetryDetail?: () => void
   readOnly?: boolean
   allowDelete?: boolean
+  onEditTags?: () => void
 }
 
 export function MediaDetailInfoPanel({
@@ -53,6 +54,7 @@ export function MediaDetailInfoPanel({
   onRetryDetail,
   readOnly = false,
   allowDelete = false,
+  onEditTags,
 }: MediaDetailInfoPanelProps) {
   return (
     <MediaDetailInfoPanelFrame
@@ -112,6 +114,7 @@ export function MediaDetailInfoPanel({
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
                 readOnly={readOnly}
+                onEditTags={onEditTags}
               />
               )}
               <Divider
