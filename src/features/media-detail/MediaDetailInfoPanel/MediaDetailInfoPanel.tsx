@@ -109,6 +109,7 @@ export function MediaDetailInfoPanel({
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
+                readOnly={readOnly}
               />
               )}
               <Divider
