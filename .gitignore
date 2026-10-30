@@ -10,5 +10,3 @@ storybook-static
 test-results/*
 tests/vrt/report/*
 
-# Generated VRT test registration (not source of truth)
-tests/vrt/generated/
