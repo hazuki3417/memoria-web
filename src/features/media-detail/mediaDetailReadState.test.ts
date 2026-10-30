@@ -11,7 +11,7 @@ const media: DetailRecord = {
   originalFileName: "example.jpg",
   fileSize: 1200,
   uploadedAt: "2026-10-01T00:00:00Z",
-  uploader: { nickname: "User", deleted: false },
+  uploadedBy: { nickname: "User", deleted: false },
   processing: { status: "READY" },
   image: {
     width: 1600,
