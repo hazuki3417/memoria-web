@@ -30,6 +30,7 @@ export type MediaDetailInfoPanelProps = Pick<
   groupsReadState?: CollectionReadState
   tagsReadState?: CollectionReadState
   onRetryDetail?: () => void
+  readOnly?: boolean
 }
 
 export function MediaDetailInfoPanel({
@@ -49,12 +50,13 @@ export function MediaDetailInfoPanel({
   groupsReadState,
   tagsReadState,
   onRetryDetail,
+  readOnly = false,
 }: MediaDetailInfoPanelProps) {
   return (
     <MediaDetailInfoPanelFrame
       compact={compact}
       opened={detailInfoOpened}
-      footer={!detailReadState && (
+      footer={!readOnly && !detailReadState && (
         <Box
           p="md"
           style={{
@@ -92,6 +94,7 @@ export function MediaDetailInfoPanel({
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
+                readOnly={readOnly}
               />
               )}
               {detailReadState && !tagsReadState ? (
@@ -113,7 +116,7 @@ export function MediaDetailInfoPanel({
                   marginInline: "calc(-1 * var(--mantine-spacing-md))",
                 }}
               />
-              {!detailReadState && <MediaDetailCommunitySection
+              {!readOnly && !detailReadState && <MediaDetailCommunitySection
                 detailValues={detailValues}
                 detailSectionsExpanded={detailSectionsExpanded}
                 toggleDetailSection={toggleDetailSection}
