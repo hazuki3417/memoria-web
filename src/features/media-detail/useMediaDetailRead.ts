@@ -6,6 +6,8 @@ import {
   projectCollection,
   projectMediaDetail,
   projectPreview,
+  nextProcessingPollFailures,
+  processingPollDelay,
   type MediaDetailResult,
 } from "./mediaDetailReadState"
 
@@ -87,10 +89,10 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
 
   const processing = detail.kind === "ready" && detail.media.processing?.status === "PROCESSING"
   const shouldPoll = Boolean(mediaId && visible && processing && !activePoll.stopped)
-  const pollDelay = activePoll.failures > 0 ? 10000 : 5000
+  const pollDelay = processingPollDelay(activePoll.failures)
 
   useEffect(() => {
-    if (!shouldPoll || !mediaId) return
+    if (!shouldPoll || !mediaId || pollDelay === null) return
     let cancelled = false
     const timer = window.setInterval(() => {
       if (cancelled || requestInFlight.current) return
@@ -100,7 +102,7 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
           if (cancelled) return
           if (result.error?.networkError) {
             setPollState((current) => {
-              const failures = (current.id === mediaId ? current.failures : 0) + 1
+              const failures = nextProcessingPollFailures(current.id === mediaId ? current.failures : 0, true)
               return { id: mediaId, failures, stopped: failures >= 3 }
             })
           } else {
@@ -109,7 +111,7 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
         },
         () => {
           if (!cancelled) setPollState((current) => {
-            const failures = (current.id === mediaId ? current.failures : 0) + 1
+            const failures = nextProcessingPollFailures(current.id === mediaId ? current.failures : 0, true)
             return { id: mediaId, failures, stopped: failures >= 3 }
           })
         },
