@@ -88,7 +88,7 @@ jobs:
         with:
           name: vrt-generation-diagnostics
           path: |
-            e2e/storybook-visual/report/
+            tests/vrt/report/
             test-results/
           if-no-files-found: warn
           retention-days: 7
