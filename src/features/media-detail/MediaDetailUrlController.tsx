@@ -1,6 +1,7 @@
 "use client"
 
 import { useMediaQuery } from "@mantine/hooks"
+import { useEffect, useRef } from "react"
 import { MediaDetailViewer } from "./MediaDetailViewer"
 import { useMediaDetailEditing } from "./useMediaDetailEditing"
 import { useMediaDetailViewport } from "./useMediaDetailViewport"
@@ -20,6 +21,18 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
   const viewport = useMediaDetailViewport()
   const editing = useMediaDetailEditing(null)
   const compact = useMediaQuery("(max-width: 47.99em)")
+  const previousId = useRef<string | null>(null)
+  useEffect(() => {
+    const nextId = presentation.selectedMediaId
+    if (previousId.current !== nextId) {
+      if (previousId.current !== null) {
+        viewport.setDetailZoom(100)
+        viewport.setDetailRotate(0)
+        viewport.setDetailRotateAnimated(false)
+      }
+      previousId.current = nextId
+    }
+  }, [presentation.selectedMediaId, viewport.setDetailZoom, viewport.setDetailRotate, viewport.setDetailRotateAnimated])
 
   return (
     <MediaDetailViewer
