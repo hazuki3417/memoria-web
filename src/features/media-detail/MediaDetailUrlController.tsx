@@ -165,17 +165,20 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
     const added = desired.map((name) => byName.get(name)!).filter((groupId) => ![...original.values()].includes(groupId))
     setSavingGroups(true)
     try {
-      for (const [groupIds, mutate, field] of [
-        [removed, removeFromGroup, "removeMediaFromGroup"],
-        [added, addToGroup, "addMediaToGroup"],
-      ] as const) {
-        for (const groupId of groupIds) {
-          const result = await mutate({ variables: { input: { groupId, mediaIds: [id] } } })
-          const data = result.data?.[field]
-          if (!data || data.results.length !== 1 || data.results[0].mediaId !== id ||
-              !["SUCCEEDED", "ALREADY_APPLIED"].includes(data.results[0].status)) {
-            throw new Error("Classification result was not confirmed")
-          }
+      for (const groupId of removed) {
+        const result = await removeFromGroup({ variables: { input: { groupId, mediaIds: [id] } } })
+        const response = result.data?.removeMediaFromGroup.results
+        if (!response || response.length !== 1 || response[0].mediaId !== id ||
+            !["SUCCEEDED", "ALREADY_APPLIED"].includes(response[0].status)) {
+          throw new Error("Group removal was not confirmed")
+        }
+      }
+      for (const groupId of added) {
+        const result = await addToGroup({ variables: { input: { groupId, mediaIds: [id] } } })
+        const response = result.data?.addMediaToGroup.results
+        if (!response || response.length !== 1 || response[0].mediaId !== id ||
+            !["SUCCEEDED", "ALREADY_APPLIED"].includes(response[0].status)) {
+          throw new Error("Group addition was not confirmed")
         }
       }
       setGroupTarget(null)
