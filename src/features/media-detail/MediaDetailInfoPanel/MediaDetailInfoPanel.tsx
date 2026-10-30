@@ -122,7 +122,6 @@ export function MediaDetailInfoPanel({
                 setDetailEditor={setDetailEditor}
                 context={contextKind}
               />}
-            </Stack>
     </MediaDetailInfoPanelFrame>
   )
 }
