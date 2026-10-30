@@ -286,3 +286,9 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - Personal削除が`DELETING`受付済みの場合、Media BrowserとDashboard Recent Mediaの有効Queryをrefetchする。一覧再取得失敗は削除受付失敗として扱わない。
 - **非対象**: Processing Polling、未実装のCommunity共有・共有解除、Original Download。Group編集の実Mutation接続は別途バックエンド契約照合が必要。
 - **検証未完了**: Typecheck/Build/Unit/Interaction/VRT/E2E、実ブラウザでのTag新規作成・競合・Scope切替・通信断・削除後一覧更新。CI上限のため今回のGitHub反映のみで合格判定しない。PR #221はDraft、mergeしない。
+
+### Media削除後のGroup Detail同期とTag Draft破棄（2026-10-30）
+
+- `deleteMedia` が `DELETING` を返した後に、既存の `MediaBrowserList`、`DashboardRecentMedia` に加えて `BrowseGroupDetail` のアクティブQueryも再取得する。Mutationの受付と一覧同期の成否は独立して扱い、削除受付を過大に確約しない。
+- URL Viewerで Media ID が変更された場合、開いていた Tag 編集対象とDraftを破棄する。過去のMediaの編集内容を別Mediaへ送らない。Processing Pollingは無変更。
+- **未検証**: 3画面での実一覧同期、Group DetailのページングCache、Tags編集途中の遷移とMutation結果、Typecheck / Build / Browser E2E / VRT。PRはDraftのまま維持する。
