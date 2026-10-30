@@ -135,3 +135,24 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 - Preserved the legacy 340px Wide/Medium width, 0.3-second width/height + opacity transitions, Compact vertical placement, body background/borders, flex column, internal scrolling, and optional fixed footer. The legacy InfoPanel still owns all of its original sections, edit/share/delete controls, and async states.
 - This is a **frame-level** extraction, not full content/component consolidation. The ID-only read-only panel still lacks the complete legacy sections/actions. Do not treat it as production equivalent or migrate consumers on this basis alone.
 - New head requires Typecheck/Build/Unit/Interaction/VRT and Human Visual Review. Keep PR Draft; no baseline approval/merge.
+
+
+## Component placement and responsibility review (2026-10-30)
+
+Agreed approach: inventory existing components first, relocate/reuse as appropriate, and split only when responsibility boundaries genuinely require it. Do not rebuild an existing UI for a new consumer. Existing visual, behavior, responsive and capability contracts remain unchanged unless a separate change is approved.
+
+| Existing code | Responsibility | Review direction (not yet final) |
+| --- | --- | --- |
+| `MediaDetailDialog` | local selection, editing and nested Modal composition | retain feature actions while revisiting controller boundary |
+| `MediaDetailViewer` | established Preview / InfoPanel composition | consolidate the ID-based consumer here instead of duplicating composition |
+| `MediaDetailPreview` | preview, animations and viewport controls | reuse original visual component; abstract navigation/data source only as needed |
+| `MediaDetailInfoPanel` | Metadata, Groups, Tags, Community, delete | keep as the sole existing panel; express permissions and data as inputs |
+| `MediaDetailMetadata` | fixture metadata / download controls | distinguish production data from fixture without losing download capability |
+| `MediaDetailGroupsSection` / `MediaDetailTagsSection` | counts, badges, expand/collapse, editing | reuse directly; preserve editing capability for authorized consumers |
+| `MediaDetailIdViewer` | provisional second ID-only visual composition | candidate for removal after unifying existing Viewer; not a permanent second UI |
+| `MediaDetailNavigationButton`, `MediaDetailRotationControls`, `MediaDetailZoomControls`, `MediaDetailInfoPanelFrame` | visual controls / animated frame | evaluate grouping/placement, avoid unnecessary abstractions |
+| `MediaDetailUrlProvider`, `useMediaDetailRead`, `useMediaDetailPresentation` | history, read model, adapter | isolate from display and mutation concerns |
+
+The final folder layout and component ownership remain under review. Before moving files, inspect imports, Stories, and all consumers; verify visual and behavioral parity after changes. The ID-only viewer and the existing Viewer must not be kept as two independently implemented permanent interfaces.
+
+Current branch's prior changes remain subject to CI and Human Visual Review; no baseline approval or merge is implied.
