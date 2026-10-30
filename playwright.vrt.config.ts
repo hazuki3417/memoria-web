@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests/vrt/generated",
   fullyParallel: true,
   reporter: [["list"], ["html", { outputFolder: "tests/vrt/report", open: "never" }]],
-  snapshotPathTemplate: "e2e/storybook-visual/__screenshots__/{arg}{ext}",
+  snapshotPathTemplate: "tests/vrt/baselines/{arg}{ext}",
   use: {
     ...devices["Desktop Chrome"],
     baseURL: "http://127.0.0.1:6006",
