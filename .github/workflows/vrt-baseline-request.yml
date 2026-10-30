@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: vrt-candidate-baselines-unapproved
-          path: e2e/storybook-visual/__screenshots__/
+          path: tests/vrt/baselines/
           if-no-files-found: error
           retention-days: 14
       - name: Upload failure diagnostics
@@ -118,7 +118,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: vrt-candidate-baselines-unapproved
-          path: e2e/storybook-visual/__screenshots__/
+          path: tests/vrt/baselines/
       - name: Publish candidate branch and PR
         id: publish
         env:
@@ -132,7 +132,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- e2e/storybook-visual/__screenshots__/
+          git add -A -- tests/vrt/baselines/
           if git diff --cached --quiet; then
             echo "No baseline changes against the target branch."
             echo "status=unchanged" >> "$GITHUB_OUTPUT"
