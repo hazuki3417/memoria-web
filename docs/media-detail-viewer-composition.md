@@ -305,3 +305,10 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - ユーザー合意：すでに実装済みの機能の安定化・境界条件・回帰テストは当面保留し、[Issue #227](https://github.com/hazuki3417/memoria-web/issues/227) で一括追跡する。今回優先するのは、現行Backendだけで対応できる**未実装の機能**。Processing Pollingの変更、Backend未対応のShare/Downloadは対象外。
 - URL Viewerの未接続だった `me.preferences.mediaDetailInitialInfoWide` / `mediaDetailInitialInfoMedium` をApplicationShellから渡し、既存の`useResponsiveViewport`によるWide/Medium判定で**Viewerを開いた時に一度だけ**InfoPanelの初期開閉へ適用する。Mediaページ送りや手動開閉で設定を上書きしない。Compactは既存の開いた初期表示を維持する。設定情報が未取得の場合も既存の開いた初期表示を維持する。
 - CI/実ブラウザ検証は保留Issue #227へ。PRはDraftを維持し、Mergeしない。
+
+### URL Viewer — 日付・ファイルサイズ表記設定（2026-10-30）
+
+- `me.preferences.dateFormat` (`YYYY_MM_DD` / `MM_DD_YYYY` / `DD_MM_YYYY`) と `fileSizeUnit` (`DECIMAL` / `BINARY`) を ApplicationShell → URL Viewer → 既存InfoPanelの実データMetadataへ伝搬する。
+- アップロード日時はBrowserローカル時刻で設定した日付順と `HH:mm` に整形し、無効な日時は `-` として表示する。容量表示はUsageと同じ `formatFileSize` を再利用する。設定未取得時は既定の `YYYY_MM_DD` / `DECIMAL`。
+- 旧ローカルPrototypeの固定Fixture MetadataとDownloadは変更しない。Processing Polling・Backend APIには変更なし。
+- 単体テストを追加。実行とUI回帰の検証は保留Issue #227で管理する。
