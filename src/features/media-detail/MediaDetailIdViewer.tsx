@@ -8,10 +8,11 @@ import { useMediaDetailViewport } from "./useMediaDetailViewport"
 import { MediaDetailNavigationButton } from "./MediaDetailNavigationButton"
 import { MediaDetailRotationControls } from "./MediaDetailRotationControls"
 import { MediaDetailZoomControls } from "./MediaDetailZoomControls"
-import { DetailCollectionStatus, DetailMetadataStatus, PreviewStatus } from "./MediaDetailReadFeedback"
+import { PreviewStatus } from "./MediaDetailReadFeedback"
 import { MediaDetailLayout } from "./MediaDetailViewer/MediaDetailLayout"
 import { MediaDetailViewerHost } from "./MediaDetailViewer/MediaDetailViewerHost"
-import { MediaDetailInfoPanelFrame } from "./MediaDetailInfoPanel/MediaDetailInfoPanelFrame"
+import { MediaDetailInfoPanel } from "./MediaDetailInfoPanel"
+import { useMediaDetailEditing } from "./useMediaDetailEditing"
 import type { MediaDetailPresentation } from "./useMediaDetailPresentation"
 
 /**
@@ -33,6 +34,7 @@ export function MediaDetailIdViewer({
   const [infoOpened, setInfoOpened] = useState(true)
   const { navigation, navigateMediaDetail } = useMediaDetailUrl()
   const viewport = useMediaDetailViewport()
+  const editing = useMediaDetailEditing(null)
   const priorId = useRef<string | null>(null)
   const move = (direction: -1 | 1) => {
     viewport.prepareNavigation(direction)
@@ -104,14 +106,25 @@ export function MediaDetailIdViewer({
           </Box>
         }
         infoPanel={
-          <MediaDetailInfoPanelFrame compact={compact} opened={infoOpened}>
-                <Text fw={600} size="sm">Media情報</Text>
-                <DetailMetadataStatus state={detail} onRetry={retryDetail} />
-                <DetailCollectionStatus title="Groups" state={groups} />
-                {groups.kind === "ready" && <Text size="xs">{groups.values.map((item) => item.name).join(", ") || "なし"}</Text>}
-                <DetailCollectionStatus title="Tags" state={tags} />
-                {tags.kind === "ready" && <Text size="xs">{tags.values.map((item) => item.name).join(", ") || "なし"}</Text>}
-          </MediaDetailInfoPanelFrame>
+          <MediaDetailInfoPanel
+            compact={compact}
+            detailInfoOpened={infoOpened}
+            detailValues={editing.detailValues}
+            detailSectionsExpanded={editing.detailSectionsExpanded}
+            toggleDetailSection={editing.toggleDetailSection}
+            openDetailEditor={editing.openDetailEditor}
+            setUnshareTarget={editing.setUnshareTarget}
+            setShareTarget={editing.setShareTarget}
+            setDetailEditor={editing.setDetailEditor}
+            context="personal"
+            downloadMock="forbidden"
+            onRequestDelete={() => {}}
+            detailReadState={detail}
+            groupsReadState={groups}
+            tagsReadState={tags}
+            onRetryDetail={retryDetail}
+            readOnly
+          />
         }
       />
     </MediaDetailViewerHost>
