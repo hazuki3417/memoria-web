@@ -68,6 +68,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: vrt-candidate-baselines-unapproved
-          path: e2e/storybook-visual/__screenshots__/
+          path: tests/vrt/baselines/
           if-no-files-found: error
           retention-days: 14
