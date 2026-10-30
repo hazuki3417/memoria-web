@@ -33,6 +33,7 @@ export type MediaDetailInfoPanelProps = Pick<
   readOnly?: boolean
   allowDelete?: boolean
   onEditTags?: () => void
+  onEditGroups?: () => void
 }
 
 export function MediaDetailInfoPanel({
@@ -55,6 +56,7 @@ export function MediaDetailInfoPanel({
   readOnly = false,
   allowDelete = false,
   onEditTags,
+  onEditGroups,
 }: MediaDetailInfoPanelProps) {
   return (
     <MediaDetailInfoPanelFrame
@@ -99,6 +101,7 @@ export function MediaDetailInfoPanel({
                 toggleDetailSection={toggleDetailSection}
                 openDetailEditor={openDetailEditor}
                 readOnly={readOnly}
+                onEditGroups={onEditGroups}
               />
               )}
               {detailReadState && !tagsReadState ? (
