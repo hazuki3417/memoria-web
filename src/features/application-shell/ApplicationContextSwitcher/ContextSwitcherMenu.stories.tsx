@@ -26,8 +26,8 @@ const meta = {
 } satisfies Meta<typeof ContextSwitcherMenu>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = { name: "Visual · Context一覧", tags: ["visual", "vrt-menu"] }
-export const Community: Story = { name: "Visual · Community選択中", tags: ["visual", "vrt-menu"], args: { currentContext: family } }
-export const Empty: Story = { name: "Visual · Communityなし", tags: ["visual", "vrt-menu"], args: { contexts: [personal] } }
-export const Loading: Story = { name: "Visual · 初期取得中", tags: ["visual", "vrt-menu"], args: { contexts: [personal], loading: true } }
-export const Error: Story = { name: "Visual · 取得失敗", tags: ["visual", "vrt-menu"], args: { error: true } }
+export const Default: Story = { name: "Visual · Context一覧", tags: ["visual", "vrt", "vrt-menu"] }
+export const Community: Story = { name: "Visual · Community選択中", tags: ["visual", "vrt", "vrt-menu"], args: { currentContext: family } }
+export const Empty: Story = { name: "Visual · Communityなし", tags: ["visual", "vrt", "vrt-menu"], args: { contexts: [personal] } }
+export const Loading: Story = { name: "Visual · 初期取得中", tags: ["visual", "vrt", "vrt-menu"], args: { contexts: [personal], loading: true } }
+export const Error: Story = { name: "Visual · 取得失敗", tags: ["visual", "vrt", "vrt-menu"], args: { error: true } }
