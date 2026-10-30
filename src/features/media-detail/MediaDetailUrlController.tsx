@@ -1,7 +1,7 @@
 "use client"
 
 import { useMediaQuery } from "@mantine/hooks"
-import { gql, useMutation } from "@apollo/client"
+import { gql, useApolloClient, useMutation } from "@apollo/client"
 import { Button, Group, Text } from "@mantine/core"
 import { useState } from "react"
 import { Modal } from "@/components/Modal"
@@ -27,6 +27,7 @@ const DELETE_MEDIA = gql`
  */
 export function MediaDetailUrlController({ scope, wrap = false }: { scope: MediaDetailScope; wrap?: boolean }) {
   const url = useMediaDetailUrl()
+  const apollo = useApolloClient()
   const presentation = useMediaDetailPresentation(scope)
   const navigation = getMediaNavigation(url.snapshot, url.selectedMediaId, wrap)
   const viewport = useMediaDetailViewport()
@@ -57,6 +58,15 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       setDeleteTarget(null)
       deletionKey.current = null
       url.closeMediaDetail()
+      // The mutation acknowledges DELETING; refresh visible lists separately.
+      // A list-refresh failure must not reinterpret an accepted deletion as failure.
+      void apollo.refetchQueries({ include: ["MediaBrowserList"] }).catch(() => {
+        showNotification({
+          kind: "error",
+          title: "一覧を更新できませんでした",
+          description: "削除処理は受け付けられました。一覧を再読み込みしてください。",
+        })
+      })
       showNotification({ kind: "success", title: "Mediaの削除", description: "削除処理を受け付けました。" })
     } catch {
       setDeleteError(true)
