@@ -79,3 +79,13 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 **未接続事項**：実Application Controllerが`read`を組み立てる実際のConsumer結線は未実施。GraphQL Read Hook自体の取得成功だけでは画像Browser load/decode成功としないため、load/decodeエラー監視と手動署名URL更新・再試行、Polling停止中UIは別途実装が必要。Community共有情報とDelete許可は現在のRead Queryに含まれないため、非同期モードで未確認の操作を有効化せず、既存Local Modal modeのCapabilityは維持する。Groups/Tagsの編集DraftとRead Data同期もConsumer統合時に検証する。
 
 **検証Gate**：Typecheck / Build / Unit / Interaction / VRTで既存表示が変わらないこと、新Storyで状態別の描画を確認すること。新しいVRT Baselineの正式採用とmergeは別途レビュー・承認する。
+
+
+## Stage 3 — URL-scoped read-only Presenter Adapter (2026-10-30)
+
+- `useMediaDetailPresentation(scope)` combines `MediaDetailUrlProvider.selectedMediaId` with `useMediaDetailRead` and returns ID-bound detail, preview, groups, tags, and detail retry.
+- This adapter is **read-only plumbing**, not a completed viewer connection. No legacy `MediaItem` is fabricated from a URL/media ID, and no new Host is opened by this change.
+- The existing `MediaDetailViewer` still requires a local `detail: MediaItem | null` to open. ID-only loading, unavailable, and error rendering must be integrated with a deliberate Host/Presenter contract; Browser/Group/Dashboard migration is not complete.
+- Scope is supplied by the consumer rather than inferred from URL; production wiring must validate scope and access rights before showing/editing/sharing/deleting.
+- Follow-up verification: correct ID on rapid transitions, independent Preview/InfoPanel errors, mounted Host continuity, URL Back/Forward/reload, nested overlays, Compact/Medium/Wide visual behavior, and real browser image load/decode.
+- This is an intermediate checkpoint. CI and Human Visual Review must be completed on the new commit. No baseline acceptance or merge is implied.
