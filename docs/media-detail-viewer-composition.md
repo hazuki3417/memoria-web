@@ -112,3 +112,10 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 - Visual props are copied from the legacy component: subtle gray ActionIcon, lg size, the same Tabler chevrons and accessible labels. The legacy callbacks still run `prepareNavigation(direction)` then `setDetail(item)`; the ID-only consumer runs its own URL navigation callback. State ownership and existing navigation semantics are not merged.
 - This is a narrowly scoped reusable **control**, not a replacement of the full Preview, its transitions, zoom slider, direct input, image delivery, or the animated InfoPanel. Do not migrate existing consumers based solely on this extraction.
 - Automated gates and Human Visual Review on this commit are still required; PR remains Draft.
+
+
+## Stage 3 — Shared rotation controls (2026-10-30)
+
+- Extracted `MediaDetailRotationControls` from the legacy Preview and reused it in the isolated ID-only viewer. It keeps the existing reset/left/right icons, labels, subtle button variant and callback order (`setAnimated` before `setRotate`). State remains owned by the respective viewport hook.
+- The legacy footer grid, Compact visibility rule, zoom slider and direct input remain in place. Existing consumers are not switched. This is a small control-level extraction, not full Preview/InfoPanel parity.
+- Verify TypeScript/Build/Unit/Interaction/VRT and Human Visual Review on the new head before proceeding; do not claim visual regression equivalence solely from successful CI. PR stays Draft.
