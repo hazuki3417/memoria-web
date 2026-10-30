@@ -234,3 +234,10 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 ## Modal命名への統一（2026-10-30）
 
 `develop`の命名方針に合わせ、Media Detail fullscreen Mantine Modal の公開Component・Props・実装フォルダ・Storybookタイトルを `MediaDetailDialog` から `MediaDetailModal` に改名した。Media BrowserとGroup Browserのconsumer importも変更した。表示・操作・layout・responsive behaviorは変更せず、VRTのStory ID変更に伴うbaselineの取り扱いとローカルTypecheck/Build/VRT確認を後続Gateに残す。CI利用上限によりcommitは `[skip ci]` を利用する。
+
+
+## Stage 2 — Media Browserの非破壊的Controller接続境界（2026-10-30）
+
+- `MediaBrowser`へoptional `onOpenMediaDetail(mediaId, orderedLoadedMediaIds)`を追加。指定時はMedia選択を外部URL Controllerへ委譲し、未指定時は従来どおりローカル`MediaDetailModal`を開く。順序は現在読み込まれた`stateItems`の表示順に固定する。
+- `MediaBrowserContainer`ではまだこのcallbackを渡さない。URL Controllerのread-only Modeには編集・共有・削除の実操作が未接続であり、Consumerを切り替えるとCapability regressionになるため。既存Prototype/Group Browserも変更しない。
+- 次段階でApplication ShellのURL Hostの単一所有者、Scope検証、実操作のpermission/pending/unknown contract、Back/Forward/no-remountを整えてからConsumerを移行する。変更のTypecheck、Build、Interaction、VRTはローカルで検証する。CIの実行上限中は `[skip ci]` を適用する。
