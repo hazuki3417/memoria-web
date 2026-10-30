@@ -7,6 +7,7 @@ import {
   useDashboardRecentGroupsQuery,
 } from "@/infrastructure/graphql/generated"
 import { Dashboard, type DashboardGroup } from "./Dashboard"
+import { useMediaDetailUrl } from "@/features/media-detail/MediaDetailUrlProvider"
 import { selectDashboardThumbnail } from "./selectDashboardThumbnail"
 
 // Remount the entire scoped query consumer when switching contexts. Apollo
@@ -38,6 +39,7 @@ function ScopedDashboard({
   contextKind: "personal" | "community"
   communityId?: string
 }) {
+  const { openMediaDetail } = useMediaDetailUrl()
   const scope = useMemo(
     () =>
       contextKind === "community"
@@ -106,6 +108,10 @@ function ScopedDashboard({
     <Dashboard
       contextKind={contextKind}
       communityId={communityId}
+      mediaIds={mediaNodes.slice(0, 32).map((node) => node.id)}
+      onOpenMedia={(mediaId) => {
+        if (!skip) openMediaDetail({ mediaId, orderedLoadedMediaIds: mediaNodes.slice(0, 32).map((node) => node.id) })
+      }}
       mediaItems={mediaNodes.map((node) =>
         selectDashboardThumbnail(node.image?.variants),
       )}
