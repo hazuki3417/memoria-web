@@ -86,9 +86,11 @@ export function DetailMetadataStatus({
 export function DetailCollectionStatus({
   title,
   state,
+  onRetry,
 }: {
   title: string
   state: CollectionReadState
+  onRetry?: () => void
 }) {
   if (state.kind === "ready") return null
   return (
@@ -96,7 +98,10 @@ export function DetailCollectionStatus({
       <Text size="xs" c="dimmed">{title}</Text>
       {state.kind === "pending"
         ? <Skeleton height={18} width="70%" />
-        : <Text size="xs" c="dimmed">{state.kind === "incomplete" ? "追加情報を取得中です" : "情報を取得できませんでした"}</Text>}
+        : <Text size="xs" c="dimmed">{state.kind === "incomplete" ? "追加情報を取得中、または取得が停止しています" : "情報を取得できませんでした"}</Text>}
+      {(state.kind === "incomplete" || state.kind === "error") && onRetry && (
+        <Button size="xs" variant="light" onClick={onRetry}>再試行</Button>
+      )}
     </Stack>
   )
 }
