@@ -10,6 +10,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { showNotification } from "@/components/Feedback"
 import { MediaDetailUrlProvider } from "@/features/media-detail/MediaDetailUrlProvider"
+import { MediaDetailUrlController } from "@/features/media-detail/MediaDetailUrlController"
 import { getCommunityDisplayName, sortCommunitiesByDisplayName } from "./communityDisplayName"
 import { CommunityCreateModal } from "./CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from "./useApplicationContextSelection"
@@ -285,7 +286,14 @@ export function ApplicationShellContainer({
           ) : undefined
         }
       >
-        <MediaDetailUrlProvider>{children}</MediaDetailUrlProvider>
+        <MediaDetailUrlProvider>
+          {children}
+          {contextKind === "community" && communityId ? (
+            <MediaDetailUrlController scope={{ type: "COMMUNITY", communityId }} />
+          ) : contextKind === "personal" ? (
+            <MediaDetailUrlController scope={{ type: "PERSONAL" }} />
+          ) : null}
+        </MediaDetailUrlProvider>
       </ApplicationShell>
     </>
   )
