@@ -36,6 +36,9 @@ export type MediaDetailViewerProps = Pick<
     | "detailDirection"
   > & {
     detail: MediaItem | null
+    selectedId?: string | null
+    navigation?: { previousId: string | null; nextId: string | null; position: number | null; count: number | null }
+    navigateById?: (direction: -1 | 1) => void
     setDetail: Dispatch<SetStateAction<MediaItem | null>>
     closeMediaDetail: () => void
     onRequestDelete: () => void
@@ -59,13 +62,13 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
     props
   return (
     <MediaDetailViewerHost
-      opened={detail !== null}
+      opened={Boolean(props.selectedId ?? detail?.id)}
       onClose={closeMediaDetail}
     >
-      {detail &&
+      {(props.selectedId || detail) &&
         (() => {
           const detailIndex = stateItems.findIndex(
-            (item) => item.id === detail.id,
+            (item) => item.id === (props.selectedId ?? detail?.id),
           )
           const prev = detailIndex > 0 ? stateItems[detailIndex - 1] : null
           const next =
@@ -79,6 +82,9 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
               preview={
                 <MediaDetailPreview
                   detail={detail}
+                  selectedId={props.selectedId}
+                  navigation={props.navigation}
+                  navigateById={props.navigateById}
                   readState={props.read?.preview}
                   onRetryImage={props.read?.retryImage}
                   stateItems={stateItems}
@@ -105,6 +111,7 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
                   groupsReadState={props.read?.groups}
                   tagsReadState={props.read?.tags}
                   onRetryDetail={props.read?.retryDetail}
+                  readOnly={Boolean(props.read)}
                   compact={compact}
                   detailInfoOpened={detailInfoOpened}
                   detailValues={props.detailValues}
