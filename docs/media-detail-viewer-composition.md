@@ -292,3 +292,10 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - `deleteMedia` が `DELETING` を返した後に、既存の `MediaBrowserList`、`DashboardRecentMedia` に加えて `BrowseGroupDetail` のアクティブQueryも再取得する。Mutationの受付と一覧同期の成否は独立して扱い、削除受付を過大に確約しない。
 - URL Viewerで Media ID が変更された場合、開いていた Tag 編集対象とDraftを破棄する。過去のMediaの編集内容を別Mediaへ送らない。Processing Pollingは無変更。
 - **未検証**: 3画面での実一覧同期、Group DetailのページングCache、Tags編集途中の遷移とMutation結果、Typecheck / Build / Browser E2E / VRT。PRはDraftのまま維持する。
+
+### URL Viewer — Groups分類編集の実API接続（2026-10-30）
+
+- canonical Viewerの既存Groupsセクションと`GroupsEditModal`を再利用。URL ViewerのGroups取得が全件完了した場合だけ編集を開く。
+- `mediaGroups(scope:)`のRelayページをCursorで取得し、候補一覧が完結するまで保存させない。取得失敗は再試行を表示。候補のIDを用い、`removeMediaFromGroup`と`addMediaToGroup`を逐次実行する。
+- MutationのSUCCEEDED/ALREADY_APPLIEDのみ受付を確認する。途中で失敗・結果不明になった場合は部分成功を想定して成功表示せず、Media DetailとアクティブなGroup一覧/詳細を再取得する。
+- Media移動時はGroups編集のDraftを破棄。**未検証**: 実APIの権限判定、分類操作の部分成功・不明結果、複数ページ、Scope切替、Typecheck/Build/Interaction/VRT/E2E。CI Gate/Human Visual Review前のcheckpointであり、PR #221のmergeはしない。
