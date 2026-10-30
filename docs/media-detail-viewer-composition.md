@@ -119,3 +119,11 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 - Extracted `MediaDetailRotationControls` from the legacy Preview and reused it in the isolated ID-only viewer. It keeps the existing reset/left/right icons, labels, subtle button variant and callback order (`setAnimated` before `setRotate`). State remains owned by the respective viewport hook.
 - The legacy footer grid, Compact visibility rule, zoom slider and direct input remain in place. Existing consumers are not switched. This is a small control-level extraction, not full Preview/InfoPanel parity.
 - Verify TypeScript/Build/Unit/Interaction/VRT and Human Visual Review on the new head before proceeding; do not claim visual regression equivalence solely from successful CI. PR stays Draft.
+
+
+## Stage 3 — Shared Zoom toolbar checkpoint (2026-10-30)
+
+- Extracted `MediaDetailZoomControls` directly from legacy `MediaDetailPreview` and reused it in both legacy Preview and the isolated ID-only read-only Viewer. It preserves the reset/minus/plus Tabler icons, subtle variants, disabled bounds (50–300%), 10% increments, 100px slider, and existing `ZoomInput` with direct numeric entry/dropdown.
+- Zoom state remains owned by `useMediaDetailViewport` or the legacy viewport props; no URL/router or data fetching was placed into the toolbar. The legacy Preview footer grid and Compact visibility are unchanged.
+- **Not full visual parity**: the ID-only Viewer still has a separate preliminary footer and information panel rather than consuming the full original Preview/InfoPanel composition. Preserve the original Layout, spacing, animated panel, transitions and all actions before migration of existing consumers.
+- Typecheck/Build/Unit/Storybook Interaction/VRT and Human Visual Review of the new head remain required. PR stays Draft; no baseline approval or merge.
