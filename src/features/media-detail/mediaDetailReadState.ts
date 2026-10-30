@@ -7,7 +7,7 @@ export type DetailRecord = {
   originalFileName: string
   fileSize: number
   uploadedAt: string
-  uploader: { nickname: string | null; deleted: boolean } | null
+  uploadedBy: { nickname: string | null; deleted: boolean } | null
   image: {
     width: number
     height: number
