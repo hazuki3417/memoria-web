@@ -19,8 +19,8 @@ import type { MediaDetailViewerProps } from "../MediaDetailViewer/MediaDetailVie
 import { MediaDetailZoomControls } from "./MediaDetailZoomControls"
 import type { PreviewReadState } from "../mediaDetailReadState"
 import { PreviewStatus } from "../MediaDetailReadFeedback"
-import { MediaDetailNavigationButton } from "../MediaDetailNavigationButton"
-import { MediaDetailRotationControls } from "../MediaDetailRotationControls"
+import { MediaDetailNavigationButton } from "./MediaDetailNavigationButton"
+import { MediaDetailRotationControls } from "./MediaDetailRotationControls"
 
 export type MediaDetailPreviewProps = Pick<
   MediaDetailViewerProps,
