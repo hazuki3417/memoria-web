@@ -113,7 +113,10 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
           if (!fetchMoreResult?.media || fetchMoreResult.media.id !== previous.media?.id || !previous.media) return previous
           const incoming = fetchMoreResult.media[field]
           const existing = previous.media[field]
-          if (!incoming || !existing) return previous
+          if (!incoming || !existing || (incoming.pageInfo.hasNextPage && incoming.pageInfo.endCursor === cursor)) {
+            setPageFailure(requestKey)
+            return previous
+          }
           return {
             media: {
               ...previous.media,
