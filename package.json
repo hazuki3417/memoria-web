@@ -21,7 +21,7 @@
     "test:interaction": "vitest run --config vitest.storybook.config.ts",
     "test:visual": "node scripts/vrt/run.mjs",
     "test:visual:update": "node scripts/vrt/run.mjs --update-snapshots",
-    "test:visual:report": "playwright show-report ./e2e/storybook-visual/report",
+    "test:visual:report": "playwright show-report ./tests/vrt/report",
     "graphql:codegen": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs",
     "graphql:codegen:api": "graphql-codegen --config codegen.ts && node scripts/align-apollo-operation-types.mjs",
     "openapi:codegen": "orval --config orval.config.ts"
