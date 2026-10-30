@@ -85,7 +85,7 @@ export function MediaDetailInfoPanel({
               {detailReadState && !groupsReadState ? (
                 <DetailCollectionStatus title="Groups" state={{ kind: "pending" }} />
               ) : groupsReadState && groupsReadState.kind !== "ready" ? (
-                <DetailCollectionStatus title="Groups" state={groupsReadState} />
+                <DetailCollectionStatus title="Groups" state={groupsReadState} onRetry={onRetryDetail} />
               ) : detailReadState && detailReadState.kind !== "ready" ? (
                 <DetailCollectionStatus title="Groups" state={{ kind: "pending" }} />
               ) : (
@@ -100,7 +100,7 @@ export function MediaDetailInfoPanel({
               {detailReadState && !tagsReadState ? (
                 <DetailCollectionStatus title="Tags" state={{ kind: "pending" }} />
               ) : tagsReadState && tagsReadState.kind !== "ready" ? (
-                <DetailCollectionStatus title="Tags" state={tagsReadState} />
+                <DetailCollectionStatus title="Tags" state={tagsReadState} onRetry={onRetryDetail} />
               ) : detailReadState && detailReadState.kind !== "ready" ? (
                 <DetailCollectionStatus title="Tags" state={{ kind: "pending" }} />
               ) : (
