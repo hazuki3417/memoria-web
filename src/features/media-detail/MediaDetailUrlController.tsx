@@ -55,6 +55,8 @@ export function MediaDetailUrlController({ scope }: { scope: MediaDetailScope })
         groups: presentation.groups,
         tags: presentation.tags,
         retryDetail: presentation.retryDetail,
+        retryImage: presentation.retryDetail,
+        pollingStopped: presentation.pollingStopped,
       }}
     />
   )
