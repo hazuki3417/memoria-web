@@ -104,3 +104,11 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 - The isolated `MediaDetailIdViewer` now uses `useMediaDetailUrl().navigation` for previous/next controls and `navigateMediaDetail` for URL transitions. `useMediaDetailViewport` owns zoom/rotation state; controls are disabled on Compact consistently with the existing Compact design intent. URL selection changes reset zoom/rotation, including Back/Forward-driven changes.
 - The ID-only read-only path remains **unmounted in application consumers**. Its current controls are preliminary and **not a visual/behavioral parity claim**: existing zoom slider/direct entry, animated InfoPanel, navigation transitions, edit/share/delete and all source-specific actions remain in the legacy Viewer and are not replicated here. Reuse or refactor existing Preview/InfoPanel before consumer migration to preserve them rather than substituting this reduced UI.
 - Gate required: Typecheck, Build, Unit, Interaction, VRT and Human Visual Review after this commit; validate next/previous, Back/Forward, no-remount, stale ID and image, Compact/Medium/Wide, and zoom reset before any production wiring. PR remains Draft.
+
+
+## Stage 3 — Navigation control reuse checkpoint (2026-10-30)
+
+- Extracted `MediaDetailNavigationButton` from the existing `MediaDetailPreview`; both legacy Preview and isolated `MediaDetailIdViewer` consume it.
+- Visual props are copied from the legacy component: subtle gray ActionIcon, lg size, the same Tabler chevrons and accessible labels. The legacy callbacks still run `prepareNavigation(direction)` then `setDetail(item)`; the ID-only consumer runs its own URL navigation callback. State ownership and existing navigation semantics are not merged.
+- This is a narrowly scoped reusable **control**, not a replacement of the full Preview, its transitions, zoom slider, direct input, image delivery, or the animated InfoPanel. Do not migrate existing consumers based solely on this extraction.
+- Automated gates and Human Visual Review on this commit are still required; PR remains Draft.
