@@ -277,3 +277,12 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - 実URL ViewerのPersonal Scopeでのみ削除確認Modalを有効化する。`DeleteMediaInput {mediaId,idempotencyKey}` に従ってGraphQL `deleteMedia` を呼び出し、`DELETING`受理応答を確認した場合のみViewerを閉じて受付通知する。物理削除完了とは表示しない。
 - 通信失敗・不明応答時は受理済みの可能性があるため、同じMedia IDへの再試行で同一idempotencyKeyを再利用する。確認Modalを閉じた場合のみキーを破棄する。Communityでの削除権限UXは未確定のため有効化しない。共有・共有解除とGroups/Tags編集は引き続き未接続。
 - タイプチェック・Mutationの成功/拒否/Unknown・Navigation/Focus・削除後リスト更新・VRTを検証する必要がある。CI上限中は`[skip ci]`を付けPRはDraftを維持する。
+
+
+### URL Viewer — Tags編集と一覧同期（2026-10-30）
+
+- 既存Media DetailのTags節・TagsEditModalを再利用し、URL Viewerで実API `mediaTagEditState` と `updateMediaTags` を接続した。編集開始時は現在のMedia IDとScopeに紐づくTag状態Tokenをnetwork-onlyで取得する。
+- 保存前にTokenとDetail上の所属Tag ID集合の整合性を照合する。Token取得失敗は再試行UIを表示し、取得中・保存中の操作を禁止する。保存時は既存のTag IDを再利用し、新規名はnameで送信する。成功後にDetailを再取得し、失敗・結果不明時は成功表示しない。
+- Personal削除が`DELETING`受付済みの場合、Media BrowserとDashboard Recent Mediaの有効Queryをrefetchする。一覧再取得失敗は削除受付失敗として扱わない。
+- **非対象**: Processing Polling、未実装のCommunity共有・共有解除、Original Download。Group編集の実Mutation接続は別途バックエンド契約照合が必要。
+- **検証未完了**: Typecheck/Build/Unit/Interaction/VRT/E2E、実ブラウザでのTag新規作成・競合・Scope切替・通信断・削除後一覧更新。CI上限のため今回のGitHub反映のみで合格判定しない。PR #221はDraft、mergeしない。
