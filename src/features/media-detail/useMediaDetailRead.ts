@@ -130,7 +130,7 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
   const retryDetail = useCallback(() => {
     if (mediaId) setPollState({ id: pollKey, failures: 0, stopped: false })
     return query.refetch()
-  }, [pollKey, mediaId, query.refetch]
+  }, [pollKey, mediaId, query.refetch])
 
   return {
     detail,
