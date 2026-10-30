@@ -48,6 +48,7 @@ export type MediaDetailPreviewProps = Pick<
   next: NonNullable<MediaDetailViewerProps["detail"]> | null
   readState?: PreviewReadState
   onRetryImage?: () => void
+  pollingStopped?: boolean
 }
 
 export function MediaDetailPreview(props: MediaDetailPreviewProps) {
@@ -74,6 +75,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
     setDetailInfoOpened,
     readState,
     onRetryImage,
+    pollingStopped,
   } = props
   const activeId = selectedId ?? detail?.id ?? null
   const detailIndex = stateItems.findIndex((item) => item.id === activeId)
@@ -145,7 +147,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
               }}
             >
               {readState && readState.kind !== "ready" ? (
-                <PreviewStatus state={readState} onRetry={onRetryImage} />
+                <PreviewStatus state={readState} onRetry={onRetryImage} pollingStopped={pollingStopped} />
               ) : detail?.failed ? (
                 <Stack align="center" c="dimmed">
                   <IconPhotoOff size={48} />
