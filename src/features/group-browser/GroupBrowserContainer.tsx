@@ -17,6 +17,7 @@ import {
   useRemoveBrowserMediaFromGroupMutation,
 } from "@/infrastructure/graphql/generated"
 import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
+import { useMediaDetailUrl } from "@/features/media-detail/MediaDetailUrlProvider"
 import { deleteGroupThenRefresh } from "./groupDeleteFlow"
 import {
   isGroupCreateOutcomeUnknown,
@@ -34,6 +35,7 @@ export function GroupBrowserContainer({
   contextKind,
   communityId,
 }: GroupBrowserContainerProps) {
+  const { openMediaDetail } = useMediaDetailUrl()
   const scope = useMemo(
     () =>
       contextKind === "community"
@@ -614,6 +616,9 @@ export function GroupBrowserContainer({
 
   return (
     <GroupBrowser
+      onOpenMediaDetail={(mediaId, orderedLoadedMediaIds) => {
+        if (contextKind === "personal" || communityId) openMediaDetail({ mediaId, orderedLoadedMediaIds })
+      }}
       discoveryState={
         listing.error && !listingSnapshot
           ? "error"
