@@ -7,6 +7,8 @@ import {
   processingPollDelay,
   mediaDetailPollingIdentity,
   mergeDetailCollectionPages,
+  shouldRefreshVariantUrl,
+  VARIANT_URL_REFRESH_MS,
   type DetailRecord,
 } from "./mediaDetailReadState"
 
@@ -103,5 +105,16 @@ describe("Media Detail Relay pagination", () => {
     )
     expect(merged.edges.map(({ node }) => node.id)).toEqual(["a", "b", "c"])
     expect(merged.pageInfo).toEqual({ hasNextPage: false, endCursor: "last" })
+  })
+})
+
+
+describe("Media Detail signed Variant URL renewal", () => {
+  it("refreshes only a visible READY image when the 12-minute threshold elapses", () => {
+    const started = 1000
+    expect(shouldRefreshVariantUrl(started, started + VARIANT_URL_REFRESH_MS - 1, true, true)).toBe(false)
+    expect(shouldRefreshVariantUrl(started, started + VARIANT_URL_REFRESH_MS, true, true)).toBe(true)
+    expect(shouldRefreshVariantUrl(started, started + VARIANT_URL_REFRESH_MS, false, true)).toBe(false)
+    expect(shouldRefreshVariantUrl(started, started + VARIANT_URL_REFRESH_MS, true, false)).toBe(false)
   })
 })
