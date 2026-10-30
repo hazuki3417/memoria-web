@@ -14,6 +14,11 @@ on:
       - "src/app/layout.tsx"
       - "package.json"
       - "package-lock.json"
+      - "tests/vrt/**"
+      - "scripts/vrt/**"
+      - "playwright.vrt.config.ts"
+      - "compose.yaml"
+      - ".storybook/**"
   workflow_dispatch:
     inputs:
       mode:
