@@ -1,6 +1,6 @@
 # Storybook VRT
 
-StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較します。MDXのDocsは対象外です。既存のVRTとは独立した環境で、既存Quality Gateには組み込まず、Phase 1では独立したCompose動作確認用のGitHub Actionsを利用します。
+StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較します。MDXのDocsは対象外です。シナリオE2Eとは独立した環境で、既存Quality Gateには組み込まず、Phase 1では独立したCompose動作確認用のGitHub Actionsを利用します。
 
 ## VRT実行構造（Issue #223 改修ブランチ）
 
@@ -13,7 +13,7 @@ StorybookのCanvasをPlaywrightで撮影し、Git管理の基準画像と比較�
 - 現段階ではViewportは従来の3幅を維持する。Story別の選択方式は未決定であり、このブランチで暗黙に導入しない。
 - Baseline比較と明示的な候補生成を分離し、人間のVisual Review後にのみ採用する。
 
-`playwright.vrt.config.ts` は生成済みテストだけを収集する。旧 `storybook.spec.ts` はこの実行経路で参照しない。旧ファイルの削除は既存保証と参照先の棚卸し後に行う。
+`playwright.vrt.config.ts` は生成済みテストだけを収集する。旧単一テスト `storybook.spec.ts` と旧VRT設定は新構成へ置き換える。Git管理済みBaselineは既存画像の保持を優先し、暫定的に `e2e/storybook-visual/__screenshots__/` を使用する。画像資産の移行時にBaseline名・件数・差分を照合し、承認なしに更新・削除しない。
 
 **検証状態**: このブランチでのGitHub更新はコードの実行成功を意味しない。Storybook起動、Playwrightテスト列挙、Baseline比較、CI動作、特にグループ別の分割実行と環境再現性は実行検証が必要。
 
@@ -91,7 +91,7 @@ Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-no
 
 GitHubの「Actions」→「VRT Docker Compose smoke test」→「Run workflow」で対象branchを選び、`mode: generate`を選択する。**GitHubの手動実行UIはworkflow定義がデフォルトブランチに存在する必要がある**ため、このPRが未マージの間は手動実行を利用できない場合がある。PRの自動実行は比較のみであり、Baseline未登録の失敗は想定どおりとする。
 
-生成Artifactを取得してVRT対象Story×3領域の画像を設計と照合し、レビューを通過した画像だけを`tests/vrt/__screenshots__/`に登録する。その後`mode: compare`またはPR比較で成功を確認する。Artifactの取得だけではBaseline承認やGit反映は完了しない。**候補画像を自動的にコミットしない。**
+生成Artifactを取得してVRT対象Story×3領域の画像を設計と照合し、レビューを通過した画像だけを`e2e/storybook-visual/__screenshots__/`に登録する。その後`mode: compare`またはPR比較で成功を確認する。Artifactの取得だけではBaseline承認やGit反映は完了しない。**候補画像を自動的にコミットしない。**
 
 ## Issue・GitHubプラグインからのBaseline生成PR依頼
 
