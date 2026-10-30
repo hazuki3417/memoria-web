@@ -5,7 +5,10 @@ import { Modal } from "@/components/Modal"
 import { ActionPanel } from "@/components/ActionPanel"
 import type { useMediaDetailEditing } from "@/features/media-detail/useMediaDetailEditing"
 
-type Props = Pick<
+type Props = {
+  pending?: boolean
+  options?: string[]
+} & Pick<
   ReturnType<typeof useMediaDetailEditing>,
   | "detailEditor"
   | "setDetailEditor"
@@ -21,11 +24,13 @@ export function TagsEditModal({
   detailDraft,
   setDetailDraft,
   saveDetailDraft,
+  pending = false,
+  options,
 }: Props) {
   return (
     <Modal
       opened={detailEditor === "tags"}
-      onClose={() => setDetailEditor(null)}
+      onClose={() => { if (!pending) setDetailEditor(null) }}
       title="Tagsを編集"
       centered
       zIndex={400}
@@ -37,9 +42,10 @@ export function TagsEditModal({
         </Text>
         <TagsInput
           label="Tags"
-          data={["旅行", "風景", "家族", "お気に入り"]}
+          data={options ?? ["旅行", "風景", "家族", "お気に入り"]}
           value={detailDraft}
           onChange={setDetailDraft}
+          disabled={pending}
         />
 
         </Stack>
@@ -48,10 +54,10 @@ export function TagsEditModal({
       <Modal.Footer>
         <ActionPanel>
           <ActionPanel.End>
-          <Button variant="default" onClick={() => setDetailEditor(null)}>
+          <Button variant="default" disabled={pending} onClick={() => setDetailEditor(null)}>
             キャンセル
           </Button>
-          <Button onClick={saveDetailDraft}>変更を反映</Button>
+          <Button loading={pending} disabled={pending} onClick={saveDetailDraft}>変更を反映</Button>
           </ActionPanel.End>
         </ActionPanel>
       </Modal.Footer>
