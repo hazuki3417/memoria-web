@@ -50,7 +50,10 @@ function MediaPage({
           key={page * pageSize + index}
           component={onOpenMedia && mediaIds?.[page * pageSize + index] ? "button" : "div"}
           type={onOpenMedia && mediaIds?.[page * pageSize + index] ? "button" : undefined}
-          onClick={onOpenMedia && mediaIds?.[page * pageSize + index] ? () => onOpenMedia(mediaIds[page * pageSize + index]) : undefined}
+          onClick={onOpenMedia ? () => {
+            const id = mediaIds?.[page * pageSize + index]
+            if (id) onOpenMedia(id)
+          } : undefined}
           aria-label={onOpenMedia && mediaIds?.[page * pageSize + index] ? `Mediaを表示: ${page * pageSize + index + 1}` : undefined}
           bdrs="md"
           style={{
