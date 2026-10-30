@@ -127,3 +127,11 @@ GraphQL SDL `src/infrastructure/graphql/schema.graphql` を照合した上で `m
 - Zoom state remains owned by `useMediaDetailViewport` or the legacy viewport props; no URL/router or data fetching was placed into the toolbar. The legacy Preview footer grid and Compact visibility are unchanged.
 - **Not full visual parity**: the ID-only Viewer still has a separate preliminary footer and information panel rather than consuming the full original Preview/InfoPanel composition. Preserve the original Layout, spacing, animated panel, transitions and all actions before migration of existing consumers.
 - Typecheck/Build/Unit/Storybook Interaction/VRT and Human Visual Review of the new head remain required. PR stays Draft; no baseline approval or merge.
+
+
+## Stage 3 — Shared InfoPanel frame checkpoint (2026-10-30)
+
+- Following user authorization to modify the currently nonfunctional legacy Media Detail Dialog directly, extracted the **existing** animated outer layout into `MediaDetailInfoPanelFrame` and reused it from both `MediaDetailInfoPanel` and the ID-only read-only viewer.
+- Preserved the legacy 340px Wide/Medium width, 0.3-second width/height + opacity transitions, Compact vertical placement, body background/borders, flex column, internal scrolling, and optional fixed footer. The legacy InfoPanel still owns all of its original sections, edit/share/delete controls, and async states.
+- This is a **frame-level** extraction, not full content/component consolidation. The ID-only read-only panel still lacks the complete legacy sections/actions. Do not treat it as production equivalent or migrate consumers on this basis alone.
+- New head requires Typecheck/Build/Unit/Interaction/VRT and Human Visual Review. Keep PR Draft; no baseline approval/merge.
