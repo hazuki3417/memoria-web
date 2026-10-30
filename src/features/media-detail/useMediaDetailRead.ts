@@ -1,7 +1,7 @@
 "use client"
 
 import { gql, useQuery } from "@apollo/client"
-import { useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   projectCollection,
   projectMediaDetail,
@@ -56,6 +56,19 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     },
   )
 
+  const [visible, setVisible] = useState(true)
+  const [pollState, setPollState] = useState<{ id: string | null; failures: number; stopped: boolean }>({ id: null, failures: 0, stopped: false })
+  const activePoll = pollState.id === mediaId ? pollState : { id: mediaId, failures: 0, stopped: false }
+  const requestInFlight = useRef(false)
+
+  useEffect(() => {
+    setPollState({ id: mediaId, failures: 0, stopped: false })
+    const syncVisibility = () => setVisible(!document.hidden)
+    syncVisibility()
+    document.addEventListener("visibilitychange", syncVisibility)
+    return () => document.removeEventListener("visibilitychange", syncVisibility)
+  }, [mediaId])
+
   const detail = useMemo(
     () => projectMediaDetail(mediaId, query.loading, query.data, Boolean(query.error)),
     [mediaId, query.loading, query.data, query.error],
@@ -72,11 +85,45 @@ export function useMediaDetailRead(mediaId: string | null, scope: MediaDetailSco
     [detail, query.error],
   )
 
+  const processing = detail.kind === "ready" && detail.media.processing?.status === "PROCESSING"
+  const shouldPoll = Boolean(mediaId && visible && processing && !activePoll.stopped)
+
+  useEffect(() => {
+    if (!shouldPoll || !mediaId) return
+    let cancelled = false
+    const timer = window.setInterval(() => {
+      if (cancelled || requestInFlight.current) return
+      requestInFlight.current = true
+      void query.refetch().then(
+        () => {
+          if (!cancelled) setPollState((current) => ({ id: mediaId, failures: 0, stopped: false }))
+        },
+        () => {
+          if (!cancelled) setPollState((current) => {
+            const failures = (current.id === mediaId ? current.failures : 0) + 1
+            return { id: mediaId, failures, stopped: failures >= 3 }
+          })
+        },
+      ).finally(() => { requestInFlight.current = false })
+    }, 5000)
+    return () => {
+      cancelled = true
+      window.clearInterval(timer)
+    }
+  }, [shouldPoll, mediaId, query.refetch])
+
+  const retryDetail = useCallback(() => {
+    if (mediaId) setPollState({ id: mediaId, failures: 0, stopped: false })
+    return query.refetch()
+  }, [mediaId, query.refetch])
+
   return {
     detail,
     preview,
     groups,
     tags,
-    retryDetail: () => query.refetch(),
+    pollingStopped: activePoll.stopped,
+    pollingFailures: activePoll.failures,
+    retryDetail,
   }
 }
