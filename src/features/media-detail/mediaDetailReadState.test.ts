@@ -6,6 +6,7 @@ import {
   nextProcessingPollFailures,
   processingPollDelay,
   mediaDetailPollingIdentity,
+  mergeDetailCollectionPages,
   type DetailRecord,
 } from "./mediaDetailReadState"
 
@@ -90,5 +91,17 @@ describe("processing polling identity", () => {
   it("does not permit delimiter collisions in IDs", () => {
     expect(mediaDetailPollingIdentity("a:b", { type: "COMMUNITY", communityId: "c" }))
       .not.toBe(mediaDetailPollingIdentity("a", { type: "COMMUNITY", communityId: "b:c" }))
+  })
+})
+
+
+describe("Media Detail Relay pagination", () => {
+  it("deduplicates overlapping page nodes and uses the latest cursor", () => {
+    const merged = mergeDetailCollectionPages(
+      { edges: [{ node: { id: "a" } }, { node: { id: "b" } }], pageInfo: { hasNextPage: true, endCursor: "first" } },
+      { edges: [{ node: { id: "b" } }, { node: { id: "c" } }], pageInfo: { hasNextPage: false, endCursor: "last" } },
+    )
+    expect(merged.edges.map(({ node }) => node.id)).toEqual(["a", "b", "c"])
+    expect(merged.pageInfo).toEqual({ hasNextPage: false, endCursor: "last" })
   })
 })
