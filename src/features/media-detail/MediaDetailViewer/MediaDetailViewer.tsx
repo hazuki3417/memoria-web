@@ -46,6 +46,7 @@ export type MediaDetailViewerProps = Pick<
     compact: boolean | undefined
     context: "personal" | "community"
     downloadMock: "available" | "forbidden" | "processing"
+    allowDelete?: boolean
     read?: {
       detail: DetailReadState
       preview: PreviewReadState
@@ -114,6 +115,7 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
                   tagsReadState={props.read?.tags}
                   onRetryDetail={props.read?.retryDetail}
                   readOnly={Boolean(props.read)}
+                  allowDelete={props.allowDelete}
                   compact={compact}
                   detailInfoOpened={detailInfoOpened}
                   detailValues={props.detailValues}
