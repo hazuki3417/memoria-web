@@ -270,3 +270,10 @@ On a change of GraphQL variables (especially Personal ↔ Community scope with t
 - READYかつURLを表示可能なMediaでのみ、署名付きVariant URL（有効期限15分）を12分経過後に`media(id:)`再取得する。表示中は1分間隔で経過を確認し、非表示タブでは更新しない。再表示時は経過時間を評価して必要なら再取得する。
 - Media ID・Scope変更時は更新基準をリセットし、同時再取得を抑止する。画像load/decodeエラー時の再試行は自動化せず、既存のユーザー操作によるGraphQL再取得と画像remountを使う。
 - 12分の境界、非表示タブと非READY状態をUnit Testで固定した。実ブラウザでの期限切れ、GraphQL通信競合、画像decode、VRTとローカルTypecheck/Buildは未検証。GitHub Actions上限期間中は`[skip ci]`を継続する。
+
+
+### Stage 5 — Personal Media削除Mutation接続（2026-10-30）
+
+- 実URL ViewerのPersonal Scopeでのみ削除確認Modalを有効化する。`DeleteMediaInput {mediaId,idempotencyKey}` に従ってGraphQL `deleteMedia` を呼び出し、`DELETING`受理応答を確認した場合のみViewerを閉じて受付通知する。物理削除完了とは表示しない。
+- 通信失敗・不明応答時は受理済みの可能性があるため、同じMedia IDへの再試行で同一idempotencyKeyを再利用する。確認Modalを閉じた場合のみキーを破棄する。Communityでの削除権限UXは未確定のため有効化しない。共有・共有解除とGroups/Tags編集は引き続き未接続。
+- タイプチェック・Mutationの成功/拒否/Unknown・Navigation/Focus・削除後リスト更新・VRTを検証する必要がある。CI上限中は`[skip ci]`を付けPRはDraftを維持する。
