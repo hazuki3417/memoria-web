@@ -10,9 +10,11 @@ import type {
 export function PreviewStatus({
   state,
   onRetry,
+  pollingStopped = false,
 }: {
   state: Exclude<PreviewReadState, { kind: "ready" }>
   onRetry?: () => void
+  pollingStopped?: boolean
 }) {
   const messages: Record<Exclude<PreviewReadState, { kind: "ready" }>["kind"], string> = {
     idle: "画像を選択してください",
@@ -27,10 +29,10 @@ export function PreviewStatus({
   return (
     <Center h="100%" role="status" aria-live="polite">
       <Stack align="center" gap="sm">
-        {(state.kind === "detail-loading" || state.kind === "image-loading" || state.kind === "processing") && <Loader size="sm" />}
-        <Text size="sm" c="dimmed">{messages[state.kind]}</Text>
-        {(state.kind === "detail-error" || state.kind === "delivery-error") && onRetry && (
-          <Button size="xs" variant="light" onClick={onRetry}>再試行</Button>
+        {(state.kind === "detail-loading" || state.kind === "image-loading" || (state.kind === "processing" && !pollingStopped)) && <Loader size="sm" />}
+        <Text size="sm" c="dimmed">{state.kind === "processing" && pollingStopped ? "処理状態を取得できませんでした" : messages[state.kind]}</Text>
+        {(state.kind === "detail-error" || state.kind === "delivery-error" || (state.kind === "processing" && pollingStopped)) && onRetry && (
+          <Button size="xs" variant="light" onClick={onRetry}>{state.kind === "processing" ? "監視を再開" : "再試行"}</Button>
         )}
       </Stack>
     </Center>
