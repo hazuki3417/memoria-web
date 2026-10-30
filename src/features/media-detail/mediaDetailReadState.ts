@@ -81,3 +81,14 @@ export function projectCollection(
   if (result.pageInfo.hasNextPage) return { kind: "incomplete" }
   return { kind: "ready", values: result.edges.map((edge) => edge.node) }
 }
+
+
+/** Polling contract: 5s normally, 10s after transport errors, stop on third failure. */
+export function nextProcessingPollFailures(previous: number, transportFailed: boolean): number {
+  return transportFailed ? Math.min(3, previous + 1) : 0
+}
+
+export function processingPollDelay(failures: number): number | null {
+  if (failures >= 3) return null
+  return failures > 0 ? 10000 : 5000
+}
