@@ -12,6 +12,7 @@ import { TagsEditModal } from "./TagsEditModal"
 import { GroupsEditModal } from "./GroupsEditModal"
 import { useMediaDetailEditing } from "./useMediaDetailEditing"
 import { useMediaDetailViewport } from "./useMediaDetailViewport"
+import { useResponsiveViewport } from "@/hooks/useResponsiveViewport"
 import { useMediaDetailPresentation } from "./useMediaDetailPresentation"
 import { useMediaDetailUrl } from "./MediaDetailUrlProvider"
 import { getMediaNavigation } from "./mediaDetailNavigation"
@@ -59,12 +60,29 @@ const MEDIA_DETAIL_REMOVE_GROUP = gql`
  * Application-level controller for the ORIGINAL Viewer, not an alternative UI.
  * Never enable fixture-only mutation actions for URL/GraphQL selections.
  */
-export function MediaDetailUrlController({ scope, wrap = false }: { scope: MediaDetailScope; wrap?: boolean }) {
+export function MediaDetailUrlController({ scope, wrap = false, initialInfoWide, initialInfoMedium }: { scope: MediaDetailScope; wrap?: boolean; initialInfoWide?: boolean; initialInfoMedium?: boolean }) {
   const url = useMediaDetailUrl()
   const apollo = useApolloClient()
   const presentation = useMediaDetailPresentation(scope)
   const navigation = getMediaNavigation(url.snapshot, url.selectedMediaId, wrap)
   const viewport = useMediaDetailViewport()
+  const { category: viewportCategory, isResolved: viewportResolved } = useResponsiveViewport()
+  const initializedInfoForOpenSession = useRef(false)
+  useEffect(() => {
+    if (!url.selectedMediaId) {
+      initializedInfoForOpenSession.current = false
+      return
+    }
+    if (initializedInfoForOpenSession.current || !viewportResolved) return
+    // Initial preference applies once per open session; manual panel toggles and paging win afterward.
+    viewport.setDetailInfoOpened(
+      viewportCategory === "wide" ? (initialInfoWide ?? true)
+      : viewportCategory === "medium" ? (initialInfoMedium ?? true)
+      : true,
+    )
+    initializedInfoForOpenSession.current = true
+  }, [url.selectedMediaId, viewportResolved, viewportCategory, initialInfoWide, initialInfoMedium, viewport.setDetailInfoOpened])
+
   const editing = useMediaDetailEditing(null)
 
   const [tagTarget, setTagTarget] = useState<string | null>(null)
