@@ -135,6 +135,44 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
     skip: groupTarget === null,
     fetchPolicy: "network-only",
   })
+  const [groupOptionsPageError, setGroupOptionsPageError] = useState(false)
+  const groupOptionsPageInFlight = useRef<string | null>(null)
+  const nextGroupCursor = groupOptions.data?.mediaGroups.pageInfo.hasNextPage
+    ? groupOptions.data.mediaGroups.pageInfo.endCursor : null
+  useEffect(() => {
+    if (!groupTarget || !nextGroupCursor || groupOptions.loading ||
+        groupOptions.error || groupOptionsPageError ||
+        groupOptionsPageInFlight.current !== null) return
+    const key = JSON.stringify([groupTarget, scope, nextGroupCursor])
+    groupOptionsPageInFlight.current = key
+    void groupOptions.fetchMore({
+      variables: { after: nextGroupCursor },
+      updateQuery(previous, { fetchMoreResult }) {
+        if (!fetchMoreResult) return previous
+        const seen = new Set(previous.mediaGroups.edges.map(({ node }) => node.id))
+        return {
+          mediaGroups: {
+            ...fetchMoreResult.mediaGroups,
+            edges: [
+              ...previous.mediaGroups.edges,
+              ...fetchMoreResult.mediaGroups.edges.filter(({ node }) => {
+                if (seen.has(node.id)) return false
+                seen.add(node.id)
+                return true
+              }),
+            ],
+          },
+        }
+      },
+    }).catch(() => setGroupOptionsPageError(true)).finally(() => {
+      if (groupOptionsPageInFlight.current === key) groupOptionsPageInFlight.current = null
+    })
+  }, [groupTarget, nextGroupCursor, groupOptions.loading, groupOptions.error, groupOptionsPageError, groupOptions.fetchMore, scope])
+  const retryGroupOptions = () => {
+    setGroupOptionsPageError(false)
+    groupOptionsPageInFlight.current = null
+    void groupOptions.refetch({ after: null })
+  }
   const [addToGroup] = useMutation<{
     addMediaToGroup: { results: { mediaId: string; status: string }[] }
   }>(MEDIA_DETAIL_ADD_GROUP)
@@ -144,6 +182,7 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
   const openGroupEditor = () => {
     const id = presentation.selectedMediaId
     if (!id || presentation.groups.kind !== "ready") return
+    setGroupOptionsPageError(false)
     setGroupDraft(presentation.groups.values.map((item) => item.name))
     setGroupTarget(id)
   }
@@ -153,7 +192,7 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
     const catalog = groupOptions.data?.mediaGroups
     if (!id || savingGroups || presentation.selectedMediaId !== id ||
         groups.kind !== "ready" || !catalog || catalog.pageInfo.hasNextPage ||
-        groupOptions.error) return
+        (groupOptions.error || groupOptionsPageError)) return
     const byName = new Map(catalog.edges.map(({ node }) => [node.name, node.id]))
     const original = new Map(groups.values.map((item) => [item.name, item.id]))
     const desired = [...new Set(groupDraft)]
@@ -309,8 +348,8 @@ export function MediaDetailUrlController({ scope, wrap = false }: { scope: Media
       saveDetailDraft={saveGroups}
       groupOptions={groupOptions.data?.mediaGroups.edges.map(({ node }) => node.name)}
       pending={savingGroups || groupOptions.loading || (!groupOptions.data && !groupOptions.error) || Boolean(groupOptions.data?.mediaGroups.pageInfo.hasNextPage)}
-      loadError={Boolean(groupOptions.error || (groupOptions.data?.mediaGroups.pageInfo.hasNextPage && !groupOptions.loading))}
-      onRetryLoad={() => { void groupOptions.refetch() }}
+      loadError={Boolean(groupOptions.error || groupOptionsPageError)}
+      onRetryLoad={retryGroupOptions}
     />
     <TagsEditModal
       detailEditor={tagTarget ? "tags" : null}
