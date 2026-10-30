@@ -26,6 +26,8 @@ export type MediaDetailInfoPanelProps = Pick<
   | "downloadMock"
   | "onRequestDelete"
 > & {
+  dateFormat?: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
+  fileSizeUnit?: "DECIMAL" | "BINARY"
   detailReadState?: DetailReadState
   groupsReadState?: CollectionReadState
   tagsReadState?: CollectionReadState
@@ -50,6 +52,8 @@ export function MediaDetailInfoPanel({
   downloadMock,
   onRequestDelete,
   detailReadState,
+  dateFormat,
+  fileSizeUnit,
   groupsReadState,
   tagsReadState,
   onRetryDetail,
@@ -79,7 +83,7 @@ export function MediaDetailInfoPanel({
       )}
     >
               {detailReadState ? (
-                <DetailMetadataStatus state={detailReadState} onRetry={onRetryDetail} />
+                <DetailMetadataStatus state={detailReadState} onRetry={onRetryDetail} dateFormat={dateFormat} fileSizeUnit={fileSizeUnit} />
               ) : (
                 <MediaDetailMetadata downloadMock={downloadMock} />
               )}
