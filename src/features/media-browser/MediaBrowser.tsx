@@ -4,7 +4,7 @@ import { useMediaQuery } from "@mantine/hooks"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { showNotification } from "@/components/Feedback"
-import { MediaDetailDialog, type MediaItem } from "@/features/media-detail"
+import { MediaDetailModal, type MediaItem } from "@/features/media-detail"
 import { MediaBrowserPane } from "./MediaBrowserPane"
 import { MediaBrowserGroupModal } from "./MediaBrowserGroupModal"
 import { MediaBrowserShareModal } from "./MediaBrowserShareModal"
@@ -264,7 +264,7 @@ function MediaBrowserController({
       />
 
       {detail && (
-        <MediaDetailDialog
+        <MediaDetailModal
           items={stateItems}
           initialId={detail.id}
           onClose={() => setDetail(null)}
