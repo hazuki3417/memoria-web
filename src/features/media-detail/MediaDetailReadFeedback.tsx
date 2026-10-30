@@ -1,6 +1,8 @@
 "use client"
 
 import { Button, Center, Group, Loader, Skeleton, Stack, Text } from "@mantine/core"
+import { formatFileSize } from "@/features/usage/formatFileSize"
+import { formatMediaDetailDate } from "./formatMediaDetailDate"
 import type {
   CollectionReadState,
   DetailReadState,
@@ -42,9 +44,13 @@ export function PreviewStatus({
 export function DetailMetadataStatus({
   state,
   onRetry,
+  dateFormat = "YYYY_MM_DD",
+  fileSizeUnit = "DECIMAL",
 }: {
   state: DetailReadState
   onRetry?: () => void
+  dateFormat?: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
+  fileSizeUnit?: "DECIMAL" | "BINARY"
 }) {
   if (state.kind === "loading" || state.kind === "idle") {
     return (
@@ -65,10 +71,11 @@ export function DetailMetadataStatus({
     )
   }
   const { media } = state
+  const size = formatFileSize(media.fileSize, fileSizeUnit)
   const rows = [
-    ["ファイルサイズ", `${media.fileSize.toLocaleString()} B`],
+    ["ファイルサイズ", `${size.value} ${size.unit}`],
     ["サイズ", media.image ? `${media.image.width} × ${media.image.height}` : "-"],
-    ["アップロード", media.uploadedAt],
+    ["アップロード", formatMediaDetailDate(media.uploadedAt, dateFormat)],
     ["Uploader", media.uploadedBy?.nickname ?? "-"],
   ]
   return (
