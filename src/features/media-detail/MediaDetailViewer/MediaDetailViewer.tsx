@@ -57,6 +57,8 @@ export type MediaDetailViewerProps = Pick<
       retryDetail?: () => void
       retryImage?: () => void
       pollingStopped?: boolean
+      dateFormat?: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
+      fileSizeUnit?: "DECIMAL" | "BINARY"
     }
   }
 
@@ -113,6 +115,8 @@ export function MediaDetailViewer(props: MediaDetailViewerProps) {
               infoPanel={
                 <MediaDetailInfoPanel
                   detailReadState={props.read?.detail}
+                  dateFormat={props.read?.dateFormat}
+                  fileSizeUnit={props.read?.fileSizeUnit}
                   groupsReadState={props.read?.groups}
                   tagsReadState={props.read?.tags}
                   onRetryDetail={props.read?.retryDetail}
