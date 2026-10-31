@@ -4,7 +4,7 @@ import { expect, within } from "storybook/test"
 import { PageStatusBoundary } from "./PageStatusBoundary"
 
 const meta = {
-  title: "Components/Page Status Boundary",
+  title: "Components/Feedback/Page Status Boundary",
   component: PageStatusBoundary,
   args: {
     state: "ready",
@@ -19,11 +19,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Ready: Story = {
-  name: "Visual · Ready",
+  name: "Visual · コンテンツ表示",
   tags: ["visual", "vrt"],
 }
 export const Loading: Story = {
-  name: "Visual · Loading",
+  name: "Visual · 読み込み中",
   tags: ["visual"],
   args: { state: "loading" },
   play: async ({ canvasElement }) => {
@@ -32,7 +32,7 @@ export const Loading: Story = {
   },
 }
 export const Error: Story = {
-  name: "Visual · Error",
+  name: "Visual · 取得失敗",
   tags: ["visual", "vrt"],
   args: { state: "error" },
   play: async ({ canvasElement }) => {
@@ -42,7 +42,7 @@ export const Error: Story = {
   },
 }
 export const CustomMessage: Story = {
-  name: "Visual · Custom error message",
+  name: "Visual · カスタムエラーメッセージ",
   tags: ["visual"],
   args: {
     state: "error",
