@@ -261,7 +261,7 @@ export function CommunityMembersContent({
                                   <Button
                                     size="compact-xs"
                                     variant="subtle"
-                                    aria-label={member.name + "の管理操作"}
+                                    aria-label={`${member.name}の管理操作`}
                                   >
                                     <IconDots size={18} />
                                   </Button>
