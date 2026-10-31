@@ -7,6 +7,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { SettingsUsage } from "./SettingsUsage"
 import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
+import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { emptyUsage, mapUsageProjection } from "./usageGraphqlAdapter"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
 
@@ -51,6 +52,7 @@ export function ConnectedUsage({
   }
 
   const hasData = Boolean(projection) && !conversionFailed && Boolean(scope === "personal" || communityPreferences.data?.me)
+  useSettingsRefreshError(Boolean(hasData && (active.error || communityPreferences.error)))
   const status: UsageStatus = hasData
     ? "ready"
     : active.loading || communityPreferencesLoading
