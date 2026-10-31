@@ -1,0 +1,33 @@
+# Settings page responsibility boundaries
+
+This refactoring preserves the established UI and behavior of Personal and Community settings. No setting fields, actions, navigation entries, responsive breakpoints, loading delays, or error transitions may be removed solely to facilitate reuse.
+
+## Personal Settings
+
+- `ConnectedSettings` fetches CurrentUser, resolves the page state and connects data to presentation.
+- `usePersonalSettingsActions` owns profile/preferences mutations, confirmation and the CurrentUser refetch contract.
+- `Settings` owns page routing and composition with the existing SettingsLayout.
+- `SettingsSectionContent` owns only choosing and rendering the existing Profile, Preferences, Account and Usage content; it does not fetch data.
+- `ConnectedPersonalSettingsSection` keeps the established Account/Usage dependency differences.
+
+## Community Settings
+
+- `CommunitySettingsRoute` composes the data source, loading/error boundary and existing member/name mutation callbacks.
+- `useCommunitySettingsMembership` owns membership lookup, accent selection and the existing Preferences membership-loss redirect.
+- `CommunitySettings` owns responsive navigation, prototype section selection, name/invitation state and page layout.
+- `CommunitySettingsContent` owns only choosing existing General, Members, Preferences and Usage content.
+- `ConnectedCommunityPreferences` retains its existing network/cache and save ordering responsibilities.
+
+## Shared status presentation
+
+`src/components/PageStatusBoundary` remains the shared page-level Loading/Error/Ready presentation, regardless of whether Personal, Community or Usage consumes it. The 300 ms delay, no manual retry, content-region placement and background-refresh behavior remain unchanged.
+
+## Stories
+
+- `SettingsSectionContent.stories.tsx`: Personal Profile, Preferences, Account, Usage.
+- `CommunitySettings.sections.stories.tsx`: Community General, Members, Preferences, Usage.
+- Existing `SettingsLoadLayout.stories.tsx` and `PageStatusBoundary.stories.tsx` cover loading and error layout.
+
+## Verification requirements
+
+Before merging, verify TypeScript, formatting/lint, Storybook interactions, visual regression at desktop and mobile widths, and navigation, saving, permission-loss and loading behavior against the pre-refactor implementation.
