@@ -31,7 +31,7 @@ export const Loading: Story = {
     await expect(await canvas.findByRole("status", { name: "ページを読み込み中" })).toBeVisible()
   },
 }
-export const Error: Story = {
+export const LoadError: Story = {
   name: "Visual · 取得失敗",
   tags: ["visual", "vrt"],
   args: { state: "error" },
