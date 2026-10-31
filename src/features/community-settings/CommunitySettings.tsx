@@ -1,17 +1,13 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import {
-  CommunityMembersContent,
-  type CommunityMember,
-} from "./CommunityMembersContent"
+import type { CommunityMember } from "./CommunityMembersContent"
+import { CommunitySettingsContent } from "./CommunitySettingsContent"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   SettingsSectionLayout,
   SettingsSectionNavigation,
 } from "@/components/SettingsSectionLayout"
-import { CommunityGeneralContent } from "./CommunityGeneralContent"
-import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 import { useCommunityNameSettings } from "./useCommunityNameSettings"
 import { useCommunityInvitation } from "./useCommunityInvitation"
 import {
@@ -72,35 +68,6 @@ export function CommunitySettings({
 
   const sections = getCommunitySettingsSections(communityId)
 
-  const generalContent = (
-    <CommunityGeneralContent
-      name={name}
-      invitation={invitation}
-      communityId={communityId}
-      isAdmin={isAdmin}
-    />
-  )
-
-  const membersContent = (
-    <CommunityMembersContent
-      members={members}
-      onChangeRole={onChangeMemberRole}
-      onRemoveMember={onRemoveMember}
-      onLeave={onLeaveCommunity}
-      onLeaveSuccess={onLeaveSuccess}
-    />
-  )
-  const resolvedPreferencesContent = preferencesContent ?? (
-    <CommunityPreferencesContent accent={accent} setAccent={setAccent} />
-  )
-  const content =
-    currentSection === "general"
-      ? generalContent
-      : currentSection === "members"
-        ? membersContent
-        : currentSection === "usage"
-          ? usageContent
-          : resolvedPreferencesContent
 
   return (
     <SettingsSectionLayout
@@ -120,7 +87,24 @@ export function CommunitySettings({
         />
       }
     >
-      {contentOverride ?? content}
+      {contentOverride ?? (
+        <CommunitySettingsContent
+          section={currentSection}
+          communityId={communityId}
+          isAdmin={isAdmin}
+          name={name}
+          invitation={invitation}
+          members={members}
+          onChangeMemberRole={onChangeMemberRole}
+          onRemoveMember={onRemoveMember}
+          onLeaveCommunity={onLeaveCommunity}
+          onLeaveSuccess={onLeaveSuccess}
+          preferencesContent={preferencesContent}
+          usageContent={usageContent}
+          accent={accent}
+          setAccent={setAccent}
+        />
+      )}
     </SettingsSectionLayout>
   )
 }
