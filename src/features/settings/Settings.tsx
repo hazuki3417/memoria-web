@@ -26,6 +26,7 @@ export function Settings({
   initialPreferences,
   savePreferences,
   usageContent,
+  accountContent,
   personalAccentColor,
 }: {
   section: Section
@@ -34,6 +35,7 @@ export function Settings({
   initialPreferences?: UserPreferences
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
   usageContent?: ReactNode
+  accountContent?: ReactNode
   personalAccentColor?: string
 }) {
   const router = useRouter()
@@ -61,7 +63,7 @@ export function Settings({
       content = usageContent ?? null
       break
     case "account":
-      content = (
+      content = accountContent ?? (
         <SettingsAccount
           deletionAction={
             <Button
