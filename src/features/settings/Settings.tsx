@@ -27,6 +27,7 @@ export function Settings({
   savePreferences,
   usageContent,
   accountContent,
+  contentOverride,
   personalAccentColor,
 }: {
   section: Section
@@ -36,6 +37,7 @@ export function Settings({
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
   usageContent?: ReactNode
   accountContent?: ReactNode
+  contentOverride?: ReactNode
   personalAccentColor?: string
 }) {
   const router = useRouter()
@@ -86,7 +88,7 @@ export function Settings({
       section={section}
       onSectionChange={(next) => router.push(`/settings/${next}`)}
     >
-      {content}
+      {contentOverride ?? content}
     </SettingsLayout>
   )
 }
