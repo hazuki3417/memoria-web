@@ -39,10 +39,6 @@ export function ConnectedUsage({
 
   const communityPreferencesLoading =
     scope === "community" && communityPreferences.loading
-  const communityPreferencesError =
-    scope === "community" &&
-    (Boolean(communityPreferences.error) ||
-      (!communityPreferences.loading && !communityPreferences.data?.me))
 
   let usage: SettingsUsageData = emptyUsage
   let conversionFailed = false
