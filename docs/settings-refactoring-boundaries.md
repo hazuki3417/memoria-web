@@ -25,8 +25,8 @@ This refactoring preserves the established UI and behavior of Personal and Commu
 
 ## Stories
 
-- `SettingsSectionContent.stories.tsx`: Personal Profile, Preferences, Account, Usage, Profile save callback and required nickname validation.
-- `CommunitySettings.sections.stories.tsx`: Community General, Members, Preferences, Usage and member search.
+- Personal URL-aligned Storybook branches: `Features/Settings/Profile`, `Features/Settings/Preferences`, `Features/Settings/Account`, `Features/Settings/Usage`. Profile interaction stories remain under Profile.
+- Community URL-aligned Storybook branches: `Features/Community Settings/Settings` (the `/settings` general screen), `/Members`, `/Preferences`, `/Usage`. All member interactions remain under Members.
 - Existing `SettingsLoadLayout.stories.tsx` and `PageStatusBoundary.stories.tsx` cover loading and error layout.
 
 ## Verification requirements
@@ -39,3 +39,5 @@ Before merging, verify TypeScript, formatting/lint, Storybook interactions, visu
 - The VRT runner (`tests/vrt/storybook.spec.mts`) captures all `vrt`-tagged stories across Compact (375×812), Medium (1024×768) and Wide (1440×900) viewports. Existing settings loading/error VRT cases cover the shared page status in both viewport classes; run VRT and compare baselines before merge. New interaction stories are not claimed as passing until the runner executes.
 - Verify actual component rendering at desktop and compact widths; the GitHub file edits have not yet been executed against a local TypeScript/Storybook runtime.
 - Current work branch may be behind `develop`. Reconcile its changes before requesting a merge, without changing the existing UI contract.
+
+Page-level Storybook titles follow the leaf segment of the browser route. Reusable state/layout and Usage contract stories can remain separate from route-specific branches as cross-page test surfaces.
