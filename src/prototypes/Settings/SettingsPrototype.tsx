@@ -63,7 +63,7 @@ function UsageContent({
   initialScenario: UsageScenario
   fileSizeUnit: "DECIMAL" | "BINARY"
 }) {
-  const [scenario, setScenario] = useState<UsageScenario | "retrying">(
+  const [scenario] = useState<UsageScenario | "retrying">(
     initialScenario === "retry-error" ? "error" : initialScenario,
   )
   let usage = MOCK_USAGE
@@ -87,7 +87,6 @@ function UsageContent({
       status = "error"
       break
   }
-
 
   return (
     <SettingsUsage
