@@ -20,7 +20,7 @@ export function ConnectedSettings({
 }: {
   section: "profile" | "preferences"
 }) {
-  const { data, loading, error } = useCurrentUserQuery()
+  const { data, loading } = useCurrentUserQuery()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
   const [updatePreferences] = useSaveUserPreferencesMutation()
   const preferences = data?.me ? fromGraphqlUserPreferences(data.me.preferences) : undefined
