@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { CommunitySettings } from "./CommunitySettings"
 
 const meta = {
-  title: "Features/Community Settings/General",
+  title: "Features/Community Settings/Settings",
   component: CommunitySettings,
   args: {
     communityId: "photo-club",
