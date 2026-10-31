@@ -4,14 +4,13 @@ import { useState } from "react"
 import { IconDatabase, IconPercentage } from "@tabler/icons-react"
 import {
   Box,
-  Button,
   Group,
   SegmentedControl,
   Stack,
   Text,
   VisuallyHidden,
 } from "@mantine/core"
-import { FeedbackAlert } from "@/components/Feedback"
+import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
 import { PageHeader } from "@/components/PageHeader"
 import type { FileSizeUnit } from "./formatFileSize"
 import { UsageStorageSection } from "./UsageStorageSection"
@@ -26,44 +25,24 @@ import {
   type UsageSortKey,
 } from "./sortUsageFormats"
 
-function UsageErrorContent({ onRetry }: { onRetry?: () => void }) {
-  return (
-    <Box role="region" aria-label="利用状況の取得エラー">
-      <Stack gap="md" align="flex-start">
-        <FeedbackAlert
-          kind="error"
-          title="利用状況を取得できませんでした"
-          role="alert"
-        >
-          通信状況を確認して、もう一度お試しください。
-        </FeedbackAlert>
-        {onRetry && (
-          <Button size="sm" variant="light" onClick={onRetry}>
-            再試行
-          </Button>
-        )}
-      </Stack>
-    </Box>
-  )
-}
-
 export function SettingsUsage({
   usage,
   scope = "personal",
   status = "ready",
-  onRetry,
   fileSizeUnit = "DECIMAL",
 }: {
   usage: SettingsUsageData
   scope?: "personal" | "community"
   status?: UsageStatus
-  onRetry?: () => void
   fileSizeUnit?: FileSizeUnit
 }) {
   const [sort, setSort] = useState<UsageSort>(defaultUsageSort)
   const [displayMode, setDisplayMode] = useState<UsageDisplayMode>("size")
   const toggleSort = (key: UsageSortKey) => {
     setSort((current) => nextUsageSort(current, key))
+  }
+  if (status !== "ready") {
+    return <SettingsLoadBoundary state={status} label="利用状況を読み込み中">{null}</SettingsLoadBoundary>
   }
   return (
     <Stack gap="xl">
@@ -132,32 +111,22 @@ export function SettingsUsage({
         </Group>
       </Group>
       <Box>
-        {status === "error" ? (
-          <UsageErrorContent onRetry={onRetry} />
-        ) : (
-          <Stack
-            gap="xl"
-            role={status === "loading" ? "status" : undefined}
-            aria-label={
-              status === "loading" ? "利用状況を読み込んでいます" : undefined
-            }
-          >
-            <UsageStorageSection
-              usage={usage}
-              status={status}
-              fileSizeUnit={fileSizeUnit}
-              displayMode={displayMode}
-            />
-            <UsageFormatBreakdownSection
-              usage={usage}
-              status={status}
-              sort={sort}
-              onSort={toggleSort}
-              fileSizeUnit={fileSizeUnit}
-              displayMode={displayMode}
-            />
-          </Stack>
-        )}
+        <Stack gap="xl">
+          <UsageStorageSection
+            usage={usage}
+            status="ready"
+            fileSizeUnit={fileSizeUnit}
+            displayMode={displayMode}
+          />
+          <UsageFormatBreakdownSection
+            usage={usage}
+            status="ready"
+            sort={sort}
+            onSort={toggleSort}
+            fileSizeUnit={fileSizeUnit}
+            displayMode={displayMode}
+          />
+        </Stack>
       </Box>
     </Stack>
   )
