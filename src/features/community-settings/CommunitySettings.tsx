@@ -37,6 +37,7 @@ export function CommunitySettings({
   fileSizeUnit = "DECIMAL",
   usageContent,
   preferencesContent,
+  contentOverride,
   communityAccentColor,
 }: {
   role?: Role
@@ -53,6 +54,7 @@ export function CommunitySettings({
   fileSizeUnit?: "DECIMAL" | "BINARY"
   usageContent?: ReactNode
   preferencesContent?: ReactNode
+  contentOverride?: ReactNode
   communityAccentColor?: string
 }) {
   const [previewSection, setPreviewSection] =
@@ -118,7 +120,7 @@ export function CommunitySettings({
         />
       }
     >
-      {content}
+      {contentOverride ?? content}
     </SettingsSectionLayout>
   )
 }
