@@ -1,8 +1,8 @@
 "use client"
 
-import { Text } from "@mantine/core"
 import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
 import { useEffect, type ReactNode } from "react"
+import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
@@ -71,31 +71,16 @@ export function CommunitySettingsRoute({
         {null}
       </LoadingBoundary>
     )
-  if (loadError)
-    return (
-      <Text c="red">
-        Community情報を取得できませんでした。再読み込みしてください。
-      </Text>
-    )
-  if (requiresMembers && membersError)
-    return (
-      <Text c="red">
-        メンバー一覧を取得できませんでした。再読み込みしてください。
-      </Text>
-    )
-  if (pending)
-    return (
-      <LoadingBoundary loading label="Community設定を読み込み中">
-        {null}
-      </LoadingBoundary>
-    )
-  if (name === null || (requiresMembers && members === null)) return null
+  const loadState = loadError || (requiresMembers && membersError)
+    ? "error"
+    : pending ? "loading" : "ready"
 
   return (
     <CommunitySettings
       communityId={communityId}
       communityAccentColor={communityAccentColor}
-      communityName={name}
+      communityName={name ?? undefined}
+      contentOverride={loadState !== "ready" ? <SettingsLoadBoundary state={loadState} label="Community設定を読み込み中">{null}</SettingsLoadBoundary> : undefined}
       members={members ?? undefined}
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
