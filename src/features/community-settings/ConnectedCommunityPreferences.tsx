@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Stack } from "@mantine/core"
 import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
+import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 import { CommunityAliasControl } from "./CommunityAliasControl"
@@ -37,13 +38,14 @@ export function ConnectedCommunityPreferences({
 }: {
   communityId: string
 }) {
-  const { data, loading } = useQuery<SettingsResult>(
+  const { data, loading, error } = useQuery<SettingsResult>(
     COMMUNITY_SETTINGS,
     {
       variables: { communityId },
       fetchPolicy: "cache-and-network",
     },
   )
+  useSettingsRefreshError(Boolean(data?.community && error))
   const client = useApolloClient()
   const [save] = useMutation<SaveResult>(SAVE_COMMUNITY_SETTINGS)
   const [accent, setAccent] = useState<string | null>(null)
