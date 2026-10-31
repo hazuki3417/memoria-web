@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Stack } from "@mantine/core"
-import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
@@ -151,9 +151,9 @@ export function ConnectedCommunityPreferences({
 
   if (!data?.community) {
     return (
-      <SettingsLoadBoundary state={loading ? "loading" : "error"} label="Community環境設定を読み込み中">
+      <PageStatusBoundary state={loading ? "loading" : "error"} label="Community環境設定を読み込み中">
         {null}
-      </SettingsLoadBoundary>
+      </PageStatusBoundary>
     )
   }
 
