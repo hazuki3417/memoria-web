@@ -52,3 +52,7 @@ Page-level Storybook titles follow the leaf segment of the browser route. Reusab
 - Usage: the existing dedicated Usage contract stories remain authoritative for usage calculation and display behavior.
 
 The new stories and interaction tests are committed but their successful execution and visual baselines have not been verified in this environment.
+
+## Component Directory移行（作業中）
+
+合意済みの横断規約により、exportするReact Componentは同名Directory内に実装し、`index.ts`を公開入口とする。現在の設定機能では`Settings`、`SettingsSectionContent`、`CommunitySettings`、`CommunitySettingsContent`を移行した。ページ別Storyは対象表示Componentと近接配置する。残りのComponentのDirectory移行、import参照確認、TypeScript・Storybook・VRTの実行確認が必要であり、完了扱いにしない。
