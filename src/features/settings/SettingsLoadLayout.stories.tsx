@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { SettingsSectionLayout, SettingsSectionNavigation } from "@/components/SettingsSectionLayout"
-import { PageStatusBoundary } from "./PageStatusBoundary"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { SettingsLayout } from "./SettingsLayout"
 import { getCommunitySettingsSections } from "@/features/community-settings/communitySettingsSections"
 
