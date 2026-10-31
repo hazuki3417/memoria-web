@@ -2,7 +2,7 @@
 
 import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
 import { useEffect, type ReactNode } from "react"
-import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
@@ -81,7 +81,7 @@ export function CommunitySettingsRoute({
       communityId={communityId}
       communityAccentColor={communityAccentColor}
       communityName={name ?? undefined}
-      contentOverride={loadState !== "ready" ? <SettingsLoadBoundary state={loadState} label="Community設定を読み込み中">{null}</SettingsLoadBoundary> : undefined}
+      contentOverride={loadState !== "ready" ? <PageStatusBoundary state={loadState} label="Community設定を読み込み中">{null}</PageStatusBoundary> : undefined}
       members={members ?? undefined}
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
