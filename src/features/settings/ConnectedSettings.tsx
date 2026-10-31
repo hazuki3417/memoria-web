@@ -5,12 +5,8 @@ import { useSettingsRefreshError } from "./useSettingsRefreshError"
 import { usePersonalSettingsActions } from "./usePersonalSettingsActions"
 import type { ReactNode } from "react"
 import { Settings } from "./Settings"
-import {
-  fromGraphqlUserPreferences,
-} from "./preferences/userPreferencesGraphqlAdapter"
-import {
-  useCurrentUserQuery,
-} from "@/infrastructure/graphql/generated"
+import { fromGraphqlUserPreferences } from "./preferences/userPreferencesGraphqlAdapter"
+import { useCurrentUserQuery } from "@/infrastructure/graphql/generated"
 
 export function ConnectedSettings({
   section,
