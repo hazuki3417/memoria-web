@@ -349,7 +349,6 @@ export const DisplayModeSwitchContract: Story = {
   },
 }
 
-// SS-02/03: Errorは必ず再試行可能であり、操作後にReadyへ復旧する（API接続なし）。
 
 export const DisplayModeLifetimeContract: Story = {
   name: "Interaction · 表示モードの初期値とscope間独立",
@@ -382,7 +381,7 @@ export const VrtEmpty: Story = {
   tags: ["visual", "vrt"],
   args: { usage: zeroUsage },
 }
-// Skeletonの撮影安定化方針が確定するまでVRT対象外（memoria-web#171）。
+// PageStatusBoundary の300ms遅延があるため、Loadingは専用Interaction Storyで検証する。
 export const VrtLoading: Story = {
   name: "Visual · Loading",
   tags: ["visual"],
@@ -404,7 +403,6 @@ export const VrtCommunity: Story = {
   args: { scope: "community" },
 }
 
-// SS-04: 再取得が再失敗してもEmptyではなくErrorと復旧Actionを維持する。
 
 export const PercentDenominatorContract: Story = {
   name: "Interaction · 上限を分母とする割合表示",
@@ -494,7 +492,7 @@ export const KeyboardDisplayModeContract: Story = {
   },
 }
 
-// Usage UI: ErrorはCommunityでも必須のRetryを示し、正常値を誤表示しない。
+// Usage UI: Community Errorも再試行ボタンを表示せず、確定済み集計値を露出しない。
 export const CommunityErrorContract: Story = {
   name: "Interaction · Community取得エラー",
   tags: ["interaction"],
