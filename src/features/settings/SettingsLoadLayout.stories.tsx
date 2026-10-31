@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { SettingsSectionLayout, SettingsSectionNavigation } from "@/components/SettingsSectionLayout"
-import { SettingsLoadBoundary } from "./SettingsLoadBoundary"
+import { PageStatusBoundary } from "./PageStatusBoundary"
 import { SettingsLayout } from "./SettingsLayout"
 import { getCommunitySettingsSections } from "@/features/community-settings/communitySettingsSections"
 
@@ -15,9 +15,9 @@ function LayoutStory({
   compact: boolean
 }) {
   const content = (
-    <SettingsLoadBoundary state={state} label="設定を読み込み中">
+    <PageStatusBoundary state={state} label="設定を読み込み中">
       <Box>設定の読み込みが完了しました。</Box>
-    </SettingsLoadBoundary>
+    </PageStatusBoundary>
   )
   if (context === "personal") {
     // Render the real Personal settings navigation with a content-only boundary.
