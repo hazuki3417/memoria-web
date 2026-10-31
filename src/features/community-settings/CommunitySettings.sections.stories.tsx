@@ -110,7 +110,14 @@ export const MemberRoleChangeContract: Story = {
 export const LeaveFailureContract: Story = {
   name: "Interaction · Community退会失敗",
   tags: ["interaction"],
-  args: { section: "members", onLeaveCommunity: fn(async () => { throw new Error("network") }) },
+  args: {
+    section: "members",
+    members: [
+      { id: "user-1", name: "テストユーザー", role: "admin", isSelf: true },
+      { id: "user-2", name: "家族メンバー", role: "admin" },
+    ],
+    onLeaveCommunity: fn(async () => { throw new Error("network") }),
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const page = within(canvasElement.ownerDocument.body)
