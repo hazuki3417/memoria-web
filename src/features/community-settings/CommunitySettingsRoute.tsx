@@ -3,6 +3,7 @@
 import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
 import { useEffect, type ReactNode } from "react"
 import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
+import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
@@ -60,10 +61,8 @@ export function CommunitySettingsRoute({
   const [removeMember] = useRemoveCommunityMemberMutation()
   const [leaveCommunity] = useLeaveCommunityMutation()
 
-  const pending =
-    !loadError &&
-    !(requiresMembers && membersError) &&
-    (name === null || (requiresMembers && members === null))
+  const hasRequiredData = name !== null && (!requiresMembers || members !== null)
+  useSettingsRefreshError(Boolean(hasRequiredData && (loadError || (requiresMembers && membersError))))
 
   if (membershipLost)
     return (
@@ -71,9 +70,11 @@ export function CommunitySettingsRoute({
         {null}
       </LoadingBoundary>
     )
-  const loadState = loadError || (requiresMembers && membersError)
-    ? "error"
-    : pending ? "loading" : "ready"
+  const loadState = hasRequiredData
+    ? "ready"
+    : loadError || (requiresMembers && membersError)
+      ? "error"
+      : "loading"
 
   return (
     <CommunitySettings
