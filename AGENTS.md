@@ -38,7 +38,7 @@ Application Architectureの正本は `memoria-design/content/system/web/implemen
 
 - `src/app` はNext.jsのentry、routing、layout等を担当し、Product/Application Logicを蓄積しません。
 - Product Capabilityは `src/features` をownerとします。FeatureはURL hierarchyではなく独立したUser Purpose / Use Caseで分け、`src/features` 直下へkebab-caseでflatに配置します。Feature間の直接依存はtype-only importを含め原則として避けます。
-- Feature内部はFrontendで把握しやすい責務・変更理由を起点に分類します。exportするReact Componentは必ず同名の専用Directoryとindex.tsを持ちます。Hook・Pure Logicには専用Directoryを機械的に要求しません。既存Componentは変更対象から段階的に移行します。`components` / `hooks` / `types` / `utils` 等のcode種別directoryは標準化しません。詳細は`memoria-design/content/system/web/implementation-conventions.mdx`を正本とします。
+- Feature内部はFrontendで把握しやすい責務・変更理由を起点に分類します。React Componentはexportの有無にかかわらず同名の専用Directoryとindex.tsを持ちます。Hook・Pure Logicには専用Directoryを機械的に要求しません。既存Componentは変更対象から段階的に移行します。`components` / `hooks` / `types` / `utils` 等のcode種別directoryは標準化しません。詳細は`memoria-design/content/system/web/implementation-conventions.mdx`を正本とします。
 - Feature rootの `index.ts` をPublic APIとし、外部consumerからFeature内部Fileへのdeep importを行いません。
 - Feature非依存のMemoria UI / Pattern実装は `src/ui` が所有します。再利用されるだけではFeature Componentを移動しません。`src/ui/<Component>/index.ts` をPublic APIとします。
 - GraphQL Client等の外部Integrationは `src/infrastructure` が所有し、`src/infrastructure/<integration>/index.ts` をPublic APIとします。
