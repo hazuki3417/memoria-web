@@ -1,10 +1,10 @@
-import { Box, Text } from "@mantine/core"
+import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
 
 const meta = {
-  title: "Features/Settings/Personal/Section Content",
+  title: "Features/Settings/Profile",
   component: SettingsSectionContent,
   args: {
     section: "profile",
@@ -21,22 +21,6 @@ export const Profile: Story = {
   name: "Visual · プロフィール",
   tags: ["visual"],
 }
-export const Preferences: Story = {
-  name: "Visual · 環境設定",
-  tags: ["visual"],
-  args: { section: "preferences" },
-}
-export const Account: Story = {
-  name: "Visual · アカウント",
-  tags: ["visual"],
-  args: { section: "account" },
-}
-export const Usage: Story = {
-  name: "Visual · 利用状況",
-  tags: ["visual"],
-  args: { section: "usage" },
-}
-
 /** Confirms Profile delegates persistence while keeping the existing form interaction. */
 export const ProfileSaveContract: Story = {
   name: "Interaction · プロフィール保存",
