@@ -1,6 +1,6 @@
 import { Box, Text } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { fn } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
 
 const meta = {
