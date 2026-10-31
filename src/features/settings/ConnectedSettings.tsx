@@ -1,6 +1,6 @@
 "use client"
 
-import { PageStatusBoundary } from "./PageStatusBoundary"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "./useSettingsRefreshError"
 import type { ReactNode } from "react"
 import { Settings } from "./Settings"
