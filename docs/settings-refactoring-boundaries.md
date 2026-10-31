@@ -55,4 +55,4 @@ The new stories and interaction tests are committed but their successful executi
 
 ## Component Directory移行（作業中）
 
-合意済みの横断規約により、exportするReact Componentは同名Directory内に実装し、`index.ts`を公開入口とする。現在の設定機能では`Settings`、`SettingsSectionContent`、`CommunitySettings`、`CommunitySettingsContent`を移行した。ページ別Storyは対象表示Componentと近接配置する。残りのComponentのDirectory移行、import参照確認、TypeScript・Storybook・VRTの実行確認が必要であり、完了扱いにしない。
+合意済みの横断規約により、exportするReact Componentは同名Directory内に実装し、`index.ts`を公開入口とする。現在の設定機能では`Settings`、`SettingsSectionContent`、`SettingsLayout`、`SettingsProfile`、`SettingsPreferences`、`SettingsAccount`、`CommunitySettings`、`CommunitySettingsContent`、`CommunityGeneralContent`、`CommunityMembersContent`、`CommunityPreferencesContent`、`CommunityDangerZone`を移行した。ページ別Storyは対象表示Componentと近接配置する。残りのComponentのDirectory移行、import参照確認、TypeScript・Storybook・VRTの実行確認が必要であり、完了扱いにしない。
