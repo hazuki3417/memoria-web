@@ -1,7 +1,6 @@
 "use client"
 
-import { Text } from "@mantine/core"
-import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
+import { SettingsLoadBoundary } from "./SettingsLoadBoundary"
 import type { ReactNode } from "react"
 import { Settings } from "./Settings"
 import type { UserPreferencesPatch } from "./preferences/userPreferences"
@@ -24,24 +23,15 @@ export function ConnectedSettings({
   const { data, loading, error } = useCurrentUserQuery()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
   const [updatePreferences] = useSaveUserPreferencesMutation()
-  if (loading && !data)
-    return (
-      <LoadingBoundary loading label="Personal設定を読み込み中">
-        {null}
-      </LoadingBoundary>
-    )
-  if (error || !data?.me)
-    return (
-      <Text c="red">設定を取得できませんでした。再読み込みしてください。</Text>
-    )
-
-  const preferences = fromGraphqlUserPreferences(data.me.preferences)
+  const preferences = data?.me ? fromGraphqlUserPreferences(data.me.preferences) : undefined
+  const state = !data?.me ? (loading ? "loading" : "error") : "ready"
   return (
     <Settings
       key={section}
       section={section}
-      personalAccentColor={data.me.preferences.personalAccentColor}
-      profileNickname={data.me.profile.nickname}
+      personalAccentColor={data?.me?.preferences.personalAccentColor}
+      profileNickname={data?.me?.profile.nickname}
+      contentOverride={state !== "ready" ? <SettingsLoadBoundary state={state} label="Personal設定を読み込み中">{null}</SettingsLoadBoundary> : undefined}
       initialPreferences={preferences}
       saveProfile={async (nickname) => {
         await updateProfile({
@@ -76,14 +66,10 @@ export function ConnectedPersonalSettingsSection({
   usageContent?: ReactNode
 }) {
   const { data, loading, error } = useCurrentUserQuery()
-  const accountContent =
-    section === "account"
-      ? !data?.me && loading
-        ? <LoadingBoundary loading label="Personal設定を読み込み中">{null}</LoadingBoundary>
-        : !data?.me && (error || !loading)
-          ? <Text c="red">設定を取得できませんでした。再読み込みしてください。</Text>
-          : undefined
-      : undefined
+  const accountState = !data?.me ? (loading ? "loading" : "error") : "ready"
+  const accountContent = section === "account" && accountState !== "ready"
+    ? <SettingsLoadBoundary state={accountState} label="Personal設定を読み込み中">{null}</SettingsLoadBoundary>
+    : undefined
   return (
     <Settings
       section={section}
