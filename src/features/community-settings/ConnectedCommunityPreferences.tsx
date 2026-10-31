@@ -157,6 +157,8 @@ export function ConnectedCommunityPreferences({
     )
   }
 
+  const resolvedCommunity = data.community
+
   return (
     <Stack gap="sm">
       {saveError && (
@@ -165,7 +167,7 @@ export function ConnectedCommunityPreferences({
         </Alert>
       )}
       <CommunityPreferencesContent
-        accent={accent ?? data.community.mySettings.accentColor}
+        accent={accent ?? resolvedCommunity.mySettings.accentColor}
         isPreview={false}
         aliasControl={
           <CommunityAliasControl
