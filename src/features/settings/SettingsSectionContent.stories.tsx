@@ -1,6 +1,6 @@
 import { Box, Text } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { fn } from "storybook/test"
+import { expect, fn, userEvent, within } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
 
 const meta = {
@@ -35,4 +35,30 @@ export const Usage: Story = {
   name: "Visual · 利用状況",
   tags: ["visual"],
   args: { section: "usage" },
+}
+
+/** Confirms Profile delegates persistence while keeping the existing form interaction. */
+export const ProfileSaveContract: Story = {
+  name: "Interaction · プロフィール保存",
+  tags: ["interaction"],
+  args: { section: "profile", saveProfile: fn(async () => undefined) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後の名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(args.saveProfile).toHaveBeenCalledWith("変更後の名前")
+  },
+}
+
+export const ProfileValidationContract: Story = {
+  name: "Interaction · ニックネーム必須",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.clear(canvas.getByRole("textbox", { name: /ニックネーム/ }))
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await expect(canvas.getByText("ニックネームを入力してください。")).toBeVisible()
+  },
 }
