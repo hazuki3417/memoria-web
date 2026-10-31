@@ -196,9 +196,11 @@ export function ContextSwitcherMenu({
           style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
         >
           {!error && pinned && menuOption(pinned)}
-          <Box px={8} py={4}>
-            {searchInput}
-          </Box>
+          {communities.length > 0 && (
+            <Box px={8} py={4}>
+              {searchInput}
+            </Box>
+          )}
           <ScrollArea.Autosize mah={360} type="auto">
             {status}
             {!error && shown.map(menuOption)}
