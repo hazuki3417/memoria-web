@@ -10,7 +10,7 @@ import {
   Text,
   VisuallyHidden,
 } from "@mantine/core"
-import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { PageHeader } from "@/components/PageHeader"
 import type { FileSizeUnit } from "./formatFileSize"
 import { UsageStorageSection } from "./UsageStorageSection"
@@ -42,7 +42,7 @@ export function SettingsUsage({
     setSort((current) => nextUsageSort(current, key))
   }
   if (status !== "ready") {
-    return <SettingsLoadBoundary state={status} label="利用状況を読み込み中">{null}</SettingsLoadBoundary>
+    return <PageStatusBoundary state={status} label="利用状況を読み込み中">{null}</PageStatusBoundary>
   }
   return (
     <Stack gap="xl">
