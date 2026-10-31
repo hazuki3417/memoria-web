@@ -35,7 +35,7 @@ Before merging, verify TypeScript, formatting/lint, Storybook interactions, visu
 
 ## Outstanding behavioral verification
 
-- `useCommunitySettingsActions.test.ts` covers mocked GraphQL mutation responses for rename, member removal, role updates and leave, including refetch arguments and notifications. The test has been committed but not executed yet. The Storybook member confirmation Stories cover UI callback wiring and modal retention after failures.
-- The VRT runner (`tests/vrt/storybook.spec.mts`) captures all `vrt`-tagged stories across the `responsiveViewports` configuration. Existing settings loading/error VRT cases cover the shared page status in both viewport classes; run VRT and compare baselines before merge. New interaction stories are not claimed as passing until the runner executes.
+- `useCommunitySettingsActions.test.ts` covers mocked GraphQL mutation responses for rename, member removal, role updates and leave, including refetch arguments and notifications. The test has been committed but not executed yet. Storybook interaction cases cover member removal success/failure, role change success/failure, Community leave success/failure, and confirmation modal behavior. The final-Administrator guard remains in force; leave scenarios use two administrators.
+- The VRT runner (`tests/vrt/storybook.spec.mts`) captures all `vrt`-tagged stories across Compact (375×812), Medium (1024×768) and Wide (1440×900) viewports. Existing settings loading/error VRT cases cover the shared page status in both viewport classes; run VRT and compare baselines before merge. New interaction stories are not claimed as passing until the runner executes.
 - Verify actual component rendering at desktop and compact widths; the GitHub file edits have not yet been executed against a local TypeScript/Storybook runtime.
 - Current work branch may be behind `develop`. Reconcile its changes before requesting a merge, without changing the existing UI contract.
