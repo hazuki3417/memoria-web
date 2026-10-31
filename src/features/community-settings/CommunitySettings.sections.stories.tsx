@@ -1,5 +1,6 @@
 import { Box, Text } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
+import { expect, userEvent, within } from "storybook/test"
 import { CommunitySettings } from "./CommunitySettings"
 
 const meta = {
@@ -40,5 +41,21 @@ export const Usage: Story = {
   args: {
     section: "usage",
     usageContent: <Text>利用状況の表示領域</Text>,
+  },
+}
+
+/** Member search must filter the real member table without changing navigation. */
+export const MemberSearchContract: Story = {
+  name: "Interaction · メンバー検索",
+  tags: ["interaction"],
+  args: { section: "members" },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.type(
+      canvas.getByRole("textbox", { name: "参加者を名前で検索" }),
+      "家族メンバー",
+    )
+    await expect(canvas.getByText("家族メンバー")).toBeVisible()
+    await expect(canvas.queryByText("テストユーザー")).not.toBeInTheDocument()
   },
 }
