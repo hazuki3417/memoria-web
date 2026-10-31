@@ -25,10 +25,16 @@ This refactoring preserves the established UI and behavior of Personal and Commu
 
 ## Stories
 
-- `SettingsSectionContent.stories.tsx`: Personal Profile, Preferences, Account, Usage.
-- `CommunitySettings.sections.stories.tsx`: Community General, Members, Preferences, Usage.
+- `SettingsSectionContent.stories.tsx`: Personal Profile, Preferences, Account, Usage, Profile save callback and required nickname validation.
+- `CommunitySettings.sections.stories.tsx`: Community General, Members, Preferences, Usage and member search.
 - Existing `SettingsLoadLayout.stories.tsx` and `PageStatusBoundary.stories.tsx` cover loading and error layout.
 
 ## Verification requirements
 
 Before merging, verify TypeScript, formatting/lint, Storybook interactions, visual regression at desktop and mobile widths, and navigation, saving, permission-loss and loading behavior against the pre-refactor implementation.
+
+## Outstanding behavioral verification
+
+- Verify Community mutation hooks with controlled GraphQL responses for rename, member removal, role updates and leave, including refetch behavior and failure notifications. Visual/section Stories do not substitute for these integration checks.
+- Verify actual component rendering at desktop and compact widths; the GitHub file edits have not yet been executed against a local TypeScript/Storybook runtime.
+- Current work branch may be behind `develop`. Reconcile its changes before requesting a merge, without changing the existing UI contract.
