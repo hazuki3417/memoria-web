@@ -1,7 +1,8 @@
 "use client"
 
 import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
-import { useEffect, type ReactNode } from "react"
+import { useCommunitySettingsMembership } from "./useCommunitySettingsMembership"
+import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
@@ -9,7 +10,6 @@ import { useRouter } from "next/navigation"
 import { showNotification } from "@/components/Feedback"
 import {
   MyCommunitiesDocument,
-  useMyCommunitiesQuery,
   CommunityMembersDocument,
   CommunityMemberRole,
   useRenameCommunityMutation,
@@ -33,24 +33,7 @@ export function CommunitySettingsRoute({
   usageContent?: ReactNode
 }) {
   const router = useRouter()
-  const {
-    data: accentData,
-    loading: accentLoading,
-    error: accentError,
-  } = useMyCommunitiesQuery()
-  const activeMembership = accentData?.myCommunities.find(
-    (item) => item.id === communityId,
-  )
-  const communityAccentColor = activeMembership?.mySettings.accentColor
-  const membershipLost =
-    section === "preferences" &&
-    !accentLoading &&
-    !accentError &&
-    !!accentData &&
-    !activeMembership
-  useEffect(() => {
-    if (membershipLost) router.replace("/dashboard")
-  }, [membershipLost, router])
+  const { communityAccentColor, membershipLost } = useCommunitySettingsMembership(communityId, section)
   // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
   const requiresMembers = section === "members" || section === "general"
   const { name, members, loadError, membersError } = useCommunity({
