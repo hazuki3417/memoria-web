@@ -41,3 +41,14 @@ Before merging, verify TypeScript, formatting/lint, Storybook interactions, visu
 - Current work branch may be behind `develop`. Reconcile its changes before requesting a merge, without changing the existing UI contract.
 
 Page-level Storybook titles follow the leaf segment of the browser route. Reusable state/layout and Usage contract stories can remain separate from route-specific branches as cross-page test surfaces.
+
+## Extended Storybook contracts
+
+- Personal Profile: unchanged input, required nickname, successful save, retryable save failure and blocked save.
+- Personal Preferences: all setting fields are present and Media Detail navigation wrap can be toggled.
+- Personal Account: account deletion action links to `/settings/account/delete`.
+- Community General: Community name editing, invalid input, saving and member read-only states.
+- Community Members: search and membership confirmation success/failure cases.
+- Usage: the existing dedicated Usage contract stories remain authoritative for usage calculation and display behavior.
+
+The new stories and interaction tests are committed but their successful execution and visual baselines have not been verified in this environment.
