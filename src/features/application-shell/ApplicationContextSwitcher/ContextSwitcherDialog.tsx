@@ -182,9 +182,11 @@ export function ContextSwitcherDialog({
           style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
         >
           {!error && pinned && modalOption(pinned)}
-          <Box px={8} py={4}>
-            {searchInput}
-          </Box>
+          {communities.length > 0 && (
+            <Box px={8} py={4}>
+              {searchInput}
+            </Box>
+          )}
           <ScrollArea.Autosize mah="50vh" type="auto">
             {status}
             {!error && shown.map(modalOption)}
