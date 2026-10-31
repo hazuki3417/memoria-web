@@ -88,20 +88,12 @@ function UsageContent({
       break
   }
 
-  const retry = async () => {
-    if (scenario !== "error") return
-    setScenario("retrying")
-    // Story fixture: both the retry in progress and its result can be observed.
-    await new Promise((resolve) => setTimeout(resolve, 600))
-    setScenario(initialScenario === "retry-error" ? "error" : "default")
-  }
 
   return (
     <SettingsUsage
       usage={usage}
       fileSizeUnit={fileSizeUnit}
       status={status}
-      onRetry={initialScenario === "error-no-retry" ? undefined : retry}
     />
   )
 }
