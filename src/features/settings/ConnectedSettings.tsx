@@ -2,18 +2,14 @@
 
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "./useSettingsRefreshError"
+import { usePersonalSettingsActions } from "./usePersonalSettingsActions"
 import type { ReactNode } from "react"
 import { Settings } from "./Settings"
-import type { UserPreferencesPatch } from "./preferences/userPreferences"
 import {
   fromGraphqlUserPreferences,
-  toGraphqlUserPreferencesPatch,
 } from "./preferences/userPreferencesGraphqlAdapter"
 import {
-  CurrentUserDocument,
   useCurrentUserQuery,
-  useSaveUserPreferencesMutation,
-  useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
 
 export function ConnectedSettings({
@@ -23,8 +19,7 @@ export function ConnectedSettings({
 }) {
   const { data, loading, error } = useCurrentUserQuery()
   useSettingsRefreshError(Boolean(data?.me && error))
-  const [updateProfile] = useUpdateMemoriaUserProfileMutation()
-  const [updatePreferences] = useSaveUserPreferencesMutation()
+  const { saveProfile, savePreferences } = usePersonalSettingsActions()
   const preferences = data?.me ? fromGraphqlUserPreferences(data.me.preferences) : undefined
   const state = !data?.me ? (loading ? "loading" : "error") : "ready"
   return (
@@ -35,26 +30,8 @@ export function ConnectedSettings({
       profileNickname={data?.me?.profile.nickname}
       contentOverride={state !== "ready" ? <PageStatusBoundary state={state} label="Personal設定を読み込み中">{null}</PageStatusBoundary> : undefined}
       initialPreferences={preferences}
-      saveProfile={async (nickname) => {
-        await updateProfile({
-          variables: { input: { nickname } },
-          refetchQueries: [CurrentUserDocument],
-          awaitRefetchQueries: true,
-        })
-      }}
-      savePreferences={async (patch: UserPreferencesPatch) => {
-        const input = toGraphqlUserPreferencesPatch(patch)
-        const result = await updatePreferences({
-          variables: { input },
-          refetchQueries: [CurrentUserDocument],
-          awaitRefetchQueries: true,
-        })
-        if (!result.data?.updateUserPreferences.preferences)
-          throw new Error("Preferences update unconfirmed")
-        return fromGraphqlUserPreferences(
-          result.data.updateUserPreferences.preferences,
-        )
-      }}
+      saveProfile={saveProfile}
+      savePreferences={savePreferences}
     />
   )
 }
