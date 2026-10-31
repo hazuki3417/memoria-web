@@ -6,7 +6,7 @@ import {
   usePersonalUsageQuery,
 } from "@/infrastructure/graphql/generated"
 import { SettingsUsage } from "./SettingsUsage"
-import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { emptyUsage, mapUsageProjection } from "./usageGraphqlAdapter"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
@@ -61,9 +61,9 @@ export function ConnectedUsage({
 
   if (status !== "ready") {
     return (
-      <SettingsLoadBoundary state={status} label="利用状況を読み込み中">
+      <PageStatusBoundary state={status} label="利用状況を読み込み中">
         {null}
-      </SettingsLoadBoundary>
+      </PageStatusBoundary>
     )
   }
 
