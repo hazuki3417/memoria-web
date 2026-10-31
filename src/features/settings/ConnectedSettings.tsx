@@ -59,7 +59,7 @@ export function ConnectedSettings({
   )
 }
 
-/** Keep account and usage pages rendered while resolving the personal accent color. */
+/** Account requires CurrentUser; Usage handles its own data and loading state. */
 export function ConnectedPersonalSettingsSection({
   section,
   usageContent,
@@ -68,6 +68,7 @@ export function ConnectedPersonalSettingsSection({
   usageContent?: ReactNode
 }) {
   const { data, loading, error } = useCurrentUserQuery()
+  useSettingsRefreshError(Boolean(data?.me && error))
   const accountState = !data?.me ? (loading ? "loading" : "error") : "ready"
   const accountContent = section === "account" && accountState !== "ready"
     ? <SettingsLoadBoundary state={accountState} label="Personal設定を読み込み中">{null}</SettingsLoadBoundary>
