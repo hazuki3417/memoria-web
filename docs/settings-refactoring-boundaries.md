@@ -12,7 +12,8 @@ This refactoring preserves the established UI and behavior of Personal and Commu
 
 ## Community Settings
 
-- `CommunitySettingsRoute` composes the data source, loading/error boundary and existing member/name mutation callbacks.
+- `CommunitySettingsRoute` composes the data source, loading/error boundary, existing section navigation and mutation callbacks returned by the actions hook.
+- `useCommunitySettingsActions` owns Community renaming, member removal, role updates and leaving mutations. It preserves the existing success/error notifications, return values, refetch queries and confirmation semantics.
 - `useCommunitySettingsMembership` owns membership lookup, accent selection and the existing Preferences membership-loss redirect.
 - `CommunitySettings` owns responsive navigation, prototype section selection, name/invitation state and page layout.
 - `CommunitySettingsContent` owns only choosing existing General, Members, Preferences and Usage content.
