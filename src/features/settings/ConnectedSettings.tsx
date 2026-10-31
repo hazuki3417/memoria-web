@@ -1,6 +1,7 @@
 "use client"
 
 import { SettingsLoadBoundary } from "./SettingsLoadBoundary"
+import { useSettingsRefreshError } from "./useSettingsRefreshError"
 import type { ReactNode } from "react"
 import { Settings } from "./Settings"
 import type { UserPreferencesPatch } from "./preferences/userPreferences"
@@ -20,7 +21,8 @@ export function ConnectedSettings({
 }: {
   section: "profile" | "preferences"
 }) {
-  const { data, loading } = useCurrentUserQuery()
+  const { data, loading, error } = useCurrentUserQuery()
+  useSettingsRefreshError(Boolean(data?.me && error))
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
   const [updatePreferences] = useSaveUserPreferencesMutation()
   const preferences = data?.me ? fromGraphqlUserPreferences(data.me.preferences) : undefined
