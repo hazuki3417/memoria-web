@@ -127,3 +127,43 @@ export const LeaveFailureContract: Story = {
     await expect(await within(dialog).findByRole("alert")).toBeVisible()
   },
 }
+
+export const MemberRoleChangeFailureContract: Story = {
+  name: "Interaction · メンバー権限変更失敗",
+  tags: ["interaction"],
+  args: { section: "members", onChangeMemberRole: fn(async () => false) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const page = within(canvasElement.ownerDocument.body)
+    await userEvent.click(canvas.getByRole("button", { name: "家族メンバーの管理操作" }))
+    await userEvent.click(await page.findByText("役割を変更", { exact: true }))
+    const dialog = await page.findByRole("dialog", { name: "役割を変更" })
+    await userEvent.click(within(dialog).getByRole("radio", { name: /Administrator/ }))
+    await userEvent.click(within(dialog).getByRole("button", { name: "変更する" }))
+    await expect(args.onChangeMemberRole).toHaveBeenCalledWith("user-2", "admin")
+    await expect(dialog).toBeVisible()
+  },
+}
+
+export const LeaveSuccessContract: Story = {
+  name: "Interaction · Community退会成功",
+  tags: ["interaction"],
+  args: {
+    section: "members",
+    members: [
+      { id: "user-1", name: "テストユーザー", role: "admin", isSelf: true },
+      { id: "user-2", name: "家族メンバー", role: "admin" },
+    ],
+    onLeaveCommunity: fn(async () => undefined),
+    onLeaveSuccess: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const page = within(canvasElement.ownerDocument.body)
+    await userEvent.click(canvas.getByRole("button", { name: "Communityから退会する" }))
+    const dialog = await page.findByRole("dialog", { name: "Communityから退会" })
+    await userEvent.click(within(dialog).getByRole("button", { name: "退会する" }))
+    await expect(args.onLeaveCommunity).toHaveBeenCalledOnce()
+    await expect(args.onLeaveSuccess).toHaveBeenCalledOnce()
+  },
+}
