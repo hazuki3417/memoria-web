@@ -24,9 +24,9 @@ export function SettingsLoadBoundary({
   }
   if (state === "error") {
     return (
-      <Box role="alert">
+      <Box>
         <Center mih={180}>
-          <Alert color="red" title="設定を取得できませんでした">
+          <Alert color="red" title="設定を取得できませんでした" role="alert">
             ページを再読み込みしてください。
           </Alert>
         </Center>
