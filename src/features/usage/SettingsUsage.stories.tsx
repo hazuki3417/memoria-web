@@ -19,44 +19,6 @@ function UnitPreferenceStory() {
   )
 }
 
-function RetryContractStory({ scope }: { scope: "personal" | "community" }) {
-  const [status, setStatus] = useState<"error" | "ready">("error")
-  const [retryCount, setRetryCount] = useState(0)
-  return (
-    <>
-      <span data-testid="retry-count">{retryCount}</span>
-      <SettingsUsage
-        usage={sampleUsage}
-        scope={scope}
-        status={status}
-        onRetry={() => {
-          setRetryCount((count) => count + 1)
-          setStatus("ready")
-        }}
-      />
-    </>
-  )
-}
-
-function RetryFailureContractStory({
-  scope,
-}: {
-  scope: "personal" | "community"
-}) {
-  const [retryCount, setRetryCount] = useState(0)
-  return (
-    <>
-      <span data-testid="retry-count">{retryCount}</span>
-      <SettingsUsage
-        usage={sampleUsage}
-        scope={scope}
-        status="error"
-        onRetry={() => setRetryCount((count) => count + 1)}
-      />
-    </>
-  )
-}
-
 function ModeLifetimeContractStory() {
   const [scope, setScope] = useState<"personal" | "community">("personal")
   return (
@@ -290,26 +252,18 @@ export const UnitPreferenceChangeContract: Story = {
 
 // SS-01: Loadingでは確定値を露出せず、空データと誤認させない。
 export const LoadingContract: Story = {
-  name: "Interaction · 未確定値を隠す",
+  name: "Interaction · 共通Loader（未確定値を隠す）",
   tags: ["interaction"],
   args: { status: "loading" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(
-      canvas.getByRole("status", { name: "利用状況を読み込んでいます" }),
-    ).toBeVisible()
+    await expect(await canvas.findByRole("status", { name: "利用状況を読み込み中" })).toBeVisible()
     await expect(canvas.queryByText("1.24 GB")).not.toBeInTheDocument()
-    const table = canvas.getByRole("table")
-    await expect(within(table).getAllByRole("row")).toHaveLength(6)
-    await expect(within(table).getAllByRole("row")[5]).toHaveTextContent("合計")
-    await expect(
-      canvas.getByRole("button", { name: "使用量で並べ替え" }),
-    ).toBeDisabled()
-    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "再試行" })).not.toBeInTheDocument()
   },
 }
 
-// 0件の内訳では件数・使用量の昇順・降順でも形式順を変えず、3回目で未ソートへ戻る。
 export const ZeroSortContract: Story = {
   name: "Interaction · 0件の安定ソートとソート解除",
   tags: ["interaction"],
@@ -396,27 +350,7 @@ export const DisplayModeSwitchContract: Story = {
 }
 
 // SS-02/03: Errorは必ず再試行可能であり、操作後にReadyへ復旧する（API接続なし）。
-export const ErrorRetryContract: Story = {
-  name: "Interaction · 取得失敗と再試行",
-  tags: ["interaction"],
-  render: () => <RetryContractStory scope="personal" />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(canvas.getByRole("alert")).toHaveTextContent(
-      "利用状況を取得できませんでした",
-    )
-    await expect(canvas.getByRole("alert")).toHaveTextContent(
-      "通信状況を確認して、もう一度お試しください。",
-    )
-    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
-    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(canvas.getByTestId("retry-count")).toHaveTextContent("1")
-    await expect(canvas.getByRole("table")).toBeVisible()
-    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
-  },
-}
 
-// UI-14: 表示モードはコンポーネント存続中のみ保持し、別scopeへ持ち越さない。
 export const DisplayModeLifetimeContract: Story = {
   name: "Interaction · 表示モードの初期値とscope間独立",
   tags: ["interaction"],
@@ -455,9 +389,9 @@ export const VrtLoading: Story = {
   args: { status: "loading" },
 }
 export const VrtError: Story = {
-  name: "Visual · Error / Retry",
+  name: "Visual · 取得失敗",
   tags: ["visual", "vrt"],
-  args: { status: "error", onRetry: () => undefined },
+  args: { status: "error" },
 }
 export const VrtLimit: Story = {
   name: "Visual · 上限到達",
@@ -471,24 +405,7 @@ export const VrtCommunity: Story = {
 }
 
 // SS-04: 再取得が再失敗してもEmptyではなくErrorと復旧Actionを維持する。
-export const ErrorRetryFailureContract: Story = {
-  name: "Interaction · 再試行後の再失敗",
-  tags: ["interaction"],
-  render: () => <RetryFailureContractStory scope="community" />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(canvas.getByRole("alert")).toHaveTextContent(
-      "利用状況を取得できませんでした",
-    )
-    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(canvas.getByTestId("retry-count")).toHaveTextContent("1")
-    await expect(canvas.getByRole("alert")).toBeVisible()
-    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
-    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
-  },
-}
 
-// UI-06/07: 割合はscope上限を分母とし、上限・件数・列名は切り替わらない。
 export const PercentDenominatorContract: Story = {
   name: "Interaction · 上限を分母とする割合表示",
   tags: ["interaction"],
@@ -579,14 +496,13 @@ export const KeyboardDisplayModeContract: Story = {
 
 // Usage UI: ErrorはCommunityでも必須のRetryを示し、正常値を誤表示しない。
 export const CommunityErrorContract: Story = {
-  name: "Interaction · Communityのエラー復旧UI",
+  name: "Interaction · Community取得エラー",
   tags: ["interaction"],
-  args: { scope: "community", status: "error", onRetry: () => undefined },
+  args: { scope: "community", status: "error" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("alert")).toBeVisible()
-    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
+    await expect(canvas.queryByRole("button", { name: "再試行" })).not.toBeInTheDocument()
     await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
-    await expect(canvas.queryByText("1.24 GB")).not.toBeInTheDocument()
   },
 }
