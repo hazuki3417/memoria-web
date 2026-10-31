@@ -27,7 +27,7 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
 type Actions = ReturnType<typeof useCommunitySettingsActions>
 let root: Root
 let host: HTMLDivElement
-let actions: Actions
+let actions!: Actions
 
 beforeEach(async () => {
   vi.clearAllMocks()
