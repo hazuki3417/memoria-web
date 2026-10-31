@@ -1,0 +1,1 @@
+export { CommunitySettingsRoute } from "./CommunitySettingsRoute"
