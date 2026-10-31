@@ -2,21 +2,12 @@
 
 import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
 import { useCommunitySettingsMembership } from "./useCommunitySettingsMembership"
+import { useCommunitySettingsActions } from "./useCommunitySettingsActions"
 import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
-import { showNotification } from "@/components/Feedback"
-import {
-  MyCommunitiesDocument,
-  CommunityMembersDocument,
-  CommunityMemberRole,
-  useRenameCommunityMutation,
-  useChangeCommunityMemberRoleMutation,
-  useRemoveCommunityMemberMutation,
-  useLeaveCommunityMutation,
-} from "@/infrastructure/graphql/generated"
 import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
@@ -39,10 +30,8 @@ export function CommunitySettingsRoute({
   const { name, members, loadError, membersError } = useCommunity({
     includeMembers: requiresMembers,
   })
-  const [renameCommunity] = useRenameCommunityMutation()
-  const [changeRole] = useChangeCommunityMemberRoleMutation()
-  const [removeMember] = useRemoveCommunityMemberMutation()
-  const [leaveCommunity] = useLeaveCommunityMutation()
+  const { onRemoveMember, onLeaveCommunity, onChangeMemberRole, onSaveName } =
+    useCommunitySettingsActions(communityId)
 
   const hasRequiredData = name !== null && (!requiresMembers || members !== null)
   useSettingsRefreshError(Boolean(hasRequiredData && (loadError || (requiresMembers && membersError))))
@@ -74,111 +63,12 @@ export function CommunitySettingsRoute({
           <ConnectedCommunityPreferences communityId={communityId} />
         ) : undefined
       }
-      onRemoveMember={async (userId) => {
-        try {
-          const result = await removeMember({
-            variables: { input: { communityId, userId } },
-            refetchQueries: [CommunityMembersDocument],
-            awaitRefetchQueries: true,
-          })
-          if (!result.data?.removeCommunityMember.success) {
-            showNotification({
-              kind: "error",
-              title: "メンバーを除外",
-              description: "メンバーを除外できませんでした。",
-            })
-            return false
-          }
-          showNotification({
-            kind: "success",
-            title: "メンバーを除外",
-            description: "メンバーを除外しました。",
-          })
-          return true
-        } catch {
-          showNotification({
-            kind: "error",
-            title: "メンバーを除外",
-            description: "メンバーを除外できませんでした。",
-          })
-          return false
-        }
-      }}
-      onLeaveCommunity={async () => {
-        const result = await leaveCommunity({
-          variables: { communityId },
-          refetchQueries: [MyCommunitiesDocument],
-          awaitRefetchQueries: true,
-        })
-        if (!result.data?.leaveCommunity.success)
-          throw new Error("leave failed")
-      }}
+      onRemoveMember={onRemoveMember}
+      onLeaveCommunity={onLeaveCommunity}
       onLeaveSuccess={() => router.push("/dashboard")}
-      onChangeMemberRole={async (userId, role) => {
-        try {
-          const result = await changeRole({
-            variables: {
-              input: {
-                communityId,
-                userId,
-                role:
-                  role === "admin"
-                    ? CommunityMemberRole.Admin
-                    : CommunityMemberRole.Member,
-              },
-            },
-            refetchQueries: [CommunityMembersDocument],
-            awaitRefetchQueries: true,
-          })
-          if (!result.data?.changeCommunityMemberRole.success) {
-            showNotification({
-              kind: "error",
-              title: "メンバーの役割を変更",
-              description: "メンバーの役割を変更できませんでした。",
-            })
-            return false
-          }
-          showNotification({
-            kind: "success",
-            title: "メンバーの役割を変更",
-            description: "メンバーの役割を変更しました。",
-          })
-          return true
-        } catch {
-          showNotification({
-            kind: "error",
-            title: "メンバーの役割を変更",
-            description: "メンバーの役割を変更できませんでした。",
-          })
-          return false
-        }
-      }}
+      onChangeMemberRole={onChangeMemberRole}
       onNavigate={(href) => router.push(href)}
-      onSaveName={async (nextName) => {
-        try {
-          const result = await renameCommunity({
-            variables: { input: { communityId, name: nextName } },
-            refetchQueries: [MyCommunitiesDocument],
-            awaitRefetchQueries: true,
-          })
-          if (result.data?.renameCommunity.community) {
-            return true
-          }
-          showNotification({
-            kind: "error",
-            title: "Community名を変更",
-            description: "Community名を変更できませんでした。",
-          })
-          return false
-        } catch {
-          showNotification({
-            kind: "error",
-            title: "Community名を変更",
-            description: "Community名を変更できませんでした。",
-          })
-          return false
-        }
-      }}
+      onSaveName={onSaveName}
     />
   )
 }
