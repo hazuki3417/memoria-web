@@ -1,6 +1,6 @@
 import { Box, Text } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { fn } from "storybook/test"
+import { expect, fn, within } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
 
 const meta = {
@@ -21,4 +21,18 @@ export const Account: Story = {
   name: "Visual · アカウント",
   tags: ["visual"],
   args: { section: "account" },
+}
+
+export const DeleteAccountEntry: Story = {
+  name: "Interaction · アカウント削除導線",
+  tags: ["interaction"],
+  args: { section: "account" },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。")).toBeVisible()
+    await expect(canvas.getByRole("link", { name: "アカウントを削除する" })).toHaveAttribute(
+      "href",
+      "/settings/account/delete",
+    )
+  },
 }
