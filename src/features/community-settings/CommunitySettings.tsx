@@ -68,7 +68,6 @@ export function CommunitySettings({
 
   const sections = getCommunitySettingsSections(communityId)
 
-
   return (
     <SettingsSectionLayout
       compact={compact}
