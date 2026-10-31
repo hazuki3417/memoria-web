@@ -1,7 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Alert, Button, Loader, Stack } from "@mantine/core"
+import { Alert, Stack } from "@mantine/core"
+import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 import { CommunityAliasControl } from "./CommunityAliasControl"
@@ -36,7 +37,7 @@ export function ConnectedCommunityPreferences({
 }: {
   communityId: string
 }) {
-  const { data, loading, error, refetch } = useQuery<SettingsResult>(
+  const { data, loading } = useQuery<SettingsResult>(
     COMMUNITY_SETTINGS,
     {
       variables: { communityId },
@@ -146,15 +147,13 @@ export function ConnectedCommunityPreferences({
     void flush()
   }
 
-  if (loading && !data?.community)
-    return <Loader aria-label="Community環境設定を読み込み中" />
-  if (!data?.community)
+  if (!data?.community) {
     return (
-      <Stack>
-        <Alert color="red">Community環境設定を取得できませんでした。</Alert>
-        <Button onClick={() => void refetch()}>再試行</Button>
-      </Stack>
+      <SettingsLoadBoundary state={loading ? "loading" : "error"} label="Community環境設定を読み込み中">
+        {null}
+      </SettingsLoadBoundary>
     )
+  }
 
   return (
     <Stack gap="sm">
