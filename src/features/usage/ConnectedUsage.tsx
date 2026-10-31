@@ -6,6 +6,7 @@ import {
   usePersonalUsageQuery,
 } from "@/infrastructure/graphql/generated"
 import { SettingsUsage } from "./SettingsUsage"
+import { SettingsLoadBoundary } from "@/features/settings/SettingsLoadBoundary"
 import { emptyUsage, mapUsageProjection } from "./usageGraphqlAdapter"
 import type { SettingsUsageData, UsageStatus } from "./usageTypes"
 
@@ -53,26 +54,19 @@ export function ConnectedUsage({
     }
   }
 
-  let status: UsageStatus = "ready"
-  if (active.loading || communityPreferencesLoading) {
-    status = "loading"
-  } else if (
-    active.error ||
-    communityPreferencesError ||
-    conversionFailed ||
-    !projection
-  ) {
-    status = "error"
-  }
+  const hasData = Boolean(projection) && !conversionFailed && !communityPreferencesError
+  const status: UsageStatus = hasData
+    ? "ready"
+    : active.loading || communityPreferencesLoading
+      ? "loading"
+      : "error"
 
-  const retry = () => {
-    // 再取得で再び失敗した場合もApolloのerror stateに反映し、Retryを維持する。
-    if (active.error || !projection || conversionFailed) {
-      void active.refetch().catch(() => undefined)
-    }
-    if (communityPreferencesError) {
-      void communityPreferences.refetch().catch(() => undefined)
-    }
+  if (status !== "ready") {
+    return (
+      <SettingsLoadBoundary state={status} label="利用状況を読み込み中">
+        {null}
+      </SettingsLoadBoundary>
+    )
   }
 
   return (
@@ -80,7 +74,6 @@ export function ConnectedUsage({
       scope={scope}
       usage={usage}
       status={status}
-      onRetry={retry}
       fileSizeUnit={
         (scope === "personal"
           ? personal.data?.me?.preferences.fileSizeUnit
