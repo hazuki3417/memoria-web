@@ -30,7 +30,6 @@ export function CommunitySettings({
   onRemoveMember,
   onLeaveCommunity,
   onLeaveSuccess,
-  fileSizeUnit = "DECIMAL",
   usageContent,
   preferencesContent,
   contentOverride,
