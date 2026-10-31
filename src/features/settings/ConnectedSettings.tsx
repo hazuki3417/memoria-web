@@ -75,11 +75,20 @@ export function ConnectedPersonalSettingsSection({
   section: "account" | "usage"
   usageContent?: ReactNode
 }) {
-  const { data } = useCurrentUserQuery()
+  const { data, loading, error } = useCurrentUserQuery()
+  const accountContent =
+    section === "account"
+      ? !data?.me && loading
+        ? <LoadingBoundary loading label="Personal設定を読み込み中">{null}</LoadingBoundary>
+        : !data?.me && (error || !loading)
+          ? <Text c="red">設定を取得できませんでした。再読み込みしてください。</Text>
+          : undefined
+      : undefined
   return (
     <Settings
       section={section}
       usageContent={usageContent}
+      accountContent={accountContent}
       personalAccentColor={data?.me?.preferences.personalAccentColor}
     />
   )
