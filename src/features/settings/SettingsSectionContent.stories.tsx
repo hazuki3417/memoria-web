@@ -10,7 +10,6 @@ const meta = {
     section: "profile",
     profileNickname: "テストユーザー",
     saveProfile: fn(async () => undefined),
-    usageContent: <Text>利用状況の表示領域</Text>,
   },
   decorators: [(Story) => <Box maw={760} p="md"><Story /></Box>],
 } satisfies Meta<typeof SettingsSectionContent>
