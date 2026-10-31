@@ -1,6 +1,6 @@
 "use client"
 
-import { SettingsLoadBoundary } from "./SettingsLoadBoundary"
+import { PageStatusBoundary } from "./PageStatusBoundary"
 import { useSettingsRefreshError } from "./useSettingsRefreshError"
 import type { ReactNode } from "react"
 import { Settings } from "./Settings"
@@ -33,7 +33,7 @@ export function ConnectedSettings({
       section={section}
       personalAccentColor={data?.me?.preferences.personalAccentColor}
       profileNickname={data?.me?.profile.nickname}
-      contentOverride={state !== "ready" ? <SettingsLoadBoundary state={state} label="Personal設定を読み込み中">{null}</SettingsLoadBoundary> : undefined}
+      contentOverride={state !== "ready" ? <PageStatusBoundary state={state} label="Personal設定を読み込み中">{null}</PageStatusBoundary> : undefined}
       initialPreferences={preferences}
       saveProfile={async (nickname) => {
         await updateProfile({
@@ -71,7 +71,7 @@ export function ConnectedPersonalSettingsSection({
   useSettingsRefreshError(Boolean(data?.me && error))
   const accountState = !data?.me ? (loading ? "loading" : "error") : "ready"
   const accountContent = section === "account" && accountState !== "ready"
-    ? <SettingsLoadBoundary state={accountState} label="Personal設定を読み込み中">{null}</SettingsLoadBoundary>
+    ? <PageStatusBoundary state={accountState} label="Personal設定を読み込み中">{null}</PageStatusBoundary>
     : undefined
   return (
     <Settings
