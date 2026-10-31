@@ -1,23 +1,11 @@
 "use client"
 
-import { Button } from "@mantine/core"
-import { useMediaQuery } from "@mantine/hooks"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import { SettingsLayout, type Section } from "./SettingsLayout"
-import { SettingsProfile, type SaveProfile } from "./profile/SettingsProfile"
-import { SettingsPreferences } from "./preferences/SettingsPreferences"
-import { SettingsAccount } from "./account/SettingsAccount"
-import type {
-  UserPreferences,
-  UserPreferencesPatch,
-} from "./preferences/userPreferences"
-
-// Productionで保存接続がない場合に成功を装わない。
-async function unavailableProfileSave(): Promise<void> {
-  throw new Error("Profile save unavailable")
-}
+import { SettingsSectionContent } from "./SettingsSectionContent"
+import type { SaveProfile } from "./profile/SettingsProfile"
+import type { UserPreferences, UserPreferencesPatch } from "./preferences/userPreferences"
 
 export function Settings({
   section,
@@ -41,54 +29,23 @@ export function Settings({
   personalAccentColor?: string
 }) {
   const router = useRouter()
-  const compact = useMediaQuery("(max-width: 48em)")
-  let content: ReactNode
-  switch (section) {
-    case "profile":
-      content = (
-        <SettingsProfile
-          onSave={saveProfile ?? unavailableProfileSave}
-          initialNickname={profileNickname}
-        />
-      )
-      break
-    case "preferences":
-      content = (
-        <SettingsPreferences
-          compact={compact}
-          initialPreferences={initialPreferences}
-          onSave={savePreferences}
-        />
-      )
-      break
-    case "usage":
-      content = usageContent ?? null
-      break
-    case "account":
-      content = accountContent ?? (
-        <SettingsAccount
-          deletionAction={
-            <Button
-              component={Link}
-              href="/settings/account/delete"
-              color="red"
-              size="sm"
-            >
-              アカウントを削除する
-            </Button>
-          }
-        />
-      )
-      break
-  }
-
   return (
     <SettingsLayout
       accentColor={personalAccentColor}
       section={section}
       onSectionChange={(next) => router.push(`/settings/${next}`)}
     >
-      {contentOverride ?? content}
+      {contentOverride ?? (
+        <SettingsSectionContent
+          section={section}
+          saveProfile={saveProfile}
+          profileNickname={profileNickname}
+          initialPreferences={initialPreferences}
+          savePreferences={savePreferences}
+          usageContent={usageContent}
+          accountContent={accountContent}
+        />
+      )}
     </SettingsLayout>
   )
 }
