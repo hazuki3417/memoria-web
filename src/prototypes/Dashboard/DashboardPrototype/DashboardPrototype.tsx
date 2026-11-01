@@ -1,6 +1,5 @@
 "use client"
 
-import { media } from "./dashboardPrototypeData"
 import { RecentGroups } from "./RecentGroups"
 import { RecentMediaCarousel } from "./RecentMediaCarousel"
 
@@ -9,10 +8,8 @@ import {
   ScrollArea as PageScrollArea,
 } from "@mantine/core"
 
-import { GroupItem } from "@/components/GroupItem"
 
 import {
-  Box,
   Button,
   Center,
   Group,
