@@ -83,9 +83,9 @@ export function UsageFormatBreakdownSection({
             </Table.Thead>
             <Table.Tbody>
               {status === "loading" &&
-                Array.from({ length: 4 }, (_, row) => (
-                  <Table.Tr key={`loading-${row}`}>
-                    {Array.from({ length: 3 }, (_, column) => (
+                ["JPEG", "PNG", "WebP", "HEIC / HEIF"].map((format) => (
+                  <Table.Tr key={`loading-${format}`}>
+                    {["format", "count", "size"].map((column) => (
                       <Table.Td key={column}>
                         <Skeleton h={16} radius="sm" />
                       </Table.Td>
@@ -132,13 +132,11 @@ export function UsageFormatBreakdownSection({
                 <Table.Tr>
                   <Table.Th>合計</Table.Th>
                   {status === "loading" ? (
-                    <>
-                      {["count", "value"].map((field) => (
+                    ["count", "value"].map((field) => (
                         <Table.Th key={field} ta="right">
                           <Skeleton h={16} radius="sm" />
                         </Table.Th>
-                      ))}
-                    </>
+                      ))
                   ) : (
                     <>
                       <Table.Th ta="right">
