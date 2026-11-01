@@ -1,41 +1,9 @@
-import { Button, Group } from "@mantine/core"
-import { useState } from "react"
+import { ModeLifetimeContractStory } from "./ModeLifetimeContractStory"
+import { UnitPreferenceStory } from "./UnitPreferenceStory"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import { SettingsUsage } from "./SettingsUsage"
 import { sampleUsage, zeroUsage } from "../usageStoryFixtures"
-
-function UnitPreferenceStory() {
-  const [unit, setUnit] = useState<"DECIMAL" | "BINARY">("DECIMAL")
-
-  return (
-    <>
-      <Group mb="md">
-        <Button onClick={() => setUnit("BINARY")}>Binaryに変更</Button>
-        <Button onClick={() => setUnit("DECIMAL")}>Decimalに戻す</Button>
-      </Group>
-      <SettingsUsage usage={sampleUsage} fileSizeUnit={unit} />
-    </>
-  )
-}
-
-function ModeLifetimeContractStory() {
-  const [scope, setScope] = useState<"personal" | "community">("personal")
-  return (
-    <>
-      <Button
-        onClick={() =>
-          setScope((current) =>
-            current === "personal" ? "community" : "personal",
-          )
-        }
-      >
-        Scopeを切り替え
-      </Button>
-      <SettingsUsage key={scope} usage={sampleUsage} scope={scope} />
-    </>
-  )
-}
 
 const limitReachedUsage = {
   usedBytes: 5_000_000_000,

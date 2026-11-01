@@ -1,6 +1,5 @@
+import { CommunitySwitchScenario } from "./CommunitySwitchScenario"
 import { MockedProvider } from "@apollo/client/testing"
-import { Button } from "@mantine/core"
-import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import {
@@ -69,18 +68,6 @@ const personalSuccess = {
 }
 
 // NV-04: 同一画面でCommunity IDが変わっても別Communityの集計値を表示しない。
-function CommunitySwitchScenario() {
-  const [communityId, setCommunityId] = useState("club-a")
-  return (
-    <>
-      <Button onClick={() => setCommunityId("club-b")}>
-        Community Bへ切り替え
-      </Button>
-      <ConnectedUsage scope="community" communityId={communityId} />
-    </>
-  )
-}
-
 const otherCommunityUsage = {
   mediaCount: 1,
   storage: { usedBytes: "2000000000", effectiveLimitBytes: "5000000000" },
