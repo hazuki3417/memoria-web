@@ -6,7 +6,7 @@ import {
   groupRelationOptions,
   sortGroupRelationNames,
   type GroupRelationCandidateAvailability,
-} from "./groupRelationOptions"
+} from ".././groupRelationOptions"
 
 export function RelationEditor({
   label,
