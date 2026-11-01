@@ -1,3 +1,4 @@
+import { GroupCell } from "./GroupCell"
 "use client"
 
 import { Box, SimpleGrid, Text } from "@mantine/core"
@@ -6,39 +7,6 @@ type GroupPreviewGridProps = {
   directMedia: string[]
   aggregateMedia?: string[]
   directMediaCount?: number
-}
-
-function GroupCell({ sources }: { sources: string[] }) {
-  return (
-    <Box
-      w="100%"
-      h="100%"
-      bg="var(--mantine-color-default-hover)"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "2fr 1fr",
-        gridTemplateRows: "1fr 1fr",
-        gap: 2,
-        overflow: "hidden",
-      }}
-    >
-      {Array.from({ length: 3 }, (_, index) => (
-        <Box
-          key={index}
-          style={{
-            gridRow: index === 0 ? "1 / 3" : undefined,
-            ...(sources[index]
-              ? {
-                  backgroundImage: `url("${sources[index]}")`,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                }
-              : {}),
-          }}
-        />
-      ))}
-    </Box>
-  )
 }
 
 /** Shared visual preview; the owning screen controls selection and navigation. */

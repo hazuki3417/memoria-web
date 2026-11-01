@@ -1,3 +1,4 @@
+import { TileMessage } from "./TileMessage"
 "use client"
 
 import { Box, Center, Loader, Stack, Text } from "@mantine/core"
@@ -9,32 +10,6 @@ export type MediaTileState =
   | { status: "loading" }
   | { status: "processing" }
   | { status: "error" }
-
-function TileMessage({
-  icon,
-  title,
-  description,
-}: {
-  icon: ReactNode
-  title: string
-  description?: string
-}) {
-  return (
-    <Center h="100%" w="100%">
-      <Stack align="center" gap={6} p="xs" c="dimmed">
-        {icon}
-        <Text size="xs" fw={600} ta="center">
-          {title}
-        </Text>
-        {description && (
-          <Text size="10px" ta="center">
-            {description}
-          </Text>
-        )}
-      </Stack>
-    </Center>
-  )
-}
 
 export function MediaTile({
   src,
