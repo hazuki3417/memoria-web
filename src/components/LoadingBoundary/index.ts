@@ -1,0 +1,1 @@
+export { LoadingBoundary } from "./LoadingBoundary"
