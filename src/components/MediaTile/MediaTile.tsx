@@ -5,6 +5,7 @@ import { TileMessage } from "./TileMessage"
 import { Box, Loader, Text } from "@mantine/core"
 import { IconPhotoOff, IconRefresh } from "@tabler/icons-react"
 import { useState, type ReactNode } from "react"
+import Image from "next/image"
 
 export type MediaTileState =
   | { status: "ready"; src: string }
@@ -45,10 +46,14 @@ export function MediaTile({
           {label}
         </Text>
       ) : resolved.status === "ready" && !imageFailed ? (
-        <img
+        <Image
           key={resolved.src}
           src={resolved.src}
           alt={label}
+          width={1}
+          height={1}
+          unoptimized
+          loading="eager"
           draggable={false}
           onError={() => setFailedSrc(resolved.src)}
           style={{
