@@ -10,7 +10,7 @@ const meta = {
     opened: true,
     name: "アルバムA",
     parents: ["親Group"],
-    children: ["子Group"],
+    childNames: ["子Group"],
     candidates: ["親Group", "子Group"],
     currentGroupName: "アルバムA",
     canManage: true,
