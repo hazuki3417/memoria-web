@@ -10,7 +10,6 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import { usePathname } from "next/navigation"
 import {
   createMediaNavigationSnapshot,
   getMediaDetailId,
@@ -46,7 +45,6 @@ const SESSION_MARKER = "__memoriaMediaDetailSession"
  * Visual host and consumer migration are intentionally a later review checkpoint.
  */
 export function MediaDetailUrlProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname()
   const session = useRef<ActiveSession | null>(null)
   const [selectedMediaId, setSelectedMediaId] = useState<string | null>(null)
   const [snapshot, setSnapshot] = useState<MediaNavigationSnapshot | null>(null)
