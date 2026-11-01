@@ -12,24 +12,19 @@ import {
 import { GroupItem } from "@/components/GroupItem"
 
 import {
-  ActionIcon,
   Box,
   Button,
   Center,
-  Image,
   Group,
-  SimpleGrid,
   Stack,
   Text,
   Title,
 } from "@mantine/core"
 import {
-  IconChevronLeft,
-  IconChevronRight,
   IconFolder,
   IconPhoto,
 } from "@tabler/icons-react"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PageWidth } from "@/components/PageWidth/PageWidth"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
