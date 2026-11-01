@@ -63,6 +63,9 @@ export const ProfileSaveFailed: Story = {
       .mockResolvedValue(undefined),
   },
   play: async ({ canvasElement, args }) => {
+    args.saveProfile?.mockReset()
+    args.saveProfile?.mockRejectedValueOnce(new Error("network"))
+    args.saveProfile?.mockResolvedValue(undefined)
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
     await userEvent.clear(input)
