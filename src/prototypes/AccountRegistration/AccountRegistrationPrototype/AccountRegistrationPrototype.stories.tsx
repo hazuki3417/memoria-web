@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { AccountRegistrationPrototype } from "./AccountRegistrationPrototype"
+import { AccountRegistrationPrototype } from ".././AccountRegistrationPrototype"
 
 const meta = {
   title: "Design Prototypes/Account Registration",

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { AccountDeletionImpactPrototype } from "./AccountDeletionImpactPrototype"
+import { AccountDeletionImpactPrototype } from ".././AccountDeletionImpactPrototype"
 
 const meta = {
   title: "Design Prototypes/Account Deletion",

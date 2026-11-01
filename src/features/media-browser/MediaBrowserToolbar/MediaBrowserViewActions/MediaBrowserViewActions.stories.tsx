@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { fn } from "storybook/test"
-import { MediaBrowserViewActions } from "./MediaBrowserViewActions"
+import { MediaBrowserViewActions } from ".././MediaBrowserViewActions"
 
 const meta = {
   title: "Features/Media Browser/MediaBrowserViewActions",

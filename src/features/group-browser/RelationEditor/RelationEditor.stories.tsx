@@ -1,7 +1,7 @@
 import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
-import { RelationEditor } from "./RelationEditor"
+import { RelationEditor } from ".././RelationEditor"
 
 const meta = {
   title: "Features/Group Browser/Relation Editor",

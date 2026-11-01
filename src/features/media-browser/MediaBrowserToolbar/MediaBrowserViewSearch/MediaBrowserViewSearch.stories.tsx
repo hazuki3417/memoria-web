@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
-import { MediaBrowserViewSearch } from "./MediaBrowserViewSearch"
+import { MediaBrowserViewSearch } from ".././MediaBrowserViewSearch"
 
 const meta = {
   title: "Features/Media Browser/MediaBrowserViewSearch",
