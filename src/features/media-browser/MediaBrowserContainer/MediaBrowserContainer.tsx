@@ -33,7 +33,7 @@ export function MediaBrowserContainer({
     [contextKind, communityId],
   )
   const skip = contextKind === "community" && !communityId
-  const scopeKey = contextKind + ":" + (communityId ?? "")
+  const scopeKey = `${contextKind}:${communityId ?? ""}`
 
   // The applied filter belongs to one scope. Reset it on scope change.
   const [appliedFilter, setAppliedFilter] = useState<{
@@ -67,7 +67,7 @@ export function MediaBrowserContainer({
   // Exhaust the bounded Tag connection so Search can resolve all scoped names.
   useEffect(() => {
     if (!nextTagsCursor || tagQuery.loading || tagQuery.error || skip) return
-    const key = scopeKey + ":" + nextTagsCursor
+    const key = `${scopeKey}:${nextTagsCursor}`
     if (tagPageInFlight.current === key || tagPageFailures.current.has(key))
       return
     tagPageInFlight.current = key
@@ -281,7 +281,7 @@ export function MediaBrowserContainer({
       groupPageFailure === scopeKey
     )
       return
-    const key = scopeKey + ":" + groupCursor
+    const key = `${scopeKey}:${groupCursor}`
     if (groupPageInFlight.current === key) return
     groupPageInFlight.current = key
     void groupQuery
