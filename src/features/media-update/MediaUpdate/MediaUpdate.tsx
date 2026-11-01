@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Box, Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { IconTrash } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
-import type { MediaUpdateDraftItem } from "../../useMediaUpdateDraft"
+import type { MediaUpdateDraftItem } from "../useMediaUpdateDraft"
 
 import { FeedbackAlert } from "@/components/Feedback"
 import { applyMediaTagDraftAction } from "@/components/MediaTagEditor/mediaTagDraft"
