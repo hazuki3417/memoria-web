@@ -21,7 +21,7 @@ export function GroupCreateModal({
   opened,
   name,
   parents,
-  children,
+  childNames,
   candidates,
   canManage,
   saving,
@@ -34,7 +34,7 @@ export function GroupCreateModal({
   opened: boolean
   name: string
   parents: string[]
-  children: string[]
+  childNames: string[]
   candidates: string[]
   canManage: boolean
   saving: boolean
@@ -73,14 +73,14 @@ export function GroupCreateModal({
               candidates={candidates}
               label="Parents"
               names={parents}
-              oppositeNames={children}
+              oppositeNames={childNames}
               onChange={onParentsChange}
               currentGroupName={name.trim()}
             />
             <RelationEditor
               candidates={candidates}
               label="Children"
-              names={children}
+              names={childNames}
               oppositeNames={parents}
               onChange={onChildrenChange}
               currentGroupName={name.trim()}
