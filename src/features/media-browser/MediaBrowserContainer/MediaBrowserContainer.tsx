@@ -106,7 +106,6 @@ export function MediaBrowserContainer({
     tagQuery.error,
     tagQuery.fetchMore,
     skip,
-    tagPageFailedKey,
   ])
 
   const retryTags = useCallback(() => {
@@ -345,7 +344,7 @@ export function MediaBrowserContainer({
       window.clearInterval(interval)
       document.removeEventListener("visibilitychange", onVisible)
     }
-  }, [skip, query.refetch, scopeKey, selectedTagIds.join(",")])
+  }, [skip, query.refetch])
 
   const [pageFailure, setPageFailure] = useState<string | null>(null)
   const [pageLoading, setPageLoading] = useState<string | null>(null)
@@ -362,7 +361,7 @@ export function MediaBrowserContainer({
   }))
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
   const requestKey =
-    scopeKey + ":" + selectedTagIds.join(",") + ":" + (nextCursor ?? "")
+    `${scopeKey}:${selectedTagIds.join(",")}:${nextCursor ?? ""}`
   const loadMore = useCallback(async () => {
     if (!nextCursor || query.loading || pageInFlight.current === requestKey)
       return
@@ -406,7 +405,7 @@ export function MediaBrowserContainer({
         </Alert>
       )}
       {(tagQuery.error ||
-        (tagPageFailedKey && tagPageFailedKey.startsWith(scopeKey + ":"))) && (
+        (tagPageFailedKey?.startsWith(`${scopeKey}:`))) && (
         <Alert color="red" title="Tagを読み込めませんでした" role="alert">
           <Group justify="space-between">
             <Text size="sm">通信状態を確認して再度お試しください。</Text>
@@ -424,7 +423,7 @@ export function MediaBrowserContainer({
         contextKind={contextKind}
         communityId={communityId}
         items={items}
-        filterResetKey={scopeKey + ":" + selectedTagIds.join(",")}
+        filterResetKey={`${scopeKey}:${selectedTagIds.join(",")}`}
         groupOptions={
           groupQuery.loading ||
           groupQuery.error ||
