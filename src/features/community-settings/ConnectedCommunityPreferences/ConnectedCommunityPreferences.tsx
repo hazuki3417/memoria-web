@@ -219,7 +219,7 @@ export function ConnectedCommunityPreferences({
           />
         }
         setAccent={(next) => {
-          const current = accent ?? data.community.mySettings.accentColor
+          const current = accent ?? resolvedCommunity.mySettings.accentColor
           choose(typeof next === "function" ? next(current) : next)
         }}
       />
