@@ -1,5 +1,6 @@
 "use client"
 
+import { Button, Center } from "@mantine/core"
 import {
   useCommunityUsageQuery,
   useCurrentUserQuery,
@@ -66,9 +67,32 @@ export function ConnectedUsage({
 
   if (status !== "ready") {
     return (
-      <PageStatusBoundary state={status} label="利用状況を読み込み中">
-        {null}
-      </PageStatusBoundary>
+      <>
+        <PageStatusBoundary
+          state={status}
+          label="利用状況を読み込み中"
+          errorTitle="利用状況を取得できませんでした"
+        >
+          {null}
+        </PageStatusBoundary>
+        {status === "error" && (
+          <Center>
+            <Button
+              variant="light"
+              onClick={() => {
+                void Promise.all([
+                  active.refetch().catch(() => undefined),
+                  ...(scope === "community"
+                    ? [communityPreferences.refetch().catch(() => undefined)]
+                    : []),
+                ])
+              }}
+            >
+              再試行
+            </Button>
+          </Center>
+        )}
+      </>
     )
   }
 
