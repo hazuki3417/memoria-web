@@ -1,5 +1,6 @@
-import { GroupCell } from "./GroupCell"
 "use client"
+
+import { GroupCell } from "./GroupCell"
 
 import { Box, SimpleGrid, Text } from "@mantine/core"
 
