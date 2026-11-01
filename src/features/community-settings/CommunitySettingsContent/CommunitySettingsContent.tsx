@@ -1,6 +1,6 @@
 "use client"
 
-import type { ReactNode } from "react"
+import type { Dispatch, ReactNode, SetStateAction } from "react"
 import { CommunityGeneralContent } from "../CommunityGeneralContent"
 import { CommunityMembersContent, type CommunityMember } from "../CommunityMembersContent"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
@@ -39,7 +39,7 @@ export function CommunitySettingsContent({
   preferencesContent?: ReactNode
   usageContent?: ReactNode
   accent: string
-  setAccent: (value: string) => void
+  setAccent: Dispatch<SetStateAction<string>>
 }) {
   switch (section) {
     case "general":
