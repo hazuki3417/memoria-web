@@ -2,8 +2,8 @@
 
 import type { ComponentProps } from "react"
 import { Box, Divider, ScrollArea } from "@mantine/core"
-import { MediaBrowserToolbar } from "./MediaBrowserToolbar"
-import { MediaBrowserListContent } from "./MediaBrowserListContent"
+import { MediaBrowserToolbar } from ".././MediaBrowserToolbar"
+import { MediaBrowserListContent } from ".././MediaBrowserListContent"
 
 type MediaBrowserPaneProps = ComponentProps<typeof MediaBrowserToolbar> &
   ComponentProps<typeof MediaBrowserListContent>
