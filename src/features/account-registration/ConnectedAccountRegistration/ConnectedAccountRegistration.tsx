@@ -5,8 +5,8 @@ import { useRegisterMemoriaUserMutation } from "@/infrastructure/graphql/generat
 import {
   AccountRegistration,
   type AccountRegistrationResult,
-} from "./AccountRegistration"
-import { isBlockingRegistrationError } from "./registrationError"
+} from ".././AccountRegistration"
+import { isBlockingRegistrationError } from ".././registrationError"
 
 /** API接続・登録後Navigationを担当し、画面UIとStorybookのFixtureは所有しない。 */
 export function ConnectedAccountRegistration() {
