@@ -25,7 +25,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { useRef, useState } from "react"
-import { uploadMedia, uploadMediaBatch, MediaUploadError } from "./uploadMedia"
+import { uploadMedia, uploadMediaBatch, MediaUploadError } from ".././uploadMedia"
 import { FeedbackAlert } from "@/components/Feedback"
 import {
   MediaTagBulkEditor,

@@ -8,8 +8,8 @@ import { useEffect, useState } from "react"
 import {
   useMediaUpdateDraft,
   type MediaUpdateDraftItem,
-} from "./useMediaUpdateDraft"
-import type { MediaUpdateScope } from "./mediaTagApi"
+} from ".././useMediaUpdateDraft"
+import type { MediaUpdateScope } from ".././mediaTagApi"
 
 import { FeedbackAlert } from "@/components/Feedback"
 import { applyMediaTagDraftAction } from "@/components/MediaTagEditor/mediaTagDraft"
