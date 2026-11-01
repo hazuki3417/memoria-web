@@ -2,8 +2,8 @@
 
 import type { ComponentProps, Ref } from "react"
 import { Box, Divider, ScrollArea } from "@mantine/core"
-import { GroupBrowserToolbar } from "./GroupBrowserToolbar"
-import { GroupBrowserListContent } from "./GroupBrowserListContent"
+import { GroupBrowserToolbar } from ".././GroupBrowserToolbar"
+import { GroupBrowserListContent } from ".././GroupBrowserListContent"
 
 type GroupBrowserListPaneProps = Omit<
   ComponentProps<typeof GroupBrowserListContent>,

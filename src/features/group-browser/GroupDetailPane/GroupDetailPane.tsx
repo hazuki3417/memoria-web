@@ -2,8 +2,8 @@
 
 import type { ReactNode, Ref } from "react"
 import { Box, Divider, ScrollArea } from "@mantine/core"
-import { GroupDetailToolbar } from "./GroupDetailToolbar"
-import { GroupDetailMediaContent } from "./GroupDetailMediaContent"
+import { GroupDetailToolbar } from ".././GroupDetailToolbar"
+import { GroupDetailMediaContent } from ".././GroupDetailMediaContent"
 
 export type GroupDetailPaneProps = {
   compact?: boolean

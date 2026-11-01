@@ -3,12 +3,12 @@
 import type { RefObject } from "react"
 import { Box, Button, Stack, Text, UnstyledButton } from "@mantine/core"
 import { IconFolderPlus, IconSearch } from "@tabler/icons-react"
-import { GroupPreviewGrid as PreviewGrid } from "./GroupPreviewGrid"
-import { LoadMoreSentinel } from "./LoadMoreSentinel"
+import { GroupPreviewGrid as PreviewGrid } from ".././GroupPreviewGrid"
+import { LoadMoreSentinel } from ".././LoadMoreSentinel"
 import { ErrorState } from "@/components/ErrorState"
 import { LoadingState } from "@/components/LoadingState"
 import { EmptyState } from "@/components/EmptyState"
-import type { GroupBrowserGroup } from "./GroupBrowser"
+import type { GroupBrowserGroup } from ".././GroupBrowser"
 
 type GroupBrowserListContentProps = {
   compact: boolean

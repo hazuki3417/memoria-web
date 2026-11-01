@@ -16,14 +16,14 @@ import {
   useAddBrowserMediaToGroupMutation,
   useRemoveBrowserMediaFromGroupMutation,
 } from "@/infrastructure/graphql/generated"
-import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
+import { GroupBrowser, type GroupBrowserGroup } from ".././GroupBrowser"
 import { useMediaDetailUrl } from "@/features/media-detail/MediaDetailUrlProvider"
-import { deleteGroupThenRefresh } from "./groupDeleteFlow"
+import { deleteGroupThenRefresh } from ".././groupDeleteFlow"
 import {
   isGroupCreateOutcomeUnknown,
   isGroupStateConflict,
   isGroupUpdateOutcomeUnknown,
-} from "./groupStateConflict"
+} from ".././groupStateConflict"
 import { showNotification } from "@/components/Feedback"
 
 type GroupBrowserContainerProps = {

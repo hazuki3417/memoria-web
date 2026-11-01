@@ -3,11 +3,11 @@
 import type { ReactNode } from "react"
 import { Box } from "@mantine/core"
 import { IconPhoto } from "@tabler/icons-react"
-import { MediaGrid } from "./MediaGrid"
+import { MediaGrid } from ".././MediaGrid"
 import { ErrorState } from "@/components/ErrorState"
 import { LoadingState } from "@/components/LoadingState"
 import { EmptyState } from "@/components/EmptyState"
-import { LoadMoreSentinel } from "./LoadMoreSentinel"
+import { LoadMoreSentinel } from ".././LoadMoreSentinel"
 
 type GroupDetailMediaContentProps = {
   selected: { mediaCount: number } | null
