@@ -66,6 +66,7 @@ export const Loading: Story = {
   tags: ["visual", "vrt", "vrt-menu"],
   args: { contexts: [personal], loading: true },
 }
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Preserve existing Storybook story ID and visual regression references.
 export const Error: Story = {
   name: "Visual · 取得失敗",
   tags: ["visual", "vrt", "vrt-menu"],

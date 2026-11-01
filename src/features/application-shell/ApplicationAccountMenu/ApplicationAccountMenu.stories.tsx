@@ -41,6 +41,7 @@ export const Loading: Story = {
   },
 }
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Preserve existing Storybook story ID and visual regression references.
 export const Error: Story = {
   name: "Visual · Error",
   tags: ["visual", "vrt"],

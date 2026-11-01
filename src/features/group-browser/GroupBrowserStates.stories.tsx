@@ -83,6 +83,7 @@ export const Loading: Story = {
   args: { groupsData: [], discoveryState: "loading" },
 }
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Preserve existing Storybook story ID and visual regression references.
 export const Error: Story = {
   name: "Visual · Discovery · Load Error",
   args: { groupsData: [], discoveryState: "error", onRetryDiscovery: () => {} },

@@ -30,6 +30,7 @@ export const Processing: Story = {
   name: "Visual · Processing",
   args: { state: { status: "processing" } },
 }
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Preserve existing Storybook story ID and visual regression references.
 export const Error: Story = {
   name: "Visual · Error",
   args: { state: { status: "error" } },

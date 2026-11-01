@@ -10,4 +10,5 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Idle: Story = {}
 export const Loading: Story = { args: { state: "loading" }, tags: ["visual"] }
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Preserve existing Storybook story ID and visual regression references.
 export const Error: Story = { args: { state: "error" }, tags: ["visual"] }
