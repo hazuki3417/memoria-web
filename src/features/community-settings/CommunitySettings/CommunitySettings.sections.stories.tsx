@@ -139,7 +139,12 @@ export const LeaveFailureContract: Story = {
     await userEvent.click(
       within(dialog).getByRole("button", { name: "退会する" }),
     )
-    await expect(await within(dialog).findByText(/退会処理に失敗しました/)).toBeVisible()
+    await waitFor(() => {
+      expect(within(dialog).getByRole("alert")).toBeVisible()
+      expect(within(dialog).getByRole("alert")).toHaveTextContent(
+        "退会処理に失敗しました",
+      )
+    })
   },
 }
 
