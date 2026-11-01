@@ -336,8 +336,7 @@ export function MediaDetailUrlController({
         })
         const response = result.data?.addMediaToGroup.results
         if (
-          !response ||
-          response.length !== 1 ||
+          response?.length !== 1 ||
           response[0].mediaId !== id ||
           !["SUCCEEDED", "ALREADY_APPLIED"].includes(response[0].status)
         ) {
