@@ -26,7 +26,8 @@ export const Compact: Story = { args: { compact: true }, tags: ["visual"] }
 const longContent = (
   <Box p="md">
     {Array.from({ length: 30 }, (_, i) => (
-      <Text key={`setting-row-${i}`} py="xs">
+      <Text // biome-ignore lint/suspicious/noArrayIndexKey: Fixed, static Storybook placeholder rows never reorder.
+        key={i} py="xs">
         設定コンテンツ {i + 1}
       </Text>
     ))}
