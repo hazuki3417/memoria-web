@@ -312,7 +312,8 @@ export function MediaDetailUrlController({
       (groupId) => !desired.some((name) => byName.get(name) === groupId),
     )
     const added = desired
-      .map((name) => byName.get(name)!)
+      .map((name) => byName.get(name))
+      .filter((groupId): groupId is string => groupId !== undefined)
       .filter((groupId) => ![...original.values()].includes(groupId))
     setSavingGroups(true)
     try {
@@ -322,8 +323,7 @@ export function MediaDetailUrlController({
         })
         const response = result.data?.removeMediaFromGroup.results
         if (
-          !response ||
-          response.length !== 1 ||
+          response?.length !== 1 ||
           response[0].mediaId !== id ||
           !["SUCCEEDED", "ALREADY_APPLIED"].includes(response[0].status)
         ) {
