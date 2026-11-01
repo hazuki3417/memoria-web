@@ -10,7 +10,7 @@ const meta = {
     opened: true,
     name: "",
     parents: [],
-    children: [],
+    childNames: [],
     candidates: [],
     canManage: true,
     saving: false,
@@ -38,7 +38,7 @@ export const ReadyToCreate: Story = {
   args: {
     name: "新しいGroup",
     parents: ["親Group"],
-    children: ["子Group"],
+    childNames: ["子Group"],
     candidates: ["親Group", "子Group"],
   },
 }
