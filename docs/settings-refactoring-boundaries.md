@@ -56,3 +56,7 @@ The new stories and interaction tests are committed but their successful executi
 ## Component Directory移行（作業中）
 
 合意済みの横断規約により、exportするReact Componentは同名Directory内に実装し、`index.ts`を公開入口とする。現在の設定機能では`Settings`、`SettingsSectionContent`、`SettingsLayout`、`SettingsProfile`、`SettingsPreferences`、`SettingsAccount`、`CommunitySettings`、`CommunitySettingsContent`、`CommunityGeneralContent`、`CommunityMembersContent`、`CommunityPreferencesContent`、`CommunityDangerZone`、`CommunityInvitationSection`、`CommunityNameSection`、`CommunityAliasControl`、`CommunityDeletionConfirmation`、`CommunitySettingsRoute`、`ConnectedCommunityPreferences`、`ConnectedSettings`、`ConnectedPersonalSettingsSection`を移行した。ページ別Storyは対象表示Componentと近接配置し、Storybookのtitleを変更しない。旧ファイルは削除し、Directoryのindex.tsから公開する。残りのComponentのDirectory移行、import参照確認、TypeScript・Storybook・VRTの実行確認が必要であり、完了扱いにしない。
+
+## Usage Featureの段階的移行
+
+設定画面に接続されるUsage Featureの `SettingsUsage`、`ConnectedUsage`、`UsageStorageSection`、`UsageFormatBreakdownSection`、`UsageSortHeader`、`UsageFileSize` について、ComponentごとのDirectoryと `index.ts` を整備した。対象StoryもComponentのDirectoryへ近接配置した。表示ロジック・Storyタイトルは変更していない。移動後のTypeScript、Storybook Interaction、VRTによる回帰検証は未実行であり、未対応Featureの全件棚卸しは別途必要。
