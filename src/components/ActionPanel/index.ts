@@ -1,1 +1,1 @@
-export * from "./ActionPanel"
+export { ActionPanel } from "./ActionPanel"
