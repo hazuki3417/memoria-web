@@ -12,7 +12,7 @@ import {
   Title,
 } from "@mantine/core"
 import { Fragment, type ComponentType, type PropsWithChildren } from "react"
-import type { MockScenario } from "./accountDeletionGateway"
+import type { MockScenario } from ".././accountDeletionGateway"
 import { FeedbackAlert } from "@/components/Feedback"
 
 import {
@@ -20,17 +20,17 @@ import {
   type ReviewState,
   type CommunityScenario,
   type RetryOutcome,
-} from "./accountDeletionScenarios"
-import { useAccountDeletionController } from "./useAccountDeletionController"
-import { AccountDeletionImpactStep } from "./AccountDeletionImpactStep"
-import { AccountDeletionResolutionStep } from "./AccountDeletionResolutionStep"
-import { AccountDeletionCommunityReviewStep } from "./AccountDeletionCommunityReviewStep"
-import { AccountDeletionFinalStep } from "./AccountDeletionFinalStep"
+} from ".././accountDeletionScenarios"
+import { useAccountDeletionController } from ".././useAccountDeletionController"
+import { AccountDeletionImpactStep } from ".././AccountDeletionImpactStep"
+import { AccountDeletionResolutionStep } from ".././AccountDeletionResolutionStep"
+import { AccountDeletionCommunityReviewStep } from ".././AccountDeletionCommunityReviewStep"
+import { AccountDeletionFinalStep } from ".././AccountDeletionFinalStep"
 export type {
   ReviewState,
   CommunityScenario,
   RetryOutcome,
-} from "./accountDeletionScenarios"
+} from ".././accountDeletionScenarios"
 
 export function AccountDeletionFlow({
   reviewState = "default",

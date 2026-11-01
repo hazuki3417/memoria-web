@@ -10,7 +10,7 @@ import {
   Title,
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
-import type { AccountDeletionController } from "./useAccountDeletionController"
+import type { AccountDeletionController } from ".././useAccountDeletionController"
 
 export function AccountDeletionCommunityReviewStep({
   flow,

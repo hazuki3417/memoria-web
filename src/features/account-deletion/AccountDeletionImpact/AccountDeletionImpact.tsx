@@ -6,8 +6,8 @@ import {
   type ReviewState,
   type CommunityScenario,
   type RetryOutcome,
-} from "./AccountDeletionFlow"
-import type { MockScenario } from "./accountDeletionGateway"
+} from ".././AccountDeletionFlow"
+import type { MockScenario } from ".././accountDeletionGateway"
 
 export function AccountDeletionImpact({
   reviewState = "default",

@@ -11,8 +11,8 @@ import {
   Title,
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
-import type { AccountDeletionController } from "./useAccountDeletionController"
-import type { Decision } from "./accountDeletionScenarios"
+import type { AccountDeletionController } from ".././useAccountDeletionController"
+import type { Decision } from ".././accountDeletionScenarios"
 
 export function AccountDeletionResolutionStep({
   flow,

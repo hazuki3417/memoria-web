@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Group, Stack, Text, Title } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
-import type { AccountDeletionController } from "./useAccountDeletionController"
-import type { RetryOutcome } from "./accountDeletionScenarios"
+import type { AccountDeletionController } from ".././useAccountDeletionController"
+import type { RetryOutcome } from ".././accountDeletionScenarios"
 
 export function AccountDeletionImpactStep({
   flow,
