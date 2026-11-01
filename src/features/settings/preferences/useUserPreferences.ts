@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { usePreferencesSave } from "./usePreferencesSave"
-import {
-  type UserPreferences,
-  type UserPreferencesPatch,
+import type {
+  UserPreferences,
+  UserPreferencesPatch,
 } from "./userPreferences"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
