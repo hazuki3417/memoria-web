@@ -16,7 +16,6 @@ import {
   Divider,
   Group,
   Image,
-  InputBase,
   Loader,
   Menu,
   Modal,
@@ -29,7 +28,6 @@ import {
   TagsInput,
   Text,
   ThemeIcon,
-  useCombobox,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
