@@ -94,7 +94,6 @@ export function MediaUpdate({
       ? "editing"
       : live.status
     : scenario
-  const currentContext = contexts[context]
   const unavailable =
     !live && shownScenario === "partial-failure"
       ? new Set(["2"])
@@ -169,7 +168,9 @@ export function MediaUpdate({
                       aria-label="すべて削除"
                       onClick={() => {
                         if (live) {
-                          shownItems.forEach((item) => live.onDiscard(item.id))
+                          shownItems.forEach((item) => {
+                            live.onDiscard(item.id)
+                          })
                         } else setItems([])
                         setSelectedIds([])
                       }}
