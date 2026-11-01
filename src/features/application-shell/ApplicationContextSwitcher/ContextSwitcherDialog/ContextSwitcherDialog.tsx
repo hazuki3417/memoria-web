@@ -14,7 +14,7 @@ import {
   TextInput,
 } from "@mantine/core"
 import { IconCheck, IconPlus, IconSearch, IconX } from "@tabler/icons-react"
-import type { ApplicationContextOption } from "../types"
+import type { ApplicationContextOption } from "../../types"
 
 type Props = {
   opened: boolean

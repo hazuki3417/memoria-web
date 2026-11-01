@@ -6,9 +6,9 @@ import {
   useDashboardRecentMediaQuery,
   useDashboardRecentGroupsQuery,
 } from "@/infrastructure/graphql/generated"
-import { Dashboard, type DashboardGroup } from "./Dashboard"
+import { Dashboard, type DashboardGroup } from ".././Dashboard"
 import { useMediaDetailUrl } from "@/features/media-detail/MediaDetailUrlProvider"
-import { selectDashboardThumbnail } from "./selectDashboardThumbnail"
+import { selectDashboardThumbnail } from ".././selectDashboardThumbnail"
 
 // Remount the entire scoped query consumer when switching contexts. Apollo
 // must not expose the previous Community's protected data while loading.

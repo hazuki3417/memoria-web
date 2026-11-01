@@ -14,9 +14,9 @@ import { MediaDetailUrlController } from "@/features/media-detail/MediaDetailUrl
 import {
   getCommunityDisplayName,
   sortCommunitiesByDisplayName,
-} from "./communityDisplayName"
-import { CommunityCreateModal } from "./CommunityCreateModal/CommunityCreateModal"
-import { useApplicationContextSelection } from "./useApplicationContextSelection"
+} from ".././communityDisplayName"
+import { CommunityCreateModal } from ".././CommunityCreateModal/CommunityCreateModal"
+import { useApplicationContextSelection } from ".././useApplicationContextSelection"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,

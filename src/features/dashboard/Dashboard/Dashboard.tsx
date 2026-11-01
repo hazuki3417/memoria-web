@@ -21,7 +21,7 @@ import {
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { showNotification } from "@/components/Feedback"
-import { recentGroups, recentMedia } from "./dashboardData"
+import { recentGroups, recentMedia } from ".././dashboardData"
 import { GroupPreviewGrid } from "@/features/group-browser/GroupPreviewGrid"
 
 function MediaPage({
