@@ -52,13 +52,13 @@ export type GroupBrowserProps = {
     name: string,
     parents: string[],
     children: string[],
-  ) => Promise<"unknown" | void>
+  ) => Promise<"unknown" | undefined>
   onUpdateGroup?: (
     id: string,
     name: string,
     parents: string[],
     children: string[],
-  ) => Promise<"conflict" | "unknown" | void>
+  ) => Promise<"conflict" | "unknown" | undefined>
   onDeleteGroup?: (id: string) => Promise<void>
   onSelectGroup?: (id: string | null) => void
   detailsReady?: boolean
@@ -132,7 +132,6 @@ export function GroupBrowser({
     compact,
     compactView,
     splitViewRef,
-    savedLayout,
     compactDetailHeadingRef,
     compactSearchRef,
     compactGroupItemRefs,
