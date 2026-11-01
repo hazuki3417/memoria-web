@@ -1,0 +1,1 @@
+export { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
