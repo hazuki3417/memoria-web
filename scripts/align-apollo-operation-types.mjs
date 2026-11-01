@@ -13,4 +13,7 @@ for (const name of names) {
   hooks = hooks.replace(new RegExp(`(?<!Operation)\\b${name}\\b`, "g"), `Operation${name}`)
 }
 source = source.slice(0, start) + hooks
+// GraphQL Code Generator emits broad @ts-ignore on Suspense overloads.
+// Use the narrower directive so obsolete suppressions surface during type checking.
+source = source.replaceAll("// @ts-ignore", "// @ts-expect-error")
 writeFileSync(path, source)
