@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaTagEditorList } from "./MediaTagEditorList"
-import { MediaTagEditorRow } from "./MediaTagEditorRow"
+import { MediaTagEditorList } from ".././MediaTagEditorList"
+import { MediaTagEditorRow } from ".././MediaTagEditorRow"
 
 const meta = {
   title: "Components/Media Tag Editor/List",

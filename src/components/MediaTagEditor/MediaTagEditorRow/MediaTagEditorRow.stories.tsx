@@ -1,6 +1,6 @@
 import { Badge } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaTagEditorRow } from "./MediaTagEditorRow"
+import { MediaTagEditorRow } from ".././MediaTagEditorRow"
 
 const meta = {
   title: "Components/Media Tag Editor/Row",

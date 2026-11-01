@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { GroupItem } from "./GroupItem"
+import { GroupItem } from ".././GroupItem"
 const images = [
   "/group-browser/group-media-01.jpg",
   "/group-browser/group-media-02.jpg",

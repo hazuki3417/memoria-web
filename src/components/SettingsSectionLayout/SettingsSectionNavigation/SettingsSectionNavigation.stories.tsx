@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { IconSettings, IconUser } from "@tabler/icons-react"
 import { fn } from "storybook/test"
-import { SettingsSectionNavigation } from "./SettingsSectionNavigation"
+import { SettingsSectionNavigation } from ".././SettingsSectionNavigation"
 const sections = [
   { id: "profile", label: "プロフィール", icon: IconUser },
   { id: "preferences", label: "環境設定", icon: IconSettings },

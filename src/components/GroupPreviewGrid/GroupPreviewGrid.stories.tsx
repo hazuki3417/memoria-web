@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { GroupPreviewGrid } from "./GroupPreviewGrid"
+import { GroupPreviewGrid } from ".././GroupPreviewGrid"
 const images = [
   "/group-browser/group-media-01.jpg",
   "/group-browser/group-media-02.jpg",

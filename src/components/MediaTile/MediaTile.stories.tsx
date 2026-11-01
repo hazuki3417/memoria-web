@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaTile } from "./MediaTile"
+import { MediaTile } from ".././MediaTile"
 
 const meta = {
   title: "Components/Media Tile",

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaTagBulkEditor } from "./MediaTagBulkEditor"
+import { MediaTagBulkEditor } from ".././MediaTagBulkEditor"
 
 const meta = {
   title: "Components/Media Tag Editor/Bulk Editor",

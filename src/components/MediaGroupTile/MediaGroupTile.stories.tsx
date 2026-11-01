@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaGroupTile } from "./MediaGroupTile"
+import { MediaGroupTile } from ".././MediaGroupTile"
 
 const images = [
   "/__dev-assets/group-browser/group-media-01.jpg",
