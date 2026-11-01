@@ -2,7 +2,7 @@
 
 import { Stack } from "@mantine/core"
 import type { ComponentType } from "react"
-import { NavigationItem } from "./NavigationItem"
+import { NavigationItem } from ".././NavigationItem"
 
 export type NavigationListItem<Id extends string = string> = {
   id: Id
