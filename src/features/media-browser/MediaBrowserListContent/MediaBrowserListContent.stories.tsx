@@ -35,6 +35,7 @@ export const Loading: Story = {
   args: { activeState: "loading" },
   tags: ["visual"],
 }
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Preserve Storybook story IDs used by visual tests.
 export const Error: Story = { args: { activeState: "error" }, tags: ["visual"] }
 export const LoadingMore: Story = {
   args: { activeState: "loading-more", loadingMore: true },

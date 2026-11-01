@@ -95,7 +95,7 @@ export async function listMediaUpdateTags(
   const records: MediaTagRecord[] = []
   let after: string | null = null
   const seen = new Set<string>()
-  do {
+  while (true) {
     const response: MediaUpdateResult<{
       mediaTags: {
         edges: { node: MediaTagRecord }[]
@@ -113,7 +113,7 @@ export async function listMediaUpdateTags(
     if (!cursor || seen.has(cursor)) return { kind: "error" }
     seen.add(cursor)
     after = cursor
-  } while (true)
+  }
   return { kind: "ok", value: records }
 }
 

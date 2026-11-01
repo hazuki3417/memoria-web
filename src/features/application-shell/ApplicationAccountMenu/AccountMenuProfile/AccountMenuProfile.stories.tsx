@@ -50,7 +50,7 @@ export const Loading: Story = {
   },
 }
 
-export const Error: Story = {
+const ErrorState: Story = {
   name: "Visual · Error",
   tags: ["visual", "vrt"],
   args: { state: { status: "error" } },
@@ -60,3 +60,6 @@ export const Error: Story = {
     ).toBeVisible()
   },
 }
+
+// Keep the existing Storybook export name and VRT story ID.
+export { ErrorState as Error }

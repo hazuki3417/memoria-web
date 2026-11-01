@@ -25,9 +25,7 @@ const meta = {
         })}
         user={{ displayName: "ユーザー" }}
       >
-        <>
-          <Story />
-        </>
+        <Story />
       </PrototypeApplicationShell>
     ),
   ],

@@ -1,6 +1,6 @@
 import {
   DEFAULT_THEME,
-  MantineSize,
+  type MantineSize,
   createTheme,
   mergeMantineTheme,
 } from "@mantine/core"

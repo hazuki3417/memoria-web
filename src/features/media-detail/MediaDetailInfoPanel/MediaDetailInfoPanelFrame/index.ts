@@ -1,0 +1,1 @@
+export { MediaDetailInfoPanelFrame } from "./MediaDetailInfoPanelFrame"

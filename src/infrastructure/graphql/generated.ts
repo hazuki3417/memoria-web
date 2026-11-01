@@ -1359,7 +1359,7 @@ export function useMyCommunitiesLazyQuery(
     OperationMyCommunitiesQueryVariables
   >(MyCommunitiesDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useMyCommunitiesSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationMyCommunitiesQuery,
@@ -1465,7 +1465,7 @@ export function useCommunityDetailsLazyQuery(
     OperationCommunityDetailsQueryVariables
   >(CommunityDetailsDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useCommunityDetailsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationCommunityDetailsQuery,
@@ -1571,7 +1571,7 @@ export function useCommunityMembersLazyQuery(
     OperationCommunityMembersQueryVariables
   >(CommunityMembersDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useCommunityMembersSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationCommunityMembersQuery,
@@ -1680,7 +1680,7 @@ export function useCommunityDeletionSnapshotLazyQuery(
     OperationCommunityDeletionSnapshotQueryVariables
   >(CommunityDeletionSnapshotDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useCommunityDeletionSnapshotSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationCommunityDeletionSnapshotQuery,
@@ -2103,7 +2103,7 @@ export function useCommunityUsageLazyQuery(
     OperationCommunityUsageQueryVariables
   >(CommunityUsageDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useCommunityUsageSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationCommunityUsageQuery,
@@ -2212,7 +2212,7 @@ export function useCommunityMySettingsLazyQuery(
     OperationCommunityMySettingsQueryVariables
   >(CommunityMySettingsDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useCommunityMySettingsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationCommunityMySettingsQuery,
@@ -2380,7 +2380,7 @@ export function useDashboardRecentMediaLazyQuery(
     OperationDashboardRecentMediaQueryVariables
   >(DashboardRecentMediaDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useDashboardRecentMediaSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationDashboardRecentMediaQuery,
@@ -2507,7 +2507,7 @@ export function useDashboardRecentGroupsLazyQuery(
     OperationDashboardRecentGroupsQueryVariables
   >(DashboardRecentGroupsDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useDashboardRecentGroupsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationDashboardRecentGroupsQuery,
@@ -2631,7 +2631,7 @@ export function useBrowseGroupsLazyQuery(
     OperationBrowseGroupsQueryVariables
   >(BrowseGroupsDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useBrowseGroupsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationBrowseGroupsQuery,
@@ -2795,7 +2795,7 @@ export function useBrowseGroupDetailLazyQuery(
     OperationBrowseGroupDetailQueryVariables
   >(BrowseGroupDetailDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useBrowseGroupDetailSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationBrowseGroupDetailQuery,
@@ -2933,7 +2933,7 @@ export function useBrowseGroupRelationCandidatesLazyQuery(
     OperationBrowseGroupRelationCandidatesQueryVariables
   >(BrowseGroupRelationCandidatesDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useBrowseGroupRelationCandidatesSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationBrowseGroupRelationCandidatesQuery,
@@ -3375,7 +3375,7 @@ export function useMediaBrowserListLazyQuery(
     OperationMediaBrowserListQueryVariables
   >(MediaBrowserListDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useMediaBrowserListSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationMediaBrowserListQuery,
@@ -3490,7 +3490,7 @@ export function useMediaBrowserTagsLazyQuery(
     OperationMediaBrowserTagsQueryVariables
   >(MediaBrowserTagsDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useMediaBrowserTagsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationMediaBrowserTagsQuery,
@@ -3600,7 +3600,7 @@ export function useCurrentUserLazyQuery(
     OperationCurrentUserQueryVariables
   >(CurrentUserDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function useCurrentUserSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationCurrentUserQuery,
@@ -3880,7 +3880,7 @@ export function usePersonalUsageLazyQuery(
     OperationPersonalUsageQueryVariables
   >(PersonalUsageDocument, options)
 }
-// @ts-ignore
+// @ts-expect-error
 export function usePersonalUsageSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
     OperationPersonalUsageQuery,

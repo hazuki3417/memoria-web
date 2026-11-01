@@ -10,12 +10,8 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (
-    !request.headers
-      .get("content-type")
-      ?.toLowerCase()
-      .startsWith("multipart/form-data;")
-  ) {
+  const contentType = request.headers.get("content-type")
+  if (!contentType?.toLowerCase().startsWith("multipart/form-data;")) {
     return NextResponse.json(
       {
         error: { code: "VALIDATION", message: "multipart/form-data required" },
@@ -57,7 +53,7 @@ export async function POST(request: NextRequest) {
       headers: {
         Authorization: `Bearer ${token}`,
         "Idempotency-Key": key,
-        "Content-Type": request.headers.get("content-type")!,
+        "Content-Type": contentType,
       },
       body: request.body,
       // Streaming request bodies require duplex in Node.js fetch.

@@ -83,7 +83,7 @@ export const Loading: Story = {
   args: { groupsData: [], discoveryState: "loading" },
 }
 
-export const Error: Story = {
+const ErrorState: Story = {
   name: "Visual · Discovery · Load Error",
   args: { groupsData: [], discoveryState: "error", onRetryDiscovery: () => {} },
 }
@@ -150,3 +150,6 @@ export const CompactDiscoveryLoadMoreError: Story = {
   },
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
+
+// Keep the existing Storybook export name and VRT story ID.
+export { ErrorState as Error }

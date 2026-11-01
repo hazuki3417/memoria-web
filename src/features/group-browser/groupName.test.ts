@@ -33,7 +33,7 @@ describe("Group name grapheme validation", () => {
     expect(validGroupName("")).toBe(false)
     expect(validGroupName("　\t ")).toBe(false)
     expect(validGroupName("  卒業式  ")).toBe(true)
-    expect(validGroupName(" ".repeat(50) + "卒業式" + " ".repeat(50))).toBe(
+    expect(validGroupName(`${" ".repeat(50)}卒業式${" ".repeat(50)}`)).toBe(
       true,
     )
   })
@@ -45,17 +45,17 @@ describe("Group name grapheme validation", () => {
 
   it("rejects forbidden Cc before trim, whether leading, internal, or trailing (GB-038)", () => {
     for (const control of ["\n", "\t", "\u0000", "\u0001", "\u007f"]) {
-      expect(validGroupName(control + "Group")).toBe(false)
-      expect(validGroupName("Group" + control)).toBe(false)
-      expect(validGroupName("Gr" + control + "oup")).toBe(false)
+      expect(validGroupName(`${control}Group`)).toBe(false)
+      expect(validGroupName(`Group${control}`)).toBe(false)
+      expect(validGroupName(`Gr${control}oup`)).toBe(false)
     }
   })
 
   it("rejects Unicode line and paragraph separators even when trim would remove them (GB-038)", () => {
     for (const separator of ["\u2028", "\u2029"]) {
-      expect(validGroupName(separator + "Group")).toBe(false)
-      expect(validGroupName("Group" + separator)).toBe(false)
-      expect(validGroupName("Gr" + separator + "oup")).toBe(false)
+      expect(validGroupName(`${separator}Group`)).toBe(false)
+      expect(validGroupName(`Group${separator}`)).toBe(false)
+      expect(validGroupName(`Gr${separator}oup`)).toBe(false)
     }
   })
 

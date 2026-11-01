@@ -455,11 +455,7 @@ export async function getMemoriaCommunityDeletionSnapshot(
             : "error",
     }
   const snapshot = response.result.data?.communityDeletionSnapshot
-  if (
-    !snapshot ||
-    !snapshot.revision ||
-    !Number.isSafeInteger(snapshot.managedMediaCount)
-  )
+  if (!snapshot?.revision || !Number.isSafeInteger(snapshot.managedMediaCount))
     return { kind: "error" }
   return { kind: "loaded", snapshot }
 }

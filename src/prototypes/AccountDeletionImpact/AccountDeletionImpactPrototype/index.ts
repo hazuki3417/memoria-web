@@ -1,0 +1,1 @@
+export { AccountDeletionImpactPrototype } from "./AccountDeletionImpactPrototype"

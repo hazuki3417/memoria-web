@@ -317,12 +317,10 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
         </Text>
         <Group gap={4} wrap="nowrap" justify="flex-end" style={{ minWidth: 0 }}>
           {!compact && (
-            <>
-              <MediaDetailZoomControls
-                zoom={detailZoom}
-                setZoom={setDetailZoom}
-              />
-            </>
+            <MediaDetailZoomControls
+              zoom={detailZoom}
+              setZoom={setDetailZoom}
+            />
           )}
           <ActionIcon
             variant={detailInfoOpened ? "light" : "subtle"}

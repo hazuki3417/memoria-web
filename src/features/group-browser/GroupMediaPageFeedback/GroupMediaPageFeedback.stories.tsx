@@ -10,4 +10,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Idle: Story = {}
 export const Loading: Story = { args: { state: "loading" }, tags: ["visual"] }
-export const Error: Story = { args: { state: "error" }, tags: ["visual"] }
+const ErrorState: Story = { args: { state: "error" }, tags: ["visual"] }
+
+// Keep the existing Storybook export name and VRT story ID.
+export { ErrorState as Error }

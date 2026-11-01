@@ -22,7 +22,7 @@ export function GroupEditModal({
   opened,
   name,
   parents,
-  children,
+  childNames,
   candidates,
   currentGroupName,
   availability,
@@ -40,7 +40,7 @@ export function GroupEditModal({
   opened: boolean
   name: string
   parents: string[]
-  children: string[]
+  childNames: string[]
   candidates: string[]
   currentGroupName: string
   availability?: GroupRelationAvailability
@@ -83,7 +83,7 @@ export function GroupEditModal({
               candidates={candidates}
               label="Parents"
               names={parents}
-              oppositeNames={children}
+              oppositeNames={childNames}
               onChange={onParentsChange}
               currentGroupName={currentGroupName}
               availability={availability}
@@ -91,7 +91,7 @@ export function GroupEditModal({
             <RelationEditor
               candidates={candidates}
               label="Children"
-              names={children}
+              names={childNames}
               oppositeNames={parents}
               onChange={onChildrenChange}
               currentGroupName={currentGroupName}

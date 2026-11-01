@@ -1,0 +1,1 @@
+export { CommunityDeletePageContent } from "./CommunityDeletePageContent"

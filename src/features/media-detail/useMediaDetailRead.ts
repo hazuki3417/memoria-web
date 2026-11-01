@@ -121,14 +121,17 @@ export function useMediaDetailRead(
   // automatically (those continue to require a deliberate user action).
   const lastVariantRefresh = useRef(Date.now())
   const variantRefreshInFlight = useRef(false)
+  const variantRefreshIdentity = useRef<string | null>(null)
   const readyVariant = preview.kind === "ready"
   useEffect(() => {
+    if (variantRefreshIdentity.current === pollKey) return
+    variantRefreshIdentity.current = pollKey
     lastVariantRefresh.current = Date.now()
     variantRefreshInFlight.current = false
   }, [pollKey])
 
   useEffect(() => {
-    if (!mediaId || !readyVariant || !visible) return
+    if (!pollKey || !mediaId || !readyVariant || !visible) return
     let cancelled = false
     const refreshIfNeeded = () => {
       if (

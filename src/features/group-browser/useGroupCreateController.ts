@@ -33,7 +33,9 @@ export function useGroupCreateController({
     const result = await runAction(async () => {
       if (!onCreateGroup)
         throw new Error("Group create operation is not configured")
-      let outcome
+      let outcome: Awaited<
+        ReturnType<NonNullable<GroupBrowserProps["onCreateGroup"]>>
+      >
       try {
         outcome = await onCreateGroup(name, createParents, createChildren)
       } catch (error) {

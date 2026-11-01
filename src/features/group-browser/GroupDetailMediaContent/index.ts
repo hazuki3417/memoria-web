@@ -1,0 +1,1 @@
+export { GroupDetailMediaContent } from "./GroupDetailMediaContent"

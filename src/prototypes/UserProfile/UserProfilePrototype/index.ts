@@ -1,0 +1,1 @@
+export { UserProfilePrototype } from "./UserProfilePrototype"
