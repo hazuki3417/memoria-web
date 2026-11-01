@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
-import { GroupBrowser, type GroupBrowserGroup } from "./GroupBrowser"
+import { GroupBrowser, type GroupBrowserGroup } from ".././GroupBrowser"
 
 const fixtures: GroupBrowserGroup[] = [
   {

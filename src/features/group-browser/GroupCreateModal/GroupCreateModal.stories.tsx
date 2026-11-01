@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
-import { GroupCreateModal } from "./GroupCreateModal"
+import { GroupCreateModal } from ".././GroupCreateModal"
 
 const meta = {
   title: "Features/Group Browser/Create Modal",

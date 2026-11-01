@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, within } from "storybook/test"
-import { Dashboard } from "./Dashboard"
+import { Dashboard } from ".././Dashboard"
 
 const image = "/__dev-assets/media-browser/h-01.png"
 

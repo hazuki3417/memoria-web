@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { GroupDetailPane } from "./GroupDetailPane"
-import { GroupRelationSection } from "./GroupRelationSection"
-import { GroupRelationCandidateFeedback } from "./GroupRelationCandidateFeedback"
-import { GroupMediaPageFeedback } from "./GroupMediaPageFeedback"
+import { GroupDetailPane } from ".././GroupDetailPane"
+import { GroupRelationSection } from ".././GroupRelationSection"
+import { GroupRelationCandidateFeedback } from ".././GroupRelationCandidateFeedback"
+import { GroupMediaPageFeedback } from ".././GroupMediaPageFeedback"
 
 // Direct right-pane review: uses the real extracted Feature component, without the left discovery pane.
 // The `vrt` tag remains absent until visual review is complete.

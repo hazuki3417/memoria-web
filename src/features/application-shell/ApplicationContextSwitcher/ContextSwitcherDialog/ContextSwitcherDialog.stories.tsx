@@ -1,7 +1,6 @@
-import { Box, Button } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { fn } from "storybook/test"
-import { ContextSwitcherMenu } from "./ContextSwitcherMenu"
+import { ContextSwitcherDialog } from ".././ContextSwitcherDialog"
 
 const personal = {
   id: "personal",
@@ -22,18 +21,12 @@ const travel = {
   accentColor: "var(--mantine-color-violet-6)",
 }
 const meta = {
-  title: "Features/Application Shell/Context Switcher/Menu",
-  component: ContextSwitcherMenu,
+  title: "Features/Application Shell/Context Switcher/Dialog",
+  component: ContextSwitcherDialog,
+  parameters: { layout: "fullscreen" },
   args: {
     opened: true,
-    onOpenedChange: fn(),
-    trigger: (
-      <Box p="sm">
-        <Button variant="subtle" color="gray" size="compact-sm">
-          Personal
-        </Button>
-      </Box>
-    ),
+    onClose: fn(),
     currentContext: personal,
     contexts: [personal, family, travel],
     search: "",
@@ -44,30 +37,30 @@ const meta = {
     loading: false,
     error: false,
   },
-} satisfies Meta<typeof ContextSwitcherMenu>
+} satisfies Meta<typeof ContextSwitcherDialog>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {
   name: "Visual · Context一覧",
-  tags: ["visual", "vrt", "vrt-menu"],
+  tags: ["visual", "vrt", "vrt-modal"],
 }
 export const Community: Story = {
   name: "Visual · Community選択中",
-  tags: ["visual", "vrt", "vrt-menu"],
+  tags: ["visual", "vrt", "vrt-modal"],
   args: { currentContext: family },
 }
 export const Empty: Story = {
   name: "Visual · Communityなし",
-  tags: ["visual", "vrt", "vrt-menu"],
+  tags: ["visual", "vrt", "vrt-modal"],
   args: { contexts: [personal] },
 }
 export const Loading: Story = {
   name: "Visual · 初期取得中",
-  tags: ["visual", "vrt", "vrt-menu"],
+  tags: ["visual", "vrt", "vrt-modal"],
   args: { contexts: [personal], loading: true },
 }
 export const Error: Story = {
   name: "Visual · 取得失敗",
-  tags: ["visual", "vrt", "vrt-menu"],
+  tags: ["visual", "vrt", "vrt-modal"],
   args: { error: true },
 }
