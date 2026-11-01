@@ -21,11 +21,11 @@ export function MediaGroupTile({ sources = [] }: { sources?: string[] }) {
         overflow: "hidden",
       }}
     >
-      {Array.from({ length: 3 }, (_, index) => {
+      {(["main", "top", "bottom"] as const).map((slot, index) => {
         const source = sources[index]
         return (
           <Box
-            key={["main", "top", "bottom"][index]}
+            key={slot}
             style={{
               gridRow: index === 0 ? "1 / 3" : undefined,
               position: "relative",
