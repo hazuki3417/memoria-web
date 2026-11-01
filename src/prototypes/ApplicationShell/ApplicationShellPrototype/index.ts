@@ -1,0 +1,1 @@
+export { ApplicationShellPrototype } from "./ApplicationShellPrototype"

@@ -1,0 +1,1 @@
+export { AccountRegistrationPrototype } from "./AccountRegistrationPrototype"
