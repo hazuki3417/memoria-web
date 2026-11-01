@@ -19,7 +19,7 @@ export function GroupPreviewGrid({
   let groupCellIndex = 0
   return (
     <SimpleGrid cols={2} spacing={4}>
-      {Array.from({ length: 4 }, (_, index) => {
+      {(["top-left", "top-right", "bottom-left", "bottom-right"] as const).map((slot, index) => {
         const src = index < directMediaCount ? directMedia[index] : undefined
         const groupCell = index >= directMediaCount || !src
         const groupSources = groupCell
@@ -27,7 +27,7 @@ export function GroupPreviewGrid({
           : []
         return (
           <Box
-            key={["top-left", "top-right", "bottom-left", "bottom-right"][index]}
+            key={slot}
             bdrs="sm"
             style={{
               position: "relative",
