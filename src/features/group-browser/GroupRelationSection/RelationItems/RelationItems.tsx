@@ -1,4 +1,4 @@
-"import { Badge, Group, Text } from "@mantine/core"
+import { Badge, Group, Text } from "@mantine/core"
 
 export function RelationItems({ names }: { names: string[] }) {
   if (names.length === 0) {
