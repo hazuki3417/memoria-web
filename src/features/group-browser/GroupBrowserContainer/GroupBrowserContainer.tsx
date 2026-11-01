@@ -109,7 +109,7 @@ export function GroupBrowserContainer({
       candidateRetryingId === selectedId
     )
       return
-    const requestKey = selectedId + ":" + candidateCursor
+    const requestKey = `${selectedId}:${candidateCursor}`
     if (candidatePageInFlight.current === requestKey) return
     candidatePageInFlight.current = requestKey
     void candidateQuery
@@ -160,7 +160,7 @@ export function GroupBrowserContainer({
       ? detailData.mediaGroup.aggregateMedia.pageInfo.endCursor
       : null
   const mediaPageKey =
-    selectedId && mediaCursor ? selectedId + ":" + mediaCursor : null
+    selectedId && mediaCursor ? `${selectedId}:${mediaCursor}` : null
   const [mediaPageFailedKey, setMediaPageFailedKey] = useState<string | null>(
     null,
   )
@@ -441,7 +441,7 @@ export function GroupBrowserContainer({
         })
       // The Group and all relations are created in one server transaction.
       // No follow-up Update mutation or automatic retry is allowed.
-      let created
+      let created: Awaited<ReturnType<typeof createGroup>>
       try {
         created = await createGroup({
           variables: {
