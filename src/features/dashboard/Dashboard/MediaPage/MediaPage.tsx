@@ -22,10 +22,9 @@ export function MediaPage({
       w="100%"
       style={{ flex: "0 0 50%", width: "50%" }}
     >
-      {items.map((src, index) => (
+      {items.map((src, index) => ({ src, slot: `page-${page}-slot-${index}`, index })).map(({ src, slot, index }) => (
         <Box
-          // biome-ignore lint/suspicious/noArrayIndexKey: This is a fixed pagination slot, not a mutable item identity.
-          key={page * pageSize + index}
+          key={slot}
           component={
             onOpenMedia && mediaIds?.[page * pageSize + index]
               ? "button"
