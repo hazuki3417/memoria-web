@@ -1,5 +1,5 @@
 import { Box, Image, SimpleGrid } from "@mantine/core"
-import { media } from "../dashboardPrototypeData"
+import type { media } from "../dashboardPrototypeData"
 
 export function MediaPage({
   items,
