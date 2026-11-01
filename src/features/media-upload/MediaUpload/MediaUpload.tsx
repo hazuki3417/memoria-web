@@ -246,21 +246,6 @@ const fixtures: Record<
   ],
 }
 
-const contexts = {
-  personal: {
-    id: "personal",
-    kind: "personal" as const,
-    label: "Personal",
-    accentColor: "var(--mantine-color-blue-6)",
-  },
-  community: {
-    id: "community",
-    kind: "community" as const,
-    label: "家族のアルバム",
-    accentColor: "var(--mantine-color-teal-6)",
-  },
-}
-
 const selectableStatuses: FileStatus[] = ["ready", "upload-failed"]
 const removableStatuses: FileStatus[] = [
   "ready",
