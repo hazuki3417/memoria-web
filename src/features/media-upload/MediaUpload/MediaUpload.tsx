@@ -1,30 +1,22 @@
 "use client"
 
 import { UploadStatus } from "./UploadStatus"
-import { statusPresentation, type UploadFile, type FileStatus } from "./uploadStatusModels"
+import type { UploadFile, FileStatus } from "./uploadStatusModels"
 
 import { useRouter } from "next/navigation"
 
 import {
-  Badge,
   Box,
   Button,
   Group,
   Modal,
   Paper,
-  Popover,
   Stack,
   Text,
   ThemeIcon,
 } from "@mantine/core"
 import {
-  IconAlertCircle,
-  IconCheck,
-  IconClock,
-  IconCloudUpload,
-  IconHelpCircle,
   IconPhotoPlus,
-  IconRefresh,
   IconTrash,
 } from "@tabler/icons-react"
 import { useRef, useState } from "react"
