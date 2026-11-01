@@ -387,7 +387,6 @@ export function MediaUpload({
     setSending(false)
     setSelectedIds([])
   }
-  const currentContext = contexts[context]
 
   const selectableFiles = files.filter((file) =>
     selectableStatuses.includes(file.status),
