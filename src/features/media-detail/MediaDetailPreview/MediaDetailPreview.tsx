@@ -321,7 +321,7 @@ export function MediaDetailPreview(props: MediaDetailPreviewProps) {
                 zoom={detailZoom}
                 setZoom={setDetailZoom}
               />
-          )
+          )}
           <ActionIcon
             variant={detailInfoOpened ? "light" : "subtle"}
             aria-label={detailInfoOpened ? "情報を閉じる" : "情報を開く"}
