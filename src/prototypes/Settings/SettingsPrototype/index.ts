@@ -1,0 +1,1 @@
+export { SettingsPrototype } from "./SettingsPrototype"
