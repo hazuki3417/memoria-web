@@ -75,7 +75,7 @@ export function MediaDetailUrlProvider({ children }: { children: ReactNode }) {
     syncUrl()
     window.addEventListener("popstate", syncUrl)
     return () => window.removeEventListener("popstate", syncUrl)
-  }, [pathname])
+  }, [])
 
   const openMediaDetail = useCallback(
     (input: { mediaId: string; orderedLoadedMediaIds: readonly string[] }) => {
