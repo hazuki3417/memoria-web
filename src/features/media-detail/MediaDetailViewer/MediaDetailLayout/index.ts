@@ -1,0 +1,1 @@
+export { MediaDetailLayout } from "./MediaDetailLayout"

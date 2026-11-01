@@ -3,7 +3,7 @@
 import { ActionIcon, Slider } from "@mantine/core"
 import { IconZoomIn, IconZoomOut, IconZoomReset } from "@tabler/icons-react"
 import type { Dispatch, SetStateAction } from "react"
-import { ZoomInput } from "../ZoomInput"
+import { ZoomInput } from "../../ZoomInput"
 
 /** Exact zoom controls extracted from the existing MediaDetailPreview toolbar. */
 export function MediaDetailZoomControls({

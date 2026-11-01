@@ -19,7 +19,7 @@ import {
   mediaDetailUrl,
   type MediaNavigationSnapshot,
   type MediaDetailNavigation,
-} from "./mediaDetailNavigation"
+} from ".././mediaDetailNavigation"
 
 type ActiveSession = {
   token: string
