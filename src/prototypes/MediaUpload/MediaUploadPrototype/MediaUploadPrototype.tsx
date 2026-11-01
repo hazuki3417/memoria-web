@@ -1,5 +1,8 @@
 "use client"
 
+import { UploadStatus } from "./UploadStatus"
+import type { FileStatus, UploadFile } from "./uploadPrototypeStatus"
+
 import {
   Box as ScrollPaddingBox,
   ScrollArea as PageScrollArea,
@@ -51,26 +54,6 @@ export type UploadScenario =
   | "processing-failure"
   | "leave-confirmation"
   | "leave-uploading-confirmation"
-
-type FileStatus =
-  | "ready"
-  | "validation-error"
-  | "uploading"
-  | "upload-failed"
-  | "upload-rejected"
-  | "result-unknown"
-  | "processing"
-  | "completed"
-  | "processing-failed"
-
-type UploadFile = {
-  id: string
-  name: string
-  size: string
-  status: FileStatus
-  reason?: string
-  tags: string[]
-}
 
 const fixtures: Record<
   Exclude<
@@ -273,41 +256,6 @@ const fixtures: Record<
       tags: [],
     },
   ],
-}
-
-const statusPresentation: Record<
-  FileStatus,
-  { label: string; color: string; icon: typeof IconCheck }
-> = {
-  ready: { label: "準備完了", color: "gray", icon: IconClock },
-  "validation-error": {
-    label: "アップロード不可",
-    color: "red",
-    icon: IconAlertCircle,
-  },
-  uploading: { label: "アップロード中", color: "blue", icon: IconCloudUpload },
-  "upload-failed": {
-    label: "アップロード失敗",
-    color: "red",
-    icon: IconAlertCircle,
-  },
-  "upload-rejected": {
-    label: "アップロード不可",
-    color: "red",
-    icon: IconAlertCircle,
-  },
-  "result-unknown": {
-    label: "結果を確認中",
-    color: "yellow",
-    icon: IconHelpCircle,
-  },
-  processing: { label: "画像処理中", color: "blue", icon: IconClock },
-  completed: { label: "完了", color: "green", icon: IconCheck },
-  "processing-failed": {
-    label: "画像処理失敗",
-    color: "red",
-    icon: IconAlertCircle,
-  },
 }
 
 const contexts = {
@@ -679,56 +627,3 @@ export function MediaUploadPrototype({
   )
 }
 
-function UploadStatus({ file }: { file: UploadFile }) {
-  const presentation = statusPresentation[file.status]
-  const StatusIcon = presentation.icon
-  const badge = (
-    <Badge
-      variant="light"
-      color={presentation.color}
-      leftSection={<StatusIcon size={12} />}
-      style={{ cursor: file.reason ? "pointer" : undefined }}
-    >
-      {presentation.label}
-    </Badge>
-  )
-
-  return (
-    <Group gap={4} wrap="nowrap" style={{ flex: "0 0 auto" }}>
-      {file.reason ? (
-        <Popover width={300} position="bottom-start" withArrow shadow="md">
-          <Popover.Target>
-            <Box
-              component="button"
-              type="button"
-              p={0}
-              bg="transparent"
-              style={{ border: 0, cursor: "pointer" }}
-            >
-              {badge}
-            </Box>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <Stack gap={4}>
-              <Text size="sm" fw={600}>
-                {presentation.label}
-              </Text>
-              <Text size="sm">{file.reason}</Text>
-            </Stack>
-          </Popover.Dropdown>
-        </Popover>
-      ) : (
-        badge
-      )}
-      {file.status === "upload-failed" && (
-        <Badge
-          variant="outline"
-          color="gray"
-          leftSection={<IconRefresh size={12} />}
-        >
-          再試行可能
-        </Badge>
-      )}
-    </Group>
-  )
-}
