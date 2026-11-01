@@ -8,7 +8,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 import { Dashboard, type DashboardGroup } from "../../Dashboard"
 import { useMediaDetailUrl } from "@/features/media-detail/MediaDetailUrlProvider"
-import { selectDashboardThumbnail } from "../../../selectDashboardThumbnail"
+import { selectDashboardThumbnail } from "../../selectDashboardThumbnail"
 
 export function ScopedDashboard({
   contextKind,
