@@ -79,7 +79,7 @@ export function useMediaUpdateDraft(
       }),
     )
     setStatus("idle")
-  }, [scope, targets]
+  }, [scope, targets])
   useEffect(() => {
     void load().catch(() => setStatus("load-failure"))
   }, [load])
