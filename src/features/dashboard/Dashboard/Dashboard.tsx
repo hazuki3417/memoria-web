@@ -64,8 +64,7 @@ export function Dashboard({
   const noGroups = empty || (groupState === "ready" && groups.length === 0)
 
   return (
-    <>
-      <Stack gap="xl" w="100%">
+    <Stack gap="xl" w="100%">
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="nowrap">
             <Title order={3} size="h4">
@@ -129,7 +128,6 @@ export function Dashboard({
             <RecentGroups groups={groups} />
           )}
         </Stack>
-      </Stack>
-    </>
+    </Stack>
   )
 }

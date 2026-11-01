@@ -27,7 +27,7 @@ export function GroupPreviewGrid({
           : []
         return (
           <Box
-            key={index}
+            key={["top-left", "top-right", "bottom-left", "bottom-right"][index]}
             bdrs="sm"
             style={{
               position: "relative",

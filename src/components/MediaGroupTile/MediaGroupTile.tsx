@@ -25,7 +25,7 @@ export function MediaGroupTile({ sources = [] }: { sources?: string[] }) {
         const source = sources[index]
         return (
           <Box
-            key={index}
+            key={["main", "top", "bottom"][index]}
             style={{
               gridRow: index === 0 ? "1 / 3" : undefined,
               position: "relative",

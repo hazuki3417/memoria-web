@@ -24,6 +24,7 @@ export function MediaPage({
     >
       {items.map((src, index) => (
         <Box
+          // biome-ignore lint/suspicious/noArrayIndexKey: This is a fixed pagination slot, not a mutable item identity.
           key={page * pageSize + index}
           component={
             onOpenMedia && mediaIds?.[page * pageSize + index]

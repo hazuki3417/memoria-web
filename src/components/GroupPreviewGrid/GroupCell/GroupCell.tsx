@@ -18,7 +18,7 @@ export function GroupCell({ sources }: { sources: string[] }) {
     >
       {Array.from({ length: 3 }, (_, index) => (
         <Box
-          key={index}
+          key={["main", "top", "bottom"][index]}
           style={{
             gridRow: index === 0 ? "1 / 3" : undefined,
             ...(sources[index]

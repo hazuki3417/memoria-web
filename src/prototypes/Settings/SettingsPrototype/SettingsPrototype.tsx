@@ -116,7 +116,6 @@ export function SettingsPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <>
         <SettingsLayout section={section} onSectionChange={setSection}>
           {content}
         </SettingsLayout>
@@ -131,7 +130,6 @@ export function SettingsPrototype({
         >
           現在の設定: {currentLabel}
         </Text>
-      </>
     </PrototypeApplicationShell>
   )
 }

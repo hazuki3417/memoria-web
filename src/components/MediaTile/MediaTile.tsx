@@ -2,7 +2,7 @@
 
 import { TileMessage } from "./TileMessage"
 
-import { Box, Center, Loader, Stack, Text } from "@mantine/core"
+import { Box, Loader, Text } from "@mantine/core"
 import { IconPhotoOff, IconRefresh } from "@tabler/icons-react"
 import { useState, type ReactNode } from "react"
 

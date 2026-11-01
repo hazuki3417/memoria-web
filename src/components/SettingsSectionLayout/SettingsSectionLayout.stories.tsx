@@ -26,7 +26,7 @@ export const Compact: Story = { args: { compact: true }, tags: ["visual"] }
 const longContent = (
   <Box p="md">
     {Array.from({ length: 30 }, (_, i) => (
-      <Text key={i} py="xs">
+      <Text key={`setting-row-${i}`} py="xs">
         設定コンテンツ {i + 1}
       </Text>
     ))}
