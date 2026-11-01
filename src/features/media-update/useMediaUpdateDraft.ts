@@ -37,9 +37,6 @@ export function useMediaUpdateDraft(
   const [items, setItems] = useState<LoadedItem[]>([])
   const [status, setStatus] = useState<SaveStatus>("loading")
   const [catalog, setCatalog] = useState<MediaTagRecord[]>([])
-  const scopeKey =
-    scope.type === "PERSONAL" ? "personal" : `community:${scope.communityId}`
-  const idsKey = targets.map((target) => target.id).join(",")
   const load = useCallback(async () => {
     setStatus("loading")
     if (targets.length === 0) {
@@ -82,9 +79,7 @@ export function useMediaUpdateDraft(
       }),
     )
     setStatus("idle")
-    // Only reload when the selected target IDs or Scope change.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idsKey, scopeKey])
+  }, [scope, targets]
   useEffect(() => {
     void load().catch(() => setStatus("load-failure"))
   }, [load])
@@ -139,7 +134,7 @@ export function useMediaUpdateDraft(
       )
       setStatus("idle")
     },
-    [scopeKey],
+    [scope],
   )
   const save = useCallback(async () => {
     if (status === "saving") return
