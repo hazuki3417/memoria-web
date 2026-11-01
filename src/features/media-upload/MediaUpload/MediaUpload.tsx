@@ -336,6 +336,7 @@ export function MediaUpload({
     if (targets.length === 0 || sending) return
     setSending(true)
     await uploadMediaBatch(targets, async (item) => {
+      if (!item.original || !item.idempotencyKey) return
       setFiles((current) =>
         current.map((file) =>
           file.id === item.id
@@ -345,11 +346,11 @@ export function MediaUpload({
       )
       try {
         await uploadMedia(
-          item.original!,
+          item.original,
           context === "personal"
             ? { scopeType: "PERSONAL" }
             : { scopeType: "COMMUNITY", communityId },
-          item.idempotencyKey!,
+          item.idempotencyKey,
         )
         setFiles((current) =>
           current.map((file) =>
