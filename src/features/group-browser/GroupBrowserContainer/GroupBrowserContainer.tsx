@@ -473,6 +473,7 @@ export function GroupBrowserContainer({
             "一覧の更新に失敗しました。画面を再読み込みして確認してください。",
         })
       })
+      return undefined
     },
     [scope, createGroup, nameToId, refetch],
   )
@@ -540,6 +541,7 @@ export function GroupBrowserContainer({
         }
         throw error
       }
+      return undefined
     },
     [
       allGroups,
