@@ -30,8 +30,10 @@ export const Processing: Story = {
   name: "Visual · Processing",
   args: { state: { status: "processing" } },
 }
-// biome-ignore lint/suspicious/noShadowRestrictedNames: Preserve existing Storybook story ID and visual regression references.
-export const Error: Story = {
+const ErrorState: Story = {
   name: "Visual · Error",
   args: { state: { status: "error" } },
 }
+
+// Keep the existing Storybook export name and VRT story ID.
+export { ErrorState as Error }
