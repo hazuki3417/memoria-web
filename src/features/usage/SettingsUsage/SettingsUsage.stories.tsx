@@ -225,10 +225,14 @@ export const LoadingContract: Story = {
   args: { status: "loading" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByRole("status", { name: "利用状況を読み込み中" })).toBeVisible()
+    await expect(
+      await canvas.findByRole("status", { name: "利用状況を読み込み中" }),
+    ).toBeVisible()
     await expect(canvas.queryByText("1.24 GB")).not.toBeInTheDocument()
     await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
-    await expect(canvas.queryByRole("button", { name: "再試行" })).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByRole("button", { name: "再試行" }),
+    ).not.toBeInTheDocument()
   },
 }
 
@@ -317,7 +321,6 @@ export const DisplayModeSwitchContract: Story = {
   },
 }
 
-
 export const DisplayModeLifetimeContract: Story = {
   name: "Interaction · 表示モードの初期値とscope間独立",
   tags: ["interaction"],
@@ -370,7 +373,6 @@ export const VrtCommunity: Story = {
   tags: ["visual", "vrt"],
   args: { scope: "community" },
 }
-
 
 export const PercentDenominatorContract: Story = {
   name: "Interaction · 上限を分母とする割合表示",
@@ -468,7 +470,9 @@ export const CommunityErrorContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("alert")).toBeVisible()
-    await expect(canvas.queryByRole("button", { name: "再試行" })).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByRole("button", { name: "再試行" }),
+    ).not.toBeInTheDocument()
     await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
   },
 }

@@ -1,4 +1,9 @@
-import { IconAlertCircle, IconAlertTriangle, IconCheck, IconInfoCircle } from "@tabler/icons-react"
+import {
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconCheck,
+  IconInfoCircle,
+} from "@tabler/icons-react"
 
 export type FeedbackKind = "success" | "info" | "warning" | "error"
 
@@ -23,4 +28,3 @@ export function feedbackAppearance(kind: FeedbackKind) {
     backgroundColor: `color-mix(in srgb, var(--mantine-color-${color}-6) 7%, var(--mantine-color-body))`,
   }
 }
-

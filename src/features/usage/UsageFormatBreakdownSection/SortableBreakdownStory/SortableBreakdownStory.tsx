@@ -1,6 +1,11 @@
 import { useState, type ComponentProps } from "react"
 import { UsageFormatBreakdownSection } from "../UsageFormatBreakdownSection"
-import { defaultUsageSort, nextUsageSort, type UsageSort, type UsageSortKey } from "../../sortUsageFormats"
+import {
+  defaultUsageSort,
+  nextUsageSort,
+  type UsageSort,
+  type UsageSortKey,
+} from "../../sortUsageFormats"
 
 export function SortableBreakdownStory(
   props: Omit<

@@ -16,7 +16,13 @@ const meta = {
       { id: "user-2", name: "家族メンバー", role: "member" },
     ],
   },
-  decorators: [(Story) => <Box h={600}><Story /></Box>],
+  decorators: [
+    (Story) => (
+      <Box h={600}>
+        <Story />
+      </Box>
+    ),
+  ],
 } satisfies Meta<typeof CommunitySettings>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -33,7 +39,10 @@ export const NameEdited: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.clear(canvas.getByRole("textbox", { name: /Community名/ }))
-    await userEvent.type(canvas.getByRole("textbox", { name: /Community名/ }), "新しいCommunity名")
+    await userEvent.type(
+      canvas.getByRole("textbox", { name: /Community名/ }),
+      "新しいCommunity名",
+    )
     await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
   },
 }
@@ -44,7 +53,9 @@ export const NameInvalid: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.clear(canvas.getByRole("textbox", { name: /Community名/ }))
-    await expect(canvas.getByText("Community名を入力してください")).toBeVisible()
+    await expect(
+      canvas.getByText("Community名を入力してください"),
+    ).toBeVisible()
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
@@ -70,7 +81,11 @@ export const NameReadOnly: Story = {
   args: { role: "member" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toBeDisabled()
-    await expect(canvas.queryByRole("button", { name: "保存" })).not.toBeInTheDocument()
+    await expect(
+      canvas.getByRole("textbox", { name: /Community名/ }),
+    ).toBeDisabled()
+    await expect(
+      canvas.queryByRole("button", { name: "保存" }),
+    ).not.toBeInTheDocument()
   },
 }

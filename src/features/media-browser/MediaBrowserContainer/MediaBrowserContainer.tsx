@@ -360,8 +360,7 @@ export function MediaBrowserContainer({
     processing: node.processing?.status === "PROCESSING",
   }))
   const nextCursor = page?.pageInfo.hasNextPage ? page.pageInfo.endCursor : null
-  const requestKey =
-    `${scopeKey}:${selectedTagIds.join(",")}:${nextCursor ?? ""}`
+  const requestKey = `${scopeKey}:${selectedTagIds.join(",")}:${nextCursor ?? ""}`
   const loadMore = useCallback(async () => {
     if (!nextCursor || query.loading || pageInFlight.current === requestKey)
       return
@@ -404,8 +403,7 @@ export function MediaBrowserContainer({
           {tagError.message}
         </Alert>
       )}
-      {(tagQuery.error ||
-        (tagPageFailedKey?.startsWith(`${scopeKey}:`))) && (
+      {(tagQuery.error || tagPageFailedKey?.startsWith(`${scopeKey}:`)) && (
         <Alert color="red" title="Tagを読み込めませんでした" role="alert">
           <Group justify="space-between">
             <Text size="sm">通信状態を確認して再度お試しください。</Text>

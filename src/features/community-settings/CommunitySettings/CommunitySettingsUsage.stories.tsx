@@ -19,7 +19,13 @@ const meta = {
     ],
     usageContent: <SettingsUsage scope="community" usage={sampleUsage} />,
   },
-  decorators: [(Story) => <Box h={600}><Story /></Box>],
+  decorators: [
+    (Story) => (
+      <Box h={600}>
+        <Story />
+      </Box>
+    ),
+  ],
 } satisfies Meta<typeof CommunitySettings>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -30,7 +36,11 @@ export const Usage: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("table")).toBeVisible()
-    await expect(canvas.getByText("このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
+    await expect(
+      canvas.getByText(
+        "このCommunityが管理する登録済みオリジナルファイルの使用状況を確認します。",
+      ),
+    ).toBeVisible()
   },
 }
 
@@ -44,7 +54,9 @@ export const ErrorState: Story = {
   name: "Visual · 取得失敗",
   tags: ["visual"],
   args: {
-    usageContent: <SettingsUsage scope="community" usage={sampleUsage} status="error" />,
+    usageContent: (
+      <SettingsUsage scope="community" usage={sampleUsage} status="error" />
+    ),
   },
 }
 
@@ -52,6 +64,8 @@ export const LoadingState: Story = {
   name: "Visual · 読み込み中",
   tags: ["visual"],
   args: {
-    usageContent: <SettingsUsage scope="community" usage={sampleUsage} status="loading" />,
+    usageContent: (
+      <SettingsUsage scope="community" usage={sampleUsage} status="loading" />
+    ),
   },
 }

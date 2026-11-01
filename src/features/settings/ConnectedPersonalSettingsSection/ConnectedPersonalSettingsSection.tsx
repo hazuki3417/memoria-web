@@ -17,9 +17,12 @@ export function ConnectedPersonalSettingsSection({
   const { data, loading, error } = useCurrentUserQuery()
   useSettingsRefreshError(Boolean(data?.me && error))
   const accountState = !data?.me ? (loading ? "loading" : "error") : "ready"
-  const accountContent = section === "account" && accountState !== "ready"
-    ? <PageStatusBoundary state={accountState} label="Personal設定を読み込み中">{null}</PageStatusBoundary>
-    : undefined
+  const accountContent =
+    section === "account" && accountState !== "ready" ? (
+      <PageStatusBoundary state={accountState} label="Personal設定を読み込み中">
+        {null}
+      </PageStatusBoundary>
+    ) : undefined
   return (
     <Settings
       section={section}

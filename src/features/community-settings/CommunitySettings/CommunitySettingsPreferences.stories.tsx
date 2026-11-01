@@ -15,7 +15,13 @@ const meta = {
       { id: "user-2", name: "家族メンバー", role: "member" },
     ],
   },
-  decorators: [(Story) => <Box h={600}><Story /></Box>],
+  decorators: [
+    (Story) => (
+      <Box h={600}>
+        <Story />
+      </Box>
+    ),
+  ],
 } satisfies Meta<typeof CommunitySettings>
 export default meta
 type Story = StoryObj<typeof meta>

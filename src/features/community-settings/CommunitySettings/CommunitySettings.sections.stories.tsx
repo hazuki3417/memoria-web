@@ -16,7 +16,13 @@ const meta = {
       { id: "user-2", name: "家族メンバー", role: "member" },
     ],
   },
-  decorators: [(Story) => <Box h={600}><Story /></Box>],
+  decorators: [
+    (Story) => (
+      <Box h={600}>
+        <Story />
+      </Box>
+    ),
+  ],
 } satisfies Meta<typeof CommunitySettings>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -50,11 +56,15 @@ export const RemoveMemberSuccessContract: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const page = within(canvasElement.ownerDocument.body)
-    await userEvent.click(canvas.getByRole("button", { name: "家族メンバーの管理操作" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "家族メンバーの管理操作" }),
+    )
     await userEvent.click(await page.findByText("除外", { exact: true }))
     await userEvent.click(await page.findByRole("button", { name: "除外する" }))
     await expect(args.onRemoveMember).toHaveBeenCalledWith("user-2")
-    await expect(page.queryByRole("dialog", { name: "メンバーを除外" })).not.toBeInTheDocument()
+    await expect(
+      page.queryByRole("dialog", { name: "メンバーを除外" }),
+    ).not.toBeInTheDocument()
   },
 }
 
@@ -65,11 +75,15 @@ export const RemoveMemberFailureContract: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const page = within(canvasElement.ownerDocument.body)
-    await userEvent.click(canvas.getByRole("button", { name: "家族メンバーの管理操作" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "家族メンバーの管理操作" }),
+    )
     await userEvent.click(await page.findByText("除外", { exact: true }))
     await userEvent.click(await page.findByRole("button", { name: "除外する" }))
     await expect(args.onRemoveMember).toHaveBeenCalledWith("user-2")
-    await expect(page.getByRole("dialog", { name: "メンバーを除外" })).toBeVisible()
+    await expect(
+      page.getByRole("dialog", { name: "メンバーを除外" }),
+    ).toBeVisible()
   },
 }
 
@@ -80,12 +94,21 @@ export const MemberRoleChangeContract: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const page = within(canvasElement.ownerDocument.body)
-    await userEvent.click(canvas.getByRole("button", { name: "家族メンバーの管理操作" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "家族メンバーの管理操作" }),
+    )
     await userEvent.click(await page.findByText("役割を変更", { exact: true }))
     const dialog = await page.findByRole("dialog", { name: "役割を変更" })
-    await userEvent.click(within(dialog).getByRole("radio", { name: /Administrator/ }))
-    await userEvent.click(within(dialog).getByRole("button", { name: "変更する" }))
-    await expect(args.onChangeMemberRole).toHaveBeenCalledWith("user-2", "admin")
+    await userEvent.click(
+      within(dialog).getByRole("radio", { name: /Administrator/ }),
+    )
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "変更する" }),
+    )
+    await expect(args.onChangeMemberRole).toHaveBeenCalledWith(
+      "user-2",
+      "admin",
+    )
   },
 }
 
@@ -98,14 +121,22 @@ export const LeaveFailureContract: Story = {
       { id: "user-1", name: "テストユーザー", role: "admin", isSelf: true },
       { id: "user-2", name: "家族メンバー", role: "admin" },
     ],
-    onLeaveCommunity: fn(async () => { throw new Error("network") }),
+    onLeaveCommunity: fn(async () => {
+      throw new Error("network")
+    }),
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const page = within(canvasElement.ownerDocument.body)
-    await userEvent.click(canvas.getByRole("button", { name: "Communityから退会する" }))
-    const dialog = await page.findByRole("dialog", { name: "Communityから退会" })
-    await userEvent.click(within(dialog).getByRole("button", { name: "退会する" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityから退会する" }),
+    )
+    const dialog = await page.findByRole("dialog", {
+      name: "Communityから退会",
+    })
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "退会する" }),
+    )
     await expect(await within(dialog).findByRole("alert")).toBeVisible()
   },
 }
@@ -117,12 +148,21 @@ export const MemberRoleChangeFailureContract: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const page = within(canvasElement.ownerDocument.body)
-    await userEvent.click(canvas.getByRole("button", { name: "家族メンバーの管理操作" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "家族メンバーの管理操作" }),
+    )
     await userEvent.click(await page.findByText("役割を変更", { exact: true }))
     const dialog = await page.findByRole("dialog", { name: "役割を変更" })
-    await userEvent.click(within(dialog).getByRole("radio", { name: /Administrator/ }))
-    await userEvent.click(within(dialog).getByRole("button", { name: "変更する" }))
-    await expect(args.onChangeMemberRole).toHaveBeenCalledWith("user-2", "admin")
+    await userEvent.click(
+      within(dialog).getByRole("radio", { name: /Administrator/ }),
+    )
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "変更する" }),
+    )
+    await expect(args.onChangeMemberRole).toHaveBeenCalledWith(
+      "user-2",
+      "admin",
+    )
     await expect(dialog).toBeVisible()
   },
 }
@@ -142,9 +182,15 @@ export const LeaveSuccessContract: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const page = within(canvasElement.ownerDocument.body)
-    await userEvent.click(canvas.getByRole("button", { name: "Communityから退会する" }))
-    const dialog = await page.findByRole("dialog", { name: "Communityから退会" })
-    await userEvent.click(within(dialog).getByRole("button", { name: "退会する" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityから退会する" }),
+    )
+    const dialog = await page.findByRole("dialog", {
+      name: "Communityから退会",
+    })
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "退会する" }),
+    )
     await expect(args.onLeaveCommunity).toHaveBeenCalledOnce()
     await expect(args.onLeaveSuccess).toHaveBeenCalledOnce()
   },

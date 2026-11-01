@@ -28,4 +28,3 @@ export function SectionFeedback({
     </Center>
   )
 }
-

@@ -12,7 +12,13 @@ const meta = {
     saveProfile: fn(async () => undefined),
     usageContent: <Text>利用状況の表示領域</Text>,
   },
-  decorators: [(Story) => <Box maw={760} p="md"><Story /></Box>],
+  decorators: [
+    (Story) => (
+      <Box maw={760} p="md">
+        <Story />
+      </Box>
+    ),
+  ],
 } satisfies Meta<typeof SettingsSectionContent>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -29,10 +35,13 @@ export const DeleteAccountEntry: Story = {
   args: { section: "account" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText("アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。")).toBeVisible()
-    await expect(canvas.getByRole("link", { name: "アカウントを削除する" })).toHaveAttribute(
-      "href",
-      "/settings/account/delete",
-    )
+    await expect(
+      canvas.getByText(
+        "アカウントと関連データを削除します。削除前に、対象データとCommunityへの影響を確認できます。",
+      ),
+    ).toBeVisible()
+    await expect(
+      canvas.getByRole("link", { name: "アカウントを削除する" }),
+    ).toHaveAttribute("href", "/settings/account/delete")
   },
 }

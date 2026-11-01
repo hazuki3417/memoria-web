@@ -1,6 +1,11 @@
 "use client"
 
-import { AccountDeletionFlow, type ReviewState, type CommunityScenario, type RetryOutcome } from "@/features/account-deletion/AccountDeletionFlow"
+import {
+  AccountDeletionFlow,
+  type ReviewState,
+  type CommunityScenario,
+  type RetryOutcome,
+} from "@/features/account-deletion/AccountDeletionFlow"
 import { PrototypeShell } from "./PrototypeShell"
 
 export function AccountDeletionImpactPrototype({

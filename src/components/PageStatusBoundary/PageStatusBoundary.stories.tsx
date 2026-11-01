@@ -12,7 +12,13 @@ const meta = {
     children: <Text>ページコンテンツ</Text>,
     delayMs: 0,
   },
-  decorators: [(Story) => <Box maw={760}><Story /></Box>],
+  decorators: [
+    (Story) => (
+      <Box maw={760}>
+        <Story />
+      </Box>
+    ),
+  ],
 } satisfies Meta<typeof PageStatusBoundary>
 
 export default meta
@@ -28,7 +34,9 @@ export const Loading: Story = {
   args: { state: "loading" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByRole("status", { name: "ページを読み込み中" })).toBeVisible()
+    await expect(
+      await canvas.findByRole("status", { name: "ページを読み込み中" }),
+    ).toBeVisible()
   },
 }
 export const LoadError: Story = {
@@ -38,7 +46,9 @@ export const LoadError: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("alert")).toBeVisible()
-    await expect(canvas.queryByRole("button", { name: "再試行" })).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByRole("button", { name: "再試行" }),
+    ).not.toBeInTheDocument()
   },
 }
 export const CustomMessage: Story = {

@@ -18,4 +18,3 @@ export function RelationItems({ names }: { names: string[] }) {
     </Group>
   )
 }
-

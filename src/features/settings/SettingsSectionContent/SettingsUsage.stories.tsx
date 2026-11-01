@@ -12,7 +12,13 @@ const meta = {
     section: "usage",
     usageContent: <SettingsUsage scope="personal" usage={sampleUsage} />,
   },
-  decorators: [(Story) => <Box maw={760} p="md"><Story /></Box>],
+  decorators: [
+    (Story) => (
+      <Box maw={760} p="md">
+        <Story />
+      </Box>
+    ),
+  ],
 } satisfies Meta<typeof SettingsSectionContent>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -23,7 +29,11 @@ export const Usage: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("table")).toBeVisible()
-    await expect(canvas.getByText("Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。")).toBeVisible()
+    await expect(
+      canvas.getByText(
+        "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
+      ),
+    ).toBeVisible()
   },
 }
 
@@ -37,7 +47,9 @@ export const ErrorState: Story = {
   name: "Visual · 取得失敗",
   tags: ["visual"],
   args: {
-    usageContent: <SettingsUsage scope="personal" usage={sampleUsage} status="error" />,
+    usageContent: (
+      <SettingsUsage scope="personal" usage={sampleUsage} status="error" />
+    ),
   },
 }
 
@@ -45,6 +57,8 @@ export const LoadingState: Story = {
   name: "Visual · 読み込み中",
   tags: ["visual"],
   args: {
-    usageContent: <SettingsUsage scope="personal" usage={sampleUsage} status="loading" />,
+    usageContent: (
+      <SettingsUsage scope="personal" usage={sampleUsage} status="loading" />
+    ),
   },
 }

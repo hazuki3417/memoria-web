@@ -151,7 +151,10 @@ export function ConnectedCommunityPreferences({
 
   if (!data?.community) {
     return (
-      <PageStatusBoundary state={loading ? "loading" : "error"} label="Community環境設定を読み込み中">
+      <PageStatusBoundary
+        state={loading ? "loading" : "error"}
+        label="Community環境設定を読み込み中"
+      >
         {null}
       </PageStatusBoundary>
     )

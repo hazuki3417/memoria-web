@@ -76,4 +76,3 @@ export const recentGroups = [
   },
   { name: "記録", media: [], nestedGroups: 4 },
 ]
-

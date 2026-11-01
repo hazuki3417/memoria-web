@@ -11,7 +11,13 @@ const meta = {
     profileNickname: "テストユーザー",
     saveProfile: fn(async () => undefined),
   },
-  decorators: [(Story) => <Box maw={760} p="md"><Story /></Box>],
+  decorators: [
+    (Story) => (
+      <Box maw={760} p="md">
+        <Story />
+      </Box>
+    ),
+  ],
 } satisfies Meta<typeof SettingsSectionContent>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -42,7 +48,9 @@ export const ProfileValidationContract: Story = {
     const canvas = within(canvasElement)
     await userEvent.clear(canvas.getByRole("textbox", { name: /ニックネーム/ }))
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
-    await expect(canvas.getByText("ニックネームを入力してください。")).toBeVisible()
+    await expect(
+      canvas.getByText("ニックネームを入力してください。"),
+    ).toBeVisible()
   },
 }
 
@@ -71,7 +79,11 @@ export const ProfileSaveFailed: Story = {
 export const ProfileSaveBlocked: Story = {
   name: "Interaction · 保存不可の状態",
   tags: ["interaction"],
-  args: { saveProfile: fn(async () => { throw { kind: "blocked" } }) },
+  args: {
+    saveProfile: fn(async () => {
+      throw { kind: "blocked" }
+    }),
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })

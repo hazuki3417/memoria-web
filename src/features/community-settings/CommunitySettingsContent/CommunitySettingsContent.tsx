@@ -2,7 +2,10 @@
 
 import type { Dispatch, ReactNode, SetStateAction } from "react"
 import { CommunityGeneralContent } from "../CommunityGeneralContent"
-import { CommunityMembersContent, type CommunityMember } from "../CommunityMembersContent"
+import {
+  CommunityMembersContent,
+  type CommunityMember,
+} from "../CommunityMembersContent"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { useCommunityNameSettings } from "../useCommunityNameSettings"
@@ -67,7 +70,10 @@ export function CommunitySettingsContent({
       return (
         <>
           {preferencesContent ?? (
-            <CommunityPreferencesContent accent={accent} setAccent={setAccent} />
+            <CommunityPreferencesContent
+              accent={accent}
+              setAccent={setAccent}
+            />
           )}
         </>
       )

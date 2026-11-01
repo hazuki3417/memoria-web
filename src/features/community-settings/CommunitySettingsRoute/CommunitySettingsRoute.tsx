@@ -24,7 +24,8 @@ export function CommunitySettingsRoute({
   usageContent?: ReactNode
 }) {
   const router = useRouter()
-  const { communityAccentColor, membershipLost } = useCommunitySettingsMembership(communityId, section)
+  const { communityAccentColor, membershipLost } =
+    useCommunitySettingsMembership(communityId, section)
   // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
   const requiresMembers = section === "members" || section === "general"
   const { name, members, loadError, membersError } = useCommunity({
@@ -33,8 +34,13 @@ export function CommunitySettingsRoute({
   const { onRemoveMember, onLeaveCommunity, onChangeMemberRole, onSaveName } =
     useCommunitySettingsActions(communityId)
 
-  const hasRequiredData = name !== null && (!requiresMembers || members !== null)
-  useSettingsRefreshError(Boolean(hasRequiredData && (loadError || (requiresMembers && membersError))))
+  const hasRequiredData =
+    name !== null && (!requiresMembers || members !== null)
+  useSettingsRefreshError(
+    Boolean(
+      hasRequiredData && (loadError || (requiresMembers && membersError)),
+    ),
+  )
 
   if (membershipLost)
     return (
@@ -53,7 +59,16 @@ export function CommunitySettingsRoute({
       communityId={communityId}
       communityAccentColor={communityAccentColor}
       communityName={name ?? undefined}
-      contentOverride={loadState !== "ready" ? <PageStatusBoundary state={loadState} label="Community設定を読み込み中">{null}</PageStatusBoundary> : undefined}
+      contentOverride={
+        loadState !== "ready" ? (
+          <PageStatusBoundary
+            state={loadState}
+            label="Community設定を読み込み中"
+          >
+            {null}
+          </PageStatusBoundary>
+        ) : undefined
+      }
       members={members ?? undefined}
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}

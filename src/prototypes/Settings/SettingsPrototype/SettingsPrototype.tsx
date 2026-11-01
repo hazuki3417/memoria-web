@@ -116,20 +116,20 @@ export function SettingsPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-        <SettingsLayout section={section} onSectionChange={setSection}>
-          {content}
-        </SettingsLayout>
-        <Text
-          pos="absolute"
-          style={{
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-          }}
-        >
-          現在の設定: {currentLabel}
-        </Text>
+      <SettingsLayout section={section} onSectionChange={setSection}>
+        {content}
+      </SettingsLayout>
+      <Text
+        pos="absolute"
+        style={{
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+          clip: "rect(0 0 0 0)",
+        }}
+      >
+        現在の設定: {currentLabel}
+      </Text>
     </PrototypeApplicationShell>
   )
 }

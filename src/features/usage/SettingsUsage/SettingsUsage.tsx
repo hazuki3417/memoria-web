@@ -42,7 +42,11 @@ export function SettingsUsage({
     setSort((current) => nextUsageSort(current, key))
   }
   if (status !== "ready") {
-    return <PageStatusBoundary state={status} label="利用状況を読み込み中">{null}</PageStatusBoundary>
+    return (
+      <PageStatusBoundary state={status} label="利用状況を読み込み中">
+        {null}
+      </PageStatusBoundary>
+    )
   }
   return (
     <Stack gap="xl">

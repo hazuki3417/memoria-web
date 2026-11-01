@@ -14,11 +14,7 @@ export function useCommunitySettingsMembership(
   const { data, loading, error } = useMyCommunitiesQuery()
   const membership = data?.myCommunities.find((item) => item.id === communityId)
   const membershipLost =
-    section === "preferences" &&
-    !loading &&
-    !error &&
-    !!data &&
-    !membership
+    section === "preferences" && !loading && !error && !!data && !membership
 
   useEffect(() => {
     if (membershipLost) router.replace("/dashboard")

@@ -2,7 +2,13 @@ import { Button, Center, Group, Stack, Text } from "@mantine/core"
 import { IconFolder, IconPhoto } from "@tabler/icons-react"
 import Link from "next/link"
 
-export function EmptyState({ kind, href }: { kind: "media" | "group"; href: string }) {
+export function EmptyState({
+  kind,
+  href,
+}: {
+  kind: "media" | "group"
+  href: string
+}) {
   const media = kind === "media"
   return (
     <Center
@@ -31,4 +37,3 @@ export function EmptyState({ kind, href }: { kind: "media" | "group"; href: stri
     </Center>
   )
 }
-

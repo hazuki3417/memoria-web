@@ -65,69 +65,67 @@ export function Dashboard({
 
   return (
     <Stack gap="xl" w="100%">
-        <Stack gap="sm">
-          <Group justify="space-between" align="center" wrap="nowrap">
-            <Title order={3} size="h4">
-              最近のメディア
-            </Title>
-            {!noMedia && mediaState !== "loading" && mediaState !== "error" && (
-              <Button
-                variant="subtle"
-                size="compact-sm"
-                component={Link}
-                href={mediaHref}
-              >
-                すべて見る
-              </Button>
-            )}
-          </Group>
-          {mediaState === "loading" || mediaState === "error" ? (
-            <SectionFeedback
-              state={mediaState}
-              onRetry={onRetryMedia}
-              kind="media"
-            />
-          ) : noMedia ? (
-            <EmptyState kind="media" href={mediaHref} />
-          ) : (
-            <RecentMediaCarousel
-              key={contextKind + communityId}
-              items={media.slice(0, 32)}
-              mediaIds={mediaIds}
-              onOpenMedia={onOpenMedia}
-            />
+      <Stack gap="sm">
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Title order={3} size="h4">
+            最近のメディア
+          </Title>
+          {!noMedia && mediaState !== "loading" && mediaState !== "error" && (
+            <Button
+              variant="subtle"
+              size="compact-sm"
+              component={Link}
+              href={mediaHref}
+            >
+              すべて見る
+            </Button>
           )}
-        </Stack>
-        <Stack gap="sm">
-          <Group justify="space-between" align="center" wrap="nowrap">
-            <Title order={3} size="h4">
-              最近のGroup
-            </Title>
-            {!noGroups &&
-              groupState !== "loading" &&
-              groupState !== "error" && (
-                <Button
-                  variant="subtle"
-                  size="compact-sm"
-                  component={Link}
-                  href={groupsHref}
-                >
-                  すべて見る
-                </Button>
-              )}
-          </Group>
-          {groupState === "loading" || groupState === "error" ? (
-            <SectionFeedback
-              state={groupState}
-              onRetry={onRetryGroups}
-              kind="group"
-            />
-          ) : noGroups ? (
-            <EmptyState kind="group" href={groupsHref} />
-          ) : (
-            <RecentGroups groups={groups} />
+        </Group>
+        {mediaState === "loading" || mediaState === "error" ? (
+          <SectionFeedback
+            state={mediaState}
+            onRetry={onRetryMedia}
+            kind="media"
+          />
+        ) : noMedia ? (
+          <EmptyState kind="media" href={mediaHref} />
+        ) : (
+          <RecentMediaCarousel
+            key={contextKind + communityId}
+            items={media.slice(0, 32)}
+            mediaIds={mediaIds}
+            onOpenMedia={onOpenMedia}
+          />
+        )}
+      </Stack>
+      <Stack gap="sm">
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Title order={3} size="h4">
+            最近のGroup
+          </Title>
+          {!noGroups && groupState !== "loading" && groupState !== "error" && (
+            <Button
+              variant="subtle"
+              size="compact-sm"
+              component={Link}
+              href={groupsHref}
+            >
+              すべて見る
+            </Button>
           )}
-        </Stack>
+        </Group>
+        {groupState === "loading" || groupState === "error" ? (
+          <SectionFeedback
+            state={groupState}
+            onRetry={onRetryGroups}
+            kind="group"
+          />
+        ) : noGroups ? (
+          <EmptyState kind="group" href={groupsHref} />
+        ) : (
+          <RecentGroups groups={groups} />
+        )}
+      </Stack>
     </Stack>
   )
 }

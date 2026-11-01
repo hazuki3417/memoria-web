@@ -76,11 +76,6 @@ export function UsageContent({
   }
 
   return (
-    <SettingsUsage
-      usage={usage}
-      fileSizeUnit={fileSizeUnit}
-      status={status}
-    />
+    <SettingsUsage usage={usage} fileSizeUnit={fileSizeUnit} status={status} />
   )
 }
-

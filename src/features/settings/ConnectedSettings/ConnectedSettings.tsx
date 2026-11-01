@@ -15,7 +15,9 @@ export function ConnectedSettings({
   const { data, loading, error } = useCurrentUserQuery()
   useSettingsRefreshError(Boolean(data?.me && error))
   const { saveProfile, savePreferences } = usePersonalSettingsActions()
-  const preferences = data?.me ? fromGraphqlUserPreferences(data.me.preferences) : undefined
+  const preferences = data?.me
+    ? fromGraphqlUserPreferences(data.me.preferences)
+    : undefined
   const state = !data?.me ? (loading ? "loading" : "error") : "ready"
   return (
     <Settings
@@ -23,11 +25,16 @@ export function ConnectedSettings({
       section={section}
       personalAccentColor={data?.me?.preferences.personalAccentColor}
       profileNickname={data?.me?.profile.nickname}
-      contentOverride={state !== "ready" ? <PageStatusBoundary state={state} label="Personal設定を読み込み中">{null}</PageStatusBoundary> : undefined}
+      contentOverride={
+        state !== "ready" ? (
+          <PageStatusBoundary state={state} label="Personal設定を読み込み中">
+            {null}
+          </PageStatusBoundary>
+        ) : undefined
+      }
       initialPreferences={preferences}
       saveProfile={saveProfile}
       savePreferences={savePreferences}
     />
   )
 }
-

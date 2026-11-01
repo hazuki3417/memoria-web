@@ -24,4 +24,3 @@ export function RecentGroups({ groups }: { groups: DashboardGroup[] }) {
     </SimpleGrid>
   )
 }
-

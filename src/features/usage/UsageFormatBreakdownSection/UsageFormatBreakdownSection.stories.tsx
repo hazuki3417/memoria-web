@@ -2,9 +2,7 @@ import { SortableBreakdownStory } from "./SortableBreakdownStory"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
-import {
-  defaultUsageSort,
-} from "../sortUsageFormats"
+import { defaultUsageSort } from "../sortUsageFormats"
 import { sampleUsage, zeroUsage } from "../usageStoryFixtures"
 
 const meta = {

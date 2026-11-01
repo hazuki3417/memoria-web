@@ -8,19 +8,8 @@ import {
   ScrollArea as PageScrollArea,
 } from "@mantine/core"
 
-
-import {
-  Button,
-  Center,
-  Group,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core"
-import {
-  IconFolder,
-  IconPhoto,
-} from "@tabler/icons-react"
+import { Button, Center, Group, Stack, Text, Title } from "@mantine/core"
+import { IconFolder, IconPhoto } from "@tabler/icons-react"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PageWidth } from "@/components/PageWidth/PageWidth"

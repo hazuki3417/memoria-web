@@ -1,5 +1,8 @@
 import { Box } from "@mantine/core"
-import { SettingsSectionLayout, SettingsSectionNavigation } from "@/components/SettingsSectionLayout"
+import {
+  SettingsSectionLayout,
+  SettingsSectionNavigation,
+} from "@/components/SettingsSectionLayout"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { getCommunitySettingsSections } from "@/features/community-settings/communitySettingsSections"
 import { SettingsLayout } from "../SettingsLayout"

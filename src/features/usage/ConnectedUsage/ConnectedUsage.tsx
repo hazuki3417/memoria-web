@@ -51,8 +51,13 @@ export function ConnectedUsage({
     }
   }
 
-  const hasData = Boolean(projection) && !conversionFailed && Boolean(scope === "personal" || communityPreferences.data?.me)
-  useSettingsRefreshError(Boolean(hasData && (active.error || communityPreferences.error)))
+  const hasData =
+    Boolean(projection) &&
+    !conversionFailed &&
+    Boolean(scope === "personal" || communityPreferences.data?.me)
+  useSettingsRefreshError(
+    Boolean(hasData && (active.error || communityPreferences.error)),
+  )
   const status: UsageStatus = hasData
     ? "ready"
     : active.loading || communityPreferencesLoading

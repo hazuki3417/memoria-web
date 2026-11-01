@@ -8,7 +8,10 @@ import type { Section } from "../SettingsLayout"
 import { SettingsProfile, type SaveProfile } from "../profile/SettingsProfile"
 import { SettingsPreferences } from "../preferences/SettingsPreferences"
 import { SettingsAccount } from "../account/SettingsAccount"
-import type { UserPreferences, UserPreferencesPatch } from "../preferences/userPreferences"
+import type {
+  UserPreferences,
+  UserPreferencesPatch,
+} from "../preferences/userPreferences"
 
 // No production persistence should be simulated when the callback is absent.
 async function unavailableProfileSave(): Promise<void> {

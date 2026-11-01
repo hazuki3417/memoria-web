@@ -1,6 +1,14 @@
 "use client"
 
-import { Box, Center, Loader, Stack, Text, ThemeIcon, Title } from "@mantine/core"
+import {
+  Box,
+  Center,
+  Loader,
+  Stack,
+  Text,
+  ThemeIcon,
+  Title,
+} from "@mantine/core"
 import { IconAlertCircle } from "@tabler/icons-react"
 import { useEffect, useState, type ReactNode } from "react"
 
@@ -43,9 +51,17 @@ export function PageStatusBoundary({
     <Box w="100%" mih={320} px={{ base: "md", sm: "xl" }} py="xl">
       <Center mih={272}>
         {state === "loading" ? (
-          <Stack align="center" gap="sm" role="status" aria-label={label} aria-busy="true">
+          <Stack
+            align="center"
+            gap="sm"
+            role="status"
+            aria-label={label}
+            aria-busy="true"
+          >
             <Loader size="md" color="gray" aria-hidden="true" />
-            <Text size="sm" c="dimmed">{label}</Text>
+            <Text size="sm" c="dimmed">
+              {label}
+            </Text>
           </Stack>
         ) : (
           <Stack align="center" gap="sm" maw={440} role="alert">

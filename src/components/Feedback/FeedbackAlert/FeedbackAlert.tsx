@@ -2,7 +2,11 @@
 
 import { Alert, type AlertProps } from "@mantine/core"
 import type { ReactNode } from "react"
-import { feedbackAppearance, icons, type FeedbackKind } from "../feedbackAppearance"
+import {
+  feedbackAppearance,
+  icons,
+  type FeedbackKind,
+} from "../feedbackAppearance"
 
 export function FeedbackAlert({
   kind,
@@ -31,4 +35,3 @@ export function FeedbackAlert({
     </Alert>
   )
 }
-

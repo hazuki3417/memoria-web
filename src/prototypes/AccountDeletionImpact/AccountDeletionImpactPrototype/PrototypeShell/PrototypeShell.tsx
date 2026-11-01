@@ -1,6 +1,9 @@
 "use client"
 
-import { Box as ScrollPaddingBox, ScrollArea as PageScrollArea } from "@mantine/core"
+import {
+  Box as ScrollPaddingBox,
+  ScrollArea as PageScrollArea,
+} from "@mantine/core"
 import type { PropsWithChildren } from "react"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -30,4 +33,3 @@ export function PrototypeShell({ children }: PropsWithChildren) {
     </PrototypeApplicationShell>
   )
 }
-

@@ -18,10 +18,7 @@ import {
   Text,
   ThemeIcon,
 } from "@mantine/core"
-import {
-  IconPhotoPlus,
-  IconTrash,
-} from "@tabler/icons-react"
+import { IconPhotoPlus, IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { FeedbackAlert } from "@/components/Feedback"
@@ -618,4 +615,3 @@ export function MediaUploadPrototype({
     </PrototypeApplicationShell>
   )
 }
-

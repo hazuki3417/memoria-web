@@ -4,4 +4,3 @@ export type DashboardGroup = {
   media: string[]
   mediaCount: number
 }
-

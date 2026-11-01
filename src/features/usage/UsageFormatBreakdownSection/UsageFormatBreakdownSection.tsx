@@ -133,10 +133,10 @@ export function UsageFormatBreakdownSection({
                   <Table.Th>合計</Table.Th>
                   {status === "loading" ? (
                     ["count", "value"].map((field) => (
-                        <Table.Th key={field} ta="right">
-                          <Skeleton h={16} radius="sm" />
-                        </Table.Th>
-                      ))
+                      <Table.Th key={field} ta="right">
+                        <Skeleton h={16} radius="sm" />
+                      </Table.Th>
+                    ))
                   ) : (
                     <>
                       <Table.Th ta="right">

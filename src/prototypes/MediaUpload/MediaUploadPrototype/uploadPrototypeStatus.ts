@@ -1,4 +1,10 @@
-import { IconAlertCircle, IconCheck, IconClock, IconCloudUpload, IconHelpCircle } from "@tabler/icons-react"
+import {
+  IconAlertCircle,
+  IconCheck,
+  IconClock,
+  IconCloudUpload,
+  IconHelpCircle,
+} from "@tabler/icons-react"
 
 export type FileStatus =
   | "ready"
@@ -54,4 +60,3 @@ export const statusPresentation: Record<
     icon: IconAlertCircle,
   },
 }
-

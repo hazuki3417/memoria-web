@@ -2,7 +2,11 @@
 
 import { Alert } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
-import { feedbackAppearance, icons, type FeedbackKind } from "./feedbackAppearance"
+import {
+  feedbackAppearance,
+  icons,
+  type FeedbackKind,
+} from "./feedbackAppearance"
 export type { FeedbackKind } from "./feedbackAppearance"
 export { FeedbackAlert } from "./FeedbackAlert"
 
