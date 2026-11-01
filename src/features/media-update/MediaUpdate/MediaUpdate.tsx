@@ -23,21 +23,6 @@ export type MediaUpdateScenario =
   | "load-failure"
   | "leave-confirmation"
 
-const contexts = {
-  personal: {
-    id: "personal",
-    kind: "personal" as const,
-    label: "Personal",
-    accentColor: "var(--mantine-color-blue-6)",
-  },
-  community: {
-    id: "community",
-    kind: "community" as const,
-    label: "家族のアルバム",
-    accentColor: "var(--mantine-color-teal-6)",
-  },
-}
-
 const initialItems = [
   { id: "1", label: "Media 1", detail: "", tags: ["旅行", "夏"] },
   { id: "2", label: "Media 2", detail: "", tags: ["旅行"] },
@@ -83,11 +68,11 @@ export function MediaUpdate({
     router.push(
       context === "community" ? `/communities/${communityId}/media` : "/media",
     )
+  const liveIdsKey = JSON.stringify(live?.items.map((item) => item.id) ?? null)
   useEffect(() => {
-    if (live) setSelectedIds(live.items.map((item) => item.id))
-    // Sync selection when loaded Media identifiers change.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [live?.items.map((item) => item.id).join(",")])
+    const ids = JSON.parse(liveIdsKey) as string[] | null
+    if (ids !== null) setSelectedIds(ids)
+  }, [liveIdsKey])
   const shownItems = live?.items ?? items
   const shownScenario = live
     ? live.status === "idle" || live.status === "loading"
