@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaUploadPrototype } from "./MediaUploadPrototype"
+import { MediaUpdatePrototype } from ".././MediaUpdatePrototype"
 
 const meta = {
-  title: "Design Prototypes/Media Upload",
-  component: MediaUploadPrototype,
+  title: "Design Prototypes/Media Update",
+  component: MediaUpdatePrototype,
   parameters: { layout: "fullscreen" },
-} satisfies Meta<typeof MediaUploadPrototype>
+} satisfies Meta<typeof MediaUpdatePrototype>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -13,5 +13,4 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   name: "Default",
   tags: ["visual"],
-  args: { scenario: "empty", context: "personal" },
 }

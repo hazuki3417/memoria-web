@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { ApplicationShellPrototype } from "./ApplicationShellPrototype"
+import { ApplicationShellPrototype } from ".././ApplicationShellPrototype"
 
 const meta = {
   title: "Design Prototypes/Application Shell",

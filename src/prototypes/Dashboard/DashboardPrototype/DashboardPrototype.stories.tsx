@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { DashboardPrototype } from "./DashboardPrototype"
+import { DashboardPrototype } from ".././DashboardPrototype"
 
 const meta = {
   title: "Design Prototypes/Dashboard",

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MediaBrowserPrototype } from "./MediaBrowserPrototype"
+import { MediaBrowserPrototype } from ".././MediaBrowserPrototype"
 
 const meta = {
   title: "Design Prototypes/Media Browser",
