@@ -1,5 +1,6 @@
-import { TileMessage } from "./TileMessage"
 "use client"
+
+import { TileMessage } from "./TileMessage"
 
 import { Box, Center, Loader, Stack, Text } from "@mantine/core"
 import { IconPhotoOff, IconRefresh } from "@tabler/icons-react"
