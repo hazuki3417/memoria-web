@@ -1,6 +1,6 @@
 import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { CommunitySettings } from "./CommunitySettings"
 
 const meta = {
@@ -62,9 +62,11 @@ export const RemoveMemberSuccessContract: Story = {
     await userEvent.click(await page.findByText("除外", { exact: true }))
     await userEvent.click(await page.findByRole("button", { name: "除外する" }))
     await expect(args.onRemoveMember).toHaveBeenCalledWith("user-2")
-    await expect(
-      page.queryByRole("dialog", { name: "メンバーを除外" }),
-    ).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        page.queryByRole("dialog", { name: "メンバーを除外" }),
+      ).not.toBeInTheDocument()
+    })
   },
 }
 
@@ -137,7 +139,7 @@ export const LeaveFailureContract: Story = {
     await userEvent.click(
       within(dialog).getByRole("button", { name: "退会する" }),
     )
-    await expect(await within(dialog).findByRole("alert")).toBeVisible()
+    await expect(await within(dialog).findByText(/退会処理に失敗しました/)).toBeVisible()
   },
 }
 
