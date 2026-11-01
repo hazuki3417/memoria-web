@@ -283,7 +283,7 @@ export function GroupBrowser({
         opened={createOpened}
         name={createName}
         parents={createParents}
-        children={createChildren}
+        childNames={createChildren}
         candidates={candidates ?? []}
         canManage={canManage}
         saving={saving}
@@ -297,7 +297,7 @@ export function GroupBrowser({
         opened={editOpened}
         name={draftName}
         parents={draftParents}
-        children={draftChildren}
+        childNames={draftChildren}
         candidates={candidates ?? []}
         currentGroupName={selected?.name ?? ""}
         availability={relationAvailability}
