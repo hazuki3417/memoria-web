@@ -16,7 +16,7 @@ export const icons = {
   error: IconAlertCircle,
 }
 
-function feedbackAppearance(kind: FeedbackKind) {
+export function feedbackAppearance(kind: FeedbackKind) {
   const color = colors[kind]
   return {
     color,
