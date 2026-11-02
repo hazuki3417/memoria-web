@@ -23,6 +23,7 @@ export function useUserPreferences(
   const {
     saveError,
     saveStatus,
+    validation,
     sessionSnapshot,
     enqueue,
     setAccentDraft,
@@ -40,7 +41,9 @@ export function useUserPreferences(
     setValue,
     getValues,
     reset,
-    formState: { dirtyFields },
+    setError,
+    clearErrors,
+    formState: { dirtyFields, errors },
   } = useForm<PreferencesFormValues>({
     resolver: zodResolver(preferencesSchema),
     mode: "onChange",
@@ -49,6 +52,18 @@ export function useUserPreferences(
       accentDraft: sessionSnapshot?.accentDraft ?? initial.personalAccentColor,
     },
   })
+  // The controller survives route changes; reapply persisted Server Field
+  // validation on mount without converting transport failures to input errors.
+  useEffect(() => {
+    if (!validation) return
+    for (const [field, message] of Object.entries(validation.fieldErrors)) {
+      setError(field as keyof PreferencesFormValues, {
+        type: "server",
+        message,
+      })
+    }
+  }, [validation, setError])
+
   // Apply new source values only to fields the user has not edited.
   // Dirty field subscriptions are required by RHF's keepDirtyValues option.
   const previousSource = useRef(initialPreferences)
@@ -103,6 +118,7 @@ export function useUserPreferences(
     // Do not enqueue a value that violates the same schema as the RHF form.
     if (!preferencesSchema.safeParse({ ...getValues(), [key]: value }).success)
       return
+    clearErrors(key)
     setValue(key, value as FieldPathValue<PreferencesFormValues, K>, {
       shouldDirty: true,
     })
@@ -110,6 +126,7 @@ export function useUserPreferences(
   }
 
   const changeAccentDraft = (value: string) => {
+    clearErrors("personalAccentColor")
     setAccentDraft(value)
     setValue("accentDraft", value, { shouldDirty: true })
     const parsed = preferencesSchema.shape.personalAccentColor.safeParse(value)
@@ -123,6 +140,8 @@ export function useUserPreferences(
     changeAccentDraft,
     saveError,
     saveStatus,
+    fieldErrors: errors,
+    validation,
     retry,
     inspect,
     confirmObservation,
