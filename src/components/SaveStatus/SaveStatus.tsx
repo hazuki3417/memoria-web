@@ -43,7 +43,7 @@ export function SaveStatus({ state, announce = false }: SaveStatusProps) {
       variant="light"
       color={state === "attention" ? "red" : state === "saved" ? "green" : "gray"}
       size="sm"
-      radius="sm"
+      radius="xl"
       leftSection={Icon ? <Icon size={13} aria-hidden="true" /> : undefined}
       style={{ visibility: state === "idle" ? "hidden" : "visible" }}
       role={announce && state !== "idle" ? "status" : undefined}
