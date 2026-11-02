@@ -8,6 +8,7 @@ import {
   type OperationSaveUserPreferencesMutationVariables,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
+import { SettingsInputValidationError } from "./graphqlSettingsResult"
 import type { UserPreferencesPatch } from "./preferences/userPreferences"
 import {
   fromGraphqlUserPreferences,
@@ -21,11 +22,15 @@ export function usePersonalSettingsActions() {
 
   return {
     saveProfile: async (nickname: string) => {
-      await updateProfile({
+      const result = await updateProfile({
         variables: { input: { nickname } },
-        refetchQueries: [CurrentUserDocument],
-        awaitRefetchQueries: true,
       })
+      const outcome = result.data?.updateUserProfile
+      if (outcome?.__typename === "InputValidationFailure")
+        throw new SettingsInputValidationError(outcome.violations)
+      if (outcome?.__typename !== "UpdateUserProfileSuccess")
+        throw new Error("Profile update unconfirmed")
+      void client.refetchQueries({ include: [CurrentUserDocument] }).catch(() => undefined)
     },
     savePreferences: async (patch: UserPreferencesPatch) => {
       const input = toGraphqlUserPreferencesPatch(patch)
@@ -33,11 +38,12 @@ export function usePersonalSettingsActions() {
         OperationSaveUserPreferencesMutation,
         OperationSaveUserPreferencesMutationVariables
       >({ mutation: SaveUserPreferencesDocument, variables: { input } })
-      if (!result.data?.updateUserPreferences.preferences)
+      const outcome = result.data?.updateUserPreferences
+      if (outcome?.__typename === "InputValidationFailure")
+        throw new SettingsInputValidationError(outcome.violations)
+      if (outcome?.__typename !== "UpdateUserPreferencesSuccess")
         throw new Error("Preferences update unconfirmed")
-      const confirmed = fromGraphqlUserPreferences(
-        result.data.updateUserPreferences.preferences,
-      )
+      const confirmed = fromGraphqlUserPreferences(outcome.preferences)
       // A follow-up Query failure cannot turn an already confirmed Mutation
       // into an unknown outcome or trigger a duplicate settings write.
       void client.refetchQueries({
