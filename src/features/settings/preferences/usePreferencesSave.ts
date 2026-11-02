@@ -5,9 +5,15 @@ import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import { usePersonalPreferencesSession } from "./PersonalPreferencesSessionContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
+import {
+  SettingsInputValidationError,
+  classifySettingsSaveFailure,
+  resolveSettingsValidation,
+} from "../graphqlSettingsResult"
+import type { PreferencesFailure } from "./personalPreferencesSession"
 
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
-type SaveError = "blocked" | "retryable" | "unknown" | null
+type SaveError = PreferencesFailure
 
 /** Session controller in Application Shell, legacy local queue for isolated Storybook. */
 export function usePreferencesSave(
@@ -17,6 +23,10 @@ export function usePreferencesSave(
 ) {
   const { controller: session, snapshot } = usePersonalPreferencesSession()
   const [localError, setLocalError] = useState<SaveError>(null)
+  const [localValidation, setLocalValidation] = useState<{
+    fieldErrors: Record<string, string>
+    formError: boolean
+  } | null>(null)
   const [localStatus, setLocalStatus] = useState<SaveStatusState>("idle")
   const saveRef = useRef(onSave)
   const inspectRef = useRef(onInspect)
@@ -57,17 +67,19 @@ export function usePreferencesSave(
         return save(patch)
       },
       () => {
-        if (mounted) setLocalError(null)
+        if (mounted) {
+          setLocalError(null)
+          setLocalValidation(null)
+        }
       },
-      (error) => {
+      (error, attempted) => {
         if (!mounted) return
-        setLocalError(
-          typeof error === "object" &&
-            error !== null &&
-            "kind" in error &&
-            error.kind === "blocked"
-            ? "blocked"
-            : "retryable",
+        const kind = classifySettingsSaveFailure(error)
+        setLocalError(kind)
+        setLocalValidation(
+          kind === "validation" && error instanceof SettingsInputValidationError
+            ? resolveSettingsValidation(error, Object.keys(attempted))
+            : null,
         )
       },
       400,
@@ -86,6 +98,7 @@ export function usePreferencesSave(
 
   return {
     saveError: session ? snapshot.failure : localError,
+    validation: session ? snapshot.validation : localValidation,
     saveStatus: session ? snapshot.saveStatus : localStatus,
     sessionSnapshot: session ? snapshot : null,
     enqueue: (patch: UserPreferencesPatch) => {
@@ -99,6 +112,7 @@ export function usePreferencesSave(
       if (session) session.retry()
       else {
         setLocalError(null)
+        setLocalValidation(null)
         void localRef.current?.flush()
       }
     },
