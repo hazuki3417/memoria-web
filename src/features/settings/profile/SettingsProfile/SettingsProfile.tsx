@@ -1,7 +1,8 @@
 "use client"
 
 import { Box, Button, Stack, TextInput } from "@mantine/core"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { useController, useForm } from "react-hook-form"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -32,17 +33,22 @@ export function SettingsProfile({
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
 }) {
-  const [name, setName] = useState(
-    initialSaveState === "saving" || initialSaveState === "retryable-error"
-      ? `${initialNickname}新`
-      : initialNickname,
-  )
-  const [saved, setSaved] = useState(initialNickname)
+  const { control, reset } = useForm<{ nickname: string }>({
+    defaultValues: {
+      nickname:
+        initialSaveState === "saving" || initialSaveState === "retryable-error"
+          ? `${initialNickname}新`
+          : initialNickname,
+    },
+  })
+  const { field } = useController({ control, name: "nickname" })
+  // The confirmed server value is not an editable Form Draft.
+  const saved = useRef(initialNickname)
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "retryable-error" | "blocked"
   >(initialSaveState)
-  const normalized = name.trim()
-  const dirty = normalized !== saved
+  const normalized = field.value.trim()
+  const dirty = normalized !== saved.current
   const invalid = normalized.length === 0
   const isSaving = saveState === "saving"
   const isBlocked = saveState === "blocked"
@@ -59,8 +65,8 @@ export function SettingsProfile({
     setSaveState("saving")
     try {
       await onSave(normalized)
-      setSaved(normalized)
-      setName(normalized)
+      saved.current = normalized
+      reset({ nickname: normalized })
       setSaveState("idle")
       showNotification({
         kind: "success",
@@ -104,8 +110,11 @@ export function SettingsProfile({
           <TextInput
             label="ニックネーム"
             description="Memoriaで表示する名前です。"
-            value={name}
-            onChange={(event) => setName(event.currentTarget.value)}
+            name={field.name}
+            ref={field.ref}
+            onBlur={field.onBlur}
+            value={field.value}
+            onChange={field.onChange}
             error={invalid ? "ニックネームを入力してください。" : undefined}
             required
             disabled={isSaving || isBlocked}
