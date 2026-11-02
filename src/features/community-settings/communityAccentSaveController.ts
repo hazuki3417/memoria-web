@@ -154,7 +154,7 @@ export function createCommunityAccentSaveController() {
     },
     edit(id: string, value: string) {
       const entry = entryFor(id)
-      update(id, { draft: value, observedMatches: false })
+      update(id, { draft: value, observedMatches: false, inspected: false })
       if (!hex(value)) {
         update(id, { status: entry.snapshot.failure ? "attention" : "pending" })
         return
