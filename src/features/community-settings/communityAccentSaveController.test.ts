@@ -116,6 +116,50 @@ describe("session Community Accent save controller", () => {
     })
   })
 
+  it("requires manual retry after a rejected mutation and keeps Draft on error", async () => {
+    const controller = createCommunityAccentSaveController()
+    const rejected = Object.assign(new Error("domain"), { graphQLErrors: [{ message: "Rejected" }] })
+    const save = vi.fn().mockRejectedValueOnce(rejected).mockResolvedValueOnce("#AABBCC")
+    const release = vi.fn()
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save,
+      observe: vi.fn(),
+      preview: vi.fn().mockReturnValue(1),
+      release,
+    })
+    controller.edit(id, "#AABBCC")
+    await tick()
+    expect(controller.getSnapshot(id)).toMatchObject({
+      confirmed: "#112233", draft: "#AABBCC",
+      failure: "rejected", status: "attention",
+    })
+    expect(release).toHaveBeenCalled()
+    await tick()
+    expect(save).toHaveBeenCalledTimes(1)
+    controller.retry(id)
+    await tick()
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(controller.getSnapshot(id).confirmed).toBe("#AABBCC")
+  })
+
+  it("discards an errored draft without pretending to cancel an unknown mutation", async () => {
+    const controller = createCommunityAccentSaveController()
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save: vi.fn().mockRejectedValue(new Error("unconfirmed")),
+      observe: vi.fn(),
+      preview: vi.fn().mockReturnValue(1),
+      release: vi.fn(),
+    })
+    controller.edit(id, "#AABBCC")
+    await tick()
+    controller.discard(id)
+    expect(controller.getSnapshot(id)).toMatchObject({
+      draft: "#112233", confirmed: "#112233", failure: null, status: "idle",
+    })
+  })
+
   it("does not leak Draft or failure state between communities", async () => {
     const controller = createCommunityAccentSaveController()
     controller.initialize("community-a", "#112233")
