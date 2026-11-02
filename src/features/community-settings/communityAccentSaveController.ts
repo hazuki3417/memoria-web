@@ -19,6 +19,7 @@ type Entry = {
   snapshot: AccentSnapshot
   desired: string | null
   running: boolean
+  inspectionGeneration: number
   previewOwner: number | null
   save?: SaveAccent
   observe?: ObserveAccent
@@ -50,7 +51,7 @@ export function createCommunityAccentSaveController() {
   const entryFor = (id: string): Entry => {
     let entry = entries.get(id)
     if (!entry) {
-      entry = { snapshot: emptySnapshot, desired: null, running: false, previewOwner: null }
+      entry = { snapshot: emptySnapshot, desired: null, running: false, inspectionGeneration: 0, previewOwner: null }
       entries.set(id, entry)
     }
     return entry
@@ -179,9 +180,10 @@ export function createCommunityAccentSaveController() {
       const entry = entryFor(id)
       if (entry.snapshot.failure !== "unknown" || !entry.observe) return
       const draftAtStart = entry.snapshot.draft
+      const generation = ++entry.inspectionGeneration
       try {
         const server = normalized(await entry.observe())
-        if (entry.snapshot.draft !== draftAtStart || entry.snapshot.failure !== "unknown") return
+        if (generation !== entry.inspectionGeneration || entry.snapshot.draft !== draftAtStart || entry.snapshot.failure !== "unknown") return
         const draft = entry.snapshot.draft
         update(id, {
           // This is a current observation, not proof of the old mutation.
