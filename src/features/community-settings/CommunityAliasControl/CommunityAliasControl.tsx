@@ -28,18 +28,21 @@ export function CommunityAliasControl({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(false)
   // Compare the current draft to the last source value, not a sticky "edited" flag.
-  const previousAlias = useRef(savedAlias ?? "")
+  const previousSourceAlias = useRef(savedAlias ?? "")
+  // A confirmed save can precede the refreshed savedAlias prop.
+  const savedBaseline = useRef(savedAlias ?? "")
   useEffect(() => {
     const sourceAlias = savedAlias ?? ""
-    if (previousAlias.current === sourceAlias) return
-    const draftIsEdited = getValues("alias").trim() !== previousAlias.current
-    previousAlias.current = sourceAlias
+    if (previousSourceAlias.current === sourceAlias) return
+    const draftIsEdited = getValues("alias").trim() !== savedBaseline.current
+    previousSourceAlias.current = sourceAlias
+    savedBaseline.current = sourceAlias
     if (!draftIsEdited && !saving) reset({ alias: sourceAlias })
   }, [savedAlias, getValues, reset, saving])
   const text = field.value
   const normalized = text.trim()
   const validation = communityAliasSchema.safeParse({ alias: text })
-  const changed = normalized !== (savedAlias ?? "")
+  const changed = normalized !== savedBaseline.current
   const invalid = !validation.success
 
   const save = handleSubmit(async ({ alias }) => {
@@ -48,6 +51,7 @@ export function CommunityAliasControl({
     setError(false)
     try {
       await onSave(alias)
+      savedBaseline.current = normalized
       reset({ alias: normalized })
       showNotification({
         kind: "success",
