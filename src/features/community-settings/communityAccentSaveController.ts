@@ -1,7 +1,7 @@
 import type { SaveStatusState } from "@/components/SaveStatus"
 import {
-  SettingsInputValidationError,
-  resolveSettingsValidation,
+  classifySettingsSaveFailure,
+  resolveSettingsFailureValidation,
 } from "@/features/settings/graphqlSettingsResult"
 
 export type AccentFailure = "rejected" | "unknown" | null
@@ -115,8 +115,8 @@ export function createCommunityAccentSaveController() {
           entry.desired = null
           clearPreview(entry)
           const validation =
-            error instanceof SettingsInputValidationError
-              ? resolveSettingsValidation(error, ["accentColor"])
+            classifySettingsSaveFailure(error) === "validation"
+              ? resolveSettingsFailureValidation(error, ["accentColor"])
               : null
           update(id, {
             status: "attention",
