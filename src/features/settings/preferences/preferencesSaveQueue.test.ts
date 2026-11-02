@@ -303,6 +303,29 @@ describe("preferences save queue", () => {
     expect(save).toHaveBeenCalledTimes(1)
   })
 
+  it("does not duplicate an in-flight save when manually flushed again", async () => {
+    vi.useFakeTimers()
+    let resolveSave: ((value: typeof defaultUserPreferences) => void) | undefined
+    const save = vi.fn().mockImplementation(
+      () => new Promise<typeof defaultUserPreferences>((resolve) => {
+        resolveSave = resolve
+      }),
+    )
+    const onSaved = vi.fn()
+    const queue = createPreferencesSaveQueue(save, onSaved, vi.fn())
+
+    queue.enqueue({ dateFormat: "DD_MM_YYYY" })
+    const firstFlush = queue.flush()
+    const secondFlush = queue.flush()
+    expect(save).toHaveBeenCalledTimes(1)
+
+    resolveSave?.(defaultUserPreferences)
+    await Promise.all([firstFlush, secondFlush])
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(onSaved).toHaveBeenCalledTimes(1)
+    expect(queue.getPending()).toEqual({})
+  })
+
   it("does not save new edits after disposal", async () => {
     vi.useFakeTimers()
     const save = vi.fn().mockResolvedValue(defaultUserPreferences)
