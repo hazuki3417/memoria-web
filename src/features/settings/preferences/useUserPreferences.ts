@@ -1,24 +1,36 @@
 "use client"
 
-import { useState } from "react"
+import { useForm, type FieldPathValue } from "react-hook-form"
 import { usePreferencesSave } from "./usePreferencesSave"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
+type PreferencesFormValues = UserPreferences & { accentDraft: string }
 
 /**
- * Preferencesの選択値と保存Controllerの接続を担当する。
- * 保存失敗時も入力値を巻き戻さず、Queueに再試行対象を保持する。
+ * RHF owns editable Preference fields and the incomplete ColorInput draft.
+ * The existing queue remains the only owner of save ordering and retries.
  */
 export function useUserPreferences(
   initialPreferences: UserPreferences,
   onSave?: SavePreferences,
 ) {
-  const [preferences, setPreferences] =
-    useState<UserPreferences>(initialPreferences)
-  const [accentDraft, setAccentDraft] = useState(
-    initialPreferences.personalAccentColor,
-  )
+  const { watch, setValue } = useForm<PreferencesFormValues>({
+    defaultValues: {
+      ...initialPreferences,
+      accentDraft: initialPreferences.personalAccentColor,
+    },
+  })
+  const values = watch()
+  const preferences: UserPreferences = {
+    personalAccentColor: values.personalAccentColor,
+    dateFormat: values.dateFormat,
+    fileSizeUnit: values.fileSizeUnit,
+    mediaThumbnailSize: values.mediaThumbnailSize,
+    mediaDetailNavigationWrap: values.mediaDetailNavigationWrap,
+    mediaDetailInitialInfoWide: values.mediaDetailInitialInfoWide,
+    mediaDetailInitialInfoMedium: values.mediaDetailInitialInfoMedium,
+  }
   const { saveError, enqueue, retry } = usePreferencesSave(onSave)
 
   const change = <K extends keyof UserPreferences>(
@@ -26,12 +38,14 @@ export function useUserPreferences(
     value: UserPreferences[K],
   ) => {
     if (saveError === "blocked") return
-    setPreferences((current) => ({ ...current, [key]: value }))
+    setValue(key, value as FieldPathValue<PreferencesFormValues, K>, {
+      shouldDirty: true,
+    })
     enqueue({ [key]: value } as UserPreferencesPatch)
   }
 
   const changeAccentDraft = (value: string) => {
-    setAccentDraft(value)
+    setValue("accentDraft", value, { shouldDirty: true })
     if (/^#[0-9a-fA-F]{6}$/.test(value)) {
       change("personalAccentColor", value.toUpperCase())
     }
@@ -39,7 +53,7 @@ export function useUserPreferences(
 
   return {
     preferences,
-    accentDraft,
+    accentDraft: values.accentDraft,
     change,
     changeAccentDraft,
     saveError,
