@@ -47,6 +47,7 @@ export function SettingsPreferences({
     inspected,
     observedMatches,
     hasSession,
+    canRetry,
   } = useUserPreferences(initialPreferences, onSave, onInspect)
   const dateFormat = preferences.dateFormat
   const fileSizeUnit = preferences.fileSizeUnit
@@ -100,7 +101,7 @@ export function SettingsPreferences({
               </Button>
             )}
             {(saveError === "retryable" || (saveError === "unknown" && inspected && !observedMatches)) && (
-              <Button size="xs" onClick={retry}>
+              <Button size="xs" disabled={!canRetry} onClick={retry}>
                 もう一度保存
               </Button>
             )}
