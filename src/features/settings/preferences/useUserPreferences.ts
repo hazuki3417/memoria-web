@@ -44,7 +44,8 @@ export function useUserPreferences(
   ) => {
     if (saveError === "blocked") return
     // Do not enqueue a value that violates the same schema as the RHF form.
-    if (!preferencesSchema.safeParse({ ...getValues(), [key]: value }).success) return
+    if (!preferencesSchema.safeParse({ ...getValues(), [key]: value }).success)
+      return
     setValue(key, value as FieldPathValue<PreferencesFormValues, K>, {
       shouldDirty: true,
     })
@@ -53,9 +54,8 @@ export function useUserPreferences(
 
   const changeAccentDraft = (value: string) => {
     setValue("accentDraft", value, { shouldDirty: true })
-    if (/^#[0-9a-fA-F]{6}$/.test(value)) {
-      change("personalAccentColor", value.toUpperCase())
-    }
+    const parsed = preferencesSchema.shape.personalAccentColor.safeParse(value)
+    if (parsed.success) change("personalAccentColor", parsed.data.toUpperCase())
   }
 
   return {
