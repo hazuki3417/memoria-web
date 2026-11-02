@@ -30,10 +30,12 @@ export function CommunityAliasControl({
   // Compare the current draft to the last source value, not a sticky "edited" flag.
   const previousAlias = useRef(savedAlias ?? "")
   useEffect(() => {
+    const sourceAlias = savedAlias ?? ""
+    if (previousAlias.current === sourceAlias) return
     const draftIsEdited = getValues("alias").trim() !== previousAlias.current
-    previousAlias.current = savedAlias ?? ""
-    if (!draftIsEdited && !saving) reset({ alias: savedAlias ?? "" })
-  }, [savedAlias, getValues, reset])
+    previousAlias.current = sourceAlias
+    if (!draftIsEdited && !saving) reset({ alias: sourceAlias })
+  }, [savedAlias, getValues, reset, saving])
   const text = field.value
   const normalized = text.trim()
   const validation = communityAliasSchema.safeParse({ alias: text })
