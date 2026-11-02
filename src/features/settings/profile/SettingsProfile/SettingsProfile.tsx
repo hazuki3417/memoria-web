@@ -10,9 +10,8 @@ import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import {
-  SettingsInputValidationError,
   classifySettingsSaveFailure,
-  resolveSettingsValidation,
+  resolveSettingsFailureValidation,
 } from "../../graphqlSettingsResult"
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
@@ -93,8 +92,8 @@ export function SettingsProfile({
       })
     } catch (error) {
       const kind = classifySettingsSaveFailure(error)
-      if (kind === "validation" && error instanceof SettingsInputValidationError) {
-        const result = resolveSettingsValidation(error, ["nickname"])
+      if (kind === "validation") {
+        const result = resolveSettingsFailureValidation(error, ["nickname"])
         if (result.fieldErrors.nickname) {
           setError("nickname", {
             type: "server",
