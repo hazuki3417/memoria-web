@@ -52,13 +52,16 @@ export function SettingsProfile({
     "idle" | "saving" | "retryable-error" | "blocked"
   >(initialSaveState)
   // Update an untouched draft when the source nickname changes.
+  const previousSourceNickname = useRef(initialNickname)
   useEffect(() => {
+    if (previousSourceNickname.current === initialNickname) return
+    previousSourceNickname.current = initialNickname
     const draftIsEdited = getValues("nickname").trim() !== saved.current
     saved.current = initialNickname
     if (!draftIsEdited && saveState !== "saving" && saveState !== "retryable-error") {
       reset({ nickname: initialNickname })
     }
-  }, [initialNickname, getValues, reset])
+  }, [initialNickname, getValues, reset, saveState])
   const validation = profileSchema.safeParse({ nickname: field.value })
   const normalized = field.value.trim()
   const dirty = normalized !== saved.current
