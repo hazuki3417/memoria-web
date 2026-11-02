@@ -20,6 +20,8 @@ import { SettingRow } from "@/components/SettingRow"
 
 export function CommunityPreferencesContent({
   accent,
+  initialDraft,
+  onAccentDraftChange,
   setAccent,
   isPreview = true,
   restoreOnAccentChange = false,
@@ -30,6 +32,8 @@ export function CommunityPreferencesContent({
   aliasControl,
 }: {
   accent: string
+  initialDraft?: string
+  onAccentDraftChange?: (value: string) => void
   setAccent: Dispatch<SetStateAction<string>>
   isPreview?: boolean
   restoreOnAccentChange?: boolean
@@ -43,7 +47,7 @@ export function CommunityPreferencesContent({
   const { control, getValues, reset } = useForm<z.input<typeof communityAccentSchema>>({
     resolver: zodResolver(communityAccentSchema),
     mode: "onChange",
-    defaultValues: { accentDraft: accent },
+    defaultValues: { accentDraft: initialDraft ?? accent },
   })
   const { field } = useController({ control, name: "accentDraft" })
 
@@ -90,6 +94,7 @@ export function CommunityPreferencesContent({
               value={field.value}
               onChange={(next) => {
                 field.onChange(next)
+                onAccentDraftChange?.(next)
                 const parsed = communityAccentSchema.safeParse({ accentDraft: next })
                 onDraftValidityChange?.(parsed.success)
                 if (parsed.success) setAccent(parsed.data.accentDraft)
