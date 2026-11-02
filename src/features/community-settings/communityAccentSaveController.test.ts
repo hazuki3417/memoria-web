@@ -130,7 +130,8 @@ describe("session Community Accent save controller", () => {
     expect(controller.getSnapshot(id)).toMatchObject({
       status: "idle", confirmed: "#ABCDEF", failure: null,
     })
-    expect(confirm).toHaveBeenCalledExactlyOnceWith("#ABCDEF")
+    expect(confirm).toHaveBeenCalledTimes(1)
+    expect(confirm).toHaveBeenCalledWith("#ABCDEF")
     expect(save).toHaveBeenCalledTimes(1)
   })
 
