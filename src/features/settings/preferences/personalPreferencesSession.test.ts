@@ -33,6 +33,25 @@ describe("Personal Preferences session controller", () => {
     }
   })
 
+  it("ignores stale server values until a query echoes the local confirmed field", async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = createPersonalPreferencesSession()
+      controller.configure(vi.fn().mockResolvedValue({
+        ...defaultUserPreferences, fileSizeUnit: "BINARY",
+      }))
+      controller.hydrate(defaultUserPreferences)
+      controller.edit({ fileSizeUnit: "BINARY" })
+      await vi.advanceTimersByTimeAsync(400)
+      controller.hydrate(defaultUserPreferences)
+      expect(controller.getSnapshot().confirmed?.fileSizeUnit).toBe("BINARY")
+      controller.hydrate({ ...defaultUserPreferences, fileSizeUnit: "BINARY" })
+      expect(controller.getSnapshot().confirmed?.fileSizeUnit).toBe("BINARY")
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("stores incomplete ColorInput Draft without sending a mutation", async () => {
     const controller = createPersonalPreferencesSession()
     const save = vi.fn()
