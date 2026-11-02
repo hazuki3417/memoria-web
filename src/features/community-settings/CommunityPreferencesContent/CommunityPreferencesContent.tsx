@@ -53,7 +53,7 @@ export function CommunityPreferencesContent({
     mode: "onChange",
     defaultValues: { accentDraft: initialDraft ?? accent },
   })
-  const { field } = useController({ control, name: "accentDraft" })
+  const { field, fieldState } = useController({ control, name: "accentDraft" })
 
   // Refresh an untouched input; preserve an incomplete draft unless the
   // owning save controller explicitly restores its last confirmed value.
@@ -131,7 +131,13 @@ export function CommunityPreferencesContent({
           >
             <ColorInput
               aria-label="Communityアクセントカラー"
-              error={accentError}
+              error={
+                accentError ??
+                (fieldState.isTouched &&
+                !communityAccentSchema.safeParse({ accentDraft: field.value }).success
+                  ? "HEXカラーコード（#RRGGBB）を入力してください。"
+                  : undefined)
+              }
               format="hex"
               name={field.name}
               ref={field.ref}
