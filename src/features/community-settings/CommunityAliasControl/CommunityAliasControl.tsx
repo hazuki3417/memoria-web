@@ -8,9 +8,8 @@ import type { z } from "zod"
 import { communityAliasSchema } from "../communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
 import {
-  SettingsInputValidationError,
   classifySettingsSaveFailure,
-  resolveSettingsValidation,
+  resolveSettingsFailureValidation,
   type SettingsSaveFailureKind,
 } from "@/features/settings/graphqlSettingsResult"
 
@@ -71,8 +70,8 @@ export function CommunityAliasControl({
       })
     } catch (error) {
       const kind = classifySettingsSaveFailure(error)
-      if (kind === "validation" && error instanceof SettingsInputValidationError) {
-        const result = resolveSettingsValidation(error, ["alias"])
+      if (kind === "validation") {
+        const result = resolveSettingsFailureValidation(error, ["alias"])
         if (result.fieldErrors.alias) {
           setError("alias", { type: "server", message: result.fieldErrors.alias })
         }
