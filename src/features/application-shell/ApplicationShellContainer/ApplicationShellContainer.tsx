@@ -23,6 +23,8 @@ import {
 } from "../CommunityAccentPreviewContext"
 import { resolveCommunityAccent } from "../communityAccentPreview"
 import { PersonalPreferencesSessionProvider } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
+import { usePersonalPreferencesSession } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
+import { resolvePersonalAccent } from "@/features/settings/preferences/personalAccentPreview"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -67,6 +69,7 @@ export function ApplicationShellContainer({
 
 function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
   const { previews: accentPreviews } = useCommunityAccentPreview()
+  const { snapshot: personalSession } = usePersonalPreferencesSession()
   const router = useRouter()
   const pathname = usePathname()
   const navigation = useApplicationNavigation()
@@ -121,8 +124,10 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
   const resolvedPersonalContext = {
     ...personalContext,
     accentColor:
-      currentUserData?.me?.preferences.personalAccentColor ??
-      personalContext.accentColor,
+      resolvePersonalAccent(
+        currentUserData?.me?.preferences.personalAccentColor,
+        personalSession,
+      ) ?? personalContext.accentColor,
   }
   const currentContext =
     contextKind === "community"
