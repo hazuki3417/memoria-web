@@ -106,6 +106,7 @@ export function ConnectedCommunityPreferences({
   const failure = snapshot.failure
   const accent = snapshot.confirmed ?? data.community.mySettings.accentColor
   const lastDraft = snapshot.draft ?? accent
+  const canResave = Boolean(snapshot.draft && isHex(snapshot.draft))
 
   return (
     <Stack gap="sm">
@@ -150,7 +151,7 @@ export function ConnectedCommunityPreferences({
                     </Button>
                   )}
                   {(failure === "rejected" || snapshot.inspected) && !snapshot.observedMatches && (
-                    <Button size="xs" onClick={() => controller.retry(communityId)}>
+                    <Button size="xs" disabled={!canResave} onClick={() => controller.retry(communityId)}>
                       もう一度保存
                     </Button>
                   )}
