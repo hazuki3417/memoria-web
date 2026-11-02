@@ -38,10 +38,10 @@ export function createPreferencesSaveQueue(
             onStateChange?.(Object.keys(pending).length ? "saving" : "saved")
           }
         } catch (error) {
-          // Preserve unsuccessful edits, without overwriting newer values.
-          pending = { ...patch, ...pending }
-          paused = true
           if (!stopped) {
+            // Preserve unsuccessful edits, without overwriting newer values.
+            pending = { ...patch, ...pending }
+            paused = true
             onError(error, patch)
             onStateChange?.("attention")
           }
