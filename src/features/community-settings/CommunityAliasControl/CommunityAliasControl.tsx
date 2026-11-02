@@ -100,7 +100,9 @@ export function CommunityAliasControl({
         onChange={(event) => {
           field.onChange(event.currentTarget.value)
           clearErrors("alias")
-          setFailure(null)
+          setFailure((current) =>
+            current === "unknown" || current === "blocked" ? current : null,
+          )
           setFormInvalid(false)
         }}
         error={
