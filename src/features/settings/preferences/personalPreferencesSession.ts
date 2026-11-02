@@ -111,7 +111,13 @@ export function createPersonalPreferencesSession() {
       const refreshed = { ...snapshot.confirmed }
       const pending = { ...snapshot.draftPatch, ...queue?.getPending() }
       for (const key of Object.keys(current) as Array<keyof UserPreferences>) {
-        if (!(key in pending) && !locallyConfirmedKeys.has(key)) {
+        if (locallyConfirmedKeys.has(key)) {
+          // An authoritative Query has now echoed the locally confirmed value.
+          // Older snapshots must not roll it back before this point.
+          if (current[key] === snapshot.confirmed[key]) locallyConfirmedKeys.delete(key)
+          else continue
+        }
+        if (!(key in pending)) {
           Object.assign(refreshed, { [key]: current[key] })
         }
       }
