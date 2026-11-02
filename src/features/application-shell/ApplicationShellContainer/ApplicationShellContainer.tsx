@@ -17,6 +17,7 @@ import {
 } from ".././communityDisplayName"
 import { CommunityCreateModal } from ".././CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from ".././useApplicationContextSelection"
+import { CommunityAccentPreviewProvider, useCommunityAccentPreview } from "../CommunityAccentPreviewContext"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -45,11 +46,16 @@ const communityContext = {
   accentColor: "var(--mantine-color-teal-6)",
 }
 
-export function ApplicationShellContainer({
-  children,
-}: {
-  children: ReactNode
-}) {
+export function ApplicationShellContainer({ children }: { children: ReactNode }) {
+  return (
+    <CommunityAccentPreviewProvider>
+      <ApplicationShellWithPreview>{children}</ApplicationShellWithPreview>
+    </CommunityAccentPreviewProvider>
+  )
+}
+
+function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
+  const { preview: accentPreview } = useCommunityAccentPreview()
   const router = useRouter()
   const pathname = usePathname()
   const navigation = useApplicationNavigation()
@@ -116,7 +122,9 @@ export function ApplicationShellContainer({
             currentCreated?.label ??
             (communitiesLoaded ? "Community" : "読み込み中"),
           accentColor:
-            currentCreated?.accentColor ?? communityContext.accentColor,
+            accentPreview?.communityId === communityId
+              ? accentPreview.color
+              : (currentCreated?.accentColor ?? communityContext.accentColor),
         }
       : resolvedPersonalContext
   const contextLoading =
@@ -240,7 +248,10 @@ export function ApplicationShellContainer({
                       ...communityContext,
                       id: item.id,
                       label: item.label,
-                      accentColor: item.accentColor,
+                      accentColor:
+                        accentPreview?.communityId === item.id
+                          ? accentPreview.color
+                          : item.accentColor,
                     })),
                   ]}
                   onSelect={(id) => {
