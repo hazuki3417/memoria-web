@@ -75,6 +75,39 @@ describe("session Community Accent save controller", () => {
     expect(controller.getSnapshot(id).failure).toBeNull()
   })
 
+  it("requires a fresh inspection if an unknown Accent draft changes", async () => {
+    const controller = createCommunityAccentSaveController()
+    const save = vi.fn().mockRejectedValue(
+      Object.assign(new Error("offline"), { networkError: new Error("offline") }),
+    )
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save,
+      observe: vi.fn().mockResolvedValue("#112233"),
+      preview: vi.fn().mockReturnValue(1),
+      release: vi.fn(),
+    })
+    controller.edit(id, "#AABBCC")
+    await tick()
+    await controller.inspect(id)
+    expect(controller.getSnapshot(id).inspected).toBe(true)
+
+    controller.edit(id, "#445566")
+    expect(controller.getSnapshot(id)).toMatchObject({
+      failure: "unknown",
+      inspected: false,
+      observedMatches: false,
+      draft: "#445566",
+    })
+    controller.retry(id)
+    await tick()
+    expect(save).toHaveBeenCalledTimes(1)
+    await controller.inspect(id)
+    controller.retry(id)
+    await tick()
+    expect(save).toHaveBeenCalledTimes(2)
+  })
+
   it("allows explicit completion on an observed match without a second mutation", async () => {
     const controller = createCommunityAccentSaveController()
     const save = vi.fn().mockRejectedValueOnce(
