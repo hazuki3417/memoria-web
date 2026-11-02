@@ -223,7 +223,7 @@ describe("preferences save queue", () => {
   it("keeps attention visible when editing after a failed save", async () => {
     vi.useFakeTimers()
     const states: string[] = []
-    const save = vi.fn().mockRejectedValueOnce(new Error("offline")).mockResolvedValue(defaultUserPreferences)
+    const save = vi\n      .fn()\n      .mockRejectedValueOnce(new Error("offline"))\n      .mockResolvedValue(defaultUserPreferences)
     const queue = createPreferencesSaveQueue(
       save,
       vi.fn(),
@@ -243,6 +243,53 @@ describe("preferences save queue", () => {
 
     await queue.flush()
     expect(save).toHaveBeenCalledTimes(2)
+    expect(states.at(-1)).toBe("saved")
+  })
+
+  it("preserves newer edits after an in-flight failure until explicit retry", async () => {
+    vi.useFakeTimers()
+    const states: string[] = []
+    let rejectFirst: ((error: Error) => void) | undefined
+    const save = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<typeof defaultUserPreferences>((_resolve, reject) => {
+            rejectFirst = reject
+          }),
+      )
+      .mockResolvedValue(defaultUserPreferences)
+    const queue = createPreferencesSaveQueue(
+      save,
+      vi.fn(),
+      vi.fn(),
+      400,
+      (state) => states.push(state),
+    )
+
+    queue.enqueue({ mediaThumbnailSize: "SMALL", dateFormat: "DD_MM_YYYY" })
+    const first = queue.flush()
+    queue.enqueue({ mediaThumbnailSize: "LARGE" })
+    rejectFirst?.(new Error("offline"))
+    await first
+
+    expect(queue.getPending()).toEqual({
+      mediaThumbnailSize: "LARGE",
+      dateFormat: "DD_MM_YYYY",
+    })
+    expect(states.at(-1)).toBe("attention")
+
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(save).toHaveBeenCalledTimes(1)
+    await queue.flush({ manual: false })
+    expect(save).toHaveBeenCalledTimes(1)
+
+    await queue.flush()
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(save).toHaveBeenLastCalledWith({
+      mediaThumbnailSize: "LARGE",
+      dateFormat: "DD_MM_YYYY",
+    })
     expect(states.at(-1)).toBe("saved")
   })
 
