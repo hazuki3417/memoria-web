@@ -189,6 +189,8 @@ export function createCommunityAccentSaveController() {
           inspected: true,
         })
       } catch {
+        // An old inspection failure must not reset a newer draft's recovery.
+        if (entry.snapshot.draft !== draftAtStart || entry.snapshot.failure !== "unknown") return
         update(id, { observedMatches: false, inspected: false })
       }
     },
