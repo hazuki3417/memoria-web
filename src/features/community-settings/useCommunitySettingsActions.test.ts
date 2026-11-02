@@ -49,38 +49,53 @@ afterEach(async () => {
 })
 
 describe("Community設定のMutation契約", () => {
-  it("Community名変更の成功はtrue、MyCommunitiesの再取得を要求する", async () => {
+  it("Community名変更の成功は確定名を返し、MyCommunitiesの再取得を要求する", async () => {
     mocks.rename.mockResolvedValue({
       data: {
         updateCommunity: {
           __typename: "UpdateCommunitySuccess",
-          community: { id: "community-1" },
+          community: { id: "community-1", name: "新しい名前" },
         },
       },
     })
-    expect(await actions.onSaveName("新しい名前")).toBe(true)
+    expect(await actions.onSaveName("新しい名前")).toBe("新しい名前")
     expect(mocks.rename).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
           input: { communityId: "community-1", name: "新しい名前" },
         },
-        awaitRefetchQueries: true,
+        awaitRefetchQueries: false,
       }),
     )
     expect(mocks.rename.mock.calls[0][0].refetchQueries).toHaveLength(1)
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
-  it("Community名変更の応答欠落と通信失敗をfalseとして通知する", async () => {
+  it("Community名変更の応答欠落と通信失敗をFormに伝搬し、接続層から重複通知しない", async () => {
     mocks.rename
       .mockResolvedValueOnce({ data: null })
       .mockRejectedValueOnce(new Error("network"))
-    expect(await actions.onSaveName("変更")).toBe(false)
-    expect(await actions.onSaveName("変更")).toBe(false)
-    expect(mocks.notify).toHaveBeenCalledTimes(2)
-    expect(mocks.notify).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "error" }),
-    )
+    await expect(actions.onSaveName("変更")).rejects.toThrow("unconfirmed")
+    await expect(actions.onSaveName("変更")).rejects.toThrow("network")
+    expect(mocks.notify).not.toHaveBeenCalled()
+  })
+
+  it("Community名のTyped ValidationをField Path付きでFormへ伝達する", async () => {
+    mocks.rename.mockResolvedValue({
+      data: {
+        updateCommunity: {
+          __typename: "InputValidationFailure",
+          violations: [{
+            scope: "FIELD", code: "REQUIRED", inputPaths: [{ segments: ["name"] }],
+          }],
+        },
+      },
+    })
+    await expect(actions.onSaveName("変更")).rejects.toMatchObject({
+      kind: "validation",
+      violations: [{ code: "REQUIRED" }],
+    })
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
 
   it("メンバー除外成功はtrueと成功通知、CommunityMembersの再取得", async () => {
