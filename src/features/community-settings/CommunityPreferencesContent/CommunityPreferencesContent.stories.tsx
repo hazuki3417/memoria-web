@@ -100,6 +100,23 @@ export const AccentIncompleteDraftDoesNotPreview: Story = {
   },
 }
 
+export const AccentClientValidationOnBlur: Story = {
+  name: "Interaction · 未完成HEXはBlur後にのみError表示",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Communityアクセントカラー" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "#123")
+    await expect(canvas.queryByText("HEXカラーコード（#RRGGBB）を入力してください。")).not.toBeInTheDocument()
+    await userEvent.tab()
+    await expect(canvas.getByText("HEXカラーコード（#RRGGBB）を入力してください。")).toBeVisible()
+    await userEvent.clear(input)
+    await userEvent.type(input, "#ABCDEF")
+    await expect(canvas.queryByText("HEXカラーコード（#RRGGBB）を入力してください。")).not.toBeInTheDocument()
+  },
+}
+
 export const AccentRollbackPreservesDraft: Story = {
   name: "Interaction · 保存失敗時もColorInput Draftを保持",
   tags: ["interaction"],
