@@ -1,6 +1,10 @@
 services:
   vrt:
-    image: ${MEMORIA_VRT_IMAGE:-mcr.microsoft.com/playwright:v1.64.1-noble}
+    image: memoria-vrt-node24:playwright-1.64.1
+    build:
+      dockerfile_inline: |
+        FROM ${MEMORIA_VRT_IMAGE:-mcr.microsoft.com/playwright:v1.64.1-noble}
+        COPY --from=node:24-bookworm-slim /usr/local/bin/node /usr/local/bin/node
     profiles: [vrt]
     init: true
     ipc: host
