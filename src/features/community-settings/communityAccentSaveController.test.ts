@@ -130,6 +130,37 @@ describe("session Community Accent save controller", () => {
     })
   })
 
+  it("ignores an older inspection result when a newer inspection of the same draft finishes", async () => {
+    const controller = createCommunityAccentSaveController()
+    let resolveFirst: ((value: string) => void) | undefined
+    const observe = vi.fn()
+      .mockImplementationOnce(() => new Promise<string>((resolve) => {
+        resolveFirst = resolve
+      }))
+      .mockResolvedValue("#112233")
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save: vi.fn().mockRejectedValue(
+        Object.assign(new Error("offline"), { networkError: new Error("offline") }),
+      ),
+      observe,
+      preview: vi.fn().mockReturnValue(1),
+      release: vi.fn(),
+    })
+    controller.edit(id, "#AABBCC")
+    await tick()
+    const older = controller.inspect(id)
+    await controller.inspect(id)
+    expect(controller.getSnapshot(id)).toMatchObject({
+      inspected: true, observedMatches: false,
+    })
+    resolveFirst?.("#AABBCC")
+    await older
+    expect(controller.getSnapshot(id)).toMatchObject({
+      inspected: true, observedMatches: false,
+    })
+  })
+
   it("does not roll back a confirmed mutation when an older query result arrives", async () => {
     const controller = createCommunityAccentSaveController()
     controller.initialize(id, "#112233")
