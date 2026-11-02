@@ -3,6 +3,9 @@
 import { Alert, Box, Button, Stack, TextInput } from "@mantine/core"
 import { useEffect, useRef, useState } from "react"
 import { useController, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { communityAliasSchema } from "../communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
 
 export function CommunityAliasControl({
@@ -12,7 +15,13 @@ export function CommunityAliasControl({
   savedAlias: string | null
   onSave: (alias: string | null) => Promise<void>
 }) {
-  const { control, reset } = useForm<{ alias: string }>({
+  const { control, reset, handleSubmit } = useForm<
+    z.input<typeof communityAliasSchema>,
+    unknown,
+    z.output<typeof communityAliasSchema>
+  >({
+    resolver: zodResolver(communityAliasSchema),
+    mode: "onChange",
     defaultValues: { alias: savedAlias ?? "" },
   })
   const { field } = useController({ control, name: "alias" })
@@ -25,16 +34,16 @@ export function CommunityAliasControl({
   const [error, setError] = useState(false)
   const text = field.value
   const normalized = text.trim()
-  const codepoints = Array.from(normalized).length
+  const validation = communityAliasSchema.safeParse({ alias: text })
   const changed = normalized !== (savedAlias ?? "")
-  const invalid = codepoints > 100
+  const invalid = !validation.success
 
-  const save = async () => {
-    if (saving || !changed || invalid) return
+  const save = handleSubmit(async ({ alias }) => {
+    if (saving || !changed) return
     setSaving(true)
     setError(false)
     try {
-      await onSave(normalized || null)
+      await onSave(alias)
       editing.current = false
       reset({ alias: normalized })
       showNotification({
@@ -50,7 +59,7 @@ export function CommunityAliasControl({
     } finally {
       setSaving(false)
     }
-  }
+  })
 
   return (
     <Stack gap="md" maw={540}>
@@ -69,7 +78,9 @@ export function CommunityAliasControl({
           field.onChange(event.currentTarget.value)
           setError(false)
         }}
-        error={invalid ? "100文字以内で入力してください。" : undefined}
+        error={
+          !validation.success ? validation.error.issues[0]?.message : undefined
+        }
       />
       {error && (
         <Alert color="red" title="保存できませんでした">
