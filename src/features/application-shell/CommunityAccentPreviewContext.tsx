@@ -15,7 +15,7 @@ import {
 } from "react"
 
 type CommunityAccentPreviewContextValue = {
-  preview: CommunityAccentPreview
+  previews: Record<string, NonNullable<CommunityAccentPreview>>
   setPreview: (communityId: string, color: string) => number
   clearPreview: (communityId: string, owner: number) => void
   saveController: ReturnType<typeof createCommunityAccentSaveController>
@@ -34,22 +34,26 @@ export function CommunityAccentPreviewProvider({
 }: {
   children: ReactNode
 }) {
-  const [preview, setCurrentPreview] = useState<CommunityAccentPreview>(null)
+  const [previews, setCurrentPreviews] = useState<Record<string, NonNullable<CommunityAccentPreview>>>({})
   const saveController = useRef(createCommunityAccentSaveController()).current
   const nextOwner = useRef(0)
   const setPreview = useCallback((communityId: string, color: string) => {
     const owner = ++nextOwner.current
-    setCurrentPreview({ communityId, color, owner })
+    setCurrentPreviews((current) => ({ ...current, [communityId]: { communityId, color, owner } }))
     return owner
   }, [])
   const clearPreview = useCallback((communityId: string, owner: number) => {
-    setCurrentPreview((current) =>
-      releaseCommunityAccentPreview(current, communityId, owner),
-    )
+    setCurrentPreviews((current) => {
+      if (!current[communityId] ||
+        releaseCommunityAccentPreview(current[communityId], communityId, owner) !== null) return current
+      const updated = { ...current }
+      delete updated[communityId]
+      return updated
+    })
   }, [])
   const value = useMemo(
-    () => ({ preview, setPreview, clearPreview, saveController }),
-    [preview, setPreview, clearPreview, saveController],
+    () => ({ previews, setPreview, clearPreview, saveController }),
+    [previews, setPreview, clearPreview, saveController],
   )
 
   return (
