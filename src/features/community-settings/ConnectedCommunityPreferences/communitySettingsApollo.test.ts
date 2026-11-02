@@ -46,19 +46,19 @@ describe("Community settings Apollo operation isolation", () => {
     expect(pending).toHaveLength(2)
 
     pending[1]({ updateCommunitySettings: {
-      __typename: "UpdateCommunitySettingsPayload",
+      __typename: "UpdateCommunitySettingsSuccess",
       settings: settings("#112233", "New alias"),
     } })
     const aliasResult = await alias
-    const confirmedAlias = aliasResult.data?.updateCommunitySettings.settings.alias
+    const confirmedAlias = aliasResult.data?.updateCommunitySettings.__typename === "UpdateCommunitySettingsSuccess" ? aliasResult.data.updateCommunitySettings.settings.alias : undefined
     if (confirmedAlias === undefined) throw new Error("Alias result missing")
     commitCommunitySettingsPatch(cache, "community-1", { alias: confirmedAlias })
     pending[0]({ updateCommunitySettings: {
-      __typename: "UpdateCommunitySettingsPayload",
+      __typename: "UpdateCommunitySettingsSuccess",
       settings: settings("#AABBCC", "Old alias"),
     } })
     const accentResult = await accent
-    const confirmedAccent = accentResult.data?.updateCommunitySettings.settings.accentColor
+    const confirmedAccent = accentResult.data?.updateCommunitySettings.__typename === "UpdateCommunitySettingsSuccess" ? accentResult.data.updateCommunitySettings.settings.accentColor : undefined
     if (!confirmedAccent) throw new Error("Accent result missing")
     commitCommunitySettingsPatch(cache, "community-1", { accentColor: confirmedAccent })
 
