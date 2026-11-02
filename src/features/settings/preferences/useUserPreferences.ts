@@ -40,10 +40,9 @@ export function useUserPreferences(
     previousSource.current = initialPreferences
     reset(
       { ...initialPreferences, accentDraft: initialPreferences.personalAccentColor },
-      { keepDirtyValues: true },
+      { keepDirtyValues: Object.keys(dirtyFields).length > 0 },
     )
-  }, [initialPreferences, reset])
-  void dirtyFields
+  }, [initialPreferences, reset, dirtyFields])
   const values = watch()
   const preferences: UserPreferences = {
     personalAccentColor: values.personalAccentColor,
