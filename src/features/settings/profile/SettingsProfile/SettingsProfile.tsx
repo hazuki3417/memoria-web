@@ -43,12 +43,7 @@ export function SettingsProfile({
   >({
     resolver: zodResolver(profileSchema),
     mode: "onChange",
-    defaultValues: {
-      nickname:
-        initialSaveState === "saving" || initialSaveState === "retryable-error"
-          ? `${initialNickname}新`
-          : initialNickname,
-    },
+    defaultValues: { nickname: initialNickname },
   })
   const { field } = useController({ control, name: "nickname" })
   // The confirmed server value is not an editable Form Draft.
