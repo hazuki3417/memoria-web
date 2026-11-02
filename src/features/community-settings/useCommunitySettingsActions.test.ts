@@ -18,7 +18,7 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   MyCommunitiesDocument: { kind: "Document", name: "myCommunities" },
   CommunityMembersDocument: { kind: "Document", name: "communityMembers" },
   CommunityMemberRole: { Admin: "ADMIN", Member: "MEMBER" },
-  useRenameCommunityMutation: () => [mocks.rename],
+  useUpdateCommunityMutation: () => [mocks.rename],
   useChangeCommunityMemberRoleMutation: () => [mocks.changeRole],
   useRemoveCommunityMemberMutation: () => [mocks.remove],
   useLeaveCommunityMutation: () => [mocks.leave],
@@ -51,7 +51,7 @@ afterEach(async () => {
 describe("Community設定のMutation契約", () => {
   it("Community名変更の成功はtrue、MyCommunitiesの再取得を要求する", async () => {
     mocks.rename.mockResolvedValue({
-      data: { renameCommunity: { community: { id: "community-1" } } },
+      data: { updateCommunity: { __typename: "UpdateCommunitySuccess", community: { id: "community-1" } } },
     })
     expect(await actions.onSaveName("新しい名前")).toBe(true)
     expect(mocks.rename).toHaveBeenCalledWith(
