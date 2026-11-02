@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
+import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
 import { createPersonalPreferencesSession } from "./personalPreferencesSession"
 import { defaultUserPreferences } from "./userPreferences"
 
@@ -309,4 +310,35 @@ describe("Personal Preferences session controller", () => {
       vi.useRealTimers()
     }
   })
+
+  it("preserves Typed Field Validation and pending Patch until explicit recovery", async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = createPersonalPreferencesSession()
+      const save = vi.fn().mockRejectedValue(new SettingsInputValidationError([
+        { scope: "FIELD", code: "INVALID_VALUE", inputPaths: [{ segments: ["fileSizeUnit"] }] },
+      ]))
+      controller.configure(save)
+      controller.hydrate(defaultUserPreferences)
+      controller.edit({ fileSizeUnit: "BINARY" })
+      await vi.advanceTimersByTimeAsync(400)
+      expect(controller.getSnapshot()).toMatchObject({
+        failure: "validation",
+        validation: {
+          fieldErrors: { fileSizeUnit: "入力内容を確認してください。" },
+          formError: false,
+        },
+        draftPatch: { fileSizeUnit: "BINARY" },
+      })
+      controller.edit({ mediaDetailNavigationWrap: true })
+      await vi.advanceTimersByTimeAsync(400)
+      expect(save).toHaveBeenCalledTimes(1)
+      expect(controller.getSnapshot().failure).toBe("validation")
+      controller.discard()
+      expect(controller.getSnapshot()).toMatchObject({ failure: null, validation: null })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
 })
