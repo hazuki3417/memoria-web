@@ -5,7 +5,7 @@ import {
   MyCommunitiesDocument,
   CommunityMembersDocument,
   CommunityMemberRole,
-  useRenameCommunityMutation,
+  useUpdateCommunityMutation,
   useChangeCommunityMemberRoleMutation,
   useRemoveCommunityMemberMutation,
   useLeaveCommunityMutation,
@@ -102,12 +102,12 @@ export function useCommunitySettingsActions(communityId: string) {
 
   const onSaveName = async (nextName: string): Promise<boolean> => {
     try {
-      const result = await renameCommunity({
+      const result = await updateCommunity({
         variables: { input: { communityId, name: nextName } },
         refetchQueries: [MyCommunitiesDocument],
         awaitRefetchQueries: true,
       })
-      if (result.data?.renameCommunity.community) return true
+      if (result.data?.updateCommunity?.__typename === "UpdateCommunitySuccess") return true
       showNotification({
         kind: "error",
         title: "Community名を変更",
