@@ -18,6 +18,8 @@ export type SaveStatusProps = {
   state: SaveStatusState
   /** Enable only for meaningful transitions; avoid announcing every edit. */
   announce?: boolean
+  /** Optional timing; omitted props preserve the established presentation. */
+  timing?: { savingDelayMs?: number; savedDurationMs?: number; savingAnnouncementMs?: number }
 }
 
 const labels: Record<SaveStatusState, string> = {
@@ -35,39 +37,57 @@ const icons = {
   attention: IconAlertCircle,
 }
 
-export function SaveStatus({ state, announce = false }: SaveStatusProps) {
-  const label = labels[state]
+export function SaveStatus({ state, announce = false, timing }: SaveStatusProps) {
+  const [visibleState, setVisibleState] = useState<SaveStatusState>(state)
+  const savingDelay = timing?.savingDelayMs ?? 0
+  const savedDuration = timing?.savedDurationMs ?? 0
+  const savingAnnouncementDelay = timing?.savingAnnouncementMs
+
+  useEffect(() => {
+    if (state === "saving" && savingDelay > 0) {
+      const timer = setTimeout(() => setVisibleState("saving"), savingDelay)
+      return () => clearTimeout(timer)
+    }
+    setVisibleState(state)
+    if (state === "saved" && savedDuration > 0) {
+      const timer = setTimeout(() => setVisibleState("idle"), savedDuration)
+      return () => clearTimeout(timer)
+    }
+  }, [state, savingDelay, savedDuration])
+
+  const label = labels[visibleState]
   const previousState = useRef<SaveStatusState | null>(null)
   const [announcement, setAnnouncement] = useState("")
 
   useEffect(() => {
     const previous = previousState.current
     previousState.current = state
-    // Error announcements belong to the persistent form alert.
-    // Avoid announcing every edit or an initial saved state.
-    if (
-      !announce ||
-      previous === null ||
-      state !== "saved" ||
-      previous === "saved"
-    ) {
+    if (!announce) {
       setAnnouncement("")
       return
     }
-    setAnnouncement("変更を保存しました")
-  }, [announce, state])
+    if (state === "saving" && savingAnnouncementDelay !== undefined) {
+      setAnnouncement("")
+      const timer = setTimeout(() => setAnnouncement("保存中です"), savingAnnouncementDelay)
+      return () => clearTimeout(timer)
+    }
+    // Persistent form alerts own failure announcements.
+    setAnnouncement(previous !== null && state === "saved" && previous !== "saved"
+      ? "変更を保存しました"
+      : "")
+  }, [announce, state, savingAnnouncementDelay])
 
-  const Icon = state === "idle" ? null : icons[state]
+  const Icon = visibleState === "idle" ? null : icons[visibleState]
 
   return (
     <>
       <Badge
         variant="light"
-        color={state === "attention" ? "red" : state === "saved" ? "green" : "gray"}
+        color={visibleState === "attention" ? "red" : visibleState === "saved" ? "green" : "gray"}
         size="sm"
         radius="xl"
         leftSection={Icon ? <Icon size={13} aria-hidden="true" /> : undefined}
-        style={{ visibility: state === "idle" ? "hidden" : "visible" }}
+        style={{ visibility: visibleState === "idle" ? "hidden" : "visible" }}
         aria-live="off"
         aria-label={label || undefined}
       >
