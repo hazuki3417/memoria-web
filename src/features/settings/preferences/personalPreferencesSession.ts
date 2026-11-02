@@ -47,6 +47,7 @@ export function createPersonalPreferencesSession() {
   let inspectServer: Inspect | undefined
   let queue: ReturnType<typeof createPreferencesSaveQueue> | null = null
   let inspectedValue: UserPreferences | null = null
+  let inspectionGeneration = 0
   const locallyConfirmedKeys = new Set<keyof UserPreferences>()
 
   const emit = (change: Partial<PreferencesSessionSnapshot>) => {
@@ -145,9 +146,10 @@ export function createPersonalPreferencesSession() {
       if (snapshot.failure !== "unknown" || !inspectServer) return
       const draftAtStart = snapshot.draftPatch
       const rawAtStart = snapshot.accentDraft
+      const generation = ++inspectionGeneration
       try {
         const current = await inspectServer()
-        if (snapshot.draftPatch !== draftAtStart || snapshot.accentDraft !== rawAtStart) return
+        if (generation !== inspectionGeneration || snapshot.failure !== "unknown" || snapshot.draftPatch !== draftAtStart || snapshot.accentDraft !== rawAtStart) return
         inspectedValue = current
         const pending = { ...queue?.getPending(), ...snapshot.draftPatch }
         const observedMatches = Object.keys(pending).length > 0 &&
@@ -158,6 +160,7 @@ export function createPersonalPreferencesSession() {
             /^#[0-9a-fA-F]{6}$/.test(snapshot.accentDraft))
         emit({ inspected: true, observedMatches })
       } catch {
+        if (generation !== inspectionGeneration || snapshot.failure !== "unknown" || snapshot.draftPatch !== draftAtStart || snapshot.accentDraft !== rawAtStart) return
         inspectedValue = null
         emit({ inspected: false, observedMatches: false })
       }
