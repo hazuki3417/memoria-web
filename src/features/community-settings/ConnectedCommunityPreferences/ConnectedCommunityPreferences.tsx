@@ -117,6 +117,7 @@ export function ConnectedCommunityPreferences({
         isPreview={false}
         preserveDraftOnAccentChange={failure !== null}
         saveStatus={failure ? "attention" : snapshot.status}
+        accentError={snapshot.validation?.fieldErrors.accentColor}
         onAccentDraftChange={(value) => controller.edit(communityId, value)}
         saveFeedback={
           failure ? (
@@ -134,7 +135,9 @@ export function ConnectedCommunityPreferences({
                   Shellは最後に確認できた色を表示しています。入力内容は保持しています。
                   {failure === "unknown"
                     ? " 現在のServer状態を確認してから、必要に応じて手動で保存してください。"
-                    : " 内容を確認して、再保存するか変更を破棄してください。"}
+                    : snapshot.validation
+                      ? " 入力項目を修正したうえで再保存するか、変更を破棄してください。"
+                      : " 内容を確認して、再保存するか変更を破棄してください。"}
                 </Text>
                 {failure === "unknown" && snapshot.inspected && (
                   <Text size="sm">
