@@ -3,6 +3,9 @@
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { useRef, useState } from "react"
 import { useController, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { profileSchema } from "../profileSchema"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -33,7 +36,13 @@ export function SettingsProfile({
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
 }) {
-  const { control, reset } = useForm<{ nickname: string }>({
+  const { control, reset, handleSubmit } = useForm<
+    z.input<typeof profileSchema>,
+    unknown,
+    z.output<typeof profileSchema>
+  >({
+    resolver: zodResolver(profileSchema),
+    mode: "onChange",
     defaultValues: {
       nickname:
         initialSaveState === "saving" || initialSaveState === "retryable-error"
@@ -47,9 +56,10 @@ export function SettingsProfile({
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "retryable-error" | "blocked"
   >(initialSaveState)
+  const validation = profileSchema.safeParse({ nickname: field.value })
   const normalized = field.value.trim()
   const dirty = normalized !== saved.current
-  const invalid = normalized.length === 0
+  const invalid = !validation.success
   const isSaving = saveState === "saving"
   const isBlocked = saveState === "blocked"
   let saveLabel = "更新"
@@ -59,14 +69,14 @@ export function SettingsProfile({
     saveLabel = "更新中"
   }
 
-  const save = async () => {
-    if (!dirty || invalid || isSaving || isBlocked) return
+  const save = handleSubmit(async ({ nickname }) => {
+    if (!dirty || isSaving || isBlocked) return
 
     setSaveState("saving")
     try {
-      await onSave(normalized)
-      saved.current = normalized
-      reset({ nickname: normalized })
+      await onSave(nickname)
+      saved.current = nickname
+      reset({ nickname })
       setSaveState("idle")
       showNotification({
         kind: "success",
@@ -78,7 +88,7 @@ export function SettingsProfile({
         isBlockingProfileSaveError(error) ? "blocked" : "retryable-error",
       )
     }
-  }
+  })
 
   return (
     <Stack gap="xl">
@@ -115,7 +125,9 @@ export function SettingsProfile({
             onBlur={field.onBlur}
             value={field.value}
             onChange={field.onChange}
-            error={invalid ? "ニックネームを入力してください。" : undefined}
+            error={
+              invalid ? validation.error.issues[0]?.message : undefined
+            }
             required
             disabled={isSaving || isBlocked}
           />
@@ -124,7 +136,7 @@ export function SettingsProfile({
             style={{ alignSelf: "flex-start" }}
             disabled={!dirty || invalid || isSaving || isBlocked}
             loading={isSaving}
-            onClick={save}
+            onClick={() => void save()}
           >
             {saveLabel}
           </Button>
