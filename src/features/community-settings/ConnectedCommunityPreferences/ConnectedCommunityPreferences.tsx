@@ -1,12 +1,14 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
-import { Alert, Stack } from "@mantine/core"
-import type { SaveStatusState } from "@/components/SaveStatus"
-import { useCommunityAccentPreview } from "@/features/application-shell/CommunityAccentPreviewContext"
+import { useEffect } from "react"
+import { Alert, Button, Group, Stack, Text } from "@mantine/core"
+import { useApolloClient } from "@apollo/client"
+import {
+  useCommunityAccentPreview,
+  useCommunityAccentSave,
+} from "@/features/application-shell/CommunityAccentPreviewContext"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
-import { useApolloClient } from "@apollo/client"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import {
@@ -32,125 +34,63 @@ export function ConnectedCommunityPreferences({
   useSettingsRefreshError(Boolean(data?.community && error))
   const client = useApolloClient()
   const { setPreview, clearPreview } = useCommunityAccentPreview()
+  const { snapshot, controller } = useCommunityAccentSave(communityId)
   const [save] = useUpdateCommunitySettingsMutation()
-  const [accent, setAccent] = useState<string | null>(null)
-  const [saveError, setSaveError] = useState(false)
-  const [saveStatus, setSaveStatus] = useState<SaveStatusState>("idle")
-  const saved = useRef<string | null>(null)
-  const desired = useRef<string | null>(null)
-  const inFlight = useRef(false)
-  const hasIncompleteDraft = useRef(false)
-  const previewOwner = useRef<number | null>(null)
-  const active = useRef(true)
 
-  useEffect(() => {
-    active.current = true
-    return () => {
-      active.current = false
-      if (previewOwner.current !== null) {
-        clearPreview(communityId, previewOwner.current)
-        previewOwner.current = null
-      }
-    }
-  }, [communityId, clearPreview])
-
-  // A server refresh must not replace a newer unsaved user selection.
-  useEffect(() => {
-    const value = data?.community?.mySettings.accentColor
-    if (value && !inFlight.current && desired.current === null) {
-      saved.current = value
-      setAccent(value)
-    }
-  }, [data])
-
-  const applyContextAccent = useCallback(
-    (value: string) => {
-      const id = client.cache.identify({
+  // Keep only confirmed Mutation results in the shared Apollo cache.
+  // Reading the current fragment protects Alias against unrelated Accent writes.
+  const commitConfirmedAccent = (value: string) => {
+    const id = client.cache.identify({ __typename: "Community", id: communityId })
+    if (!id) return
+    const previous = client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
+      id,
+      fragment: CommunitySettingsCacheFragmentDoc,
+    })
+    if (!previous) return
+    client.cache.writeFragment({
+      id,
+      fragment: CommunitySettingsCacheFragmentDoc,
+      data: {
         __typename: "Community",
-        id: communityId,
-      })
-      if (!id) return
-      const previous =
-        client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
-          id,
-          fragment: CommunitySettingsCacheFragmentDoc,
-        })
-      if (!previous) return
-      client.cache.writeFragment({
-        id,
-        fragment: CommunitySettingsCacheFragmentDoc,
-        data: {
-          __typename: "Community",
-          mySettings: {
-            __typename: "CommunitySettings",
-            accentColor: value,
-            alias: previous.mySettings.alias,
-          },
+        mySettings: {
+          __typename: "CommunitySettings",
+          accentColor: value,
+          alias: previous.mySettings.alias,
         },
-      })
-    },
-    [client, communityId],
-  )
-
-  const flush = useCallback(async () => {
-    if (inFlight.current || desired.current === null) return
-    inFlight.current = true
-    if (active.current) {
-      setSaveStatus("saving")
-    }
-    try {
-      while (desired.current !== null) {
-        const next = desired.current
-        desired.current = null
-        const result = await save({
-          variables: {
-            input: { communityId, accentColor: next.toUpperCase() },
-          },
-        })
-        const confirmed =
-          result.data?.updateCommunitySettings?.settings?.accentColor
-        if (!confirmed || !isHex(confirmed)) throw new Error("Save unconfirmed")
-        saved.current = confirmed
-        // Only confirmed mutation results may update Apollo. A newer draft
-        // continues to be shown through the independent Shell preview.
-        applyContextAccent(confirmed)
-        if (desired.current === null && previewOwner.current !== null) {
-          clearPreview(communityId, previewOwner.current)
-          previewOwner.current = null
-        }
-      }
-      if (active.current) {
-        setSaveError(false)
-        setSaveStatus(hasIncompleteDraft.current ? "pending" : "saved")
-      }
-    } catch {
-      desired.current = null
-      // The Shell can outlive this route: always restore shared cache even
-      // if the preferences screen was unmounted while saving.
-      if (previewOwner.current !== null) {
-        clearPreview(communityId, previewOwner.current)
-        previewOwner.current = null
-      }
-      if (active.current) {
-        setAccent(saved.current)
-        setSaveError(true)
-        setSaveStatus("attention")
-      }
-    } finally {
-      inFlight.current = false
-    }
-  }, [communityId, save, applyContextAccent, clearPreview])
-
-  const choose = (value: string) => {
-    if (!isHex(value)) return
-    const normalized = value.toUpperCase()
-    setAccent(normalized)
-    previewOwner.current = setPreview(communityId, normalized)
-    desired.current = normalized
-    setSaveError(false)
-    setSaveStatus("pending")
-    void flush()
+      },
+    })
   }
+
+  useEffect(() => {
+    const color = data?.community?.mySettings.accentColor
+    if (color) controller.initialize(communityId, color)
+  }, [communityId, data, controller])
+
+  useEffect(() => {
+    controller.configure(communityId, {
+      save: async (next) => {
+        const result = await save({
+          variables: { input: { communityId, accentColor: next } },
+        })
+        const confirmed = result.data?.updateCommunitySettings?.settings?.accentColor
+        if (!confirmed || !isHex(confirmed)) throw new Error("Accent save response invalid")
+        commitConfirmedAccent(confirmed.toUpperCase())
+        return confirmed
+      },
+      observe: async () => {
+        const result = await client.query({
+          query: CommunityMySettingsDocument,
+          variables: { communityId },
+          fetchPolicy: "network-only",
+        })
+        const current = result.data?.community?.mySettings.accentColor
+        if (!current || !isHex(current)) throw new Error("Community accent unavailable")
+        return current
+      },
+      preview: (value) => setPreview(communityId, value),
+      release: (owner) => clearPreview(communityId, owner),
+    })
+  })
 
   if (!data?.community) {
     return (
@@ -163,26 +103,66 @@ export function ConnectedCommunityPreferences({
     )
   }
 
-  const resolvedCommunity = data.community
+  const failure = snapshot.failure
+  const accent = snapshot.confirmed ?? data.community.mySettings.accentColor
+  const lastDraft = snapshot.draft ?? accent
 
   return (
     <Stack gap="sm">
       <CommunityPreferencesContent
-        accent={accent ?? resolvedCommunity.mySettings.accentColor}
+        key={communityId}
+        accent={accent}
+        initialDraft={lastDraft}
         isPreview={false}
-        preserveDraftOnAccentChange={saveError}
-        saveStatus={saveError ? "attention" : saveStatus}
+        preserveDraftOnAccentChange={failure !== null}
+        saveStatus={failure ? "attention" : snapshot.status}
+        onAccentDraftChange={(value) => controller.edit(communityId, value)}
         saveFeedback={
-          saveError ? (
-            <Alert color="red" title="保存できませんでした" role="alert">
-              Shellは最後に保存できた色へ戻しました。入力した色は保持しています。内容を確認し、必要であればもう一度選択して保存してください。
+          failure ? (
+            <Alert color="red" role="alert" title={
+              failure === "unknown"
+                ? "保存結果を確認できませんでした"
+                : "保存できませんでした"
+            }>
+              <Stack gap="xs">
+                <Text size="sm">
+                  Shellは最後に確認できた色を表示しています。入力内容は保持しています。
+                  {failure === "unknown"
+                    ? " 現在のServer状態を確認してから、必要に応じて手動で保存してください。"
+                    : " 内容を確認して、再保存するか変更を破棄してください。"}
+                </Text>
+                {failure === "unknown" && snapshot.inspected && (
+                  <Text size="sm">
+                    {snapshot.observedMatches
+                      ? "現在のServer値は入力した色と一致しています。旧Mutationの完了を証明するものではありません。"
+                      : "現在のServer値と入力した色が一致しません。"}
+                  </Text>
+                )}
+                <Group gap="xs">
+                  {failure === "unknown" && (
+                    <Button size="xs" variant="light" onClick={() => void controller.inspect(communityId)}>
+                      現在の状態を確認
+                    </Button>
+                  )}
+                  {failure === "unknown" && snapshot.observedMatches && (
+                    <Button size="xs" variant="light" onClick={() => controller.confirmObservation(communityId)}>
+                      確認完了
+                    </Button>
+                  )}
+                  {(failure === "rejected" || snapshot.inspected) && !snapshot.observedMatches && (
+                    <Button size="xs" onClick={() => controller.retry(communityId)}>
+                      もう一度保存
+                    </Button>
+                  )}
+                  <Button size="xs" variant="subtle" color="gray"
+                    onClick={() => controller.discard(communityId)}>
+                    変更を破棄
+                  </Button>
+                </Group>
+              </Stack>
             </Alert>
           ) : undefined
         }
-        onDraftValidityChange={(valid) => {
-          hasIncompleteDraft.current = !valid
-          if (!valid) setSaveStatus("pending")
-        }}
         aliasControl={
           <CommunityAliasControl
             savedAlias={data.community.mySettings.alias}
@@ -194,11 +174,7 @@ export function ConnectedCommunityPreferences({
               if (!settings || settings.alias !== alias) {
                 throw new Error("Community alias save unconfirmed")
               }
-              // Mutationの成立を確認した時点で、ShellとPreferencesの同じ参照元を更新する。
-              const id = client.cache.identify({
-                __typename: "Community",
-                id: communityId,
-              })
+              const id = client.cache.identify({ __typename: "Community", id: communityId })
               if (id) {
                 const previous =
                   client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
@@ -220,19 +196,13 @@ export function ConnectedCommunityPreferences({
                   })
                 }
               }
-              // 再取得の通信失敗は確定済みMutationを失敗扱いしない。
-              void client
-                .refetchQueries({
-                  include: [MyCommunitiesDocument, CommunityMySettingsDocument],
-                })
-                .catch(() => undefined)
+              void client.refetchQueries({
+                include: [MyCommunitiesDocument, CommunityMySettingsDocument],
+              }).catch(() => undefined)
             }}
           />
         }
-        setAccent={(next) => {
-          const current = accent ?? resolvedCommunity.mySettings.accentColor
-          choose(typeof next === "function" ? next(current) : next)
-        }}
+        setAccent={() => undefined}
       />
     </Stack>
   )
