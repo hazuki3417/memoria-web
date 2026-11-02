@@ -79,6 +79,7 @@ export function ConnectedCommunityPreferences({
           OperationUpdateCommunitySettingsMutationVariables
         >({
           mutation: UpdateCommunitySettingsDocument,
+          fetchPolicy: "no-cache",
           variables: { input: { communityId, accentColor: next } },
         })
         const confirmed = result.data?.updateCommunitySettings?.settings?.accentColor
@@ -178,6 +179,7 @@ export function ConnectedCommunityPreferences({
             savedAlias={data.community.mySettings.alias}
             onSave={async (alias) => {
               const result = await save({
+                fetchPolicy: "no-cache",
                 variables: { input: { communityId, alias } },
               })
               const settings = result.data?.updateCommunitySettings?.settings
