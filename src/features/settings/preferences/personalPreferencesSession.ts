@@ -125,7 +125,8 @@ export function createPersonalPreferencesSession() {
         observedMatches: false,
         inspected: false,
       })
-      if (snapshot.failure) return
+      // The queue is paused after a failure, but must retain newer user edits.
+      // No automatic retry occurs until the user explicitly requests it.
       ensureQueue().enqueue(patch)
     },
     editAccentDraft(value: string) {
