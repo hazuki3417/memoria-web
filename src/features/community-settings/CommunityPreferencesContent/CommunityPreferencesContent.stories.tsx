@@ -84,6 +84,22 @@ export const AccentPreservesIncompleteDraft: Story = {
   },
 }
 
+export const AccentIncompleteDraftDoesNotPreview: Story = {
+  name: "Interaction · 未完成HEXはPreviewへ通知しない",
+  tags: ["interaction"],
+  args: { setAccent: fn() },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", {
+      name: "Communityアクセントカラー",
+    })
+    await userEvent.clear(input)
+    await userEvent.type(input, "#123")
+    await expect(input).toHaveValue("#123")
+    await expect(args.setAccent).not.toHaveBeenCalled()
+  },
+}
+
 export const AccentRollbackPreservesDraft: Story = {
   name: "Interaction · 保存失敗時もColorInput Draftを保持",
   tags: ["interaction"],
