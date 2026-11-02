@@ -15,7 +15,7 @@ export function useCommunityNameSettings({
   onSaveName?: (name: string) => Promise<boolean>
 }) {
   const initialName = communityName ?? "家族のアルバム"
-  const { control, reset, handleSubmit } = useForm<
+  const { control, reset, getValues, handleSubmit } = useForm<
     z.input<typeof communityNameSchema>,
     unknown,
     z.output<typeof communityNameSchema>
@@ -27,12 +27,13 @@ export function useCommunityNameSettings({
   const { field } = useController({ control, name: "name" })
   const savedName = useRef(initialName)
   const [savingName, setSavingName] = useState(false)
-  // Preserve the existing server-refresh behavior, including replacing a draft.
+  // Refresh an untouched form, but never replace the user's unsaved draft.
   useEffect(() => {
     if (communityName === undefined) return
+    const draftIsEdited = getValues("name").trim() !== savedName.current
     savedName.current = communityName
-    reset({ name: communityName })
-  }, [communityName, reset])
+    if (!draftIsEdited && !savingName) reset({ name: communityName })
+  }, [communityName, getValues, reset, savingName])
   const draft = field.value
   const setDraft = (next: SetStateAction<string>) => {
     field.onChange(typeof next === "function" ? next(field.value) : next)
@@ -42,7 +43,7 @@ export function useCommunityNameSettings({
     void handleSubmit(({ name: updated }) => {
       if (!onSaveName) {
         savedName.current = updated
-        reset({ name: updated })
+        if (getValues("name") === updated) reset({ name: updated })
         showNotification({
           kind: "success",
           title: "Community名を変更",
@@ -55,7 +56,7 @@ export function useCommunityNameSettings({
         .then((saved) => {
           if (!saved) return
           savedName.current = updated
-          reset({ name: updated })
+          if (getValues("name") === updated) reset({ name: updated })
           showNotification({
             kind: "success",
             title: "Community名を変更",
