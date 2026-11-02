@@ -1,3 +1,4 @@
+import { Group, SegmentedControl, Text } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { PageHeader } from "./PageHeader"
 import { SaveStatus } from "../SaveStatus"
@@ -37,4 +38,33 @@ export const WithIdleTitleAccessoryStatus: Story = {
     description: "表示とプレビューの動作を設定します。",
     titleAccessory: <SaveStatus state="idle" />,
   },
+}
+
+export const WithExternalUsageAction: Story = {
+  name: "Visual · タイトルBadgeと右側のUsage操作が共存",
+  tags: ["visual"],
+  args: {
+    title: "利用状況",
+    description: "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
+    titleAccessory: <SaveStatus state="saving" />,
+  },
+  render: (args) => (
+    <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
+      <PageHeader {...args} />
+      <Group gap="xs" wrap="nowrap">
+        <Text size="sm" c="dimmed" id="usage-header-mode-label">
+          表示
+        </Text>
+        <SegmentedControl
+          size="xs"
+          aria-labelledby="usage-header-mode-label"
+          defaultValue="size"
+          data={[
+            { value: "size", label: "容量" },
+            { value: "percent", label: "割合" },
+          ]}
+        />
+      </Group>
+    </Group>
+  ),
 }
