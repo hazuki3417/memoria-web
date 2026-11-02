@@ -181,7 +181,7 @@ export function createCommunityAccentSaveController() {
       const draftAtStart = entry.snapshot.draft
       try {
         const server = normalized(await entry.observe())
-        if (entry.snapshot.draft !== draftAtStart) return
+        if (entry.snapshot.draft !== draftAtStart || entry.snapshot.failure !== "unknown") return
         const draft = entry.snapshot.draft
         update(id, {
           // This is a current observation, not proof of the old mutation.
