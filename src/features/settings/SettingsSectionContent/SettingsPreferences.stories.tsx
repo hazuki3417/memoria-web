@@ -3,7 +3,7 @@ import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
-import { defaultUserPreferences } from "../preferences/userPreferences"
+import { defaultUserPreferences, type UserPreferencesPatch } from "../preferences/userPreferences"
 
 const meta = {
   title: "Features/Settings/Preferences",
@@ -93,7 +93,7 @@ export const PreferenceSaveStatus: Story = {
   tags: ["interaction"],
   args: {
     section: "preferences",
-    savePreferences: fn(async (patch) => ({
+    savePreferences: fn(async (patch: UserPreferencesPatch) => ({
       ...defaultUserPreferences,
       ...patch,
     })),
