@@ -47,6 +47,15 @@ describe("Hybrid settings input rejection", () => {
     expect(classifySettingsSaveFailure(new SettingsInputValidationError([]))).toBe("validation")
     expect(classifySettingsSaveFailure({ kind: "blocked" })).toBe("blocked")
     expect(classifySettingsSaveFailure({ kind: "retryable" })).toBe("retryable")
+    expect(classifySettingsSaveFailure({
+      graphQLErrors: [{ extensions: { code: "UNAUTHORIZED" } }],
+    })).toBe("blocked")
+    expect(classifySettingsSaveFailure({
+      errors: [{ extensions: { code: "FORBIDDEN" } }],
+    })).toBe("blocked")
+    expect(classifySettingsSaveFailure({
+      errors: [{ extensions: { code: "INTERNAL_SERVER_ERROR" } }],
+    })).toBe("unknown")
     expect(classifySettingsSaveFailure(new Error("network timeout"))).toBe("unknown")
     expect(classifySettingsSaveFailure(new Error("missing response"))).toBe("unknown")
   })
