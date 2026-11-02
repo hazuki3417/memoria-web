@@ -79,7 +79,7 @@ export function CommunityPreferencesContent({
       <PageHeader
         title="環境設定"
         description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
-        titleAccessory={saveStatus !== undefined ? <SaveStatus state={saveStatus} /> : undefined}
+        titleAccessory={saveStatus !== undefined ? <SaveStatus state={saveStatus} announce timing={{ savingDelayMs: 300, savedDurationMs: 2000, savingAnnouncementMs: 2000 }} /> : undefined}
       />
       {saveFeedback}
       {aliasControl && (
