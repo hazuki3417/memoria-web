@@ -127,7 +127,7 @@ export function SettingsProfile({
           {saveState === "retryable-error" && (
             <FeedbackAlert
               kind="error"
-              title="保存の完了を確認できませんでした"
+              title="保存できませんでした"
               role="alert"
             >
               入力内容は保持されています。内容を確認して、もう一度保存してください。
