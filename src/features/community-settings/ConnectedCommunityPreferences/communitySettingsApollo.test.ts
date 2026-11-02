@@ -13,7 +13,7 @@ function settings(accentColor: string, alias: string | null) {
 
 describe("Community settings Apollo operation isolation", () => {
   it("does not cache a stale mutation response while Accent and Alias complete out of order", async () => {
-    const pending: Array<(data: unknown) => void> = []
+    const pending: Array<(data: Record<string, unknown>) => void> = []
     const link = new ApolloLink(() => new Observable((observer) => {
       pending.push((data) => {
         observer.next({ data })
