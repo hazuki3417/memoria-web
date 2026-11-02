@@ -27,13 +27,11 @@ type Story = StoryObj<typeof meta>
 export const Preferences: Story = {
   name: "Visual · 環境設定",
   tags: ["visual"],
-  args: { section: "preferences" },
 }
 
 export const PreferenceSections: Story = {
   name: "Interaction · 設定項目の表示",
   tags: ["interaction"],
-  args: { section: "preferences" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     for (const label of [
@@ -56,7 +54,6 @@ export const PreferenceSections: Story = {
 export const PreviewToggle: Story = {
   name: "Interaction · Media Detail循環設定",
   tags: ["interaction"],
-  args: { section: "preferences" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const row = canvas
@@ -74,7 +71,6 @@ export const PreferencePatchContract: Story = {
   name: "Interaction · 編集したFieldだけを自動保存",
   tags: ["interaction"],
   args: {
-    
     onSave: fn(async () => ({ ...defaultUserPreferences, mediaDetailNavigationWrap: true })),
   },
   play: async ({ canvasElement, args }) => {
@@ -91,7 +87,6 @@ export const PreferenceSaveStatus: Story = {
   name: "Interaction · 自動保存のタイトル横Status",
   tags: ["interaction"],
   args: {
-    
     onSave: fn(async (patch: UserPreferencesPatch) => ({
       ...defaultUserPreferences,
       ...patch,
