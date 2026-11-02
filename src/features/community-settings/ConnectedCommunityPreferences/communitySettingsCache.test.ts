@@ -118,6 +118,30 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
     })
   })
 
+  it("未確定のundefinedは無視し、Aliasの明示的なnull解除を保持する", () => {
+    const cache = createCache()
+    commitCommunitySettingsPatch(cache, "community-1", {
+      accentColor: undefined,
+      alias: undefined,
+    })
+    expect(cache.readQuery<OperationCommunityMySettingsQuery>({
+      query: CommunityMySettingsDocument,
+      variables: { communityId: "community-1" },
+    })?.community?.mySettings).toMatchObject({
+      accentColor: "#112233",
+      alias: "My community",
+    })
+
+    commitCommunitySettingsPatch(cache, "community-1", { alias: null })
+    expect(cache.readQuery<OperationCommunityMySettingsQuery>({
+      query: CommunityMySettingsDocument,
+      variables: { communityId: "community-1" },
+    })?.community?.mySettings).toMatchObject({
+      accentColor: "#112233",
+      alias: null,
+    })
+  })
+
   it("Alias更新はアクセントを維持し、一覧と設定Queryに反映される", () => {
     const cache = createCache()
     commitCommunitySettingsPatch(cache, "community-1", { alias: "New alias" })
