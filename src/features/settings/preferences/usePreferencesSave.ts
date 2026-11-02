@@ -20,14 +20,18 @@ export function usePreferencesSave(onSave?: Save) {
 
   useEffect(() => {
     if (!saveRef.current) return
+    let mounted = true
     const controller = createPreferencesSaveQueue(
       (patch) => {
         const save = saveRef.current
         if (!save) throw new Error("Preferences save unavailable")
         return save(patch)
       },
-      () => setSaveError(null),
-      (error) =>
+      () => {
+        if (mounted) setSaveError(null)
+      },
+      (error) => {
+        if (!mounted) return
         setSaveError(
           typeof error === "object" &&
             error !== null &&
@@ -35,12 +39,16 @@ export function usePreferencesSave(onSave?: Save) {
             error.kind === "blocked"
             ? "blocked"
             : "retryable",
-        ),
+        )
+      },
       400,
-      (state) => setSaveStatus(state),
+      (state) => {
+        if (mounted) setSaveStatus(state)
+      },
     )
     controllerRef.current = controller
     return () => {
+      mounted = false
       // Flush without waiting for the component; the server action can finish
       // after navigation. Callbacks must not update an unmounted component.
       controller.flush()
