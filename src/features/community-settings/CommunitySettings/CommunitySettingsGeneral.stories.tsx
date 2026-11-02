@@ -89,3 +89,15 @@ export const NameReadOnly: Story = {
     ).not.toBeInTheDocument()
   },
 }
+
+export const NameTrimmedUnchanged: Story = {
+  name: "Interaction · 前後の空白のみの変更は保存不可",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, " 家族のアルバム ")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
