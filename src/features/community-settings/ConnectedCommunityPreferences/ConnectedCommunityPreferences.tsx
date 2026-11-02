@@ -160,7 +160,7 @@ export function ConnectedCommunityPreferences({
         accent={accent ?? resolvedCommunity.mySettings.accentColor}
         isPreview={false}
         preserveDraftOnAccentChange={saveError}
-        saveStatus={saveStatus}
+        saveStatus={saveError ? "attention" : saveStatus}
         onDraftValidityChange={(valid) => {
           hasIncompleteDraft.current = !valid
           if (!valid) setSaveStatus("pending")
