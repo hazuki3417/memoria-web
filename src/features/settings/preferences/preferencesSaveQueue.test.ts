@@ -128,6 +128,79 @@ describe("preferences save queue", () => {
     })
   })
 
+  it("emits pending, saving and saved without changing patch coalescing", async () => {
+    vi.useFakeTimers()
+    const states: string[] = []
+    const save = vi.fn().mockResolvedValue(defaultUserPreferences)
+    const queue = createPreferencesSaveQueue(
+      save,
+      vi.fn(),
+      vi.fn(),
+      400,
+      (state) => states.push(state),
+    )
+
+    queue.enqueue({ dateFormat: "DD_MM_YYYY" })
+    queue.enqueue({ mediaThumbnailSize: "LARGE" })
+    expect(states).toEqual(["pending", "pending"])
+    await vi.advanceTimersByTimeAsync(400)
+
+    expect(states).toEqual(["pending", "pending", "saving", "saved"])
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(save).toHaveBeenCalledWith({
+      dateFormat: "DD_MM_YYYY",
+      mediaThumbnailSize: "LARGE",
+    })
+  })
+
+  it("keeps saving status while newer edits remain in flight", async () => {
+    vi.useFakeTimers()
+    const states: string[] = []
+    let completeFirst: ((value: typeof defaultUserPreferences) => void) | undefined
+    const save = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            completeFirst = resolve
+          }),
+      )
+      .mockResolvedValue(defaultUserPreferences)
+    const queue = createPreferencesSaveQueue(
+      save,
+      vi.fn(),
+      vi.fn(),
+      400,
+      (state) => states.push(state),
+    )
+
+    queue.enqueue({ dateFormat: "MM_DD_YYYY" })
+    const flush = queue.flush()
+    queue.enqueue({ mediaDetailNavigationWrap: true })
+    completeFirst?.(defaultUserPreferences)
+    await flush
+
+    expect(states.at(-1)).toBe("saved")
+    expect(states.filter((state) => state === "saved")).toHaveLength(1)
+    expect(save).toHaveBeenCalledTimes(2)
+  })
+
+  it("shows attention after the queue rejects a save", async () => {
+    vi.useFakeTimers()
+    const states: string[] = []
+    const queue = createPreferencesSaveQueue(
+      vi.fn().mockRejectedValue(new Error("network")),
+      vi.fn(),
+      vi.fn(),
+      400,
+      (state) => states.push(state),
+    )
+    queue.enqueue({ mediaDetailInitialInfoWide: true })
+    await vi.advanceTimersByTimeAsync(400)
+    expect(states.at(-1)).toBe("attention")
+    expect(states).not.toContain("saved")
+  })
+
   it("does not save new edits after disposal", async () => {
     vi.useFakeTimers()
     const save = vi.fn().mockResolvedValue(defaultUserPreferences)
