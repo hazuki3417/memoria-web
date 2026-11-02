@@ -7,6 +7,7 @@ export type AccentSnapshot = Readonly<{
   status: SaveStatusState
   failure: AccentFailure
   observedMatches: boolean
+  inspected: boolean
 }>
 
 type SaveAccent = (color: string) => Promise<string>
@@ -31,6 +32,7 @@ const emptySnapshot: AccentSnapshot = {
   status: "idle",
   failure: null,
   observedMatches: false,
+  inspected: false,
 }
 
 const hex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
@@ -96,7 +98,7 @@ export function createCommunityAccentSaveController() {
             : "rejected"
           entry.desired = null
           clearPreview(entry)
-          update(id, { status: "attention", failure, observedMatches: false })
+          update(id, { status: "attention", failure, observedMatches: false, inspected: false })
           return
         }
       }
@@ -133,7 +135,8 @@ export function createCommunityAccentSaveController() {
       if (!hex(serverColor)) return
       const entry = entryFor(id)
       // Do not let background refetch replace an edited/failed Draft.
-      if (entry.snapshot.draft !== null || entry.running || entry.snapshot.failure) return
+      if (entry.running || entry.snapshot.failure || entry.desired !== null) return
+      if (entry.snapshot.draft !== null && entry.snapshot.draft !== entry.snapshot.confirmed) return
       update(id, { confirmed: normalized(serverColor), draft: normalized(serverColor) })
     },
     configure(
@@ -181,24 +184,26 @@ export function createCommunityAccentSaveController() {
         update(id, {
           // This is a current observation, not proof of the old mutation.
           observedMatches: Boolean(draft && hex(draft) && normalized(draft) === server),
+          inspected: true,
         })
       } catch {
-        update(id, { observedMatches: false })
+        update(id, { observedMatches: false, inspected: false })
       }
     },
     confirmObservation(id: string) {
       const entry = entryFor(id)
       if (entry.snapshot.failure !== "unknown" || !entry.snapshot.observedMatches) return
       clearPreview(entry)
-      update(id, { failure: null, status: "idle", observedMatches: false,
+      update(id, { failure: null, status: "idle", observedMatches: false, inspected: false,
         confirmed: entry.snapshot.draft ? normalized(entry.snapshot.draft) : entry.snapshot.confirmed })
     },
     retry(id: string) {
       const entry = entryFor(id)
       if (!entry.snapshot.failure || !entry.snapshot.draft || !hex(entry.snapshot.draft)) return
+      if (entry.snapshot.failure === "unknown" && !entry.snapshot.inspected) return
       // Unknown is never retried without a separate explicit user click.
       entry.desired = normalized(entry.snapshot.draft)
-      update(id, { failure: null, observedMatches: false, status: "pending" })
+      update(id, { failure: null, observedMatches: false, inspected: false, status: "pending" })
       if (entry.preview) entry.previewOwner = entry.preview(entry.desired)
       void drain(id)
     },
@@ -209,7 +214,7 @@ export function createCommunityAccentSaveController() {
       entry.desired = null
       clearPreview(entry)
       update(id, { draft: entry.snapshot.confirmed, failure: null,
-        observedMatches: false, status: "idle" })
+        observedMatches: false, inspected: false, status: "idle" })
     },
   }
 }
