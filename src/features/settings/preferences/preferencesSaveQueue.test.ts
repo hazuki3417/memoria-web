@@ -201,6 +201,35 @@ describe("preferences save queue", () => {
     expect(states).not.toContain("saved")
   })
 
+  it("does not auto retry after failure even when new edits arrive", async () => {
+    vi.useFakeTimers()
+    const save = vi.fn()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValue(defaultUserPreferences)
+    const queue = createPreferencesSaveQueue(save, vi.fn(), vi.fn())
+    queue.enqueue({ mediaDetailNavigationWrap: true })
+    await vi.advanceTimersByTimeAsync(400)
+    queue.enqueue({ mediaThumbnailSize: "LARGE" })
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(queue.getPending()).toEqual({
+      mediaDetailNavigationWrap: true,
+      mediaThumbnailSize: "LARGE",
+    })
+    await queue.flush()
+    expect(save).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not resume a failed queue on an automatic unmount flush", async () => {
+    vi.useFakeTimers()
+    const save = vi.fn().mockRejectedValue(new Error("offline"))
+    const queue = createPreferencesSaveQueue(save, vi.fn(), vi.fn())
+    queue.enqueue({ mediaDetailInitialInfoWide: false })
+    await vi.advanceTimersByTimeAsync(400)
+    await queue.flush({ manual: false })
+    expect(save).toHaveBeenCalledTimes(1)
+  })
+
   it("does not save new edits after disposal", async () => {
     vi.useFakeTimers()
     const save = vi.fn().mockResolvedValue(defaultUserPreferences)
