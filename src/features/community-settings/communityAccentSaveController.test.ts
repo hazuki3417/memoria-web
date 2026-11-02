@@ -98,6 +98,24 @@ describe("session Community Accent save controller", () => {
     expect(save).toHaveBeenCalledTimes(1)
   })
 
+  it("does not roll back a confirmed mutation when an older query result arrives", async () => {
+    const controller = createCommunityAccentSaveController()
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save: vi.fn().mockResolvedValue("#ABCDEF"),
+      observe: vi.fn(),
+      preview: vi.fn().mockReturnValue(1),
+      release: vi.fn(),
+    })
+    controller.edit(id, "#ABCDEF")
+    await tick()
+    controller.initialize(id, "#112233")
+    expect(controller.getSnapshot(id)).toMatchObject({
+      confirmed: "#ABCDEF",
+      draft: "#ABCDEF",
+    })
+  })
+
   it("does not leak Draft or failure state between communities", async () => {
     const controller = createCommunityAccentSaveController()
     controller.initialize("community-a", "#112233")
