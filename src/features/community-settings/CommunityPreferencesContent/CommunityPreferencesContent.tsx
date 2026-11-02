@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useRef,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
@@ -20,26 +21,34 @@ export function CommunityPreferencesContent({
   accent,
   setAccent,
   isPreview = true,
+  restoreOnAccentChange = false,
   aliasControl,
 }: {
   accent: string
   setAccent: Dispatch<SetStateAction<string>>
   isPreview?: boolean
+  restoreOnAccentChange?: boolean
   aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
-  const { control, reset } = useForm<z.input<typeof communityAccentSchema>>({
+  const { control, getValues, reset } = useForm<z.input<typeof communityAccentSchema>>({
     resolver: zodResolver(communityAccentSchema),
     mode: "onChange",
     defaultValues: { accentDraft: accent },
   })
   const { field } = useController({ control, name: "accentDraft" })
 
-  // Preserve partially typed values without submitting an invalid color.
-  // Update the input when a saved value or a rollback arrives from the parent.
+  // Refresh an untouched input; preserve an incomplete draft unless the
+  // owning save controller explicitly restores its last confirmed value.
+  const previousAccent = useRef(accent)
   useEffect(() => {
-    reset({ accentDraft: accent })
-  }, [accent, reset])
+    const draft = getValues("accentDraft")
+    const draftIsEdited = draft.toUpperCase() !== previousAccent.current.toUpperCase()
+    previousAccent.current = accent
+    if (restoreOnAccentChange || !draftIsEdited) {
+      reset({ accentDraft: accent })
+    }
+  }, [accent, restoreOnAccentChange, getValues, reset])
 
   return (
     <Stack gap="xl">
