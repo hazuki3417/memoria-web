@@ -64,7 +64,7 @@ export const NameInvalid: Story = {
 export const NameSaving: Story = {
   name: "Interaction · Community名保存中",
   tags: ["interaction"],
-  args: { onSaveName: fn(() => new Promise<boolean>(() => undefined)) },
+  args: { onSaveName: fn(() => new Promise<string>(() => undefined)) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /Community名/ })
@@ -155,16 +155,16 @@ export const NameRefreshWhileEditing: Story = {
 function CommunityNamePendingSaveFixture(
   args: ComponentProps<typeof CommunitySettings>,
 ) {
-  const resolveSave = useRef<((saved: boolean) => void) | null>(null)
+  const resolveSave = useRef<((saved: string) => void) | null>(null)
   return (
     <>
-      <Button onClick={() => resolveSave.current?.(true)}>
+      <Button onClick={() => resolveSave.current?.("最初の変更")}>
         保存応答を再現
       </Button>
       <CommunitySettings
         {...args}
         onSaveName={() =>
-          new Promise<boolean>((resolve) => {
+          new Promise<string>((resolve) => {
             resolveSave.current = resolve
           })
         }
