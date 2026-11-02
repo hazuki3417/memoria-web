@@ -223,7 +223,9 @@ describe("preferences save queue", () => {
   it("keeps attention visible when editing after a failed save", async () => {
     vi.useFakeTimers()
     const states: string[] = []
-    const save = vi\n      .fn()\n      .mockRejectedValueOnce(new Error("offline"))\n      .mockResolvedValue(defaultUserPreferences)
+    const save = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("offline"))\n      .mockResolvedValue(defaultUserPreferences)
     const queue = createPreferencesSaveQueue(
       save,
       vi.fn(),
