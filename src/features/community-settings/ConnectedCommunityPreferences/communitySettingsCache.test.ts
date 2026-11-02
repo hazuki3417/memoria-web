@@ -2,12 +2,11 @@ import { InMemoryCache } from "@apollo/client"
 import { describe, expect, it } from "vitest"
 import {
   CommunityMySettingsDocument,
-  CommunitySettingsCacheFragmentDoc,
   MyCommunitiesDocument,
-  type OperationCommunitySettingsCacheFragment,
   type OperationCommunityMySettingsQuery,
   type OperationMyCommunitiesQuery,
 } from "@/infrastructure/graphql/generated"
+import { commitCommunitySettingsPatch } from "./communitySettingsCache"
 
 function createCache() {
   const cache = new InMemoryCache()
@@ -48,36 +47,10 @@ function createCache() {
   return cache
 }
 
-function updateSettings(
-  cache: InMemoryCache,
-  patch: Partial<OperationCommunitySettingsCacheFragment["mySettings"]>,
-) {
-  const id = cache.identify({ __typename: "Community", id: "community-1" })
-  expect(id).toBeDefined()
-  const previous = cache.readFragment<OperationCommunitySettingsCacheFragment>({
-    id,
-    fragment: CommunitySettingsCacheFragmentDoc,
-  })
-  expect(previous).not.toBeNull()
-  if (!previous) throw new Error("Community settings cache is missing")
-  cache.writeFragment({
-    id,
-    fragment: CommunitySettingsCacheFragmentDoc,
-    data: {
-      __typename: "Community",
-      mySettings: {
-        __typename: "CommunitySettings",
-        ...previous.mySettings,
-        ...patch,
-      },
-    },
-  })
-}
-
 describe("Community設定の生成FragmentとApollo Cache契約", () => {
   it("アクセント更新はAliasを維持し、一覧と設定Queryに反映される", () => {
     const cache = createCache()
-    updateSettings(cache, { accentColor: "#AABBCC" })
+    commitCommunitySettingsPatch(cache, "community-1", { accentColor: "#AABBCC" })
 
     const community = cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
@@ -103,8 +76,8 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
     const accentResponse = { accentColor: "#AABBCC", alias: "My community" }
     const aliasResponse = { accentColor: "#112233", alias: "New alias" }
 
-    updateSettings(cache, { alias: aliasResponse.alias })
-    updateSettings(cache, { accentColor: accentResponse.accentColor })
+    commitCommunitySettingsPatch(cache, "community-1", { alias: aliasResponse.alias })
+    commitCommunitySettingsPatch(cache, "community-1", { accentColor: accentResponse.accentColor })
 
     const community = cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
@@ -125,7 +98,7 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
 
   it("Alias更新はアクセントを維持し、一覧と設定Queryに反映される", () => {
     const cache = createCache()
-    updateSettings(cache, { alias: "New alias" })
+    commitCommunitySettingsPatch(cache, "community-1", { alias: "New alias" })
 
     const community = cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
