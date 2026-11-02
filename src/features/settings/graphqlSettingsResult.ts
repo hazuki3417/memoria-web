@@ -22,9 +22,29 @@ export type SettingsSaveFailureKind = "validation" | "retryable" | "blocked" | "
 
 export function classifySettingsSaveFailure(error: unknown): SettingsSaveFailureKind {
   if (error instanceof SettingsInputValidationError) return "validation"
-  if (typeof error === "object" && error !== null && "kind" in error) {
-    if (error.kind === "blocked") return "blocked"
-    if (error.kind === "retryable") return "retryable"
+  if (typeof error === "object" && error !== null) {
+    if ("kind" in error) {
+      if (error.kind === "blocked") return "blocked"
+      if (error.kind === "retryable") return "retryable"
+    }
+    // API-authenticated/authorized execution failures explicitly forbid
+    // continuing in this Form. Other GraphQL/transport failures are not
+    // evidence that a sent write was safely rejected.
+    const errors =
+      "graphQLErrors" in error && Array.isArray(error.graphQLErrors)
+        ? error.graphQLErrors
+        : "errors" in error && Array.isArray(error.errors)
+          ? error.errors
+          : []
+    for (const item of errors) {
+      if (typeof item !== "object" || item === null || !("extensions" in item))
+        continue
+      const extensions = item.extensions
+      if (typeof extensions !== "object" || extensions === null || !("code" in extensions))
+        continue
+      if (extensions.code === "UNAUTHORIZED" || extensions.code === "FORBIDDEN")
+        return "blocked"
+    }
   }
   // A missing response, timeout or transport failure may already have committed.
   return "unknown"
