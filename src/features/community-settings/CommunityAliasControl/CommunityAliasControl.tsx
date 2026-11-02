@@ -130,7 +130,7 @@ export function CommunityAliasControl({
                 ? "入力内容を修正してから保存してください。"
                 : "入力内容を保持しています。再度保存してください。"}
         </Alert>
-      )
+      )}
       <Box>
         <Button
           size="sm"
