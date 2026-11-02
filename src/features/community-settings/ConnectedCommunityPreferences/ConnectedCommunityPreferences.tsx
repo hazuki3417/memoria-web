@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Stack } from "@mantine/core"
+import type { SaveStatusState } from "@/components/SaveStatus"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { useApolloClient } from "@apollo/client"
@@ -31,8 +32,8 @@ export function ConnectedCommunityPreferences({
   const client = useApolloClient()
   const [save] = useUpdateCommunitySettingsMutation()
   const [accent, setAccent] = useState<string | null>(null)
-  const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<SaveStatusState>("idle")
   const saved = useRef<string | null>(null)
   const desired = useRef<string | null>(null)
   const inFlight = useRef(false)
@@ -86,7 +87,9 @@ export function ConnectedCommunityPreferences({
   const flush = useCallback(async () => {
     if (inFlight.current || desired.current === null) return
     inFlight.current = true
-    if (active.current) setSaving(true)
+    if (active.current) {
+      setSaveStatus("saving")
+    }
     try {
       while (desired.current !== null) {
         const next = desired.current
@@ -102,7 +105,10 @@ export function ConnectedCommunityPreferences({
         saved.current = confirmed
         if (desired.current === null) applyContextAccent(confirmed)
       }
-      if (active.current) setSaveError(false)
+      if (active.current) {
+        setSaveError(false)
+        setSaveStatus("saved")
+      }
     } catch {
       desired.current = null
       // The Shell can outlive this route: always restore shared cache even
@@ -111,10 +117,10 @@ export function ConnectedCommunityPreferences({
       if (active.current) {
         setAccent(saved.current)
         setSaveError(true)
+        setSaveStatus("attention")
       }
     } finally {
       inFlight.current = false
-      if (active.current) setSaving(false)
     }
   }, [communityId, save, applyContextAccent])
 
@@ -125,6 +131,7 @@ export function ConnectedCommunityPreferences({
     applyContextAccent(normalized)
     desired.current = normalized
     setSaveError(false)
+    setSaveStatus("pending")
     void flush()
   }
 
@@ -151,7 +158,8 @@ export function ConnectedCommunityPreferences({
       <CommunityPreferencesContent
         accent={accent ?? resolvedCommunity.mySettings.accentColor}
         isPreview={false}
-        restoreOnAccentChange={saveError}
+        preserveDraftOnAccentChange={saveError}
+        saveStatus={saveStatus}
         aliasControl={
           <CommunityAliasControl
             savedAlias={data.community.mySettings.alias}
@@ -203,7 +211,6 @@ export function ConnectedCommunityPreferences({
           choose(typeof next === "function" ? next(current) : next)
         }}
       />
-      {saving && <span role="status">保存中...</span>}
     </Stack>
   )
 }
