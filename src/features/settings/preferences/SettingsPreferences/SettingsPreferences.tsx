@@ -25,10 +25,12 @@ export function SettingsPreferences({
   compact,
   initialPreferences = defaultUserPreferences,
   onSave,
+  onInspect,
 }: {
   compact: boolean
   initialPreferences?: UserPreferences
   onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+  onInspect?: () => Promise<UserPreferences>
 }) {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
   const {
@@ -39,7 +41,12 @@ export function SettingsPreferences({
     saveError,
     saveStatus,
     retry,
-  } = useUserPreferences(initialPreferences, onSave)
+    inspect,
+    confirmObservation,
+    discard,
+    inspected,
+    observedMatches,
+  } = useUserPreferences(initialPreferences, onSave, onInspect)
   const dateFormat = preferences.dateFormat
   const fileSizeUnit = preferences.fileSizeUnit
   const loop = preferences.mediaDetailNavigationWrap
@@ -60,18 +67,46 @@ export function SettingsPreferences({
           title={
             saveError === "blocked"
               ? "設定を変更できません"
-              : "保存できませんでした"
+              : saveError === "unknown"
+                ? "保存結果を確認できませんでした"
+                : "保存できませんでした"
           }
           role="alert"
         >
-          {saveError === "blocked"
-            ? "画面を再読み込みして現在の状態を確認してください。"
-            : "変更内容を保持しています。再試行すると変更内容を保存します。"}
-          {saveError === "retryable" && (
-            <Button size="xs" onClick={retry}>
-              再試行
+          <Stack gap="xs">
+            {saveError === "blocked" ? (
+              <span>画面を再読み込みして現在の状態を確認してください。</span>
+            ) : saveError === "unknown" ? (
+              <span>変更内容は保持しています。現在のServer値を確認してから、必要に応じて手動で保存してください。</span>
+            ) : (
+              <span>変更内容を保持しています。内容を確認して再試行してください。</span>
+            )}
+            {saveError === "unknown" && inspected && (
+              <span>
+                {observedMatches
+                  ? "現在の設定は入力した値と一致しています。旧Mutationの成功を証明するものではありません。"
+                  : "現在のServer値と入力した値が一致しません。"}
+              </span>
+            )}
+            {saveError === "unknown" && (
+              <Button size="xs" variant="light" onClick={() => void inspect()}>
+                現在の状態を確認
+              </Button>
+            )}
+            {saveError === "unknown" && observedMatches && (
+              <Button size="xs" variant="light" onClick={confirmObservation}>
+                確認完了
+              </Button>
+            )}
+            {(saveError === "retryable" || (saveError === "unknown" && inspected && !observedMatches)) && (
+              <Button size="xs" onClick={retry}>
+                もう一度保存
+              </Button>
+            )}
+            <Button size="xs" variant="subtle" color="gray" onClick={discard}>
+              変更を破棄
             </Button>
-          )}
+          </Stack>
         </FeedbackAlert>
       )}
       <Box>
