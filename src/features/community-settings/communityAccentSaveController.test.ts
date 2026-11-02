@@ -169,10 +169,12 @@ describe("session Community Accent save controller", () => {
     const save = vi.fn().mockRejectedValueOnce(
       Object.assign(new Error("connection"), { networkError: new Error("offline") }),
     )
+    const confirm = vi.fn()
     controller.initialize(id, "#112233")
     controller.configure(id, {
       save,
       observe: vi.fn().mockResolvedValue("#ABCDEF"),
+      confirm,
       confirm: vi.fn(),
       preview: vi.fn().mockReturnValue(1),
       release: vi.fn(),
@@ -185,7 +187,8 @@ describe("session Community Accent save controller", () => {
     expect(controller.getSnapshot(id)).toMatchObject({
       status: "idle", confirmed: "#ABCDEF", failure: null,
     })
-    // The optional confirmation callback is exercised in a separate integration path.
+    expect(confirm).toHaveBeenCalledTimes(1)
+    expect(confirm).toHaveBeenCalledWith("#ABCDEF")
     expect(save).toHaveBeenCalledTimes(1)
   })
 
