@@ -14,6 +14,7 @@ import { communityAccentSchema } from "../communityAccentSchema"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"
+import { SaveStatus, type SaveStatusState } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 
@@ -22,12 +23,16 @@ export function CommunityPreferencesContent({
   setAccent,
   isPreview = true,
   restoreOnAccentChange = false,
+  preserveDraftOnAccentChange = false,
+  saveStatus,
   aliasControl,
 }: {
   accent: string
   setAccent: Dispatch<SetStateAction<string>>
   isPreview?: boolean
   restoreOnAccentChange?: boolean
+  preserveDraftOnAccentChange?: boolean
+  saveStatus?: SaveStatusState
   aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
@@ -45,16 +50,17 @@ export function CommunityPreferencesContent({
     const draft = getValues("accentDraft")
     const draftIsEdited = draft.toUpperCase() !== previousAccent.current.toUpperCase()
     previousAccent.current = accent
-    if (restoreOnAccentChange || !draftIsEdited) {
+    if (!preserveDraftOnAccentChange && (restoreOnAccentChange || !draftIsEdited)) {
       reset({ accentDraft: accent })
     }
-  }, [accent, restoreOnAccentChange, getValues, reset])
+  }, [accent, restoreOnAccentChange, preserveDraftOnAccentChange, getValues, reset])
 
   return (
     <Stack gap="xl">
       <PageHeader
         title="環境設定"
         description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
+        titleAccessory={saveStatus !== undefined ? <SaveStatus state={saveStatus} /> : undefined}
       />
       {aliasControl && (
         <Box>
