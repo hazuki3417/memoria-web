@@ -110,3 +110,24 @@ export const AnnouncementTransitions: Story = {
     await expect(status).toBeEmptyDOMElement()
   },
 }
+
+function TimedPresentationScenario() {
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "attention">("idle")
+  return (
+    <Stack align="flex-start">
+      <SaveStatus state={state} timing={{
+        savingDelayMs: 300,
+        savedDurationMs: 2000,
+        savingAnnouncementMs: 2000,
+      }} announce />
+      <Button onClick={() => setState("saving")}>Start saving</Button>
+      <Button onClick={() => setState("saved")}>Confirm saved</Button>
+      <Button onClick={() => setState("attention")}>Require attention</Button>
+    </Stack>
+  )
+}
+
+export const TimedPresentationCandidate: Story = {
+  name: "Interaction · Timing候補（実画面未適用）",
+  render: () => <TimedPresentationScenario />,
+}
