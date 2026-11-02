@@ -7,7 +7,7 @@ import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
  */
 export function createPreferencesSaveQueue(
   save: (patch: UserPreferencesPatch) => Promise<UserPreferences>,
-  onSaved: (preferences: UserPreferences) => void,
+  onSaved: (preferences: UserPreferences, attempted: UserPreferencesPatch) => void,
   onError: (error: unknown, attempted: UserPreferencesPatch) => void,
   delayMs = 400,
   onStateChange?: (state: "pending" | "saving" | "saved" | "attention") => void,
@@ -34,7 +34,7 @@ export function createPreferencesSaveQueue(
         try {
           const saved = await save(patch)
           if (!stopped) {
-            onSaved(saved)
+            onSaved(saved, patch)
             onStateChange?.(Object.keys(pending).length ? "saving" : "saved")
           }
         } catch (error) {
