@@ -175,7 +175,6 @@ describe("session Community Accent save controller", () => {
       save,
       observe: vi.fn().mockResolvedValue("#ABCDEF"),
       confirm,
-      confirm: vi.fn(),
       preview: vi.fn().mockReturnValue(1),
       release: vi.fn(),
     })
