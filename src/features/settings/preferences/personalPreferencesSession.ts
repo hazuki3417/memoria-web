@@ -47,6 +47,7 @@ export function createPersonalPreferencesSession() {
   let inspectServer: Inspect | undefined
   let queue: ReturnType<typeof createPreferencesSaveQueue> | null = null
   let inspectedValue: UserPreferences | null = null
+  const locallyConfirmedKeys = new Set<keyof UserPreferences>()
 
   const emit = (change: Partial<PreferencesSessionSnapshot>) => {
     snapshot = { ...snapshot, ...change }
@@ -65,7 +66,8 @@ export function createPersonalPreferencesSession() {
         const nextDraft = { ...snapshot.draftPatch }
         for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
           // Only fields present in this Mutation are authoritative.
-          ;(nextConfirmed as Record<string, unknown>)[key] = confirmed[key]
+          Object.assign(nextConfirmed, { [key]: confirmed[key] })
+          locallyConfirmedKeys.add(key)
           if (nextDraft[key] === confirmed[key]) delete nextDraft[key]
         }
         emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null })
@@ -109,8 +111,8 @@ export function createPersonalPreferencesSession() {
       const refreshed = { ...snapshot.confirmed }
       const pending = { ...snapshot.draftPatch, ...queue?.getPending() }
       for (const key of Object.keys(current) as Array<keyof UserPreferences>) {
-        if (!(key in pending)) {
-          ;(refreshed as Record<string, unknown>)[key] = current[key]
+        if (!(key in pending) && !locallyConfirmedKeys.has(key)) {
+          Object.assign(refreshed, { [key]: current[key] })
         }
       }
       if (
@@ -166,6 +168,7 @@ export function createPersonalPreferencesSession() {
     },
     retry() {
       if (!snapshot.failure || snapshot.failure === "blocked") return
+      if (snapshot.accentDraft !== null && !/^#[0-9a-fA-F]{6}$/.test(snapshot.accentDraft)) return
       if (snapshot.failure === "unknown" && !snapshot.inspected) return
       inspectedValue = null
       emit({ failure: null, saveStatus: "pending",
