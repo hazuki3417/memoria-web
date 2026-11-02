@@ -158,7 +158,12 @@ export function createCommunityAccentSaveController() {
       const entry = entryFor(id)
       update(id, { draft: value, observedMatches: false, inspected: false })
       if (!hex(value)) {
-        update(id, { status: entry.snapshot.failure ? "attention" : "pending" })
+        // A newer incomplete draft supersedes any queued valid color.
+        // The in-flight request cannot be cancelled, but no stale queued
+        // mutation should start after it settles.
+        entry.desired = null
+        clearPreview(entry)
+        update(id, { status: entry.snapshot.failure ? "attention" : entry.running ? "saving" : "pending" })
         return
       }
       if (entry.snapshot.failure) {
