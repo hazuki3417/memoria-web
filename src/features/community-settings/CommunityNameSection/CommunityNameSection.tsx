@@ -14,6 +14,7 @@ export type CommunityNameSectionProps = {
   savingName: boolean
   saveName: () => void
   fieldError?: string
+  onNameBlur?: () => void
   saveFeedback?: { title: string; description: string } | null
   saveBlocked?: boolean
 }
@@ -27,6 +28,7 @@ export function CommunityNameSection({
   savingName,
   saveName,
   fieldError,
+  onNameBlur,
   saveFeedback,
   saveBlocked = false,
 }: CommunityNameSectionProps) {
@@ -43,7 +45,8 @@ export function CommunityNameSection({
           label="Community名"
           value={draft}
           onChange={(event) => setDraft(event.currentTarget.value)}
-          error={fieldError ?? (invalid ? "Community名を入力してください" : undefined)}
+          onBlur={onNameBlur}
+          error={fieldError}
           disabled={!isAdmin}
           required
         />
