@@ -7,9 +7,8 @@ import type { z } from "zod"
 import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 import {
-  SettingsInputValidationError,
   classifySettingsSaveFailure,
-  resolveSettingsValidation,
+  resolveSettingsFailureValidation,
   type SettingsSaveFailureKind,
 } from "@/features/settings/graphqlSettingsResult"
 
@@ -70,8 +69,8 @@ export function useCommunityNameSettings({
         })
       } catch (error) {
         const kind = classifySettingsSaveFailure(error)
-        if (kind === "validation" && error instanceof SettingsInputValidationError) {
-          const result = resolveSettingsValidation(error, ["name"])
+        if (kind === "validation") {
+          const result = resolveSettingsFailureValidation(error, ["name"])
           if (result.fieldErrors.name) {
             setError("name", { type: "server", message: result.fieldErrors.name })
           }
