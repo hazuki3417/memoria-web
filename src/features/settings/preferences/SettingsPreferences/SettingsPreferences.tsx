@@ -11,6 +11,7 @@ import {
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
+import { SaveStatus } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import { useUserPreferences } from "../useUserPreferences"
@@ -36,6 +37,7 @@ export function SettingsPreferences({
     change,
     changeAccentDraft,
     saveError,
+    saveStatus,
     retry,
   } = useUserPreferences(initialPreferences, onSave)
   const dateFormat = preferences.dateFormat
@@ -50,6 +52,7 @@ export function SettingsPreferences({
       <PageHeader
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
+        titleAccessory={onSave ? <SaveStatus state={saveError ? "attention" : saveStatus} /> : undefined}
       />
       {saveError && (
         <FeedbackAlert
