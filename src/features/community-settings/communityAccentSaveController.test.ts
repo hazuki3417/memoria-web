@@ -98,6 +98,38 @@ describe("session Community Accent save controller", () => {
     expect(save).toHaveBeenCalledTimes(1)
   })
 
+  it("ignores a stale inspection failure after a newer draft was inspected", async () => {
+    const controller = createCommunityAccentSaveController()
+    let rejectFirst: ((error: Error) => void) | undefined
+    const observe = vi.fn()
+      .mockImplementationOnce(() => new Promise<string>((_resolve, reject) => {
+        rejectFirst = reject
+      }))
+      .mockResolvedValue("#445566")
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save: vi.fn().mockRejectedValue(
+        Object.assign(new Error("offline"), { networkError: new Error("offline") }),
+      ),
+      observe,
+      preview: vi.fn().mockReturnValue(1),
+      release: vi.fn(),
+    })
+    controller.edit(id, "#ABCDEF")
+    await tick()
+    const oldInspection = controller.inspect(id)
+    controller.edit(id, "#445566")
+    await controller.inspect(id)
+    expect(controller.getSnapshot(id)).toMatchObject({
+      inspected: true, observedMatches: true,
+    })
+    rejectFirst?.(new Error("stale request failed"))
+    await oldInspection
+    expect(controller.getSnapshot(id)).toMatchObject({
+      inspected: true, observedMatches: true, draft: "#445566",
+    })
+  })
+
   it("does not roll back a confirmed mutation when an older query result arrives", async () => {
     const controller = createCommunityAccentSaveController()
     controller.initialize(id, "#112233")
