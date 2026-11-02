@@ -1,4 +1,5 @@
-import { Box, Text } from "@mantine/core"
+import { Box, Button, Text } from "@mantine/core"
+import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
@@ -84,5 +85,53 @@ export const PreferencePatchContract: Story = {
     await waitFor(() => {
       expect(args.savePreferences).toHaveBeenCalledWith({ mediaDetailNavigationWrap: true })
     })
+  },
+}
+
+function PreferencesRefreshFixture(args: ComponentProps<typeof SettingsSectionContent>) {
+  const [preferences, setPreferences] = useState(defaultUserPreferences)
+  return (
+    <>
+      <Button onClick={() => setPreferences((current) => ({
+        ...current,
+        mediaDetailNavigationWrap: true,
+        mediaDetailInitialInfoMedium: true,
+      }))}>
+        Preferences再取得を再現
+      </Button>
+      <SettingsSectionContent
+        {...args}
+        section="preferences"
+        initialPreferences={preferences}
+      />
+    </>
+  )
+}
+
+export const PreferencesRefreshWhileUntouched: Story = {
+  name: "Interaction · Preferences未編集Fieldは再取得値へ追従",
+  tags: ["interaction"],
+  render: (args) => <PreferencesRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getAllByRole("switch")[0]
+    await expect(input).not.toBeChecked()
+    await userEvent.click(canvas.getByRole("button", { name: "Preferences再取得を再現" }))
+    await expect(input).toBeChecked()
+  },
+}
+
+export const PreferencesRefreshWhileEditing: Story = {
+  name: "Interaction · Preferences編集中Fieldを再取得で保護",
+  tags: ["interaction"],
+  render: (args) => <PreferencesRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const switches = canvas.getAllByRole("switch")
+    await userEvent.click(switches[0])
+    await expect(switches[0]).toBeChecked()
+    await userEvent.click(canvas.getByRole("button", { name: "Preferences再取得を再現" }))
+    await expect(switches[0]).toBeChecked()
+    await expect(switches[2]).toBeChecked()
   },
 }
