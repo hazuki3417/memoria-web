@@ -28,6 +28,7 @@ export function CommunityPreferencesContent({
   preserveDraftOnAccentChange = false,
   saveStatus,
   saveFeedback,
+  accentError,
   onDraftValidityChange,
   aliasControl,
 }: {
@@ -40,6 +41,7 @@ export function CommunityPreferencesContent({
   preserveDraftOnAccentChange?: boolean
   saveStatus?: SaveStatusState
   saveFeedback?: ReactNode
+  accentError?: string
   onDraftValidityChange?: (valid: boolean) => void
   aliasControl?: ReactNode
 }) {
@@ -129,6 +131,7 @@ export function CommunityPreferencesContent({
           >
             <ColorInput
               aria-label="Communityアクセントカラー"
+              error={accentError}
               format="hex"
               name={field.name}
               ref={field.ref}
