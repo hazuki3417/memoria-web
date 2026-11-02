@@ -50,17 +50,17 @@ describe("Community settings Apollo operation isolation", () => {
       settings: settings("#112233", "New alias"),
     } })
     const aliasResult = await alias
-    commitCommunitySettingsPatch(cache, "community-1", {
-      alias: aliasResult.data?.updateCommunitySettings.settings.alias,
-    })
+    const confirmedAlias = aliasResult.data?.updateCommunitySettings.settings.alias
+    if (confirmedAlias === undefined) throw new Error("Alias result missing")
+    commitCommunitySettingsPatch(cache, "community-1", { alias: confirmedAlias })
     pending[0]({ updateCommunitySettings: {
       __typename: "UpdateCommunitySettingsPayload",
       settings: settings("#AABBCC", "Old alias"),
     } })
     const accentResult = await accent
-    commitCommunitySettingsPatch(cache, "community-1", {
-      accentColor: accentResult.data?.updateCommunitySettings.settings.accentColor,
-    })
+    const confirmedAccent = accentResult.data?.updateCommunitySettings.settings.accentColor
+    if (!confirmedAccent) throw new Error("Accent result missing")
+    commitCommunitySettingsPatch(cache, "community-1", { accentColor: confirmedAccent })
 
     expect(cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
