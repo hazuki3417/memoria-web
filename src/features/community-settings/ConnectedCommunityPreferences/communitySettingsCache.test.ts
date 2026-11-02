@@ -96,6 +96,33 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
     })
   })
 
+  it("AccentとAliasの応答が逆順でも互いの確定Fieldを巻き戻さない", () => {
+    const cache = createCache()
+    // The Accent response carries an old Alias; the Alias response carries an
+    // old Accent. Only the field actually patched may be committed to cache.
+    const accentResponse = { accentColor: "#AABBCC", alias: "My community" }
+    const aliasResponse = { accentColor: "#112233", alias: "New alias" }
+
+    updateSettings(cache, { alias: aliasResponse.alias })
+    updateSettings(cache, { accentColor: accentResponse.accentColor })
+
+    const community = cache.readQuery<OperationCommunityMySettingsQuery>({
+      query: CommunityMySettingsDocument,
+      variables: { communityId: "community-1" },
+    })
+    const list = cache.readQuery<OperationMyCommunitiesQuery>({
+      query: MyCommunitiesDocument,
+    })
+    expect(community?.community?.mySettings).toMatchObject({
+      accentColor: "#AABBCC",
+      alias: "New alias",
+    })
+    expect(list?.myCommunities[0].mySettings).toMatchObject({
+      accentColor: "#AABBCC",
+      alias: "New alias",
+    })
+  })
+
   it("Alias更新はアクセントを維持し、一覧と設定Queryに反映される", () => {
     const cache = createCache()
     updateSettings(cache, { alias: "New alias" })
