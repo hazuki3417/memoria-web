@@ -19,22 +19,22 @@ export const Default: Story = {
   tags: ["visual"],
 }
 
-export const WithTrailingStatus: Story = {
-  name: "Visual · タイトル右側の状態表示",
+export const WithTitleAccessoryStatus: Story = {
+  name: "Visual · タイトル横の保存バッジ",
   tags: ["visual"],
   args: {
     title: "環境設定",
     description: "表示とプレビューの動作を設定します。",
-    trailing: <SaveStatus state="saving" />,
+    titleAccessory: <SaveStatus state="saving" />,
   },
 }
 
-export const WithIdleTrailingStatus: Story = {
+export const WithIdleTitleAccessoryStatus: Story = {
   name: "Visual · 状態非表示時も配置を予約",
   tags: ["visual"],
   args: {
     title: "環境設定",
     description: "表示とプレビューの動作を設定します。",
-    trailing: <SaveStatus state="idle" />,
+    titleAccessory: <SaveStatus state="idle" />,
   },
 }
