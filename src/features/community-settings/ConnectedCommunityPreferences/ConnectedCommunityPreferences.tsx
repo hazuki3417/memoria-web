@@ -12,6 +12,7 @@ import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshE
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
 import {
   CommunityMySettingsDocument,
   UpdateCommunitySettingsDocument,
@@ -57,7 +58,11 @@ export function ConnectedCommunityPreferences({
           fetchPolicy: "no-cache",
           variables: { input: { communityId, accentColor: next } },
         })
-        const confirmed = result.data?.updateCommunitySettings?.settings?.accentColor
+        const outcome = result.data?.updateCommunitySettings
+        if (outcome?.__typename === "InputValidationFailure")
+          throw new SettingsInputValidationError(outcome.violations)
+        const confirmed = outcome?.__typename === "UpdateCommunitySettingsSuccess"
+          ? outcome.settings.accentColor : undefined
         if (!confirmed || !isHex(confirmed)) throw new Error("Accent save response invalid")
         commitCommunitySettingsPatch(client.cache, communityId, { accentColor: confirmed.toUpperCase() })
         return confirmed
@@ -159,7 +164,11 @@ export function ConnectedCommunityPreferences({
                 fetchPolicy: "no-cache",
                 variables: { input: { communityId, alias } },
               })
-              const settings = result.data?.updateCommunitySettings?.settings
+              const outcome = result.data?.updateCommunitySettings
+              if (outcome?.__typename === "InputValidationFailure")
+                throw new SettingsInputValidationError(outcome.violations)
+              const settings = outcome?.__typename === "UpdateCommunitySettingsSuccess"
+                ? outcome.settings : undefined
               if (!settings || settings.alias !== alias) {
                 throw new Error("Community alias save unconfirmed")
               }
