@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
+import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
 import { createCommunityAccentSaveController } from "./communityAccentSaveController"
 
 const id = "community-1"
@@ -507,4 +508,31 @@ describe("session Community Accent save controller", () => {
       status: "saved",
     })
   })
+
+  it("retains Typed accent Field Validation with its Draft after rejection", async () => {
+    const controller = createCommunityAccentSaveController()
+    const save = vi.fn().mockRejectedValue(new SettingsInputValidationError([
+      { scope: "FIELD", code: "INVALID_FORMAT", inputPaths: [{ segments: ["accentColor"] }] },
+    ]))
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save,
+      observe: vi.fn(),
+      preview: vi.fn().mockReturnValue(1),
+      release: vi.fn(),
+    })
+    controller.edit(id, "#ABCDEF")
+    await tick()
+    expect(controller.getSnapshot(id)).toMatchObject({
+      failure: "rejected",
+      draft: "#ABCDEF",
+      validation: {
+        fieldErrors: { accentColor: "入力形式を確認してください。" },
+        formError: false,
+      },
+    })
+    controller.discard(id)
+    expect(controller.getSnapshot(id)).toMatchObject({ failure: null, validation: null })
+  })
+
 })
