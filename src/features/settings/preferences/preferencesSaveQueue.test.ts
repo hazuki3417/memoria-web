@@ -326,6 +326,37 @@ describe("preferences save queue", () => {
     expect(queue.getPending()).toEqual({})
   })
 
+  it("does not restore failed in-flight drafts after disposal", async () => {
+    vi.useFakeTimers()
+    let rejectSave: ((reason: Error) => void) | undefined
+    const save = vi.fn().mockImplementation(
+      () => new Promise<typeof defaultUserPreferences>((_resolve, reject) => {
+        rejectSave = reject
+      }),
+    )
+    const onError = vi.fn()
+    const states: string[] = []
+    const queue = createPreferencesSaveQueue(
+      save,
+      vi.fn(),
+      onError,
+      400,
+      (state) => states.push(state),
+    )
+
+    queue.enqueue({ mediaThumbnailSize: "LARGE" })
+    const inFlight = queue.flush()
+    queue.dispose()
+    rejectSave?.(new Error("offline"))
+    await inFlight
+
+    expect(queue.getPending()).toEqual({})
+    expect(onError).not.toHaveBeenCalled()
+    expect(states).not.toContain("attention")
+    await queue.flush()
+    expect(save).toHaveBeenCalledTimes(1)
+  })
+
   it("does not save new edits after disposal", async () => {
     vi.useFakeTimers()
     const save = vi.fn().mockResolvedValue(defaultUserPreferences)
