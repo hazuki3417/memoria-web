@@ -25,6 +25,7 @@ export function CommunityPreferencesContent({
   restoreOnAccentChange = false,
   preserveDraftOnAccentChange = false,
   saveStatus,
+  onDraftValidityChange,
   aliasControl,
 }: {
   accent: string
@@ -33,6 +34,7 @@ export function CommunityPreferencesContent({
   restoreOnAccentChange?: boolean
   preserveDraftOnAccentChange?: boolean
   saveStatus?: SaveStatusState
+  onDraftValidityChange?: (valid: boolean) => void
   aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
@@ -86,6 +88,7 @@ export function CommunityPreferencesContent({
               onChange={(next) => {
                 field.onChange(next)
                 const parsed = communityAccentSchema.safeParse({ accentDraft: next })
+                onDraftValidityChange?.(parsed.success)
                 if (parsed.success) setAccent(parsed.data.accentDraft)
               }}
             />
