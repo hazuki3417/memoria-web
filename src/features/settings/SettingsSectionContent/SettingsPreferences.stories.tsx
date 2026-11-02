@@ -99,6 +99,12 @@ function PreferencesRefreshFixture(args: ComponentProps<typeof SettingsSectionCo
       }))}>
         Preferences再取得を再現
       </Button>
+      <Button onClick={() => setPreferences((current) => ({
+        ...current,
+        mediaDetailInitialInfoMedium: true,
+      }))}>
+        別Fieldのみ再取得を再現
+      </Button>
       <SettingsSectionContent
         {...args}
         section="preferences"
@@ -111,13 +117,15 @@ function PreferencesRefreshFixture(args: ComponentProps<typeof SettingsSectionCo
 export const PreferencesRefreshWhileUntouched: Story = {
   name: "Interaction · Preferences未編集Fieldは再取得値へ追従",
   tags: ["interaction"],
+  args: { savePreferences: fn(async () => defaultUserPreferences) },
   render: (args) => <PreferencesRefreshFixture {...args} />,
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getAllByRole("switch")[0]
     await expect(input).not.toBeChecked()
     await userEvent.click(canvas.getByRole("button", { name: "Preferences再取得を再現" }))
     await expect(input).toBeChecked()
+    await expect(args.savePreferences).not.toHaveBeenCalled()
   },
 }
 
@@ -130,7 +138,7 @@ export const PreferencesRefreshWhileEditing: Story = {
     const switches = canvas.getAllByRole("switch")
     await userEvent.click(switches[0])
     await expect(switches[0]).toBeChecked()
-    await userEvent.click(canvas.getByRole("button", { name: "Preferences再取得を再現" }))
+    await userEvent.click(canvas.getByRole("button", { name: "別Fieldのみ再取得を再現" }))
     await expect(switches[0]).toBeChecked()
     await expect(switches[2]).toBeChecked()
   },
