@@ -1,7 +1,8 @@
 "use client"
 
 import { Alert, Box, Button, Stack, TextInput } from "@mantine/core"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { useController, useForm } from "react-hook-form"
 import { showNotification } from "@/components/Feedback"
 
 export function CommunityAliasControl({
@@ -11,10 +12,18 @@ export function CommunityAliasControl({
   savedAlias: string | null
   onSave: (alias: string | null) => Promise<void>
 }) {
-  const [draft, setDraft] = useState<string | null>(null)
+  const { control, reset } = useForm<{ alias: string }>({
+    defaultValues: { alias: savedAlias ?? "" },
+  })
+  const { field } = useController({ control, name: "alias" })
+  // A draft is independent of Apollo refreshes until it is saved.
+  const editing = useRef(false)
+  useEffect(() => {
+    if (!editing.current) reset({ alias: savedAlias ?? "" })
+  }, [savedAlias, reset])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(false)
-  const text = draft ?? savedAlias ?? ""
+  const text = field.value
   const normalized = text.trim()
   const codepoints = Array.from(normalized).length
   const changed = normalized !== (savedAlias ?? "")
@@ -26,7 +35,8 @@ export function CommunityAliasControl({
     setError(false)
     try {
       await onSave(normalized || null)
-      setDraft(null)
+      editing.current = false
+      reset({ alias: normalized })
       showNotification({
         kind: "success",
         title: "Community別名を保存",
@@ -49,10 +59,14 @@ export function CommunityAliasControl({
         description="自分だけに表示される名前です。空欄で保存すると正式名称が表示されます。"
         aria-label="Community別名"
         placeholder="別名を入力"
+        name={field.name}
+        ref={field.ref}
+        onBlur={field.onBlur}
         value={text}
         disabled={saving}
         onChange={(event) => {
-          setDraft(event.currentTarget.value)
+          editing.current = true
+          field.onChange(event.currentTarget.value)
           setError(false)
         }}
         error={invalid ? "100文字以内で入力してください。" : undefined}
