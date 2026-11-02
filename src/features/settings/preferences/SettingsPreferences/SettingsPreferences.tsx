@@ -40,6 +40,8 @@ export function SettingsPreferences({
     changeAccentDraft,
     saveError,
     saveStatus,
+    fieldErrors,
+    validation,
     retry,
     inspect,
     confirmObservation,
@@ -81,14 +83,22 @@ export function SettingsPreferences({
           title={
             saveError === "blocked"
               ? "設定を変更できません"
-              : saveError === "unknown"
+              : saveError === "validation"
+                ? "入力内容を確認してください"
+                : saveError === "unknown"
                 ? "保存結果を確認できませんでした"
                 : "保存できませんでした"
           }
           role="alert"
         >
           <Stack gap="xs">
-            {saveError === "blocked" ? (
+            {saveError === "validation" ? (
+              <span>
+                {validation?.formError
+                  ? "保存できない入力の組み合わせがあります。内容を修正してから再保存してください。"
+                  : "入力項目のエラーを修正してから、もう一度保存してください。"}
+              </span>
+            ) : saveError === "blocked" ? (
               <span>画面を再読み込みして現在の状態を確認してください。</span>
             ) : saveError === "unknown" ? (
               <span>
@@ -116,7 +126,7 @@ export function SettingsPreferences({
                 確認完了
               </Button>
             )}
-            {(saveError === "retryable" ||
+            {((saveError === "retryable" || saveError === "validation") ||
               (saveError === "unknown" && inspected && !observedMatches)) && (
               <Button size="xs" disabled={!canRetry} onClick={retry}>
                 もう一度保存
@@ -159,6 +169,7 @@ export function SettingsPreferences({
           >
             <ColorInput
               aria-label="Personal Accent Color"
+              error={fieldErrors.personalAccentColor?.message}
               format="hex"
               value={accentDraft}
               onChange={changeAccentDraft}
@@ -171,6 +182,7 @@ export function SettingsPreferences({
           >
             <Select
               aria-label="日付形式"
+              error={fieldErrors.dateFormat?.message}
               value={dateFormat}
               onChange={(value) =>
                 value &&
@@ -191,6 +203,7 @@ export function SettingsPreferences({
           >
             <Select
               aria-label="ファイルサイズの単位"
+              error={fieldErrors.fileSizeUnit?.message}
               value={fileSizeUnit}
               onChange={(value) =>
                 value &&
@@ -210,6 +223,7 @@ export function SettingsPreferences({
           >
             <Select
               aria-label="Mediaサムネイルサイズ"
+              error={fieldErrors.mediaThumbnailSize?.message}
               value={thumbnailSize}
               onChange={(value) =>
                 value &&
@@ -238,6 +252,7 @@ export function SettingsPreferences({
           >
             <Switch
               checked={loop}
+              error={fieldErrors.mediaDetailNavigationWrap?.message}
               onChange={(event) =>
                 change("mediaDetailNavigationWrap", event.currentTarget.checked)
               }
@@ -251,6 +266,7 @@ export function SettingsPreferences({
           >
             <Switch
               checked={wideDetails}
+              error={fieldErrors.mediaDetailInitialInfoWide?.message}
               onChange={(event) =>
                 change(
                   "mediaDetailInitialInfoWide",
@@ -267,6 +283,7 @@ export function SettingsPreferences({
           >
             <Switch
               checked={mediumDetails}
+              error={fieldErrors.mediaDetailInitialInfoMedium?.message}
               onChange={(event) =>
                 change(
                   "mediaDetailInitialInfoMedium",
