@@ -18,13 +18,21 @@ type PreferencesFormValues = z.input<typeof preferencesSchema>
 export function useUserPreferences(
   initialPreferences: UserPreferences,
   onSave?: SavePreferences,
+  onInspect?: () => Promise<UserPreferences>,
 ) {
+  const { saveError, saveStatus, sessionSnapshot, enqueue, setAccentDraft,
+    retry, inspect, confirmObservation, discard } =
+    usePreferencesSave(onSave, initialPreferences, onInspect)
+  const initial = {
+    ...(sessionSnapshot?.confirmed ?? initialPreferences),
+    ...sessionSnapshot?.draftPatch,
+  }
   const { watch, setValue, getValues, reset, formState: { dirtyFields } } = useForm<PreferencesFormValues>({
     resolver: zodResolver(preferencesSchema),
     mode: "onChange",
     defaultValues: {
-      ...initialPreferences,
-      accentDraft: initialPreferences.personalAccentColor,
+      ...initial,
+      accentDraft: sessionSnapshot?.accentDraft ?? initial.personalAccentColor,
     },
   })
   // Apply new source values only to fields the user has not edited.
@@ -43,6 +51,14 @@ export function useUserPreferences(
       { keepDirtyValues: Object.keys(dirtyFields).length > 0 },
     )
   }, [initialPreferences, reset, dirtyFields])
+  const previousDiscardRevision = useRef(sessionSnapshot?.discardRevision)
+  useEffect(() => {
+    if (!sessionSnapshot || previousDiscardRevision.current === sessionSnapshot.discardRevision) return
+    previousDiscardRevision.current = sessionSnapshot.discardRevision
+    const baseline = sessionSnapshot.confirmed ?? initialPreferences
+    reset({ ...baseline, accentDraft: baseline.personalAccentColor })
+  }, [sessionSnapshot, initialPreferences, reset])
+
   const values = watch()
   const preferences: UserPreferences = {
     personalAccentColor: values.personalAccentColor,
@@ -53,7 +69,6 @@ export function useUserPreferences(
     mediaDetailInitialInfoWide: values.mediaDetailInitialInfoWide,
     mediaDetailInitialInfoMedium: values.mediaDetailInitialInfoMedium,
   }
-  const { saveError, saveStatus, enqueue, retry } = usePreferencesSave(onSave)
 
   const change = <K extends keyof UserPreferences>(
     key: K,
@@ -70,6 +85,7 @@ export function useUserPreferences(
   }
 
   const changeAccentDraft = (value: string) => {
+    setAccentDraft(value)
     setValue("accentDraft", value, { shouldDirty: true })
     const parsed = preferencesSchema.shape.personalAccentColor.safeParse(value)
     if (parsed.success) change("personalAccentColor", parsed.data.toUpperCase())
@@ -83,5 +99,10 @@ export function useUserPreferences(
     saveError,
     saveStatus,
     retry,
+    inspect,
+    confirmObservation,
+    discard,
+    inspected: sessionSnapshot?.inspected ?? false,
+    observedMatches: sessionSnapshot?.observedMatches ?? false,
   }
 }
