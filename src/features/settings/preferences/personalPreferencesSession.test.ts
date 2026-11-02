@@ -127,6 +127,42 @@ describe("Personal Preferences session controller", () => {
     }
   })
 
+  it("ignores superseded inspection errors for the same Preferences draft", async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = createPersonalPreferencesSession()
+      let rejectFirst: ((error: Error) => void) | undefined
+      const inspect = vi.fn()
+        .mockImplementationOnce(() => new Promise((_, reject) => {
+          rejectFirst = reject
+        }))
+        .mockResolvedValue({
+          ...defaultUserPreferences, mediaDetailNavigationWrap: true,
+        })
+      controller.configure(
+        vi.fn().mockRejectedValue(
+          Object.assign(new Error("offline"), { networkError: new Error("offline") }),
+        ),
+        inspect,
+      )
+      controller.hydrate(defaultUserPreferences)
+      controller.edit({ mediaDetailNavigationWrap: true })
+      await vi.advanceTimersByTimeAsync(400)
+      const older = controller.inspect()
+      await controller.inspect()
+      expect(controller.getSnapshot()).toMatchObject({
+        inspected: true, observedMatches: true,
+      })
+      rejectFirst?.(new Error("old query failed"))
+      await older
+      expect(controller.getSnapshot()).toMatchObject({
+        inspected: true, observedMatches: true,
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("discards a failed Draft and restores a form reset revision", async () => {
     vi.useFakeTimers()
     try {
