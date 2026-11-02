@@ -1,5 +1,7 @@
 "use client"
 
+import { releaseCommunityAccentPreview, type CommunityAccentPreview } from "./communityAccentPreview"
+
 import {
   createContext,
   useCallback,
@@ -10,10 +12,8 @@ import {
   type ReactNode,
 } from "react"
 
-type AccentPreview = { communityId: string; color: string; owner: number } | null
-
 type CommunityAccentPreviewContextValue = {
-  preview: AccentPreview
+  preview: CommunityAccentPreview
   setPreview: (communityId: string, color: string) => number
   clearPreview: (communityId: string, owner: number) => void
 }
@@ -31,7 +31,7 @@ export function CommunityAccentPreviewProvider({
 }: {
   children: ReactNode
 }) {
-  const [preview, setCurrentPreview] = useState<AccentPreview>(null)
+  const [preview, setCurrentPreview] = useState<CommunityAccentPreview>(null)
   const nextOwner = useRef(0)
   const setPreview = useCallback((communityId: string, color: string) => {
     const owner = ++nextOwner.current
@@ -40,9 +40,7 @@ export function CommunityAccentPreviewProvider({
   }, [])
   const clearPreview = useCallback((communityId: string, owner: number) => {
     setCurrentPreview((current) =>
-      current?.communityId === communityId && current.owner === owner
-        ? null
-        : current,
+      releaseCommunityAccentPreview(current, communityId, owner),
     )
   }, [])
   const value = useMemo(
