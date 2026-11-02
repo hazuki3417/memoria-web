@@ -88,6 +88,29 @@ export const PreferencePatchContract: Story = {
   },
 }
 
+export const PreferenceSaveStatus: Story = {
+  name: "Interaction · 自動保存のタイトル横Status",
+  tags: ["interaction"],
+  args: {
+    section: "preferences",
+    savePreferences: fn(async (patch) => ({
+      ...defaultUserPreferences,
+      ...patch,
+    })),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getAllByRole("switch")[0]
+
+    await expect(canvas.queryByText("保存済み")).not.toBeInTheDocument()
+    await userEvent.click(input)
+    await expect(canvas.getByText("保存待ち")).toBeVisible()
+    await waitFor(() => {
+      expect(canvas.getByText("保存済み")).toBeVisible()
+    })
+  },
+}
+
 function PreferencesRefreshFixture(args: ComponentProps<typeof SettingsSectionContent>) {
   const [preferences, setPreferences] = useState(defaultUserPreferences)
   return (
