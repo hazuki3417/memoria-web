@@ -25,6 +25,8 @@ export function CommunityAliasControl({
     defaultValues: { alias: savedAlias ?? "" },
   })
   const { field } = useController({ control, name: "alias" })
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(false)
   // Compare the current draft to the last source value, not a sticky "edited" flag.
   const previousAlias = useRef(savedAlias ?? "")
   useEffect(() => {
@@ -32,8 +34,6 @@ export function CommunityAliasControl({
     previousAlias.current = savedAlias ?? ""
     if (!draftIsEdited && !saving) reset({ alias: savedAlias ?? "" })
   }, [savedAlias, getValues, reset])
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState(false)
   const text = field.value
   const normalized = text.trim()
   const validation = communityAliasSchema.safeParse({ alias: text })
