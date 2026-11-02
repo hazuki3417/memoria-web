@@ -183,6 +183,8 @@ export function createCommunityAccentSaveController() {
       if (entry.snapshot.failure !== "unknown" || !entry.observe) return
       const draftAtStart = entry.snapshot.draft
       const generation = ++entry.inspectionGeneration
+      // A new inspection supersedes the previous observation immediately.
+      update(id, { inspected: false, observedMatches: false })
       try {
         const server = normalized(await entry.observe())
         if (generation !== entry.inspectionGeneration || entry.snapshot.draft !== draftAtStart || entry.snapshot.failure !== "unknown") return
