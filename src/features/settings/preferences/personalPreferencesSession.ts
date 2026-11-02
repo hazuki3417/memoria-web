@@ -138,7 +138,8 @@ export function createPersonalPreferencesSession() {
       ensureQueue().enqueue(patch)
     },
     editAccentDraft(value: string) {
-      emit({ accentDraft: value })
+      // A new raw Draft invalidates any observation made before this edit.
+      emit({ accentDraft: value, inspected: false, observedMatches: false })
     },
     async inspect() {
       if (snapshot.failure !== "unknown" || !inspectServer) return
