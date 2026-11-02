@@ -61,6 +61,8 @@ export const AliasTooLong: Story = {
     const input = canvas.getByRole("textbox", { name: "Community別名" })
     await userEvent.clear(input)
     await userEvent.type(input, "あ".repeat(101))
+    await expect(canvas.queryByText("100文字以内で入力してください。")).not.toBeInTheDocument()
+    await userEvent.tab()
     await expect(
       canvas.getByText("100文字以内で入力してください。"),
     ).toBeVisible()
