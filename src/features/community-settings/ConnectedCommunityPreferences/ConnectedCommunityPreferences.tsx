@@ -90,7 +90,8 @@ export function ConnectedCommunityPreferences({
         const result = await client.query({
           query: CommunityMySettingsDocument,
           variables: { communityId },
-          fetchPolicy: "network-only",
+          // Inspection must not mutate a newer confirmed cache snapshot.
+          fetchPolicy: "no-cache",
         })
         const current = result.data?.community?.mySettings.accentColor
         if (!current || !isHex(current)) throw new Error("Community accent unavailable")
