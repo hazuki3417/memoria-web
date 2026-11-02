@@ -20,7 +20,7 @@ export function CommunityAliasControl({
   savedAlias: string | null
   onSave: (alias: string | null) => Promise<void>
 }) {
-  const { control, getValues, reset, handleSubmit, setError, clearErrors } = useForm<
+  const { control, getValues, reset, handleSubmit, setError, clearErrors, formState: { isSubmitted } } = useForm<
     z.input<typeof communityAliasSchema>,
     unknown,
     z.output<typeof communityAliasSchema>
@@ -50,6 +50,7 @@ export function CommunityAliasControl({
   const validation = communityAliasSchema.safeParse({ alias: text })
   const changed = normalized !== savedBaseline.current
   const invalid = !validation.success
+  const showClientError = fieldState.isTouched || isSubmitted
 
   const save = handleSubmit(async ({ alias }) => {
     if (saving || !changed) return
@@ -105,8 +106,11 @@ export function CommunityAliasControl({
           setFormInvalid(false)
         }}
         error={
-          fieldState.error?.message ??
-          (!validation.success ? validation.error.issues[0]?.message : undefined)
+          fieldState.error?.type === "server"
+            ? fieldState.error.message
+            : showClientError && !validation.success
+              ? validation.error.issues[0]?.message
+              : undefined
         }
       />
       {(failure || formInvalid) && (
