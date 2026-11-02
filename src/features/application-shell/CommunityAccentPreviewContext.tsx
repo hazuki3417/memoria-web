@@ -5,16 +5,17 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react"
 
-type AccentPreview = { communityId: string; color: string } | null
+type AccentPreview = { communityId: string; color: string; owner: number } | null
 
 type CommunityAccentPreviewContextValue = {
   preview: AccentPreview
-  setPreview: (communityId: string, color: string) => void
-  clearPreview: (communityId: string) => void
+  setPreview: (communityId: string, color: string) => number
+  clearPreview: (communityId: string, owner: number) => void
 }
 
 const CommunityAccentPreviewContext =
@@ -31,12 +32,17 @@ export function CommunityAccentPreviewProvider({
   children: ReactNode
 }) {
   const [preview, setCurrentPreview] = useState<AccentPreview>(null)
+  const nextOwner = useRef(0)
   const setPreview = useCallback((communityId: string, color: string) => {
-    setCurrentPreview({ communityId, color })
+    const owner = ++nextOwner.current
+    setCurrentPreview({ communityId, color, owner })
+    return owner
   }, [])
-  const clearPreview = useCallback((communityId: string) => {
+  const clearPreview = useCallback((communityId: string, owner: number) => {
     setCurrentPreview((current) =>
-      current?.communityId === communityId ? null : current,
+      current?.communityId === communityId && current.owner === owner
+        ? null
+        : current,
     )
   }, [])
   const value = useMemo(
