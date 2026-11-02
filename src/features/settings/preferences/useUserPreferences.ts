@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { useForm, type FieldPathValue } from "react-hook-form"
+import { useController, useForm, type FieldPathValue } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { preferencesSchema } from "./preferencesSchema"
@@ -37,6 +37,7 @@ export function useUserPreferences(
     ...(sessionSnapshot?.draftPatch ?? {}),
   }
   const {
+    control,
     watch,
     setValue,
     getValues,
@@ -51,6 +52,10 @@ export function useUserPreferences(
       ...initial,
       accentDraft: sessionSnapshot?.accentDraft ?? initial.personalAccentColor,
     },
+  })
+  const { field: accentField, fieldState: accentState } = useController({
+    control,
+    name: "accentDraft",
   })
   // The controller survives route changes; reapply persisted Server Field
   // validation on mount without converting transport failures to input errors.
@@ -136,6 +141,12 @@ export function useUserPreferences(
   return {
     preferences,
     accentDraft: values.accentDraft,
+    accentOnBlur: accentField.onBlur,
+    accentDraftError:
+      accentState.isTouched &&
+      !preferencesSchema.shape.personalAccentColor.safeParse(values.accentDraft).success
+        ? "HEXカラーコード（#RRGGBB）を入力してください。"
+        : undefined,
     change,
     changeAccentDraft,
     saveError,
