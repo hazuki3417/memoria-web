@@ -7,6 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { communityAliasSchema } from "../communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
+import {
+  SettingsInputValidationError,
+  classifySettingsSaveFailure,
+  resolveSettingsValidation,
+  type SettingsSaveFailureKind,
+} from "@/features/settings/graphqlSettingsResult"
 
 export function CommunityAliasControl({
   savedAlias,
@@ -15,7 +21,7 @@ export function CommunityAliasControl({
   savedAlias: string | null
   onSave: (alias: string | null) => Promise<void>
 }) {
-  const { control, getValues, reset, handleSubmit } = useForm<
+  const { control, getValues, reset, handleSubmit, setError, clearErrors } = useForm<
     z.input<typeof communityAliasSchema>,
     unknown,
     z.output<typeof communityAliasSchema>
@@ -24,9 +30,10 @@ export function CommunityAliasControl({
     mode: "onChange",
     defaultValues: { alias: savedAlias ?? "" },
   })
-  const { field } = useController({ control, name: "alias" })
+  const { field, fieldState } = useController({ control, name: "alias" })
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState(false)
+  const [failure, setFailure] = useState<SettingsSaveFailureKind | null>(null)
+  const [formInvalid, setFormInvalid] = useState(false)
   // Compare the current draft to the last source value, not a sticky "edited" flag.
   const previousSourceAlias = useRef(savedAlias ?? "")
   // A confirmed save can precede the refreshed savedAlias prop.
@@ -48,7 +55,9 @@ export function CommunityAliasControl({
   const save = handleSubmit(async ({ alias }) => {
     if (saving || !changed) return
     setSaving(true)
-    setError(false)
+    setFailure(null)
+    setFormInvalid(false)
+    clearErrors("alias")
     try {
       await onSave(alias)
       savedBaseline.current = normalized
@@ -60,9 +69,17 @@ export function CommunityAliasControl({
           ? "別名を変更しました。"
           : "別名を解除しました。",
       })
-    } catch {
-      // 未保存のDraftを保持し、再試行可能にする。
-      setError(true)
+    } catch (error) {
+      const kind = classifySettingsSaveFailure(error)
+      if (kind === "validation" && error instanceof SettingsInputValidationError) {
+        const result = resolveSettingsValidation(error, ["alias"])
+        if (result.fieldErrors.alias) {
+          setError("alias", { type: "server", message: result.fieldErrors.alias })
+        }
+        setFormInvalid(result.formError)
+      } else {
+        setFailure(kind)
+      }
     } finally {
       setSaving(false)
     }
@@ -82,22 +99,43 @@ export function CommunityAliasControl({
         disabled={saving}
         onChange={(event) => {
           field.onChange(event.currentTarget.value)
-          setError(false)
+          clearErrors("alias")
+          setFailure(null)
+          setFormInvalid(false)
         }}
         error={
-          !validation.success ? validation.error.issues[0]?.message : undefined
+          fieldState.error?.message ??
+          (!validation.success ? validation.error.issues[0]?.message : undefined)
         }
       />
-      {error && (
-        <Alert color="red" title="保存できませんでした">
-          入力内容を保持しています。再度保存してください。
+      {(failure || formInvalid) && (
+        <Alert
+          color="red"
+          role="alert"
+          title={
+            failure === "unknown"
+              ? "保存結果を確認できませんでした"
+              : failure === "blocked"
+                ? "Community別名を変更できません"
+                : formInvalid
+                  ? "入力内容を確認してください"
+                  : "保存できませんでした"
+          }
+        >
+          {failure === "unknown"
+            ? "入力内容を保持しています。二重保存を避けるため、ページを再読み込みして現在の状態を確認してください。"
+            : failure === "blocked"
+              ? "入力内容を保持しています。権限を確認して画面を再読み込みしてください。"
+              : formInvalid
+                ? "入力内容を修正してから保存してください。"
+                : "入力内容を保持しています。再度保存してください。"}
         </Alert>
-      )}
+      )
       <Box>
         <Button
           size="sm"
           loading={saving}
-          disabled={!changed || invalid}
+          disabled={!changed || invalid || saving || failure === "unknown" || failure === "blocked"}
           onClick={() => void save()}
         >
           保存
