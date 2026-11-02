@@ -23,6 +23,7 @@ type Entry = {
   previewOwner: number | null
   save?: SaveAccent
   observe?: ObserveAccent
+  confirm?: (color: string) => void
   preview?: PreviewAccent
   release?: ReleasePreview
 }
@@ -145,6 +146,7 @@ export function createCommunityAccentSaveController() {
       operations: {
         save: SaveAccent
         observe: ObserveAccent
+        confirm?: (color: string) => void
         preview: PreviewAccent
         release: ReleasePreview
       },
@@ -199,9 +201,12 @@ export function createCommunityAccentSaveController() {
     confirmObservation(id: string) {
       const entry = entryFor(id)
       if (entry.snapshot.failure !== "unknown" || !entry.snapshot.observedMatches) return
+      const confirmed = entry.snapshot.draft ? normalized(entry.snapshot.draft) : entry.snapshot.confirmed
+      if (!confirmed) return
+      entry.confirm?.(confirmed)
       clearPreview(entry)
       update(id, { failure: null, status: "idle", observedMatches: false, inspected: false,
-        confirmed: entry.snapshot.draft ? normalized(entry.snapshot.draft) : entry.snapshot.confirmed })
+        confirmed })
     },
     retry(id: string) {
       const entry = entryFor(id)
