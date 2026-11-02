@@ -25,6 +25,7 @@ export function CommunityPreferencesContent({
   restoreOnAccentChange = false,
   preserveDraftOnAccentChange = false,
   saveStatus,
+  saveFeedback,
   onDraftValidityChange,
   aliasControl,
 }: {
@@ -34,6 +35,7 @@ export function CommunityPreferencesContent({
   restoreOnAccentChange?: boolean
   preserveDraftOnAccentChange?: boolean
   saveStatus?: SaveStatusState
+  saveFeedback?: ReactNode
   onDraftValidityChange?: (valid: boolean) => void
   aliasControl?: ReactNode
 }) {
@@ -64,6 +66,7 @@ export function CommunityPreferencesContent({
         description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
         titleAccessory={saveStatus !== undefined ? <SaveStatus state={saveStatus} /> : undefined}
       />
+      {saveFeedback}
       {aliasControl && (
         <Box>
           <SectionHeader>表示名</SectionHeader>
