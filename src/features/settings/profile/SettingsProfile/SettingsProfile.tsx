@@ -1,7 +1,11 @@
 "use client"
 
 import { Box, Button, Stack, TextInput } from "@mantine/core"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { useController, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { profileSchema } from "../profileSchema"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -32,18 +36,36 @@ export function SettingsProfile({
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
 }) {
-  const [name, setName] = useState(
-    initialSaveState === "saving" || initialSaveState === "retryable-error"
-      ? `${initialNickname}新`
-      : initialNickname,
-  )
-  const [saved, setSaved] = useState(initialNickname)
+  const { control, reset, getValues, handleSubmit } = useForm<
+    z.input<typeof profileSchema>,
+    unknown,
+    z.output<typeof profileSchema>
+  >({
+    resolver: zodResolver(profileSchema),
+    mode: "onChange",
+    defaultValues: { nickname: initialNickname },
+  })
+  const { field } = useController({ control, name: "nickname" })
+  // The confirmed server value is not an editable Form Draft.
+  const saved = useRef(initialNickname)
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "retryable-error" | "blocked"
   >(initialSaveState)
-  const normalized = name.trim()
-  const dirty = normalized !== saved
-  const invalid = normalized.length === 0
+  // Update an untouched draft when the source nickname changes.
+  const previousSourceNickname = useRef(initialNickname)
+  useEffect(() => {
+    if (previousSourceNickname.current === initialNickname) return
+    previousSourceNickname.current = initialNickname
+    const draftIsEdited = getValues("nickname").trim() !== saved.current
+    saved.current = initialNickname
+    if (!draftIsEdited && saveState !== "saving" && saveState !== "retryable-error") {
+      reset({ nickname: initialNickname })
+    }
+  }, [initialNickname, getValues, reset, saveState])
+  const validation = profileSchema.safeParse({ nickname: field.value })
+  const normalized = field.value.trim()
+  const dirty = normalized !== saved.current
+  const invalid = !validation.success
   const isSaving = saveState === "saving"
   const isBlocked = saveState === "blocked"
   let saveLabel = "更新"
@@ -53,14 +75,14 @@ export function SettingsProfile({
     saveLabel = "更新中"
   }
 
-  const save = async () => {
-    if (!dirty || invalid || isSaving || isBlocked) return
+  const save = handleSubmit(async ({ nickname }) => {
+    if (!dirty || isSaving || isBlocked) return
 
     setSaveState("saving")
     try {
-      await onSave(normalized)
-      setSaved(normalized)
-      setName(normalized)
+      await onSave(nickname)
+      saved.current = nickname
+      reset({ nickname })
       setSaveState("idle")
       showNotification({
         kind: "success",
@@ -72,7 +94,7 @@ export function SettingsProfile({
         isBlockingProfileSaveError(error) ? "blocked" : "retryable-error",
       )
     }
-  }
+  })
 
   return (
     <Stack gap="xl">
@@ -104,9 +126,14 @@ export function SettingsProfile({
           <TextInput
             label="ニックネーム"
             description="Memoriaで表示する名前です。"
-            value={name}
-            onChange={(event) => setName(event.currentTarget.value)}
-            error={invalid ? "ニックネームを入力してください。" : undefined}
+            name={field.name}
+            ref={field.ref}
+            onBlur={field.onBlur}
+            value={field.value}
+            onChange={field.onChange}
+            error={
+              !validation.success ? validation.error.issues[0]?.message : undefined
+            }
             required
             disabled={isSaving || isBlocked}
           />
@@ -115,7 +142,7 @@ export function SettingsProfile({
             style={{ alignSelf: "flex-start" }}
             disabled={!dirty || invalid || isSaving || isBlocked}
             loading={isSaving}
-            onClick={save}
+            onClick={() => void save()}
           >
             {saveLabel}
           </Button>

@@ -38,6 +38,7 @@ export const ProfileSaveContract: Story = {
     await userEvent.type(input, "変更後の名前")
     await userEvent.click(canvas.getByRole("button", { name: "更新" }))
     await expect(args.saveProfile).toHaveBeenCalledWith("変更後の名前")
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
   },
 }
 
@@ -103,6 +104,18 @@ export const ProfileUnchanged: Story = {
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
+
+export const ProfileTrimmedUnchanged: Story = {
+  name: "Interaction · 前後の空白のみの変更は保存不可",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, " テストユーザー ")
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
   },
 }

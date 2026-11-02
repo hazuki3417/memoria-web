@@ -1,24 +1,58 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef } from "react"
+import { useForm, type FieldPathValue } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { preferencesSchema } from "./preferencesSchema"
 import { usePreferencesSave } from "./usePreferencesSave"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
+type PreferencesFormValues = z.input<typeof preferencesSchema>
 
 /**
- * Preferencesの選択値と保存Controllerの接続を担当する。
- * 保存失敗時も入力値を巻き戻さず、Queueに再試行対象を保持する。
+ * RHF owns editable Preference fields and the incomplete ColorInput draft.
+ * The existing queue remains the only owner of save ordering and retries.
  */
 export function useUserPreferences(
   initialPreferences: UserPreferences,
   onSave?: SavePreferences,
 ) {
-  const [preferences, setPreferences] =
-    useState<UserPreferences>(initialPreferences)
-  const [accentDraft, setAccentDraft] = useState(
-    initialPreferences.personalAccentColor,
-  )
+  const { watch, setValue, getValues, reset, formState: { dirtyFields } } = useForm<PreferencesFormValues>({
+    resolver: zodResolver(preferencesSchema),
+    mode: "onChange",
+    defaultValues: {
+      ...initialPreferences,
+      accentDraft: initialPreferences.personalAccentColor,
+    },
+  })
+  // Apply new source values only to fields the user has not edited.
+  // Dirty field subscriptions are required by RHF's keepDirtyValues option.
+  const previousSource = useRef(initialPreferences)
+  useEffect(() => {
+    const previous = previousSource.current
+    if (
+      (Object.keys(previous) as Array<keyof UserPreferences>).every(
+        (key) => previous[key] === initialPreferences[key],
+      )
+    ) return
+    previousSource.current = initialPreferences
+    reset(
+      { ...initialPreferences, accentDraft: initialPreferences.personalAccentColor },
+      { keepDirtyValues: Object.keys(dirtyFields).length > 0 },
+    )
+  }, [initialPreferences, reset, dirtyFields])
+  const values = watch()
+  const preferences: UserPreferences = {
+    personalAccentColor: values.personalAccentColor,
+    dateFormat: values.dateFormat,
+    fileSizeUnit: values.fileSizeUnit,
+    mediaThumbnailSize: values.mediaThumbnailSize,
+    mediaDetailNavigationWrap: values.mediaDetailNavigationWrap,
+    mediaDetailInitialInfoWide: values.mediaDetailInitialInfoWide,
+    mediaDetailInitialInfoMedium: values.mediaDetailInitialInfoMedium,
+  }
   const { saveError, enqueue, retry } = usePreferencesSave(onSave)
 
   const change = <K extends keyof UserPreferences>(
@@ -26,20 +60,24 @@ export function useUserPreferences(
     value: UserPreferences[K],
   ) => {
     if (saveError === "blocked") return
-    setPreferences((current) => ({ ...current, [key]: value }))
+    // Do not enqueue a value that violates the same schema as the RHF form.
+    if (!preferencesSchema.safeParse({ ...getValues(), [key]: value }).success)
+      return
+    setValue(key, value as FieldPathValue<PreferencesFormValues, K>, {
+      shouldDirty: true,
+    })
     enqueue({ [key]: value } as UserPreferencesPatch)
   }
 
   const changeAccentDraft = (value: string) => {
-    setAccentDraft(value)
-    if (/^#[0-9a-fA-F]{6}$/.test(value)) {
-      change("personalAccentColor", value.toUpperCase())
-    }
+    setValue("accentDraft", value, { shouldDirty: true })
+    const parsed = preferencesSchema.shape.personalAccentColor.safeParse(value)
+    if (parsed.success) change("personalAccentColor", parsed.data.toUpperCase())
   }
 
   return {
     preferences,
-    accentDraft,
+    accentDraft: values.accentDraft,
     change,
     changeAccentDraft,
     saveError,

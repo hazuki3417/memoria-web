@@ -1,7 +1,9 @@
-import { Box, Text } from "@mantine/core"
+import { Box, Button, Text } from "@mantine/core"
+import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
+import { defaultUserPreferences } from "../preferences/userPreferences"
 
 const meta = {
   title: "Features/Settings/Preferences",
@@ -66,5 +68,78 @@ export const PreviewToggle: Story = {
     const previous = (input as HTMLInputElement).checked
     await userEvent.click(input)
     await expect(input).toHaveProperty("checked", !previous)
+  },
+}
+
+export const PreferencePatchContract: Story = {
+  name: "Interaction · 編集したFieldだけを自動保存",
+  tags: ["interaction"],
+  args: {
+    section: "preferences",
+    savePreferences: fn(async () => ({ ...defaultUserPreferences, mediaDetailNavigationWrap: true })),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getAllByRole("switch")[0]
+    await userEvent.click(input)
+    await waitFor(() => {
+      expect(args.savePreferences).toHaveBeenCalledWith({ mediaDetailNavigationWrap: true })
+    })
+  },
+}
+
+function PreferencesRefreshFixture(args: ComponentProps<typeof SettingsSectionContent>) {
+  const [preferences, setPreferences] = useState(defaultUserPreferences)
+  return (
+    <>
+      <Button onClick={() => setPreferences((current) => ({
+        ...current,
+        mediaDetailNavigationWrap: true,
+        mediaDetailInitialInfoMedium: true,
+      }))}>
+        Preferences再取得を再現
+      </Button>
+      <Button onClick={() => setPreferences((current) => ({
+        ...current,
+        mediaDetailInitialInfoMedium: true,
+      }))}>
+        別Fieldのみ再取得を再現
+      </Button>
+      <SettingsSectionContent
+        {...args}
+        section="preferences"
+        initialPreferences={preferences}
+      />
+    </>
+  )
+}
+
+export const PreferencesRefreshWhileUntouched: Story = {
+  name: "Interaction · Preferences未編集Fieldは再取得値へ追従",
+  tags: ["interaction"],
+  args: { savePreferences: fn(async () => defaultUserPreferences) },
+  render: (args) => <PreferencesRefreshFixture {...args} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getAllByRole("switch")[0]
+    await expect(input).not.toBeChecked()
+    await userEvent.click(canvas.getByRole("button", { name: "Preferences再取得を再現" }))
+    await expect(input).toBeChecked()
+    await expect(args.savePreferences).not.toHaveBeenCalled()
+  },
+}
+
+export const PreferencesRefreshWhileEditing: Story = {
+  name: "Interaction · Preferences編集中Fieldを再取得で保護",
+  tags: ["interaction"],
+  render: (args) => <PreferencesRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const switches = canvas.getAllByRole("switch")
+    await userEvent.click(switches[0])
+    await expect(switches[0]).toBeChecked()
+    await userEvent.click(canvas.getByRole("button", { name: "別Fieldのみ再取得を再現" }))
+    await expect(switches[0]).toBeChecked()
+    await expect(switches[2]).toBeChecked()
   },
 }

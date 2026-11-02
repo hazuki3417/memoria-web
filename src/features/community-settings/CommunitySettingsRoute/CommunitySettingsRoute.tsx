@@ -56,6 +56,7 @@ export function CommunitySettingsRoute({
 
   return (
     <CommunitySettings
+      key={communityId}
       communityId={communityId}
       communityAccentColor={communityAccentColor}
       communityName={name ?? undefined}

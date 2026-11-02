@@ -2,38 +2,53 @@
 
 import {
   useEffect,
-  useState,
+  useRef,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
 } from "react"
+import { useController, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { communityAccentSchema } from "../communityAccentSchema"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 
-const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
-
 export function CommunityPreferencesContent({
   accent,
   setAccent,
   isPreview = true,
+  restoreOnAccentChange = false,
   aliasControl,
 }: {
   accent: string
   setAccent: Dispatch<SetStateAction<string>>
   isPreview?: boolean
+  restoreOnAccentChange?: boolean
   aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
-  const [draft, setDraft] = useState(accent)
+  const { control, getValues, reset } = useForm<z.input<typeof communityAccentSchema>>({
+    resolver: zodResolver(communityAccentSchema),
+    mode: "onChange",
+    defaultValues: { accentDraft: accent },
+  })
+  const { field } = useController({ control, name: "accentDraft" })
 
-  // Preserve partially typed values without submitting an invalid color.
-  // Update the input when a saved value or a rollback arrives from the parent.
+  // Refresh an untouched input; preserve an incomplete draft unless the
+  // owning save controller explicitly restores its last confirmed value.
+  const previousAccent = useRef(accent)
   useEffect(() => {
-    setDraft(accent)
-  }, [accent])
+    const draft = getValues("accentDraft")
+    const draftIsEdited = draft.toUpperCase() !== previousAccent.current.toUpperCase()
+    previousAccent.current = accent
+    if (restoreOnAccentChange || !draftIsEdited) {
+      reset({ accentDraft: accent })
+    }
+  }, [accent, restoreOnAccentChange, getValues, reset])
 
   return (
     <Stack gap="xl">
@@ -58,10 +73,14 @@ export function CommunityPreferencesContent({
             <ColorInput
               aria-label="Communityアクセントカラー"
               format="hex"
-              value={draft}
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
               onChange={(next) => {
-                setDraft(next)
-                if (isHex(next)) setAccent(next)
+                field.onChange(next)
+                const parsed = communityAccentSchema.safeParse({ accentDraft: next })
+                if (parsed.success) setAccent(parsed.data.accentDraft)
               }}
             />
           </SettingRow>

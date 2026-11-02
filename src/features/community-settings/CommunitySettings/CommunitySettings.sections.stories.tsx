@@ -83,9 +83,12 @@ export const RemoveMemberFailureContract: Story = {
     await userEvent.click(await page.findByText("除外", { exact: true }))
     await userEvent.click(await page.findByRole("button", { name: "除外する" }))
     await expect(args.onRemoveMember).toHaveBeenCalledWith("user-2")
-    await expect(
-      page.getByRole("dialog", { name: "メンバーを除外" }),
-    ).toBeVisible()
+    // Mantine Modal uses a transition; wait for visibility after the failed save.
+    await waitFor(() => {
+      expect(
+        page.getByRole("dialog", { name: "メンバーを除外" }),
+      ).toBeVisible()
+    })
   },
 }
 

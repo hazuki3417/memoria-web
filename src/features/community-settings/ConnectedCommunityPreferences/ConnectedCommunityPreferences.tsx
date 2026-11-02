@@ -151,6 +151,7 @@ export function ConnectedCommunityPreferences({
       <CommunityPreferencesContent
         accent={accent ?? resolvedCommunity.mySettings.accentColor}
         isPreview={false}
+        restoreOnAccentChange={saveError}
         aliasControl={
           <CommunityAliasControl
             savedAlias={data.community.mySettings.alias}
