@@ -100,3 +100,27 @@ export const AliasRefreshWhileEditing: Story = {
     await expect(input).toHaveValue("未保存の別名")
   },
 }
+
+
+export const AliasRefreshAfterRevert: Story = {
+  name: "Interaction · 編集を元に戻したら再取得値へ追従",
+  tags: ["interaction"],
+  render: (args) => <AliasRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    const save = canvas.getByRole("button", { name: "保存" })
+
+    await userEvent.clear(input)
+    await userEvent.type(input, "一時的な別名")
+    await expect(save).toBeEnabled()
+
+    await userEvent.clear(input)
+    await userEvent.type(input, "元の別名")
+    await expect(save).toBeDisabled()
+
+    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
+    await expect(input).toHaveValue("取得した新しい別名")
+    await expect(save).toBeDisabled()
+  },
+}
