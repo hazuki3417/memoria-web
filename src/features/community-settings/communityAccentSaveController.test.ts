@@ -231,6 +231,39 @@ describe("session Community Accent save controller", () => {
     })
   })
 
+  it("invalidates a matching observation while a fresh inspection is pending", async () => {
+    const controller = createCommunityAccentSaveController()
+    let resolveRefresh: ((value: string) => void) | undefined
+    const observe = vi.fn().mockResolvedValueOnce("#AABBCC")
+      .mockImplementationOnce(() => new Promise<string>((resolve) => {
+        resolveRefresh = resolve
+      }))
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save: vi.fn().mockRejectedValue(
+        Object.assign(new Error("offline"), { networkError: new Error("offline") }),
+      ),
+      observe,
+      preview: vi.fn().mockReturnValue(1),
+      release: vi.fn(),
+    })
+    controller.edit(id, "#AABBCC")
+    await tick()
+    await controller.inspect(id)
+    expect(controller.getSnapshot(id).observedMatches).toBe(true)
+    const pending = controller.inspect(id)
+    expect(controller.getSnapshot(id)).toMatchObject({
+      inspected: false, observedMatches: false,
+    })
+    controller.confirmObservation(id)
+    expect(controller.getSnapshot(id).failure).toBe("unknown")
+    resolveRefresh?.("#112233")
+    await pending
+    expect(controller.getSnapshot(id)).toMatchObject({
+      inspected: true, observedMatches: false,
+    })
+  })
+
   it("does not roll back a confirmed mutation when an older query result arrives", async () => {
     const controller = createCommunityAccentSaveController()
     controller.initialize(id, "#112233")
