@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test"
 import { SettingsProfile } from "./SettingsProfile"
 
 const meta = {
-  title: "Features/Settings/Profile/Initial Save State",
+  title: "features/settings/profile/SettingsProfile",
   component: SettingsProfile,
   args: {
     initialNickname: "テストユーザー",
@@ -28,9 +28,9 @@ export const InitiallySaving: Story = {
   args: { initialSaveState: "saving" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(
-      canvas.getByRole("textbox", { name: /ニックネーム/ }),
-    ).toHaveValue("テストユーザー")
+    await expect(canvas.getByRole("textbox", { name: /ニックネーム/ })).toHaveValue(
+      "テストユーザー",
+    )
     await expect(canvas.getByRole("button", { name: "更新中" })).toBeDisabled()
   },
 }
@@ -41,18 +41,16 @@ export const InitiallyRetryable: Story = {
   args: { initialSaveState: "retryable-error" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(
-      canvas.getByRole("textbox", { name: /ニックネーム/ }),
-    ).toHaveValue("テストユーザー")
+    await expect(canvas.getByRole("textbox", { name: /ニックネーム/ })).toHaveValue(
+      "テストユーザー",
+    )
     await expect(canvas.getByRole("alert")).toBeVisible()
     await expect(canvas.getByRole("button", { name: "再試行" })).toBeDisabled()
   },
 }
 
 function ProfileRefreshFixture(args: ComponentProps<typeof SettingsProfile>) {
-  const [nickname, setNickname] = useState(
-    args.initialNickname ?? "テストユーザー",
-  )
+  const [nickname, setNickname] = useState(args.initialNickname ?? "テストユーザー")
   return (
     <>
       <Button onClick={() => setNickname("サーバー更新後の名前")}>
@@ -69,12 +67,10 @@ export const RefreshWhileUntouched: Story = {
   render: (args) => <ProfileRefreshFixture {...args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(
-      canvas.getByRole("button", { name: "プロフィール再取得を再現" }),
+    await userEvent.click(canvas.getByRole("button", { name: "プロフィール再取得を再現" }))
+    await expect(canvas.getByRole("textbox", { name: /ニックネーム/ })).toHaveValue(
+      "サーバー更新後の名前",
     )
-    await expect(
-      canvas.getByRole("textbox", { name: /ニックネーム/ }),
-    ).toHaveValue("サーバー更新後の名前")
   },
 }
 
@@ -87,10 +83,106 @@ export const RefreshWhileEditing: Story = {
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
     await userEvent.clear(input)
     await userEvent.type(input, "編集中の名前")
-    await userEvent.click(
-      canvas.getByRole("button", { name: "プロフィール再取得を再現" }),
-    )
+    await userEvent.click(canvas.getByRole("button", { name: "プロフィール再取得を再現" }))
     await expect(input).toHaveValue("編集中の名前")
     await expect(canvas.getByRole("button", { name: "更新" })).toBeEnabled()
+  },
+}
+
+export const Profile: Story = {
+  name: "Visual · プロフィール",
+  tags: ["visual"],
+}
+/** Confirms Profile delegates persistence while keeping the existing form interaction. */
+export const ProfileSaveContract: Story = {
+  name: "Interaction · プロフィール保存",
+  tags: ["interaction"],
+  args: { onSave: fn(async () => undefined) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後の名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(args.onSave).toHaveBeenCalledWith("変更後の名前")
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
+
+export const ProfileValidationContract: Story = {
+  name: "Interaction · ニックネーム必須",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.clear(canvas.getByRole("textbox", { name: /ニックネーム/ }))
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await expect(
+      canvas.getByText("ニックネームを入力してください。"),
+    ).toBeVisible()
+  },
+}
+
+export const ProfileSaveFailed: Story = {
+  name: "Interaction · 保存失敗と再試行",
+  tags: ["interaction"],
+  args: {
+    onSave: fn()
+      .mockRejectedValueOnce(new Error("network"))
+      .mockResolvedValue(undefined),
+  },
+  play: async ({ canvasElement, args }) => {
+    args.onSave?.mockReset()
+    args.onSave?.mockRejectedValueOnce(new Error("network"))
+    args.onSave?.mockResolvedValue(undefined)
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後の名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await expect(input).toHaveValue("変更後の名前")
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(args.onSave).toHaveBeenCalledTimes(2)
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const ProfileSaveBlocked: Story = {
+  name: "Interaction · 保存不可の状態",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => {
+      throw { kind: "blocked" }
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後の名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await expect(input).toBeDisabled()
+  },
+}
+
+export const ProfileUnchanged: Story = {
+  name: "Interaction · 変更なしで保存不可",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
+
+export const ProfileTrimmedUnchanged: Story = {
+  name: "Interaction · 前後の空白のみの変更は保存不可",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, " テストユーザー ")
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
   },
 }
