@@ -55,6 +55,8 @@ export const NameInvalid: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.clear(canvas.getByRole("textbox", { name: /Community名/ }))
+    await expect(canvas.queryByText("Community名を入力してください")).not.toBeInTheDocument()
+    await userEvent.tab()
     await expect(
       canvas.getByText("Community名を入力してください"),
     ).toBeVisible()
