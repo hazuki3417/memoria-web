@@ -47,10 +47,14 @@ export function useUserPreferences(
     ) return
     previousSource.current = initialPreferences
     reset(
-      { ...initialPreferences, accentDraft: initialPreferences.personalAccentColor },
+      {
+        ...initialPreferences,
+        ...(sessionSnapshot?.draftPatch ?? {}),
+        accentDraft: sessionSnapshot?.accentDraft ?? initialPreferences.personalAccentColor,
+      },
       { keepDirtyValues: Object.keys(dirtyFields).length > 0 },
     )
-  }, [initialPreferences, reset, dirtyFields])
+  }, [initialPreferences, reset, dirtyFields, sessionSnapshot])
   const previousDiscardRevision = useRef(sessionSnapshot?.discardRevision)
   useEffect(() => {
     if (!sessionSnapshot || previousDiscardRevision.current === sessionSnapshot.discardRevision) return
