@@ -36,14 +36,21 @@ export function classifySettingsSaveFailure(error: unknown): SettingsSaveFailure
         : "errors" in error && Array.isArray(error.errors)
           ? error.errors
           : []
-    for (const item of errors) {
+    const codes = errors.map((item) => {
       if (typeof item !== "object" || item === null || !("extensions" in item))
-        continue
+        return null
       const extensions = item.extensions
       if (typeof extensions !== "object" || extensions === null || !("code" in extensions))
-        continue
-      if (extensions.code === "UNAUTHORIZED" || extensions.code === "FORBIDDEN")
+        return null
+      return typeof extensions.code === "string" ? extensions.code : null
+    })
+    if (codes.length > 0) {
+      // Mixed or unknown errors do not prove that a mutation was rejected.
+      const blocked = ["UNAUTHENTICATED", "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND"]
+      if (codes.every((code) => code !== null && blocked.includes(code)))
         return "blocked"
+      if (codes.every((code) => code === "VALIDATION" || code === "CONFLICT"))
+        return "validation"
     }
   }
   // A missing response, timeout or transport failure may already have committed.
@@ -84,4 +91,15 @@ export function resolveSettingsValidation(
   }
   if (error.violations.length === 0) formError = true
   return { fieldErrors, formError }
+}
+
+/** GraphQL Request/Execution VALIDATION/CONFLICT lacks input field paths.
+ * Present those as a Form error, never invent a Field validation path. */
+export function resolveSettingsFailureValidation(
+  error: unknown,
+  fields: readonly string[],
+): { fieldErrors: Record<string, string>; formError: boolean } {
+  return error instanceof SettingsInputValidationError
+    ? resolveSettingsValidation(error, fields)
+    : { fieldErrors: {}, formError: true }
 }
