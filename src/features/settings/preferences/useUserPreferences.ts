@@ -1,11 +1,14 @@
 "use client"
 
 import { useForm, type FieldPathValue } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { preferencesSchema } from "./preferencesSchema"
 import { usePreferencesSave } from "./usePreferencesSave"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
-type PreferencesFormValues = UserPreferences & { accentDraft: string }
+type PreferencesFormValues = z.input<typeof preferencesSchema>
 
 /**
  * RHF owns editable Preference fields and the incomplete ColorInput draft.
@@ -15,7 +18,9 @@ export function useUserPreferences(
   initialPreferences: UserPreferences,
   onSave?: SavePreferences,
 ) {
-  const { watch, setValue } = useForm<PreferencesFormValues>({
+  const { watch, setValue, getValues } = useForm<PreferencesFormValues>({
+    resolver: zodResolver(preferencesSchema),
+    mode: "onChange",
     defaultValues: {
       ...initialPreferences,
       accentDraft: initialPreferences.personalAccentColor,
@@ -38,6 +43,8 @@ export function useUserPreferences(
     value: UserPreferences[K],
   ) => {
     if (saveError === "blocked") return
+    // Do not enqueue a value that violates the same schema as the RHF form.
+    if (!preferencesSchema.safeParse({ ...getValues(), [key]: value }).success) return
     setValue(key, value as FieldPathValue<PreferencesFormValues, K>, {
       shouldDirty: true,
     })
