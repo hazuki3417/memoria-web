@@ -11,15 +11,14 @@ import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBo
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
+import { commitCommunitySettingsPatch } from "./communitySettingsCache"
 import {
   CommunityMySettingsDocument,
   UpdateCommunitySettingsDocument,
   type OperationUpdateCommunitySettingsMutation,
   type OperationUpdateCommunitySettingsMutationVariables,
-  CommunitySettingsCacheFragmentDoc,
   useCommunityMySettingsQuery,
   useUpdateCommunitySettingsMutation,
-  type OperationCommunitySettingsCacheFragment,
 } from "@/infrastructure/graphql/generated"
 
 const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
@@ -39,29 +38,6 @@ export function ConnectedCommunityPreferences({
   const { snapshot, controller } = useCommunityAccentSave(communityId)
   const [save] = useUpdateCommunitySettingsMutation()
 
-  // Keep only confirmed Mutation results in the shared Apollo cache.
-  // Reading the current fragment protects Alias against unrelated Accent writes.
-  const commitConfirmedAccent = (value: string) => {
-    const id = client.cache.identify({ __typename: "Community", id: communityId })
-    if (!id) return
-    const previous = client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
-      id,
-      fragment: CommunitySettingsCacheFragmentDoc,
-    })
-    if (!previous) return
-    client.cache.writeFragment({
-      id,
-      fragment: CommunitySettingsCacheFragmentDoc,
-      data: {
-        __typename: "Community",
-        mySettings: {
-          __typename: "CommunitySettings",
-          accentColor: value,
-          alias: previous.mySettings.alias,
-        },
-      },
-    })
-  }
 
   useEffect(() => {
     const color = data?.community?.mySettings.accentColor
@@ -83,7 +59,7 @@ export function ConnectedCommunityPreferences({
         })
         const confirmed = result.data?.updateCommunitySettings?.settings?.accentColor
         if (!confirmed || !isHex(confirmed)) throw new Error("Accent save response invalid")
-        commitConfirmedAccent(confirmed.toUpperCase())
+        commitCommunitySettingsPatch(client.cache, communityId, { accentColor: confirmed.toUpperCase() })
         return confirmed
       },
       observe: async () => {
@@ -186,28 +162,7 @@ export function ConnectedCommunityPreferences({
               if (!settings || settings.alias !== alias) {
                 throw new Error("Community alias save unconfirmed")
               }
-              const id = client.cache.identify({ __typename: "Community", id: communityId })
-              if (id) {
-                const previous =
-                  client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
-                    id,
-                    fragment: CommunitySettingsCacheFragmentDoc,
-                  })
-                if (previous) {
-                  client.cache.writeFragment({
-                    id,
-                    fragment: CommunitySettingsCacheFragmentDoc,
-                    data: {
-                      __typename: "Community",
-                      mySettings: {
-                        __typename: "CommunitySettings",
-                        accentColor: previous.mySettings.accentColor,
-                        alias: settings.alias,
-                      },
-                    },
-                  })
-                }
-              }
+              commitCommunitySettingsPatch(client.cache, communityId, { alias: settings.alias })
               // Both subscribed views share the normalized Community fragment.
               // Refetching either after this write may reintroduce an older
               // Accent/Alias snapshot while the other field is in flight.
