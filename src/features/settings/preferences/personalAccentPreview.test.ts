@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { resolvePersonalAccent } from "./personalAccentPreview"
 import type { PreferencesSessionSnapshot } from "./personalPreferencesSession"
-import { DefaultUserPreferences } from "./userPreferences"
+import { defaultUserPreferences } from "./userPreferences"
 
 const snapshot = (changes: Partial<PreferencesSessionSnapshot> = {}): PreferencesSessionSnapshot => ({
   confirmed: null,
@@ -26,7 +26,7 @@ describe("Personal Accent visual preview", () => {
   it("keeps displaying confirmed color on rejected or unknown write without deleting draft", () => {
     for (const failure of ["unknown", "retryable", "blocked"] as const) {
       const state = snapshot({
-        confirmed: { ...DefaultUserPreferences(), personalAccentColor: "#112233" },
+        confirmed: { ...defaultUserPreferences, personalAccentColor: "#112233" },
         draftPatch: { personalAccentColor: "#AABBCC" },
         failure,
         saveStatus: "attention",
