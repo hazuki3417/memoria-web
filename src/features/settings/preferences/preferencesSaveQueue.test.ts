@@ -225,7 +225,8 @@ describe("preferences save queue", () => {
     const states: string[] = []
     const save = vi
       .fn()
-      .mockRejectedValueOnce(new Error("offline"))\n      .mockResolvedValue(defaultUserPreferences)
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValue(defaultUserPreferences)
     const queue = createPreferencesSaveQueue(
       save,
       vi.fn(),
