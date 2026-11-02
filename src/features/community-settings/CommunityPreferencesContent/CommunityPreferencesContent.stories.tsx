@@ -1,4 +1,4 @@
-import { Box, Button } from "@mantine/core"
+import { Alert, Box, Button } from "@mantine/core"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
@@ -94,5 +94,20 @@ export const AccentErrorBadge: Story = {
     accent: "#123456",
     isPreview: false,
     saveStatus: "attention",
+  },
+}
+
+export const AccentErrorWithDetails: Story = {
+  name: "Visual · Header Badgeと下部の保存Error詳細",
+  tags: ["visual"],
+  args: {
+    accent: "#123456",
+    isPreview: false,
+    saveStatus: "attention",
+    saveFeedback: (
+      <Alert color="red" title="保存できませんでした" role="alert">
+        Shellは確定色に戻しました。ColorInputの変更内容は保持しています。
+      </Alert>
+    ),
   },
 }
