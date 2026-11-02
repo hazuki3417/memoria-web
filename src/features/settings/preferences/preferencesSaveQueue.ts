@@ -65,7 +65,7 @@ export function createPreferencesSaveQueue(
     enqueue(patch: UserPreferencesPatch) {
       if (stopped) return
       pending = { ...pending, ...patch }
-      onStateChange?.(running ? "saving" : "pending")
+      onStateChange?.(paused ? "attention" : running ? "saving" : "pending")
       if (!paused) schedule()
     },
     flush({ manual = true }: { manual?: boolean } = {}) {
