@@ -120,10 +120,12 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
 
   it("未確定のundefinedは無視し、Aliasの明示的なnull解除を保持する", () => {
     const cache = createCache()
+    const before = cache.extract()
     commitCommunitySettingsPatch(cache, "community-1", {
       accentColor: undefined,
       alias: undefined,
     })
+    expect(cache.extract()).toEqual(before)
     expect(cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
       variables: { communityId: "community-1" },
