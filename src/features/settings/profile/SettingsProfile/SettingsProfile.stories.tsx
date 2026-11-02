@@ -3,6 +3,7 @@ import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { SettingsProfile } from "./SettingsProfile"
+import { SettingsInputValidationError } from "../../graphqlSettingsResult"
 
 const meta = {
   title: "features/settings/profile/SettingsProfile",
@@ -127,12 +128,12 @@ export const ProfileSaveFailed: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn()
-      .mockRejectedValueOnce(new Error("network"))
+      .mockRejectedValueOnce({ kind: "retryable" })
       .mockResolvedValue(undefined),
   },
   play: async ({ canvasElement, args }) => {
     args.onSave?.mockReset()
-    args.onSave?.mockRejectedValueOnce(new Error("network"))
+    args.onSave?.mockRejectedValueOnce({ kind: "retryable" })
     args.onSave?.mockResolvedValue(undefined)
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
@@ -144,6 +145,45 @@ export const ProfileSaveFailed: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(args.onSave).toHaveBeenCalledTimes(2)
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const ProfileServerFieldValidation: Story = {
+  name: "Interaction · API Field ValidationをRHFに反映",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["nickname"] }] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByText("文字数が上限を超えています。")).toBeVisible()
+    await expect(input).toHaveValue("変更した名前")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const ProfileUnknownOutcome: Story = {
+  name: "Interaction · 未確定応答は自動再送しない",
+  tags: ["interaction"],
+  args: { onSave: fn(async () => { throw new Error("network timeout") }) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByText("保存結果を確認できませんでした")).toBeVisible()
+    await expect(input).toHaveValue("変更した名前")
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
   },
 }
 
