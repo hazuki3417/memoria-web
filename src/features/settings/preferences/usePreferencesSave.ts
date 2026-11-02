@@ -2,68 +2,98 @@
 
 import { useEffect, useRef, useState } from "react"
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
+import { usePersonalPreferencesSession } from "./PersonalPreferencesSessionContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
 
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
-type SaveError = "blocked" | "retryable" | null
+type SaveError = "blocked" | "retryable" | "unknown" | null
 
-/** Keeps the saving controller stable across renders; flushes edits on unmount. */
-export function usePreferencesSave(onSave?: Save) {
-  const [saveError, setSaveError] = useState<SaveError>(null)
-  const [saveStatus, setSaveStatus] = useState<SaveStatusState>("idle")
+/** Session controller in Application Shell, legacy local queue for isolated Storybook. */
+export function usePreferencesSave(
+  onSave?: Save,
+  initialPreferences?: UserPreferences,
+  onInspect?: () => Promise<UserPreferences>,
+) {
+  const { controller: session, snapshot } = usePersonalPreferencesSession()
+  const [localError, setLocalError] = useState<SaveError>(null)
+  const [localStatus, setLocalStatus] = useState<SaveStatusState>("idle")
   const saveRef = useRef(onSave)
+  const inspectRef = useRef(onInspect)
   saveRef.current = onSave
-  const controllerRef = useRef<ReturnType<
-    typeof createPreferencesSaveQueue
-  > | null>(null)
+  inspectRef.current = onInspect
+  const localRef = useRef<ReturnType<typeof createPreferencesSaveQueue> | null>(null)
 
   useEffect(() => {
-    if (!saveRef.current) return
-    let mounted = true
-    const controller = createPreferencesSaveQueue(
+    if (!session || !saveRef.current) return
+    session.configure(
       (patch) => {
         const save = saveRef.current
         if (!save) throw new Error("Preferences save unavailable")
         return save(patch)
       },
-      () => {
-        if (mounted) setSaveError(null)
+      async () => {
+        const inspect = inspectRef.current
+        if (!inspect) throw new Error("Preferences Query unavailable")
+        return inspect()
       },
+    )
+  }, [session])
+
+  useEffect(() => {
+    if (!session || !initialPreferences) return
+    session.hydrate(initialPreferences)
+  }, [session, initialPreferences])
+
+  useEffect(() => {
+    if (session || !saveRef.current) return
+    let mounted = true
+    const queue = createPreferencesSaveQueue(
+      (patch) => {
+        const save = saveRef.current
+        if (!save) throw new Error("Preferences save unavailable")
+        return save(patch)
+      },
+      () => { if (mounted) setLocalError(null) },
       (error) => {
         if (!mounted) return
-        setSaveError(
-          typeof error === "object" &&
-            error !== null &&
-            "kind" in error &&
-            error.kind === "blocked"
+        setLocalError(
+          typeof error === "object" && error !== null &&
+            "kind" in error && error.kind === "blocked"
             ? "blocked"
             : "retryable",
         )
       },
       400,
-      (state) => {
-        if (mounted) setSaveStatus(state)
-      },
+      (state) => { if (mounted) setLocalStatus(state) },
     )
-    controllerRef.current = controller
+    localRef.current = queue
     return () => {
       mounted = false
-      // Flush without waiting for the component; the server action can finish
-      // after navigation. Callbacks must not update an unmounted component.
-      controller.flush()
-      controllerRef.current = null
+      // A paused failure is never retried by navigation.
+      void queue.flush({ manual: false })
+      localRef.current = null
     }
-  }, [])
+  }, [session])
 
   return {
-    saveError,
-    saveStatus,
-    enqueue: (patch: UserPreferencesPatch) =>
-      controllerRef.current?.enqueue(patch),
-    retry: () => {
-      setSaveError(null)
-      void controllerRef.current?.flush()
+    saveError: session ? snapshot.failure : localError,
+    saveStatus: session ? snapshot.saveStatus : localStatus,
+    sessionSnapshot: session ? snapshot : null,
+    enqueue: (patch: UserPreferencesPatch) => {
+      if (session) session.edit(patch)
+      else localRef.current?.enqueue(patch)
     },
+    setAccentDraft: (value: string) => { session?.editAccentDraft(value) },
+    retry: () => {
+      if (session) session.retry()
+      else {
+        setLocalError(null)
+        void localRef.current?.flush()
+      }
+    },
+    inspect: () => session?.inspect(),
+    confirmObservation: () => session?.confirmObservation(),
+    discard: () => session?.discard(),
   }
 }
