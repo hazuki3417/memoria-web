@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { useForm, type FieldPathValue } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
@@ -18,7 +19,7 @@ export function useUserPreferences(
   initialPreferences: UserPreferences,
   onSave?: SavePreferences,
 ) {
-  const { watch, setValue, getValues } = useForm<PreferencesFormValues>({
+  const { watch, setValue, getValues, reset, formState: { dirtyFields } } = useForm<PreferencesFormValues>({
     resolver: zodResolver(preferencesSchema),
     mode: "onChange",
     defaultValues: {
@@ -26,6 +27,23 @@ export function useUserPreferences(
       accentDraft: initialPreferences.personalAccentColor,
     },
   })
+  // Apply new source values only to fields the user has not edited.
+  // Dirty field subscriptions are required by RHF's keepDirtyValues option.
+  const previousSource = useRef(initialPreferences)
+  useEffect(() => {
+    const previous = previousSource.current
+    if (
+      (Object.keys(previous) as Array<keyof UserPreferences>).every(
+        (key) => previous[key] === initialPreferences[key],
+      )
+    ) return
+    previousSource.current = initialPreferences
+    reset(
+      { ...initialPreferences, accentDraft: initialPreferences.personalAccentColor },
+      { keepDirtyValues: true },
+    )
+  }, [initialPreferences, reset])
+  void dirtyFields
   const values = watch()
   const preferences: UserPreferences = {
     personalAccentColor: values.personalAccentColor,
