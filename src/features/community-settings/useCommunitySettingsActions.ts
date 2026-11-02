@@ -12,7 +12,7 @@ import {
 } from "@/infrastructure/graphql/generated"
 
 export function useCommunitySettingsActions(communityId: string) {
-  const [renameCommunity] = useRenameCommunityMutation()
+  const [updateCommunity] = useUpdateCommunityMutation()
   const [changeRole] = useChangeCommunityMemberRoleMutation()
   const [removeMember] = useRemoveCommunityMemberMutation()
   const [leaveCommunity] = useLeaveCommunityMutation()
