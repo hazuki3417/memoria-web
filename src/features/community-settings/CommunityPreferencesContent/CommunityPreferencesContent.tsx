@@ -14,48 +14,74 @@ import { communityAccentSchema } from "../communityAccentSchema"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"
+import { SaveStatus, type SaveStatusState } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 
 export function CommunityPreferencesContent({
   accent,
+  initialDraft,
+  onAccentDraftChange,
   setAccent,
   isPreview = true,
   restoreOnAccentChange = false,
+  preserveDraftOnAccentChange = false,
+  saveStatus,
+  saveFeedback,
+  onDraftValidityChange,
   aliasControl,
 }: {
   accent: string
+  initialDraft?: string
+  onAccentDraftChange?: (value: string) => void
   setAccent: Dispatch<SetStateAction<string>>
   isPreview?: boolean
   restoreOnAccentChange?: boolean
+  preserveDraftOnAccentChange?: boolean
+  saveStatus?: SaveStatusState
+  saveFeedback?: ReactNode
+  onDraftValidityChange?: (valid: boolean) => void
   aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const { control, getValues, reset } = useForm<z.input<typeof communityAccentSchema>>({
     resolver: zodResolver(communityAccentSchema),
     mode: "onChange",
-    defaultValues: { accentDraft: accent },
+    defaultValues: { accentDraft: initialDraft ?? accent },
   })
   const { field } = useController({ control, name: "accentDraft" })
 
   // Refresh an untouched input; preserve an incomplete draft unless the
   // owning save controller explicitly restores its last confirmed value.
   const previousAccent = useRef(accent)
+  const previousInitialDraft = useRef(initialDraft)
   useEffect(() => {
     const draft = getValues("accentDraft")
     const draftIsEdited = draft.toUpperCase() !== previousAccent.current.toUpperCase()
     previousAccent.current = accent
-    if (restoreOnAccentChange || !draftIsEdited) {
+    if (!preserveDraftOnAccentChange && (restoreOnAccentChange || !draftIsEdited)) {
       reset({ accentDraft: accent })
     }
-  }, [accent, restoreOnAccentChange, getValues, reset])
+  }, [accent, restoreOnAccentChange, preserveDraftOnAccentChange, getValues, reset])
+
+  // Explicit controller discard restores the input without remounting Alias controls.
+  // Normal server refetch and pending input must not overwrite the live RHF Draft.
+  useEffect(() => {
+    if (initialDraft === undefined || previousInitialDraft.current === initialDraft) return
+    previousInitialDraft.current = initialDraft
+    if (saveStatus === "idle" && initialDraft.toUpperCase() === accent.toUpperCase()) {
+      reset({ accentDraft: initialDraft })
+    }
+  }, [initialDraft, saveStatus, accent, reset])
 
   return (
     <Stack gap="xl">
       <PageHeader
         title="環境設定"
         description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
+        titleAccessory={saveStatus !== undefined ? <SaveStatus state={saveStatus} announce timing={{ savingDelayMs: 300, savedDurationMs: 2000, savingAnnouncementMs: 2000 }} /> : undefined}
       />
+      {saveFeedback}
       {aliasControl && (
         <Box>
           <SectionHeader>表示名</SectionHeader>
@@ -79,7 +105,9 @@ export function CommunityPreferencesContent({
               value={field.value}
               onChange={(next) => {
                 field.onChange(next)
+                onAccentDraftChange?.(next)
                 const parsed = communityAccentSchema.safeParse({ accentDraft: next })
+                onDraftValidityChange?.(parsed.success)
                 if (parsed.success) setAccent(parsed.data.accentDraft)
               }}
             />

@@ -3,7 +3,8 @@ import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
-import { defaultUserPreferences } from "../preferences/userPreferences"
+import { defaultUserPreferences, type UserPreferencesPatch } from "../preferences/userPreferences"
+import { PersonalPreferencesSessionProvider } from "../preferences/PersonalPreferencesSessionContext"
 
 const meta = {
   title: "Features/Settings/Preferences",
@@ -84,6 +85,72 @@ export const PreferencePatchContract: Story = {
     await userEvent.click(input)
     await waitFor(() => {
       expect(args.savePreferences).toHaveBeenCalledWith({ mediaDetailNavigationWrap: true })
+    })
+  },
+}
+
+export const PreferenceSaveStatus: Story = {
+  name: "Interaction · 自動保存のタイトル横Status",
+  tags: ["interaction"],
+  args: {
+    section: "preferences",
+    savePreferences: fn(async (patch: UserPreferencesPatch) => ({
+      ...defaultUserPreferences,
+      ...patch,
+    })),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getAllByRole("switch")[0]
+
+    await expect(canvas.getByText("保存済み")).not.toBeVisible()
+    await userEvent.click(input)
+    await expect(canvas.getByText("保存待ち")).toBeVisible()
+    await waitFor(() => {
+      expect(canvas.getByText("保存済み")).toBeVisible()
+    })
+  },
+}
+
+function PreferencesSessionRoundTripFixture(
+  args: ComponentProps<typeof SettingsSectionContent>,
+) {
+  const [show, setShow] = useState(true)
+  return (
+    <PersonalPreferencesSessionProvider>
+      <Button onClick={() => setShow((previous) => !previous)}>
+        {show ? "設定画面から移動" : "設定画面へ戻る"}
+      </Button>
+      {show && (
+        <SettingsSectionContent
+          {...args}
+          section="preferences"
+          initialPreferences={defaultUserPreferences}
+          savePreferences={async (patch) => ({
+            ...defaultUserPreferences,
+            ...patch,
+          })}
+        />
+      )}
+    </PersonalPreferencesSessionProvider>
+  )
+}
+
+export const PreferencesSessionRoundTrip: Story = {
+  name: "Interaction · SPA画面再訪で未保存DraftとBadgeを保持",
+  tags: ["interaction"],
+  render: (args) => <PreferencesSessionRoundTripFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getAllByRole("switch")[0]
+    await userEvent.click(input)
+    await expect(input).toBeChecked()
+    await userEvent.click(canvas.getByRole("button", { name: "設定画面から移動" }))
+    await userEvent.click(canvas.getByRole("button", { name: "設定画面へ戻る" }))
+    const restored = canvas.getAllByRole("switch")[0]
+    await expect(restored).toBeChecked()
+    await waitFor(() => {
+      expect(canvas.getByText("保存済み")).toBeVisible()
     })
   },
 }

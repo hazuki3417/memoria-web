@@ -12,7 +12,7 @@ export function ConnectedSettings({
 }: {
   section: "profile" | "preferences"
 }) {
-  const { data, loading, error } = useCurrentUserQuery()
+  const { data, loading, error, refetch } = useCurrentUserQuery()
   useSettingsRefreshError(Boolean(data?.me && error))
   const { saveProfile, savePreferences } = usePersonalSettingsActions()
   const preferences = data?.me
@@ -35,6 +35,11 @@ export function ConnectedSettings({
       initialPreferences={preferences}
       saveProfile={saveProfile}
       savePreferences={savePreferences}
+      inspectPreferences={async () => {
+        const current = await refetch()
+        if (!current.data?.me) throw new Error("Current User unavailable")
+        return fromGraphqlUserPreferences(current.data.me.preferences)
+      }}
     />
   )
 }

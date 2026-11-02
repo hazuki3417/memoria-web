@@ -7,13 +7,15 @@ import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
  */
 export function createPreferencesSaveQueue(
   save: (patch: UserPreferencesPatch) => Promise<UserPreferences>,
-  onSaved: (preferences: UserPreferences) => void,
+  onSaved: (preferences: UserPreferences, attempted: UserPreferencesPatch) => void,
   onError: (error: unknown, attempted: UserPreferencesPatch) => void,
   delayMs = 400,
+  onStateChange?: (state: "pending" | "saving" | "saved" | "attention") => void,
 ) {
   let pending: UserPreferencesPatch = {}
   let running = false
   let stopped = false
+  let paused = false
   let timer: ReturnType<typeof setTimeout> | undefined
 
   function clearTimer() {
@@ -22,19 +24,27 @@ export function createPreferencesSaveQueue(
   }
 
   async function drain() {
-    if (running || stopped) return
+    if (running || stopped || paused || Object.keys(pending).length === 0) return
     running = true
+    onStateChange?.("saving")
     try {
       while (!stopped && Object.keys(pending).length > 0) {
         const patch = pending
         pending = {}
         try {
           const saved = await save(patch)
-          if (!stopped) onSaved(saved)
+          if (!stopped) {
+            onSaved(saved, patch)
+            onStateChange?.(Object.keys(pending).length ? "saving" : "saved")
+          }
         } catch (error) {
-          // Preserve unsuccessful edits, without overwriting newer values.
-          pending = { ...patch, ...pending }
-          if (!stopped) onError(error, patch)
+          if (!stopped) {
+            // Preserve unsuccessful edits, without overwriting newer values.
+            pending = { ...patch, ...pending }
+            paused = true
+            onError(error, patch)
+            onStateChange?.("attention")
+          }
           break
         }
       }
@@ -55,11 +65,21 @@ export function createPreferencesSaveQueue(
     enqueue(patch: UserPreferencesPatch) {
       if (stopped) return
       pending = { ...pending, ...patch }
-      schedule()
+      onStateChange?.(paused ? "attention" : running ? "saving" : "pending")
+      if (!paused) schedule()
     },
-    flush() {
+    flush({ manual = true }: { manual?: boolean } = {}) {
       clearTimer()
+      if (manual) paused = false
       return drain()
+    },
+    getPending() {
+      return { ...pending }
+    },
+    clearPending() {
+      clearTimer()
+      pending = {}
+      paused = false
     },
     dispose({ flush = false }: { flush?: boolean } = {}) {
       if (flush) {

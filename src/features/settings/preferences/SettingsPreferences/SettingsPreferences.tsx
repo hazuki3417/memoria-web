@@ -11,6 +11,7 @@ import {
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
+import { SaveStatus } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import { useUserPreferences } from "../useUserPreferences"
@@ -24,10 +25,12 @@ export function SettingsPreferences({
   compact,
   initialPreferences = defaultUserPreferences,
   onSave,
+  onInspect,
 }: {
   compact: boolean
   initialPreferences?: UserPreferences
   onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+  onInspect?: () => Promise<UserPreferences>
 }) {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
   const {
@@ -36,8 +39,16 @@ export function SettingsPreferences({
     change,
     changeAccentDraft,
     saveError,
+    saveStatus,
     retry,
-  } = useUserPreferences(initialPreferences, onSave)
+    inspect,
+    confirmObservation,
+    discard,
+    inspected,
+    observedMatches,
+    hasSession,
+    canRetry,
+  } = useUserPreferences(initialPreferences, onSave, onInspect)
   const dateFormat = preferences.dateFormat
   const fileSizeUnit = preferences.fileSizeUnit
   const loop = preferences.mediaDetailNavigationWrap
@@ -50,6 +61,7 @@ export function SettingsPreferences({
       <PageHeader
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
+        titleAccessory={onSave ? <SaveStatus state={saveError ? "attention" : saveStatus} announce timing={{ savingDelayMs: 300, savedDurationMs: 2000, savingAnnouncementMs: 2000 }} /> : undefined}
       />
       {saveError && (
         <FeedbackAlert
@@ -57,18 +69,48 @@ export function SettingsPreferences({
           title={
             saveError === "blocked"
               ? "設定を変更できません"
-              : "保存できませんでした"
+              : saveError === "unknown"
+                ? "保存結果を確認できませんでした"
+                : "保存できませんでした"
           }
           role="alert"
         >
-          {saveError === "blocked"
-            ? "画面を再読み込みして現在の状態を確認してください。"
-            : "変更内容を保持しています。再試行すると変更内容を保存します。"}
-          {saveError === "retryable" && (
-            <Button size="xs" onClick={retry}>
-              再試行
-            </Button>
-          )}
+          <Stack gap="xs">
+            {saveError === "blocked" ? (
+              <span>画面を再読み込みして現在の状態を確認してください。</span>
+            ) : saveError === "unknown" ? (
+              <span>変更内容は保持しています。現在のServer値を確認してから、必要に応じて手動で保存してください。</span>
+            ) : (
+              <span>変更内容を保持しています。内容を確認して再試行してください。</span>
+            )}
+            {saveError === "unknown" && inspected && (
+              <span>
+                {observedMatches
+                  ? "現在の設定は入力した値と一致しています。旧Mutationの成功を証明するものではありません。"
+                  : "現在のServer値と入力した値が一致しません。"}
+              </span>
+            )}
+            {saveError === "unknown" && (
+              <Button size="xs" variant="light" onClick={() => void inspect()}>
+                現在の状態を確認
+              </Button>
+            )}
+            {saveError === "unknown" && observedMatches && (
+              <Button size="xs" variant="light" onClick={confirmObservation}>
+                確認完了
+              </Button>
+            )}
+            {(saveError === "retryable" || (saveError === "unknown" && inspected && !observedMatches)) && (
+              <Button size="xs" disabled={!canRetry} onClick={retry}>
+                もう一度保存
+              </Button>
+            )}
+            {hasSession && saveError !== "blocked" && (
+              <Button size="xs" variant="subtle" color="gray" onClick={discard}>
+                変更を破棄
+              </Button>
+            )}
+          </Stack>
         </FeedbackAlert>
       )}
       <Box>

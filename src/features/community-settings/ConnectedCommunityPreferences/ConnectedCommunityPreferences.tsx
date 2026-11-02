@@ -1,19 +1,24 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
-import { Alert, Stack } from "@mantine/core"
+import { useEffect } from "react"
+import { Alert, Button, Group, Stack, Text } from "@mantine/core"
+import { useApolloClient } from "@apollo/client"
+import {
+  useCommunityAccentPreview,
+  useCommunityAccentSave,
+} from "@/features/application-shell/CommunityAccentPreviewContext"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
-import { useApolloClient } from "@apollo/client"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
+import { commitCommunitySettingsPatch } from "./communitySettingsCache"
 import {
   CommunityMySettingsDocument,
-  CommunitySettingsCacheFragmentDoc,
-  MyCommunitiesDocument,
+  UpdateCommunitySettingsDocument,
+  type OperationUpdateCommunitySettingsMutation,
+  type OperationUpdateCommunitySettingsMutationVariables,
   useCommunityMySettingsQuery,
   useUpdateCommunitySettingsMutation,
-  type OperationCommunitySettingsCacheFragment,
 } from "@/infrastructure/graphql/generated"
 
 const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
@@ -29,104 +34,50 @@ export function ConnectedCommunityPreferences({
   })
   useSettingsRefreshError(Boolean(data?.community && error))
   const client = useApolloClient()
+  const { setPreview, clearPreview } = useCommunityAccentPreview()
+  const { snapshot, controller } = useCommunityAccentSave(communityId)
   const [save] = useUpdateCommunitySettingsMutation()
-  const [accent, setAccent] = useState<string | null>(null)
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState(false)
-  const saved = useRef<string | null>(null)
-  const desired = useRef<string | null>(null)
-  const inFlight = useRef(false)
-  const active = useRef(true)
+
 
   useEffect(() => {
-    active.current = true
-    return () => {
-      active.current = false
-    }
-  }, [])
+    const color = data?.community?.mySettings.accentColor
+    if (color) controller.initialize(communityId, color)
+  }, [communityId, data, controller])
 
-  // A server refresh must not replace a newer unsaved user selection.
   useEffect(() => {
-    const value = data?.community?.mySettings.accentColor
-    if (value && !inFlight.current && desired.current === null) {
-      saved.current = value
-      setAccent(value)
-    }
-  }, [data])
-
-  const applyContextAccent = useCallback(
-    (value: string) => {
-      const id = client.cache.identify({
-        __typename: "Community",
-        id: communityId,
-      })
-      if (!id) return
-      const previous =
-        client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
-          id,
-          fragment: CommunitySettingsCacheFragmentDoc,
+    controller.configure(communityId, {
+      save: async (next) => {
+        // The session queue must survive the settings view unmount.
+        // ApolloClient.mutate is independent of the useMutation hook lifetime.
+        const result = await client.mutate<
+          OperationUpdateCommunitySettingsMutation,
+          OperationUpdateCommunitySettingsMutationVariables
+        >({
+          mutation: UpdateCommunitySettingsDocument,
+          fetchPolicy: "no-cache",
+          variables: { input: { communityId, accentColor: next } },
         })
-      if (!previous) return
-      client.cache.writeFragment({
-        id,
-        fragment: CommunitySettingsCacheFragmentDoc,
-        data: {
-          __typename: "Community",
-          mySettings: {
-            __typename: "CommunitySettings",
-            accentColor: value,
-            alias: previous.mySettings.alias,
-          },
-        },
-      })
-    },
-    [client, communityId],
-  )
-
-  const flush = useCallback(async () => {
-    if (inFlight.current || desired.current === null) return
-    inFlight.current = true
-    if (active.current) setSaving(true)
-    try {
-      while (desired.current !== null) {
-        const next = desired.current
-        desired.current = null
-        const result = await save({
-          variables: {
-            input: { communityId, accentColor: next.toUpperCase() },
-          },
+        const confirmed = result.data?.updateCommunitySettings?.settings?.accentColor
+        if (!confirmed || !isHex(confirmed)) throw new Error("Accent save response invalid")
+        commitCommunitySettingsPatch(client.cache, communityId, { accentColor: confirmed.toUpperCase() })
+        return confirmed
+      },
+      observe: async () => {
+        const result = await client.query({
+          query: CommunityMySettingsDocument,
+          variables: { communityId },
+          // Inspection must not mutate a newer confirmed cache snapshot.
+          fetchPolicy: "no-cache",
         })
-        const confirmed =
-          result.data?.updateCommunitySettings?.settings?.accentColor
-        if (!confirmed || !isHex(confirmed)) throw new Error("Save unconfirmed")
-        saved.current = confirmed
-        if (desired.current === null) applyContextAccent(confirmed)
-      }
-      if (active.current) setSaveError(false)
-    } catch {
-      desired.current = null
-      // The Shell can outlive this route: always restore shared cache even
-      // if the preferences screen was unmounted while saving.
-      if (saved.current) applyContextAccent(saved.current)
-      if (active.current) {
-        setAccent(saved.current)
-        setSaveError(true)
-      }
-    } finally {
-      inFlight.current = false
-      if (active.current) setSaving(false)
-    }
-  }, [communityId, save, applyContextAccent])
-
-  const choose = (value: string) => {
-    if (!isHex(value)) return
-    const normalized = value.toUpperCase()
-    setAccent(normalized)
-    applyContextAccent(normalized)
-    desired.current = normalized
-    setSaveError(false)
-    void flush()
-  }
+        const current = result.data?.community?.mySettings.accentColor
+        if (!current || !isHex(current)) throw new Error("Community accent unavailable")
+        return current
+      },
+      confirm: (color) => commitCommunitySettingsPatch(client.cache, communityId, { accentColor: color }),
+      preview: (value) => setPreview(communityId, value),
+      release: (owner) => clearPreview(communityId, owner),
+    })
+  })
 
   if (!data?.community) {
     return (
@@ -139,71 +90,88 @@ export function ConnectedCommunityPreferences({
     )
   }
 
-  const resolvedCommunity = data.community
+  const failure = snapshot.failure
+  const accent = snapshot.confirmed ?? data.community.mySettings.accentColor
+  const lastDraft = snapshot.draft ?? accent
+  const canResave = Boolean(snapshot.draft && isHex(snapshot.draft))
 
   return (
     <Stack gap="sm">
-      {saveError && (
-        <Alert color="red" title="保存できませんでした">
-          最後に保存できた色へ戻しました。色を選び直して再試行してください。
-        </Alert>
-      )}
       <CommunityPreferencesContent
-        accent={accent ?? resolvedCommunity.mySettings.accentColor}
+        key={communityId}
+        accent={accent}
+        initialDraft={lastDraft}
         isPreview={false}
-        restoreOnAccentChange={saveError}
+        preserveDraftOnAccentChange={failure !== null}
+        saveStatus={failure ? "attention" : snapshot.status}
+        onAccentDraftChange={(value) => controller.edit(communityId, value)}
+        saveFeedback={
+          failure ? (
+            <Alert color="red" role="alert" title={
+              failure === "unknown"
+                ? "保存結果を確認できませんでした"
+                : "保存できませんでした"
+            }>
+              <Stack gap="xs">
+                <Text size="sm">
+                  Shellは最後に確認できた色を表示しています。入力内容は保持しています。
+                  {failure === "unknown"
+                    ? " 現在のServer状態を確認してから、必要に応じて手動で保存してください。"
+                    : " 内容を確認して、再保存するか変更を破棄してください。"}
+                </Text>
+                {failure === "unknown" && snapshot.inspected && (
+                  <Text size="sm">
+                    {snapshot.observedMatches
+                      ? "現在のServer値は入力した色と一致しています。旧Mutationの完了を証明するものではありません。"
+                      : "現在のServer値と入力した色が一致しません。"}
+                  </Text>
+                )}
+                <Group gap="xs">
+                  {failure === "unknown" && (
+                    <Button size="xs" variant="light" onClick={() => void controller.inspect(communityId)}>
+                      現在の状態を確認
+                    </Button>
+                  )}
+                  {failure === "unknown" && snapshot.observedMatches && (
+                    <Button size="xs" variant="light" onClick={() => controller.confirmObservation(communityId)}>
+                      確認完了
+                    </Button>
+                  )}
+                  {(failure === "rejected" || snapshot.inspected) && !snapshot.observedMatches && (
+                    <Button size="xs" disabled={!canResave} onClick={() => controller.retry(communityId)}>
+                      もう一度保存
+                    </Button>
+                  )}
+                  <Button size="xs" variant="subtle" color="gray"
+                    onClick={() => controller.discard(communityId)}>
+                    変更を破棄
+                  </Button>
+                </Group>
+              </Stack>
+            </Alert>
+          ) : undefined
+        }
         aliasControl={
           <CommunityAliasControl
             savedAlias={data.community.mySettings.alias}
             onSave={async (alias) => {
               const result = await save({
+                fetchPolicy: "no-cache",
                 variables: { input: { communityId, alias } },
               })
               const settings = result.data?.updateCommunitySettings?.settings
               if (!settings || settings.alias !== alias) {
                 throw new Error("Community alias save unconfirmed")
               }
-              // Mutationの成立を確認した時点で、ShellとPreferencesの同じ参照元を更新する。
-              const id = client.cache.identify({
-                __typename: "Community",
-                id: communityId,
-              })
-              if (id) {
-                const previous =
-                  client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
-                    id,
-                    fragment: CommunitySettingsCacheFragmentDoc,
-                  })
-                if (previous) {
-                  client.cache.writeFragment({
-                    id,
-                    fragment: CommunitySettingsCacheFragmentDoc,
-                    data: {
-                      __typename: "Community",
-                      mySettings: {
-                        __typename: "CommunitySettings",
-                        accentColor: previous.mySettings.accentColor,
-                        alias: settings.alias,
-                      },
-                    },
-                  })
-                }
-              }
-              // 再取得の通信失敗は確定済みMutationを失敗扱いしない。
-              void client
-                .refetchQueries({
-                  include: [MyCommunitiesDocument, CommunityMySettingsDocument],
-                })
-                .catch(() => undefined)
+              commitCommunitySettingsPatch(client.cache, communityId, { alias: settings.alias })
+              // Both subscribed views share the normalized Community fragment.
+              // Refetching either after this write may reintroduce an older
+              // Accent/Alias snapshot while the other field is in flight.
             }}
           />
         }
-        setAccent={(next) => {
-          const current = accent ?? resolvedCommunity.mySettings.accentColor
-          choose(typeof next === "function" ? next(current) : next)
-        }}
+        setAccent={() => undefined}
       />
-      {saving && <span role="status">保存中...</span>}
     </Stack>
   )
 }

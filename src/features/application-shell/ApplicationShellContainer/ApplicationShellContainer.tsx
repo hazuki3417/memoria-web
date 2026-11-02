@@ -17,6 +17,9 @@ import {
 } from ".././communityDisplayName"
 import { CommunityCreateModal } from ".././CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from ".././useApplicationContextSelection"
+import { CommunityAccentPreviewProvider, useCommunityAccentPreview } from "../CommunityAccentPreviewContext"
+import { resolveCommunityAccent } from "../communityAccentPreview"
+import { PersonalPreferencesSessionProvider } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -45,11 +48,18 @@ const communityContext = {
   accentColor: "var(--mantine-color-teal-6)",
 }
 
-export function ApplicationShellContainer({
-  children,
-}: {
-  children: ReactNode
-}) {
+export function ApplicationShellContainer({ children }: { children: ReactNode }) {
+  return (
+    <PersonalPreferencesSessionProvider>
+      <CommunityAccentPreviewProvider>
+        <ApplicationShellWithPreview>{children}</ApplicationShellWithPreview>
+      </CommunityAccentPreviewProvider>
+    </PersonalPreferencesSessionProvider>
+  )
+}
+
+function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
+  const { previews: accentPreviews } = useCommunityAccentPreview()
   const router = useRouter()
   const pathname = usePathname()
   const navigation = useApplicationNavigation()
@@ -115,8 +125,11 @@ export function ApplicationShellContainer({
           label:
             currentCreated?.label ??
             (communitiesLoaded ? "Community" : "読み込み中"),
-          accentColor:
+          accentColor: resolveCommunityAccent(
+            communityId,
             currentCreated?.accentColor ?? communityContext.accentColor,
+            accentPreviews[communityId] ?? null,
+          ),
         }
       : resolvedPersonalContext
   const contextLoading =
@@ -240,7 +253,13 @@ export function ApplicationShellContainer({
                       ...communityContext,
                       id: item.id,
                       label: item.label,
-                      accentColor: item.accentColor,
+                      accentColor: resolveCommunityAccent(
+                        item.id,
+                        item.accentColor,
+                        contextKind === "community" && communityId === item.id
+                          ? (accentPreviews[item.id] ?? null)
+                          : null,
+                      ),
                     })),
                   ]}
                   onSelect={(id) => {

@@ -1,0 +1,23 @@
+.titleGroup {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
+  min-width: 0;
+}
+
+.title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.accessory {
+  flex: 0 0 7rem;
+  width: 7rem;
+  min-height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}

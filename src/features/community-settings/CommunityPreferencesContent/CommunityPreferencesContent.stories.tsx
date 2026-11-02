@@ -1,4 +1,4 @@
-import { Box, Button } from "@mantine/core"
+import { Alert, Box, Button } from "@mantine/core"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
@@ -19,17 +19,17 @@ type Story = StoryObj<typeof meta>
 
 function AccentRefreshFixture(args: ComponentProps<typeof CommunityPreferencesContent>) {
   const [accent, setAccent] = useState(args.accent)
-  const [restore, setRestore] = useState(false)
+  const [preserveDraft, setPreserveDraft] = useState(false)
   return (
     <>
       <Button onClick={() => setAccent("#654321")}>アクセント再取得を再現</Button>
-      <Button onClick={() => { setRestore(true); setAccent("#ABCDEF") }}>
+      <Button onClick={() => { setPreserveDraft(true); setAccent("#ABCDEF") }}>
         保存失敗の復元を再現
       </Button>
       <CommunityPreferencesContent
         {...args}
         accent={accent}
-        restoreOnAccentChange={restore}
+        preserveDraftOnAccentChange={preserveDraft}
         setAccent={setAccent}
       />
     </>
@@ -63,8 +63,8 @@ export const AccentPreservesIncompleteDraft: Story = {
   },
 }
 
-export const AccentRollbackRestoresConfirmedColor: Story = {
-  name: "Interaction · 保存失敗時は確定色へ復元",
+export const AccentRollbackPreservesDraft: Story = {
+  name: "Interaction · 保存失敗時もColorInput Draftを保持",
   tags: ["interaction"],
   render: (args) => <AccentRefreshFixture {...args} />,
   play: async ({ canvasElement }) => {
@@ -73,6 +73,41 @@ export const AccentRollbackRestoresConfirmedColor: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, "#123")
     await userEvent.click(canvas.getByRole("button", { name: "保存失敗の復元を再現" }))
-    await expect(input).toHaveValue("#ABCDEF")
+    await expect(input).toHaveValue("#123")
+  },
+}
+
+export const AccentStatusBadge: Story = {
+  name: "Visual · Community Accentの保存Badge",
+  tags: ["visual"],
+  args: {
+    accent: "#123456",
+    isPreview: false,
+    saveStatus: "saved",
+  },
+}
+
+export const AccentErrorBadge: Story = {
+  name: "Visual · 保存エラー時のBadge",
+  tags: ["visual"],
+  args: {
+    accent: "#123456",
+    isPreview: false,
+    saveStatus: "attention",
+  },
+}
+
+export const AccentErrorWithDetails: Story = {
+  name: "Visual · Header Badgeと下部の保存Error詳細",
+  tags: ["visual"],
+  args: {
+    accent: "#123456",
+    isPreview: false,
+    saveStatus: "attention",
+    saveFeedback: (
+      <Alert color="red" title="保存できませんでした" role="alert">
+        Shellは確定色に戻しました。ColorInputの変更内容は保持しています。
+      </Alert>
+    ),
   },
 }
