@@ -58,3 +58,7 @@ mutation UpdateCommunitySettings($input: UpdateCommunitySettingsInput!) {
     settings { accentColor alias }
   }
 }
+
+fragment CommunitySettingsCache on Community {
+  mySettings { accentColor alias }
+}
