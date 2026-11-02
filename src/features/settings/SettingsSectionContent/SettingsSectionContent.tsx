@@ -24,6 +24,7 @@ export type SettingsSectionContentProps = {
   profileNickname?: string
   initialPreferences?: UserPreferences
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+  inspectPreferences?: () => Promise<UserPreferences>
   usageContent?: ReactNode
   accountContent?: ReactNode
 }
@@ -35,6 +36,7 @@ export function SettingsSectionContent({
   profileNickname,
   initialPreferences,
   savePreferences,
+  inspectPreferences,
   usageContent,
   accountContent,
 }: SettingsSectionContentProps) {
@@ -53,6 +55,7 @@ export function SettingsSectionContent({
           compact={compact}
           initialPreferences={initialPreferences}
           onSave={savePreferences}
+          onInspect={inspectPreferences}
         />
       )
     case "usage":
