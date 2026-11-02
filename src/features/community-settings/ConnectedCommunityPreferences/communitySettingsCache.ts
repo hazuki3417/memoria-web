@@ -1,4 +1,4 @@
-import type { ApolloCache } from "@apollo/client"
+import type { ApolloCache, NormalizedCacheObject } from "@apollo/client"
 import {
   CommunitySettingsCacheFragmentDoc,
   type OperationCommunitySettingsCacheFragment,
@@ -6,7 +6,7 @@ import {
 
 /** Only the fields in the successful mutation's input are authoritative. */
 export function commitCommunitySettingsPatch(
-  cache: ApolloCache<unknown>,
+  cache: ApolloCache<NormalizedCacheObject>,
   communityId: string,
   patch: Partial<OperationCommunitySettingsCacheFragment["mySettings"]>,
 ) {
