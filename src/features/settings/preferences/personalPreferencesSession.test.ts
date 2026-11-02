@@ -198,6 +198,41 @@ describe("Personal Preferences session controller", () => {
     }
   })
 
+  it("does not confirm a prior Preferences observation while a refresh is pending", async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = createPersonalPreferencesSession()
+      let resolveRefresh: ((value: typeof defaultUserPreferences) => void) | undefined
+      const inspect = vi.fn()
+        .mockResolvedValueOnce({ ...defaultUserPreferences, mediaDetailNavigationWrap: true })
+        .mockImplementationOnce(() => new Promise((resolve) => { resolveRefresh = resolve }))
+      controller.configure(
+        vi.fn().mockRejectedValue(
+          Object.assign(new Error("offline"), { networkError: new Error("offline") }),
+        ),
+        inspect,
+      )
+      controller.hydrate(defaultUserPreferences)
+      controller.edit({ mediaDetailNavigationWrap: true })
+      await vi.advanceTimersByTimeAsync(400)
+      await controller.inspect()
+      expect(controller.getSnapshot().observedMatches).toBe(true)
+      const pending = controller.inspect()
+      expect(controller.getSnapshot()).toMatchObject({
+        inspected: false, observedMatches: false,
+      })
+      controller.confirmObservation()
+      expect(controller.getSnapshot().failure).toBe("unknown")
+      resolveRefresh?.(defaultUserPreferences)
+      await pending
+      expect(controller.getSnapshot()).toMatchObject({
+        inspected: true, observedMatches: false,
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("discards a failed Draft and restores a form reset revision", async () => {
     vi.useFakeTimers()
     try {
