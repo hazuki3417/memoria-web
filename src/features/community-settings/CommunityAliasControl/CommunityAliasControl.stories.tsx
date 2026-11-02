@@ -35,6 +35,23 @@ export const ClearAlias: Story = {
   },
 }
 
+export const AliasConfirmedBeforeRefetch: Story = {
+  name: "Interaction · 保存成功後は再取得前でも未編集扱い",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    const save = canvas.getByRole("button", { name: "保存" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "確定した別名")
+    await userEvent.click(save)
+    await expect(args.onSave).toHaveBeenCalledWith("確定した別名")
+    await expect(input).toHaveValue("確定した別名")
+    await expect(save).toBeDisabled()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
 export const AliasTooLong: Story = {
   name: "Interaction · Unicode100文字上限",
   tags: ["interaction"],
