@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState, type SetStateAction } from "react"
 import { useController, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 
 export function useCommunityNameSettings({
@@ -12,7 +15,13 @@ export function useCommunityNameSettings({
   onSaveName?: (name: string) => Promise<boolean>
 }) {
   const initialName = communityName ?? "家族のアルバム"
-  const { control, reset } = useForm<{ name: string }>({
+  const { control, reset, handleSubmit } = useForm<
+    z.input<typeof communityNameSchema>,
+    unknown,
+    z.output<typeof communityNameSchema>
+  >({
+    resolver: zodResolver(communityNameSchema),
+    mode: "onChange",
     defaultValues: { name: initialName },
   })
   const { field } = useController({ control, name: "name" })
@@ -30,7 +39,7 @@ export function useCommunityNameSettings({
   }
   const saveName = () => {
     if (savingName) return
-    const updated = draft.trim()
+    void handleSubmit(({ name: updated }) => {
     if (!onSaveName) {
       savedName.current = updated
       reset({ name: updated })
@@ -54,9 +63,10 @@ export function useCommunityNameSettings({
         })
       })
       .finally(() => setSavingName(false))
+    })()
   }
 
   const dirty = draft.trim() !== savedName.current
-  const invalid = !draft.trim()
+  const invalid = !communityNameSchema.safeParse({ name: draft }).success
   return { draft, setDraft, dirty, invalid, savingName, saveName }
 }
