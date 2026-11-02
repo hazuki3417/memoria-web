@@ -46,6 +46,7 @@ export function SettingsPreferences({
     discard,
     inspected,
     observedMatches,
+    hasSession,
   } = useUserPreferences(initialPreferences, onSave, onInspect)
   const dateFormat = preferences.dateFormat
   const fileSizeUnit = preferences.fileSizeUnit
@@ -103,9 +104,11 @@ export function SettingsPreferences({
                 もう一度保存
               </Button>
             )}
-            <Button size="xs" variant="subtle" color="gray" onClick={discard}>
-              変更を破棄
-            </Button>
+            {hasSession && saveError !== "blocked" && (
+              <Button size="xs" variant="subtle" color="gray" onClick={discard}>
+                変更を破棄
+              </Button>
+            )}
           </Stack>
         </FeedbackAlert>
       )}
