@@ -5,6 +5,7 @@ import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { SettingsPreferences } from "./SettingsPreferences"
 import { defaultUserPreferences, type UserPreferencesPatch } from "../userPreferences"
 import { PersonalPreferencesSessionProvider } from "../PersonalPreferencesSessionContext"
+import { SettingsInputValidationError } from "../../graphqlSettingsResult"
 
 const meta = {
   title: "features/settings/preferences/SettingsPreferences",
@@ -82,6 +83,31 @@ export const PreferencePatchContract: Story = {
         mediaDetailNavigationWrap: true,
       })
     })
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const PreferencesTypedFieldValidation: Story = {
+  name: "Interaction · Preferences Server Field Errorと明示復旧",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => {
+      throw new SettingsInputValidationError([
+        {
+          scope: "FIELD",
+          code: "INVALID_VALUE",
+          inputPaths: [{ segments: ["mediaDetailNavigationWrap"] }],
+        },
+      ])
+    }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getAllByRole("switch")[0]
+    await userEvent.click(input)
+    await expect(await canvas.findByText("入力内容を確認してください。")).toBeVisible()
+    await expect(input).toBeChecked()
+    await expect(canvas.getByRole("button", { name: "もう一度保存" })).toBeVisible()
     await expect(args.onSave).toHaveBeenCalledTimes(1)
   },
 }
