@@ -27,7 +27,7 @@ This refactoring preserves the established UI and behavior of Personal and Commu
 
 - Personal URL-aligned Storybook branches: `Features/Settings/Profile`, `Features/Settings/Preferences`, `Features/Settings/Account`, `Features/Settings/Usage`. Profile interaction stories remain under Profile.
 - Community URL-aligned Storybook branches: `Features/Community Settings/Settings` (the `/settings` general screen), `/Members`, `/Preferences`, `/Usage`. All member interactions remain under Members.
-- Existing `SettingsLoadLayout.stories.tsx` and `PageStatusBoundary.stories.tsx` cover loading and error layout.
+- Shared loading/error behavior is owned by `src/components/PageStatusBoundary/PageStatusBoundary.tsx` and tested by its adjacent `PageStatusBoundary.stories.tsx`. The Personal/Community settings-navigation composition is exercised by `src/features/settings/LayoutStory/LayoutStory.stories.tsx`, next to its story-only fixture `LayoutStory.tsx` (six existing context/layout variants; not per-page coverage).
 
 ## Verification requirements
 
