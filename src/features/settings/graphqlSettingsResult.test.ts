@@ -3,6 +3,7 @@ import {
   SettingsInputValidationError,
   classifySettingsSaveFailure,
   resolveSettingsValidation,
+  resolveSettingsFailureValidation,
 } from "./graphqlSettingsResult"
 
 describe("Hybrid settings input rejection", () => {
@@ -55,6 +56,29 @@ describe("Hybrid settings input rejection", () => {
     })).toBe("blocked")
     expect(classifySettingsSaveFailure({
       errors: [{ extensions: { code: "INTERNAL_SERVER_ERROR" } }],
+    })).toBe("unknown")
+    expect(classifySettingsSaveFailure({
+      graphQLErrors: [{ extensions: { code: "UNAUTHENTICATED" } }],
+    })).toBe("blocked")
+    expect(classifySettingsSaveFailure({
+      graphQLErrors: [{ extensions: { code: "NOT_FOUND" } }],
+    })).toBe("blocked")
+    for (const code of ["VALIDATION", "CONFLICT"]) {
+      const error = { graphQLErrors: [{ extensions: { code } }] }
+      expect(classifySettingsSaveFailure(error)).toBe("validation")
+      expect(resolveSettingsFailureValidation(error, ["nickname"])).toEqual({
+        fieldErrors: {},
+        formError: true,
+      })
+    }
+    expect(classifySettingsSaveFailure({
+      graphQLErrors: [
+        { extensions: { code: "VALIDATION" } },
+        { extensions: { code: "INTERNAL_SERVER_ERROR" } },
+      ],
+    })).toBe("unknown")
+    expect(classifySettingsSaveFailure({
+      graphQLErrors: [{ extensions: { code: "UNKNOWN_OUTCOME" } }],
     })).toBe("unknown")
     expect(classifySettingsSaveFailure(new Error("network timeout"))).toBe("unknown")
     expect(classifySettingsSaveFailure(new Error("missing response"))).toBe("unknown")
