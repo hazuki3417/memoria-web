@@ -1,14 +1,20 @@
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
+import {
+  SettingsInputValidationError,
+  classifySettingsSaveFailure,
+  resolveSettingsValidation,
+} from "../graphqlSettingsResult"
 
-export type PreferencesFailure = "unknown" | "retryable" | "blocked" | null
+export type PreferencesFailure = "unknown" | "retryable" | "blocked" | "validation" | null
 export type PreferencesSessionSnapshot = Readonly<{
   confirmed: UserPreferences | null
   draftPatch: UserPreferencesPatch
   accentDraft: string | null
   saveStatus: SaveStatusState
   failure: PreferencesFailure
+  validation: { fieldErrors: Record<string, string>; formError: boolean } | null
   inspected: boolean
   observedMatches: boolean
   discardRevision: number
@@ -20,6 +26,7 @@ const initial: PreferencesSessionSnapshot = {
   accentDraft: null,
   saveStatus: "idle",
   failure: null,
+  validation: null,
   inspected: false,
   observedMatches: false,
   discardRevision: 0,
@@ -28,13 +35,7 @@ const initial: PreferencesSessionSnapshot = {
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type Inspect = () => Promise<UserPreferences>
 
-const isUnknown = (error: unknown): boolean => {
-  if (typeof error !== "object" || error === null) return true
-  if ("networkError" in error && error.networkError) return true
-  if ("kind" in error && error.kind === "blocked") return false
-  if ("graphQLErrors" in error) return false
-  return true
-}
+
 
 /**
  * Session-scoped owner: the preferences view is only a subscriber.
@@ -73,20 +74,17 @@ export function createPersonalPreferencesSession() {
           locallyConfirmedKeys.add(key)
           if (nextDraft[key] === confirmed[key]) delete nextDraft[key]
         }
-        emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null })
+        emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null, validation: null })
       },
-      (error) => {
-        const failure: PreferencesFailure =
-          typeof error === "object" &&
-          error !== null &&
-          "kind" in error &&
-          error.kind === "blocked"
-            ? "blocked"
-            : isUnknown(error)
-              ? "unknown"
-              : "retryable"
+      (error, attempted) => {
+        const failure = classifySettingsSaveFailure(error)
+        const validation =
+          failure === "validation" && error instanceof SettingsInputValidationError
+            ? resolveSettingsValidation(error, Object.keys(attempted))
+            : null
         emit({
           failure,
+          validation,
           saveStatus: "attention",
           inspected: false,
           observedMatches: false,
@@ -144,8 +142,19 @@ export function createPersonalPreferencesSession() {
         emit({ confirmed: refreshed })
     },
     edit(patch: UserPreferencesPatch) {
+      const validation = snapshot.validation
+        ? {
+            fieldErrors: Object.fromEntries(
+              Object.entries(snapshot.validation.fieldErrors).filter(
+                ([key]) => !(key in patch),
+              ),
+            ),
+            formError: false,
+          }
+        : null
       emit({
         draftPatch: { ...snapshot.draftPatch, ...patch },
+        validation,
         observedMatches: false,
         inspected: false,
       })
@@ -216,6 +225,7 @@ export function createPersonalPreferencesSession() {
         confirmed,
         draftPatch: {},
         failure: null,
+        validation: null,
         saveStatus: "idle",
         observedMatches: false,
         inspected: false,
@@ -233,6 +243,7 @@ export function createPersonalPreferencesSession() {
       inspectedValue = null
       emit({
         failure: null,
+        validation: null,
         saveStatus: "pending",
         observedMatches: false,
         inspected: false,
@@ -245,6 +256,7 @@ export function createPersonalPreferencesSession() {
       inspectedValue = null
       emit({
         failure: null,
+        validation: null,
         draftPatch: {},
         accentDraft: snapshot.confirmed?.personalAccentColor ?? null,
         saveStatus: "idle",
