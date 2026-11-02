@@ -46,6 +46,33 @@ describe("session Community Accent save controller", () => {
     })
   })
 
+  it("does not save a superseded queued color after a newer HEX draft becomes incomplete", async () => {
+    const controller = createCommunityAccentSaveController()
+    let resolveFirst: ((value: string) => void) | undefined
+    const save = vi.fn().mockImplementationOnce(
+      () => new Promise<string>((resolve) => { resolveFirst = resolve }),
+    )
+    const release = vi.fn()
+    controller.initialize(id, "#112233")
+    controller.configure(id, {
+      save,
+      observe: vi.fn(),
+      preview: vi.fn().mockReturnValue(1),
+      release,
+    })
+    controller.edit(id, "#AABBCC")
+    controller.edit(id, "#445566")
+    controller.edit(id, "#445")
+    expect(controller.getSnapshot(id).draft).toBe("#445")
+    resolveFirst?.("#AABBCC")
+    await tick()
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(controller.getSnapshot(id)).toMatchObject({
+      confirmed: "#AABBCC", draft: "#445", status: "pending",
+    })
+    expect(release).toHaveBeenCalled()
+  })
+
   it("never automatically resends an unknown write and requires observation", async () => {
     const controller = createCommunityAccentSaveController()
     const save = vi.fn()
