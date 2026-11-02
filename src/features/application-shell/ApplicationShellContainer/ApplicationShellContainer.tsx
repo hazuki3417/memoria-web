@@ -59,7 +59,7 @@ export function ApplicationShellContainer({ children }: { children: ReactNode })
 }
 
 function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
-  const { preview: accentPreview } = useCommunityAccentPreview()
+  const { previews: accentPreviews } = useCommunityAccentPreview()
   const router = useRouter()
   const pathname = usePathname()
   const navigation = useApplicationNavigation()
@@ -128,7 +128,7 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
           accentColor: resolveCommunityAccent(
             communityId,
             currentCreated?.accentColor ?? communityContext.accentColor,
-            accentPreview,
+            accentPreviews[communityId] ?? null,
           ),
         }
       : resolvedPersonalContext
@@ -257,7 +257,7 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
                         item.id,
                         item.accentColor,
                         contextKind === "community" && communityId === item.id
-                          ? accentPreview
+                          ? (accentPreviews[item.id] ?? null)
                           : null,
                       ),
                     })),
