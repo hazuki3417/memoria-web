@@ -1,4 +1,4 @@
-import { Group, Text } from "@mantine/core"
+import { Badge } from "@mantine/core"
 import {
   IconAlertCircle,
   IconCheck,
@@ -15,7 +15,7 @@ export type SaveStatusState =
 
 export type SaveStatusProps = {
   state: SaveStatusState
-  /** Announcements should be enabled only for meaningful, throttled transitions. */
+  /** Enable only for meaningful transitions; avoid announcing every edit. */
   announce?: boolean
 }
 
@@ -39,29 +39,18 @@ export function SaveStatus({ state, announce = false }: SaveStatusProps) {
   const Icon = state === "idle" ? null : icons[state]
 
   return (
-    <Group
-      gap={4}
-      justify="flex-end"
-      wrap="nowrap"
-      style={{
-        width: "100%",
-        visibility: state === "idle" ? "hidden" : "visible",
-        whiteSpace: "nowrap",
-      }}
+    <Badge
+      variant="light"
+      color={state === "attention" ? "red" : state === "saved" ? "green" : "gray"}
+      size="sm"
+      radius="sm"
+      leftSection={Icon ? <Icon size={13} aria-hidden="true" /> : undefined}
+      style={{ visibility: state === "idle" ? "hidden" : "visible" }}
       role={announce && state !== "idle" ? "status" : undefined}
       aria-live={announce && state !== "idle" ? "polite" : "off"}
       aria-label={label || undefined}
     >
-      {Icon && (
-        <Icon
-          size={16}
-          aria-hidden="true"
-          color={state === "attention" ? "var(--mantine-color-red-6)" : "currentColor"}
-        />
-      )}
-      <Text size="xs" c={state === "attention" ? "red" : "dimmed"}>
-        {label}
-      </Text>
-    </Group>
+      {label || "保存済み"}
+    </Badge>
   )
 }
