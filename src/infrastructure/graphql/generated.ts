@@ -162,6 +162,38 @@ export type ImageVariant = {
   width: Scalars['Int']['output'];
 };
 
+export type InputFieldPath = {
+  __typename?: 'InputFieldPath';
+  segments: Array<Scalars['String']['output']>;
+};
+
+export type InputValidationFailure = {
+  __typename?: 'InputValidationFailure';
+  violations: Array<InputViolation>;
+};
+
+export type InputViolation = {
+  __typename?: 'InputViolation';
+  code: InputViolationCode;
+  inputPaths: Array<InputFieldPath>;
+  scope: InputViolationScope;
+};
+
+export enum InputViolationCode {
+  InvalidCombination = 'INVALID_COMBINATION',
+  InvalidFormat = 'INVALID_FORMAT',
+  InvalidValue = 'INVALID_VALUE',
+  OutOfRange = 'OUT_OF_RANGE',
+  Required = 'REQUIRED',
+  TooLong = 'TOO_LONG'
+}
+
+export enum InputViolationScope {
+  Field = 'FIELD',
+  FieldGroup = 'FIELD_GROUP',
+  Form = 'FORM'
+}
+
 export type Media = {
   __typename?: 'Media';
   createdAt: Scalars['DateTime']['output'];
@@ -422,11 +454,11 @@ export type Mutation = {
   registerUser: RegisterUserPayload;
   removeCommunityMember: CommunityMembershipMutationPayload;
   removeMediaFromGroup: ChangeMediaGroupClassificationPayload;
-  renameCommunity: RenameCommunityPayload;
-  updateCommunitySettings: UpdateCommunitySettingsPayload;
+  updateCommunity: UpdateCommunityResult;
+  updateCommunitySettings: UpdateCommunitySettingsResult;
   updateMediaGroup: UpdateMediaGroupPayload;
-  updateUserPreferences: UpdateUserPreferencesPayload;
-  updateUserProfile: UpdateUserProfilePayload;
+  updateUserPreferences: UpdateUserPreferencesResult;
+  updateUserProfile: UpdateUserProfileResult;
 };
 
 
@@ -485,8 +517,8 @@ export type MutationRemoveMediaFromGroupArgs = {
 };
 
 
-export type MutationRenameCommunityArgs = {
-  input: RenameCommunityInput;
+export type MutationUpdateCommunityArgs = {
+  input: UpdateCommunityInput;
 };
 
 
@@ -631,16 +663,6 @@ export type RemoveCommunityMemberInput = {
   userId: Scalars['ID']['input'];
 };
 
-export type RenameCommunityInput = {
-  communityId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-};
-
-export type RenameCommunityPayload = {
-  __typename?: 'RenameCommunityPayload';
-  community: Community;
-};
-
 export type ScopeInput = {
   communityId?: InputMaybe<Scalars['ID']['input']>;
   type: ScopeType;
@@ -657,15 +679,29 @@ export type StorageUsage = {
   usedBytes: Scalars['Int64']['output'];
 };
 
+export type UpdateCommunityInput = {
+  communityId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
+
+export type UpdateCommunityResult = InputValidationFailure | UpdateCommunitySuccess;
+
 export type UpdateCommunitySettingsInput = {
   accentColor?: InputMaybe<Scalars['String']['input']>;
   alias?: InputMaybe<Scalars['String']['input']>;
   communityId: Scalars['ID']['input'];
 };
 
-export type UpdateCommunitySettingsPayload = {
-  __typename?: 'UpdateCommunitySettingsPayload';
+export type UpdateCommunitySettingsResult = InputValidationFailure | UpdateCommunitySettingsSuccess;
+
+export type UpdateCommunitySettingsSuccess = {
+  __typename?: 'UpdateCommunitySettingsSuccess';
   settings: CommunitySettings;
+};
+
+export type UpdateCommunitySuccess = {
+  __typename?: 'UpdateCommunitySuccess';
+  community: Community;
 };
 
 export type UpdateMediaGroupInput = {
@@ -691,8 +727,10 @@ export type UpdateUserPreferencesInput = {
   personalAccentColor?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type UpdateUserPreferencesPayload = {
-  __typename?: 'UpdateUserPreferencesPayload';
+export type UpdateUserPreferencesResult = InputValidationFailure | UpdateUserPreferencesSuccess;
+
+export type UpdateUserPreferencesSuccess = {
+  __typename?: 'UpdateUserPreferencesSuccess';
   preferences: UserPreferences;
 };
 
@@ -700,8 +738,10 @@ export type UpdateUserProfileInput = {
   nickname: Scalars['String']['input'];
 };
 
-export type UpdateUserProfilePayload = {
-  __typename?: 'UpdateUserProfilePayload';
+export type UpdateUserProfileResult = InputValidationFailure | UpdateUserProfileSuccess;
+
+export type UpdateUserProfileSuccess = {
+  __typename?: 'UpdateUserProfileSuccess';
   user: User;
 };
 
@@ -792,6 +832,19 @@ export type OperationFileSizeUnit =
   | 'BINARY'
   | 'DECIMAL';
 
+export type OperationInputViolationCode =
+  | 'INVALID_COMBINATION'
+  | 'INVALID_FORMAT'
+  | 'INVALID_VALUE'
+  | 'OUT_OF_RANGE'
+  | 'REQUIRED'
+  | 'TOO_LONG';
+
+export type OperationInputViolationScope =
+  | 'FIELD'
+  | 'FIELD_GROUP'
+  | 'FORM';
+
 export type OperationMediaFilterInput = {
   tagIds?: Array<string | number> | null | undefined;
 };
@@ -842,11 +895,6 @@ export type OperationRemoveCommunityMemberInput = {
   userId: string | number;
 };
 
-export type OperationRenameCommunityInput = {
-  communityId: string | number;
-  name: string;
-};
-
 export type OperationScopeInput = {
   communityId?: string | number | null | undefined;
   type: OperationScopeType;
@@ -855,6 +903,11 @@ export type OperationScopeInput = {
 export type OperationScopeType =
   | 'COMMUNITY'
   | 'PERSONAL';
+
+export type OperationUpdateCommunityInput = {
+  communityId: string | number;
+  name: string;
+};
 
 export type OperationUpdateCommunitySettingsInput = {
   accentColor?: string | null | undefined;
@@ -917,12 +970,15 @@ export type OperationCreateCommunityMutationVariables = Exact<{
 
 export type OperationCreateCommunityMutation = { createCommunity: { community: { id: string, name: string, createdAt: string, updatedAt: string } } };
 
-export type OperationRenameCommunityMutationVariables = Exact<{
-  input: OperationRenameCommunityInput;
+export type OperationUpdateCommunityMutationVariables = Exact<{
+  input: OperationUpdateCommunityInput;
 }>;
 
 
-export type OperationRenameCommunityMutation = { renameCommunity: { community: { id: string, name: string, createdAt: string, updatedAt: string } } };
+export type OperationUpdateCommunityMutation = { updateCommunity:
+    | { __typename: 'InputValidationFailure', violations: Array<{ scope: OperationInputViolationScope, code: OperationInputViolationCode, inputPaths: Array<{ segments: Array<string> }> }> }
+    | { __typename: 'UpdateCommunitySuccess', community: { id: string, name: string, createdAt: string, updatedAt: string } }
+   };
 
 export type OperationChangeCommunityMemberRoleMutationVariables = Exact<{
   input: OperationChangeCommunityMemberRoleInput;
@@ -971,7 +1027,10 @@ export type OperationUpdateCommunitySettingsMutationVariables = Exact<{
 }>;
 
 
-export type OperationUpdateCommunitySettingsMutation = { updateCommunitySettings: { settings: { accentColor: string, alias: string | null } } };
+export type OperationUpdateCommunitySettingsMutation = { updateCommunitySettings:
+    | { __typename: 'InputValidationFailure', violations: Array<{ scope: OperationInputViolationScope, code: OperationInputViolationCode, inputPaths: Array<{ segments: Array<string> }> }> }
+    | { __typename: 'UpdateCommunitySettingsSuccess', settings: { accentColor: string, alias: string | null } }
+   };
 
 export type OperationCommunitySettingsCacheFragment = { mySettings: { accentColor: string, alias: string | null } };
 
@@ -1099,14 +1158,20 @@ export type OperationUpdateMemoriaUserProfileMutationVariables = Exact<{
 }>;
 
 
-export type OperationUpdateMemoriaUserProfileMutation = { updateUserProfile: { user: { id: string, profile: { nickname: string } } } };
+export type OperationUpdateMemoriaUserProfileMutation = { updateUserProfile:
+    | { __typename: 'InputValidationFailure', violations: Array<{ scope: OperationInputViolationScope, code: OperationInputViolationCode, inputPaths: Array<{ segments: Array<string> }> }> }
+    | { __typename: 'UpdateUserProfileSuccess', user: { id: string, profile: { nickname: string } } }
+   };
 
 export type OperationSaveUserPreferencesMutationVariables = Exact<{
   input: OperationUpdateUserPreferencesInput;
 }>;
 
 
-export type OperationSaveUserPreferencesMutation = { updateUserPreferences: { preferences: { personalAccentColor: string, dateFormat: OperationDateFormat, fileSizeUnit: OperationFileSizeUnit, mediaThumbnailSize: OperationMediaThumbnailSize, mediaDetailNavigationWrap: boolean, mediaDetailInitialInfoWide: boolean, mediaDetailInitialInfoMedium: boolean } } };
+export type OperationSaveUserPreferencesMutation = { updateUserPreferences:
+    | { __typename: 'InputValidationFailure', violations: Array<{ scope: OperationInputViolationScope, code: OperationInputViolationCode, inputPaths: Array<{ segments: Array<string> }> }> }
+    | { __typename: 'UpdateUserPreferencesSuccess', preferences: { personalAccentColor: string, dateFormat: OperationDateFormat, fileSizeUnit: OperationFileSizeUnit, mediaThumbnailSize: OperationMediaThumbnailSize, mediaDetailNavigationWrap: boolean, mediaDetailInitialInfoWide: boolean, mediaDetailInitialInfoMedium: boolean } }
+   };
 
 export type OperationPersonalUsageQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1354,44 +1419,56 @@ export function useCreateCommunityMutation(baseOptions?: Apollo.MutationHookOpti
 export type CreateCommunityMutationHookResult = ReturnType<typeof useCreateCommunityMutation>;
 export type CreateCommunityMutationResult = Apollo.MutationResult<OperationCreateCommunityMutation>;
 export type CreateCommunityMutationOptions = Apollo.BaseMutationOptions<OperationCreateCommunityMutation, OperationCreateCommunityMutationVariables>;
-export const RenameCommunityDocument = gql`
-    mutation RenameCommunity($input: RenameCommunityInput!) {
-  renameCommunity(input: $input) {
-    community {
-      id
-      name
-      createdAt
-      updatedAt
+export const UpdateCommunityDocument = gql`
+    mutation UpdateCommunity($input: UpdateCommunityInput!) {
+  updateCommunity(input: $input) {
+    __typename
+    ... on UpdateCommunitySuccess {
+      community {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+    }
+    ... on InputValidationFailure {
+      violations {
+        scope
+        code
+        inputPaths {
+          segments
+        }
+      }
     }
   }
 }
     `;
-export type RenameCommunityMutationFn = Apollo.MutationFunction<OperationRenameCommunityMutation, OperationRenameCommunityMutationVariables>;
+export type UpdateCommunityMutationFn = Apollo.MutationFunction<OperationUpdateCommunityMutation, OperationUpdateCommunityMutationVariables>;
 
 /**
- * __useRenameCommunityMutation__
+ * __useUpdateCommunityMutation__
  *
- * To run a mutation, you first call `useRenameCommunityMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRenameCommunityMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateCommunityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCommunityMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [renameCommunityMutation, { data, loading, error }] = useRenameCommunityMutation({
+ * const [updateCommunityMutation, { data, loading, error }] = useUpdateCommunityMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useRenameCommunityMutation(baseOptions?: Apollo.MutationHookOptions<OperationRenameCommunityMutation, OperationRenameCommunityMutationVariables>) {
+export function useUpdateCommunityMutation(baseOptions?: Apollo.MutationHookOptions<OperationUpdateCommunityMutation, OperationUpdateCommunityMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<OperationRenameCommunityMutation, OperationRenameCommunityMutationVariables>(RenameCommunityDocument, options);
+        return Apollo.useMutation<OperationUpdateCommunityMutation, OperationUpdateCommunityMutationVariables>(UpdateCommunityDocument, options);
       }
-export type RenameCommunityMutationHookResult = ReturnType<typeof useRenameCommunityMutation>;
-export type RenameCommunityMutationResult = Apollo.MutationResult<OperationRenameCommunityMutation>;
-export type RenameCommunityMutationOptions = Apollo.BaseMutationOptions<OperationRenameCommunityMutation, OperationRenameCommunityMutationVariables>;
+export type UpdateCommunityMutationHookResult = ReturnType<typeof useUpdateCommunityMutation>;
+export type UpdateCommunityMutationResult = Apollo.MutationResult<OperationUpdateCommunityMutation>;
+export type UpdateCommunityMutationOptions = Apollo.BaseMutationOptions<OperationUpdateCommunityMutation, OperationUpdateCommunityMutationVariables>;
 export const ChangeCommunityMemberRoleDocument = gql`
     mutation ChangeCommunityMemberRole($input: ChangeCommunityMemberRoleInput!) {
   changeCommunityMemberRole(input: $input) {
@@ -1626,9 +1703,21 @@ export type CommunityMySettingsQueryResult = Apollo.QueryResult<OperationCommuni
 export const UpdateCommunitySettingsDocument = gql`
     mutation UpdateCommunitySettings($input: UpdateCommunitySettingsInput!) {
   updateCommunitySettings(input: $input) {
-    settings {
-      accentColor
-      alias
+    __typename
+    ... on UpdateCommunitySettingsSuccess {
+      settings {
+        accentColor
+        alias
+      }
+    }
+    ... on InputValidationFailure {
+      violations {
+        scope
+        code
+        inputPaths {
+          segments
+        }
+      }
     }
   }
 }
@@ -2448,10 +2537,22 @@ export type RegisterMemoriaUserMutationOptions = Apollo.BaseMutationOptions<Oper
 export const UpdateMemoriaUserProfileDocument = gql`
     mutation UpdateMemoriaUserProfile($input: UpdateUserProfileInput!) {
   updateUserProfile(input: $input) {
-    user {
-      id
-      profile {
-        nickname
+    __typename
+    ... on UpdateUserProfileSuccess {
+      user {
+        id
+        profile {
+          nickname
+        }
+      }
+    }
+    ... on InputValidationFailure {
+      violations {
+        scope
+        code
+        inputPaths {
+          segments
+        }
       }
     }
   }
@@ -2486,14 +2587,26 @@ export type UpdateMemoriaUserProfileMutationOptions = Apollo.BaseMutationOptions
 export const SaveUserPreferencesDocument = gql`
     mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
   updateUserPreferences(input: $input) {
-    preferences {
-      personalAccentColor
-      dateFormat
-      fileSizeUnit
-      mediaThumbnailSize
-      mediaDetailNavigationWrap
-      mediaDetailInitialInfoWide
-      mediaDetailInitialInfoMedium
+    __typename
+    ... on InputValidationFailure {
+      violations {
+        scope
+        code
+        inputPaths {
+          segments
+        }
+      }
+    }
+    ... on UpdateUserPreferencesSuccess {
+      preferences {
+        personalAccentColor
+        dateFormat
+        fileSizeUnit
+        mediaThumbnailSize
+        mediaDetailNavigationWrap
+        mediaDetailInitialInfoWide
+        mediaDetailInitialInfoMedium
+      }
     }
   }
 }
