@@ -109,5 +109,6 @@ export function useUserPreferences(
     inspected: sessionSnapshot?.inspected ?? false,
     observedMatches: sessionSnapshot?.observedMatches ?? false,
     hasSession: Boolean(sessionSnapshot),
+    canRetry: !sessionSnapshot?.accentDraft || /^#[0-9a-fA-F]{6}$/.test(sessionSnapshot.accentDraft),
   }
 }
