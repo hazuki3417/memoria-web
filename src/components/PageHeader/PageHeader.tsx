@@ -5,12 +5,18 @@ import styles from "./PageHeader.module.css"
 export type PageHeaderProps = {
   title: string
   description: string
-  trailing?: ReactNode
+  /** Content associated with the title, such as a SaveStatus badge. */
+  titleAccessory?: ReactNode
 }
 
-export function PageHeader({ title, description, trailing }: PageHeaderProps) {
-  // Keep the original DOM structure and spacing for existing consumers.
-  if (trailing === undefined) {
+export function PageHeader({
+  title,
+  description,
+  titleAccessory,
+}: PageHeaderProps) {
+  // Preserve the original DOM and spacing for consumers without an accessory,
+  // including Usage where the view-mode input lives outside PageHeader.
+  if (titleAccessory === undefined) {
     return (
       <Box>
         <Title order={1} size="h2">
@@ -25,11 +31,11 @@ export function PageHeader({ title, description, trailing }: PageHeaderProps) {
 
   return (
     <Box>
-      <div className={styles.titleRow}>
+      <div className={styles.titleGroup}>
         <Title order={1} size="h2" className={styles.title}>
           {title}
         </Title>
-        <div className={styles.trailing}>{trailing}</div>
+        <div className={styles.accessory}>{titleAccessory}</div>
       </div>
       <Text c="dimmed" size="sm" mt={4}>
         {description}
