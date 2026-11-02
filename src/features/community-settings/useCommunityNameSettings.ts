@@ -46,7 +46,9 @@ export function useCommunityNameSettings({
   const setDraft = (next: SetStateAction<string>) => {
     field.onChange(typeof next === "function" ? next(field.value) : next)
     clearErrors("name")
-    setFailure(null)
+    setFailure((current) =>
+      current === "unknown" || current === "blocked" ? current : null,
+    )
     setFormInvalid(false)
   }
   const saveName = () => {
