@@ -1,5 +1,7 @@
-import { Box, Stack, Text } from "@mantine/core"
+import { Box, Button, Stack, Text } from "@mantine/core"
+import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
+import { expect, userEvent, within } from "storybook/test"
 import { FeedbackAlert } from "../Feedback"
 import { PageHeader } from "../PageHeader"
 import { SaveStatus } from "./SaveStatus"
@@ -74,4 +76,37 @@ export const WithErrorDetails: Story = {
       </FeedbackAlert>
     </Stack>
   ),
+}
+
+function AnnouncementScenario() {
+  const [state, setState] = useState<"idle" | "pending" | "saving" | "saved" | "attention">("idle")
+
+  return (
+    <Stack align="flex-start">
+      <SaveStatus state={state} announce />
+      <Button onClick={() => setState("pending")}>Pending</Button>
+      <Button onClick={() => setState("saving")}>Saving</Button>
+      <Button onClick={() => setState("saved")}>Saved</Button>
+      <Button onClick={() => setState("attention")}>Attention</Button>
+    </Stack>
+  )
+}
+
+export const AnnouncementTransitions: Story = {
+  name: "Interaction · 保存確定のみ読み上げる",
+  render: () => <AnnouncementScenario />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const status = canvas.getByRole("status")
+    expect(status).toBeEmptyDOMElement()
+
+    await userEvent.click(canvas.getByRole("button", { name: "Pending" }))
+    expect(status).toBeEmptyDOMElement()
+    await userEvent.click(canvas.getByRole("button", { name: "Saving" }))
+    expect(status).toBeEmptyDOMElement()
+    await userEvent.click(canvas.getByRole("button", { name: "Saved" }))
+    await expect(status).toHaveTextContent("変更を保存しました")
+    await userEvent.click(canvas.getByRole("button", { name: "Attention" }))
+    await expect(status).toBeEmptyDOMElement()
+  },
 }
