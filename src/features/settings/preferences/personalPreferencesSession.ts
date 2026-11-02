@@ -168,9 +168,17 @@ export function createPersonalPreferencesSession() {
     confirmObservation() {
       if (snapshot.failure !== "unknown" || !snapshot.observedMatches ||
         !inspectedValue) return
+      const pending = { ...ensureQueue().getPending(), ...snapshot.draftPatch }
+      const confirmed = { ...(snapshot.confirmed ?? inspectedValue) }
+      // The observation establishes only the fields being recovered. Unrelated
+      // locally confirmed fields must not be rolled back by an older Query.
+      for (const key of Object.keys(pending) as Array<keyof UserPreferences>) {
+        Object.assign(confirmed, { [key]: inspectedValue[key] })
+        locallyConfirmedKeys.add(key)
+      }
       ensureQueue().clearPending()
       emit({
-        confirmed: inspectedValue,
+        confirmed,
         draftPatch: {},
         failure: null,
         saveStatus: "idle",
