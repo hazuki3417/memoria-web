@@ -19,7 +19,7 @@ const meta = {
     <PageHeader
       title="環境設定"
       description="表示とプレビューの動作を設定します。"
-      trailing={<SaveStatus {...args} />}
+      titleAccessory={<SaveStatus {...args} />}
     />
   ),
 } satisfies Meta<typeof SaveStatus>
@@ -57,7 +57,7 @@ export const Idle: Story = {
 }
 
 export const WithErrorDetails: Story = {
-  name: "Visual · Header短文と詳細Errorを分離",
+  name: "Visual · タイトル横バッジと詳細Errorを分離",
   tags: ["visual"],
   args: { state: "attention" },
   render: (args) => (
@@ -65,7 +65,7 @@ export const WithErrorDetails: Story = {
       <PageHeader
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
-        trailing={<SaveStatus {...args} />}
+        titleAccessory={<SaveStatus {...args} />}
       />
       <FeedbackAlert kind="error" title="保存結果を確認できませんでした">
         <Text size="sm">
