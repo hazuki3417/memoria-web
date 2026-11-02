@@ -1,5 +1,5 @@
 import { Box, Button } from "@mantine/core"
-import { useState, type ComponentProps } from "react"
+import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunitySettings } from "./CommunitySettings"
@@ -141,6 +141,44 @@ export const NameRefreshWhileEditing: Story = {
     await userEvent.type(input, "編集中のCommunity名")
     await userEvent.click(canvas.getByRole("button", { name: "サーバー再取得を再現" }))
     await expect(input).toHaveValue("編集中のCommunity名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
+  },
+}
+
+/** Complete a pending save after the user has made a second edit. */
+function CommunityNamePendingSaveFixture(args: ComponentProps<typeof CommunitySettings>) {
+  const resolveSave = useRef<((saved: boolean) => void) | null>(null)
+  return (
+    <>
+      <Button onClick={() => resolveSave.current?.(true)}>
+        保存応答を再現
+      </Button>
+      <CommunitySettings
+        {...args}
+        onSaveName={() =>
+          new Promise<boolean>((resolve) => {
+            resolveSave.current = resolve
+          })
+        }
+      />
+    </>
+  )
+}
+
+export const NameEditedDuringSave: Story = {
+  name: "Interaction · 保存中の新しい入力を保存応答から保護",
+  tags: ["interaction"],
+  render: (args) => <CommunityNamePendingSaveFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "最初の変更")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await userEvent.clear(input)
+    await userEvent.type(input, "保存中の追加変更")
+    await userEvent.click(canvas.getByRole("button", { name: "保存応答を再現" }))
+    await expect(input).toHaveValue("保存中の追加変更")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
   },
 }
