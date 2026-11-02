@@ -19,17 +19,17 @@ type Story = StoryObj<typeof meta>
 
 function AccentRefreshFixture(args: ComponentProps<typeof CommunityPreferencesContent>) {
   const [accent, setAccent] = useState(args.accent)
-  const [restore, setRestore] = useState(false)
+  const [preserveDraft, setPreserveDraft] = useState(false)
   return (
     <>
       <Button onClick={() => setAccent("#654321")}>アクセント再取得を再現</Button>
-      <Button onClick={() => { setRestore(true); setAccent("#ABCDEF") }}>
+      <Button onClick={() => { setPreserveDraft(true); setAccent("#ABCDEF") }}>
         保存失敗の復元を再現
       </Button>
       <CommunityPreferencesContent
         {...args}
         accent={accent}
-        restoreOnAccentChange={restore}
+        preserveDraftOnAccentChange={preserveDraft}
         setAccent={setAccent}
       />
     </>
@@ -63,8 +63,8 @@ export const AccentPreservesIncompleteDraft: Story = {
   },
 }
 
-export const AccentRollbackRestoresConfirmedColor: Story = {
-  name: "Interaction · 保存失敗時は確定色へ復元",
+export const AccentRollbackPreservesDraft: Story = {
+  name: "Interaction · 保存失敗時もColorInput Draftを保持",
   tags: ["interaction"],
   render: (args) => <AccentRefreshFixture {...args} />,
   play: async ({ canvasElement }) => {
@@ -73,6 +73,6 @@ export const AccentRollbackRestoresConfirmedColor: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, "#123")
     await userEvent.click(canvas.getByRole("button", { name: "保存失敗の復元を再現" }))
-    await expect(input).toHaveValue("#ABCDEF")
+    await expect(input).toHaveValue("#123")
   },
 }
