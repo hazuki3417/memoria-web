@@ -147,6 +147,9 @@ export function createPersonalPreferencesSession() {
       const draftAtStart = snapshot.draftPatch
       const rawAtStart = snapshot.accentDraft
       const generation = ++inspectionGeneration
+      // Do not permit confirmation against an observation being refreshed.
+      inspectedValue = null
+      emit({ inspected: false, observedMatches: false })
       try {
         const current = await inspectServer()
         if (generation !== inspectionGeneration || snapshot.failure !== "unknown" || snapshot.draftPatch !== draftAtStart || snapshot.accentDraft !== rawAtStart) return
