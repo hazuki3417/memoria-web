@@ -37,6 +37,7 @@ export function ConnectedCommunityPreferences({
   const saved = useRef<string | null>(null)
   const desired = useRef<string | null>(null)
   const inFlight = useRef(false)
+  const hasIncompleteDraft = useRef(false)
   const active = useRef(true)
 
   useEffect(() => {
@@ -107,7 +108,7 @@ export function ConnectedCommunityPreferences({
       }
       if (active.current) {
         setSaveError(false)
-        setSaveStatus("saved")
+        setSaveStatus(hasIncompleteDraft.current ? "pending" : "saved")
       }
     } catch {
       desired.current = null
@@ -160,6 +161,10 @@ export function ConnectedCommunityPreferences({
         isPreview={false}
         preserveDraftOnAccentChange={saveError}
         saveStatus={saveStatus}
+        onDraftValidityChange={(valid) => {
+          hasIncompleteDraft.current = !valid
+          if (!valid) setSaveStatus("pending")
+        }}
         aliasControl={
           <CommunityAliasControl
             savedAlias={data.community.mySettings.alias}
