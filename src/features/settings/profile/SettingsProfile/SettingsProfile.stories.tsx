@@ -116,7 +116,9 @@ export const ProfileValidationContract: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.clear(canvas.getByRole("textbox", { name: /ニックネーム/ }))
+    await expect(canvas.queryByText("ニックネームを入力してください。")).not.toBeInTheDocument()
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await userEvent.tab()
     await expect(
       canvas.getByText("ニックネームを入力してください。"),
     ).toBeVisible()
