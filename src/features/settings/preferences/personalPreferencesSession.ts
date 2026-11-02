@@ -2,9 +2,8 @@ import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import {
-  SettingsInputValidationError,
   classifySettingsSaveFailure,
-  resolveSettingsValidation,
+  resolveSettingsFailureValidation,
 } from "../graphqlSettingsResult"
 
 export type PreferencesFailure = "unknown" | "retryable" | "blocked" | "validation" | null
@@ -79,8 +78,8 @@ export function createPersonalPreferencesSession() {
       (error, attempted) => {
         const failure = classifySettingsSaveFailure(error)
         const validation =
-          failure === "validation" && error instanceof SettingsInputValidationError
-            ? resolveSettingsValidation(error, Object.keys(attempted))
+          failure === "validation"
+            ? resolveSettingsFailureValidation(error, Object.keys(attempted))
             : null
         emit({
           failure,
