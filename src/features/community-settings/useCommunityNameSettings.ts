@@ -32,8 +32,8 @@ export function useCommunityNameSettings({
     if (communityName === undefined) return
     const draftIsEdited = getValues("name").trim() !== savedName.current
     savedName.current = communityName
-    if (!draftIsEdited && !savingName) reset({ name: communityName })
-  }, [communityName, getValues, reset, savingName])
+    if (!draftIsEdited) reset({ name: communityName })
+  }, [communityName, getValues, reset])
   const draft = field.value
   const setDraft = (next: SetStateAction<string>) => {
     field.onChange(typeof next === "function" ? next(field.value) : next)
