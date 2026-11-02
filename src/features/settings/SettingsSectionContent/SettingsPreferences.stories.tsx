@@ -103,7 +103,7 @@ export const PreferenceSaveStatus: Story = {
     const canvas = within(canvasElement)
     const input = canvas.getAllByRole("switch")[0]
 
-    await expect(canvas.queryByText("保存済み")).not.toBeInTheDocument()
+    await expect(canvas.getByText("保存済み")).not.toBeVisible()
     await userEvent.click(input)
     await expect(canvas.getByText("保存待ち")).toBeVisible()
     await waitFor(() => {
