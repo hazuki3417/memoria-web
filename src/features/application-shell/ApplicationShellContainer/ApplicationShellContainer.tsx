@@ -18,6 +18,7 @@ import {
 import { CommunityCreateModal } from ".././CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from ".././useApplicationContextSelection"
 import { CommunityAccentPreviewProvider, useCommunityAccentPreview } from "../CommunityAccentPreviewContext"
+import { resolveCommunityAccent } from "../communityAccentPreview"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -121,10 +122,11 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
           label:
             currentCreated?.label ??
             (communitiesLoaded ? "Community" : "読み込み中"),
-          accentColor:
-            accentPreview?.communityId === communityId
-              ? accentPreview.color
-              : (currentCreated?.accentColor ?? communityContext.accentColor),
+          accentColor: resolveCommunityAccent(
+            communityId,
+            currentCreated?.accentColor ?? communityContext.accentColor,
+            accentPreview,
+          ),
         }
       : resolvedPersonalContext
   const contextLoading =
@@ -248,10 +250,11 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
                       ...communityContext,
                       id: item.id,
                       label: item.label,
-                      accentColor:
-                        accentPreview?.communityId === item.id
-                          ? accentPreview.color
-                          : item.accentColor,
+                      accentColor: resolveCommunityAccent(
+                        item.id,
+                        item.accentColor,
+                        accentPreview,
+                      ),
                     })),
                   ]}
                   onSelect={(id) => {
