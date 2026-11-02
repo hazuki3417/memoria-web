@@ -17,15 +17,19 @@ export function commitCommunitySettingsPatch(
     fragment: CommunitySettingsCacheFragmentDoc,
   })
   if (!previous) return
+  const settings = { ...previous.mySettings }
+  // Undefined means the field was not confirmed by the Mutation.
+  // Null remains an explicit Alias removal.
+  if (patch.accentColor !== undefined) settings.accentColor = patch.accentColor
+  if (patch.alias !== undefined) settings.alias = patch.alias
   cache.writeFragment({
     id,
     fragment: CommunitySettingsCacheFragmentDoc,
     data: {
       __typename: "Community",
       mySettings: {
+        ...settings,
         __typename: "CommunitySettings",
-        ...previous.mySettings,
-        ...patch,
       },
     },
   })
