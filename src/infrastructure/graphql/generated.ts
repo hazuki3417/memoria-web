@@ -973,6 +973,8 @@ export type OperationUpdateCommunitySettingsMutationVariables = Exact<{
 
 export type OperationUpdateCommunitySettingsMutation = { updateCommunitySettings: { settings: { accentColor: string, alias: string | null } } };
 
+export type OperationCommunitySettingsCacheFragment = { mySettings: { accentColor: string, alias: string | null } };
+
 export type OperationDashboardRecentMediaQueryVariables = Exact<{
   scope: OperationScopeInput;
 }>;
@@ -1111,6 +1113,14 @@ export type OperationPersonalUsageQueryVariables = Exact<{ [key: string]: never;
 
 export type OperationPersonalUsageQuery = { me: { id: string, preferences: { fileSizeUnit: OperationFileSizeUnit }, usage: { mediaCount: number, storage: { usedBytes: string, effectiveLimitBytes: string }, formatBreakdown: Array<{ format: OperationOriginalImageFormat, mediaCount: number, usedBytes: string }> } } | null };
 
+export const CommunitySettingsCacheFragmentDoc = gql`
+    fragment CommunitySettingsCache on Community {
+  mySettings {
+    accentColor
+    alias
+  }
+}
+    `;
 export const GroupBrowserGroupFragmentDoc = gql`
     fragment GroupBrowserGroup on MediaGroup {
   id
