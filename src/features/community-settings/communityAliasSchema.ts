@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-/** Alias is optional; the API represents an empty alias with null. */
+/** Normalize the optional Alias form value to the application's nullable representation. */
 export const communityAliasSchema = z.object({
   alias: z
     .string()
