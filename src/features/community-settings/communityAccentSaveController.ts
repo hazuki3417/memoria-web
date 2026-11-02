@@ -134,9 +134,9 @@ export function createCommunityAccentSaveController() {
     initialize(id: string, serverColor: string) {
       if (!hex(serverColor)) return
       const entry = entryFor(id)
-      // Do not let background refetch replace an edited/failed Draft.
-      if (entry.running || entry.snapshot.failure || entry.desired !== null) return
-      if (entry.snapshot.draft !== null && entry.snapshot.draft !== entry.snapshot.confirmed) return
+      // Initial hydration only: a stale cached/refetched value must never roll
+      // back a later confirmed mutation or overwrite a restored Draft.
+      if (entry.snapshot.confirmed !== null || entry.snapshot.draft !== null) return
       update(id, { confirmed: normalized(serverColor), draft: normalized(serverColor) })
     },
     configure(
