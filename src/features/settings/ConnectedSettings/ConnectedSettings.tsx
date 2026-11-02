@@ -6,12 +6,15 @@ import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
 import { Settings } from "../Settings"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
 import { useCurrentUserQuery } from "@/infrastructure/graphql/generated"
+import { usePersonalPreferencesSession } from "../preferences/PersonalPreferencesSessionContext"
+import { resolvePersonalAccent } from "../preferences/personalAccentPreview"
 
 export function ConnectedSettings({
   section,
 }: {
   section: "profile" | "preferences"
 }) {
+  const { snapshot: personalSession } = usePersonalPreferencesSession()
   const { data, loading, error, refetch } = useCurrentUserQuery()
   useSettingsRefreshError(Boolean(data?.me && error))
   const { saveProfile, savePreferences } = usePersonalSettingsActions()
@@ -23,7 +26,10 @@ export function ConnectedSettings({
     <Settings
       key={section}
       section={section}
-      personalAccentColor={data?.me?.preferences.personalAccentColor}
+      personalAccentColor={resolvePersonalAccent(
+        data?.me?.preferences.personalAccentColor,
+        personalSession,
+      )}
       profileNickname={data?.me?.profile.nickname}
       contentOverride={
         state !== "ready" ? (
