@@ -2,11 +2,11 @@
 
 import {
   useEffect,
-  useState,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
 } from "react"
+import { useController, useForm } from "react-hook-form"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"
@@ -27,13 +27,16 @@ export function CommunityPreferencesContent({
   aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
-  const [draft, setDraft] = useState(accent)
+  const { control, reset } = useForm<{ accentDraft: string }>({
+    defaultValues: { accentDraft: accent },
+  })
+  const { field } = useController({ control, name: "accentDraft" })
 
   // Preserve partially typed values without submitting an invalid color.
   // Update the input when a saved value or a rollback arrives from the parent.
   useEffect(() => {
-    setDraft(accent)
-  }, [accent])
+    reset({ accentDraft: accent })
+  }, [accent, reset])
 
   return (
     <Stack gap="xl">
@@ -58,9 +61,12 @@ export function CommunityPreferencesContent({
             <ColorInput
               aria-label="Communityアクセントカラー"
               format="hex"
-              value={draft}
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
               onChange={(next) => {
-                setDraft(next)
+                field.onChange(next)
                 if (isHex(next)) setAccent(next)
               }}
             />
