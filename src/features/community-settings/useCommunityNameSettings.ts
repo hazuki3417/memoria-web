@@ -40,20 +40,7 @@ export function useCommunityNameSettings({
   const saveName = () => {
     if (savingName) return
     void handleSubmit(({ name: updated }) => {
-    if (!onSaveName) {
-      savedName.current = updated
-      reset({ name: updated })
-      showNotification({
-        kind: "success",
-        title: "Community名を変更",
-        description: "Community名を変更しました。",
-      })
-      return
-    }
-    setSavingName(true)
-    void onSaveName(updated)
-      .then((saved) => {
-        if (!saved) return
+      if (!onSaveName) {
         savedName.current = updated
         reset({ name: updated })
         showNotification({
@@ -61,8 +48,21 @@ export function useCommunityNameSettings({
           title: "Community名を変更",
           description: "Community名を変更しました。",
         })
-      })
-      .finally(() => setSavingName(false))
+        return
+      }
+      setSavingName(true)
+      void onSaveName(updated)
+        .then((saved) => {
+          if (!saved) return
+          savedName.current = updated
+          reset({ name: updated })
+          showNotification({
+            kind: "success",
+            title: "Community名を変更",
+            description: "Community名を変更しました。",
+          })
+        })
+        .finally(() => setSavingName(false))
     })()
   }
 
