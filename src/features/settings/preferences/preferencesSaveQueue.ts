@@ -15,6 +15,7 @@ export function createPreferencesSaveQueue(
   let pending: UserPreferencesPatch = {}
   let running = false
   let stopped = false
+  let paused = false
   let timer: ReturnType<typeof setTimeout> | undefined
 
   function clearTimer() {
@@ -23,7 +24,7 @@ export function createPreferencesSaveQueue(
   }
 
   async function drain() {
-    if (running || stopped || Object.keys(pending).length === 0) return
+    if (running || stopped || paused || Object.keys(pending).length === 0) return
     running = true
     onStateChange?.("saving")
     try {
@@ -39,6 +40,7 @@ export function createPreferencesSaveQueue(
         } catch (error) {
           // Preserve unsuccessful edits, without overwriting newer values.
           pending = { ...patch, ...pending }
+          paused = true
           if (!stopped) {
             onError(error, patch)
             onStateChange?.("attention")
@@ -64,11 +66,20 @@ export function createPreferencesSaveQueue(
       if (stopped) return
       pending = { ...pending, ...patch }
       onStateChange?.(running ? "saving" : "pending")
-      schedule()
+      if (!paused) schedule()
     },
-    flush() {
+    flush({ manual = true }: { manual?: boolean } = {}) {
       clearTimer()
+      if (manual) paused = false
       return drain()
+    },
+    getPending() {
+      return { ...pending }
+    },
+    clearPending() {
+      clearTimer()
+      pending = {}
+      paused = false
     },
     dispose({ flush = false }: { flush?: boolean } = {}) {
       if (flush) {
