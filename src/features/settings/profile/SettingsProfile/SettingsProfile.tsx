@@ -1,7 +1,7 @@
 "use client"
 
 import { Box, Button, Stack, TextInput } from "@mantine/core"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
@@ -36,7 +36,7 @@ export function SettingsProfile({
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
 }) {
-  const { control, reset, handleSubmit } = useForm<
+  const { control, reset, getValues, handleSubmit } = useForm<
     z.input<typeof profileSchema>,
     unknown,
     z.output<typeof profileSchema>
@@ -51,6 +51,14 @@ export function SettingsProfile({
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "retryable-error" | "blocked"
   >(initialSaveState)
+  // Update an untouched draft when the source nickname changes.
+  useEffect(() => {
+    const draftIsEdited = getValues("nickname").trim() !== saved.current
+    saved.current = initialNickname
+    if (!draftIsEdited && saveState !== "saving" && saveState !== "retryable-error") {
+      reset({ nickname: initialNickname })
+    }
+  }, [initialNickname, getValues, reset])
   const validation = profileSchema.safeParse({ nickname: field.value })
   const normalized = field.value.trim()
   const dirty = normalized !== saved.current
