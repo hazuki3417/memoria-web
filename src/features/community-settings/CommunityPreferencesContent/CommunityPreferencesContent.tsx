@@ -7,13 +7,14 @@ import {
   type SetStateAction,
 } from "react"
 import { useController, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { communityAccentSchema } from "../communityAccentSchema"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-
-const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 
 export function CommunityPreferencesContent({
   accent,
@@ -27,7 +28,9 @@ export function CommunityPreferencesContent({
   aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
-  const { control, reset } = useForm<{ accentDraft: string }>({
+  const { control, reset } = useForm<z.input<typeof communityAccentSchema>>({
+    resolver: zodResolver(communityAccentSchema),
+    mode: "onChange",
     defaultValues: { accentDraft: accent },
   })
   const { field } = useController({ control, name: "accentDraft" })
@@ -67,7 +70,8 @@ export function CommunityPreferencesContent({
               value={field.value}
               onChange={(next) => {
                 field.onChange(next)
-                if (isHex(next)) setAccent(next)
+                const parsed = communityAccentSchema.safeParse({ accentDraft: next })
+                if (parsed.success) setAccent(parsed.data.accentDraft)
               }}
             />
           </SettingRow>
