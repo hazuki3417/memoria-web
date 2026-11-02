@@ -10,6 +10,7 @@ export function createPreferencesSaveQueue(
   onSaved: (preferences: UserPreferences) => void,
   onError: (error: unknown, attempted: UserPreferencesPatch) => void,
   delayMs = 400,
+  onStateChange?: (state: "pending" | "saving" | "saved" | "attention") => void,
 ) {
   let pending: UserPreferencesPatch = {}
   let running = false
@@ -24,17 +25,24 @@ export function createPreferencesSaveQueue(
   async function drain() {
     if (running || stopped) return
     running = true
+    onStateChange?.("saving")
     try {
       while (!stopped && Object.keys(pending).length > 0) {
         const patch = pending
         pending = {}
         try {
           const saved = await save(patch)
-          if (!stopped) onSaved(saved)
+          if (!stopped) {
+            onSaved(saved)
+            onStateChange?.(Object.keys(pending).length ? "saving" : "saved")
+          }
         } catch (error) {
           // Preserve unsuccessful edits, without overwriting newer values.
           pending = { ...patch, ...pending }
-          if (!stopped) onError(error, patch)
+          if (!stopped) {
+            onError(error, patch)
+            onStateChange?.("attention")
+          }
           break
         }
       }
@@ -55,6 +63,7 @@ export function createPreferencesSaveQueue(
     enqueue(patch: UserPreferencesPatch) {
       if (stopped) return
       pending = { ...pending, ...patch }
+      onStateChange?.(running ? "saving" : "pending")
       schedule()
     },
     flush() {
