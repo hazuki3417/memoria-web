@@ -49,6 +49,8 @@ export function fromGraphqlUserPreferences(
   }
 }
 
+// This mapper serves event-generated application patches, not a single form's
+// submission. Keep the incomplete ColorInput accentDraft out of its input I/F.
 export function toGraphqlUserPreferencesPatch(
   patch: UserPreferencesPatch,
 ): UpdateUserPreferencesInput {
