@@ -19,6 +19,7 @@ import { CommunityCreateModal } from ".././CommunityCreateModal/CommunityCreateM
 import { useApplicationContextSelection } from ".././useApplicationContextSelection"
 import { CommunityAccentPreviewProvider, useCommunityAccentPreview } from "../CommunityAccentPreviewContext"
 import { resolveCommunityAccent } from "../communityAccentPreview"
+import { PersonalPreferencesSessionProvider } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -49,9 +50,11 @@ const communityContext = {
 
 export function ApplicationShellContainer({ children }: { children: ReactNode }) {
   return (
-    <CommunityAccentPreviewProvider>
-      <ApplicationShellWithPreview>{children}</ApplicationShellWithPreview>
-    </CommunityAccentPreviewProvider>
+    <PersonalPreferencesSessionProvider>
+      <CommunityAccentPreviewProvider>
+        <ApplicationShellWithPreview>{children}</ApplicationShellWithPreview>
+      </CommunityAccentPreviewProvider>
+    </PersonalPreferencesSessionProvider>
   )
 }
 
