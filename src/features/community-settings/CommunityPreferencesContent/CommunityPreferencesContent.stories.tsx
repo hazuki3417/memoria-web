@@ -76,3 +76,23 @@ export const AccentRollbackPreservesDraft: Story = {
     await expect(input).toHaveValue("#123")
   },
 }
+
+export const AccentStatusBadge: Story = {
+  name: "Visual · Community Accentの保存Badge",
+  tags: ["visual"],
+  args: {
+    accent: "#123456",
+    isPreview: false,
+    saveStatus: "saved",
+  },
+}
+
+export const AccentErrorBadge: Story = {
+  name: "Visual · 保存エラー時のBadge",
+  tags: ["visual"],
+  args: {
+    accent: "#123456",
+    isPreview: false,
+    saveStatus: "attention",
+  },
+}
