@@ -1,7 +1,8 @@
 import { Box, Text } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { SettingsSectionContent } from "./SettingsSectionContent"
+import { defaultUserPreferences } from "../preferences/userPreferences"
 
 const meta = {
   title: "Features/Settings/Preferences",
@@ -66,5 +67,22 @@ export const PreviewToggle: Story = {
     const previous = (input as HTMLInputElement).checked
     await userEvent.click(input)
     await expect(input).toHaveProperty("checked", !previous)
+  },
+}
+
+export const PreferencePatchContract: Story = {
+  name: "Interaction · 編集したFieldだけを自動保存",
+  tags: ["interaction"],
+  args: {
+    section: "preferences",
+    savePreferences: fn(async () => ({ ...defaultUserPreferences, mediaDetailNavigationWrap: true })),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getAllByRole("switch")[0]
+    await userEvent.click(input)
+    await waitFor(() => {
+      expect(args.savePreferences).toHaveBeenCalledWith({ mediaDetailNavigationWrap: true })
+    })
   },
 }
