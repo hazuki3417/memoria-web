@@ -535,4 +535,45 @@ describe("session Community Accent save controller", () => {
     expect(controller.getSnapshot(id)).toMatchObject({ failure: null, validation: null })
   })
 
+  it("keeps the new Community independent when an old Community mutation settles late", async () => {
+    const controller = createCommunityAccentSaveController()
+    let resolveOld: ((value: string) => void) | undefined
+    const oldRelease = vi.fn()
+    const newRelease = vi.fn()
+    const newPreview = vi.fn().mockReturnValue(2)
+    controller.initialize("community-a", "#112233")
+    controller.initialize("community-b", "#445566")
+    controller.configure("community-a", {
+      save: () => new Promise<string>((resolve) => { resolveOld = resolve }),
+      observe: vi.fn(),
+      preview: vi.fn().mockReturnValue(1),
+      release: oldRelease,
+    })
+    controller.configure("community-b", {
+      save: vi.fn().mockResolvedValue("#CCDDEE"),
+      observe: vi.fn(),
+      preview: newPreview,
+      release: newRelease,
+    })
+    // Route/Community switches while the first mutation is still in-flight.
+    controller.edit("community-a", "#ABCDEF")
+    controller.edit("community-b", "#CCDDEE")
+    await tick()
+    expect(controller.getSnapshot("community-b")).toMatchObject({
+      confirmed: "#CCDDEE", draft: "#CCDDEE", status: "saved",
+    })
+    const newReleaseCount = newRelease.mock.calls.length
+    resolveOld?.("#ABCDEF")
+    await tick()
+    expect(controller.getSnapshot("community-a")).toMatchObject({
+      confirmed: "#ABCDEF", draft: "#ABCDEF", status: "saved",
+    })
+    expect(controller.getSnapshot("community-b")).toMatchObject({
+      confirmed: "#CCDDEE", draft: "#CCDDEE", status: "saved",
+    })
+    expect(newRelease).toHaveBeenCalledTimes(newReleaseCount)
+    expect(newPreview).toHaveBeenCalledWith("#CCDDEE")
+    expect(oldRelease).toHaveBeenCalled()
+  })
+
 })
