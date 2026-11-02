@@ -13,6 +13,9 @@ import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import {
   CommunityMySettingsDocument,
+  UpdateCommunitySettingsDocument,
+  type OperationUpdateCommunitySettingsMutation,
+  type OperationUpdateCommunitySettingsMutationVariables,
   CommunitySettingsCacheFragmentDoc,
   MyCommunitiesDocument,
   useCommunityMySettingsQuery,
@@ -69,7 +72,13 @@ export function ConnectedCommunityPreferences({
   useEffect(() => {
     controller.configure(communityId, {
       save: async (next) => {
-        const result = await save({
+        // The session queue must survive the settings view unmount.
+        // ApolloClient.mutate is independent of the useMutation hook lifetime.
+        const result = await client.mutate<
+          OperationUpdateCommunitySettingsMutation,
+          OperationUpdateCommunitySettingsMutationVariables
+        >({
+          mutation: UpdateCommunitySettingsDocument,
           variables: { input: { communityId, accentColor: next } },
         })
         const confirmed = result.data?.updateCommunitySettings?.settings?.accentColor
