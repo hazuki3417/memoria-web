@@ -1,4 +1,8 @@
 import type { SaveStatusState } from "@/components/SaveStatus"
+import {
+  SettingsInputValidationError,
+  resolveSettingsValidation,
+} from "@/features/settings/graphqlSettingsResult"
 
 export type AccentFailure = "rejected" | "unknown" | null
 export type AccentSnapshot = Readonly<{
@@ -6,6 +10,7 @@ export type AccentSnapshot = Readonly<{
   draft: string | null
   status: SaveStatusState
   failure: AccentFailure
+  validation: { fieldErrors: Record<string, string>; formError: boolean } | null
   observedMatches: boolean
   inspected: boolean
 }>
@@ -33,6 +38,7 @@ const emptySnapshot: AccentSnapshot = {
   draft: null,
   status: "idle",
   failure: null,
+  validation: null,
   observedMatches: false,
   inspected: false,
 }
@@ -100,6 +106,7 @@ export function createCommunityAccentSaveController() {
           update(id, {
             confirmed,
             status: entry.desired === null ? "saved" : "saving",
+            validation: null,
           })
         } catch (error) {
           const failure: AccentFailure = isUnknownAccentOutcome(error)
@@ -107,9 +114,14 @@ export function createCommunityAccentSaveController() {
             : "rejected"
           entry.desired = null
           clearPreview(entry)
+          const validation =
+            error instanceof SettingsInputValidationError
+              ? resolveSettingsValidation(error, ["accentColor"])
+              : null
           update(id, {
             status: "attention",
             failure,
+            validation,
             observedMatches: false,
             inspected: false,
           })
@@ -174,7 +186,7 @@ export function createCommunityAccentSaveController() {
     },
     edit(id: string, value: string) {
       const entry = entryFor(id)
-      update(id, { draft: value, observedMatches: false, inspected: false })
+      update(id, { draft: value, validation: null, observedMatches: false, inspected: false })
       if (!hex(value)) {
         // A newer incomplete draft supersedes any queued valid color.
         // The in-flight request cannot be cancelled, but no stale queued
@@ -258,6 +270,7 @@ export function createCommunityAccentSaveController() {
       clearPreview(entry)
       update(id, {
         failure: null,
+        validation: null,
         status: "idle",
         observedMatches: false,
         inspected: false,
@@ -278,6 +291,7 @@ export function createCommunityAccentSaveController() {
       entry.desired = normalized(entry.snapshot.draft)
       update(id, {
         failure: null,
+        validation: null,
         observedMatches: false,
         inspected: false,
         status: "pending",
@@ -294,6 +308,7 @@ export function createCommunityAccentSaveController() {
       update(id, {
         draft: entry.snapshot.confirmed,
         failure: null,
+        validation: null,
         observedMatches: false,
         inspected: false,
         status: "idle",
