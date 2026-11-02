@@ -1,6 +1,7 @@
 "use client"
 
 import { showNotification } from "@/components/Feedback"
+import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
 import {
   MyCommunitiesDocument,
   CommunityMembersDocument,
@@ -100,29 +101,19 @@ export function useCommunitySettingsActions(communityId: string) {
     }
   }
 
-  const onSaveName = async (nextName: string): Promise<boolean> => {
-    try {
-      const result = await updateCommunity({
-        variables: { input: { communityId, name: nextName } },
-        refetchQueries: [MyCommunitiesDocument],
-        awaitRefetchQueries: true,
-      })
-      if (result.data?.updateCommunity?.__typename === "UpdateCommunitySuccess")
-        return true
-      showNotification({
-        kind: "error",
-        title: "Community名を変更",
-        description: "Community名を変更できませんでした。",
-      })
-      return false
-    } catch {
-      showNotification({
-        kind: "error",
-        title: "Community名を変更",
-        description: "Community名を変更できませんでした。",
-      })
-      return false
-    }
+  const onSaveName = async (nextName: string): Promise<string> => {
+    const result = await updateCommunity({
+      variables: { input: { communityId, name: nextName } },
+      // The confirmed mutation must not be rejected by a later refresh failure.
+      refetchQueries: [MyCommunitiesDocument],
+      awaitRefetchQueries: false,
+    })
+    const outcome = result.data?.updateCommunity
+    if (outcome?.__typename === "InputValidationFailure")
+      throw new SettingsInputValidationError(outcome.violations)
+    if (outcome?.__typename !== "UpdateCommunitySuccess")
+      throw new Error("Community name save unconfirmed")
+    return outcome.community.name
   }
 
   return { onRemoveMember, onLeaveCommunity, onChangeMemberRole, onSaveName }
