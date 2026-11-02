@@ -3,7 +3,9 @@
 import { useApolloClient } from "@apollo/client"
 import {
   CurrentUserDocument,
-  useSaveUserPreferencesMutation,
+  SaveUserPreferencesDocument,
+  type OperationSaveUserPreferencesMutation,
+  type OperationSaveUserPreferencesMutationVariables,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
 import type { UserPreferencesPatch } from "./preferences/userPreferences"
@@ -16,7 +18,6 @@ import {
 export function usePersonalSettingsActions() {
   const client = useApolloClient()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
-  const [updatePreferences] = useSaveUserPreferencesMutation()
 
   return {
     saveProfile: async (nickname: string) => {
@@ -28,7 +29,10 @@ export function usePersonalSettingsActions() {
     },
     savePreferences: async (patch: UserPreferencesPatch) => {
       const input = toGraphqlUserPreferencesPatch(patch)
-      const result = await updatePreferences({ variables: { input } })
+      const result = await client.mutate<
+        OperationSaveUserPreferencesMutation,
+        OperationSaveUserPreferencesMutationVariables
+      >({ mutation: SaveUserPreferencesDocument, variables: { input } })
       if (!result.data?.updateUserPreferences.preferences)
         throw new Error("Preferences update unconfirmed")
       const confirmed = fromGraphqlUserPreferences(
