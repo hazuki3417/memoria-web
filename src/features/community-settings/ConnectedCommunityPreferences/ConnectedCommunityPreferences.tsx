@@ -4,33 +4,18 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Stack } from "@mantine/core"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
+import { useApolloClient } from "@apollo/client"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
-import { MyCommunitiesDocument } from "@/infrastructure/graphql/generated"
+import {
+  CommunityMySettingsDocument,
+  CommunitySettingsCacheFragmentDoc,
+  MyCommunitiesDocument,
+  useCommunityMySettingsQuery,
+  useUpdateCommunitySettingsMutation,
+  type OperationCommunitySettingsCacheFragment,
+} from "@/infrastructure/graphql/generated"
 
-const COMMUNITY_SETTINGS = gql`
-  query CommunityAccentSettings($communityId: ID!) {
-    community(communityId: $communityId) { id mySettings { accentColor alias } }
-  }
-`
-const SAVE_COMMUNITY_SETTINGS = gql`
-  mutation SaveCommunityAccent($input: UpdateCommunitySettingsInput!) {
-    updateCommunitySettings(input: $input) { settings { accentColor alias } }
-  }
-`
-
-type SettingsResult = {
-  community: {
-    id: string
-    mySettings: { accentColor: string; alias: string | null }
-  } | null
-}
-type SaveResult = {
-  updateCommunitySettings: {
-    settings: { accentColor: string; alias: string | null }
-  }
-}
 const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 
 export function ConnectedCommunityPreferences({
@@ -38,16 +23,13 @@ export function ConnectedCommunityPreferences({
 }: {
   communityId: string
 }) {
-  const { data, loading, error } = useQuery<SettingsResult>(
-    COMMUNITY_SETTINGS,
-    {
-      variables: { communityId },
-      fetchPolicy: "cache-and-network",
-    },
-  )
+  const { data, loading, error } = useCommunityMySettingsQuery({
+    variables: { communityId },
+    fetchPolicy: "cache-and-network",
+  })
   useSettingsRefreshError(Boolean(data?.community && error))
   const client = useApolloClient()
-  const [save] = useMutation<SaveResult>(SAVE_COMMUNITY_SETTINGS)
+  const [save] = useUpdateCommunitySettingsMutation()
   const [accent, setAccent] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(false)
@@ -79,18 +61,15 @@ export function ConnectedCommunityPreferences({
         id: communityId,
       })
       if (!id) return
-      const fragment = gql`
-      fragment CommunityAccentCache on Community {
-        mySettings { accentColor alias }
-      }
-    `
-      const previous = client.cache.readFragment<{
-        mySettings: { accentColor: string; alias: string | null }
-      }>({ id, fragment })
+      const previous =
+        client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
+          id,
+          fragment: CommunitySettingsCacheFragmentDoc,
+        })
       if (!previous) return
       client.cache.writeFragment({
         id,
-        fragment,
+        fragment: CommunitySettingsCacheFragmentDoc,
         data: {
           __typename: "Community",
           mySettings: {
@@ -189,18 +168,15 @@ export function ConnectedCommunityPreferences({
                 id: communityId,
               })
               if (id) {
-                const fragment = gql`
-                  fragment CommunityAliasCache on Community {
-                    mySettings { accentColor alias }
-                  }
-                `
-                const previous = client.cache.readFragment<{
-                  mySettings: { accentColor: string; alias: string | null }
-                }>({ id, fragment })
+                const previous =
+                  client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
+                    id,
+                    fragment: CommunitySettingsCacheFragmentDoc,
+                  })
                 if (previous) {
                   client.cache.writeFragment({
                     id,
-                    fragment,
+                    fragment: CommunitySettingsCacheFragmentDoc,
                     data: {
                       __typename: "Community",
                       mySettings: {
@@ -215,7 +191,7 @@ export function ConnectedCommunityPreferences({
               // 再取得の通信失敗は確定済みMutationを失敗扱いしない。
               void client
                 .refetchQueries({
-                  include: [MyCommunitiesDocument, COMMUNITY_SETTINGS],
+                  include: [MyCommunitiesDocument, CommunityMySettingsDocument],
                 })
                 .catch(() => undefined)
             }}
