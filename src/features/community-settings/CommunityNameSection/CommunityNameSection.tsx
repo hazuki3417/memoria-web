@@ -3,6 +3,7 @@
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import type { Dispatch, SetStateAction } from "react"
 import { SectionHeader } from "@/components/SectionHeader"
+import { FeedbackAlert } from "@/components/Feedback"
 
 export type CommunityNameSectionProps = {
   isAdmin: boolean
@@ -12,6 +13,9 @@ export type CommunityNameSectionProps = {
   dirty: boolean
   savingName: boolean
   saveName: () => void
+  fieldError?: string
+  saveFeedback?: { title: string; description: string } | null
+  saveBlocked?: boolean
 }
 
 export function CommunityNameSection({
@@ -22,16 +26,24 @@ export function CommunityNameSection({
   dirty,
   savingName,
   saveName,
+  fieldError,
+  saveFeedback,
+  saveBlocked = false,
 }: CommunityNameSectionProps) {
   return (
     <Box>
       <SectionHeader>基本情報</SectionHeader>
       <Stack gap="md" maw={540}>
+        {saveFeedback && (
+          <FeedbackAlert kind="error" title={saveFeedback.title} role="alert">
+            {saveFeedback.description}
+          </FeedbackAlert>
+        )}
         <TextInput
           label="Community名"
           value={draft}
           onChange={(event) => setDraft(event.currentTarget.value)}
-          error={invalid ? "Community名を入力してください" : undefined}
+          error={fieldError ?? (invalid ? "Community名を入力してください" : undefined)}
           disabled={!isAdmin}
           required
         />
@@ -39,7 +51,7 @@ export function CommunityNameSection({
           <Box>
             <Button
               size="sm"
-              disabled={!dirty || invalid || savingName}
+              disabled={!dirty || invalid || savingName || saveBlocked}
               loading={savingName}
               onClick={saveName}
             >
