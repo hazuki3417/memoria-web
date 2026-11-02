@@ -143,8 +143,11 @@ export function createPersonalPreferencesSession() {
     },
     async inspect() {
       if (snapshot.failure !== "unknown" || !inspectServer) return
+      const draftAtStart = snapshot.draftPatch
+      const rawAtStart = snapshot.accentDraft
       try {
         const current = await inspectServer()
+        if (snapshot.draftPatch !== draftAtStart || snapshot.accentDraft !== rawAtStart) return
         inspectedValue = current
         const pending = { ...queue?.getPending(), ...snapshot.draftPatch }
         const observedMatches = Object.keys(pending).length > 0 &&
