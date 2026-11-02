@@ -40,7 +40,7 @@ export function CommunitySettings({
   section?: CommunitySettingsSection
   onNavigate?: (href: string) => void
   communityName?: string
-  onSaveName?: (name: string) => Promise<boolean>
+  onSaveName?: (name: string) => Promise<string>
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
   onRemoveMember?: (userId: string) => Promise<boolean>
