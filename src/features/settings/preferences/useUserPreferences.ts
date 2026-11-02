@@ -53,7 +53,7 @@ export function useUserPreferences(
     mediaDetailInitialInfoWide: values.mediaDetailInitialInfoWide,
     mediaDetailInitialInfoMedium: values.mediaDetailInitialInfoMedium,
   }
-  const { saveError, enqueue, retry } = usePreferencesSave(onSave)
+  const { saveError, saveStatus, enqueue, retry } = usePreferencesSave(onSave)
 
   const change = <K extends keyof UserPreferences>(
     key: K,
@@ -81,6 +81,7 @@ export function useUserPreferences(
     change,
     changeAccentDraft,
     saveError,
+    saveStatus,
     retry,
   }
 }
