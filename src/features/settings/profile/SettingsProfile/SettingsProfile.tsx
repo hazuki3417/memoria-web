@@ -126,7 +126,7 @@ export function SettingsProfile({
             value={field.value}
             onChange={field.onChange}
             error={
-              invalid ? validation.error.issues[0]?.message : undefined
+              !validation.success ? validation.error.issues[0]?.message : undefined
             }
             required
             disabled={isSaving || isBlocked}
