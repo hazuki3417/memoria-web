@@ -253,7 +253,9 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
                       accentColor: resolveCommunityAccent(
                         item.id,
                         item.accentColor,
-                        accentPreview,
+                        contextKind === "community" && communityId === item.id
+                          ? accentPreview
+                          : null,
                       ),
                     })),
                   ]}
