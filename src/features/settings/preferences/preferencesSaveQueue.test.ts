@@ -220,6 +220,32 @@ describe("preferences save queue", () => {
     expect(save).toHaveBeenCalledTimes(2)
   })
 
+  it("keeps attention visible when editing after a failed save", async () => {
+    vi.useFakeTimers()
+    const states: string[] = []
+    const save = vi.fn().mockRejectedValueOnce(new Error("offline")).mockResolvedValue(defaultUserPreferences)
+    const queue = createPreferencesSaveQueue(
+      save,
+      vi.fn(),
+      vi.fn(),
+      400,
+      (state) => states.push(state),
+    )
+
+    queue.enqueue({ mediaDetailNavigationWrap: true })
+    await vi.advanceTimersByTimeAsync(400)
+    expect(states.at(-1)).toBe("attention")
+
+    queue.enqueue({ mediaThumbnailSize: "LARGE" })
+    expect(states.at(-1)).toBe("attention")
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(save).toHaveBeenCalledTimes(1)
+
+    await queue.flush()
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(states.at(-1)).toBe("saved")
+  })
+
   it("does not resume a failed queue on an automatic unmount flush", async () => {
     vi.useFakeTimers()
     const save = vi.fn().mockRejectedValue(new Error("offline"))
