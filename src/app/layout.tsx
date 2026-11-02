@@ -9,7 +9,8 @@ import { ApolloProvider } from "@/providers/ApolloProvider"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Memoria",
+  // Keep the browser tab title stable across all application routes.
+  title: { absolute: "Memoria" },
   description: "Memoria web application",
 }
 
