@@ -13,10 +13,12 @@ describe("session Community Accent save controller", () => {
     const controller = createCommunityAccentSaveController()
     const save = vi.fn().mockResolvedValue("#ABCDEF")
     const subscriber = vi.fn()
+    const confirm = vi.fn()
     controller.initialize(id, "#112233")
     controller.configure(id, {
       save,
       observe: vi.fn().mockResolvedValue("#ABCDEF"),
+      confirm,
       preview: vi.fn().mockReturnValue(1),
       release: vi.fn(),
     })
@@ -128,6 +130,7 @@ describe("session Community Accent save controller", () => {
     expect(controller.getSnapshot(id)).toMatchObject({
       status: "idle", confirmed: "#ABCDEF", failure: null,
     })
+    expect(confirm).toHaveBeenCalledExactlyOnceWith("#ABCDEF")
     expect(save).toHaveBeenCalledTimes(1)
   })
 
