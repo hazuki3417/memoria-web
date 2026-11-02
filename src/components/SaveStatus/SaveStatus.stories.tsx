@@ -1,6 +1,6 @@
 import { Box, Stack, Text } from "@mantine/core"
-import { FeedbackAlert } from "../Feedback"
 import type { Meta, StoryObj } from "@storybook/react"
+import { FeedbackAlert } from "../Feedback"
 import { PageHeader } from "../PageHeader"
 import { SaveStatus } from "./SaveStatus"
 
@@ -11,14 +11,17 @@ const meta = {
   decorators: [
     (Story) => (
       <Box maw={760} p="md">
-        <PageHeader
-          title="環境設定"
-          description="表示とプレビューの動作を設定します。"
-          trailing={<Story />}
-        />
+        <Story />
       </Box>
     ),
   ],
+  render: (args) => (
+    <PageHeader
+      title="環境設定"
+      description="表示とプレビューの動作を設定します。"
+      trailing={<SaveStatus {...args} />}
+    />
+  ),
 } satisfies Meta<typeof SaveStatus>
 
 export default meta
@@ -57,22 +60,18 @@ export const WithErrorDetails: Story = {
   name: "Visual · Header短文と詳細Errorを分離",
   tags: ["visual"],
   args: { state: "attention" },
-  decorators: [
-    (Story) => (
-      <Box maw={760} p="md">
-        <Stack gap="xl">
-          <PageHeader
-            title="環境設定"
-            description="表示とプレビューの動作を設定します。"
-            trailing={<Story />}
-          />
-          <FeedbackAlert kind="error" title="保存結果を確認できませんでした">
-            <Text size="sm">
-              変更内容は保持されています。現在の設定を確認してから、必要に応じて再保存してください。
-            </Text>
-          </FeedbackAlert>
-        </Stack>
-      </Box>
-    ),
-  ],
+  render: (args) => (
+    <Stack gap="xl">
+      <PageHeader
+        title="環境設定"
+        description="表示とプレビューの動作を設定します。"
+        trailing={<SaveStatus {...args} />}
+      />
+      <FeedbackAlert kind="error" title="保存結果を確認できませんでした">
+        <Text size="sm">
+          変更内容は保持されています。現在の設定を確認してから、必要に応じて再保存してください。
+        </Text>
+      </FeedbackAlert>
+    </Stack>
+  ),
 }
