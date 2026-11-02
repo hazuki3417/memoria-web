@@ -36,6 +36,8 @@ export function SettingsPreferences({
   const {
     preferences,
     accentDraft,
+    accentOnBlur,
+    accentDraftError,
     change,
     changeAccentDraft,
     saveError,
@@ -169,7 +171,8 @@ export function SettingsPreferences({
           >
             <ColorInput
               aria-label="Personal Accent Color"
-              error={fieldErrors.personalAccentColor?.message}
+              error={fieldErrors.personalAccentColor?.message ?? accentDraftError}
+              onBlur={accentOnBlur}
               format="hex"
               value={accentDraft}
               onChange={changeAccentDraft}
