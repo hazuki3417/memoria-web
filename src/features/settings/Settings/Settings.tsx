@@ -16,6 +16,7 @@ export function Settings({
   profileNickname,
   initialPreferences,
   savePreferences,
+  inspectPreferences,
   usageContent,
   accountContent,
   contentOverride,
@@ -26,6 +27,7 @@ export function Settings({
   profileNickname?: string
   initialPreferences?: UserPreferences
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+  inspectPreferences?: () => Promise<UserPreferences>
   usageContent?: ReactNode
   accountContent?: ReactNode
   contentOverride?: ReactNode
@@ -45,6 +47,7 @@ export function Settings({
           profileNickname={profileNickname}
           initialPreferences={initialPreferences}
           savePreferences={savePreferences}
+          inspectPreferences={inspectPreferences}
           usageContent={usageContent}
           accountContent={accountContent}
         />
