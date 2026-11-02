@@ -104,7 +104,9 @@ export const NameTrimmedUnchanged: Story = {
 }
 
 /** Simulate a new query result without remounting the RHF form. */
-function CommunityNameRefreshFixture(args: ComponentProps<typeof CommunitySettings>) {
+function CommunityNameRefreshFixture(
+  args: ComponentProps<typeof CommunitySettings>,
+) {
   const [name, setName] = useState(args.communityName ?? "家族のアルバム")
   return (
     <>
@@ -122,10 +124,12 @@ export const NameRefreshWhileUntouched: Story = {
   render: (args) => <CommunityNameRefreshFixture {...args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole("button", { name: "サーバー再取得を再現" }))
-    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue(
-      "サーバー更新後のCommunity名",
+    await userEvent.click(
+      canvas.getByRole("button", { name: "サーバー再取得を再現" }),
     )
+    await expect(
+      canvas.getByRole("textbox", { name: /Community名/ }),
+    ).toHaveValue("サーバー更新後のCommunity名")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
@@ -139,14 +143,18 @@ export const NameRefreshWhileEditing: Story = {
     const input = canvas.getByRole("textbox", { name: /Community名/ })
     await userEvent.clear(input)
     await userEvent.type(input, "編集中のCommunity名")
-    await userEvent.click(canvas.getByRole("button", { name: "サーバー再取得を再現" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "サーバー再取得を再現" }),
+    )
     await expect(input).toHaveValue("編集中のCommunity名")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
   },
 }
 
 /** Complete a pending save after the user has made a second edit. */
-function CommunityNamePendingSaveFixture(args: ComponentProps<typeof CommunitySettings>) {
+function CommunityNamePendingSaveFixture(
+  args: ComponentProps<typeof CommunitySettings>,
+) {
   const resolveSave = useRef<((saved: boolean) => void) | null>(null)
   return (
     <>
@@ -177,7 +185,9 @@ export const NameEditedDuringSave: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await userEvent.clear(input)
     await userEvent.type(input, "保存中の追加変更")
-    await userEvent.click(canvas.getByRole("button", { name: "保存応答を再現" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "保存応答を再現" }),
+    )
     await expect(input).toHaveValue("保存中の追加変更")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
   },

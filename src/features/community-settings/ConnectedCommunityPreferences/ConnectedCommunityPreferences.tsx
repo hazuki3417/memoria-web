@@ -39,7 +39,6 @@ export function ConnectedCommunityPreferences({
   const { snapshot, controller } = useCommunityAccentSave(communityId)
   const [save] = useUpdateCommunitySettingsMutation()
 
-
   useEffect(() => {
     const color = data?.community?.mySettings.accentColor
     if (color) controller.initialize(communityId, color)
@@ -61,10 +60,15 @@ export function ConnectedCommunityPreferences({
         const outcome = result.data?.updateCommunitySettings
         if (outcome?.__typename === "InputValidationFailure")
           throw new SettingsInputValidationError(outcome.violations)
-        const confirmed = outcome?.__typename === "UpdateCommunitySettingsSuccess"
-          ? outcome.settings.accentColor : undefined
-        if (!confirmed || !isHex(confirmed)) throw new Error("Accent save response invalid")
-        commitCommunitySettingsPatch(client.cache, communityId, { accentColor: confirmed.toUpperCase() })
+        const confirmed =
+          outcome?.__typename === "UpdateCommunitySettingsSuccess"
+            ? outcome.settings.accentColor
+            : undefined
+        if (!confirmed || !isHex(confirmed))
+          throw new Error("Accent save response invalid")
+        commitCommunitySettingsPatch(client.cache, communityId, {
+          accentColor: confirmed.toUpperCase(),
+        })
         return confirmed
       },
       observe: async () => {
@@ -75,10 +79,14 @@ export function ConnectedCommunityPreferences({
           fetchPolicy: "no-cache",
         })
         const current = result.data?.community?.mySettings.accentColor
-        if (!current || !isHex(current)) throw new Error("Community accent unavailable")
+        if (!current || !isHex(current))
+          throw new Error("Community accent unavailable")
         return current
       },
-      confirm: (color) => commitCommunitySettingsPatch(client.cache, communityId, { accentColor: color }),
+      confirm: (color) =>
+        commitCommunitySettingsPatch(client.cache, communityId, {
+          accentColor: color,
+        }),
       preview: (value) => setPreview(communityId, value),
       release: (owner) => clearPreview(communityId, owner),
     })
@@ -112,11 +120,15 @@ export function ConnectedCommunityPreferences({
         onAccentDraftChange={(value) => controller.edit(communityId, value)}
         saveFeedback={
           failure ? (
-            <Alert color="red" role="alert" title={
-              failure === "unknown"
-                ? "保存結果を確認できませんでした"
-                : "保存できませんでした"
-            }>
+            <Alert
+              color="red"
+              role="alert"
+              title={
+                failure === "unknown"
+                  ? "保存結果を確認できませんでした"
+                  : "保存できませんでした"
+              }
+            >
               <Stack gap="xs">
                 <Text size="sm">
                   Shellは最後に確認できた色を表示しています。入力内容は保持しています。
@@ -133,22 +145,39 @@ export function ConnectedCommunityPreferences({
                 )}
                 <Group gap="xs">
                   {failure === "unknown" && (
-                    <Button size="xs" variant="light" onClick={() => void controller.inspect(communityId)}>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      onClick={() => void controller.inspect(communityId)}
+                    >
                       現在の状態を確認
                     </Button>
                   )}
                   {failure === "unknown" && snapshot.observedMatches && (
-                    <Button size="xs" variant="light" onClick={() => controller.confirmObservation(communityId)}>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      onClick={() => controller.confirmObservation(communityId)}
+                    >
                       確認完了
                     </Button>
                   )}
-                  {(failure === "rejected" || snapshot.inspected) && !snapshot.observedMatches && (
-                    <Button size="xs" disabled={!canResave} onClick={() => controller.retry(communityId)}>
-                      もう一度保存
-                    </Button>
-                  )}
-                  <Button size="xs" variant="subtle" color="gray"
-                    onClick={() => controller.discard(communityId)}>
+                  {(failure === "rejected" || snapshot.inspected) &&
+                    !snapshot.observedMatches && (
+                      <Button
+                        size="xs"
+                        disabled={!canResave}
+                        onClick={() => controller.retry(communityId)}
+                      >
+                        もう一度保存
+                      </Button>
+                    )}
+                  <Button
+                    size="xs"
+                    variant="subtle"
+                    color="gray"
+                    onClick={() => controller.discard(communityId)}
+                  >
                     変更を破棄
                   </Button>
                 </Group>
@@ -167,12 +196,16 @@ export function ConnectedCommunityPreferences({
               const outcome = result.data?.updateCommunitySettings
               if (outcome?.__typename === "InputValidationFailure")
                 throw new SettingsInputValidationError(outcome.violations)
-              const settings = outcome?.__typename === "UpdateCommunitySettingsSuccess"
-                ? outcome.settings : undefined
+              const settings =
+                outcome?.__typename === "UpdateCommunitySettingsSuccess"
+                  ? outcome.settings
+                  : undefined
               if (!settings || settings.alias !== alias) {
                 throw new Error("Community alias save unconfirmed")
               }
-              commitCommunitySettingsPatch(client.cache, communityId, { alias: settings.alias })
+              commitCommunitySettingsPatch(client.cache, communityId, {
+                alias: settings.alias,
+              })
               // Both subscribed views share the normalized Community fragment.
               // Refetching either after this write may reintroduce an older
               // Accent/Alias snapshot while the other field is in flight.

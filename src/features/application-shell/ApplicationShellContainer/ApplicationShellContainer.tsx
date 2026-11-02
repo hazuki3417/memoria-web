@@ -17,7 +17,10 @@ import {
 } from ".././communityDisplayName"
 import { CommunityCreateModal } from ".././CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from ".././useApplicationContextSelection"
-import { CommunityAccentPreviewProvider, useCommunityAccentPreview } from "../CommunityAccentPreviewContext"
+import {
+  CommunityAccentPreviewProvider,
+  useCommunityAccentPreview,
+} from "../CommunityAccentPreviewContext"
 import { resolveCommunityAccent } from "../communityAccentPreview"
 import { PersonalPreferencesSessionProvider } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
 import {
@@ -48,7 +51,11 @@ const communityContext = {
   accentColor: "var(--mantine-color-teal-6)",
 }
 
-export function ApplicationShellContainer({ children }: { children: ReactNode }) {
+export function ApplicationShellContainer({
+  children,
+}: {
+  children: ReactNode
+}) {
   return (
     <PersonalPreferencesSessionProvider>
       <CommunityAccentPreviewProvider>

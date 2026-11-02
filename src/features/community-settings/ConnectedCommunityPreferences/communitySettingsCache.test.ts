@@ -50,7 +50,9 @@ function createCache() {
 describe("Community設定の生成FragmentとApollo Cache契約", () => {
   it("アクセント更新はAliasを維持し、一覧と設定Queryに反映される", () => {
     const cache = createCache()
-    commitCommunitySettingsPatch(cache, "community-1", { accentColor: "#AABBCC" })
+    commitCommunitySettingsPatch(cache, "community-1", {
+      accentColor: "#AABBCC",
+    })
 
     const community = cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
@@ -76,8 +78,12 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
     const accentResponse = { accentColor: "#AABBCC", alias: "My community" }
     const aliasResponse = { accentColor: "#112233", alias: "New alias" }
 
-    commitCommunitySettingsPatch(cache, "community-1", { alias: aliasResponse.alias })
-    commitCommunitySettingsPatch(cache, "community-1", { accentColor: accentResponse.accentColor })
+    commitCommunitySettingsPatch(cache, "community-1", {
+      alias: aliasResponse.alias,
+    })
+    commitCommunitySettingsPatch(cache, "community-1", {
+      accentColor: accentResponse.accentColor,
+    })
 
     const community = cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
@@ -98,10 +104,14 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
 
   it("Accentを先に確定してもAliasの遅延応答でAccentを巻き戻さない", () => {
     const cache = createCache()
-    commitCommunitySettingsPatch(cache, "community-1", { accentColor: "#AABBCC" })
+    commitCommunitySettingsPatch(cache, "community-1", {
+      accentColor: "#AABBCC",
+    })
     // Alias-only response may include a stale Accent; ignore its unrelated field.
     const aliasResponse = { accentColor: "#112233", alias: "New alias" }
-    commitCommunitySettingsPatch(cache, "community-1", { alias: aliasResponse.alias })
+    commitCommunitySettingsPatch(cache, "community-1", {
+      alias: aliasResponse.alias,
+    })
 
     const community = cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
@@ -111,10 +121,12 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
       query: MyCommunitiesDocument,
     })
     expect(community?.community?.mySettings).toMatchObject({
-      accentColor: "#AABBCC", alias: "New alias",
+      accentColor: "#AABBCC",
+      alias: "New alias",
     })
     expect(list?.myCommunities[0].mySettings).toMatchObject({
-      accentColor: "#AABBCC", alias: "New alias",
+      accentColor: "#AABBCC",
+      alias: "New alias",
     })
   })
 
@@ -126,19 +138,23 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
       alias: undefined,
     })
     expect(cache.extract()).toEqual(before)
-    expect(cache.readQuery<OperationCommunityMySettingsQuery>({
-      query: CommunityMySettingsDocument,
-      variables: { communityId: "community-1" },
-    })?.community?.mySettings).toMatchObject({
+    expect(
+      cache.readQuery<OperationCommunityMySettingsQuery>({
+        query: CommunityMySettingsDocument,
+        variables: { communityId: "community-1" },
+      })?.community?.mySettings,
+    ).toMatchObject({
       accentColor: "#112233",
       alias: "My community",
     })
 
     commitCommunitySettingsPatch(cache, "community-1", { alias: null })
-    expect(cache.readQuery<OperationCommunityMySettingsQuery>({
-      query: CommunityMySettingsDocument,
-      variables: { communityId: "community-1" },
-    })?.community?.mySettings).toMatchObject({
+    expect(
+      cache.readQuery<OperationCommunityMySettingsQuery>({
+        query: CommunityMySettingsDocument,
+        variables: { communityId: "community-1" },
+      })?.community?.mySettings,
+    ).toMatchObject({
       accentColor: "#112233",
       alias: null,
     })

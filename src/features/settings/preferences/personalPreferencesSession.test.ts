@@ -14,7 +14,8 @@ describe("Personal Preferences session controller", () => {
     try {
       const controller = createPersonalPreferencesSession()
       const onSave = vi.fn().mockResolvedValue({
-        ...defaultUserPreferences, mediaDetailNavigationWrap: true,
+        ...defaultUserPreferences,
+        mediaDetailNavigationWrap: true,
       })
       controller.configure(onSave, vi.fn())
       controller.hydrate(defaultUserPreferences)
@@ -37,9 +38,12 @@ describe("Personal Preferences session controller", () => {
     vi.useFakeTimers()
     try {
       const controller = createPersonalPreferencesSession()
-      controller.configure(vi.fn().mockResolvedValue({
-        ...defaultUserPreferences, fileSizeUnit: "BINARY",
-      }))
+      controller.configure(
+        vi.fn().mockResolvedValue({
+          ...defaultUserPreferences,
+          fileSizeUnit: "BINARY",
+        }),
+      )
       controller.hydrate(defaultUserPreferences)
       controller.edit({ fileSizeUnit: "BINARY" })
       await vi.advanceTimersByTimeAsync(400)
@@ -66,12 +70,16 @@ describe("Personal Preferences session controller", () => {
     vi.useFakeTimers()
     try {
       const controller = createPersonalPreferencesSession()
-      const save = vi.fn()
-        .mockRejectedValueOnce(Object.assign(new Error("transport"), {
-          networkError: new Error("offline"),
-        }))
+      const save = vi
+        .fn()
+        .mockRejectedValueOnce(
+          Object.assign(new Error("transport"), {
+            networkError: new Error("offline"),
+          }),
+        )
         .mockResolvedValue({
-          ...defaultUserPreferences, mediaDetailNavigationWrap: true,
+          ...defaultUserPreferences,
+          mediaDetailNavigationWrap: true,
         })
       const inspect = vi.fn().mockResolvedValue(defaultUserPreferences)
       controller.configure(save, inspect)
@@ -79,7 +87,9 @@ describe("Personal Preferences session controller", () => {
       controller.edit({ mediaDetailNavigationWrap: true })
       await vi.advanceTimersByTimeAsync(400)
       expect(controller.getSnapshot()).toMatchObject({
-        failure: "unknown", saveStatus: "attention", inspected: false,
+        failure: "unknown",
+        saveStatus: "attention",
+        inspected: false,
       })
       controller.edit({ mediaThumbnailSize: "LARGE" })
       await vi.advanceTimersByTimeAsync(400)
@@ -88,7 +98,8 @@ describe("Personal Preferences session controller", () => {
       expect(save).toHaveBeenCalledTimes(1)
       await controller.inspect()
       expect(controller.getSnapshot()).toMatchObject({
-        inspected: true, observedMatches: false,
+        inspected: true,
+        observedMatches: false,
       })
       controller.retry()
       await tick()
@@ -106,12 +117,20 @@ describe("Personal Preferences session controller", () => {
     vi.useFakeTimers()
     try {
       const controller = createPersonalPreferencesSession()
-      const save = vi.fn().mockRejectedValueOnce(
-        Object.assign(new Error("connection"), { networkError: new Error("offline") }),
+      const save = vi
+        .fn()
+        .mockRejectedValueOnce(
+          Object.assign(new Error("connection"), {
+            networkError: new Error("offline"),
+          }),
+        )
+      controller.configure(
+        save,
+        vi.fn().mockResolvedValue({
+          ...defaultUserPreferences,
+          mediaDetailNavigationWrap: true,
+        }),
       )
-      controller.configure(save, vi.fn().mockResolvedValue({
-        ...defaultUserPreferences, mediaDetailNavigationWrap: true,
-      }))
       controller.hydrate(defaultUserPreferences)
       controller.edit({ mediaDetailNavigationWrap: true })
       await vi.advanceTimersByTimeAsync(400)
@@ -119,7 +138,9 @@ describe("Personal Preferences session controller", () => {
       expect(controller.getSnapshot().observedMatches).toBe(true)
       controller.confirmObservation()
       expect(controller.getSnapshot()).toMatchObject({
-        failure: null, saveStatus: "idle", draftPatch: {},
+        failure: null,
+        saveStatus: "idle",
+        draftPatch: {},
       })
       expect(save).toHaveBeenCalledTimes(1)
     } finally {
@@ -132,17 +153,26 @@ describe("Personal Preferences session controller", () => {
     try {
       const controller = createPersonalPreferencesSession()
       let rejectFirst: ((error: Error) => void) | undefined
-      const inspect = vi.fn()
-        .mockImplementationOnce(() => new Promise((_, reject) => {
-          rejectFirst = reject
-        }))
+      const inspect = vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise((_, reject) => {
+              rejectFirst = reject
+            }),
+        )
         .mockResolvedValue({
-          ...defaultUserPreferences, mediaDetailNavigationWrap: true,
+          ...defaultUserPreferences,
+          mediaDetailNavigationWrap: true,
         })
       controller.configure(
-        vi.fn().mockRejectedValue(
-          Object.assign(new Error("offline"), { networkError: new Error("offline") }),
-        ),
+        vi
+          .fn()
+          .mockRejectedValue(
+            Object.assign(new Error("offline"), {
+              networkError: new Error("offline"),
+            }),
+          ),
         inspect,
       )
       controller.hydrate(defaultUserPreferences)
@@ -151,12 +181,14 @@ describe("Personal Preferences session controller", () => {
       const older = controller.inspect()
       await controller.inspect()
       expect(controller.getSnapshot()).toMatchObject({
-        inspected: true, observedMatches: true,
+        inspected: true,
+        observedMatches: true,
       })
       rejectFirst?.(new Error("old query failed"))
       await older
       expect(controller.getSnapshot()).toMatchObject({
-        inspected: true, observedMatches: true,
+        inspected: true,
+        observedMatches: true,
       })
     } finally {
       vi.useRealTimers()
@@ -167,15 +199,24 @@ describe("Personal Preferences session controller", () => {
     vi.useFakeTimers()
     try {
       const controller = createPersonalPreferencesSession()
-      const save = vi.fn()
-        .mockResolvedValueOnce({ ...defaultUserPreferences, fileSizeUnit: "BINARY" })
-        .mockRejectedValueOnce(Object.assign(new Error("offline"), {
-          networkError: new Error("offline"),
-        }))
-      controller.configure(save, vi.fn().mockResolvedValue({
-        ...defaultUserPreferences,
-        mediaDetailNavigationWrap: true,
-      }))
+      const save = vi
+        .fn()
+        .mockResolvedValueOnce({
+          ...defaultUserPreferences,
+          fileSizeUnit: "BINARY",
+        })
+        .mockRejectedValueOnce(
+          Object.assign(new Error("offline"), {
+            networkError: new Error("offline"),
+          }),
+        )
+      controller.configure(
+        save,
+        vi.fn().mockResolvedValue({
+          ...defaultUserPreferences,
+          mediaDetailNavigationWrap: true,
+        }),
+      )
       controller.hydrate(defaultUserPreferences)
       controller.edit({ fileSizeUnit: "BINARY" })
       await vi.advanceTimersByTimeAsync(400)
@@ -202,14 +243,29 @@ describe("Personal Preferences session controller", () => {
     vi.useFakeTimers()
     try {
       const controller = createPersonalPreferencesSession()
-      let resolveRefresh: ((value: typeof defaultUserPreferences) => void) | undefined
-      const inspect = vi.fn()
-        .mockResolvedValueOnce({ ...defaultUserPreferences, mediaDetailNavigationWrap: true })
-        .mockImplementationOnce(() => new Promise((resolve) => { resolveRefresh = resolve }))
+      let resolveRefresh:
+        | ((value: typeof defaultUserPreferences) => void)
+        | undefined
+      const inspect = vi
+        .fn()
+        .mockResolvedValueOnce({
+          ...defaultUserPreferences,
+          mediaDetailNavigationWrap: true,
+        })
+        .mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              resolveRefresh = resolve
+            }),
+        )
       controller.configure(
-        vi.fn().mockRejectedValue(
-          Object.assign(new Error("offline"), { networkError: new Error("offline") }),
-        ),
+        vi
+          .fn()
+          .mockRejectedValue(
+            Object.assign(new Error("offline"), {
+              networkError: new Error("offline"),
+            }),
+          ),
         inspect,
       )
       controller.hydrate(defaultUserPreferences)
@@ -219,14 +275,16 @@ describe("Personal Preferences session controller", () => {
       expect(controller.getSnapshot().observedMatches).toBe(true)
       const pending = controller.inspect()
       expect(controller.getSnapshot()).toMatchObject({
-        inspected: false, observedMatches: false,
+        inspected: false,
+        observedMatches: false,
       })
       controller.confirmObservation()
       expect(controller.getSnapshot().failure).toBe("unknown")
       resolveRefresh?.(defaultUserPreferences)
       await pending
       expect(controller.getSnapshot()).toMatchObject({
-        inspected: true, observedMatches: false,
+        inspected: true,
+        observedMatches: false,
       })
     } finally {
       vi.useRealTimers()
@@ -243,7 +301,9 @@ describe("Personal Preferences session controller", () => {
       await vi.advanceTimersByTimeAsync(400)
       controller.discard()
       expect(controller.getSnapshot()).toMatchObject({
-        failure: null, draftPatch: {}, discardRevision: 1,
+        failure: null,
+        draftPatch: {},
+        discardRevision: 1,
       })
     } finally {
       vi.useRealTimers()

@@ -33,7 +33,10 @@ const thumbnailSizes = {
   SMALL: MediaThumbnailSize.Small,
   MEDIUM: MediaThumbnailSize.Medium,
   LARGE: MediaThumbnailSize.Large,
-} as const satisfies Record<UserPreferences["mediaThumbnailSize"], MediaThumbnailSize>
+} as const satisfies Record<
+  UserPreferences["mediaThumbnailSize"],
+  MediaThumbnailSize
+>
 
 export function fromGraphqlUserPreferences(
   preferences: PreferencesProjection,

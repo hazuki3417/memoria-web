@@ -22,7 +22,9 @@ export function usePreferencesSave(
   const inspectRef = useRef(onInspect)
   saveRef.current = onSave
   inspectRef.current = onInspect
-  const localRef = useRef<ReturnType<typeof createPreferencesSaveQueue> | null>(null)
+  const localRef = useRef<ReturnType<typeof createPreferencesSaveQueue> | null>(
+    null,
+  )
 
   useEffect(() => {
     if (!session || !saveRef.current) return
@@ -54,18 +56,24 @@ export function usePreferencesSave(
         if (!save) throw new Error("Preferences save unavailable")
         return save(patch)
       },
-      () => { if (mounted) setLocalError(null) },
+      () => {
+        if (mounted) setLocalError(null)
+      },
       (error) => {
         if (!mounted) return
         setLocalError(
-          typeof error === "object" && error !== null &&
-            "kind" in error && error.kind === "blocked"
+          typeof error === "object" &&
+            error !== null &&
+            "kind" in error &&
+            error.kind === "blocked"
             ? "blocked"
             : "retryable",
         )
       },
       400,
-      (state) => { if (mounted) setLocalStatus(state) },
+      (state) => {
+        if (mounted) setLocalStatus(state)
+      },
     )
     localRef.current = queue
     return () => {
@@ -84,7 +92,9 @@ export function usePreferencesSave(
       if (session) session.edit(patch)
       else localRef.current?.enqueue(patch)
     },
-    setAccentDraft: (value: string) => { session?.editAccentDraft(value) },
+    setAccentDraft: (value: string) => {
+      session?.editAccentDraft(value)
+    },
     retry: () => {
       if (session) session.retry()
       else {

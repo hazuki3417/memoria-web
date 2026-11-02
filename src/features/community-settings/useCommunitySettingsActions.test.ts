@@ -51,7 +51,12 @@ afterEach(async () => {
 describe("Community設定のMutation契約", () => {
   it("Community名変更の成功はtrue、MyCommunitiesの再取得を要求する", async () => {
     mocks.rename.mockResolvedValue({
-      data: { updateCommunity: { __typename: "UpdateCommunitySuccess", community: { id: "community-1" } } },
+      data: {
+        updateCommunity: {
+          __typename: "UpdateCommunitySuccess",
+          community: { id: "community-1" },
+        },
+      },
     })
     expect(await actions.onSaveName("新しい名前")).toBe(true)
     expect(mocks.rename).toHaveBeenCalledWith(

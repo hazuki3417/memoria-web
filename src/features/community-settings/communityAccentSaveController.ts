@@ -52,7 +52,13 @@ export function createCommunityAccentSaveController() {
   const entryFor = (id: string): Entry => {
     let entry = entries.get(id)
     if (!entry) {
-      entry = { snapshot: emptySnapshot, desired: null, running: false, inspectionGeneration: 0, previewOwner: null }
+      entry = {
+        snapshot: emptySnapshot,
+        desired: null,
+        running: false,
+        inspectionGeneration: 0,
+        previewOwner: null,
+      }
       entries.set(id, entry)
     }
     return entry
@@ -77,7 +83,8 @@ export function createCommunityAccentSaveController() {
 
   async function drain(id: string) {
     const entry = entryFor(id)
-    if (entry.running || entry.desired === null || entry.snapshot.failure) return
+    if (entry.running || entry.desired === null || entry.snapshot.failure)
+      return
     entry.running = true
     update(id, { status: "saving" })
     try {
@@ -100,17 +107,24 @@ export function createCommunityAccentSaveController() {
             : "rejected"
           entry.desired = null
           clearPreview(entry)
-          update(id, { status: "attention", failure, observedMatches: false, inspected: false })
+          update(id, {
+            status: "attention",
+            failure,
+            observedMatches: false,
+            inspected: false,
+          })
           return
         }
       }
       clearPreview(entry)
       update(id, {
-        status: entry.snapshot.draft !== null &&
+        status:
+          entry.snapshot.draft !== null &&
           entry.snapshot.confirmed !== null &&
-          normalized(entry.snapshot.draft) !== normalized(entry.snapshot.confirmed)
-          ? "pending"
-          : "saved",
+          normalized(entry.snapshot.draft) !==
+            normalized(entry.snapshot.confirmed)
+            ? "pending"
+            : "saved",
       })
     } finally {
       entry.running = false
@@ -138,8 +152,12 @@ export function createCommunityAccentSaveController() {
       const entry = entryFor(id)
       // Initial hydration only: a stale cached/refetched value must never roll
       // back a later confirmed mutation or overwrite a restored Draft.
-      if (entry.snapshot.confirmed !== null || entry.snapshot.draft !== null) return
-      update(id, { confirmed: normalized(serverColor), draft: normalized(serverColor) })
+      if (entry.snapshot.confirmed !== null || entry.snapshot.draft !== null)
+        return
+      update(id, {
+        confirmed: normalized(serverColor),
+        draft: normalized(serverColor),
+      })
     },
     configure(
       id: string,
@@ -163,7 +181,13 @@ export function createCommunityAccentSaveController() {
         // mutation should start after it settles.
         entry.desired = null
         clearPreview(entry)
-        update(id, { status: entry.snapshot.failure ? "attention" : entry.running ? "saving" : "pending" })
+        update(id, {
+          status: entry.snapshot.failure
+            ? "attention"
+            : entry.running
+              ? "saving"
+              : "pending",
+        })
         return
       }
       if (entry.snapshot.failure) {
@@ -194,36 +218,70 @@ export function createCommunityAccentSaveController() {
       update(id, { inspected: false, observedMatches: false })
       try {
         const server = normalized(await entry.observe())
-        if (generation !== entry.inspectionGeneration || entry.snapshot.draft !== draftAtStart || entry.snapshot.failure !== "unknown") return
+        if (
+          generation !== entry.inspectionGeneration ||
+          entry.snapshot.draft !== draftAtStart ||
+          entry.snapshot.failure !== "unknown"
+        )
+          return
         const draft = entry.snapshot.draft
         update(id, {
           // This is a current observation, not proof of the old mutation.
-          observedMatches: Boolean(draft && hex(draft) && normalized(draft) === server),
+          observedMatches: Boolean(
+            draft && hex(draft) && normalized(draft) === server,
+          ),
           inspected: true,
         })
       } catch {
         // An old inspection failure must not reset a newer draft's recovery.
-        if (generation !== entry.inspectionGeneration || entry.snapshot.draft !== draftAtStart || entry.snapshot.failure !== "unknown") return
+        if (
+          generation !== entry.inspectionGeneration ||
+          entry.snapshot.draft !== draftAtStart ||
+          entry.snapshot.failure !== "unknown"
+        )
+          return
         update(id, { observedMatches: false, inspected: false })
       }
     },
     confirmObservation(id: string) {
       const entry = entryFor(id)
-      if (entry.snapshot.failure !== "unknown" || !entry.snapshot.observedMatches) return
-      const confirmed = entry.snapshot.draft ? normalized(entry.snapshot.draft) : entry.snapshot.confirmed
+      if (
+        entry.snapshot.failure !== "unknown" ||
+        !entry.snapshot.observedMatches
+      )
+        return
+      const confirmed = entry.snapshot.draft
+        ? normalized(entry.snapshot.draft)
+        : entry.snapshot.confirmed
       if (!confirmed) return
       entry.confirm?.(confirmed)
       clearPreview(entry)
-      update(id, { failure: null, status: "idle", observedMatches: false, inspected: false,
-        confirmed })
+      update(id, {
+        failure: null,
+        status: "idle",
+        observedMatches: false,
+        inspected: false,
+        confirmed,
+      })
     },
     retry(id: string) {
       const entry = entryFor(id)
-      if (!entry.snapshot.failure || !entry.snapshot.draft || !hex(entry.snapshot.draft)) return
-      if (entry.snapshot.failure === "unknown" && !entry.snapshot.inspected) return
+      if (
+        !entry.snapshot.failure ||
+        !entry.snapshot.draft ||
+        !hex(entry.snapshot.draft)
+      )
+        return
+      if (entry.snapshot.failure === "unknown" && !entry.snapshot.inspected)
+        return
       // Unknown is never retried without a separate explicit user click.
       entry.desired = normalized(entry.snapshot.draft)
-      update(id, { failure: null, observedMatches: false, inspected: false, status: "pending" })
+      update(id, {
+        failure: null,
+        observedMatches: false,
+        inspected: false,
+        status: "pending",
+      })
       if (entry.preview) entry.previewOwner = entry.preview(entry.desired)
       void drain(id)
     },
@@ -233,8 +291,13 @@ export function createCommunityAccentSaveController() {
       if (entry.running) return
       entry.desired = null
       clearPreview(entry)
-      update(id, { draft: entry.snapshot.confirmed, failure: null,
-        observedMatches: false, inspected: false, status: "idle" })
+      update(id, {
+        draft: entry.snapshot.confirmed,
+        failure: null,
+        observedMatches: false,
+        inspected: false,
+        status: "idle",
+      })
     },
   }
 }
@@ -244,7 +307,10 @@ function isUnknownAccentOutcome(error: unknown): boolean {
   if ("networkError" in error && error.networkError) return true
   if ("name" in error && error.name === "TypeError") return true
   // An absent/invalid response cannot establish whether the server committed.
-  if (error instanceof Error && /response invalid|unconfirmed/i.test(error.message))
+  if (
+    error instanceof Error &&
+    /response invalid|unconfirmed/i.test(error.message)
+  )
     return true
   return !("graphQLErrors" in error)
 }

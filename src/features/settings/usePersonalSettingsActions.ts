@@ -30,7 +30,9 @@ export function usePersonalSettingsActions() {
         throw new SettingsInputValidationError(outcome.violations)
       if (outcome?.__typename !== "UpdateUserProfileSuccess")
         throw new Error("Profile update unconfirmed")
-      void client.refetchQueries({ include: [CurrentUserDocument] }).catch(() => undefined)
+      void client
+        .refetchQueries({ include: [CurrentUserDocument] })
+        .catch(() => undefined)
     },
     savePreferences: async (patch: UserPreferencesPatch) => {
       const input = toGraphqlUserPreferencesPatch(patch)
@@ -46,9 +48,11 @@ export function usePersonalSettingsActions() {
       const confirmed = fromGraphqlUserPreferences(outcome.preferences)
       // A follow-up Query failure cannot turn an already confirmed Mutation
       // into an unknown outcome or trigger a duplicate settings write.
-      void client.refetchQueries({
-        include: [CurrentUserDocument],
-      }).catch(() => undefined)
+      void client
+        .refetchQueries({
+          include: [CurrentUserDocument],
+        })
+        .catch(() => undefined)
       return confirmed
     },
   }

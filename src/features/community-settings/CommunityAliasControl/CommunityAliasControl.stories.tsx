@@ -27,7 +27,9 @@ export const ClearAlias: Story = {
   tags: ["interaction"],
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
-    await userEvent.clear(canvas.getByRole("textbox", { name: "Community別名" }))
+    await userEvent.clear(
+      canvas.getByRole("textbox", { name: "Community別名" }),
+    )
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(args.onSave).toHaveBeenCalledWith(null)
   },
@@ -41,7 +43,9 @@ export const AliasTooLong: Story = {
     const input = canvas.getByRole("textbox", { name: "Community別名" })
     await userEvent.clear(input)
     await userEvent.type(input, "あ".repeat(101))
-    await expect(canvas.getByText("100文字以内で入力してください。")).toBeVisible()
+    await expect(
+      canvas.getByText("100文字以内で入力してください。"),
+    ).toBeVisible()
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
@@ -49,20 +53,30 @@ export const AliasTooLong: Story = {
 export const AliasRetry: Story = {
   name: "Interaction · 保存失敗後にDraftを保持",
   tags: ["interaction"],
-  args: { onSave: fn(async () => { throw new Error("network") }) },
+  args: {
+    onSave: fn(async () => {
+      throw new Error("network")
+    }),
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: "Community別名" })
     await userEvent.clear(input)
     await userEvent.type(input, "未保存の別名")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
-    await expect(await canvas.findByText("入力内容を保持しています。再度保存してください。")).toBeVisible()
+    await expect(
+      await canvas.findByText(
+        "入力内容を保持しています。再度保存してください。",
+      ),
+    ).toBeVisible()
     await expect(input).toHaveValue("未保存の別名")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
   },
 }
 
-function AliasRefreshFixture(args: ComponentProps<typeof CommunityAliasControl>) {
+function AliasRefreshFixture(
+  args: ComponentProps<typeof CommunityAliasControl>,
+) {
   const [alias, setAlias] = useState(args.savedAlias)
   return (
     <>
@@ -80,10 +94,12 @@ export const AliasRefreshWhileUntouched: Story = {
   render: (args) => <AliasRefreshFixture {...args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
-    await expect(canvas.getByRole("textbox", { name: "Community別名" })).toHaveValue(
-      "取得した新しい別名",
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Alias再取得を再現" }),
     )
+    await expect(
+      canvas.getByRole("textbox", { name: "Community別名" }),
+    ).toHaveValue("取得した新しい別名")
   },
 }
 
@@ -96,11 +112,12 @@ export const AliasRefreshWhileEditing: Story = {
     const input = canvas.getByRole("textbox", { name: "Community別名" })
     await userEvent.clear(input)
     await userEvent.type(input, "未保存の別名")
-    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Alias再取得を再現" }),
+    )
     await expect(input).toHaveValue("未保存の別名")
   },
 }
-
 
 export const AliasRefreshAfterRevert: Story = {
   name: "Interaction · 編集を元に戻したら再取得値へ追従",
@@ -119,7 +136,9 @@ export const AliasRefreshAfterRevert: Story = {
     await userEvent.type(input, "元の別名")
     await expect(save).toBeDisabled()
 
-    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Alias再取得を再現" }),
+    )
     await expect(input).toHaveValue("取得した新しい別名")
     await expect(save).toBeDisabled()
   },

@@ -44,7 +44,9 @@ export function CommunityPreferencesContent({
   aliasControl?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
-  const { control, getValues, reset } = useForm<z.input<typeof communityAccentSchema>>({
+  const { control, getValues, reset } = useForm<
+    z.input<typeof communityAccentSchema>
+  >({
     resolver: zodResolver(communityAccentSchema),
     mode: "onChange",
     defaultValues: { accentDraft: initialDraft ?? accent },
@@ -57,19 +59,36 @@ export function CommunityPreferencesContent({
   const previousInitialDraft = useRef(initialDraft)
   useEffect(() => {
     const draft = getValues("accentDraft")
-    const draftIsEdited = draft.toUpperCase() !== previousAccent.current.toUpperCase()
+    const draftIsEdited =
+      draft.toUpperCase() !== previousAccent.current.toUpperCase()
     previousAccent.current = accent
-    if (!preserveDraftOnAccentChange && (restoreOnAccentChange || !draftIsEdited)) {
+    if (
+      !preserveDraftOnAccentChange &&
+      (restoreOnAccentChange || !draftIsEdited)
+    ) {
       reset({ accentDraft: accent })
     }
-  }, [accent, restoreOnAccentChange, preserveDraftOnAccentChange, getValues, reset])
+  }, [
+    accent,
+    restoreOnAccentChange,
+    preserveDraftOnAccentChange,
+    getValues,
+    reset,
+  ])
 
   // Explicit controller discard restores the input without remounting Alias controls.
   // Normal server refetch and pending input must not overwrite the live RHF Draft.
   useEffect(() => {
-    if (initialDraft === undefined || previousInitialDraft.current === initialDraft) return
+    if (
+      initialDraft === undefined ||
+      previousInitialDraft.current === initialDraft
+    )
+      return
     previousInitialDraft.current = initialDraft
-    if (saveStatus === "idle" && initialDraft.toUpperCase() === accent.toUpperCase()) {
+    if (
+      saveStatus === "idle" &&
+      initialDraft.toUpperCase() === accent.toUpperCase()
+    ) {
       reset({ accentDraft: initialDraft })
     }
   }, [initialDraft, saveStatus, accent, reset])
@@ -79,7 +98,19 @@ export function CommunityPreferencesContent({
       <PageHeader
         title="環境設定"
         description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
-        titleAccessory={saveStatus !== undefined ? <SaveStatus state={saveStatus} announce timing={{ savingDelayMs: 300, savedDurationMs: 2000, savingAnnouncementMs: 2000 }} /> : undefined}
+        titleAccessory={
+          saveStatus !== undefined ? (
+            <SaveStatus
+              state={saveStatus}
+              announce
+              timing={{
+                savingDelayMs: 300,
+                savedDurationMs: 2000,
+                savingAnnouncementMs: 2000,
+              }}
+            />
+          ) : undefined
+        }
       />
       {saveFeedback}
       {aliasControl && (
@@ -106,7 +137,9 @@ export function CommunityPreferencesContent({
               onChange={(next) => {
                 field.onChange(next)
                 onAccentDraftChange?.(next)
-                const parsed = communityAccentSchema.safeParse({ accentDraft: next })
+                const parsed = communityAccentSchema.safeParse({
+                  accentDraft: next,
+                })
                 onDraftValidityChange?.(parsed.success)
                 if (parsed.success) setAccent(parsed.data.accentDraft)
               }}

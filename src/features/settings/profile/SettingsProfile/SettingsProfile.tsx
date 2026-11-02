@@ -58,7 +58,11 @@ export function SettingsProfile({
     previousSourceNickname.current = initialNickname
     const draftIsEdited = getValues("nickname").trim() !== saved.current
     saved.current = initialNickname
-    if (!draftIsEdited && saveState !== "saving" && saveState !== "retryable-error") {
+    if (
+      !draftIsEdited &&
+      saveState !== "saving" &&
+      saveState !== "retryable-error"
+    ) {
       reset({ nickname: initialNickname })
     }
   }, [initialNickname, getValues, reset, saveState])
@@ -132,7 +136,9 @@ export function SettingsProfile({
             value={field.value}
             onChange={field.onChange}
             error={
-              !validation.success ? validation.error.issues[0]?.message : undefined
+              !validation.success
+                ? validation.error.issues[0]?.message
+                : undefined
             }
             required
             disabled={isSaving || isBlocked}

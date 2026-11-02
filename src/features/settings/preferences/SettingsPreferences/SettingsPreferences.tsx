@@ -61,7 +61,19 @@ export function SettingsPreferences({
       <PageHeader
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
-        titleAccessory={onSave ? <SaveStatus state={saveError ? "attention" : saveStatus} announce timing={{ savingDelayMs: 300, savedDurationMs: 2000, savingAnnouncementMs: 2000 }} /> : undefined}
+        titleAccessory={
+          onSave ? (
+            <SaveStatus
+              state={saveError ? "attention" : saveStatus}
+              announce
+              timing={{
+                savingDelayMs: 300,
+                savedDurationMs: 2000,
+                savingAnnouncementMs: 2000,
+              }}
+            />
+          ) : undefined
+        }
       />
       {saveError && (
         <FeedbackAlert
@@ -79,9 +91,13 @@ export function SettingsPreferences({
             {saveError === "blocked" ? (
               <span>画面を再読み込みして現在の状態を確認してください。</span>
             ) : saveError === "unknown" ? (
-              <span>変更内容は保持しています。現在のServer値を確認してから、必要に応じて手動で保存してください。</span>
+              <span>
+                変更内容は保持しています。現在のServer値を確認してから、必要に応じて手動で保存してください。
+              </span>
             ) : (
-              <span>変更内容を保持しています。内容を確認して再試行してください。</span>
+              <span>
+                変更内容を保持しています。内容を確認して再試行してください。
+              </span>
             )}
             {saveError === "unknown" && inspected && (
               <span>
@@ -100,7 +116,8 @@ export function SettingsPreferences({
                 確認完了
               </Button>
             )}
-            {(saveError === "retryable" || (saveError === "unknown" && inspected && !observedMatches)) && (
+            {(saveError === "retryable" ||
+              (saveError === "unknown" && inspected && !observedMatches)) && (
               <Button size="xs" disabled={!canRetry} onClick={retry}>
                 もう一度保存
               </Button>

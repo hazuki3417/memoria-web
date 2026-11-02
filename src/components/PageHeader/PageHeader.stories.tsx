@@ -45,7 +45,8 @@ export const WithExternalUsageAction: Story = {
   tags: ["visual"],
   args: {
     title: "利用状況",
-    description: "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
+    description:
+      "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
     titleAccessory: <SaveStatus state="saving" />,
   },
   render: (args) => (

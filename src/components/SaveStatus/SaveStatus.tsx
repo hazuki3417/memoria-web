@@ -19,7 +19,11 @@ export type SaveStatusProps = {
   /** Enable only for meaningful transitions; avoid announcing every edit. */
   announce?: boolean
   /** Optional timing; omitted props preserve the established presentation. */
-  timing?: { savingDelayMs?: number; savedDurationMs?: number; savingAnnouncementMs?: number }
+  timing?: {
+    savingDelayMs?: number
+    savedDurationMs?: number
+    savingAnnouncementMs?: number
+  }
 }
 
 const labels: Record<SaveStatusState, string> = {
@@ -37,7 +41,11 @@ const icons = {
   attention: IconAlertCircle,
 }
 
-export function SaveStatus({ state, announce = false, timing }: SaveStatusProps) {
+export function SaveStatus({
+  state,
+  announce = false,
+  timing,
+}: SaveStatusProps) {
   const [visibleState, setVisibleState] = useState<SaveStatusState>(state)
   const savingDelay = timing?.savingDelayMs ?? 0
   const savedDuration = timing?.savedDurationMs ?? 0
@@ -70,13 +78,18 @@ export function SaveStatus({ state, announce = false, timing }: SaveStatusProps)
     }
     if (state === "saving" && savingAnnouncementDelay !== undefined) {
       setAnnouncement("")
-      const timer = setTimeout(() => setAnnouncement("保存中です"), savingAnnouncementDelay)
+      const timer = setTimeout(
+        () => setAnnouncement("保存中です"),
+        savingAnnouncementDelay,
+      )
       return () => clearTimeout(timer)
     }
     // Persistent form alerts own failure announcements.
-    setAnnouncement(previous !== null && state === "saved" && previous !== "saved"
-      ? "変更を保存しました"
-      : "")
+    setAnnouncement(
+      previous !== null && state === "saved" && previous !== "saved"
+        ? "変更を保存しました"
+        : "",
+    )
   }, [announce, state, savingAnnouncementDelay])
 
   const Icon = visibleState === "idle" ? null : icons[visibleState]
@@ -85,7 +98,13 @@ export function SaveStatus({ state, announce = false, timing }: SaveStatusProps)
     <>
       <Badge
         variant="light"
-        color={visibleState === "attention" ? "red" : visibleState === "saved" ? "green" : "gray"}
+        color={
+          visibleState === "attention"
+            ? "red"
+            : visibleState === "saved"
+              ? "green"
+              : "gray"
+        }
         size="sm"
         radius="xl"
         leftSection={Icon ? <Icon size={13} aria-hidden="true" /> : undefined}

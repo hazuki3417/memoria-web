@@ -107,7 +107,8 @@ export function useCommunitySettingsActions(communityId: string) {
         refetchQueries: [MyCommunitiesDocument],
         awaitRefetchQueries: true,
       })
-      if (result.data?.updateCommunity?.__typename === "UpdateCommunitySuccess") return true
+      if (result.data?.updateCommunity?.__typename === "UpdateCommunitySuccess")
+        return true
       showNotification({
         kind: "error",
         title: "Community名を変更",

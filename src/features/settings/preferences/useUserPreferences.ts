@@ -20,14 +20,28 @@ export function useUserPreferences(
   onSave?: SavePreferences,
   onInspect?: () => Promise<UserPreferences>,
 ) {
-  const { saveError, saveStatus, sessionSnapshot, enqueue, setAccentDraft,
-    retry, inspect, confirmObservation, discard } =
-    usePreferencesSave(onSave, initialPreferences, onInspect)
+  const {
+    saveError,
+    saveStatus,
+    sessionSnapshot,
+    enqueue,
+    setAccentDraft,
+    retry,
+    inspect,
+    confirmObservation,
+    discard,
+  } = usePreferencesSave(onSave, initialPreferences, onInspect)
   const initial = {
     ...(sessionSnapshot?.confirmed ?? initialPreferences),
     ...(sessionSnapshot?.draftPatch ?? {}),
   }
-  const { watch, setValue, getValues, reset, formState: { dirtyFields } } = useForm<PreferencesFormValues>({
+  const {
+    watch,
+    setValue,
+    getValues,
+    reset,
+    formState: { dirtyFields },
+  } = useForm<PreferencesFormValues>({
     resolver: zodResolver(preferencesSchema),
     mode: "onChange",
     defaultValues: {
@@ -44,20 +58,27 @@ export function useUserPreferences(
       (Object.keys(previous) as Array<keyof UserPreferences>).every(
         (key) => previous[key] === initialPreferences[key],
       )
-    ) return
+    )
+      return
     previousSource.current = initialPreferences
     reset(
       {
         ...initialPreferences,
         ...(sessionSnapshot?.draftPatch ?? {}),
-        accentDraft: sessionSnapshot?.accentDraft ?? initialPreferences.personalAccentColor,
+        accentDraft:
+          sessionSnapshot?.accentDraft ??
+          initialPreferences.personalAccentColor,
       },
       { keepDirtyValues: Object.keys(dirtyFields).length > 0 },
     )
   }, [initialPreferences, reset, dirtyFields, sessionSnapshot])
   const previousDiscardRevision = useRef(sessionSnapshot?.discardRevision)
   useEffect(() => {
-    if (!sessionSnapshot || previousDiscardRevision.current === sessionSnapshot.discardRevision) return
+    if (
+      !sessionSnapshot ||
+      previousDiscardRevision.current === sessionSnapshot.discardRevision
+    )
+      return
     previousDiscardRevision.current = sessionSnapshot.discardRevision
     const baseline = sessionSnapshot.confirmed ?? initialPreferences
     reset({ ...baseline, accentDraft: baseline.personalAccentColor })
@@ -109,6 +130,8 @@ export function useUserPreferences(
     inspected: sessionSnapshot?.inspected ?? false,
     observedMatches: sessionSnapshot?.observedMatches ?? false,
     hasSession: Boolean(sessionSnapshot),
-    canRetry: !sessionSnapshot?.accentDraft || /^#[0-9a-fA-F]{6}$/.test(sessionSnapshot.accentDraft),
+    canRetry:
+      !sessionSnapshot?.accentDraft ||
+      /^#[0-9a-fA-F]{6}$/.test(sessionSnapshot.accentDraft),
   }
 }

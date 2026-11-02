@@ -79,7 +79,9 @@ export const WithErrorDetails: Story = {
 }
 
 function AnnouncementScenario() {
-  const [state, setState] = useState<"idle" | "pending" | "saving" | "saved" | "attention">("idle")
+  const [state, setState] = useState<
+    "idle" | "pending" | "saving" | "saved" | "attention"
+  >("idle")
 
   return (
     <Stack align="flex-start">
@@ -112,14 +114,20 @@ export const AnnouncementTransitions: Story = {
 }
 
 function TimedPresentationScenario() {
-  const [state, setState] = useState<"idle" | "saving" | "saved" | "attention">("idle")
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "attention">(
+    "idle",
+  )
   return (
     <Stack align="flex-start">
-      <SaveStatus state={state} timing={{
-        savingDelayMs: 300,
-        savedDurationMs: 2000,
-        savingAnnouncementMs: 2000,
-      }} announce />
+      <SaveStatus
+        state={state}
+        timing={{
+          savingDelayMs: 300,
+          savedDurationMs: 2000,
+          savingAnnouncementMs: 2000,
+        }}
+        announce
+      />
       <Button onClick={() => setState("saving")}>Start saving</Button>
       <Button onClick={() => setState("saved")}>Confirm saved</Button>
       <Button onClick={() => setState("attention")}>Require attention</Button>
