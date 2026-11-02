@@ -1,6 +1,7 @@
 "use client"
 
 import { releaseCommunityAccentPreview, type CommunityAccentPreview } from "./communityAccentPreview"
+import { createCommunityAccentSaveController } from "@/features/community-settings/communityAccentSaveController"
 
 import {
   createContext,
@@ -9,6 +10,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react"
 
@@ -16,6 +18,7 @@ type CommunityAccentPreviewContextValue = {
   preview: CommunityAccentPreview
   setPreview: (communityId: string, color: string) => number
   clearPreview: (communityId: string, owner: number) => void
+  saveController: ReturnType<typeof createCommunityAccentSaveController>
 }
 
 const CommunityAccentPreviewContext =
@@ -32,6 +35,7 @@ export function CommunityAccentPreviewProvider({
   children: ReactNode
 }) {
   const [preview, setCurrentPreview] = useState<CommunityAccentPreview>(null)
+  const saveController = useRef(createCommunityAccentSaveController()).current
   const nextOwner = useRef(0)
   const setPreview = useCallback((communityId: string, color: string) => {
     const owner = ++nextOwner.current
@@ -44,8 +48,8 @@ export function CommunityAccentPreviewProvider({
     )
   }, [])
   const value = useMemo(
-    () => ({ preview, setPreview, clearPreview }),
-    [preview, setPreview, clearPreview],
+    () => ({ preview, setPreview, clearPreview, saveController }),
+    [preview, setPreview, clearPreview, saveController],
   )
 
   return (
@@ -61,4 +65,21 @@ export function useCommunityAccentPreview() {
     throw new Error("CommunityAccentPreviewProvider is required")
   }
   return context
+}
+
+/** Observe one Community only, without binding its queue to the settings route. */
+export function useCommunityAccentSave(communityId: string) {
+  const { saveController } = useCommunityAccentPreview()
+  const subscribe = useCallback(
+    (listener: () => void) => saveController.subscribe(communityId, listener),
+    [saveController, communityId],
+  )
+  const getSnapshot = useCallback(
+    () => saveController.getSnapshot(communityId),
+    [saveController, communityId],
+  )
+  return {
+    snapshot: useSyncExternalStore(subscribe, getSnapshot, getSnapshot),
+    controller: saveController,
+  }
 }
