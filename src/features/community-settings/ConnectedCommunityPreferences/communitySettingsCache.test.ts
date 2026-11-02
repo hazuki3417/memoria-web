@@ -5,6 +5,8 @@ import {
   CommunitySettingsCacheFragmentDoc,
   MyCommunitiesDocument,
   type OperationCommunitySettingsCacheFragment,
+  type OperationCommunityMySettingsQuery,
+  type OperationMyCommunitiesQuery,
 } from "@/infrastructure/graphql/generated"
 
 function createCache() {
@@ -77,11 +79,13 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
     const cache = createCache()
     updateSettings(cache, { accentColor: "#AABBCC" })
 
-    const community = cache.readQuery({
+    const community = cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
       variables: { communityId: "community-1" },
     })
-    const list = cache.readQuery({ query: MyCommunitiesDocument })
+    const list = cache.readQuery<OperationMyCommunitiesQuery>({
+      query: MyCommunitiesDocument,
+    })
     expect(community?.community?.mySettings).toMatchObject({
       accentColor: "#AABBCC",
       alias: "My community",
@@ -96,11 +100,13 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
     const cache = createCache()
     updateSettings(cache, { alias: "New alias" })
 
-    const community = cache.readQuery({
+    const community = cache.readQuery<OperationCommunityMySettingsQuery>({
       query: CommunityMySettingsDocument,
       variables: { communityId: "community-1" },
     })
-    const list = cache.readQuery({ query: MyCommunitiesDocument })
+    const list = cache.readQuery<OperationMyCommunitiesQuery>({
+      query: MyCommunitiesDocument,
+    })
     expect(community?.community?.mySettings).toMatchObject({
       accentColor: "#112233",
       alias: "New alias",
