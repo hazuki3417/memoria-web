@@ -17,7 +17,6 @@ import {
   type OperationUpdateCommunitySettingsMutation,
   type OperationUpdateCommunitySettingsMutationVariables,
   CommunitySettingsCacheFragmentDoc,
-  MyCommunitiesDocument,
   useCommunityMySettingsQuery,
   useUpdateCommunitySettingsMutation,
   type OperationCommunitySettingsCacheFragment,
@@ -208,9 +207,9 @@ export function ConnectedCommunityPreferences({
                   })
                 }
               }
-              void client.refetchQueries({
-                include: [MyCommunitiesDocument, CommunityMySettingsDocument],
-              }).catch(() => undefined)
+              // Both subscribed views share the normalized Community fragment.
+              // Refetching either after this write may reintroduce an older
+              // Accent/Alias snapshot while the other field is in flight.
             }}
           />
         }
