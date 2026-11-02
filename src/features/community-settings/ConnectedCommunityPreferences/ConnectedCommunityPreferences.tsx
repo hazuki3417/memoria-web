@@ -40,13 +40,17 @@ export function ConnectedCommunityPreferences({
   const desired = useRef<string | null>(null)
   const inFlight = useRef(false)
   const hasIncompleteDraft = useRef(false)
+  const previewOwner = useRef<number | null>(null)
   const active = useRef(true)
 
   useEffect(() => {
     active.current = true
     return () => {
       active.current = false
-      clearPreview(communityId)
+      if (previewOwner.current !== null) {
+        clearPreview(communityId, previewOwner.current)
+        previewOwner.current = null
+      }
     }
   }, [communityId, clearPreview])
 
@@ -110,7 +114,10 @@ export function ConnectedCommunityPreferences({
         // Only confirmed mutation results may update Apollo. A newer draft
         // continues to be shown through the independent Shell preview.
         applyContextAccent(confirmed)
-        if (desired.current === null) clearPreview(communityId)
+        if (desired.current === null && previewOwner.current !== null) {
+          clearPreview(communityId, previewOwner.current)
+          previewOwner.current = null
+        }
       }
       if (active.current) {
         setSaveError(false)
@@ -120,7 +127,10 @@ export function ConnectedCommunityPreferences({
       desired.current = null
       // The Shell can outlive this route: always restore shared cache even
       // if the preferences screen was unmounted while saving.
-      clearPreview(communityId)
+      if (previewOwner.current !== null) {
+        clearPreview(communityId, previewOwner.current)
+        previewOwner.current = null
+      }
       if (active.current) {
         setAccent(saved.current)
         setSaveError(true)
@@ -135,7 +145,7 @@ export function ConnectedCommunityPreferences({
     if (!isHex(value)) return
     const normalized = value.toUpperCase()
     setAccent(normalized)
-    setPreview(communityId, normalized)
+    previewOwner.current = setPreview(communityId, normalized)
     desired.current = normalized
     setSaveError(false)
     setSaveStatus("pending")
