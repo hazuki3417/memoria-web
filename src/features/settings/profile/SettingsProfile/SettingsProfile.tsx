@@ -9,21 +9,15 @@ import { profileSchema } from "../profileSchema"
 import { FeedbackAlert, showNotification } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
+import {
+  SettingsInputValidationError,
+  classifySettingsSaveFailure,
+  resolveSettingsValidation,
+} from "../../graphqlSettingsResult"
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
 
-type ProfileSaveErrorKind = "retryable" | "blocked"
-type ProfileSaveError = { kind: ProfileSaveErrorKind }
 export type SaveProfile = (nickname: string) => Promise<void>
-
-function isBlockingProfileSaveError(error: unknown): error is ProfileSaveError {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "kind" in error &&
-    error.kind === "blocked"
-  )
-}
 
 export function SettingsProfile({
   onSave,
@@ -36,7 +30,7 @@ export function SettingsProfile({
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
 }) {
-  const { control, reset, getValues, handleSubmit } = useForm<
+  const { control, reset, getValues, handleSubmit, setError, clearErrors } = useForm<
     z.input<typeof profileSchema>,
     unknown,
     z.output<typeof profileSchema>
@@ -45,12 +39,13 @@ export function SettingsProfile({
     mode: "onChange",
     defaultValues: { nickname: initialNickname },
   })
-  const { field } = useController({ control, name: "nickname" })
+  const { field, fieldState } = useController({ control, name: "nickname" })
   // The confirmed server value is not an editable Form Draft.
   const saved = useRef(initialNickname)
   const [saveState, setSaveState] = useState<
-    "idle" | "saving" | "retryable-error" | "blocked"
+    "idle" | "saving" | "retryable-error" | "blocked" | "unknown"
   >(initialSaveState)
+  const [formInvalid, setFormInvalid] = useState(false)
   // Update an untouched draft when the source nickname changes.
   const previousSourceNickname = useRef(initialNickname)
   useEffect(() => {
@@ -72,6 +67,7 @@ export function SettingsProfile({
   const invalid = !validation.success
   const isSaving = saveState === "saving"
   const isBlocked = saveState === "blocked"
+  const isUnknown = saveState === "unknown"
   let saveLabel = "更新"
   if (saveState === "retryable-error") {
     saveLabel = "再試行"
@@ -83,6 +79,8 @@ export function SettingsProfile({
     if (!dirty || isSaving || isBlocked) return
 
     setSaveState("saving")
+    setFormInvalid(false)
+    clearErrors("nickname")
     try {
       await onSave(nickname)
       saved.current = nickname
@@ -94,9 +92,26 @@ export function SettingsProfile({
         description: "プロフィールを更新しました。",
       })
     } catch (error) {
-      setSaveState(
-        isBlockingProfileSaveError(error) ? "blocked" : "retryable-error",
-      )
+      const kind = classifySettingsSaveFailure(error)
+      if (kind === "validation" && error instanceof SettingsInputValidationError) {
+        const result = resolveSettingsValidation(error, ["nickname"])
+        if (result.fieldErrors.nickname) {
+          setError("nickname", {
+            type: "server",
+            message: result.fieldErrors.nickname,
+          })
+        }
+        setFormInvalid(result.formError)
+        setSaveState("idle")
+      } else {
+        setSaveState(
+          kind === "blocked"
+            ? "blocked"
+            : kind === "retryable"
+              ? "retryable-error"
+              : "unknown",
+        )
+      }
     }
   })
 
@@ -118,6 +133,16 @@ export function SettingsProfile({
               入力内容は保持されています。内容を確認して、もう一度保存してください。
             </FeedbackAlert>
           )}
+          {formInvalid && (
+            <FeedbackAlert kind="error" title="入力内容を確認してください" role="alert">
+              入力内容を確認し、修正してから保存してください。
+            </FeedbackAlert>
+          )}
+          {isUnknown && (
+            <FeedbackAlert kind="error" title="保存結果を確認できませんでした" role="alert">
+              入力内容を保持しています。二重保存を避けるため、ページを再読み込みして現在の状態を確認してください。
+            </FeedbackAlert>
+          )}
           {isBlocked && (
             <FeedbackAlert
               kind="error"
@@ -134,19 +159,22 @@ export function SettingsProfile({
             ref={field.ref}
             onBlur={field.onBlur}
             value={field.value}
-            onChange={field.onChange}
+            onChange={(event) => {
+              field.onChange(event)
+              clearErrors("nickname")
+              setFormInvalid(false)
+            }}
             error={
-              !validation.success
-                ? validation.error.issues[0]?.message
-                : undefined
+              fieldState.error?.message ??
+              (!validation.success ? validation.error.issues[0]?.message : undefined)
             }
             required
-            disabled={isSaving || isBlocked}
+            disabled={isSaving || isBlocked || isUnknown}
           />
           <Button
             size="sm"
             style={{ alignSelf: "flex-start" }}
-            disabled={!dirty || invalid || isSaving || isBlocked}
+            disabled={!dirty || invalid || isSaving || isBlocked || isUnknown}
             loading={isSaving}
             onClick={() => void save()}
           >
