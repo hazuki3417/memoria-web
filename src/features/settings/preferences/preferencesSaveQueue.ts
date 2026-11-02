@@ -23,7 +23,7 @@ export function createPreferencesSaveQueue(
   }
 
   async function drain() {
-    if (running || stopped) return
+    if (running || stopped || Object.keys(pending).length === 0) return
     running = true
     onStateChange?.("saving")
     try {
