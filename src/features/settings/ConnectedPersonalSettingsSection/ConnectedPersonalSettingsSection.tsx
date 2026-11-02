@@ -5,6 +5,8 @@ import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBo
 import { useSettingsRefreshError } from "../useSettingsRefreshError"
 import { Settings } from "../Settings"
 import { useCurrentUserQuery } from "@/infrastructure/graphql/generated"
+import { usePersonalPreferencesSession } from "../preferences/PersonalPreferencesSessionContext"
+import { resolvePersonalAccent } from "../preferences/personalAccentPreview"
 
 /** Account requires CurrentUser; Usage handles its own data and loading state. */
 export function ConnectedPersonalSettingsSection({
@@ -14,6 +16,7 @@ export function ConnectedPersonalSettingsSection({
   section: "account" | "usage"
   usageContent?: ReactNode
 }) {
+  const { snapshot: personalSession } = usePersonalPreferencesSession()
   const { data, loading, error } = useCurrentUserQuery()
   useSettingsRefreshError(Boolean(data?.me && error))
   const accountState = !data?.me ? (loading ? "loading" : "error") : "ready"
@@ -28,7 +31,10 @@ export function ConnectedPersonalSettingsSection({
       section={section}
       usageContent={usageContent}
       accountContent={accountContent}
-      personalAccentColor={data?.me?.preferences.personalAccentColor}
+      personalAccentColor={resolvePersonalAccent(
+        data?.me?.preferences.personalAccentColor,
+        personalSession,
+      )}
     />
   )
 }
