@@ -29,7 +29,7 @@ export function SettingsProfile({
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
 }) {
-  const { control, reset, getValues, handleSubmit, setError, clearErrors } = useForm<
+  const { control, reset, getValues, handleSubmit, setError, clearErrors, formState: { isSubmitted } } = useForm<
     z.input<typeof profileSchema>,
     unknown,
     z.output<typeof profileSchema>
@@ -64,6 +64,7 @@ export function SettingsProfile({
   const normalized = field.value.trim()
   const dirty = normalized !== saved.current
   const invalid = !validation.success
+  const showClientError = fieldState.isTouched || isSubmitted
   const isSaving = saveState === "saving"
   const isBlocked = saveState === "blocked"
   const isUnknown = saveState === "unknown"
@@ -164,8 +165,11 @@ export function SettingsProfile({
               setFormInvalid(false)
             }}
             error={
-              fieldState.error?.message ??
-              (!validation.success ? validation.error.issues[0]?.message : undefined)
+              fieldState.error?.type === "server"
+                ? fieldState.error.message
+                : showClientError && !validation.success
+                  ? validation.error.issues[0]?.message
+                  : undefined
             }
             required
             disabled={isSaving || isBlocked || isUnknown}
