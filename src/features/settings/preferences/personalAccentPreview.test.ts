@@ -9,6 +9,7 @@ const snapshot = (changes: Partial<PreferencesSessionSnapshot> = {}): Preference
   accentDraft: null,
   saveStatus: "idle",
   failure: null,
+  validation: null,
   inspected: false,
   observedMatches: false,
   discardRevision: 0,
