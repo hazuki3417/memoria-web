@@ -54,6 +54,7 @@ export function CommunityPreferencesContent({
   // Refresh an untouched input; preserve an incomplete draft unless the
   // owning save controller explicitly restores its last confirmed value.
   const previousAccent = useRef(accent)
+  const previousInitialDraft = useRef(initialDraft)
   useEffect(() => {
     const draft = getValues("accentDraft")
     const draftIsEdited = draft.toUpperCase() !== previousAccent.current.toUpperCase()
@@ -62,6 +63,16 @@ export function CommunityPreferencesContent({
       reset({ accentDraft: accent })
     }
   }, [accent, restoreOnAccentChange, preserveDraftOnAccentChange, getValues, reset])
+
+  // Explicit controller discard restores the input without remounting Alias controls.
+  // Normal server refetch and pending input must not overwrite the live RHF Draft.
+  useEffect(() => {
+    if (initialDraft === undefined || previousInitialDraft.current === initialDraft) return
+    previousInitialDraft.current = initialDraft
+    if (saveStatus === "idle" && initialDraft.toUpperCase() === accent.toUpperCase()) {
+      reset({ accentDraft: initialDraft })
+    }
+  }, [initialDraft, saveStatus, accent, reset])
 
   return (
     <Stack gap="xl">
