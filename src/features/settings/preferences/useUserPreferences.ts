@@ -25,7 +25,7 @@ export function useUserPreferences(
     usePreferencesSave(onSave, initialPreferences, onInspect)
   const initial = {
     ...(sessionSnapshot?.confirmed ?? initialPreferences),
-    ...sessionSnapshot?.draftPatch,
+    ...(sessionSnapshot?.draftPatch ?? {}),
   }
   const { watch, setValue, getValues, reset, formState: { dirtyFields } } = useForm<PreferencesFormValues>({
     resolver: zodResolver(preferencesSchema),
@@ -104,5 +104,6 @@ export function useUserPreferences(
     discard,
     inspected: sessionSnapshot?.inspected ?? false,
     observedMatches: sessionSnapshot?.observedMatches ?? false,
+    hasSession: Boolean(sessionSnapshot),
   }
 }
