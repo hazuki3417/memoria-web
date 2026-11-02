@@ -163,6 +163,41 @@ describe("Personal Preferences session controller", () => {
     }
   })
 
+  it("does not roll back unrelated confirmed fields on an unknown outcome observation", async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = createPersonalPreferencesSession()
+      const save = vi.fn()
+        .mockResolvedValueOnce({ ...defaultUserPreferences, fileSizeUnit: "BINARY" })
+        .mockRejectedValueOnce(Object.assign(new Error("offline"), {
+          networkError: new Error("offline"),
+        }))
+      controller.configure(save, vi.fn().mockResolvedValue({
+        ...defaultUserPreferences,
+        mediaDetailNavigationWrap: true,
+      }))
+      controller.hydrate(defaultUserPreferences)
+      controller.edit({ fileSizeUnit: "BINARY" })
+      await vi.advanceTimersByTimeAsync(400)
+      expect(controller.getSnapshot().confirmed?.fileSizeUnit).toBe("BINARY")
+      controller.edit({ mediaDetailNavigationWrap: true })
+      await vi.advanceTimersByTimeAsync(400)
+      await controller.inspect()
+      expect(controller.getSnapshot().observedMatches).toBe(true)
+      controller.confirmObservation()
+      expect(controller.getSnapshot()).toMatchObject({
+        confirmed: {
+          fileSizeUnit: "BINARY",
+          mediaDetailNavigationWrap: true,
+        },
+        failure: null,
+        draftPatch: {},
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("discards a failed Draft and restores a form reset revision", async () => {
     vi.useFakeTimers()
     try {
