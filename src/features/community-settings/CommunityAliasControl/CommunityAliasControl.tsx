@@ -15,7 +15,7 @@ export function CommunityAliasControl({
   savedAlias: string | null
   onSave: (alias: string | null) => Promise<void>
 }) {
-  const { control, reset, handleSubmit } = useForm<
+  const { control, getValues, reset, handleSubmit } = useForm<
     z.input<typeof communityAliasSchema>,
     unknown,
     z.output<typeof communityAliasSchema>
@@ -25,11 +25,13 @@ export function CommunityAliasControl({
     defaultValues: { alias: savedAlias ?? "" },
   })
   const { field } = useController({ control, name: "alias" })
-  // A draft is independent of Apollo refreshes until it is saved.
-  const editing = useRef(false)
+  // Compare the current draft to the last source value, not a sticky "edited" flag.
+  const previousAlias = useRef(savedAlias ?? "")
   useEffect(() => {
-    if (!editing.current) reset({ alias: savedAlias ?? "" })
-  }, [savedAlias, reset])
+    const draftIsEdited = getValues("alias").trim() !== previousAlias.current
+    previousAlias.current = savedAlias ?? ""
+    if (!draftIsEdited && !saving) reset({ alias: savedAlias ?? "" })
+  }, [savedAlias, getValues, reset])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(false)
   const text = field.value
@@ -44,7 +46,6 @@ export function CommunityAliasControl({
     setError(false)
     try {
       await onSave(alias)
-      editing.current = false
       reset({ alias: normalized })
       showNotification({
         kind: "success",
@@ -74,7 +75,6 @@ export function CommunityAliasControl({
         value={text}
         disabled={saving}
         onChange={(event) => {
-          editing.current = true
           field.onChange(event.currentTarget.value)
           setError(false)
         }}
