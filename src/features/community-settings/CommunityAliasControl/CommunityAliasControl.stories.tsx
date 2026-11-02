@@ -3,6 +3,7 @@ import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunityAliasControl } from "./CommunityAliasControl"
+import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
 
 const meta = {
   title: "Features/Community Settings/Community Alias",
@@ -72,7 +73,7 @@ export const AliasRetry: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw new Error("network")
+      throw { kind: "retryable" }
     }),
   },
   play: async ({ canvasElement }) => {
@@ -88,6 +89,45 @@ export const AliasRetry: Story = {
     ).toBeVisible()
     await expect(input).toHaveValue("未保存の別名")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
+  },
+}
+
+export const AliasServerFieldValidation: Story = {
+  name: "Interaction · API Alias Field Error",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["alias"] }] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByText("文字数が上限を超えています。")).toBeVisible()
+    await expect(input).toHaveValue("変更した別名")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const AliasUnknownOutcome: Story = {
+  name: "Interaction · Alias結果不明時の二重送信防止",
+  tags: ["interaction"],
+  args: { onSave: fn(async () => { throw new Error("timeout") }) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByText("保存結果を確認できませんでした")).toBeVisible()
+    await expect(input).toHaveValue("変更した別名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
   },
 }
 
