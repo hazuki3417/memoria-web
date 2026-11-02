@@ -45,6 +45,8 @@ export function SaveStatus({ state, announce = false, timing }: SaveStatusProps)
 
   useEffect(() => {
     if (state === "saving" && savingDelay > 0) {
+      // Do not leave a previous Saved badge visible during a new write.
+      setVisibleState("idle")
       const timer = setTimeout(() => setVisibleState("saving"), savingDelay)
       return () => clearTimeout(timer)
     }
