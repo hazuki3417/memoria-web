@@ -3,6 +3,7 @@ import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunitySettings } from "./CommunitySettings"
+import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
 
 const meta = {
   title: "Features/Community Settings/Settings",
@@ -73,6 +74,68 @@ export const NameSaving: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(args.onSaveName).toHaveBeenCalledWith("新しいCommunity名")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+export const NameServerFieldValidation: Story = {
+  name: "Interaction · Community名のServer Field Error",
+  tags: ["interaction"],
+  args: {
+    onSaveName: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["name"] }] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByText("文字数が上限を超えています。")).toBeVisible()
+    await expect(input).toHaveValue("変更後のCommunity名")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const NameServerFormValidation: Story = {
+  name: "Interaction · Community名のForm Error",
+  tags: ["interaction"],
+  args: {
+    onSaveName: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await expect(input).toHaveValue("変更後のCommunity名")
+  },
+}
+
+export const NameUnknownOutcome: Story = {
+  name: "Interaction · Community名の保存結果不明は再送しない",
+  tags: ["interaction"],
+  args: {
+    onSaveName: fn(async () => { throw new Error("timeout") }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByText("保存結果を確認できませんでした")).toBeVisible()
+    await expect(input).toHaveValue("変更後のCommunity名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await expect(args.onSaveName).toHaveBeenCalledTimes(1)
   },
 }
 
