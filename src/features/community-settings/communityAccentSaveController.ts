@@ -168,6 +168,8 @@ export function createCommunityAccentSaveController() {
       }
       if (entry.snapshot.failure) {
         // Explicit user recovery is required, especially for unknown outcomes.
+        // A new valid edit must not re-enable an older queued mutation.
+        entry.desired = null
         update(id, { status: "attention" })
         return
       }
