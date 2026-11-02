@@ -6,9 +6,8 @@ import { usePersonalPreferencesSession } from "./PersonalPreferencesSessionConte
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import {
-  SettingsInputValidationError,
   classifySettingsSaveFailure,
-  resolveSettingsValidation,
+  resolveSettingsFailureValidation,
 } from "../graphqlSettingsResult"
 import type { PreferencesFailure } from "./personalPreferencesSession"
 
@@ -77,8 +76,8 @@ export function usePreferencesSave(
         const kind = classifySettingsSaveFailure(error)
         setLocalError(kind)
         setLocalValidation(
-          kind === "validation" && error instanceof SettingsInputValidationError
-            ? resolveSettingsValidation(error, Object.keys(attempted))
+          kind === "validation"
+            ? resolveSettingsFailureValidation(error, Object.keys(attempted))
             : null,
         )
       },
