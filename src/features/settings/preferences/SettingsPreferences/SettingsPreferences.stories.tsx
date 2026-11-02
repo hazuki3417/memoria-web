@@ -77,9 +77,12 @@ export const PreferencePatchContract: Story = {
     const canvas = within(canvasElement)
     const input = canvas.getAllByRole("switch")[0]
     await userEvent.click(input)
-    await waitFor(() => {
-      expect(args.onSave).toHaveBeenCalledWith({ mediaDetailNavigationWrap: true })
+    await waitFor(async () => {
+      await expect(args.onSave).toHaveBeenCalledWith({
+        mediaDetailNavigationWrap: true,
+      })
     })
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
   },
 }
 
@@ -185,6 +188,29 @@ export const PreferencesRefreshWhileUntouched: Story = {
     await expect(input).not.toBeChecked()
     await userEvent.click(canvas.getByRole("button", { name: "Preferences再取得を再現" }))
     await expect(input).toBeChecked()
+    // RHF reset/hydration must never enqueue a new auto-save patch.
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    await expect(args.onSave).not.toHaveBeenCalled()
+  },
+}
+
+export const PreferencesInvalidAccentDraft: Story = {
+  name: "Interaction · 未完成HEXは保存Patchに含めない",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async (patch: UserPreferencesPatch) => ({
+      ...defaultUserPreferences,
+      ...patch,
+    })),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Personal Accent Color" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "#123")
+    await expect(input).toHaveValue("#123")
+    // Check after the auto-save debounce window, not only immediately.
+    await new Promise((resolve) => setTimeout(resolve, 500))
     await expect(args.onSave).not.toHaveBeenCalled()
   },
 }
