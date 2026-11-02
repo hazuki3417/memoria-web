@@ -61,10 +61,11 @@ export function ConnectedCommunityPreferences({
         id: communityId,
       })
       if (!id) return
-      const previous = client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
-        id,
-        fragment: CommunitySettingsCacheFragmentDoc,
-      })
+      const previous =
+        client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
+          id,
+          fragment: CommunitySettingsCacheFragmentDoc,
+        })
       if (!previous) return
       client.cache.writeFragment({
         id,
@@ -167,10 +168,11 @@ export function ConnectedCommunityPreferences({
                 id: communityId,
               })
               if (id) {
-                const previous = client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
-                  id,
-                  fragment: CommunitySettingsCacheFragmentDoc,
-                })
+                const previous =
+                  client.cache.readFragment<OperationCommunitySettingsCacheFragment>({
+                    id,
+                    fragment: CommunitySettingsCacheFragmentDoc,
+                  })
                 if (previous) {
                   client.cache.writeFragment({
                     id,
