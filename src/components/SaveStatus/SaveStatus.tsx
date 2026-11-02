@@ -1,4 +1,5 @@
-import { Badge } from "@mantine/core"
+import { Badge, VisuallyHidden } from "@mantine/core"
+import { useEffect, useRef, useState } from "react"
 import {
   IconAlertCircle,
   IconCheck,
@@ -36,21 +37,39 @@ const icons = {
 
 export function SaveStatus({ state, announce = false }: SaveStatusProps) {
   const label = labels[state]
+  const previousState = useRef<SaveStatusState | null>(null)
+  const [announcement, setAnnouncement] = useState("")
+
+  useEffect(() => {
+    const previous = previousState.current
+    previousState.current = state
+    // Error announcements belong to the persistent form alert.
+    // Avoid announcing every edit or an initial saved state.
+    if (!announce || previous === null || state !== "saved" || previous === "saved") {
+      setAnnouncement("")
+      return
+    }
+    setAnnouncement("変更を保存しました")
+  }, [announce, state])
   const Icon = state === "idle" ? null : icons[state]
 
   return (
-    <Badge
+    <>
+      <Badge
       variant="light"
       color={state === "attention" ? "red" : state === "saved" ? "green" : "gray"}
       size="sm"
       radius="xl"
       leftSection={Icon ? <Icon size={13} aria-hidden="true" /> : undefined}
       style={{ visibility: state === "idle" ? "hidden" : "visible" }}
-      role={announce && state !== "idle" ? "status" : undefined}
-      aria-live={announce && state !== "idle" ? "polite" : "off"}
+      aria-live="off"
       aria-label={label || undefined}
     >
       {label || "保存済み"}
-    </Badge>
+      </Badge>
+      <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </VisuallyHidden>
+    </>
   )
 }
