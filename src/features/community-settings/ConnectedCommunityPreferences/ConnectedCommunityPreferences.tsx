@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Stack } from "@mantine/core"
 import type { SaveStatusState } from "@/components/SaveStatus"
+import { useCommunityAccentPreview } from "@/features/application-shell/CommunityAccentPreviewContext"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { useApolloClient } from "@apollo/client"
@@ -30,6 +31,7 @@ export function ConnectedCommunityPreferences({
   })
   useSettingsRefreshError(Boolean(data?.community && error))
   const client = useApolloClient()
+  const { setPreview, clearPreview } = useCommunityAccentPreview()
   const [save] = useUpdateCommunitySettingsMutation()
   const [accent, setAccent] = useState<string | null>(null)
   const [saveError, setSaveError] = useState(false)
@@ -44,8 +46,9 @@ export function ConnectedCommunityPreferences({
     active.current = true
     return () => {
       active.current = false
+      clearPreview(communityId)
     }
-  }, [])
+  }, [communityId, clearPreview])
 
   // A server refresh must not replace a newer unsaved user selection.
   useEffect(() => {
@@ -104,7 +107,10 @@ export function ConnectedCommunityPreferences({
           result.data?.updateCommunitySettings?.settings?.accentColor
         if (!confirmed || !isHex(confirmed)) throw new Error("Save unconfirmed")
         saved.current = confirmed
-        if (desired.current === null) applyContextAccent(confirmed)
+        // Only confirmed mutation results may update Apollo. A newer draft
+        // continues to be shown through the independent Shell preview.
+        applyContextAccent(confirmed)
+        if (desired.current === null) clearPreview(communityId)
       }
       if (active.current) {
         setSaveError(false)
@@ -114,7 +120,7 @@ export function ConnectedCommunityPreferences({
       desired.current = null
       // The Shell can outlive this route: always restore shared cache even
       // if the preferences screen was unmounted while saving.
-      if (saved.current) applyContextAccent(saved.current)
+      clearPreview(communityId)
       if (active.current) {
         setAccent(saved.current)
         setSaveError(true)
@@ -123,13 +129,13 @@ export function ConnectedCommunityPreferences({
     } finally {
       inFlight.current = false
     }
-  }, [communityId, save, applyContextAccent])
+  }, [communityId, save, applyContextAccent, clearPreview])
 
   const choose = (value: string) => {
     if (!isHex(value)) return
     const normalized = value.toUpperCase()
     setAccent(normalized)
-    applyContextAccent(normalized)
+    setPreview(communityId, normalized)
     desired.current = normalized
     setSaveError(false)
     setSaveStatus("pending")
