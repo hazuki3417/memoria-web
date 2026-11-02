@@ -61,7 +61,7 @@ export function SettingsPreferences({
       <PageHeader
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
-        titleAccessory={onSave ? <SaveStatus state={saveError ? "attention" : saveStatus} /> : undefined}
+        titleAccessory={onSave ? <SaveStatus state={saveError ? "attention" : saveStatus} announce timing={{ savingDelayMs: 300, savedDurationMs: 2000, savingAnnouncementMs: 2000 }} /> : undefined}
       />
       {saveError && (
         <FeedbackAlert
