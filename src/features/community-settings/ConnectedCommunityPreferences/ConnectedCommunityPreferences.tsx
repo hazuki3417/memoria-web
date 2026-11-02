@@ -73,6 +73,7 @@ export function ConnectedCommunityPreferences({
         if (!current || !isHex(current)) throw new Error("Community accent unavailable")
         return current
       },
+      confirm: (color) => commitCommunitySettingsPatch(client.cache, communityId, { accentColor: color }),
       preview: (value) => setPreview(communityId, value),
       release: (owner) => clearPreview(communityId, owner),
     })
