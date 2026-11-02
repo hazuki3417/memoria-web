@@ -1,4 +1,5 @@
-import { Box } from "@mantine/core"
+import { Box, Button } from "@mantine/core"
+import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunityAliasControl } from "./CommunityAliasControl"
@@ -58,5 +59,44 @@ export const AliasRetry: Story = {
     await expect(await canvas.findByText("入力内容を保持しています。再度保存してください。")).toBeVisible()
     await expect(input).toHaveValue("未保存の別名")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
+  },
+}
+
+function AliasRefreshFixture(args: ComponentProps<typeof CommunityAliasControl>) {
+  const [alias, setAlias] = useState(args.savedAlias)
+  return (
+    <>
+      <Button onClick={() => setAlias("取得した新しい別名")}>
+        Alias再取得を再現
+      </Button>
+      <CommunityAliasControl {...args} savedAlias={alias} />
+    </>
+  )
+}
+
+export const AliasRefreshWhileUntouched: Story = {
+  name: "Interaction · Alias未編集時は再取得した値を表示",
+  tags: ["interaction"],
+  render: (args) => <AliasRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
+    await expect(canvas.getByRole("textbox", { name: "Community別名" })).toHaveValue(
+      "取得した新しい別名",
+    )
+  },
+}
+
+export const AliasRefreshWhileEditing: Story = {
+  name: "Interaction · Alias編集中は再取得でDraftを失わない",
+  tags: ["interaction"],
+  render: (args) => <AliasRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "未保存の別名")
+    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
+    await expect(input).toHaveValue("未保存の別名")
   },
 }
