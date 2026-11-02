@@ -20,7 +20,7 @@ export function useCommunityNameSettings({
   onSaveName?: (name: string) => Promise<string>
 }) {
   const initialName = communityName ?? "家族のアルバム"
-  const { control, reset, getValues, handleSubmit, setError, clearErrors } = useForm<
+  const { control, reset, getValues, handleSubmit, setError, clearErrors, formState: { isSubmitted } } = useForm<
     z.input<typeof communityNameSchema>,
     unknown,
     z.output<typeof communityNameSchema>
@@ -86,6 +86,7 @@ export function useCommunityNameSettings({
 
   const dirty = draft.trim() !== savedName.current
   const invalid = !communityNameSchema.safeParse({ name: draft }).success
+  const showClientError = fieldState.isTouched || isSubmitted
   const saveFeedback = formInvalid
     ? { title: "入力内容を確認してください", description: "入力内容を修正してから保存してください。" }
     : failure === "blocked"
@@ -98,7 +99,12 @@ export function useCommunityNameSettings({
 
   return {
     draft, setDraft, dirty, invalid, savingName, saveName,
-    fieldError: fieldState.error?.message,
+    fieldError: fieldState.error?.type === "server"
+      ? fieldState.error.message
+      : showClientError && invalid
+        ? "Community名を入力してください"
+        : undefined,
+    onNameBlur: field.onBlur,
     saveFeedback,
     saveBlocked: failure === "blocked" || failure === "unknown",
   }
