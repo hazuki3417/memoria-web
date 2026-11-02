@@ -151,16 +151,18 @@ export function ConnectedCommunityPreferences({
 
   return (
     <Stack gap="sm">
-      {saveError && (
-        <Alert color="red" title="保存できませんでした">
-          最後に保存できた色へ戻しました。色を選び直して再試行してください。
-        </Alert>
-      )}
       <CommunityPreferencesContent
         accent={accent ?? resolvedCommunity.mySettings.accentColor}
         isPreview={false}
         preserveDraftOnAccentChange={saveError}
         saveStatus={saveError ? "attention" : saveStatus}
+        saveFeedback={
+          saveError ? (
+            <Alert color="red" title="保存できませんでした" role="alert">
+              Shellは最後に保存できた色へ戻しました。入力した色は保持しています。内容を確認し、必要であればもう一度選択して保存してください。
+            </Alert>
+          ) : undefined
+        }
         onDraftValidityChange={(valid) => {
           hasIncompleteDraft.current = !valid
           if (!valid) setSaveStatus("pending")
