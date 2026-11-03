@@ -75,7 +75,7 @@ describe("Community設定のMutation契約", () => {
     mocks.rename
       .mockResolvedValueOnce({ data: null })
       .mockRejectedValueOnce(new Error("network"))
-    await expect(actions.onSaveName("変更")).rejects.toThrow("unconfirmed")
+    await expect(actions.onSaveName("変更")).rejects.toThrow("Settings mutation outcome unavailable")
     await expect(actions.onSaveName("変更")).rejects.toThrow("network")
     expect(mocks.notify).not.toHaveBeenCalled()
   })
