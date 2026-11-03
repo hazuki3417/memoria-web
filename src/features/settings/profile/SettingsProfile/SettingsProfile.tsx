@@ -252,8 +252,8 @@ export function SettingsProfile({
               title="プロフィールの保存結果を確認できませんでした"
               role="alert"
               actions={
-                <>
-                  {onInspect && (
+                onInspect ? (
+                  <>
                     <Button
                       size="xs"
                       variant="light"
@@ -266,32 +266,32 @@ export function SettingsProfile({
                         ? "現在の状態を確認"
                         : "もう一度確認"}
                     </Button>
-                  )}
-                  {inspection.status === "matches" && (
-                    <Button size="xs" onClick={confirmObservedProfile}>
-                      確認完了
-                    </Button>
-                  )}
-                  {inspection.status === "differs" && (
-                    <>
-                      <Button
-                        size="xs"
-                        disabled={!canRetryInspected}
-                        onClick={() => void save()}
-                      >
-                        もう一度保存
+                    {inspection.status === "matches" && (
+                      <Button size="xs" onClick={confirmObservedProfile}>
+                        確認完了
                       </Button>
-                      <Button
-                        size="xs"
-                        variant="subtle"
-                        color="gray"
-                        onClick={discardUnconfirmedDraft}
-                      >
-                        変更を破棄
-                      </Button>
-                    </>
-                  )}
-                </>
+                    )}
+                    {inspection.status === "differs" && (
+                      <>
+                        <Button
+                          size="xs"
+                          disabled={!canRetryInspected}
+                          onClick={() => void save()}
+                        >
+                          もう一度保存
+                        </Button>
+                        <Button
+                          size="xs"
+                          variant="subtle"
+                          color="gray"
+                          onClick={discardUnconfirmedDraft}
+                        >
+                          変更を破棄
+                        </Button>
+                      </>
+                    )}
+                  </>
+                ) : undefined
               }
             >
               <Stack gap="xs">
