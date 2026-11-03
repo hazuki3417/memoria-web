@@ -247,16 +247,24 @@ export function CommunityDeletionConfirmation({
                 </FeedbackPanel>
               )}
               {error && (
-                <Stack gap="xs">
-                  <Text size="sm" c="red" role="alert">
-                    {error}
-                  </Text>
-                  {outcomeUnknown && onReviewChanged && (
-                    <Button variant="default" onClick={onReviewChanged}>
-                      最新の状態を確認する
-                    </Button>
-                  )}
-                </Stack>
+                <FeedbackPanel
+                  kind={outcomeUnknown ? "warning" : "error"}
+                  title={
+                    outcomeUnknown
+                      ? "削除の受付結果を確認できませんでした"
+                      : "Communityを削除できませんでした"
+                  }
+                  role="alert"
+                  actions={
+                    outcomeUnknown && onReviewChanged ? (
+                      <Button variant="default" onClick={onReviewChanged}>
+                        最新の状態を確認する
+                      </Button>
+                    ) : undefined
+                  }
+                >
+                  {error}
+                </FeedbackPanel>
               )}
             </Stack>
           )}
