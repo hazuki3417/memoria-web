@@ -181,11 +181,11 @@ export function ConnectedCommunityPreferences({
             >
               <Stack gap="xs">
                 <Text size="sm">
-                  Shellは最後に確認できた色を表示しています。入力内容は保持しています。
+                  画面の色は最後に保存を確認できた状態に戻しています。入力した色は保持しています。
                   {failure === "unknown"
-                    ? " 現在のServer状態を確認してから、必要に応じて手動で保存してください。"
+                    ? " 現在の設定を確認してから、必要なら保存してください。"
                     : failure === "blocked"
-                      ? ` ${snapshot.blockedFeedback?.description ?? "権限またはSessionを確認し、画面を再読み込みしてください。"}`
+                      ? ` ${snapshot.blockedFeedback?.description ?? "ログイン状態や権限を確認し、画面を再読み込みしてください。"}`
                       : snapshot.validation
                         ? " 入力項目を修正したうえで再保存するか、変更を破棄してください。"
                         : " 内容を確認して、再保存するか変更を破棄してください。"}
@@ -193,8 +193,8 @@ export function ConnectedCommunityPreferences({
                 {failure === "unknown" && snapshot.inspected && (
                   <Text size="sm">
                     {snapshot.observedMatches
-                      ? "現在のServer値は入力した色と一致しています。旧Mutationの完了を証明するものではありません。"
-                      : "現在のServer値と入力した色が一致しません。"}
+                      ? "現在の色は入力した色と一致しています。ただし、先ほどの保存が成功したことを示すものではありません。"
+                      : "現在の色と入力した色が一致しません。"}
                   </Text>
                 )}
               </Stack>
