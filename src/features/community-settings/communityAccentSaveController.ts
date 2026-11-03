@@ -1,4 +1,5 @@
 import type { SaveStatusState } from "@/components/SaveStatus"
+import { getCommunityBlockedFeedback } from "./communityBlockedFeedback"
 import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,
@@ -10,6 +11,7 @@ export type AccentSnapshot = Readonly<{
   draft: string | null
   status: SaveStatusState
   failure: AccentFailure
+  blockedFeedback: { title: string; description: string } | null
   validation: { fieldErrors: Record<string, string>; formError: boolean } | null
   observedMatches: boolean
   inspected: boolean
@@ -38,6 +40,7 @@ const emptySnapshot: AccentSnapshot = {
   draft: null,
   status: "idle",
   failure: null,
+  blockedFeedback: null,
   validation: null,
   observedMatches: false,
   inspected: false,
@@ -125,6 +128,7 @@ export function createCommunityAccentSaveController() {
           update(id, {
             status: "attention",
             failure,
+            blockedFeedback: failure === "blocked" ? getCommunityBlockedFeedback(error, "Community設定") : null,
             validation,
             observedMatches: false,
             inspected: false,
@@ -274,6 +278,7 @@ export function createCommunityAccentSaveController() {
       clearPreview(entry)
       update(id, {
         failure: null,
+        blockedFeedback: null,
         validation: null,
         status: "idle",
         observedMatches: false,
@@ -296,6 +301,7 @@ export function createCommunityAccentSaveController() {
       entry.desired = normalized(entry.snapshot.draft)
       update(id, {
         failure: null,
+        blockedFeedback: null,
         validation: null,
         observedMatches: false,
         inspected: false,
@@ -313,6 +319,7 @@ export function createCommunityAccentSaveController() {
       update(id, {
         draft: entry.snapshot.confirmed,
         failure: null,
+        blockedFeedback: null,
         validation: null,
         observedMatches: false,
         inspected: false,
