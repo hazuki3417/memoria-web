@@ -2,6 +2,7 @@ import { ApolloClient, ApolloLink, InMemoryCache, Observable } from "@apollo/cli
 import { GraphQLError } from "graphql"
 import { describe, expect, it } from "vitest"
 import {
+  CurrentUserDocument,
   SaveUserPreferencesDocument,
   UpdateMemoriaUserProfileDocument,
   UpdateCommunityDocument,
@@ -133,4 +134,51 @@ describe("Settings Hybrid Result: Apollo partial-response integration", () => {
       "Settings mutation outcome unavailable",
     )
   })
+
+  it("isolates a stale Personal Preferences inspection from newer shared Apollo state", async () => {
+    const currentUser = (accent: string) => ({
+      me: {
+        __typename: "User",
+        id: "user-1",
+        profile: { __typename: "UserProfile", nickname: "Existing" },
+        preferences: {
+          __typename: "UserPreferences",
+          personalAccentColor: accent,
+          dateFormat: "YYYY_MM_DD",
+          fileSizeUnit: "DECIMAL",
+          mediaThumbnailSize: "MEDIUM",
+          mediaDetailNavigationWrap: false,
+          mediaDetailInitialInfoWide: true,
+          mediaDetailInitialInfoMedium: false,
+        },
+      },
+    })
+    const cache = new InMemoryCache()
+    cache.writeQuery({
+      query: CurrentUserDocument,
+      data: currentUser("#AABBCC"),
+    })
+    const client = new ApolloClient({
+      cache,
+      link: new ApolloLink(
+        () =>
+          new Observable((observer) => {
+            // The query may have started before the latest confirmed write.
+            observer.next({ data: currentUser("#112233") })
+            observer.complete()
+          }),
+      ),
+    })
+    const inspected = await client.query({
+      query: CurrentUserDocument,
+      fetchPolicy: "no-cache",
+    })
+    expect(inspected.data.me.preferences.personalAccentColor).toBe("#112233")
+    expect(
+      cache.readQuery<{ me: { preferences: { personalAccentColor: string } } }>({
+        query: CurrentUserDocument,
+      })?.me.preferences.personalAccentColor,
+    ).toBe("#AABBCC")
+  })
+
 })
