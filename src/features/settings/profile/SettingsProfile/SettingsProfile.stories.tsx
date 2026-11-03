@@ -1,7 +1,7 @@
 import { Box, Button } from "@mantine/core"
-import { useState, type ComponentProps } from "react"
+import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { SettingsProfile } from "./SettingsProfile"
 import { SettingsInputValidationError } from "../../graphqlSettingsResult"
 
@@ -94,6 +94,37 @@ export const Profile: Story = {
   name: "Visual · プロフィール",
   tags: ["visual"],
 }
+
+export const ProfileInitialContent: Story = {
+  name: "Interaction · 見出し・説明・初期値・未変更状態",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("heading", { name: "プロフィール" })).toBeVisible()
+    await expect(canvas.getByText("プロフィール情報を変更します。")).toBeVisible()
+    await expect(canvas.getByText("基本情報")).toBeVisible()
+    await expect(canvas.getByText("Memoriaで表示する名前です。")).toBeVisible()
+    await expect(canvas.getByRole("textbox", { name: /ニックネーム/ })).toHaveValue(
+      "テストユーザー",
+    )
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
+
+export const ProfileInitiallyBlocked: Story = {
+  name: "Interaction · 初期Blockedの説明と操作停止",
+  tags: ["interaction"],
+  args: { initialSaveState: "blocked" },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("alert")).toHaveTextContent(
+      "プロフィールを変更できません",
+    )
+    await expect(canvas.getByRole("textbox", { name: /ニックネーム/ })).toBeDisabled()
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
+
 /** Confirms Profile delegates persistence while keeping the existing form interaction. */
 export const ProfileSaveContract: Story = {
   name: "Interaction · プロフィール保存",
@@ -231,5 +262,162 @@ export const ProfileTrimmedUnchanged: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, " テストユーザー ")
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
+
+
+// The unresolved Promise represents an actual in-flight mutation. Neither
+// refetches nor repeated clicks may rewrite its editable draft.
+function ProfileInFlightFixture(args: ComponentProps<typeof SettingsProfile>) {
+  const [nickname, setNickname] = useState(args.initialNickname ?? "テストユーザー")
+  const resolveSave = useRef<(() => void) | null>(null)
+  return (
+    <>
+      <Button onClick={() => setNickname("保存中に再取得した名前")}>
+        保存中に再取得を再現
+      </Button>
+      <Button onClick={() => resolveSave.current?.()}>保存応答を返す</Button>
+      <SettingsProfile
+        {...args}
+        initialNickname={nickname}
+        onSave={() =>
+          new Promise<void>((resolve) => {
+            resolveSave.current = resolve
+          })
+        }
+      />
+    </>
+  )
+}
+
+export const ProfileInFlightContract: Story = {
+  name: "Interaction · 保存中の入力停止と遅延再取得時のDraft保護",
+  tags: ["interaction"],
+  render: (args) => <ProfileInFlightFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "保存待ちの名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(canvas.getByRole("button", { name: "更新中" })).toBeDisabled()
+    await expect(input).toBeDisabled()
+    await userEvent.click(canvas.getByRole("button", { name: "保存中に再取得を再現" }))
+    await expect(input).toHaveValue("保存待ちの名前")
+    await userEvent.click(canvas.getByRole("button", { name: "保存応答を返す" }))
+    await waitFor(() => expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled())
+    await expect(input).toBeEnabled()
+    await expect(input).toHaveValue("保存待ちの名前")
+  },
+}
+
+export const ProfileNormalizedSave: Story = {
+  name: "Interaction · Trim後の名前のみ送信・確定",
+  tags: ["interaction"],
+  args: { onSave: fn(async () => undefined) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "  更新後の名前  ")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(args.onSave).toHaveBeenCalledExactlyOnceWith("更新後の名前")
+    await waitFor(() => expect(input).toHaveValue("更新後の名前"))
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
+
+export const ProfileServerFormValidation: Story = {
+  name: "Interaction · API Form ValidationはFieldへ誤帰属しない",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "入力内容を確認してください",
+    )
+    await expect(input).toHaveValue("変更した名前")
+    await expect(input).not.toHaveAttribute("aria-invalid", "true")
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+    await userEvent.type(input, "再編集")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeEnabled()
+  },
+}
+
+export const ProfileGraphqlDeletingBlocked: Story = {
+  name: "Interaction · GraphQL USER_DELETINGはBlocked",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => {
+      throw { graphQLErrors: [{ extensions: { code: "USER_DELETING" } }] }
+    }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "プロフィールを変更できません",
+    )
+    await expect(input).toHaveValue("変更した名前")
+    await expect(input).toBeDisabled()
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const ProfileGraphqlInternalUnknown: Story = {
+  name: "Interaction · GraphQL INTERNALは結果未確定で二重送信しない",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => {
+      throw { graphQLErrors: [{ extensions: { code: "INTERNAL" } }] }
+    }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "保存結果を確認できませんでした",
+    )
+    await expect(input).toBeDisabled()
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const ProfileRefreshAfterRevert: Story = {
+  name: "Interaction · 編集を元に戻した後は再取得へ追従",
+  tags: ["interaction"],
+  render: (args) => <ProfileRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    const save = canvas.getByRole("button", { name: "更新" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "一時的な名前")
+    await expect(save).toBeEnabled()
+    await userEvent.clear(input)
+    await userEvent.type(input, "テストユーザー")
+    await expect(save).toBeDisabled()
+    await userEvent.click(canvas.getByRole("button", { name: "プロフィール再取得を再現" }))
+    await expect(input).toHaveValue("サーバー更新後の名前")
+    await expect(save).toBeDisabled()
   },
 }
