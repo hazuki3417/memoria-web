@@ -1,6 +1,6 @@
 import type { UsageFormatItem } from "./sortUsageFormats"
 
-export type SettingsUsageData = {
+export type UsageData = {
   usedBytes: number
   limitBytes: number
   mediaCount: number

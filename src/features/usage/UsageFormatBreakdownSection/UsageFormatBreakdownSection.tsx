@@ -13,7 +13,7 @@ import { UsageFileSize } from "../UsageFileSize"
 import { UsageSortHeader } from "../UsageSortHeader"
 import { usagePercent } from "../usagePercent"
 import { usageFormatColors as formatColors } from "../usageFormatColors"
-import type { SettingsUsageData, UsageStatus } from "../usageTypes"
+import type { UsageData, UsageStatus } from "../usageTypes"
 import type { UsageDisplayMode } from "../usageDisplayMode"
 
 // 取得成功の0件でも、分類を省略せず4形式の0件行を表示する。
@@ -32,7 +32,7 @@ export function UsageFormatBreakdownSection({
   fileSizeUnit,
   displayMode = "size",
 }: {
-  usage: SettingsUsageData
+  usage: UsageData
   status: UsageStatus
   sort: UsageSort
   onSort: (key: UsageSortKey) => void

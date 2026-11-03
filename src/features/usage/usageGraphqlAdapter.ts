@@ -1,4 +1,4 @@
-import type { SettingsUsageData } from "./usageTypes"
+import type { UsageData } from "./usageTypes"
 
 // Int64はAPIから10進数文字列として届く。表示用numberへ変換する前に精度を検証する。
 type UsageInt64 = string
@@ -30,7 +30,7 @@ const formatLabels = {
   HEIF: "HEIC / HEIF",
 } as const
 
-export function mapUsageProjection(usage: UsageProjection): SettingsUsageData {
+export function mapUsageProjection(usage: UsageProjection): UsageData {
   if (!Number.isSafeInteger(usage.mediaCount) || usage.mediaCount < 0) {
     throw new Error("Usageの登録件数が不正です")
   }
@@ -57,7 +57,7 @@ export function mapUsageProjection(usage: UsageProjection): SettingsUsageData {
   }
 }
 
-export const emptyUsage: SettingsUsageData = {
+export const emptyUsage: UsageData = {
   usedBytes: 0,
   limitBytes: 0,
   mediaCount: 0,

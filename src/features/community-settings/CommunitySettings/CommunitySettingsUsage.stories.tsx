@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, within } from "storybook/test"
-import { SettingsUsage } from "@/features/usage/SettingsUsage"
+import { Usage } from "@/features/usage"
 import { sampleUsage, zeroUsage } from "@/features/usage/usageStoryFixtures"
 import { CommunitySettings } from "./CommunitySettings"
 
@@ -17,7 +17,7 @@ const meta = {
       { id: "user-1", name: "テストユーザー", role: "admin", isSelf: true },
       { id: "user-2", name: "家族メンバー", role: "member" },
     ],
-    usageContent: <SettingsUsage scope="community" usage={sampleUsage} />,
+    usageContent: <Usage scope="community" usage={sampleUsage} />,
   },
   decorators: [
     (Story) => (
@@ -47,7 +47,7 @@ export const Usage: Story = {
 export const Empty: Story = {
   name: "Visual · 登録0件",
   tags: ["visual"],
-  args: { usageContent: <SettingsUsage scope="community" usage={zeroUsage} /> },
+  args: { usageContent: <Usage scope="community" usage={zeroUsage} /> },
 }
 
 export const ErrorState: Story = {
@@ -55,7 +55,7 @@ export const ErrorState: Story = {
   tags: ["visual"],
   args: {
     usageContent: (
-      <SettingsUsage scope="community" usage={sampleUsage} status="error" />
+      <Usage scope="community" usage={sampleUsage} status="error" />
     ),
   },
 }
@@ -65,7 +65,7 @@ export const LoadingState: Story = {
   tags: ["visual"],
   args: {
     usageContent: (
-      <SettingsUsage scope="community" usage={sampleUsage} status="loading" />
+      <Usage scope="community" usage={sampleUsage} status="loading" />
     ),
   },
 }

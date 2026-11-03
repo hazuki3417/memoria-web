@@ -1,7 +1,7 @@
-import type { SettingsUsageData } from "./usageTypes"
+import type { UsageData } from "./usageTypes"
 
 // Productionでは利用せず、Component Storyの共通入力だけを定義する。
-export const sampleUsage: SettingsUsageData = {
+export const sampleUsage: UsageData = {
   usedBytes: 1_240_000_000,
   limitBytes: 5_000_000_000,
   mediaCount: 1248,
@@ -13,7 +13,7 @@ export const sampleUsage: SettingsUsageData = {
   ],
 }
 
-export const zeroUsage: SettingsUsageData = {
+export const zeroUsage: UsageData = {
   usedBytes: 0,
   limitBytes: 5_000_000_000,
   mediaCount: 0,

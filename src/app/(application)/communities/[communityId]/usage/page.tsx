@@ -1,5 +1,7 @@
-import { CommunitySettingsRoute } from "@/features/community-settings/CommunitySettingsRoute"
-import { ConnectedUsage } from "@/features/usage"
+import {
+  CommunitySettingsRoute,
+  ConnectedCommunityUsage,
+} from "@/features/community-settings"
 
 export default async function Page({
   params,
@@ -12,9 +14,7 @@ export default async function Page({
     <CommunitySettingsRoute
       communityId={communityId}
       section="usage"
-      usageContent={
-        <ConnectedUsage scope="community" communityId={communityId} />
-      }
+      usageContent={<ConnectedCommunityUsage communityId={communityId} />}
     />
   )
 }
