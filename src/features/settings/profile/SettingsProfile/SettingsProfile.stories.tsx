@@ -643,3 +643,98 @@ export const ProfileSaveStaleQuery: Story = {
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
   },
 }
+
+
+export const ProfileFormErrorVisual: Story = {
+  name: "Visual · Profile Form-level Validation",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "修正した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("入力内容を確認してください")
+  },
+}
+
+export const ProfileRetryableVisual: Story = {
+  name: "Visual · Profile Retryable Error",
+  tags: ["visual"],
+  args: { onSave: fn(async () => { throw { kind: "retryable" } }) },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "修正した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("プロフィールを保存できませんでした")
+    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
+  },
+}
+
+export const ProfileUnknownDiffersVisual: Story = {
+  name: "Visual · Profile Unknown Current vs Draft",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => { throw new Error("unknown") }),
+    onInspect: fn(async () => "確認した現在値"),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "未確定の名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("確認した現在値")
+  },
+}
+
+export const ProfileUnknownMatchesVisual: Story = {
+  name: "Visual · Profile Unknown Current Matches Draft",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => { throw new Error("unknown") }),
+    onInspect: fn(async () => "入力した名前"),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "入力した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("成功した証明ではありません")
+  },
+}
+
+export const ProfileBlockedVisual: Story = {
+  name: "Visual · Profile Blocked",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => {
+      throw { graphQLErrors: [{ extensions: { code: "UNAUTHENTICATED" } }] }
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更する名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("ログインが必要です")
+    await expect(input).toBeDisabled()
+  },
+}
