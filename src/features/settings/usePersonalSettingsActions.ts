@@ -8,7 +8,7 @@ import {
   type OperationSaveUserPreferencesMutationVariables,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
-import { SettingsInputValidationError } from "./graphqlSettingsResult"
+import { SettingsInputValidationError, requireSettingsMutationOutcome } from "./graphqlSettingsResult"
 import type { UserPreferencesPatch } from "./preferences/userPreferences"
 import {
   fromGraphqlUserPreferences,
@@ -24,8 +24,9 @@ export function usePersonalSettingsActions() {
     saveProfile: async (nickname: string) => {
       const result = await updateProfile({
         variables: { input: { nickname } },
+        errorPolicy: "all",
       })
-      const outcome = result.data?.updateUserProfile
+      const outcome = requireSettingsMutationOutcome(result.data?.updateUserProfile, result)
       if (outcome?.__typename === "InputValidationFailure")
         throw new SettingsInputValidationError(outcome.violations)
       if (outcome?.__typename !== "UpdateUserProfileSuccess")
@@ -39,8 +40,8 @@ export function usePersonalSettingsActions() {
       const result = await client.mutate<
         OperationSaveUserPreferencesMutation,
         OperationSaveUserPreferencesMutationVariables
-      >({ mutation: SaveUserPreferencesDocument, variables: { input } })
-      const outcome = result.data?.updateUserPreferences
+      >({ mutation: SaveUserPreferencesDocument, variables: { input }, errorPolicy: "all" })
+      const outcome = requireSettingsMutationOutcome(result.data?.updateUserPreferences, result)
       if (outcome?.__typename === "InputValidationFailure")
         throw new SettingsInputValidationError(outcome.violations)
       if (outcome?.__typename !== "UpdateUserPreferencesSuccess")
