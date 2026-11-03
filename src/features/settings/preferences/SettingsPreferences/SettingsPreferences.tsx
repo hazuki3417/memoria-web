@@ -41,6 +41,7 @@ export function SettingsPreferences({
     change,
     changeAccentDraft,
     saveError,
+    blockedFeedback,
     saveStatus,
     fieldErrors,
     validation,
@@ -80,7 +81,7 @@ export function SettingsPreferences({
           kind={saveError === "unknown" ? "warning" : "error"}
           title={
             saveError === "blocked"
-              ? "設定を変更できません"
+              ? blockedFeedback?.title ?? "設定を変更できません"
               : saveError === "validation"
                 ? "入力内容を確認してください"
                 : saveError === "unknown"
@@ -124,7 +125,7 @@ export function SettingsPreferences({
                   : "入力項目のエラーを修正してから、もう一度保存してください。"}
               </span>
             ) : saveError === "blocked" ? (
-              <span>画面を再読み込みして現在の状態を確認してください。</span>
+              <span>{blockedFeedback?.description ?? "画面を再読み込みして現在の状態を確認してください。"}</span>
             ) : saveError === "unknown" ? (
               <span>
                 変更内容は保持しています。現在のServer値を確認してから、必要に応じて手動で保存してください。
