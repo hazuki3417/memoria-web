@@ -39,7 +39,7 @@ describe("Settings Hybrid Result: Apollo partial-response integration", () => {
           user: { __typename: "User", id: "user-1", profile: { nickname: "Updated" } },
         },
       },
-      ["INTERNAL_SERVER_ERROR"],
+      ["INTERNAL"],
     )
     const response = await client.mutate({
       mutation: UpdateMemoriaUserProfileDocument,
@@ -68,7 +68,7 @@ describe("Settings Hybrid Result: Apollo partial-response integration", () => {
           ],
         },
       },
-      ["INTERNAL_SERVER_ERROR"],
+      ["INTERNAL"],
     )
     const response = await client.mutate({
       mutation: SaveUserPreferencesDocument,
@@ -107,7 +107,7 @@ describe("Settings Hybrid Result: Apollo partial-response integration", () => {
   })
 
   it("treats a missing mutation result with internal errors as unknown, not retryable", async () => {
-    const client = clientFor({ updateCommunity: null }, ["INTERNAL_SERVER_ERROR"])
+    const client = clientFor({ updateCommunity: null }, ["INTERNAL"])
     const response = await client.mutate({
       mutation: UpdateCommunityDocument,
       variables: { input: { communityId: "community-1", name: "New name" } },
