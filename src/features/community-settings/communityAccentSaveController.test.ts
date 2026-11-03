@@ -595,6 +595,45 @@ describe("session Community Accent save controller", () => {
     expect(controller.getSnapshot(id)).toMatchObject({ failure: null, validation: null })
   })
 
+  it("isolates a late unknown failure from another Community's successful save", async () => {
+    const controller = createCommunityAccentSaveController()
+    let rejectOld: ((reason: unknown) => void) | undefined
+    const newRelease = vi.fn()
+    controller.initialize("community-a", "#112233")
+    controller.initialize("community-b", "#445566")
+    controller.configure("community-a", {
+      save: () =>
+        new Promise<string>((_resolve, reject) => {
+          rejectOld = reject
+        }),
+      observe: vi.fn(),
+      preview: vi.fn().mockReturnValue(1),
+      release: vi.fn(),
+    })
+    controller.configure("community-b", {
+      save: vi.fn().mockResolvedValue("#CCDDEE"),
+      observe: vi.fn(),
+      preview: vi.fn().mockReturnValue(2),
+      release: newRelease,
+    })
+    controller.edit("community-a", "#AABBCC")
+    controller.edit("community-b", "#CCDDEE")
+    await tick()
+    expect(controller.getSnapshot("community-b")).toMatchObject({
+      confirmed: "#CCDDEE", failure: null, status: "saved",
+    })
+    const released = newRelease.mock.calls.length
+    rejectOld?.({ graphQLErrors: [{ extensions: { code: "INTERNAL_SERVER_ERROR" } }] })
+    await tick()
+    expect(controller.getSnapshot("community-a")).toMatchObject({
+      confirmed: "#112233", draft: "#AABBCC", failure: "unknown",
+    })
+    expect(controller.getSnapshot("community-b")).toMatchObject({
+      confirmed: "#CCDDEE", draft: "#CCDDEE", failure: null, status: "saved",
+    })
+    expect(newRelease).toHaveBeenCalledTimes(released)
+  })
+
   it("keeps the new Community independent when an old Community mutation settles late", async () => {
     const controller = createCommunityAccentSaveController()
     let resolveOld: ((value: string) => void) | undefined
