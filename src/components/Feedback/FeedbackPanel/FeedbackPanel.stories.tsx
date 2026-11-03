@@ -119,3 +119,32 @@ export const RecoveryInteraction: Story = {
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
+
+
+export const Confirmed: Story = {
+  name: "Visual · 確認済みの結果",
+  tags: ["visual"],
+  args: {
+    kind: "success",
+    title: "現在の状態を確認しました",
+    children: "操作結果が確定しました。継続して参照する必要がある情報を表示します。",
+    role: "status",
+  },
+}
+
+export const RecoverableFailure: Story = {
+  name: "Visual · 失敗と明示的な再試行",
+  tags: ["visual"],
+  args: {
+    kind: "error",
+    title: "保存できませんでした",
+    children: "入力内容を保持しています。必要な修正を行い、もう一度保存してください。",
+    role: "alert",
+    actions: (
+      <>
+        <Button size="xs">もう一度保存</Button>
+        <Button size="xs" variant="subtle" color="gray">変更を破棄</Button>
+      </>
+    ),
+  },
+}
