@@ -115,7 +115,7 @@ describe("Community設定のMutation契約", () => {
     )
   })
 
-  it("メンバー除外失敗はfalseとエラー通知", async () => {
+  it("メンバー除外の結果未確定はfalseを返し、失敗通知はFormへ委譲", async () => {
     mocks.remove
       .mockResolvedValueOnce({
         data: { removeCommunityMember: { success: false } },
@@ -123,7 +123,7 @@ describe("Community設定のMutation契約", () => {
       .mockRejectedValueOnce(new Error("network"))
     expect(await actions.onRemoveMember("user-2")).toBe(false)
     expect(await actions.onRemoveMember("user-2")).toBe(false)
-    expect(mocks.notify).toHaveBeenCalledTimes(2)
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
 
   it("役割変更はGraphQL enumを使用し、成功時に再取得と通知", async () => {
@@ -149,14 +149,12 @@ describe("Community設定のMutation契約", () => {
     )
   })
 
-  it("役割変更失敗はfalseとエラー通知", async () => {
+  it("役割変更失敗はfalseを返し、失敗通知はModalに委譲", async () => {
     mocks.changeRole.mockResolvedValue({
       data: { changeCommunityMemberRole: { success: false } },
     })
     expect(await actions.onChangeMemberRole("user-2", "member")).toBe(false)
-    expect(mocks.notify).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "error" }),
-    )
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
 
   it("退会成功時はMyCommunitiesを再取得し、失敗は例外を伝搬", async () => {
