@@ -42,6 +42,15 @@ export function ConnectedSettings({
       }
       initialPreferences={preferences}
       saveProfile={saveProfile}
+      inspectProfile={async () => {
+        // Inspection must not publish stale data to the shared CurrentUser cache.
+        const current = await client.query<OperationCurrentUserQuery>({
+          query: CurrentUserDocument,
+          fetchPolicy: "no-cache",
+        })
+        if (!current.data?.me) throw new Error("Current User unavailable")
+        return current.data.me.profile.nickname
+      }}
       savePreferences={savePreferences}
       inspectPreferences={async () => {
         // Inspection must not publish stale data to the shared CurrentUser cache.
