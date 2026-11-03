@@ -9,7 +9,7 @@ import {
   Switch,
   useMantineColorScheme,
 } from "@mantine/core"
-import { FeedbackAlert } from "@/components/Feedback"
+import { FeedbackPanel } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
@@ -76,18 +76,43 @@ export function SettingsPreferences({
         }
       />
       {saveError && (
-        <FeedbackAlert
-          kind="error"
+        <FeedbackPanel
+          kind={saveError === "unknown" ? "warning" : "error"}
           title={
             saveError === "blocked"
               ? "設定を変更できません"
               : saveError === "validation"
                 ? "入力内容を確認してください"
                 : saveError === "unknown"
-                ? "保存結果を確認できませんでした"
-                : "保存できませんでした"
+                  ? "保存結果を確認できませんでした"
+                  : "保存できませんでした"
           }
           role="alert"
+          actions={
+            <>
+              {saveError === "unknown" && (
+                <Button size="xs" variant="light" onClick={() => void inspect()}>
+                  現在の状態を確認
+                </Button>
+              )}
+              {saveError === "unknown" && observedMatches && (
+                <Button size="xs" variant="light" onClick={confirmObservation}>
+                  確認完了
+                </Button>
+              )}
+              {((saveError === "retryable" || saveError === "validation") ||
+                (saveError === "unknown" && inspected && !observedMatches)) && (
+                <Button size="xs" disabled={!canRetry} onClick={retry}>
+                  もう一度保存
+                </Button>
+              )}
+              {hasSession && saveError !== "blocked" && (
+                <Button size="xs" variant="subtle" color="gray" onClick={discard}>
+                  変更を破棄
+                </Button>
+              )}
+            </>
+          }
         >
           <Stack gap="xs">
             {saveError === "validation" ? (
@@ -114,29 +139,8 @@ export function SettingsPreferences({
                   : "現在のServer値と入力した値が一致しません。"}
               </span>
             )}
-            {saveError === "unknown" && (
-              <Button size="xs" variant="light" onClick={() => void inspect()}>
-                現在の状態を確認
-              </Button>
-            )}
-            {saveError === "unknown" && observedMatches && (
-              <Button size="xs" variant="light" onClick={confirmObservation}>
-                確認完了
-              </Button>
-            )}
-            {((saveError === "retryable" || saveError === "validation") ||
-              (saveError === "unknown" && inspected && !observedMatches)) && (
-              <Button size="xs" disabled={!canRetry} onClick={retry}>
-                もう一度保存
-              </Button>
-            )}
-            {hasSession && saveError !== "blocked" && (
-              <Button size="xs" variant="subtle" color="gray" onClick={discard}>
-                変更を破棄
-              </Button>
-            )}
           </Stack>
-        </FeedbackAlert>
+        </FeedbackPanel>
       )}
       <Box>
         <SectionHeader>表示</SectionHeader>
