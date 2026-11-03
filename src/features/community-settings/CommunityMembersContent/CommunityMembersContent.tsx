@@ -18,6 +18,7 @@ import {
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
+import { FeedbackPanel } from "@/components/Feedback"
 import { showNotification } from "@/components/Feedback"
 import { UsageSortHeader } from "@/features/usage/UsageSortHeader"
 
@@ -480,9 +481,9 @@ export function CommunityMembersContent({
             </Text>
           </Stack>
           {error && (
-            <Text size="sm" c="red" role="alert">
+            <FeedbackPanel kind="error" title="退会できませんでした" role="alert">
               {error}
-            </Text>
+            </FeedbackPanel>
           )}
           <Group justify="flex-end">
             <Button variant="default" disabled={busy} onClick={close}>
