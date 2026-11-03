@@ -471,7 +471,7 @@ export const ProfileUnknownInspectFailure: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
     await expect(await canvas.findByText("現在のプロフィールを取得できませんでした。保存操作は再送せず、状態の確認をやり直してください。")).toBeVisible()
     await expect(input).toHaveValue("保存できたか不明")
-    await expect(canvas.getByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
     await expect(args.onSave).toHaveBeenCalledTimes(1)
     await expect(args.onInspect).toHaveBeenCalledTimes(1)
   },
