@@ -26,11 +26,6 @@ export function useCommunitySettingsActions(communityId: string) {
         awaitRefetchQueries: true,
       })
       if (!result.data?.removeCommunityMember.success) {
-        showNotification({
-          kind: "error",
-          title: "メンバーを除外",
-          description: "メンバーを除外できませんでした。",
-        })
         return false
       }
       showNotification({
@@ -40,11 +35,6 @@ export function useCommunitySettingsActions(communityId: string) {
       })
       return true
     } catch {
-      showNotification({
-        kind: "error",
-        title: "メンバーを除外",
-        description: "メンバーを除外できませんでした。",
-      })
       return false
     }
   }
@@ -78,11 +68,6 @@ export function useCommunitySettingsActions(communityId: string) {
         awaitRefetchQueries: true,
       })
       if (!result.data?.changeCommunityMemberRole.success) {
-        showNotification({
-          kind: "error",
-          title: "メンバーの役割を変更",
-          description: "メンバーの役割を変更できませんでした。",
-        })
         return false
       }
       showNotification({
@@ -92,11 +77,6 @@ export function useCommunitySettingsActions(communityId: string) {
       })
       return true
     } catch {
-      showNotification({
-        kind: "error",
-        title: "メンバーの役割を変更",
-        description: "メンバーの役割を変更できませんでした。",
-      })
       return false
     }
   }
