@@ -8,7 +8,7 @@ import {
   Text,
   Title,
 } from "@mantine/core"
-import { FeedbackAlert } from "@/components/Feedback"
+import { FeedbackPanel } from "@/components/Feedback"
 import type { AccountDeletionController } from ".././useAccountDeletionController"
 
 export function AccountDeletionFinalStep({
@@ -62,19 +62,19 @@ export function AccountDeletionFinalStep({
             Communityへの対応
           </Title>
           {!needsResolution && (
-            <FeedbackAlert
+            <FeedbackPanel
               kind="info"
               title="Communityの管理状態を変更する必要はありません"
             >
               {communities.length === 0
                 ? "参加中のCommunityはありません。管理状態の解消と削除対象の確認は省略しました。"
                 : "最後のAdministratorであるCommunityはありません。参加中のCommunityからはアカウント削除時に退会します。管理状態の解消と削除対象の確認は省略しました。"}
-            </FeedbackAlert>
+            </FeedbackPanel>
           )}
           {needsResolution && toDelete.length === 0 && (
-            <FeedbackAlert kind="info" title="削除するCommunityはありません">
+            <FeedbackPanel kind="info" title="削除するCommunityはありません">
               削除対象の確認は、対象がないため省略しました。
-            </FeedbackAlert>
+            </FeedbackPanel>
           )}
           {communities.length > 0 && (
             <Stack
@@ -152,26 +152,26 @@ export function AccountDeletionFinalStep({
             </Stack>
           )}
         </Box>
-        <FeedbackAlert
+        <FeedbackPanel
           kind="error"
           title="アカウントと削除対象のデータは復元できません"
         >
           削除を続けるには再認証が必要です。
-        </FeedbackAlert>
+        </FeedbackPanel>
         {flowError && (
-          <FeedbackAlert kind="error" title="処理を完了できませんでした">
+          <FeedbackPanel kind="error" title="処理を完了できませんでした">
             {flowError}
-          </FeedbackAlert>
+          </FeedbackPanel>
         )}
         {reauth && (
-          <FeedbackAlert
+          <FeedbackPanel
             kind="info"
             title={prototype ? "再認証（プロトタイプ）" : "再認証済み"}
           >
             {prototype
               ? "実際のAuth0認証は行いません。削除処理も実行されません。"
               : "削除を確定する前に、内容をもう一度確認してください。"}
-          </FeedbackAlert>
+          </FeedbackPanel>
         )}
         <Group gap="sm" justify="space-between">
           <Box style={{ flex: 1 }}>

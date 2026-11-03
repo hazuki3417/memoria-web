@@ -22,22 +22,34 @@ const empty: PreferencesSessionSnapshot = {
   accentDraft: null,
   saveStatus: "idle",
   failure: null,
+  blockedFeedback: null,
+  validation: null,
   inspected: false,
   observedMatches: false,
   discardRevision: 0,
 }
 
-export function PersonalPreferencesSessionProvider({ children }: { children: ReactNode }) {
+export function PersonalPreferencesSessionProvider({
+  children,
+}: {
+  children: ReactNode
+}) {
   const controllerRef = useRef<Controller | null>(null)
-  if (!controllerRef.current) controllerRef.current = createPersonalPreferencesSession()
-  return <Context.Provider value={controllerRef.current}>{children}</Context.Provider>
+  if (!controllerRef.current)
+    controllerRef.current = createPersonalPreferencesSession()
+  return (
+    <Context.Provider value={controllerRef.current}>
+      {children}
+    </Context.Provider>
+  )
 }
 
 /** Outside Application Shell (e.g. Storybook), no session owner is required. */
 export function usePersonalPreferencesSession() {
   const controller = useContext(Context)
   const subscribe = useCallback(
-    (listener: () => void) => controller?.subscribe(listener) ?? (() => undefined),
+    (listener: () => void) =>
+      controller?.subscribe(listener) ?? (() => undefined),
     [controller],
   )
   const getSnapshot = useCallback(

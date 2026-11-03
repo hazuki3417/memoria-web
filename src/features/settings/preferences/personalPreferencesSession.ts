@@ -1,14 +1,21 @@
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 import type { SaveStatusState } from "@/components/SaveStatus"
+import {
+  classifySettingsSaveFailure,
+  resolveSettingsFailureValidation,
+} from "../graphqlSettingsResult"
 
-export type PreferencesFailure = "unknown" | "retryable" | "blocked" | null
+export type PreferencesFailure = "unknown" | "retryable" | "blocked" | "validation" | null
 export type PreferencesSessionSnapshot = Readonly<{
   confirmed: UserPreferences | null
   draftPatch: UserPreferencesPatch
   accentDraft: string | null
   saveStatus: SaveStatusState
   failure: PreferencesFailure
+  blockedFeedback: PreferencesBlockedFeedback | null
+  validation: { fieldErrors: Record<string, string>; formError: boolean } | null
   inspected: boolean
   observedMatches: boolean
   discardRevision: number
@@ -20,6 +27,8 @@ const initial: PreferencesSessionSnapshot = {
   accentDraft: null,
   saveStatus: "idle",
   failure: null,
+  blockedFeedback: null,
+  validation: null,
   inspected: false,
   observedMatches: false,
   discardRevision: 0,
@@ -28,13 +37,7 @@ const initial: PreferencesSessionSnapshot = {
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type Inspect = () => Promise<UserPreferences>
 
-const isUnknown = (error: unknown): boolean => {
-  if (typeof error !== "object" || error === null) return true
-  if ("networkError" in error && error.networkError) return true
-  if ("kind" in error && error.kind === "blocked") return false
-  if ("graphQLErrors" in error) return false
-  return true
-}
+
 
 /**
  * Session-scoped owner: the preferences view is only a subscriber.
@@ -65,21 +68,30 @@ export function createPersonalPreferencesSession() {
       (confirmed, attempted) => {
         const nextConfirmed = { ...(snapshot.confirmed ?? confirmed) }
         const nextDraft = { ...snapshot.draftPatch }
-        for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
+        for (const key of Object.keys(attempted) as Array<
+          keyof UserPreferences
+        >) {
           // Only fields present in this Mutation are authoritative.
           Object.assign(nextConfirmed, { [key]: confirmed[key] })
           locallyConfirmedKeys.add(key)
           if (nextDraft[key] === confirmed[key]) delete nextDraft[key]
         }
-        emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null })
+        emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null, blockedFeedback: null, validation: null })
       },
-      (error) => {
-        const failure: PreferencesFailure =
-          typeof error === "object" && error !== null &&
-          "kind" in error && error.kind === "blocked"
-            ? "blocked"
-            : isUnknown(error) ? "unknown" : "retryable"
-        emit({ failure, saveStatus: "attention", inspected: false, observedMatches: false })
+      (error, attempted) => {
+        const failure = classifySettingsSaveFailure(error)
+        const validation =
+          failure === "validation"
+            ? resolveSettingsFailureValidation(error, Object.keys(attempted))
+            : null
+        emit({
+          failure,
+          blockedFeedback: failure === "blocked" ? getPreferencesBlockedFeedback(error) : null,
+          validation,
+          saveStatus: "attention",
+          inspected: false,
+          observedMatches: false,
+        })
       },
       400,
       (state) => {
@@ -92,7 +104,9 @@ export function createPersonalPreferencesSession() {
   return {
     subscribe(listener: () => void) {
       subscribers.add(listener)
-      return () => { subscribers.delete(listener) }
+      return () => {
+        subscribers.delete(listener)
+      }
     },
     getSnapshot(): PreferencesSessionSnapshot {
       return snapshot
@@ -115,7 +129,8 @@ export function createPersonalPreferencesSession() {
         if (locallyConfirmedKeys.has(key)) {
           // An authoritative Query has now echoed the locally confirmed value.
           // Older snapshots must not roll it back before this point.
-          if (current[key] === snapshot.confirmed[key]) locallyConfirmedKeys.delete(key)
+          if (current[key] === snapshot.confirmed[key])
+            locallyConfirmedKeys.delete(key)
           else continue
         }
         if (!(key in pending)) {
@@ -126,11 +141,23 @@ export function createPersonalPreferencesSession() {
         (Object.keys(refreshed) as Array<keyof UserPreferences>).some(
           (key) => refreshed[key] !== snapshot.confirmed?.[key],
         )
-      ) emit({ confirmed: refreshed })
+      )
+        emit({ confirmed: refreshed })
     },
     edit(patch: UserPreferencesPatch) {
+      const validation = snapshot.validation
+        ? {
+            fieldErrors: Object.fromEntries(
+              Object.entries(snapshot.validation.fieldErrors).filter(
+                ([key]) => !(key in patch),
+              ),
+            ),
+            formError: false,
+          }
+        : null
       emit({
         draftPatch: { ...snapshot.draftPatch, ...patch },
+        validation,
         observedMatches: false,
         inspected: false,
       })
@@ -152,10 +179,17 @@ export function createPersonalPreferencesSession() {
       emit({ inspected: false, observedMatches: false })
       try {
         const current = await inspectServer()
-        if (generation !== inspectionGeneration || snapshot.failure !== "unknown" || snapshot.draftPatch !== draftAtStart || snapshot.accentDraft !== rawAtStart) return
+        if (
+          generation !== inspectionGeneration ||
+          snapshot.failure !== "unknown" ||
+          snapshot.draftPatch !== draftAtStart ||
+          snapshot.accentDraft !== rawAtStart
+        )
+          return
         inspectedValue = current
         const pending = { ...queue?.getPending(), ...snapshot.draftPatch }
-        const observedMatches = Object.keys(pending).length > 0 &&
+        const observedMatches =
+          Object.keys(pending).length > 0 &&
           (Object.keys(pending) as Array<keyof UserPreferences>).every(
             (key) => current[key] === pending[key],
           ) &&
@@ -163,14 +197,24 @@ export function createPersonalPreferencesSession() {
             /^#[0-9a-fA-F]{6}$/.test(snapshot.accentDraft))
         emit({ inspected: true, observedMatches })
       } catch {
-        if (generation !== inspectionGeneration || snapshot.failure !== "unknown" || snapshot.draftPatch !== draftAtStart || snapshot.accentDraft !== rawAtStart) return
+        if (
+          generation !== inspectionGeneration ||
+          snapshot.failure !== "unknown" ||
+          snapshot.draftPatch !== draftAtStart ||
+          snapshot.accentDraft !== rawAtStart
+        )
+          return
         inspectedValue = null
         emit({ inspected: false, observedMatches: false })
       }
     },
     confirmObservation() {
-      if (snapshot.failure !== "unknown" || !snapshot.observedMatches ||
-        !inspectedValue) return
+      if (
+        snapshot.failure !== "unknown" ||
+        !snapshot.observedMatches ||
+        !inspectedValue
+      )
+        return
       const pending = { ...ensureQueue().getPending(), ...snapshot.draftPatch }
       const confirmed = { ...(snapshot.confirmed ?? inspectedValue) }
       // The observation establishes only the fields being recovered. Unrelated
@@ -184,6 +228,8 @@ export function createPersonalPreferencesSession() {
         confirmed,
         draftPatch: {},
         failure: null,
+        blockedFeedback: null,
+        validation: null,
         saveStatus: "idle",
         observedMatches: false,
         inspected: false,
@@ -192,11 +238,21 @@ export function createPersonalPreferencesSession() {
     },
     retry() {
       if (!snapshot.failure || snapshot.failure === "blocked") return
-      if (snapshot.accentDraft !== null && !/^#[0-9a-fA-F]{6}$/.test(snapshot.accentDraft)) return
+      if (
+        snapshot.accentDraft !== null &&
+        !/^#[0-9a-fA-F]{6}$/.test(snapshot.accentDraft)
+      )
+        return
       if (snapshot.failure === "unknown" && !snapshot.inspected) return
       inspectedValue = null
-      emit({ failure: null, saveStatus: "pending",
-        observedMatches: false, inspected: false })
+      emit({
+        failure: null,
+        blockedFeedback: null,
+        validation: null,
+        saveStatus: "pending",
+        observedMatches: false,
+        inspected: false,
+      })
       void ensureQueue().flush()
     },
     discard() {
@@ -204,10 +260,14 @@ export function createPersonalPreferencesSession() {
       ensureQueue().clearPending()
       inspectedValue = null
       emit({
-        failure: null, draftPatch: {},
+        failure: null,
+        blockedFeedback: null,
+        validation: null,
+        draftPatch: {},
         accentDraft: snapshot.confirmed?.personalAccentColor ?? null,
         saveStatus: "idle",
-        observedMatches: false, inspected: false,
+        observedMatches: false,
+        inspected: false,
         discardRevision: snapshot.discardRevision + 1,
       })
     },

@@ -15,7 +15,7 @@ import {
   Title,
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { FeedbackAlert, showNotification } from "@/components/Feedback"
+import { FeedbackPanel, showNotification } from "@/components/Feedback"
 
 type Props = {
   communityId: string
@@ -166,12 +166,12 @@ export function CommunityDeletionConfirmation({
               <Title order={3} size="h3">
                 {communityName}
               </Title>
-              <FeedbackAlert
+              <FeedbackPanel
                 kind="error"
                 title="削除したデータは復元できません"
               >
                 CommunityとCommunity管理Mediaは復元不能に削除されます。
-              </FeedbackAlert>
+              </FeedbackPanel>
               <Text size="sm">
                 MembershipとInvitationは失われ、Group・Tagとその関連も削除されます。
               </Text>
@@ -195,18 +195,18 @@ export function CommunityDeletionConfirmation({
                   {managedMediaCount}件
                 </Title>
               </Box>
-              <FeedbackAlert
+              <FeedbackPanel
                 kind="error"
                 title="他のUserのアップロードも削除対象です"
               >
                 Community管理Mediaは、アップロードしたUserに関係なく復元できない形で削除されます。
-              </FeedbackAlert>
+              </FeedbackPanel>
               <Text size="sm">
                 User管理MediaのこのCommunityへの共有と分類は解除されます。
               </Text>
-              <FeedbackAlert kind="info" title="削除されないもの">
+              <FeedbackPanel kind="info" title="削除されないもの">
                 User管理Media本体、User側分類、他Communityへの共有は削除されません。
-              </FeedbackAlert>
+              </FeedbackPanel>
             </Stack>
           )}
           {step === 2 && (
@@ -242,21 +242,29 @@ export function CommunityDeletionConfirmation({
                 disabled={busy || completed || !isAdministrator}
               />
               {!isAdministrator && (
-                <FeedbackAlert kind="error" title="削除できません">
+                <FeedbackPanel kind="error" title="削除できません">
                   Administratorのみ削除できます。
-                </FeedbackAlert>
+                </FeedbackPanel>
               )}
               {error && (
-                <Stack gap="xs">
-                  <Text size="sm" c="red" role="alert">
-                    {error}
-                  </Text>
-                  {outcomeUnknown && onReviewChanged && (
-                    <Button variant="default" onClick={onReviewChanged}>
-                      最新の状態を確認する
-                    </Button>
-                  )}
-                </Stack>
+                <FeedbackPanel
+                  kind={outcomeUnknown ? "warning" : "error"}
+                  title={
+                    outcomeUnknown
+                      ? "削除の受付結果を確認できませんでした"
+                      : "Communityを削除できませんでした"
+                  }
+                  role="alert"
+                  actions={
+                    outcomeUnknown && onReviewChanged ? (
+                      <Button variant="default" onClick={onReviewChanged}>
+                        最新の状態を確認する
+                      </Button>
+                    ) : undefined
+                  }
+                >
+                  {error}
+                </FeedbackPanel>
               )}
             </Stack>
           )}

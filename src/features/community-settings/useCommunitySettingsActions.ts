@@ -1,18 +1,19 @@
 "use client"
 
 import { showNotification } from "@/components/Feedback"
+import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/features/settings/graphqlSettingsResult"
 import {
   MyCommunitiesDocument,
   CommunityMembersDocument,
   CommunityMemberRole,
-  useRenameCommunityMutation,
+  useUpdateCommunityMutation,
   useChangeCommunityMemberRoleMutation,
   useRemoveCommunityMemberMutation,
   useLeaveCommunityMutation,
 } from "@/infrastructure/graphql/generated"
 
 export function useCommunitySettingsActions(communityId: string) {
-  const [renameCommunity] = useRenameCommunityMutation()
+  const [updateCommunity] = useUpdateCommunityMutation()
   const [changeRole] = useChangeCommunityMemberRoleMutation()
   const [removeMember] = useRemoveCommunityMemberMutation()
   const [leaveCommunity] = useLeaveCommunityMutation()
@@ -25,11 +26,6 @@ export function useCommunitySettingsActions(communityId: string) {
         awaitRefetchQueries: true,
       })
       if (!result.data?.removeCommunityMember.success) {
-        showNotification({
-          kind: "error",
-          title: "メンバーを除外",
-          description: "メンバーを除外できませんでした。",
-        })
         return false
       }
       showNotification({
@@ -39,11 +35,6 @@ export function useCommunitySettingsActions(communityId: string) {
       })
       return true
     } catch {
-      showNotification({
-        kind: "error",
-        title: "メンバーを除外",
-        description: "メンバーを除外できませんでした。",
-      })
       return false
     }
   }
@@ -77,11 +68,6 @@ export function useCommunitySettingsActions(communityId: string) {
         awaitRefetchQueries: true,
       })
       if (!result.data?.changeCommunityMemberRole.success) {
-        showNotification({
-          kind: "error",
-          title: "メンバーの役割を変更",
-          description: "メンバーの役割を変更できませんでした。",
-        })
         return false
       }
       showNotification({
@@ -91,37 +77,24 @@ export function useCommunitySettingsActions(communityId: string) {
       })
       return true
     } catch {
-      showNotification({
-        kind: "error",
-        title: "メンバーの役割を変更",
-        description: "メンバーの役割を変更できませんでした。",
-      })
       return false
     }
   }
 
-  const onSaveName = async (nextName: string): Promise<boolean> => {
-    try {
-      const result = await renameCommunity({
-        variables: { input: { communityId, name: nextName } },
-        refetchQueries: [MyCommunitiesDocument],
-        awaitRefetchQueries: true,
-      })
-      if (result.data?.renameCommunity.community) return true
-      showNotification({
-        kind: "error",
-        title: "Community名を変更",
-        description: "Community名を変更できませんでした。",
-      })
-      return false
-    } catch {
-      showNotification({
-        kind: "error",
-        title: "Community名を変更",
-        description: "Community名を変更できませんでした。",
-      })
-      return false
-    }
+  const onSaveName = async (nextName: string): Promise<string> => {
+    const result = await updateCommunity({
+      variables: { input: { communityId, name: nextName } },
+      errorPolicy: "all",
+      // The confirmed mutation must not be rejected by a later refresh failure.
+      refetchQueries: [MyCommunitiesDocument],
+      awaitRefetchQueries: false,
+    })
+    const outcome = requireSettingsMutationOutcome(result.data?.updateCommunity, result)
+    if (outcome?.__typename === "InputValidationFailure")
+      throw new SettingsInputValidationError(outcome.violations)
+    if (outcome?.__typename !== "UpdateCommunitySuccess")
+      throw new Error("Community name save unconfirmed")
+    return outcome.community.name
   }
 
   return { onRemoveMember, onLeaveCommunity, onChangeMemberRole, onSaveName }

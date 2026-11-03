@@ -9,9 +9,9 @@ import {
   Switch,
   useMantineColorScheme,
 } from "@mantine/core"
-import { FeedbackAlert } from "@/components/Feedback"
+import { FeedbackPanel } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
-import { SaveStatus } from "@/components/SaveStatus"
+import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import { useUserPreferences } from "../useUserPreferences"
@@ -36,10 +36,15 @@ export function SettingsPreferences({
   const {
     preferences,
     accentDraft,
+    accentOnBlur,
+    accentDraftError,
     change,
     changeAccentDraft,
     saveError,
+    blockedFeedback,
     saveStatus,
+    fieldErrors,
+    validation,
     retry,
     inspect,
     confirmObservation,
@@ -61,57 +66,84 @@ export function SettingsPreferences({
       <PageHeader
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
-        titleAccessory={onSave ? <SaveStatus state={saveError ? "attention" : saveStatus} announce timing={{ savingDelayMs: 300, savedDurationMs: 2000, savingAnnouncementMs: 2000 }} /> : undefined}
+        titleAccessory={
+          onSave ? (
+            <SaveStatus
+              state={saveError ? "attention" : saveStatus}
+              announce
+              timing={SETTINGS_SAVE_STATUS_TIMING}
+            />
+          ) : undefined
+        }
       />
       {saveError && (
-        <FeedbackAlert
-          kind="error"
+        <FeedbackPanel
+          kind={saveError === "unknown" ? "warning" : "error"}
           title={
             saveError === "blocked"
-              ? "設定を変更できません"
-              : saveError === "unknown"
-                ? "保存結果を確認できませんでした"
-                : "保存できませんでした"
+              ? blockedFeedback?.title ?? "設定を変更できません"
+              : saveError === "validation"
+                ? "入力内容を確認してください"
+                : saveError === "unknown"
+                  ? "保存結果を確認できませんでした"
+                  : "保存できませんでした"
           }
           role="alert"
+          actions={
+            saveError === "blocked" ? undefined : (
+              <>
+              {saveError === "unknown" && (
+                <Button size="xs" variant="light" onClick={() => void inspect()}>
+                  現在の状態を確認
+                </Button>
+              )}
+              {saveError === "unknown" && observedMatches && (
+                <Button size="xs" variant="light" onClick={confirmObservation}>
+                  確認完了
+                </Button>
+              )}
+              {((saveError === "retryable" || saveError === "validation") ||
+                (saveError === "unknown" && inspected && !observedMatches)) && (
+                <Button size="xs" disabled={!canRetry} onClick={retry}>
+                  もう一度保存
+                </Button>
+              )}
+              {hasSession && (
+                <Button size="xs" variant="subtle" color="gray" onClick={discard}>
+                  変更を破棄
+                </Button>
+              )}
+              </>
+            )
+          }
         >
           <Stack gap="xs">
-            {saveError === "blocked" ? (
-              <span>画面を再読み込みして現在の状態を確認してください。</span>
+            {saveError === "validation" ? (
+              <span>
+                {validation?.formError
+                  ? "入力した設定の一部を受け付けられませんでした。内容を確認してから、もう一度保存してください。"
+                  : "入力項目のエラーを修正してから、もう一度保存してください。"}
+              </span>
+            ) : saveError === "blocked" ? (
+              <span>{blockedFeedback?.description ?? "画面を再読み込みして現在の状態を確認してください。"}</span>
             ) : saveError === "unknown" ? (
-              <span>変更内容は保持しています。現在のServer値を確認してから、必要に応じて手動で保存してください。</span>
+              <span>
+                変更内容は保持しています。現在の設定を確認してから、必要に応じて保存してください。
+              </span>
             ) : (
-              <span>変更内容を保持しています。内容を確認して再試行してください。</span>
+              <span>
+                変更内容を保持しています。内容を確認して再試行してください。
+              </span>
             )}
             {saveError === "unknown" && inspected && (
               <span>
                 {observedMatches
-                  ? "現在の設定は入力した値と一致しています。旧Mutationの成功を証明するものではありません。"
-                  : "現在のServer値と入力した値が一致しません。"}
+                  ? "現在の設定は入力した値と一致しています。ただし、先ほどの保存が成功したことを示すものではありません。"
+                  : "現在の設定と入力した値が一致しません。"}
               </span>
             )}
-            {saveError === "unknown" && (
-              <Button size="xs" variant="light" onClick={() => void inspect()}>
-                現在の状態を確認
-              </Button>
-            )}
-            {saveError === "unknown" && observedMatches && (
-              <Button size="xs" variant="light" onClick={confirmObservation}>
-                確認完了
-              </Button>
-            )}
-            {(saveError === "retryable" || (saveError === "unknown" && inspected && !observedMatches)) && (
-              <Button size="xs" disabled={!canRetry} onClick={retry}>
-                もう一度保存
-              </Button>
-            )}
-            {hasSession && saveError !== "blocked" && (
-              <Button size="xs" variant="subtle" color="gray" onClick={discard}>
-                変更を破棄
-              </Button>
-            )}
           </Stack>
-        </FeedbackAlert>
+        </FeedbackPanel>
       )}
       <Box>
         <SectionHeader>表示</SectionHeader>
@@ -142,6 +174,8 @@ export function SettingsPreferences({
           >
             <ColorInput
               aria-label="Personal Accent Color"
+              error={fieldErrors.personalAccentColor?.message ?? accentDraftError}
+              onBlur={accentOnBlur}
               format="hex"
               value={accentDraft}
               onChange={changeAccentDraft}
@@ -154,6 +188,7 @@ export function SettingsPreferences({
           >
             <Select
               aria-label="日付形式"
+              error={fieldErrors.dateFormat?.message}
               value={dateFormat}
               onChange={(value) =>
                 value &&
@@ -174,6 +209,7 @@ export function SettingsPreferences({
           >
             <Select
               aria-label="ファイルサイズの単位"
+              error={fieldErrors.fileSizeUnit?.message}
               value={fileSizeUnit}
               onChange={(value) =>
                 value &&
@@ -193,6 +229,7 @@ export function SettingsPreferences({
           >
             <Select
               aria-label="Mediaサムネイルサイズ"
+              error={fieldErrors.mediaThumbnailSize?.message}
               value={thumbnailSize}
               onChange={(value) =>
                 value &&
@@ -221,6 +258,7 @@ export function SettingsPreferences({
           >
             <Switch
               checked={loop}
+              error={fieldErrors.mediaDetailNavigationWrap?.message}
               onChange={(event) =>
                 change("mediaDetailNavigationWrap", event.currentTarget.checked)
               }
@@ -234,6 +272,7 @@ export function SettingsPreferences({
           >
             <Switch
               checked={wideDetails}
+              error={fieldErrors.mediaDetailInitialInfoWide?.message}
               onChange={(event) =>
                 change(
                   "mediaDetailInitialInfoWide",
@@ -250,6 +289,7 @@ export function SettingsPreferences({
           >
             <Switch
               checked={mediumDetails}
+              error={fieldErrors.mediaDetailInitialInfoMedium?.message}
               onChange={(event) =>
                 change(
                   "mediaDetailInitialInfoMedium",

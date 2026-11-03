@@ -12,7 +12,7 @@ import {
 } from "@mantine/core"
 import { Fragment, type ComponentType, type PropsWithChildren } from "react"
 import type { MockScenario } from ".././accountDeletionGateway"
-import { FeedbackAlert } from "@/components/Feedback"
+import { FeedbackPanel } from "@/components/Feedback"
 
 import {
   labels,
@@ -160,7 +160,7 @@ export function AccountDeletionFlow({
                         ? "確認フローが完了しました"
                         : "アカウント削除を受け付けました"}
                     </Title>
-                    <FeedbackAlert
+                    <FeedbackPanel
                       kind="info"
                       title={
                         mockScenario
@@ -171,7 +171,7 @@ export function AccountDeletionFlow({
                       {mockScenario
                         ? "確認手続きが終了しました。"
                         : "アカウントは利用できなくなりました。対象データの削除はバックグラウンドで進みます。"}
-                    </FeedbackAlert>
+                    </FeedbackPanel>
                     {mockScenario && (
                       <Button
                         variant="default"

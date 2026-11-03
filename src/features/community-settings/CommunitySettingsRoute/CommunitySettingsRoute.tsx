@@ -8,6 +8,8 @@ import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBo
 import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
+import { useApolloClient } from "@apollo/client"
+import { CommunityDetailsDocument } from "@/infrastructure/graphql/generated"
 import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
@@ -24,6 +26,7 @@ export function CommunitySettingsRoute({
   usageContent?: ReactNode
 }) {
   const router = useRouter()
+  const client = useApolloClient()
   const { communityAccentColor, membershipLost } =
     useCommunitySettingsMembership(communityId, section)
   // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
@@ -85,6 +88,15 @@ export function CommunitySettingsRoute({
       onChangeMemberRole={onChangeMemberRole}
       onNavigate={(href) => router.push(href)}
       onSaveName={onSaveName}
+      onInspectName={async () => {
+        const current = await client.query({
+          query: CommunityDetailsDocument,
+          variables: { communityId },
+          fetchPolicy: "no-cache",
+        })
+        if (!current.data?.community) throw new Error("Community not available")
+        return current.data.community.name
+      }}
     />
   )
 }

@@ -13,7 +13,7 @@ const limitReachedUsage = {
 }
 
 const meta = {
-  title: "Features/Settings/Usage/Usage Contract",
+  title: "features/usage/SettingsUsage",
   component: SettingsUsage,
   args: { usage: sampleUsage, fileSizeUnit: "DECIMAL", scope: "personal" },
 } satisfies Meta<typeof SettingsUsage>
@@ -474,5 +474,41 @@ export const CommunityErrorContract: Story = {
       canvas.queryByRole("button", { name: "再試行" }),
     ).not.toBeInTheDocument()
     await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+  },
+}
+
+export const PersonalUsage: Story = {
+  name: "Visual · 利用状況",
+  tags: ["visual"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("table")).toBeVisible()
+    await expect(
+      canvas.getByText(
+        "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
+      ),
+    ).toBeVisible()
+  },
+}
+
+export const PersonalUsageEmpty: Story = {
+  name: "Visual · 登録0件",
+  tags: ["visual"],
+  args: { usage: zeroUsage },
+}
+
+export const PersonalUsageErrorState: Story = {
+  name: "Visual · 取得失敗",
+  tags: ["visual"],
+  args: {
+    usage: sampleUsage, status: "error",
+  },
+}
+
+export const PersonalUsageLoadingState: Story = {
+  name: "Visual · 読み込み中",
+  tags: ["visual"],
+  args: {
+    usage: sampleUsage, status: "loading",
   },
 }

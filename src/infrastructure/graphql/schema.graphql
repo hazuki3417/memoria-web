@@ -6,8 +6,8 @@ scalar Int64
 type Query { me: User }
 type Mutation {
  registerUser(input: RegisterUserInput!): RegisterUserPayload!
- updateUserProfile(input: UpdateUserProfileInput!): UpdateUserProfilePayload!
- updateUserPreferences(input: UpdateUserPreferencesInput!): UpdateUserPreferencesPayload!
+ updateUserProfile(input: UpdateUserProfileInput!): UpdateUserProfileResult!
+ updateUserPreferences(input: UpdateUserPreferencesInput!): UpdateUserPreferencesResult!
  createCommunity(input: CreateCommunityInput!): CreateCommunityPayload!
 }
 type User { id: ID! profile: UserProfile! preferences: UserPreferences! usage: UserUsage! createdAt: DateTime! updatedAt: DateTime! }
@@ -15,11 +15,12 @@ type UserProfile { nickname: String! }
 input RegisterUserInput { nickname: String! }
 type RegisterUserPayload { user: User! }
 input UpdateUserProfileInput { nickname: String! }
-type UpdateUserProfilePayload { user: User! }
+type UpdateUserProfileSuccess { user: User! }
+union UpdateUserProfileResult = UpdateUserProfileSuccess | InputValidationFailure
 type Community { id: ID! name: String! createdAt: DateTime! updatedAt: DateTime! mySettings: CommunitySettings! }
 type CommunitySettings { accentColor: String! alias: String }
 input UpdateCommunitySettingsInput { communityId: ID! accentColor: String alias: String }
-type UpdateCommunitySettingsPayload { settings: CommunitySettings! }
+type UpdateCommunitySettingsSuccess { settings: CommunitySettings! }
 input CreateCommunityInput { name: String! }
 type CreateCommunityPayload { community: Community! }
 type PageInfo { hasNextPage: Boolean! hasPreviousPage: Boolean! startCursor: String endCursor: String }
@@ -45,15 +46,16 @@ input UpdateUserPreferencesInput {
  mediaDetailInitialInfoWide: Boolean
  mediaDetailInitialInfoMedium: Boolean
 }
-type UpdateUserPreferencesPayload { preferences: UserPreferences! }
+type UpdateUserPreferencesSuccess { preferences: UserPreferences! }
+union UpdateUserPreferencesResult = UpdateUserPreferencesSuccess | InputValidationFailure
 
 # Synchronized Community schema from memoria-api/schemas/graphql/community.graphql.
-input RenameCommunityInput {
+input UpdateCommunityInput {
   communityId: ID!
   name: String!
 }
 
-type RenameCommunityPayload {
+type UpdateCommunitySuccess {
   community: Community!
 }
 
@@ -64,7 +66,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  renameCommunity(input: RenameCommunityInput!): RenameCommunityPayload!
+  updateCommunity(input: UpdateCommunityInput!): UpdateCommunityResult!
 }
 
 enum CommunityMemberRole {
@@ -372,4 +374,13 @@ type StorageUsage { usedBytes: Int64! effectiveLimitBytes: Int64! }
 type UserUsage { mediaCount: Int! storage: StorageUsage! formatBreakdown: [MediaFormatUsage!]! }
 type CommunityUsage { mediaCount: Int! storage: StorageUsage! formatBreakdown: [MediaFormatUsage!]! }
 
-extend type Mutation { updateCommunitySettings(input: UpdateCommunitySettingsInput!): UpdateCommunitySettingsPayload! }
+extend type Mutation { updateCommunitySettings(input: UpdateCommunitySettingsInput!): UpdateCommunitySettingsResult! }
+
+# Hybrid Result: shared expected domain validation and typed Settings outcomes.
+enum InputViolationScope { FIELD FIELD_GROUP FORM }
+enum InputViolationCode { REQUIRED INVALID_FORMAT INVALID_VALUE TOO_LONG OUT_OF_RANGE INVALID_COMBINATION }
+type InputFieldPath { segments: [String!]! }
+type InputViolation { scope: InputViolationScope! code: InputViolationCode! inputPaths: [InputFieldPath!]! }
+type InputValidationFailure { violations: [InputViolation!]! }
+union UpdateCommunitySettingsResult = UpdateCommunitySettingsSuccess | InputValidationFailure
+union UpdateCommunityResult = UpdateCommunitySuccess | InputValidationFailure

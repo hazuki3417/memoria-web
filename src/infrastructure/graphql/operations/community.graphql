@@ -18,8 +18,12 @@ mutation CreateCommunity($input: CreateCommunityInput!) {
   createCommunity(input: $input) { community { id name createdAt updatedAt } }
 }
 
-mutation RenameCommunity($input: RenameCommunityInput!) {
-  renameCommunity(input: $input) { community { id name createdAt updatedAt } }
+mutation UpdateCommunity($input: UpdateCommunityInput!) {
+  updateCommunity(input: $input) {
+    __typename
+    ... on UpdateCommunitySuccess { community { id name createdAt updatedAt } }
+    ... on InputValidationFailure { violations { scope code inputPaths { segments } } }
+  }
 }
 
 mutation ChangeCommunityMemberRole($input: ChangeCommunityMemberRoleInput!) {
@@ -55,7 +59,9 @@ query CommunityMySettings($communityId: ID!) {
 
 mutation UpdateCommunitySettings($input: UpdateCommunitySettingsInput!) {
   updateCommunitySettings(input: $input) {
-    settings { accentColor alias }
+    __typename
+    ... on UpdateCommunitySettingsSuccess { settings { accentColor alias } }
+    ... on InputValidationFailure { violations { scope code inputPaths { segments } } }
   }
 }
 

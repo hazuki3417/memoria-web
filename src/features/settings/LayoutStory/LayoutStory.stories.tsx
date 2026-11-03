@@ -2,7 +2,7 @@ import { LayoutStory } from "./LayoutStory"
 import type { Meta, StoryObj } from "@storybook/react"
 
 const meta = {
-  title: "Features/Settings/Loading & Error Layout",
+  title: "features/settings/LayoutStory",
   component: LayoutStory,
   args: { context: "personal", state: "loading", compact: false },
 } satisfies Meta<typeof LayoutStory>

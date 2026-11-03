@@ -85,9 +85,12 @@ export const RemoveMemberFailureContract: Story = {
     await expect(args.onRemoveMember).toHaveBeenCalledWith("user-2")
     // Mantine Modal uses a transition; wait for visibility after the failed save.
     await waitFor(async () => {
-      await expect(
-        page.getByRole("dialog", { name: "メンバーを除外" }),
-      ).toBeVisible()
+      const dialog = page.getByRole("dialog", { name: "メンバーを除外" })
+      await expect(dialog).toBeVisible()
+      await expect(within(dialog).getByRole("alert")).toHaveTextContent(
+        "除外の結果を確認できませんでした",
+      )
+      await expect(within(dialog).getByRole("button", { name: "除外する" })).toBeDisabled()
     })
   },
 }
@@ -173,7 +176,15 @@ export const MemberRoleChangeFailureContract: Story = {
       "user-2",
       "admin",
     )
-    await expect(dialog).toBeVisible()
+    // Mantine Modal's portal exists before its enter transition finishes.
+    // Wait for the dialog and persistent recovery feedback together.
+    await waitFor(async () => {
+      await expect(dialog).toBeVisible()
+      await expect(within(dialog).getByRole("alert")).toHaveTextContent(
+        "役割変更の結果を確認できませんでした",
+      )
+      await expect(within(dialog).getByRole("button", { name: "変更する" })).toBeDisabled()
+    })
   },
 }
 
@@ -204,4 +215,19 @@ export const LeaveSuccessContract: Story = {
     await expect(args.onLeaveCommunity).toHaveBeenCalledOnce()
     await expect(args.onLeaveSuccess).toHaveBeenCalledOnce()
   },
+}
+
+
+// Visual review variants hold the actual confirmation Modal open after a
+// simulated uncertain outcome; no separate fake Panel is rendered.
+export const RemoveMemberFailureVisual: Story = {
+  ...RemoveMemberFailureContract,
+  name: "Visual · メンバー除外の結果未確定",
+  tags: ["visual"],
+}
+
+export const RoleChangeFailureVisual: Story = {
+  ...MemberRoleChangeFailureContract,
+  name: "Visual · 役割変更の結果未確定",
+  tags: ["visual"],
 }

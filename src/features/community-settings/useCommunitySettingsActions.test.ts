@@ -18,7 +18,7 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   MyCommunitiesDocument: { kind: "Document", name: "myCommunities" },
   CommunityMembersDocument: { kind: "Document", name: "communityMembers" },
   CommunityMemberRole: { Admin: "ADMIN", Member: "MEMBER" },
-  useRenameCommunityMutation: () => [mocks.rename],
+  useUpdateCommunityMutation: () => [mocks.rename],
   useChangeCommunityMemberRoleMutation: () => [mocks.changeRole],
   useRemoveCommunityMemberMutation: () => [mocks.remove],
   useLeaveCommunityMutation: () => [mocks.leave],
@@ -30,7 +30,7 @@ let host: HTMLDivElement
 let actions!: Actions
 
 beforeEach(async () => {
-  vi.clearAllMocks()
+  vi.resetAllMocks()
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
@@ -49,33 +49,53 @@ afterEach(async () => {
 })
 
 describe("Community設定のMutation契約", () => {
-  it("Community名変更の成功はtrue、MyCommunitiesの再取得を要求する", async () => {
+  it("Community名変更の成功は確定名を返し、MyCommunitiesの再取得を要求する", async () => {
     mocks.rename.mockResolvedValue({
-      data: { renameCommunity: { community: { id: "community-1" } } },
+      data: {
+        updateCommunity: {
+          __typename: "UpdateCommunitySuccess",
+          community: { id: "community-1", name: "新しい名前" },
+        },
+      },
     })
-    expect(await actions.onSaveName("新しい名前")).toBe(true)
+    expect(await actions.onSaveName("新しい名前")).toBe("新しい名前")
     expect(mocks.rename).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
           input: { communityId: "community-1", name: "新しい名前" },
         },
-        awaitRefetchQueries: true,
+        awaitRefetchQueries: false,
       }),
     )
     expect(mocks.rename.mock.calls[0][0].refetchQueries).toHaveLength(1)
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
-  it("Community名変更の応答欠落と通信失敗をfalseとして通知する", async () => {
+  it("Community名変更の応答欠落と通信失敗をFormに伝搬し、接続層から重複通知しない", async () => {
     mocks.rename
       .mockResolvedValueOnce({ data: null })
       .mockRejectedValueOnce(new Error("network"))
-    expect(await actions.onSaveName("変更")).toBe(false)
-    expect(await actions.onSaveName("変更")).toBe(false)
-    expect(mocks.notify).toHaveBeenCalledTimes(2)
-    expect(mocks.notify).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "error" }),
-    )
+    await expect(actions.onSaveName("変更")).rejects.toThrow("Settings mutation outcome unavailable")
+    await expect(actions.onSaveName("変更")).rejects.toThrow("network")
+    expect(mocks.notify).not.toHaveBeenCalled()
+  })
+
+  it("Community名のTyped ValidationをField Path付きでFormへ伝達する", async () => {
+    mocks.rename.mockResolvedValue({
+      data: {
+        updateCommunity: {
+          __typename: "InputValidationFailure",
+          violations: [{
+            scope: "FIELD", code: "REQUIRED", inputPaths: [{ segments: ["name"] }],
+          }],
+        },
+      },
+    })
+    await expect(actions.onSaveName("変更")).rejects.toMatchObject({
+      kind: "validation",
+      violations: [{ code: "REQUIRED" }],
+    })
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
 
   it("メンバー除外成功はtrueと成功通知、CommunityMembersの再取得", async () => {
@@ -95,7 +115,7 @@ describe("Community設定のMutation契約", () => {
     )
   })
 
-  it("メンバー除外失敗はfalseとエラー通知", async () => {
+  it("メンバー除外の結果未確定はfalseを返し、失敗通知はFormへ委譲", async () => {
     mocks.remove
       .mockResolvedValueOnce({
         data: { removeCommunityMember: { success: false } },
@@ -103,7 +123,7 @@ describe("Community設定のMutation契約", () => {
       .mockRejectedValueOnce(new Error("network"))
     expect(await actions.onRemoveMember("user-2")).toBe(false)
     expect(await actions.onRemoveMember("user-2")).toBe(false)
-    expect(mocks.notify).toHaveBeenCalledTimes(2)
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
 
   it("役割変更はGraphQL enumを使用し、成功時に再取得と通知", async () => {
@@ -129,14 +149,12 @@ describe("Community設定のMutation契約", () => {
     )
   })
 
-  it("役割変更失敗はfalseとエラー通知", async () => {
+  it("役割変更失敗はfalseを返し、失敗通知はModalに委譲", async () => {
     mocks.changeRole.mockResolvedValue({
       data: { changeCommunityMemberRole: { success: false } },
     })
     expect(await actions.onChangeMemberRole("user-2", "member")).toBe(false)
-    expect(mocks.notify).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "error" }),
-    )
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
 
   it("退会成功時はMyCommunitiesを再取得し、失敗は例外を伝搬", async () => {

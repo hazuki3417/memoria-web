@@ -10,7 +10,9 @@ export function resolveCommunityAccent(
   confirmed: string,
   preview: CommunityAccentPreview,
 ): string {
-  return preview && preview.communityId === communityId ? preview.color : confirmed
+  return preview && preview.communityId === communityId
+    ? preview.color
+    : confirmed
 }
 
 /** A late response or stale cleanup cannot dismiss another owner's preview. */

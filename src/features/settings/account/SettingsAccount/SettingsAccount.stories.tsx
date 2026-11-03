@@ -1,16 +1,14 @@
-import { Box, Text } from "@mantine/core"
+import { Box, Button } from "@mantine/core"
+import Link from "next/link"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, within } from "storybook/test"
-import { SettingsSectionContent } from "./SettingsSectionContent"
+import { expect, within } from "storybook/test"
+import { SettingsAccount } from "./SettingsAccount"
 
 const meta = {
-  title: "Features/Settings/Account",
-  component: SettingsSectionContent,
+  title: "features/settings/account/SettingsAccount",
+  component: SettingsAccount,
   args: {
-    section: "profile",
-    profileNickname: "テストユーザー",
-    saveProfile: fn(async () => undefined),
-    usageContent: <Text>利用状況の表示領域</Text>,
+    deletionAction: <Button component={Link} href="/settings/account/delete" color="red" size="sm">アカウントを削除する</Button>,
   },
   decorators: [
     (Story) => (
@@ -19,20 +17,20 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof SettingsSectionContent>
+} satisfies Meta<typeof SettingsAccount>
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Account: Story = {
   name: "Visual · アカウント",
   tags: ["visual"],
-  args: { section: "account" },
+  
 }
 
 export const DeleteAccountEntry: Story = {
   name: "Interaction · アカウント削除導線",
   tags: ["interaction"],
-  args: { section: "account" },
+  
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(

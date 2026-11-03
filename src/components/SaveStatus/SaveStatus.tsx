@@ -14,12 +14,23 @@ export type SaveStatusState =
   | "saved"
   | "attention"
 
+/** Agreed Settings auto-save presentation (timers never change the save queue). */
+export const SETTINGS_SAVE_STATUS_TIMING = {
+  savingDelayMs: 300,
+  savedDurationMs: 2000,
+  savingAnnouncementMs: 2000,
+} as const
+
 export type SaveStatusProps = {
   state: SaveStatusState
   /** Enable only for meaningful transitions; avoid announcing every edit. */
   announce?: boolean
   /** Optional timing; omitted props preserve the established presentation. */
-  timing?: { savingDelayMs?: number; savedDurationMs?: number; savingAnnouncementMs?: number }
+  timing?: {
+    savingDelayMs?: number
+    savedDurationMs?: number
+    savingAnnouncementMs?: number
+  }
 }
 
 const labels: Record<SaveStatusState, string> = {
@@ -37,8 +48,15 @@ const icons = {
   attention: IconAlertCircle,
 }
 
-export function SaveStatus({ state, announce = false, timing }: SaveStatusProps) {
-  const [visibleState, setVisibleState] = useState<SaveStatusState>(state)
+export function SaveStatus({
+  state,
+  announce = false,
+  timing,
+}: SaveStatusProps) {
+  const [visibleState, setVisibleState] = useState<SaveStatusState>(
+    // Hide initial Saving until the agreed delay has elapsed.
+    state === "saving" && (timing?.savingDelayMs ?? 0) > 0 ? "idle" : state,
+  )
   const savingDelay = timing?.savingDelayMs ?? 0
   const savedDuration = timing?.savedDurationMs ?? 0
   const savingAnnouncementDelay = timing?.savingAnnouncementMs
@@ -70,14 +88,24 @@ export function SaveStatus({ state, announce = false, timing }: SaveStatusProps)
     }
     if (state === "saving" && savingAnnouncementDelay !== undefined) {
       setAnnouncement("")
-      const timer = setTimeout(() => setAnnouncement("保存中です"), savingAnnouncementDelay)
+      const timer = setTimeout(
+        () => setAnnouncement("保存中です"),
+        savingAnnouncementDelay,
+      )
       return () => clearTimeout(timer)
     }
     // Persistent form alerts own failure announcements.
-    setAnnouncement(previous !== null && state === "saved" && previous !== "saved"
-      ? "変更を保存しました"
-      : "")
-  }, [announce, state, savingAnnouncementDelay])
+    if (previous !== null && state === "saved" && previous !== "saved") {
+      setAnnouncement("変更を保存しました")
+      // Keep the live region quiet after the short confirmation window.
+      if (savedDuration > 0) {
+        const timer = setTimeout(() => setAnnouncement(""), savedDuration)
+        return () => clearTimeout(timer)
+      }
+      return
+    }
+    setAnnouncement("")
+  }, [announce, state, savingAnnouncementDelay, savedDuration])
 
   const Icon = visibleState === "idle" ? null : icons[visibleState]
 
@@ -85,7 +113,13 @@ export function SaveStatus({ state, announce = false, timing }: SaveStatusProps)
     <>
       <Badge
         variant="light"
-        color={visibleState === "attention" ? "red" : visibleState === "saved" ? "green" : "gray"}
+        color={
+          visibleState === "attention"
+            ? "red"
+            : visibleState === "saved"
+              ? "green"
+              : "gray"
+        }
         size="sm"
         radius="xl"
         leftSection={Icon ? <Icon size={13} aria-hidden="true" /> : undefined}

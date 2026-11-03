@@ -9,7 +9,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core"
-import { FeedbackAlert } from "@/components/Feedback"
+import { FeedbackPanel } from "@/components/Feedback"
 import type { AccountDeletionController } from ".././useAccountDeletionController"
 
 export function AccountDeletionCommunityReviewStep({
@@ -80,12 +80,12 @@ export function AccountDeletionCommunityReviewStep({
                     参加者：{community.members}人 / Community管理Media：
                     {community.media}件
                   </Text>
-                  <FeedbackAlert
+                  <FeedbackPanel
                     kind="error"
                     title="このCommunityは復元できません"
                   >
                     このCommunityと管理Mediaが削除されます。他のUserがアップロードしたMediaも削除されます。
-                  </FeedbackAlert>
+                  </FeedbackPanel>
                   <TextInput
                     label="確認のためCommunity名を入力"
                     description={`「${community.name}」と入力してください。`}

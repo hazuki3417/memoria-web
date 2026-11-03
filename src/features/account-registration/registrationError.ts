@@ -8,7 +8,8 @@ export function isBlockingRegistrationError(error: unknown): boolean {
   return (
     failure.networkError?.statusCode === 401 ||
     failure.graphQLErrors?.some(
-      (item) => item.extensions?.code === "UNAUTHENTICATED",
+      (item) => item.extensions?.code === "UNAUTHENTICATED" ||
+      item.extensions?.code === "USER_DELETING",
     ) === true
   )
 }

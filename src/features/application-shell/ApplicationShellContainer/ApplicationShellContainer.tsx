@@ -17,9 +17,14 @@ import {
 } from ".././communityDisplayName"
 import { CommunityCreateModal } from ".././CommunityCreateModal/CommunityCreateModal"
 import { useApplicationContextSelection } from ".././useApplicationContextSelection"
-import { CommunityAccentPreviewProvider, useCommunityAccentPreview } from "../CommunityAccentPreviewContext"
+import {
+  CommunityAccentPreviewProvider,
+  useCommunityAccentPreview,
+} from "../CommunityAccentPreviewContext"
 import { resolveCommunityAccent } from "../communityAccentPreview"
 import { PersonalPreferencesSessionProvider } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
+import { usePersonalPreferencesSession } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
+import { resolvePersonalAccent } from "@/features/settings/preferences/personalAccentPreview"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -48,7 +53,11 @@ const communityContext = {
   accentColor: "var(--mantine-color-teal-6)",
 }
 
-export function ApplicationShellContainer({ children }: { children: ReactNode }) {
+export function ApplicationShellContainer({
+  children,
+}: {
+  children: ReactNode
+}) {
   return (
     <PersonalPreferencesSessionProvider>
       <CommunityAccentPreviewProvider>
@@ -60,6 +69,7 @@ export function ApplicationShellContainer({ children }: { children: ReactNode })
 
 function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
   const { previews: accentPreviews } = useCommunityAccentPreview()
+  const { snapshot: personalSession } = usePersonalPreferencesSession()
   const router = useRouter()
   const pathname = usePathname()
   const navigation = useApplicationNavigation()
@@ -114,8 +124,10 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
   const resolvedPersonalContext = {
     ...personalContext,
     accentColor:
-      currentUserData?.me?.preferences.personalAccentColor ??
-      personalContext.accentColor,
+      resolvePersonalAccent(
+        currentUserData?.me?.preferences.personalAccentColor,
+        personalSession,
+      ) ?? personalContext.accentColor,
   }
   const currentContext =
     contextKind === "community"

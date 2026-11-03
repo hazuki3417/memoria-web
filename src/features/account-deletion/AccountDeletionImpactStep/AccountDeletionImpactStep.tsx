@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Group, Stack, Text, Title } from "@mantine/core"
-import { FeedbackAlert } from "@/components/Feedback"
+import { FeedbackPanel } from "@/components/Feedback"
 import type { AccountDeletionController } from ".././useAccountDeletionController"
 import type { RetryOutcome } from ".././accountDeletionScenarios"
 
@@ -37,7 +37,7 @@ export function AccountDeletionImpactStep({
             )}
           </Box>
         ) : (
-          <FeedbackAlert
+          <FeedbackPanel
             kind={loadState === "retrying" ? "info" : "error"}
             title={
               loadState === "retrying"
@@ -48,16 +48,16 @@ export function AccountDeletionImpactStep({
             {loadState === "retrying"
               ? "Mediaの件数を再取得しています。"
               : "削除されるMediaの件数を確認できませんでした。再試行してください。"}
-          </FeedbackAlert>
+          </FeedbackPanel>
         )}
         <Box>
           <Title order={2} size="h4">
             注意事項
           </Title>
           <Divider my="md" />
-          <FeedbackAlert kind="error" title="削除したデータは復元できません">
+          <FeedbackPanel kind="error" title="削除したデータは復元できません">
             アカウントとあなたが管理するMediaが削除されます。
-          </FeedbackAlert>
+          </FeedbackPanel>
         </Box>
         {loadState === "ready" && (
           <Text c="dimmed" size="sm">

@@ -18,6 +18,7 @@ import {
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
+import { FeedbackPanel } from "@/components/Feedback"
 import { showNotification } from "@/components/Feedback"
 import { UsageSortHeader } from "@/features/usage/UsageSortHeader"
 
@@ -56,8 +57,10 @@ export function CommunityMembersContent({
   const [roleTarget, setRoleTarget] = useState<CommunityMember | null>(null)
   const [selectedRole, setSelectedRole] = useState<"admin" | "member">("member")
   const [roleBusy, setRoleBusy] = useState(false)
+  const [roleError, setRoleError] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<CommunityMember | null>(null)
   const [removeBusy, setRemoveBusy] = useState(false)
+  const [removeError, setRemoveError] = useState(false)
   const self = members.find((member) => member.isSelf)
   const adminCount = members.filter((member) => member.role === "admin").length
   const memberLimitReached = members.length >= COMMUNITY_MEMBER_LIMIT
@@ -129,6 +132,7 @@ export function CommunityMembersContent({
       !roleTarget ||
       !onChangeRole ||
       roleBusy ||
+      roleError ||
       selectedRole === roleTarget.role ||
       (selectedRole === "admin" && adminLimitReached) ||
       (selectedRole === "member" &&
@@ -139,15 +143,21 @@ export function CommunityMembersContent({
     setRoleBusy(true)
     try {
       if (await onChangeRole(roleTarget.id, selectedRole)) setRoleTarget(null)
+      else setRoleError(true)
+    } catch {
+      setRoleError(true)
     } finally {
       setRoleBusy(false)
     }
   }
   const confirmRemoval = async () => {
-    if (!removeTarget || !onRemoveMember || removeBusy) return
+    if (!removeTarget || !onRemoveMember || removeBusy || removeError) return
     setRemoveBusy(true)
     try {
       if (await onRemoveMember(removeTarget.id)) setRemoveTarget(null)
+      else setRemoveError(true)
+    } catch {
+      setRemoveError(true)
     } finally {
       setRemoveBusy(false)
     }
@@ -270,6 +280,7 @@ export function CommunityMembersContent({
                                   <Menu.Item
                                     disabled={!onChangeRole}
                                     onClick={() => {
+                                      setRoleError(false)
                                       setRoleTarget(member)
                                       setSelectedRole(member.role)
                                     }}
@@ -282,7 +293,7 @@ export function CommunityMembersContent({
                                       (member.role === "admin" &&
                                         adminCount <= 1)
                                     }
-                                    onClick={() => setRemoveTarget(member)}
+                                    onClick={() => { setRemoveError(false); setRemoveTarget(member) }}
                                     color="red"
                                   >
                                     除外
@@ -343,7 +354,7 @@ export function CommunityMembersContent({
       <Modal
         opened={removeTarget !== null}
         onClose={() => {
-          if (!removeBusy) setRemoveTarget(null)
+          if (!removeBusy) { setRemoveTarget(null); setRemoveError(false) }
         }}
         title="メンバーを除外"
         centered
@@ -362,17 +373,23 @@ export function CommunityMembersContent({
           <Text size="sm" c="dimmed">
             除外後に元の参加状態へ自動的には戻りません。
           </Text>
+          {removeError && (
+            <FeedbackPanel kind="warning" title="除外の結果を確認できませんでした" role="alert">
+              メンバーの現在の参加状態を確認してから、必要な場合だけ操作し直してください。
+            </FeedbackPanel>
+          )}
           <Group justify="flex-end">
             <Button
               variant="default"
               disabled={removeBusy}
-              onClick={() => setRemoveTarget(null)}
+              onClick={() => { setRemoveTarget(null); setRemoveError(false) }}
             >
               キャンセル
             </Button>
             <Button
               color="red"
               loading={removeBusy}
+              disabled={removeError}
               onClick={() => void confirmRemoval()}
             >
               除外する
@@ -383,7 +400,7 @@ export function CommunityMembersContent({
       <Modal
         opened={roleTarget !== null}
         onClose={() => {
-          if (!roleBusy) setRoleTarget(null)
+          if (!roleBusy) { setRoleTarget(null); setRoleError(false) }
         }}
         title="役割を変更"
         centered
@@ -430,11 +447,16 @@ export function CommunityMembersContent({
               Administratorの上限に達しているため変更できません。
             </Text>
           )}
+          {roleError && (
+            <FeedbackPanel kind="warning" title="役割変更の結果を確認できませんでした" role="alert">
+              メンバーの現在の役割を確認してから、必要な場合だけ操作し直してください。
+            </FeedbackPanel>
+          )}
           <Group justify="flex-end">
             <Button
               variant="default"
               disabled={roleBusy}
-              onClick={() => setRoleTarget(null)}
+              onClick={() => { setRoleTarget(null); setRoleError(false) }}
             >
               キャンセル
             </Button>
@@ -442,6 +464,7 @@ export function CommunityMembersContent({
               loading={roleBusy}
               disabled={
                 !onChangeRole ||
+                roleError ||
                 selectedRole === roleTarget?.role ||
                 (selectedRole === "admin" && adminLimitReached) ||
                 (selectedRole === "member" &&
@@ -480,9 +503,9 @@ export function CommunityMembersContent({
             </Text>
           </Stack>
           {error && (
-            <Text size="sm" c="red" role="alert">
+            <FeedbackPanel kind="error" title="退会できませんでした" role="alert">
               {error}
-            </Text>
+            </FeedbackPanel>
           )}
           <Group justify="flex-end">
             <Button variant="default" disabled={busy} onClick={close}>

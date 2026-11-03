@@ -1,6 +1,9 @@
 "use client"
 
-import { releaseCommunityAccentPreview, type CommunityAccentPreview } from "./communityAccentPreview"
+import {
+  releaseCommunityAccentPreview,
+  type CommunityAccentPreview,
+} from "./communityAccentPreview"
 import { createCommunityAccentSaveController } from "@/features/community-settings/communityAccentSaveController"
 
 import {
@@ -34,18 +37,30 @@ export function CommunityAccentPreviewProvider({
 }: {
   children: ReactNode
 }) {
-  const [previews, setCurrentPreviews] = useState<Record<string, NonNullable<CommunityAccentPreview>>>({})
+  const [previews, setCurrentPreviews] = useState<
+    Record<string, NonNullable<CommunityAccentPreview>>
+  >({})
   const saveController = useRef(createCommunityAccentSaveController()).current
   const nextOwner = useRef(0)
   const setPreview = useCallback((communityId: string, color: string) => {
     const owner = ++nextOwner.current
-    setCurrentPreviews((current) => ({ ...current, [communityId]: { communityId, color, owner } }))
+    setCurrentPreviews((current) => ({
+      ...current,
+      [communityId]: { communityId, color, owner },
+    }))
     return owner
   }, [])
   const clearPreview = useCallback((communityId: string, owner: number) => {
     setCurrentPreviews((current) => {
-      if (!current[communityId] ||
-        releaseCommunityAccentPreview(current[communityId], communityId, owner) !== null) return current
+      if (
+        !current[communityId] ||
+        releaseCommunityAccentPreview(
+          current[communityId],
+          communityId,
+          owner,
+        ) !== null
+      )
+        return current
       const updated = { ...current }
       delete updated[communityId]
       return updated

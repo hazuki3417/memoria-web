@@ -10,7 +10,7 @@ import {
   Text,
   Title,
 } from "@mantine/core"
-import { FeedbackAlert } from "@/components/Feedback"
+import { FeedbackPanel } from "@/components/Feedback"
 import type { AccountDeletionController } from ".././useAccountDeletionController"
 import type { Decision } from ".././accountDeletionScenarios"
 
@@ -84,11 +84,11 @@ export function AccountDeletionResolutionStep({
                   )}
                 </Group>
                 {!requiresDecision ? (
-                  <FeedbackAlert kind="info" title="退会">
+                  <FeedbackPanel kind="info" title="退会">
                     {community.relation === "member"
                       ? "このCommunityにはMemberとして参加しています。アカウントを削除すると、このCommunityから退会します。"
                       : "あなた以外にもAdministratorがいるため、Communityはそのまま残ります。アカウントを削除すると、このCommunityから退会します。"}
-                  </FeedbackAlert>
+                  </FeedbackPanel>
                 ) : (
                   <Text size="sm" c="dimmed">
                     あなた以外にAdministratorがいません。

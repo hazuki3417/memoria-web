@@ -7,12 +7,19 @@ mutation RegisterMemoriaUser($input: RegisterUserInput!) {
 }
 
 mutation UpdateMemoriaUserProfile($input: UpdateUserProfileInput!) {
-  updateUserProfile(input: $input) { user { id profile { nickname } } }
+  updateUserProfile(input: $input) {
+    __typename
+    ... on UpdateUserProfileSuccess { user { id profile { nickname } } }
+    ... on InputValidationFailure { violations { scope code inputPaths { segments } } }
+  }
 }
 
 mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
   updateUserPreferences(input: $input) {
-    preferences {
+    __typename
+    ... on InputValidationFailure { violations { scope code inputPaths { segments } } }
+    ... on UpdateUserPreferencesSuccess {
+      preferences {
       personalAccentColor
       dateFormat
       fileSizeUnit
@@ -20,6 +27,7 @@ mutation SaveUserPreferences($input: UpdateUserPreferencesInput!) {
       mediaDetailNavigationWrap
       mediaDetailInitialInfoWide
       mediaDetailInitialInfoMedium
+      }
     }
   }
 }

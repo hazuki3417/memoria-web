@@ -156,7 +156,9 @@ describe("preferences save queue", () => {
   it("keeps saving status while newer edits remain in flight", async () => {
     vi.useFakeTimers()
     const states: string[] = []
-    let completeFirst: ((value: typeof defaultUserPreferences) => void) | undefined
+    let completeFirst:
+      | ((value: typeof defaultUserPreferences) => void)
+      | undefined
     const save = vi
       .fn()
       .mockImplementationOnce(
@@ -203,7 +205,8 @@ describe("preferences save queue", () => {
 
   it("does not auto retry after failure even when new edits arrive", async () => {
     vi.useFakeTimers()
-    const save = vi.fn()
+    const save = vi
+      .fn()
       .mockRejectedValueOnce(new Error("offline"))
       .mockResolvedValue(defaultUserPreferences)
     const queue = createPreferencesSaveQueue(save, vi.fn(), vi.fn())
@@ -308,11 +311,14 @@ describe("preferences save queue", () => {
 
   it("does not duplicate an in-flight save when manually flushed again", async () => {
     vi.useFakeTimers()
-    let resolveSave: ((value: typeof defaultUserPreferences) => void) | undefined
+    let resolveSave:
+      | ((value: typeof defaultUserPreferences) => void)
+      | undefined
     const save = vi.fn().mockImplementation(
-      () => new Promise<typeof defaultUserPreferences>((resolve) => {
-        resolveSave = resolve
-      }),
+      () =>
+        new Promise<typeof defaultUserPreferences>((resolve) => {
+          resolveSave = resolve
+        }),
     )
     const onSaved = vi.fn()
     const queue = createPreferencesSaveQueue(save, onSaved, vi.fn())
@@ -333,9 +339,10 @@ describe("preferences save queue", () => {
     vi.useFakeTimers()
     let rejectSave: ((reason: Error) => void) | undefined
     const save = vi.fn().mockImplementation(
-      () => new Promise<typeof defaultUserPreferences>((_resolve, reject) => {
-        rejectSave = reject
-      }),
+      () =>
+        new Promise<typeof defaultUserPreferences>((_resolve, reject) => {
+          rejectSave = reject
+        }),
     )
     const onError = vi.fn()
     const states: string[] = []

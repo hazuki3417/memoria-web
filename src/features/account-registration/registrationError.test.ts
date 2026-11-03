@@ -13,6 +13,14 @@ describe("登録時の認証エラー判定", () => {
     ).toBe(true)
   })
 
+  it("削除中のUserは再登録不可のBlocked状態とする", () => {
+    expect(
+      isBlockingRegistrationError({
+        graphQLErrors: [{ extensions: { code: "USER_DELETING" } }],
+      }),
+    ).toBe(true)
+  })
+
   it("一時障害と予期しないエラーを通常の失敗に分類する", () => {
     expect(
       isBlockingRegistrationError({ networkError: { statusCode: 500 } }),
