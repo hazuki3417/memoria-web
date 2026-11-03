@@ -14,7 +14,7 @@ import { communityAccentSchema } from "../communityAccentSchema"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"
-import { SaveStatus, type SaveStatusState } from "@/components/SaveStatus"
+import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING, type SaveStatusState } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 
@@ -105,11 +105,7 @@ export function CommunityPreferencesContent({
             <SaveStatus
               state={saveStatus}
               announce
-              timing={{
-                savingDelayMs: 300,
-                savedDurationMs: 2000,
-                savingAnnouncementMs: 2000,
-              }}
+              timing={SETTINGS_SAVE_STATUS_TIMING}
             />
           ) : undefined
         }
