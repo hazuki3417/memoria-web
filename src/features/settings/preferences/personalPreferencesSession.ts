@@ -1,5 +1,6 @@
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import {
   classifySettingsSaveFailure,
@@ -13,6 +14,7 @@ export type PreferencesSessionSnapshot = Readonly<{
   accentDraft: string | null
   saveStatus: SaveStatusState
   failure: PreferencesFailure
+  blockedFeedback: PreferencesBlockedFeedback | null
   validation: { fieldErrors: Record<string, string>; formError: boolean } | null
   inspected: boolean
   observedMatches: boolean
@@ -25,6 +27,7 @@ const initial: PreferencesSessionSnapshot = {
   accentDraft: null,
   saveStatus: "idle",
   failure: null,
+  blockedFeedback: null,
   validation: null,
   inspected: false,
   observedMatches: false,
@@ -73,7 +76,7 @@ export function createPersonalPreferencesSession() {
           locallyConfirmedKeys.add(key)
           if (nextDraft[key] === confirmed[key]) delete nextDraft[key]
         }
-        emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null, validation: null })
+        emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null, blockedFeedback: null, validation: null })
       },
       (error, attempted) => {
         const failure = classifySettingsSaveFailure(error)
@@ -83,6 +86,7 @@ export function createPersonalPreferencesSession() {
             : null
         emit({
           failure,
+          blockedFeedback: failure === "blocked" ? getPreferencesBlockedFeedback(error) : null,
           validation,
           saveStatus: "attention",
           inspected: false,
@@ -224,6 +228,7 @@ export function createPersonalPreferencesSession() {
         confirmed,
         draftPatch: {},
         failure: null,
+        blockedFeedback: null,
         validation: null,
         saveStatus: "idle",
         observedMatches: false,
@@ -242,6 +247,7 @@ export function createPersonalPreferencesSession() {
       inspectedValue = null
       emit({
         failure: null,
+        blockedFeedback: null,
         validation: null,
         saveStatus: "pending",
         observedMatches: false,
@@ -255,6 +261,7 @@ export function createPersonalPreferencesSession() {
       inspectedValue = null
       emit({
         failure: null,
+        blockedFeedback: null,
         validation: null,
         draftPatch: {},
         accentDraft: snapshot.confirmed?.personalAccentColor ?? null,
