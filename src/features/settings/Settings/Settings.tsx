@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import { SettingsLayout, type Section } from "../SettingsLayout"
 import { SettingsSectionContent } from "../SettingsSectionContent"
-import type { SaveProfile } from "../profile/SettingsProfile"
+import type { InspectProfile, SaveProfile } from "../profile/SettingsProfile"
 import type {
   UserPreferences,
   UserPreferencesPatch,
@@ -13,6 +13,7 @@ import type {
 export function Settings({
   section,
   saveProfile,
+  inspectProfile,
   profileNickname,
   initialPreferences,
   savePreferences,
@@ -24,6 +25,7 @@ export function Settings({
 }: {
   section: Section
   saveProfile?: SaveProfile
+  inspectProfile?: InspectProfile
   profileNickname?: string
   initialPreferences?: UserPreferences
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
@@ -44,6 +46,7 @@ export function Settings({
         <SettingsSectionContent
           section={section}
           saveProfile={saveProfile}
+          inspectProfile={inspectProfile}
           profileNickname={profileNickname}
           initialPreferences={initialPreferences}
           savePreferences={savePreferences}
