@@ -115,9 +115,11 @@ export function resolveSettingsValidation(
       violation.inputPaths[0]?.segments.length === 1
         ? violation.inputPaths[0]?.segments[0]
         : undefined
-    if (field && fieldNames.includes(field)) {
-      fieldErrors[field] = validationMessages[violation.code] ?? "入力内容を確認してください。"
+    const message = validationMessages[violation.code]
+    if (field && fieldNames.includes(field) && message) {
+      fieldErrors[field] = message
     } else {
+      // Unknown public codes and paths cannot be attributed to a specific input.
       formError = true
     }
   }
