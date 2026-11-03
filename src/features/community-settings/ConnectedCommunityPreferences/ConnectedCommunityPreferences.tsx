@@ -130,7 +130,7 @@ export function ConnectedCommunityPreferences({
                 failure === "unknown"
                   ? "保存結果を確認できませんでした"
                   : failure === "blocked"
-                    ? "Community設定を変更できません"
+                    ? snapshot.blockedFeedback?.title ?? "Community設定を変更できません"
                     : snapshot.validation
                       ? "入力内容を確認してください"
                       : "保存できませんでした"
@@ -185,7 +185,7 @@ export function ConnectedCommunityPreferences({
                   {failure === "unknown"
                     ? " 現在のServer状態を確認してから、必要に応じて手動で保存してください。"
                     : failure === "blocked"
-                      ? " 権限またはSessionを確認し、画面を再読み込みしてください。"
+                      ? ` ${snapshot.blockedFeedback?.description ?? "権限またはSessionを確認し、画面を再読み込みしてください。"}`
                       : snapshot.validation
                         ? " 入力項目を修正したうえで再保存するか、変更を破棄してください。"
                         : " 内容を確認して、再保存するか変更を破棄してください。"}
