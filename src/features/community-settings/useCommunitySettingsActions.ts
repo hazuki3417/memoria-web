@@ -1,7 +1,7 @@
 "use client"
 
 import { showNotification } from "@/components/Feedback"
-import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
+import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/features/settings/graphqlSettingsResult"
 import {
   MyCommunitiesDocument,
   CommunityMembersDocument,
@@ -104,11 +104,12 @@ export function useCommunitySettingsActions(communityId: string) {
   const onSaveName = async (nextName: string): Promise<string> => {
     const result = await updateCommunity({
       variables: { input: { communityId, name: nextName } },
+      errorPolicy: "all",
       // The confirmed mutation must not be rejected by a later refresh failure.
       refetchQueries: [MyCommunitiesDocument],
       awaitRefetchQueries: false,
     })
-    const outcome = result.data?.updateCommunity
+    const outcome = requireSettingsMutationOutcome(result.data?.updateCommunity, result)
     if (outcome?.__typename === "InputValidationFailure")
       throw new SettingsInputValidationError(outcome.violations)
     if (outcome?.__typename !== "UpdateCommunitySuccess")
