@@ -25,6 +25,7 @@ export function CommunitySettings({
   onNavigate,
   communityName,
   onSaveName,
+  onInspectName,
   members,
   onChangeMemberRole,
   onRemoveMember,
@@ -41,6 +42,7 @@ export function CommunitySettings({
   onNavigate?: (href: string) => void
   communityName?: string
   onSaveName?: (name: string) => Promise<string>
+  onInspectName?: () => Promise<string>
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
   onRemoveMember?: (userId: string) => Promise<boolean>
@@ -62,7 +64,7 @@ export function CommunitySettings({
   const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
   const [accent, setAccent] = useState("#7950f2")
-  const name = useCommunityNameSettings({ communityName, onSaveName })
+  const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
   const invitation = useCommunityInvitation(communityId)
 
   const sections = getCommunitySettingsSections(communityId)
