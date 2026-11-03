@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect } from "react"
-import { Alert, Button, Group, Stack, Text } from "@mantine/core"
+import { Button, Stack, Text } from "@mantine/core"
+import { FeedbackPanel } from "@/components/Feedback"
 import { useApolloClient } from "@apollo/client"
 import {
   useCommunityAccentPreview,
@@ -122,36 +123,20 @@ export function ConnectedCommunityPreferences({
         onAccentDraftChange={(value) => controller.edit(communityId, value)}
         saveFeedback={
           failure ? (
-            <Alert
-              color="red"
+            <FeedbackPanel
+              kind={failure === "unknown" ? "warning" : "error"}
               role="alert"
               title={
                 failure === "unknown"
                   ? "保存結果を確認できませんでした"
                   : failure === "blocked"
                     ? "Community設定を変更できません"
-                    : "保存できませんでした"
-              }
-            >
-              <Stack gap="xs">
-                <Text size="sm">
-                  Shellは最後に確認できた色を表示しています。入力内容は保持しています。
-                  {failure === "unknown"
-                    ? " 現在のServer状態を確認してから、必要に応じて手動で保存してください。"
-                    : failure === "blocked"
-                      ? " 権限またはSessionを確認し、画面を再読み込みしてください。"
                     : snapshot.validation
-                      ? " 入力項目を修正したうえで再保存するか、変更を破棄してください。"
-                      : " 内容を確認して、再保存するか変更を破棄してください。"}
-                </Text>
-                {failure === "unknown" && snapshot.inspected && (
-                  <Text size="sm">
-                    {snapshot.observedMatches
-                      ? "現在のServer値は入力した色と一致しています。旧Mutationの完了を証明するものではありません。"
-                      : "現在のServer値と入力した色が一致しません。"}
-                  </Text>
-                )}
-                <Group gap="xs">
+                      ? "入力内容を確認してください"
+                      : "保存できませんでした"
+              }
+              actions={
+                <>
                   {failure === "unknown" && (
                     <Button
                       size="xs"
@@ -189,9 +174,29 @@ export function ConnectedCommunityPreferences({
                   >
                     変更を破棄
                   </Button>
-                </Group>
+                </>
+              }
+            >
+              <Stack gap="xs">
+                <Text size="sm">
+                  Shellは最後に確認できた色を表示しています。入力内容は保持しています。
+                  {failure === "unknown"
+                    ? " 現在のServer状態を確認してから、必要に応じて手動で保存してください。"
+                    : failure === "blocked"
+                      ? " 権限またはSessionを確認し、画面を再読み込みしてください。"
+                      : snapshot.validation
+                        ? " 入力項目を修正したうえで再保存するか、変更を破棄してください。"
+                        : " 内容を確認して、再保存するか変更を破棄してください。"}
+                </Text>
+                {failure === "unknown" && snapshot.inspected && (
+                  <Text size="sm">
+                    {snapshot.observedMatches
+                      ? "現在のServer値は入力した色と一致しています。旧Mutationの完了を証明するものではありません。"
+                      : "現在のServer値と入力した色が一致しません。"}
+                  </Text>
+                )}
               </Stack>
-            </Alert>
+            </FeedbackPanel>
           ) : undefined
         }
         aliasControl={
