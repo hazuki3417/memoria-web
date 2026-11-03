@@ -358,7 +358,7 @@ export const PreferencesUnknownMatchesVisual: Story = {
     )
     await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
     await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
-    await expect(canvas.getByRole("alert")).toHaveTextContent("成功を証明するものではありません")
+    await expect(canvas.getByRole("alert")).toHaveTextContent("先ほどの保存が成功したことを示すものではありません")
   },
 }
 
