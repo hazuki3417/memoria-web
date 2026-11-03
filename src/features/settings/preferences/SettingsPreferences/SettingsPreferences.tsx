@@ -121,14 +121,14 @@ export function SettingsPreferences({
             {saveError === "validation" ? (
               <span>
                 {validation?.formError
-                  ? "保存できない入力の組み合わせがあります。内容を修正してから再保存してください。"
+                  ? "入力した設定の一部を受け付けられませんでした。内容を確認してから、もう一度保存してください。"
                   : "入力項目のエラーを修正してから、もう一度保存してください。"}
               </span>
             ) : saveError === "blocked" ? (
               <span>{blockedFeedback?.description ?? "画面を再読み込みして現在の状態を確認してください。"}</span>
             ) : saveError === "unknown" ? (
               <span>
-                変更内容は保持しています。現在のServer値を確認してから、必要に応じて手動で保存してください。
+                変更内容は保持しています。現在の設定を確認してから、必要に応じて保存してください。
               </span>
             ) : (
               <span>
@@ -138,8 +138,8 @@ export function SettingsPreferences({
             {saveError === "unknown" && inspected && (
               <span>
                 {observedMatches
-                  ? "現在の設定は入力した値と一致しています。旧Mutationの成功を証明するものではありません。"
-                  : "現在のServer値と入力した値が一致しません。"}
+                  ? "現在の設定は入力した値と一致しています。ただし、先ほどの保存が成功したことを示すものではありません。"
+                  : "現在の設定と入力した値が一致しません。"}
               </span>
             )}
           </Stack>
