@@ -44,6 +44,16 @@ describe("Hybrid settings input rejection", () => {
     ]), ["name"]).formError).toBe(true)
   })
 
+  it("shows unknown violation codes as Form errors, not invented field errors", () => {
+    const error = new SettingsInputValidationError([
+      { scope: "FIELD", code: "FUTURE_UNKNOWN_CODE", inputPaths: [{ segments: ["nickname"] }] },
+    ])
+    expect(resolveSettingsValidation(error, ["nickname"])).toEqual({
+      fieldErrors: {},
+      formError: true,
+    })
+  })
+
   it("distinguishes explicit failure kinds without assuming a transport error is retryable", () => {
     expect(classifySettingsSaveFailure(new SettingsInputValidationError([]))).toBe("validation")
     expect(classifySettingsSaveFailure({ kind: "blocked" })).toBe("blocked")
