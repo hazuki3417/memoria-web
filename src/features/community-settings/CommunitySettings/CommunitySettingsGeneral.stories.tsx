@@ -63,6 +63,8 @@ export const NameInvalid: Story = {
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
     await userEvent.type(canvas.getByRole("textbox", { name: /Community名/ }), "修正済み")
     await expect(canvas.queryByText("Community名を入力してください")).not.toBeInTheDocument()
+    await userEvent.clear(canvas.getByRole("textbox", { name: /Community名/ }))
+    await expect(canvas.getByText("Community名を入力してください")).toBeVisible()
   },
 }
 
