@@ -124,6 +124,9 @@ export const ProfileValidationContract: Story = {
     ).toBeVisible()
     await userEvent.type(canvas.getByRole("textbox", { name: /ニックネーム/ }), "修正済み")
     await expect(canvas.queryByText("ニックネームを入力してください。")).not.toBeInTheDocument()
+    // Once touched, another invalid edit must be reported without a second blur.
+    await userEvent.clear(canvas.getByRole("textbox", { name: /ニックネーム/ }))
+    await expect(canvas.getByText("ニックネームを入力してください。")).toBeVisible()
   },
 }
 
