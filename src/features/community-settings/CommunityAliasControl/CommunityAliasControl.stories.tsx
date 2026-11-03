@@ -70,6 +70,10 @@ export const AliasTooLong: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, "有効な別名")
     await expect(canvas.queryByText("100文字以内で入力してください。")).not.toBeInTheDocument()
+    // An already touched field validates again while editing.
+    await userEvent.clear(input)
+    await userEvent.type(input, "あ".repeat(101))
+    await expect(canvas.getByText("100文字以内で入力してください。")).toBeVisible()
   },
 }
 
