@@ -1,4 +1,5 @@
-import { Alert, Box, Button } from "@mantine/core"
+import { Box, Button } from "@mantine/core"
+import { FeedbackPanel } from "@/components/Feedback"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
@@ -166,9 +167,103 @@ export const AccentErrorWithDetails: Story = {
     isPreview: false,
     saveStatus: "attention",
     saveFeedback: (
-      <Alert color="red" title="保存できませんでした" role="alert">
+      <FeedbackPanel kind="error" title="保存できませんでした" role="alert">
         Shellは確定色に戻しました。ColorInputの変更内容は保持しています。
-      </Alert>
+      </FeedbackPanel>
+    ),
+  },
+}
+
+
+export const AccentUnknownBeforeInspection: Story = {
+  name: "Visual · Community Accentの保存結果未確定",
+  tags: ["visual"],
+  args: {
+    isPreview: false,
+    saveStatus: "attention",
+    saveFeedback: (
+      <FeedbackPanel
+        kind="warning"
+        title="保存結果を確認できませんでした"
+        role="alert"
+        actions={
+          <>
+            <Button size="xs" variant="light">現在の状態を確認</Button>
+            <Button size="xs" variant="subtle" color="gray">変更を破棄</Button>
+          </>
+        }
+      >
+        最後に確認できた色を表示しています。入力内容は保持しています。
+        現在値を確認してから必要な操作を選んでください。
+      </FeedbackPanel>
+    ),
+  },
+}
+
+export const AccentUnknownInspected: Story = {
+  name: "Visual · Community Accentの現在値照会一致",
+  tags: ["visual"],
+  args: {
+    isPreview: false,
+    saveStatus: "attention",
+    saveFeedback: (
+      <FeedbackPanel
+        kind="warning"
+        title="保存結果を確認できませんでした"
+        role="alert"
+        actions={
+          <>
+            <Button size="xs" variant="light">現在の状態を確認</Button>
+            <Button size="xs" variant="light">確認完了</Button>
+            <Button size="xs" variant="subtle" color="gray">変更を破棄</Button>
+          </>
+        }
+      >
+        現在の色は入力した値と一致しています。元の保存処理が成功した証明ではありません。
+      </FeedbackPanel>
+    ),
+  },
+}
+
+export const AccentBlockedPanel: Story = {
+  name: "Visual · Community Accentの操作不可",
+  tags: ["visual"],
+  args: {
+    isPreview: false,
+    saveStatus: "attention",
+    saveFeedback: (
+      <FeedbackPanel
+        kind="error"
+        title="Community設定を変更できません"
+        role="alert"
+      >
+        権限またはセッションの状態を確認してから再読み込みしてください。
+      </FeedbackPanel>
+    ),
+  },
+}
+
+export const AccentValidationPanel: Story = {
+  name: "Visual · Community AccentのServer Validation",
+  tags: ["visual"],
+  args: {
+    isPreview: false,
+    saveStatus: "attention",
+    accentError: "HEXカラーコード（#RRGGBB）を入力してください。",
+    saveFeedback: (
+      <FeedbackPanel
+        kind="error"
+        title="入力内容を確認してください"
+        role="alert"
+        actions={
+          <>
+            <Button size="xs">もう一度保存</Button>
+            <Button size="xs" variant="subtle" color="gray">変更を破棄</Button>
+          </>
+        }
+      >
+        入力内容を修正したうえで再保存するか、変更を破棄してください。
+      </FeedbackPanel>
     ),
   },
 }
