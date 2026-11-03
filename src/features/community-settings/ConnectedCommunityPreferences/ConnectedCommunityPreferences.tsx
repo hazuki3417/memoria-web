@@ -202,6 +202,15 @@ export function ConnectedCommunityPreferences({
         aliasControl={
           <CommunityAliasControl
             savedAlias={data.community.mySettings.alias}
+            onInspect={async () => {
+              const current = await client.query({
+                query: CommunityMySettingsDocument,
+                variables: { communityId },
+                fetchPolicy: "no-cache",
+              })
+              if (!current.data?.community) throw new Error("Community unavailable")
+              return current.data.community.mySettings.alias
+            }}
             onSave={async (alias) => {
               const result = await save({
                 fetchPolicy: "no-cache",
