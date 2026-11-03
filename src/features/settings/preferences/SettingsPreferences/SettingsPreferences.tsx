@@ -89,7 +89,8 @@ export function SettingsPreferences({
           }
           role="alert"
           actions={
-            <>
+            saveError === "blocked" ? undefined : (
+              <>
               {saveError === "unknown" && (
                 <Button size="xs" variant="light" onClick={() => void inspect()}>
                   現在の状態を確認
@@ -106,12 +107,13 @@ export function SettingsPreferences({
                   もう一度保存
                 </Button>
               )}
-              {hasSession && saveError !== "blocked" && (
+              {hasSession && (
                 <Button size="xs" variant="subtle" color="gray" onClick={discard}>
                   変更を破棄
                 </Button>
               )}
-            </>
+              </>
+            )
           }
         >
           <Stack gap="xs">
