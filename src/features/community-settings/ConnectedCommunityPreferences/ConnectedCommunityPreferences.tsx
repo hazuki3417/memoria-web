@@ -127,7 +127,9 @@ export function ConnectedCommunityPreferences({
               title={
                 failure === "unknown"
                   ? "保存結果を確認できませんでした"
-                  : "保存できませんでした"
+                  : failure === "blocked"
+                    ? "Community設定を変更できません"
+                    : "保存できませんでした"
               }
             >
               <Stack gap="xs">
@@ -135,6 +137,8 @@ export function ConnectedCommunityPreferences({
                   Shellは最後に確認できた色を表示しています。入力内容は保持しています。
                   {failure === "unknown"
                     ? " 現在のServer状態を確認してから、必要に応じて手動で保存してください。"
+                    : failure === "blocked"
+                      ? " 権限またはSessionを確認し、画面を再読み込みしてください。"
                     : snapshot.validation
                       ? " 入力項目を修正したうえで再保存するか、変更を破棄してください。"
                       : " 内容を確認して、再保存するか変更を破棄してください。"}
@@ -165,7 +169,8 @@ export function ConnectedCommunityPreferences({
                       確認完了
                     </Button>
                   )}
-                  {(failure === "rejected" || snapshot.inspected) &&
+                  {(failure === "rejected" ||
+                    (failure === "unknown" && snapshot.inspected)) &&
                     !snapshot.observedMatches && (
                       <Button
                         size="xs"
