@@ -8,11 +8,11 @@ Applies to Personal and Community settings (Profile, Preferences, Account, Gener
 - Render loading/error feedback in the page content area only, not across the entire shell.
 - Use `PageStatusBoundary` for initial loading and errors.
 - Delay the Loader by 300 ms to avoid flashes from short requests. The Loader is centered inside the content loading region.
-- When an initial request fails or mandatory data is missing, display a shared error message asking the user to reload the page. Do not offer a retry button.
+- When an initial request fails or mandatory data is missing, display a shared error message asking the user to reload the page. The reusable `PageStatusBoundary` itself does not provide retry. Usage is a deliberate exception at the Feature UI level: its initial error adds a `再試行` action that refetches the current Custodian's Usage.
 - When cached data is available, preserve existing content during background refetch rather than replacing it with a Loader or Skeleton.
 - Failure of a background refresh should not discard successfully loaded data; use a nonblocking error notification.
 - Preserve authorization flows (including Community membership loss) and existing content interactions.
-- Usage does not use a Skeleton as its loading representation. Loading/errors occur before rendering usage content.
+- Usage does not use a Skeleton as its loading representation. The shared `Usage` UI renders the existing `PageStatusBoundary` Loader/Error before presenting Usage content; Context-specific connections supply the state and retry callback.
 - Account also waits for its required CurrentUser data and follows the same boundary rules.
 
 ## Component ownership

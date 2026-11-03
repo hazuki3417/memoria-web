@@ -57,6 +57,16 @@ The new stories and interaction tests are committed but their successful executi
 
 合意済みの横断規約により、exportするReact Componentは同名Directory内に実装し、`index.ts`を公開入口とする。現在の設定機能では`Settings`、`SettingsSectionContent`、`SettingsLayout`、`SettingsProfile`、`SettingsPreferences`、`SettingsAccount`、`CommunitySettings`、`CommunitySettingsContent`、`CommunityGeneralContent`、`CommunityMembersContent`、`CommunityPreferencesContent`、`CommunityDangerZone`、`CommunityInvitationSection`、`CommunityNameSection`、`CommunityAliasControl`、`CommunityDeletionConfirmation`、`CommunitySettingsRoute`、`ConnectedCommunityPreferences`、`ConnectedSettings`、`ConnectedPersonalSettingsSection`を移行した。ページ別Storyは対象表示Componentと近接配置し、Storybookのtitleを変更しない。旧ファイルは削除し、Directoryのindex.tsから公開する。残りのComponentのDirectory移行、import参照確認、TypeScript・Storybook・VRTの実行確認が必要であり、完了扱いにしない。
 
-## Usage Featureの段階的移行
+## Usage共通UIとContext固有接続（2026-11-03）
 
-設定画面に接続されるUsage Featureの `SettingsUsage`、`ConnectedUsage`、`UsageStorageSection`、`UsageFormatBreakdownSection`、`UsageSortHeader`、`UsageFileSize` について、ComponentごとのDirectoryと `index.ts` を整備した。対象StoryもComponentのDirectoryへ近接配置した。表示ロジック・Storyタイトルは変更していない。移動後のTypeScript、Storybook Interaction、VRTによる回帰検証は未実行であり、未対応Featureの全件棚卸しは別途必要。
+- `src/features/usage/Usage.tsx` はPersonal / Community共通の表示、ソート、表示モード、Loading / Error / Retry UIを所有するFeature Entry。GraphQL接続は持たない。
+- `src/features/settings/usage/ConnectedPersonalUsage.tsx` はPersonal Usage QueryとPreference解決、Data Mapping、取得状態、再試行、Background Refresh通知を接続する。
+- `src/features/community-settings/usage/ConnectedCommunityUsage.tsx` はCommunity IDに紐づくUsage Query、CurrentUser Preferences、再試行、Background Refresh通知とCommunity切替時のUI State分離を接続する。
+- Context固有の接続は各Context Featureから共通UsageのPublic APIを一方向に利用する。Routeからは各Context側の接続Componentを構成し、従来のSettings / Community Settingsの`usageContent`、Navigation、Layout契約を維持する。
+- `Usage.stories.tsx` はProps / CallbackによるInteractionとVRT、Context別の`Connected*Usage.stories.tsx` は本物の生成Apollo Hook / Clientと`MockedProvider`によるGraphQL境界Integrationを担当する。実Backendに接続せず、元の有効なStory contractを維持する。
+- ローディングにはSkeletonではなく共通`PageStatusBoundary`のLoader（300ms delay）を使用し、Settings Navigationを残してContent領域だけを切り替える。Usageの初回ErrorにはFeature固有の「再試行」を追加するが、共通Boundaryには再試行責務を追加しない。
+- `settings` / `community-settings` 全体の既存ページ配置の再編成は本作業の範囲外とする。従来のvisual / behavior / responsive contractは維持し、変更前後のStory / VRT baselineを照合する。
+
+### 実装後の検証
+
+TypeScript / Biome / Unit / Storybook Interaction / VRTを実行し、元のPersonal・Community各Scenarioおよび再試行・Context切替・既存0件・Loading・Errorの回帰を確認する。テスト未実行を合格扱いにしない。
