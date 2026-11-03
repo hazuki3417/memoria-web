@@ -9,6 +9,7 @@ import {
 } from "./feedbackAppearance"
 export type { FeedbackKind } from "./feedbackAppearance"
 export { FeedbackAlert } from "./FeedbackAlert"
+export { FeedbackPanel } from "./FeedbackPanel"
 
 export function showNotification({
   kind,
