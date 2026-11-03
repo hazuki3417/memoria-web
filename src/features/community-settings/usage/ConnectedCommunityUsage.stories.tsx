@@ -78,7 +78,7 @@ function CommunitySwitchScenario() {
 }
 
 const meta = {
-  title: "Features/Community Settings/Usage/Apollo Integration",
+  title: "features/community-settings/usage/ConnectedCommunityUsage",
   component: ConnectedCommunityUsage,
   args: { communityId: "club-a" },
 } satisfies Meta<typeof ConnectedCommunityUsage>

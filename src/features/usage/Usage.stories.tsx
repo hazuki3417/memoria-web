@@ -404,7 +404,7 @@ export const ErrorRetryUiContract: Story = {
 
 export const VrtErrorWithRetry: Story = {
   name: "Visual · 再試行可能な取得失敗",
-  tags: ["visual", "vrt"],
+  tags: ["visual"],
   args: { status: "error", onRetry: () => undefined },
 }
 

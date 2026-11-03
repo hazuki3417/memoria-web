@@ -28,7 +28,7 @@ const personalSuccess = {
 }
 
 const meta = {
-  title: "Features/Settings/Usage/Apollo Integration",
+  title: "features/settings/usage/ConnectedPersonalUsage",
   component: ConnectedPersonalUsage,
 } satisfies Meta<typeof ConnectedPersonalUsage>
 export default meta

@@ -4,7 +4,7 @@ import { UsageStorageSection } from "./UsageStorageSection"
 import { sampleUsage, zeroUsage } from "../usageStoryFixtures"
 
 const meta = {
-  title: "Features/Settings/Usage/Storage",
+  title: "features/usage/UsageStorageSection",
   component: UsageStorageSection,
   args: {
     usage: sampleUsage,

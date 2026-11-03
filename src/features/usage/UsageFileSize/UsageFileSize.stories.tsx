@@ -3,7 +3,7 @@ import { expect, within } from "storybook/test"
 import { UsageFileSize } from "./UsageFileSize"
 
 const meta = {
-  title: "Features/Settings/Usage/File Size",
+  title: "features/usage/UsageFileSize",
   component: UsageFileSize,
   args: {
     bytes: 1_240_000_000,

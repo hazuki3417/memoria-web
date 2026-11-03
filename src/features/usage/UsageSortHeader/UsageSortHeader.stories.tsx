@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from "storybook/test"
 import { UsageSortHeader } from "./UsageSortHeader"
 
 const meta = {
-  title: "Features/Settings/Usage/Sort Header",
+  title: "features/usage/UsageSortHeader",
   component: UsageSortHeader,
   args: {
     label: "使用量",

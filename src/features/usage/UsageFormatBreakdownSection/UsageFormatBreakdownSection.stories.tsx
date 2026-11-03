@@ -24,7 +24,7 @@ function SortableBreakdownStory(
 }
 
 const meta = {
-  title: "Features/Settings/Usage/Format Breakdown",
+  title: "features/usage/UsageFormatBreakdownSection",
   component: UsageFormatBreakdownSection,
   args: {
     usage: sampleUsage,
