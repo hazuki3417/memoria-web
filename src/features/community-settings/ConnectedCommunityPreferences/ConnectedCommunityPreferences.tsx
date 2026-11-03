@@ -12,7 +12,7 @@ import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshE
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
-import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
+import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/features/settings/graphqlSettingsResult"
 import {
   CommunityMySettingsDocument,
   UpdateCommunitySettingsDocument,
@@ -55,9 +55,10 @@ export function ConnectedCommunityPreferences({
         >({
           mutation: UpdateCommunitySettingsDocument,
           fetchPolicy: "no-cache",
+          errorPolicy: "all",
           variables: { input: { communityId, accentColor: next } },
         })
-        const outcome = result.data?.updateCommunitySettings
+        const outcome = requireSettingsMutationOutcome(result.data?.updateCommunitySettings, result)
         if (outcome?.__typename === "InputValidationFailure")
           throw new SettingsInputValidationError(outcome.violations)
         const confirmed =
@@ -199,6 +200,7 @@ export function ConnectedCommunityPreferences({
             onSave={async (alias) => {
               const result = await save({
                 fetchPolicy: "no-cache",
+                errorPolicy: "all",
                 variables: { input: { communityId, alias } },
               })
               const outcome = result.data?.updateCommunitySettings
