@@ -39,6 +39,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+// Visual: 表示状態・VRT候補（既存のStory ID・タグを維持）
 export const Ready: Story = {
   name: "Visual · Ready（Decimal）",
   tags: ["visual"],
@@ -80,6 +81,13 @@ export const Binary: Story = {
   args: { fileSizeUnit: "BINARY" },
 }
 
+export const Percent: Story = {
+  name: "Visual · 割合表示",
+  tags: ["visual", "vrt"],
+  args: { displayMode: "percent" },
+}
+
+// Interaction: 振る舞い・接続契約
 export const SortInteraction: Story = {
   name: "Interaction · byte数に基づくソート",
   tags: ["interaction"],
@@ -141,10 +149,4 @@ export const LoadingContract: Story = {
     ).toHaveLength(3)
     await expect(canvas.getAllByRole("row")).toHaveLength(6)
   },
-}
-
-export const Percent: Story = {
-  name: "Visual · 割合表示",
-  tags: ["visual", "vrt"],
-  args: { displayMode: "percent" },
 }

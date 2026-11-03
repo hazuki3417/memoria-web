@@ -47,6 +47,51 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+// Visual: 表示状態・VRT候補（既存のStory ID・タグを維持）
+// Play無しの静的StoryのみをVRT候補とし、画像Baselineは別途Visual Reviewで承認する。
+export const VrtReady: Story = {
+  name: "Visual · Ready",
+  tags: ["visual", "vrt"],
+}
+
+export const VrtEmpty: Story = {
+  name: "Visual · 0件",
+  tags: ["visual", "vrt"],
+  args: { usage: zeroUsage },
+}
+
+// PageStatusBoundary の300ms遅延があるため、Loadingは専用Interaction Storyで検証する。
+export const VrtLoading: Story = {
+  name: "Visual · Loading",
+  tags: ["visual"],
+  args: { status: "loading" },
+}
+
+export const VrtError: Story = {
+  name: "Visual · 取得失敗",
+  tags: ["visual", "vrt"],
+  args: { status: "error" },
+}
+
+export const VrtErrorWithRetry: Story = {
+  name: "Visual · 再試行可能な取得失敗",
+  tags: ["visual"],
+  args: { status: "error", onRetry: () => undefined },
+}
+
+export const VrtLimit: Story = {
+  name: "Visual · 上限到達",
+  tags: ["visual", "vrt"],
+  args: { usage: limitReachedUsage },
+}
+
+export const VrtCommunity: Story = {
+  name: "Visual · Community",
+  tags: ["visual", "vrt"],
+  args: { scope: "community" },
+}
+
+// Interaction: 振る舞い・接続契約
 // ST-01・ST-04・ST-08・FM-01・FM-05・UN-01・UI-04:
 // UIに渡された確定済み集計値の表示だけを保証し、Backendの集計処理は保証しない。
 export const ReadyValuesContract: Story = {
@@ -54,6 +99,11 @@ export const ReadyValuesContract: Story = {
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    await expect(
+      canvas.getByText(
+        "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
+      ),
+    ).toBeVisible()
     await expect(canvas.getAllByText("1.24 GB").length).toBeGreaterThan(0)
     await expect(canvas.getByText("3.76 GB")).toBeVisible()
     await expect(canvas.getAllByText("5 GB").length).toBeGreaterThan(0)
@@ -368,28 +418,6 @@ export const DisplayModeLifetimeContract: Story = {
   },
 }
 
-// Play無しの静的StoryのみをVRT候補とし、画像Baselineは別途Visual Reviewで承認する。
-export const VrtReady: Story = {
-  name: "Visual · Ready",
-  tags: ["visual", "vrt"],
-}
-export const VrtEmpty: Story = {
-  name: "Visual · 0件",
-  tags: ["visual", "vrt"],
-  args: { usage: zeroUsage },
-}
-// PageStatusBoundary の300ms遅延があるため、Loadingは専用Interaction Storyで検証する。
-export const VrtLoading: Story = {
-  name: "Visual · Loading",
-  tags: ["visual"],
-  args: { status: "loading" },
-}
-export const VrtError: Story = {
-  name: "Visual · 取得失敗",
-  tags: ["visual", "vrt"],
-  args: { status: "error" },
-}
-
 export const ErrorRetryUiContract: Story = {
   name: "Interaction · 再試行ボタンの通知",
   tags: ["interaction"],
@@ -400,23 +428,6 @@ export const ErrorRetryUiContract: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
     await expect(args.onRetry).toHaveBeenCalledTimes(1)
   },
-}
-
-export const VrtErrorWithRetry: Story = {
-  name: "Visual · 再試行可能な取得失敗",
-  tags: ["visual"],
-  args: { status: "error", onRetry: () => undefined },
-}
-
-export const VrtLimit: Story = {
-  name: "Visual · 上限到達",
-  tags: ["visual", "vrt"],
-  args: { usage: limitReachedUsage },
-}
-export const VrtCommunity: Story = {
-  name: "Visual · Community",
-  tags: ["visual", "vrt"],
-  args: { scope: "community" },
 }
 
 export const PercentDenominatorContract: Story = {
@@ -519,41 +530,5 @@ export const CommunityErrorContract: Story = {
       canvas.queryByRole("button", { name: "再試行" }),
     ).not.toBeInTheDocument()
     await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
-  },
-}
-
-export const PersonalUsage: Story = {
-  name: "Visual · 利用状況",
-  tags: ["visual"],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(canvas.getByRole("table")).toBeVisible()
-    await expect(
-      canvas.getByText(
-        "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
-      ),
-    ).toBeVisible()
-  },
-}
-
-export const PersonalUsageEmpty: Story = {
-  name: "Visual · 登録0件",
-  tags: ["visual"],
-  args: { usage: zeroUsage },
-}
-
-export const PersonalUsageErrorState: Story = {
-  name: "Visual · 取得失敗",
-  tags: ["visual"],
-  args: {
-    usage: sampleUsage, status: "error",
-  },
-}
-
-export const PersonalUsageLoadingState: Story = {
-  name: "Visual · 読み込み中",
-  tags: ["visual"],
-  args: {
-    usage: sampleUsage, status: "loading",
   },
 }

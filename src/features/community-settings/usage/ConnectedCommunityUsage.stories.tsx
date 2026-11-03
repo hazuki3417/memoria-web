@@ -8,17 +8,8 @@ import {
   CurrentUserDocument,
 } from "@/infrastructure/graphql/generated"
 import { ConnectedCommunityUsage } from "./ConnectedCommunityUsage"
+import { graphqlUsageFixture, emptyGraphqlUsageFixture } from "@/features/usage/usageStoryFixtures"
 
-const usage = {
-  mediaCount: 1248,
-  storage: { usedBytes: "1240000000", effectiveLimitBytes: "5000000000" },
-  formatBreakdown: [
-    { format: "JPEG", mediaCount: 900, usedBytes: "900000000" },
-    { format: "PNG", mediaCount: 200, usedBytes: "200000000" },
-    { format: "WEBP", mediaCount: 100, usedBytes: "100000000" },
-    { format: "HEIF", mediaCount: 48, usedBytes: "40000000" },
-  ],
-}
 
 const communityRequest = {
   query: CommunityUsageDocument,
@@ -26,12 +17,17 @@ const communityRequest = {
 }
 const communitySuccess = {
   request: communityRequest,
-  result: { data: { communityUsage: usage } },
+  result: { data: { communityUsage: graphqlUsageFixture } },
 }
 const communityFailure = {
   request: communityRequest,
   error: new Error("Usage取得失敗"),
 }
+const communityEmptySuccess = {
+  request: communityRequest,
+  result: { data: { communityUsage: emptyGraphqlUsageFixture } },
+}
+const communityLoading = { ...communitySuccess, delay: 15_000 }
 
 const communityPreferences = (unit: "DECIMAL" | "BINARY") => ({
   request: { query: CurrentUserDocument },
@@ -142,25 +138,7 @@ export const CommunityEmpty: Story = {
     (Story) => (
       <MockedProvider
         mocks={[
-          {
-            request: communityRequest,
-            result: {
-              data: {
-                communityUsage: {
-                  mediaCount: 0,
-                  storage: {
-                    usedBytes: "0",
-                    effectiveLimitBytes: "5000000000",
-                  },
-                  formatBreakdown: usage.formatBreakdown.map((item) => ({
-                    ...item,
-                    mediaCount: 0,
-                    usedBytes: "0",
-                  })),
-                },
-              },
-            },
-          },
+          communityEmptySuccess,
           communityPreferences("DECIMAL"),
         ]}
         addTypename={false}
@@ -182,6 +160,30 @@ export const CommunityEmpty: Story = {
     }
     await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+/** SS-01: Usage取得応答が未確定の間は共通Loaderで集計値を隠す。 */
+export const CommunityLoading: Story = {
+  name: "Interaction · Community取得待機中",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[communityLoading, communityPreferences("DECIMAL")]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(
+      await canvas.findByRole("status", { name: "利用状況を読み込み中" }, { timeout: 5_000 }),
+    ).toBeVisible()
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+    await expect(canvas.queryByText("0 GB")).not.toBeInTheDocument()
   },
 }
 
