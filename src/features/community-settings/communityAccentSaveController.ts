@@ -4,7 +4,7 @@ import {
   resolveSettingsFailureValidation,
 } from "@/features/settings/graphqlSettingsResult"
 
-export type AccentFailure = "rejected" | "unknown" | null
+export type AccentFailure = "rejected" | "blocked" | "unknown" | null
 export type AccentSnapshot = Readonly<{
   confirmed: string | null
   draft: string | null
@@ -109,13 +109,17 @@ export function createCommunityAccentSaveController() {
             validation: null,
           })
         } catch (error) {
-          const failure: AccentFailure = isUnknownAccentOutcome(error)
-            ? "unknown"
-            : "rejected"
+          const kind = classifySettingsSaveFailure(error)
+          const failure: AccentFailure =
+            kind === "unknown"
+              ? "unknown"
+              : kind === "blocked"
+                ? "blocked"
+                : "rejected"
           entry.desired = null
           clearPreview(entry)
           const validation =
-            classifySettingsSaveFailure(error) === "validation"
+            kind === "validation"
               ? resolveSettingsFailureValidation(error, ["accentColor"])
               : null
           update(id, {
@@ -281,6 +285,7 @@ export function createCommunityAccentSaveController() {
       const entry = entryFor(id)
       if (
         !entry.snapshot.failure ||
+        entry.snapshot.failure === "blocked" ||
         !entry.snapshot.draft ||
         !hex(entry.snapshot.draft)
       )
@@ -317,15 +322,3 @@ export function createCommunityAccentSaveController() {
   }
 }
 
-function isUnknownAccentOutcome(error: unknown): boolean {
-  if (typeof error !== "object" || error === null) return true
-  if ("networkError" in error && error.networkError) return true
-  if ("name" in error && error.name === "TypeError") return true
-  // An absent/invalid response cannot establish whether the server committed.
-  if (
-    error instanceof Error &&
-    /response invalid|unconfirmed/i.test(error.message)
-  )
-    return true
-  return !("graphQLErrors" in error)
-}
