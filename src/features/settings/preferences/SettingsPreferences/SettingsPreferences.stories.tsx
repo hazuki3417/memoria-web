@@ -275,3 +275,108 @@ export const PreferencesRefreshWhileEditing: Story = {
     await expect(switches[2]).toBeChecked()
   },
 }
+
+
+function PreferencesFeedbackSessionFixture(
+  args: ComponentProps<typeof SettingsPreferences>,
+) {
+  return (
+    <PersonalPreferencesSessionProvider>
+      <SettingsPreferences {...args} />
+    </PersonalPreferencesSessionProvider>
+  )
+}
+
+export const PreferencesFormErrorVisual: Story = {
+  name: "Visual · Personal PreferencesのForm Error",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getAllByRole("switch")[0])
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "入力内容を確認してください",
+    )
+    await expect(canvas.getByRole("button", { name: "もう一度保存" })).toBeVisible()
+  },
+}
+
+export const PreferencesRetryableVisual: Story = {
+  name: "Visual · Personal Preferencesの再試行可能な保存失敗",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => { throw { kind: "retryable" } }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getAllByRole("switch")[0])
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "保存できませんでした",
+    )
+    await expect(canvas.getByRole("button", { name: "もう一度保存" })).toBeVisible()
+  },
+}
+
+export const PreferencesBlockedVisual: Story = {
+  name: "Visual · Personal Preferencesの操作不可",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => {
+      throw { graphQLErrors: [{ extensions: { code: "USER_DELETING" } }] }
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getAllByRole("switch")[0])
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("設定を変更できません")
+    await expect(canvas.queryByRole("button", { name: "変更を破棄" })).not.toBeInTheDocument()
+  },
+}
+
+export const PreferencesUnknownMatchesVisual: Story = {
+  name: "Visual · Personal PreferencesのUnknown照会一致",
+  tags: ["visual"],
+  render: (args) => <PreferencesFeedbackSessionFixture {...args} />,
+  args: {
+    onSave: fn(async () => { throw new Error("unknown") }),
+    onInspect: fn(async () => ({
+      ...defaultUserPreferences,
+      mediaDetailNavigationWrap: true,
+    })),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getAllByRole("switch")[0])
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "保存結果を確認できませんでした",
+    )
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("成功を証明するものではありません")
+  },
+}
+
+export const PreferencesUnknownDiffersVisual: Story = {
+  name: "Visual · Personal PreferencesのUnknown照会不一致",
+  tags: ["visual"],
+  render: (args) => <PreferencesFeedbackSessionFixture {...args} />,
+  args: {
+    onSave: fn(async () => { throw new Error("unknown") }),
+    onInspect: fn(async () => defaultUserPreferences),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getAllByRole("switch")[0])
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "変更を破棄" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("一致しません")
+  },
+}
