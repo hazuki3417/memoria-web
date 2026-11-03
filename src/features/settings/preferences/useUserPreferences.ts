@@ -22,6 +22,7 @@ export function useUserPreferences(
 ) {
   const {
     saveError,
+    blockedFeedback,
     saveStatus,
     validation,
     sessionSnapshot,
@@ -150,6 +151,7 @@ export function useUserPreferences(
     change,
     changeAccentDraft,
     saveError,
+    blockedFeedback,
     saveStatus,
     fieldErrors: errors,
     validation,
