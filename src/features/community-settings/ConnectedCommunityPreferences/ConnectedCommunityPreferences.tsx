@@ -203,7 +203,7 @@ export function ConnectedCommunityPreferences({
                 errorPolicy: "all",
                 variables: { input: { communityId, alias } },
               })
-              const outcome = result.data?.updateCommunitySettings
+              const outcome = requireSettingsMutationOutcome(result.data?.updateCommunitySettings, result)
               if (outcome?.__typename === "InputValidationFailure")
                 throw new SettingsInputValidationError(outcome.violations)
               const settings =
