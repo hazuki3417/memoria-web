@@ -122,6 +122,8 @@ export const ProfileValidationContract: Story = {
     await expect(
       canvas.getByText("ニックネームを入力してください。"),
     ).toBeVisible()
+    await userEvent.type(canvas.getByRole("textbox", { name: /ニックネーム/ }), "修正済み")
+    await expect(canvas.queryByText("ニックネームを入力してください。")).not.toBeInTheDocument()
   },
 }
 
