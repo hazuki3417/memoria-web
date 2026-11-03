@@ -30,7 +30,7 @@ let host: HTMLDivElement
 let actions!: Actions
 
 beforeEach(async () => {
-  vi.clearAllMocks()
+  vi.resetAllMocks()
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
