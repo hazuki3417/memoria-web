@@ -74,7 +74,6 @@ export function classifySettingsSaveFailure(error: unknown): SettingsSaveFailure
       // Mixed or unknown errors do not prove that a mutation was rejected.
       const blocked = [
         "UNAUTHENTICATED",
-        "UNAUTHORIZED", // Legacy API code during the coordinated Hybrid migration.
         "USER_REGISTRATION_REQUIRED",
         "USER_DELETING",
         "FORBIDDEN",
