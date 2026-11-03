@@ -46,7 +46,14 @@ export function classifySettingsSaveFailure(error: unknown): SettingsSaveFailure
     })
     if (codes.length > 0) {
       // Mixed or unknown errors do not prove that a mutation was rejected.
-      const blocked = ["UNAUTHENTICATED", "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND"]
+      const blocked = [
+        "UNAUTHENTICATED",
+        "UNAUTHORIZED", // Legacy API code during the coordinated Hybrid migration.
+        "USER_REGISTRATION_REQUIRED",
+        "USER_DELETING",
+        "FORBIDDEN",
+        "NOT_FOUND",
+      ]
       if (codes.every((code) => code !== null && blocked.includes(code)))
         return "blocked"
       if (codes.every((code) => code === "VALIDATION" || code === "CONFLICT"))
