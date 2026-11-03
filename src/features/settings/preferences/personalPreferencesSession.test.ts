@@ -292,6 +292,42 @@ describe("Personal Preferences session controller", () => {
     }
   })
 
+
+  it("keeps public blocked guidance without retrying and clears it after discard", async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = createPersonalPreferencesSession()
+      const save = vi.fn().mockRejectedValue({
+        graphQLErrors: [{ extensions: { code: "USER_DELETING" }, message: "private" }],
+      })
+      controller.configure(save)
+      controller.hydrate(defaultUserPreferences)
+      controller.edit({ fileSizeUnit: "BINARY" })
+      await vi.advanceTimersByTimeAsync(400)
+
+      expect(controller.getSnapshot()).toMatchObject({
+        failure: "blocked",
+        blockedFeedback: {
+          title: "アカウントの削除処理中です",
+        },
+        draftPatch: { fileSizeUnit: "BINARY" },
+      })
+      expect(controller.getSnapshot().blockedFeedback?.description).not.toContain("private")
+      controller.retry()
+      await vi.advanceTimersByTimeAsync(400)
+      expect(save).toHaveBeenCalledTimes(1)
+
+      controller.discard()
+      expect(controller.getSnapshot()).toMatchObject({
+        failure: null,
+        blockedFeedback: null,
+        draftPatch: {},
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("discards a failed Draft and restores a form reset revision", async () => {
     vi.useFakeTimers()
     try {
