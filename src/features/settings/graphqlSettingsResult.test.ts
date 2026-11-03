@@ -49,11 +49,15 @@ describe("Hybrid settings input rejection", () => {
     expect(classifySettingsSaveFailure({ kind: "blocked" })).toBe("blocked")
     expect(classifySettingsSaveFailure({ kind: "retryable" })).toBe("retryable")
     expect(classifySettingsSaveFailure({
-      graphQLErrors: [{ extensions: { code: "UNAUTHORIZED" } }],
+      graphQLErrors: [{ extensions: { code: "USER_REGISTRATION_REQUIRED" } }],
     })).toBe("blocked")
     expect(classifySettingsSaveFailure({
       errors: [{ extensions: { code: "FORBIDDEN" } }],
     })).toBe("blocked")
+    // The coordinated contract no longer publishes legacy UNAUTHORIZED.
+    expect(classifySettingsSaveFailure({
+      graphQLErrors: [{ extensions: { code: "UNAUTHORIZED" } }],
+    })).toBe("unknown")
     for (const code of ["USER_REGISTRATION_REQUIRED", "USER_DELETING"]) {
       expect(classifySettingsSaveFailure({
         graphQLErrors: [{ extensions: { code } }],
@@ -64,7 +68,7 @@ describe("Hybrid settings input rejection", () => {
       graphQLErrors: [{ extensions: { code: "RATE_LIMITED" } }],
     })).toBe("unknown")
     expect(classifySettingsSaveFailure({
-      errors: [{ extensions: { code: "INTERNAL_SERVER_ERROR" } }],
+      errors: [{ extensions: { code: "INTERNAL" } }],
     })).toBe("unknown")
     expect(classifySettingsSaveFailure({
       graphQLErrors: [{ extensions: { code: "UNAUTHENTICATED" } }],
@@ -83,7 +87,7 @@ describe("Hybrid settings input rejection", () => {
     expect(classifySettingsSaveFailure({
       graphQLErrors: [
         { extensions: { code: "VALIDATION" } },
-        { extensions: { code: "INTERNAL_SERVER_ERROR" } },
+        { extensions: { code: "INTERNAL" } },
       ],
     })).toBe("unknown")
     expect(classifySettingsSaveFailure({
