@@ -1,4 +1,5 @@
 import { Box, Button } from "@mantine/core"
+import { Notifications, notifications } from "@mantine/notifications"
 import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
@@ -568,5 +569,77 @@ export const ProfileUnknownStaleInspection: Story = {
     await expect(canvas.queryByRole("button", { name: "確認完了" })).not.toBeInTheDocument()
     await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
     await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
+  },
+}
+
+
+function ProfileNotificationFixture(args: ComponentProps<typeof SettingsProfile>) {
+  return (
+    <>
+      <Notifications position="top-right" />
+      <SettingsProfile {...args} />
+    </>
+  )
+}
+
+export const ProfileSuccessNotification: Story = {
+  name: "Interaction · 明示保存の成功通知は確定後に一度だけ",
+  tags: ["interaction"],
+  args: { onSave: fn(async () => undefined) },
+  render: (args) => <ProfileNotificationFixture {...args} />,
+  play: async ({ canvasElement, args }) => {
+    notifications.clean()
+    const canvas = within(canvasElement)
+    const page = within(canvasElement.ownerDocument.body)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "通知で確定する名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+    await expect(await page.findByText("プロフィールを更新しました。")).toBeVisible()
+    await expect(page.getAllByText("プロフィールを更新しました。")).toHaveLength(1)
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    notifications.clean()
+  },
+}
+
+export const ProfileUnknownInspectionInvalidation: Story = {
+  name: "Interaction · 現在値確認のあと再編集したら確認を無効化",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => { throw new Error("result missing") }),
+    onInspect: fn(async () => "保存されたか不明"),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "保存されたか不明")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
+    await userEvent.type(input, "を再編集")
+    await expect(canvas.queryByRole("button", { name: "確認完了" })).not.toBeInTheDocument()
+    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const ProfileSaveStaleQuery: Story = {
+  name: "Interaction · 確定後の古い再取得で保存値を巻き戻さない",
+  tags: ["interaction"],
+  render: (args) => <ProfileRefreshFixture {...args} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "確定した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(args.onSave).toHaveBeenCalled()
+    await expect(input).toHaveValue("確定した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "プロフィール再取得を再現" }))
+    await expect(input).toHaveValue("確定した名前")
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
   },
 }
