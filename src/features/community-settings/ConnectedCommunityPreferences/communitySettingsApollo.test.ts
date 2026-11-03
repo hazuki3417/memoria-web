@@ -4,6 +4,7 @@ import {
   InMemoryCache,
   Observable,
 } from "@apollo/client"
+import { GraphQLError } from "graphql"
 import { describe, expect, it } from "vitest"
 import {
   CommunityMySettingsDocument,
@@ -11,6 +12,7 @@ import {
   type OperationCommunityMySettingsQuery,
 } from "@/infrastructure/graphql/generated"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { requireSettingsMutationOutcome, classifySettingsSaveFailure } from "@/features/settings/graphqlSettingsResult"
 
 function settings(accentColor: string, alias: string | null) {
   return { __typename: "CommunitySettings", accentColor, alias }
@@ -144,4 +146,92 @@ describe("Community settings Apollo operation isolation", () => {
       alias: "New alias",
     })
   })
+
+  it("keeps a confirmed Community independent when another Context's mutation fails late", async () => {
+    const pending = new Map<
+      string,
+      (data: Record<string, unknown>, errors?: GraphQLError[]) => void
+    >()
+    const link = new ApolloLink(
+      (operation) =>
+        new Observable((observer) => {
+          const id = operation.variables.input.communityId as string
+          pending.set(id, (data, errors) => {
+            observer.next({ data, errors })
+            observer.complete()
+          })
+        }),
+    )
+    const cache = new InMemoryCache()
+    for (const [id, color] of [
+      ["community-a", "#112233"],
+      ["community-b", "#445566"],
+    ]) {
+      cache.writeQuery({
+        query: CommunityMySettingsDocument,
+        variables: { communityId: id },
+        data: {
+          community: {
+            __typename: "Community",
+            id,
+            mySettings: settings(color, "Old alias"),
+          },
+        },
+      })
+    }
+    const client = new ApolloClient({ cache, link })
+    const older = client.mutate({
+      mutation: UpdateCommunitySettingsDocument,
+      variables: { input: { communityId: "community-a", accentColor: "#AABBCC" } },
+      fetchPolicy: "no-cache",
+      errorPolicy: "all",
+    })
+    const newer = client.mutate({
+      mutation: UpdateCommunitySettingsDocument,
+      variables: { input: { communityId: "community-b", accentColor: "#CCDDEE" } },
+      fetchPolicy: "no-cache",
+      errorPolicy: "all",
+    })
+    expect(pending.size).toBe(2)
+    pending.get("community-b")?.({
+      updateCommunitySettings: {
+        __typename: "UpdateCommunitySettingsSuccess",
+        settings: settings("#CCDDEE", "Old alias"),
+      },
+    })
+    const newerResult = await newer
+    const newerOutcome = requireSettingsMutationOutcome(
+      newerResult.data?.updateCommunitySettings, newerResult,
+    )
+    expect(newerOutcome.__typename).toBe("UpdateCommunitySettingsSuccess")
+    if (newerOutcome.__typename === "UpdateCommunitySettingsSuccess")
+      commitCommunitySettingsPatch(cache, "community-b", {
+        accentColor: newerOutcome.settings.accentColor,
+      })
+    pending.get("community-a")?.(
+      { updateCommunitySettings: null },
+      [new GraphQLError("redacted", { extensions: { code: "INTERNAL_SERVER_ERROR" } })],
+    )
+    const olderResult = await older
+    try {
+      requireSettingsMutationOutcome(
+        olderResult.data?.updateCommunitySettings, olderResult,
+      )
+      throw new Error("Old Context response unexpectedly confirmed")
+    } catch (error) {
+      expect(classifySettingsSaveFailure(error)).toBe("unknown")
+    }
+    const read = (id: string) =>
+      cache.readQuery<OperationCommunityMySettingsQuery>({
+        query: CommunityMySettingsDocument,
+        variables: { communityId: id },
+      })?.community?.mySettings
+    expect(read("community-a")).toMatchObject({
+      accentColor: "#112233", alias: "Old alias",
+    })
+    expect(read("community-b")).toMatchObject({
+      accentColor: "#CCDDEE", alias: "Old alias",
+    })
+  })
+
 })
