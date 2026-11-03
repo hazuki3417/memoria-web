@@ -67,6 +67,9 @@ export const AliasTooLong: Story = {
       canvas.getByText("100文字以内で入力してください。"),
     ).toBeVisible()
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await userEvent.clear(input)
+    await userEvent.type(input, "有効な別名")
+    await expect(canvas.queryByText("100文字以内で入力してください。")).not.toBeInTheDocument()
   },
 }
 
