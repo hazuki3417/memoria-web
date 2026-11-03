@@ -413,9 +413,9 @@ describe("session Community Accent save controller", () => {
 
   it("requires manual retry after a rejected mutation and keeps Draft on error", async () => {
     const controller = createCommunityAccentSaveController()
-    const rejected = Object.assign(new Error("domain"), {
-      graphQLErrors: [{ message: "Rejected" }],
-    })
+    // An explicitly retryable result is distinguishable from an unclassified
+    // GraphQL execution error, which must remain Unknown Outcome.
+    const rejected = { kind: "retryable" }
     const save = vi
       .fn()
       .mockRejectedValueOnce(rejected)
@@ -443,6 +443,66 @@ describe("session Community Accent save controller", () => {
     await tick()
     expect(save).toHaveBeenCalledTimes(2)
     expect(controller.getSnapshot(id).confirmed).toBe("#AABBCC")
+  })
+
+  it("treats unclassified and internal GraphQL execution errors as unknown, never immediate retry", async () => {
+    for (const graphQLErrors of [
+      [{ extensions: { code: "INTERNAL_SERVER_ERROR" } }],
+      [{ message: "Rejected" }],
+      [
+        { extensions: { code: "VALIDATION" } },
+        { extensions: { code: "INTERNAL_SERVER_ERROR" } },
+      ],
+    ]) {
+      const controller = createCommunityAccentSaveController()
+      const save = vi.fn().mockRejectedValue({ graphQLErrors })
+      controller.initialize(id, "#112233")
+      controller.configure(id, {
+        save,
+        observe: vi.fn().mockResolvedValue("#112233"),
+        preview: vi.fn().mockReturnValue(1),
+        release: vi.fn(),
+      })
+      controller.edit(id, "#AABBCC")
+      await tick()
+      expect(controller.getSnapshot(id)).toMatchObject({
+        confirmed: "#112233",
+        draft: "#AABBCC",
+        failure: "unknown",
+        inspected: false,
+      })
+      controller.retry(id)
+      await tick()
+      expect(save).toHaveBeenCalledTimes(1)
+    }
+  })
+
+  it("blocks retry on an authenticated/authorized execution rejection", async () => {
+    for (const code of ["UNAUTHENTICATED", "FORBIDDEN", "USER_DELETING"]) {
+      const controller = createCommunityAccentSaveController()
+      const save = vi.fn().mockRejectedValue({
+        graphQLErrors: [{ extensions: { code } }],
+      })
+      controller.initialize(id, "#112233")
+      controller.configure(id, {
+        save,
+        observe: vi.fn(),
+        preview: vi.fn().mockReturnValue(1),
+        release: vi.fn(),
+      })
+      controller.edit(id, "#AABBCC")
+      await tick()
+      expect(controller.getSnapshot(id)).toMatchObject({
+        confirmed: "#112233",
+        draft: "#AABBCC",
+        failure: "blocked",
+        status: "attention",
+      })
+      controller.edit(id, "#445566")
+      controller.retry(id)
+      await tick()
+      expect(save).toHaveBeenCalledTimes(1)
+    }
   })
 
   it("discards an errored draft without pretending to cancel an unknown mutation", async () => {
