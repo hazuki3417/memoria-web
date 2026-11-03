@@ -10,6 +10,7 @@ import {
   resolveSettingsFailureValidation,
 } from "../graphqlSettingsResult"
 import type { PreferencesFailure } from "./personalPreferencesSession"
+import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type SaveError = PreferencesFailure
@@ -22,6 +23,7 @@ export function usePreferencesSave(
 ) {
   const { controller: session, snapshot } = usePersonalPreferencesSession()
   const [localError, setLocalError] = useState<SaveError>(null)
+  const [localBlockedFeedback, setLocalBlockedFeedback] = useState<PreferencesBlockedFeedback | null>(null)
   const [localValidation, setLocalValidation] = useState<{
     fieldErrors: Record<string, string>
     formError: boolean
@@ -68,6 +70,7 @@ export function usePreferencesSave(
       () => {
         if (mounted) {
           setLocalError(null)
+          setLocalBlockedFeedback(null)
           setLocalValidation(null)
         }
       },
@@ -75,6 +78,7 @@ export function usePreferencesSave(
         if (!mounted) return
         const kind = classifySettingsSaveFailure(error)
         setLocalError(kind)
+        setLocalBlockedFeedback(kind === "blocked" ? getPreferencesBlockedFeedback(error) : null)
         setLocalValidation(
           kind === "validation"
             ? resolveSettingsFailureValidation(error, Object.keys(attempted))
@@ -97,6 +101,7 @@ export function usePreferencesSave(
 
   return {
     saveError: session ? snapshot.failure : localError,
+    blockedFeedback: session ? snapshot.blockedFeedback : localBlockedFeedback,
     validation: session ? snapshot.validation : localValidation,
     saveStatus: session ? snapshot.saveStatus : localStatus,
     sessionSnapshot: session ? snapshot : null,
@@ -111,6 +116,7 @@ export function usePreferencesSave(
       if (session) session.retry()
       else {
         setLocalError(null)
+        setLocalBlockedFeedback(null)
         setLocalValidation(null)
         void localRef.current?.flush()
       }
