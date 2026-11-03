@@ -273,6 +273,8 @@ export const CommunitySwitch: Story = {
     await expect(
       await canvas.findAllByText("1.24 GB").then((elements) => elements[0]),
     ).toBeVisible()
+    await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
+    await expect(canvas.getByRole("radio", { name: "割合" })).toBeChecked()
     await userEvent.click(
       canvas.getByRole("button", { name: "Community Bへ切り替え" }),
     )
@@ -280,6 +282,7 @@ export const CommunitySwitch: Story = {
       await canvas.findAllByText("2 GB").then((elements) => elements[0]),
     ).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
+    await expect(canvas.getByRole("radio", { name: "容量" })).toBeChecked()
     await expect(canvas.queryAllByText("1.24 GB")).toHaveLength(0)
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
