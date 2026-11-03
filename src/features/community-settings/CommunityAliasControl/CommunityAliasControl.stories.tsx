@@ -209,3 +209,137 @@ export const AliasRefreshAfterRevert: Story = {
     await expect(save).toBeDisabled()
   },
 }
+
+
+export const AliasUnknownMatches: Story = {
+  name: "Interaction · 現在のAliasが一致したら明示確認",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => { throw new Error("response lost") }),
+    onInspect: fn(async () => "変更した別名"),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("成功した証明ではありません")
+    await userEvent.click(canvas.getByRole("button", { name: "確認完了" }))
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+    await expect(input).toHaveValue("変更した別名")
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const AliasUnknownDiffers: Story = {
+  name: "Visual · Alias現在値とDraft不一致・復旧Action",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => { throw new Error("unknown") }),
+    onInspect: fn(async () => "現在の別名"),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "新しい別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "変更を破棄" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("現在の別名")
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const AliasUnknownInspectFailure: Story = {
+  name: "Interaction · Alias現在値照会失敗では再送しない",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => { throw new Error("uncertain") }),
+    onInspect: fn(async () => { throw new Error("read failed") }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "未確定の別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByText("現在のCommunity別名を取得できませんでした。保存を再送せず、状態の確認をやり直してください。")).toBeVisible()
+    await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
+    await expect(input).toHaveValue("未確定の別名")
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const AliasUnknownDiscard: Story = {
+  name: "Interaction · Alias不一致時に現在値を採用してDraft破棄",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => { throw new Error("unknown") }),
+    onInspect: fn(async () => null),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "未確定の別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "変更を破棄" })).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "変更を破棄" }))
+    await expect(input).toHaveValue("")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const AliasBlockedUserDeleting: Story = {
+  name: "Visual · Alias更新不可（削除処理中）",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => {
+      throw { graphQLErrors: [{ extensions: { code: "USER_DELETING" } }] }
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "未保存の別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("アカウントの削除処理中です")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+export const AliasFormValidationPanel: Story = {
+  name: "Visual · Alias Form-level Validationの持続表示",
+  tags: ["visual"],
+  args: {
+    onSave: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "更新する別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("入力内容を確認してください")
+    await userEvent.type(input, "を再編集")
+    await expect(canvas.getByRole("alert")).toBeVisible()
+  },
+}
