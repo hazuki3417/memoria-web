@@ -17,6 +17,14 @@ export class SettingsInputValidationError extends Error {
 }
 
 
+/** An execution error without a typed Result is not proof of a failed write. */
+export class SettingsGraphQLExecutionError extends Error {
+  constructor(readonly graphQLErrors: ReadonlyArray<unknown>) {
+    super("Settings GraphQL execution failed without mutation result")
+    this.name = "SettingsGraphQLExecutionError"
+  }
+}
+
 /**
  * With Apollo errorPolicy "all", a response may contain both GraphQL
  * errors and a typed mutation result. A present result is authoritative for
@@ -30,7 +38,7 @@ export function requireSettingsMutationOutcome<T>(
 ): T {
   if (outcome !== null && outcome !== undefined) return outcome
   if (response.errors?.length) {
-    throw { graphQLErrors: response.errors }
+    throw new SettingsGraphQLExecutionError(response.errors)
   }
   throw new Error("Settings mutation outcome unavailable")
 }
