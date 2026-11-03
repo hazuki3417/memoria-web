@@ -136,7 +136,8 @@ export function ConnectedCommunityPreferences({
                       : "保存できませんでした"
               }
               actions={
-                <>
+                failure === "blocked" ? undefined : (
+                  <>
                   {failure === "unknown" && (
                     <Button
                       size="xs"
@@ -174,7 +175,8 @@ export function ConnectedCommunityPreferences({
                   >
                     変更を破棄
                   </Button>
-                </>
+                  </>
+                )
               }
             >
               <Stack gap="xs">
