@@ -17,6 +17,24 @@ export class SettingsInputValidationError extends Error {
 }
 
 
+/**
+ * With Apollo errorPolicy "all", a response may contain both GraphQL
+ * errors and a typed mutation result. A present result is authoritative for
+ * this operation; errors without its result still need to be classified.
+ *
+ * Do not infer success from unrelated partial data or an empty response.
+ */
+export function requireSettingsMutationOutcome<T>(
+  outcome: T | null | undefined,
+  response: { errors?: ReadonlyArray<unknown> },
+): T {
+  if (outcome !== null && outcome !== undefined) return outcome
+  if (response.errors?.length) {
+    throw { graphQLErrors: response.errors }
+  }
+  throw new Error("Settings mutation outcome unavailable")
+}
+
 /** Classify only failures that are explicitly distinguishable from the public contract. */
 export type SettingsSaveFailureKind = "validation" | "retryable" | "blocked" | "unknown"
 
