@@ -176,11 +176,15 @@ export const MemberRoleChangeFailureContract: Story = {
       "user-2",
       "admin",
     )
-    await expect(dialog).toBeVisible()
-    await expect(await within(dialog).findByRole("alert")).toHaveTextContent(
-      "役割変更の結果を確認できませんでした",
-    )
-    await expect(within(dialog).getByRole("button", { name: "変更する" })).toBeDisabled()
+    // Mantine Modal's portal exists before its enter transition finishes.
+    // Wait for the dialog and persistent recovery feedback together.
+    await waitFor(async () => {
+      await expect(dialog).toBeVisible()
+      await expect(within(dialog).getByRole("alert")).toHaveTextContent(
+        "役割変更の結果を確認できませんでした",
+      )
+      await expect(within(dialog).getByRole("button", { name: "変更する" })).toBeDisabled()
+    })
   },
 }
 
