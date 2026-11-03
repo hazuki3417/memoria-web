@@ -5,7 +5,7 @@ import { useMediaQuery } from "@mantine/hooks"
 import Link from "next/link"
 import type { ReactNode } from "react"
 import type { Section } from "../SettingsLayout"
-import { SettingsProfile, type SaveProfile } from "../profile/SettingsProfile"
+import { SettingsProfile, type InspectProfile, type SaveProfile } from "../profile/SettingsProfile"
 import { SettingsPreferences } from "../preferences/SettingsPreferences"
 import { SettingsAccount } from "../account/SettingsAccount"
 import type {
@@ -21,6 +21,7 @@ async function unavailableProfileSave(): Promise<void> {
 export type SettingsSectionContentProps = {
   section: Section
   saveProfile?: SaveProfile
+  inspectProfile?: InspectProfile
   profileNickname?: string
   initialPreferences?: UserPreferences
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
@@ -33,6 +34,7 @@ export type SettingsSectionContentProps = {
 export function SettingsSectionContent({
   section,
   saveProfile,
+  inspectProfile,
   profileNickname,
   initialPreferences,
   savePreferences,
@@ -46,6 +48,7 @@ export function SettingsSectionContent({
       return (
         <SettingsProfile
           onSave={saveProfile ?? unavailableProfileSave}
+          onInspect={inspectProfile}
           initialNickname={profileNickname}
         />
       )
