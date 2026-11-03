@@ -11,7 +11,7 @@ import {
 } from "@mantine/core"
 import { FeedbackAlert } from "@/components/Feedback"
 import { PageHeader } from "@/components/PageHeader"
-import { SaveStatus } from "@/components/SaveStatus"
+import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import { useUserPreferences } from "../useUserPreferences"
@@ -70,11 +70,7 @@ export function SettingsPreferences({
             <SaveStatus
               state={saveError ? "attention" : saveStatus}
               announce
-              timing={{
-                savingDelayMs: 300,
-                savedDurationMs: 2000,
-                savingAnnouncementMs: 2000,
-              }}
+              timing={SETTINGS_SAVE_STATUS_TIMING}
             />
           ) : undefined
         }
