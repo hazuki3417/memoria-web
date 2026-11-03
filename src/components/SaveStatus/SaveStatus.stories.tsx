@@ -1,10 +1,10 @@
 import { Box, Button, Stack, Text } from "@mantine/core"
 import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, userEvent, waitFor, within } from "storybook/test"
 import { FeedbackAlert } from "../Feedback"
 import { PageHeader } from "../PageHeader"
-import { SaveStatus } from "./SaveStatus"
+import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "./SaveStatus"
 
 const meta = {
   title: "Components/Save Status",
@@ -121,11 +121,7 @@ function TimedPresentationScenario() {
     <Stack align="flex-start">
       <SaveStatus
         state={state}
-        timing={{
-          savingDelayMs: 300,
-          savedDurationMs: 2000,
-          savingAnnouncementMs: 2000,
-        }}
+        timing={SETTINGS_SAVE_STATUS_TIMING}
         announce
       />
       <Button onClick={() => setState("saving")}>Start saving</Button>
@@ -136,6 +132,62 @@ function TimedPresentationScenario() {
 }
 
 export const TimedPresentationCandidate: Story = {
-  name: "Interaction · Timing候補（実画面未適用）",
+  name: "Interaction · 合意済みTiming（Saving 300ms / Saved 2秒）",
   render: () => <TimedPresentationScenario />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const announcement = canvas.getByRole("status")
+    await userEvent.click(canvas.getByRole("button", { name: "Start saving" }))
+    // The queue may complete before 300ms; the transient badge must not flash.
+    expect(canvas.queryByText("保存中")).not.toBeInTheDocument()
+    await waitFor(() => expect(canvas.getByText("保存中")).toBeVisible(), {
+      timeout: 1500,
+    })
+    expect(announcement).toBeEmptyDOMElement()
+    await userEvent.click(canvas.getByRole("button", { name: "Confirm saved" }))
+    await expect(canvas.getByText("保存済み")).toBeVisible()
+    await expect(announcement).toHaveTextContent("変更を保存しました")
+    await waitFor(() => expect(canvas.getByText("保存済み")).not.toBeVisible(), {
+      timeout: 3000,
+    })
+    await expect(announcement).toBeEmptyDOMElement()
+  },
+}
+
+export const TimedSavingAnnouncement: Story = {
+  name: "Interaction · 2秒を超えるSavingのみ読み上げる",
+  render: () => <TimedPresentationScenario />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const announcement = canvas.getByRole("status")
+    await userEvent.click(canvas.getByRole("button", { name: "Start saving" }))
+    expect(announcement).toBeEmptyDOMElement()
+    await waitFor(() => expect(announcement).toHaveTextContent("保存中です"), {
+      timeout: 3000,
+    })
+    await userEvent.click(canvas.getByRole("button", { name: "Confirm saved" }))
+    await expect(announcement).toHaveTextContent("変更を保存しました")
+  },
+}
+
+export const TimedInterruptions: Story = {
+  name: "Interaction · 高速保存とError遷移でTimerをCancel",
+  render: () => <TimedPresentationScenario />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const announcement = canvas.getByRole("status")
+    await userEvent.click(canvas.getByRole("button", { name: "Start saving" }))
+    await userEvent.click(canvas.getByRole("button", { name: "Confirm saved" }))
+    expect(canvas.queryByText("保存中")).not.toBeInTheDocument()
+    await expect(canvas.getByText("保存済み")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "Start saving" }))
+    await expect(canvas.getByText("保存済み")).not.toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "Require attention" }))
+    await expect(canvas.getByText("要確認")).toBeVisible()
+    await expect(announcement).toBeEmptyDOMElement()
+    // Old Saving/Saved timers cannot clear a persistent error.
+    await new Promise((resolve) => setTimeout(resolve, 2100))
+    await expect(canvas.getByText("要確認")).toBeVisible()
+    await expect(announcement).toBeEmptyDOMElement()
+  },
 }
