@@ -497,11 +497,20 @@ describe("session Community Accent save controller", () => {
         draft: "#AABBCC",
         failure: "blocked",
         status: "attention",
+        blockedFeedback: {
+          title: code === "UNAUTHENTICATED"
+            ? "ログインが必要です"
+            : code === "USER_DELETING"
+              ? "アカウントの削除処理中です"
+              : "Community設定を変更できません",
+        },
       })
       controller.edit(id, "#445566")
       controller.retry(id)
       await tick()
       expect(save).toHaveBeenCalledTimes(1)
+      controller.discard(id)
+      expect(controller.getSnapshot(id).blockedFeedback).toBeNull()
     }
   })
 
