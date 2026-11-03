@@ -334,7 +334,7 @@ export const PreferencesBlockedVisual: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getAllByRole("switch")[0])
-    await expect(await canvas.findByRole("alert")).toHaveTextContent("設定を変更できません")
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("アカウントの削除処理中です")
     await expect(canvas.queryByRole("button", { name: "変更を破棄" })).not.toBeInTheDocument()
   },
 }
