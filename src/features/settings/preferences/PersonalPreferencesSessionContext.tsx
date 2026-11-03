@@ -22,6 +22,7 @@ const empty: PreferencesSessionSnapshot = {
   accentDraft: null,
   saveStatus: "idle",
   failure: null,
+  blockedFeedback: null,
   validation: null,
   inspected: false,
   observedMatches: false,
