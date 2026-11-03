@@ -54,6 +54,15 @@ describe("Hybrid settings input rejection", () => {
     expect(classifySettingsSaveFailure({
       errors: [{ extensions: { code: "FORBIDDEN" } }],
     })).toBe("blocked")
+    for (const code of ["USER_REGISTRATION_REQUIRED", "USER_DELETING"]) {
+      expect(classifySettingsSaveFailure({
+        graphQLErrors: [{ extensions: { code } }],
+      })).toBe("blocked")
+    }
+    // Rate limiting is not proven to happen before the write. No automatic retry.
+    expect(classifySettingsSaveFailure({
+      graphQLErrors: [{ extensions: { code: "RATE_LIMITED" } }],
+    })).toBe("unknown")
     expect(classifySettingsSaveFailure({
       errors: [{ extensions: { code: "INTERNAL_SERVER_ERROR" } }],
     })).toBe("unknown")
