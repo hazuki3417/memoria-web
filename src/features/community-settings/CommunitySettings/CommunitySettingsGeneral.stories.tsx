@@ -261,3 +261,138 @@ export const NameEditedDuringSave: Story = {
     await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
   },
 }
+
+
+export const NameUnknownMatches: Story = {
+  name: "Interaction · Community名は現在値一致を明示確認する",
+  tags: ["interaction"],
+  args: {
+    onSaveName: fn(async () => { throw new Error("unknown") }),
+    onInspectName: fn(async () => "変更するCommunity名"),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更するCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("成功した証明ではありません")
+    await userEvent.click(canvas.getByRole("button", { name: "確認完了" }))
+    await expect(input).toHaveValue("変更するCommunity名")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+    await expect(args.onSaveName).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const NameUnknownDiffers: Story = {
+  name: "Visual · Community名の現在値とDraftが不一致",
+  tags: ["visual"],
+  args: {
+    onSaveName: fn(async () => { throw new Error("unknown") }),
+    onInspectName: fn(async () => "現在のCommunity名"),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "未確定のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "変更を破棄" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("現在のCommunity名")
+    await expect(args.onSaveName).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const NameUnknownInspectFailure: Story = {
+  name: "Interaction · Community名照会失敗時は再送しない",
+  tags: ["interaction"],
+  args: {
+    onSaveName: fn(async () => { throw new Error("unknown") }),
+    onInspectName: fn(async () => { throw new Error("read failed") }),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "未確定のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "現在のCommunity名を取得できませんでした",
+    )
+    await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
+    await expect(input).toHaveValue("未確定のCommunity名")
+    await expect(args.onSaveName).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const NameUnknownDiscard: Story = {
+  name: "Interaction · Community名の現在値へ明示破棄",
+  tags: ["interaction"],
+  args: {
+    onSaveName: fn(async () => { throw new Error("unknown") }),
+    onInspectName: fn(async () => "確認した現在値"),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "未確定のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "変更を破棄" })).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "変更を破棄" }))
+    await expect(input).toHaveValue("確認した現在値")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+    await expect(args.onSaveName).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const NameBlockedForbidden: Story = {
+  name: "Visual · Community名を変更できない権限状態",
+  tags: ["visual"],
+  args: {
+    onSaveName: fn(async () => {
+      throw { graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }] }
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("この操作を行う権限がありません")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+export const NameFormValidationVisual: Story = {
+  name: "Visual · Community名のForm Validation Feedback",
+  tags: ["visual"],
+  args: {
+    onSaveName: fn(async () => {
+      throw new SettingsInputValidationError([
+        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
+      ])
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.type(input, "を再編集")
+    await expect(canvas.getByRole("alert")).toBeVisible()
+  },
+}
