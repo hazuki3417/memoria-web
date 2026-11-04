@@ -5,7 +5,7 @@ import {
 } from "@/components/SettingsSectionLayout"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { getCommunitySettingsSections } from "@/features/community-settings/communitySettingsSections"
-import { SettingsLayout } from "../SettingsLayout"
+import { SettingsLayout } from ".."
 
 export function LayoutStory({
   context,
