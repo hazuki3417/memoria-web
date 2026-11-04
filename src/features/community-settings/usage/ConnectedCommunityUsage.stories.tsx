@@ -245,6 +245,44 @@ export const CommunityRetryFailure: Story = {
   },
 }
 
+// SS-02/03・UN-02: Usageが取得できてもCurrentUser Preferencesが失敗した場合は
+// 単位を推測して確定表示せず、再試行で双方を復旧してから集計を表示する。
+export const CommunityPreferencesRetry: Story = {
+  name: "Interaction · Preferences取得失敗から再取得成功",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[
+          communitySuccess,
+          communitySuccess,
+          {
+            request: { query: CurrentUserDocument },
+            error: new Error("Preferences取得失敗"),
+          },
+          communityPreferences("BINARY"),
+        ]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "利用状況を取得できませんでした",
+    )
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(
+      await canvas.findAllByText("4.66 GiB").then((elements) => elements[0]),
+    ).toBeVisible()
+    await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
 // NV-04: Communityを切り替えたときApolloがIDに対応するUsageだけを表示する。
 export const CommunitySwitch: Story = {
   name: "Interaction · Community AからBへの切り替え",
