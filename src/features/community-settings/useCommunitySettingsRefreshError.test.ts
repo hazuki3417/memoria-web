@@ -1,5 +1,5 @@
 import { act, createElement } from "react"
-import { createRoot } from "react-dom/client"
+import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { showNotification } from "@/components/Feedback"
 import { useCommunitySettingsRefreshError } from "./useCommunitySettingsRefreshError"
@@ -14,17 +14,15 @@ function RefreshStatus({ failed }: { failed: boolean }) {
 }
 
 describe("Community Settingsの再取得失敗通知", () => {
-  const container = document.createElement("div")
-  const root = createRoot(container)
+  let root: Root
 
   beforeEach(() => {
     vi.mocked(showNotification).mockClear()
+    root = createRoot(document.createElement("div"))
   })
 
   afterEach(() => {
-    act(() => {
-      root.render(createElement(RefreshStatus, { failed: false }))
-    })
+    act(() => root.unmount())
   })
 
   it("取得成功中は通知せず、失敗への遷移ごとに1回だけ通知する", () => {
