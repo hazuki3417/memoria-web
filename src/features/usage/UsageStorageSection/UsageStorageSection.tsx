@@ -7,7 +7,7 @@ import { UsageFileSize } from "../UsageFileSize"
 import { usagePercent } from "../usagePercent"
 import { defaultUsageSort, sortUsageFormats } from "../sortUsageFormats"
 import { usageFormatColors as formatColors } from "../usageFormatColors"
-import type { SettingsUsageData, UsageStatus } from "../usageTypes"
+import type { UsageData, UsageStatus } from "../usageTypes"
 import type { UsageDisplayMode } from "../usageDisplayMode"
 
 export function UsageStorageSection({
@@ -16,7 +16,7 @@ export function UsageStorageSection({
   fileSizeUnit,
   displayMode = "size",
 }: {
-  usage: SettingsUsageData
+  usage: UsageData
   status: UsageStatus
   fileSizeUnit: FileSizeUnit
   displayMode?: UsageDisplayMode

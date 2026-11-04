@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { SettingsUsage, type SettingsUsageData } from "@/features/usage"
+import { Usage, type UsageData } from "@/features/usage"
 
 // Deterministic Storybook sample data; these values are not product values.
-const MOCK_USAGE: SettingsUsageData = {
+const MOCK_USAGE: UsageData = {
   usedBytes: 1_240_000_000,
   limitBytes: 5_000_000_000,
   mediaCount: 1248,
@@ -26,14 +26,14 @@ export type UsageScenario =
   | "zero"
   | "limit-reached"
 
-const ZERO_USAGE: SettingsUsageData = {
+const ZERO_USAGE: UsageData = {
   usedBytes: 0,
   limitBytes: 5_000_000_000,
   mediaCount: 0,
   formatBreakdown: [],
 }
 
-const LIMIT_REACHED_USAGE: SettingsUsageData = {
+const LIMIT_REACHED_USAGE: UsageData = {
   usedBytes: 5_000_000_000,
   limitBytes: 5_000_000_000,
   mediaCount: 5000,
@@ -76,6 +76,6 @@ export function UsageContent({
   }
 
   return (
-    <SettingsUsage usage={usage} fileSizeUnit={fileSizeUnit} status={status} />
+    <Usage usage={usage} fileSizeUnit={fileSizeUnit} status={status} />
   )
 }

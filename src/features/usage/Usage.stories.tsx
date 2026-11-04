@@ -1,9 +1,35 @@
-import { ModeLifetimeContractStory } from "./ModeLifetimeContractStory"
-import { UnitPreferenceStory } from "./UnitPreferenceStory"
+import { useState } from "react"
+import { Button, Group } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, userEvent, within } from "storybook/test"
-import { SettingsUsage } from "./SettingsUsage"
-import { sampleUsage, zeroUsage } from "../usageStoryFixtures"
+import { expect, fn, userEvent, within } from "storybook/test"
+import { Usage } from "./Usage"
+import { sampleUsage, zeroUsage } from "./usageStoryFixtures"
+
+
+function ModeLifetimeContractStory() {
+  const [scope, setScope] = useState<"personal" | "community">("personal")
+  return (
+    <>
+      <Button onClick={() => setScope((current) => current === "personal" ? "community" : "personal")}>
+        Scopeを切り替え
+      </Button>
+      <Usage key={scope} usage={sampleUsage} scope={scope} />
+    </>
+  )
+}
+
+function UnitPreferenceStory() {
+  const [unit, setUnit] = useState<"DECIMAL" | "BINARY">("DECIMAL")
+  return (
+    <>
+      <Group mb="md">
+        <Button onClick={() => setUnit("BINARY")}>Binaryに変更</Button>
+        <Button onClick={() => setUnit("DECIMAL")}>Decimalに戻す</Button>
+      </Group>
+      <Usage usage={sampleUsage} fileSizeUnit={unit} />
+    </>
+  )
+}
 
 const limitReachedUsage = {
   usedBytes: 5_000_000_000,
@@ -13,14 +39,59 @@ const limitReachedUsage = {
 }
 
 const meta = {
-  title: "features/usage/SettingsUsage",
-  component: SettingsUsage,
+  title: "features/usage/Usage",
+  component: Usage,
   args: { usage: sampleUsage, fileSizeUnit: "DECIMAL", scope: "personal" },
-} satisfies Meta<typeof SettingsUsage>
+} satisfies Meta<typeof Usage>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
+// Visual: 表示状態・VRT候補（既存のStory ID・タグを維持）
+// Play無しの静的StoryのみをVRT候補とし、画像Baselineは別途Visual Reviewで承認する。
+export const VrtReady: Story = {
+  name: "Visual · Ready",
+  tags: ["visual", "vrt"],
+}
+
+export const VrtEmpty: Story = {
+  name: "Visual · 0件",
+  tags: ["visual", "vrt"],
+  args: { usage: zeroUsage },
+}
+
+// PageStatusBoundary の300ms遅延があるため、Loadingは専用Interaction Storyで検証する。
+export const VrtLoading: Story = {
+  name: "Visual · Loading",
+  tags: ["visual"],
+  args: { status: "loading" },
+}
+
+export const VrtError: Story = {
+  name: "Visual · 取得失敗",
+  tags: ["visual", "vrt"],
+  args: { status: "error" },
+}
+
+export const VrtErrorWithRetry: Story = {
+  name: "Visual · 再試行可能な取得失敗",
+  tags: ["visual"],
+  args: { status: "error", onRetry: () => undefined },
+}
+
+export const VrtLimit: Story = {
+  name: "Visual · 上限到達",
+  tags: ["visual", "vrt"],
+  args: { usage: limitReachedUsage },
+}
+
+export const VrtCommunity: Story = {
+  name: "Visual · Community",
+  tags: ["visual", "vrt"],
+  args: { scope: "community" },
+}
+
+// Interaction: 振る舞い・接続契約
 // ST-01・ST-04・ST-08・FM-01・FM-05・UN-01・UI-04:
 // UIに渡された確定済み集計値の表示だけを保証し、Backendの集計処理は保証しない。
 export const ReadyValuesContract: Story = {
@@ -28,6 +99,11 @@ export const ReadyValuesContract: Story = {
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    await expect(
+      canvas.getByText(
+        "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
+      ),
+    ).toBeVisible()
     await expect(canvas.getAllByText("1.24 GB").length).toBeGreaterThan(0)
     await expect(canvas.getByText("3.76 GB")).toBeVisible()
     await expect(canvas.getAllByText("5 GB").length).toBeGreaterThan(0)
@@ -342,36 +418,16 @@ export const DisplayModeLifetimeContract: Story = {
   },
 }
 
-// Play無しの静的StoryのみをVRT候補とし、画像Baselineは別途Visual Reviewで承認する。
-export const VrtReady: Story = {
-  name: "Visual · Ready",
-  tags: ["visual", "vrt"],
-}
-export const VrtEmpty: Story = {
-  name: "Visual · 0件",
-  tags: ["visual", "vrt"],
-  args: { usage: zeroUsage },
-}
-// PageStatusBoundary の300ms遅延があるため、Loadingは専用Interaction Storyで検証する。
-export const VrtLoading: Story = {
-  name: "Visual · Loading",
-  tags: ["visual"],
-  args: { status: "loading" },
-}
-export const VrtError: Story = {
-  name: "Visual · 取得失敗",
-  tags: ["visual", "vrt"],
-  args: { status: "error" },
-}
-export const VrtLimit: Story = {
-  name: "Visual · 上限到達",
-  tags: ["visual", "vrt"],
-  args: { usage: limitReachedUsage },
-}
-export const VrtCommunity: Story = {
-  name: "Visual · Community",
-  tags: ["visual", "vrt"],
-  args: { scope: "community" },
+export const ErrorRetryUiContract: Story = {
+  name: "Interaction · 再試行ボタンの通知",
+  tags: ["interaction"],
+  args: { status: "error", onRetry: fn() },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(args.onRetry).toHaveBeenCalledTimes(1)
+  },
 }
 
 export const PercentDenominatorContract: Story = {
@@ -474,41 +530,5 @@ export const CommunityErrorContract: Story = {
       canvas.queryByRole("button", { name: "再試行" }),
     ).not.toBeInTheDocument()
     await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
-  },
-}
-
-export const PersonalUsage: Story = {
-  name: "Visual · 利用状況",
-  tags: ["visual"],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(canvas.getByRole("table")).toBeVisible()
-    await expect(
-      canvas.getByText(
-        "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
-      ),
-    ).toBeVisible()
-  },
-}
-
-export const PersonalUsageEmpty: Story = {
-  name: "Visual · 登録0件",
-  tags: ["visual"],
-  args: { usage: zeroUsage },
-}
-
-export const PersonalUsageErrorState: Story = {
-  name: "Visual · 取得失敗",
-  tags: ["visual"],
-  args: {
-    usage: sampleUsage, status: "error",
-  },
-}
-
-export const PersonalUsageLoadingState: Story = {
-  name: "Visual · 読み込み中",
-  tags: ["visual"],
-  args: {
-    usage: sampleUsage, status: "loading",
   },
 }

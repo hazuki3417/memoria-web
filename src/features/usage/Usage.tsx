@@ -4,6 +4,8 @@ import { useState } from "react"
 import { IconDatabase, IconPercentage } from "@tabler/icons-react"
 import {
   Box,
+  Button,
+  Center,
   Group,
   SegmentedControl,
   Stack,
@@ -12,29 +14,31 @@ import {
 } from "@mantine/core"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { PageHeader } from "@/components/PageHeader"
-import type { FileSizeUnit } from "../formatFileSize"
-import { UsageStorageSection } from "../UsageStorageSection"
-import { UsageFormatBreakdownSection } from "../UsageFormatBreakdownSection"
-import type { SettingsUsageData, UsageStatus } from "../usageTypes"
-import type { UsageDisplayMode } from "../usageDisplayMode"
-export type { SettingsUsageData } from "../usageTypes"
+import type { FileSizeUnit } from "./formatFileSize"
+import { UsageStorageSection } from "./UsageStorageSection"
+import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
+import type { UsageData, UsageStatus } from "./usageTypes"
+import type { UsageDisplayMode } from "./usageDisplayMode"
+export type { UsageData } from "./usageTypes"
 import {
   defaultUsageSort,
   nextUsageSort,
   type UsageSort,
   type UsageSortKey,
-} from "../sortUsageFormats"
+} from "./sortUsageFormats"
 
-export function SettingsUsage({
+export function Usage({
   usage,
   scope = "personal",
   status = "ready",
   fileSizeUnit = "DECIMAL",
+  onRetry,
 }: {
-  usage: SettingsUsageData
+  usage: UsageData
   scope?: "personal" | "community"
   status?: UsageStatus
   fileSizeUnit?: FileSizeUnit
+  onRetry?: () => void
 }) {
   const [sort, setSort] = useState<UsageSort>(defaultUsageSort)
   const [displayMode, setDisplayMode] = useState<UsageDisplayMode>("size")
@@ -43,9 +47,22 @@ export function SettingsUsage({
   }
   if (status !== "ready") {
     return (
-      <PageStatusBoundary state={status} label="利用状況を読み込み中">
-        {null}
-      </PageStatusBoundary>
+      <>
+        <PageStatusBoundary
+          state={status}
+          label="利用状況を読み込み中"
+          errorTitle={onRetry ? "利用状況を取得できませんでした" : undefined}
+        >
+          {null}
+        </PageStatusBoundary>
+        {status === "error" && onRetry && (
+          <Center>
+            <Button variant="light" onClick={onRetry}>
+              再試行
+            </Button>
+          </Center>
+        )}
+      </>
     )
   }
   return (

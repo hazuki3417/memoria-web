@@ -1,3 +1,3 @@
-export { SettingsUsage } from "./SettingsUsage"
-export type { SettingsUsageData } from "./usageTypes"
-export { ConnectedUsage } from "./ConnectedUsage"
+export { Usage } from "./Usage"
+export type { UsageData } from "./usageTypes"
+export { emptyUsage, mapUsageProjection } from "./usageGraphqlAdapter"

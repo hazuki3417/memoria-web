@@ -1,24 +1,15 @@
-import { CommunitySwitchScenario } from "./CommunitySwitchScenario"
+import { useState } from "react"
+import { Button } from "@mantine/core"
 import { MockedProvider } from "@apollo/client/testing"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import {
   CommunityUsageDocument,
   CurrentUserDocument,
-  PersonalUsageDocument,
 } from "@/infrastructure/graphql/generated"
-import { ConnectedUsage } from "./ConnectedUsage"
+import { ConnectedCommunityUsage } from "./ConnectedCommunityUsage"
+import { graphqlUsageFixture, emptyGraphqlUsageFixture } from "@/features/usage/usageStoryFixtures"
 
-const usage = {
-  mediaCount: 1248,
-  storage: { usedBytes: "1240000000", effectiveLimitBytes: "5000000000" },
-  formatBreakdown: [
-    { format: "JPEG", mediaCount: 900, usedBytes: "900000000" },
-    { format: "PNG", mediaCount: 200, usedBytes: "200000000" },
-    { format: "WEBP", mediaCount: 100, usedBytes: "100000000" },
-    { format: "HEIF", mediaCount: 48, usedBytes: "40000000" },
-  ],
-}
 
 const communityRequest = {
   query: CommunityUsageDocument,
@@ -26,12 +17,17 @@ const communityRequest = {
 }
 const communitySuccess = {
   request: communityRequest,
-  result: { data: { communityUsage: usage } },
+  result: { data: { communityUsage: graphqlUsageFixture } },
 }
 const communityFailure = {
   request: communityRequest,
   error: new Error("Usage取得失敗"),
 }
+const communityEmptySuccess = {
+  request: communityRequest,
+  result: { data: { communityUsage: emptyGraphqlUsageFixture } },
+}
+const communityLoading = { ...communitySuccess, delay: 15_000 }
 
 const communityPreferences = (unit: "DECIMAL" | "BINARY") => ({
   request: { query: CurrentUserDocument },
@@ -54,19 +50,6 @@ const communityPreferences = (unit: "DECIMAL" | "BINARY") => ({
   },
 })
 
-const personalSuccess = {
-  request: { query: PersonalUsageDocument },
-  result: {
-    data: {
-      me: {
-        id: "user-a",
-        preferences: { fileSizeUnit: "BINARY" },
-        usage,
-      },
-    },
-  },
-}
-
 // NV-04: 同一画面でCommunity IDが変わっても別Communityの集計値を表示しない。
 const otherCommunityUsage = {
   mediaCount: 1,
@@ -79,11 +62,22 @@ const otherCommunityUsage = {
   ],
 }
 
+
+function CommunitySwitchScenario() {
+  const [communityId, setCommunityId] = useState("club-a")
+  return (
+    <>
+      <Button onClick={() => setCommunityId("club-b")}>Community Bへ切り替え</Button>
+      <ConnectedCommunityUsage communityId={communityId} />
+    </>
+  )
+}
+
 const meta = {
-  title: "Features/Settings/Usage/Apollo Integration",
-  component: ConnectedUsage,
-  args: { scope: "community", communityId: "club-a" },
-} satisfies Meta<typeof ConnectedUsage>
+  title: "features/community-settings/usage/ConnectedCommunityUsage",
+  component: ConnectedCommunityUsage,
+  args: { communityId: "club-a" },
+} satisfies Meta<typeof ConnectedCommunityUsage>
 export default meta
 type Story = StoryObj<typeof meta>
 
@@ -144,25 +138,7 @@ export const CommunityEmpty: Story = {
     (Story) => (
       <MockedProvider
         mocks={[
-          {
-            request: communityRequest,
-            result: {
-              data: {
-                communityUsage: {
-                  mediaCount: 0,
-                  storage: {
-                    usedBytes: "0",
-                    effectiveLimitBytes: "5000000000",
-                  },
-                  formatBreakdown: usage.formatBreakdown.map((item) => ({
-                    ...item,
-                    mediaCount: 0,
-                    usedBytes: "0",
-                  })),
-                },
-              },
-            },
-          },
+          communityEmptySuccess,
           communityPreferences("DECIMAL"),
         ]}
         addTypename={false}
@@ -184,6 +160,30 @@ export const CommunityEmpty: Story = {
     }
     await expect(canvas.getAllByText("5 GB")[0]).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+/** SS-01: Usage取得応答が未確定の間は共通Loaderで集計値を隠す。 */
+export const CommunityLoading: Story = {
+  name: "Interaction · Community取得待機中",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[communityLoading, communityPreferences("DECIMAL")]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(
+      await canvas.findByRole("status", { name: "利用状況を読み込み中" }, { timeout: 5_000 }),
+    ).toBeVisible()
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+    await expect(canvas.queryByText("0 GB")).not.toBeInTheDocument()
   },
 }
 
@@ -245,6 +245,44 @@ export const CommunityRetryFailure: Story = {
   },
 }
 
+// SS-02/03・UN-02: Usageが取得できてもCurrentUser Preferencesが失敗した場合は
+// 単位を推測して確定表示せず、再試行で双方を復旧してから集計を表示する。
+export const CommunityPreferencesRetry: Story = {
+  name: "Interaction · Preferences取得失敗から再取得成功",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[
+          communitySuccess,
+          communitySuccess,
+          {
+            request: { query: CurrentUserDocument },
+            error: new Error("Preferences取得失敗"),
+          },
+          communityPreferences("BINARY"),
+        ]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "利用状況を取得できませんでした",
+    )
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(
+      await canvas.findAllByText("4.66 GiB").then((elements) => elements[0]),
+    ).toBeVisible()
+    await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
 // NV-04: Communityを切り替えたときApolloがIDに対応するUsageだけを表示する。
 export const CommunitySwitch: Story = {
   name: "Interaction · Community AからBへの切り替え",
@@ -275,6 +313,8 @@ export const CommunitySwitch: Story = {
     await expect(
       await canvas.findAllByText("1.24 GB").then((elements) => elements[0]),
     ).toBeVisible()
+    await userEvent.click(canvas.getByRole("radio", { name: "割合" }))
+    await expect(canvas.getByRole("radio", { name: "割合" })).toBeChecked()
     await userEvent.click(
       canvas.getByRole("button", { name: "Community Bへ切り替え" }),
     )
@@ -282,34 +322,9 @@ export const CommunitySwitch: Story = {
       await canvas.findAllByText("2 GB").then((elements) => elements[0]),
     ).toBeVisible()
     await expect(canvas.getByRole("table")).toHaveTextContent("1 件")
+    await expect(canvas.getByRole("radio", { name: "容量" })).toBeChecked()
     await expect(canvas.queryAllByText("1.24 GB")).toHaveLength(0)
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
 
-// SC-01・UN-02: PersonalのUsageと表示単位を同一Operationから取得する。
-export const PersonalBinary: Story = {
-  name: "Interaction · Personal UsageとBinary設定",
-  tags: ["interaction"],
-  args: { scope: "personal", communityId: undefined },
-  decorators: [
-    (Story) => (
-      <MockedProvider mocks={[personalSuccess]} addTypename={false}>
-        <Story />
-      </MockedProvider>
-    ),
-  ],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(
-      await canvas.findAllByText("4.66 GiB").then((elements) => elements[0]),
-    ).toBeVisible()
-    await expect(canvas.getAllByText("1.15 GiB")[0]).toBeVisible()
-    await expect(canvas.getByRole("table")).toHaveTextContent("1,248 件")
-    await expect(
-      canvas.getByText(
-        "Personal Mediaの登録済みオリジナルファイルの使用状況を確認します。",
-      ),
-    ).toBeVisible()
-  },
-}

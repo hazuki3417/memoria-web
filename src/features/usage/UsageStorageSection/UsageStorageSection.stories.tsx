@@ -4,7 +4,7 @@ import { UsageStorageSection } from "./UsageStorageSection"
 import { sampleUsage, zeroUsage } from "../usageStoryFixtures"
 
 const meta = {
-  title: "Features/Settings/Usage/Storage",
+  title: "features/usage/UsageStorageSection",
   component: UsageStorageSection,
   args: {
     usage: sampleUsage,
@@ -16,6 +16,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+// Visual: 表示状態・VRT候補（既存のStory ID・タグを維持）
 export const Ready: Story = {
   name: "Visual · Ready（Decimal）",
   tags: ["visual"],
@@ -30,19 +31,6 @@ const reorderedUsage = {
     { format: "PNG", count: 200, sizeBytes: 200_000_000 },
     { format: "HEIC / HEIF", count: 48, sizeBytes: 900_000_000 },
   ],
-}
-
-export const ProgressOrderContract: Story = {
-  name: "Interaction · Storageバーは使用量降順",
-  tags: ["interaction"],
-  args: { usage: reorderedUsage },
-  play: async ({ canvasElement }) => {
-    const names = Array.from(canvasElement.querySelectorAll("[aria-label]"))
-      .map((element) => element.getAttribute("aria-label"))
-      .filter((label) => label && /^(JPEG|PNG|WebP|HEIC \/ HEIF) /.test(label))
-      .map((label) => label?.split(" ")[0])
-    await expect(names).toEqual(["HEIC", "PNG", "WebP", "JPEG"])
-  },
 }
 
 export const ReadyCompact: Story = {
@@ -69,6 +57,26 @@ export const Binary: Story = {
   args: { fileSizeUnit: "BINARY" },
 }
 
+export const Percent: Story = {
+  name: "Visual · 割合表示",
+  tags: ["visual", "vrt"],
+  args: { displayMode: "percent" },
+}
+
+// Interaction: 振る舞い・接続契約
+export const ProgressOrderContract: Story = {
+  name: "Interaction · Storageバーは使用量降順",
+  tags: ["interaction"],
+  args: { usage: reorderedUsage },
+  play: async ({ canvasElement }) => {
+    const names = Array.from(canvasElement.querySelectorAll("[aria-label]"))
+      .map((element) => element.getAttribute("aria-label"))
+      .filter((label) => label && /^(JPEG|PNG|WebP|HEIC \/ HEIF) /.test(label))
+      .map((label) => label?.split(" ")[0])
+    await expect(names).toEqual(["HEIC", "PNG", "WebP", "JPEG"])
+  },
+}
+
 export const BinaryContract: Story = {
   name: "Interaction · Binary表示",
   tags: ["interaction"],
@@ -80,10 +88,4 @@ export const BinaryContract: Story = {
       canvas.getByLabelText(/ストレージ使用率 24.8%/),
     ).toBeInTheDocument()
   },
-}
-
-export const Percent: Story = {
-  name: "Visual · 割合表示",
-  tags: ["visual", "vrt"],
-  args: { displayMode: "percent" },
 }

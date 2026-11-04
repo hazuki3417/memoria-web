@@ -1,12 +1,30 @@
-import { SortableBreakdownStory } from "./SortableBreakdownStory"
+import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
-import { defaultUsageSort } from "../sortUsageFormats"
+import {
+  defaultUsageSort,
+  nextUsageSort,
+  type UsageSort,
+  type UsageSortKey,
+} from "../sortUsageFormats"
 import { sampleUsage, zeroUsage } from "../usageStoryFixtures"
 
+function SortableBreakdownStory(
+  props: Omit<
+    ComponentProps<typeof UsageFormatBreakdownSection>,
+    "sort" | "onSort"
+  >,
+) {
+  const [sort, setSort] = useState<UsageSort>(defaultUsageSort)
+  const toggleSort = (key: UsageSortKey) => {
+    setSort((current) => nextUsageSort(current, key))
+  }
+  return <UsageFormatBreakdownSection {...props} sort={sort} onSort={toggleSort} />
+}
+
 const meta = {
-  title: "Features/Settings/Usage/Format Breakdown",
+  title: "features/usage/UsageFormatBreakdownSection",
   component: UsageFormatBreakdownSection,
   args: {
     usage: sampleUsage,
@@ -21,6 +39,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+// Visual: 表示状態・VRT候補（既存のStory ID・タグを維持）
 export const Ready: Story = {
   name: "Visual · Ready（Decimal）",
   tags: ["visual"],
@@ -62,6 +81,13 @@ export const Binary: Story = {
   args: { fileSizeUnit: "BINARY" },
 }
 
+export const Percent: Story = {
+  name: "Visual · 割合表示",
+  tags: ["visual", "vrt"],
+  args: { displayMode: "percent" },
+}
+
+// Interaction: 振る舞い・接続契約
 export const SortInteraction: Story = {
   name: "Interaction · byte数に基づくソート",
   tags: ["interaction"],
@@ -123,10 +149,4 @@ export const LoadingContract: Story = {
     ).toHaveLength(3)
     await expect(canvas.getAllByRole("row")).toHaveLength(6)
   },
-}
-
-export const Percent: Story = {
-  name: "Visual · 割合表示",
-  tags: ["visual", "vrt"],
-  args: { displayMode: "percent" },
 }

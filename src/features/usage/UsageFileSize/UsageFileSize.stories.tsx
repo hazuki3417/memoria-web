@@ -3,7 +3,7 @@ import { expect, within } from "storybook/test"
 import { UsageFileSize } from "./UsageFileSize"
 
 const meta = {
-  title: "Features/Settings/Usage/File Size",
+  title: "features/usage/UsageFileSize",
   component: UsageFileSize,
   args: {
     bytes: 1_240_000_000,
@@ -14,6 +14,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+// Visual: 表示状態・VRT候補（既存のStory ID・タグを維持）
 export const Decimal: Story = {
   name: "Visual · Decimal（GB）",
   tags: ["visual"],
@@ -37,6 +38,7 @@ export const Small: Story = {
   args: { bytes: 1000 },
 }
 
+// Interaction: 振る舞い・接続契約
 export const DisplayContract: Story = {
   name: "Interaction · 値と単位の表示",
   tags: ["interaction"],

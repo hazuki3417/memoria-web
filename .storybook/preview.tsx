@@ -11,6 +11,21 @@ const preview: Preview = {
     // Storybook standard: component previews have breathing room by default.
     // Viewport-based UI (pages, dialogs and overlays) opts into fullscreen in its meta.
     layout: "padded",
+    options: {
+      // Keep each component's visual scenarios together before interaction tests.
+      // Sorting by display name preserves story IDs and existing VRT baselines.
+      storySort: (a, b) => {
+        if (a.title !== b.title) return 0;
+
+        const group = (name = "") =>
+          name.startsWith("Visual ·")
+            ? 0
+            : name.startsWith("Interaction ·")
+              ? 1
+              : 2;
+        return group(a.name) - group(b.name);
+      },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,

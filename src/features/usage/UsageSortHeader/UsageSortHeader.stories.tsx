@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from "storybook/test"
 import { UsageSortHeader } from "./UsageSortHeader"
 
 const meta = {
-  title: "Features/Settings/Usage/Sort Header",
+  title: "features/usage/UsageSortHeader",
   component: UsageSortHeader,
   args: {
     label: "使用量",
@@ -17,6 +17,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+// Visual: 表示状態・VRT候補（既存のStory ID・タグを維持）
 export const Unsorted: Story = {
   name: "Visual · 未ソート",
   tags: ["visual"],
@@ -46,6 +47,7 @@ export const Disabled: Story = {
   args: { disabled: true },
 }
 
+// Interaction: 振る舞い・接続契約
 export const IconContract: Story = {
   name: "Interaction · ソートアイコン表示",
   tags: ["interaction"],
