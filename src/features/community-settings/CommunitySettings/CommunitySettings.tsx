@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react"
 import type { CommunityMember } from "../members/CommunityMembersContent"
-import { CommunitySettingsContent } from "../CommunitySettingsContent"
+import { CommunitySettingsContent } from "./CommunitySettingsContent"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   SettingsSectionLayout,
@@ -13,9 +13,9 @@ import { useCommunityInvitation } from "../general/useCommunityInvitation"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
-} from "../communitySettingsSections"
+} from "./communitySettingsSections"
 
-export type { CommunitySettingsSection } from "../communitySettingsSections"
+export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
 
 export function CommunitySettings({
