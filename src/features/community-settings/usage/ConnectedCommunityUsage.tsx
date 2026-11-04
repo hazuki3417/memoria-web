@@ -5,7 +5,7 @@ import {
   useCurrentUserQuery,
 } from "@/infrastructure/graphql/generated"
 import { Usage, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
-import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
 /** Community Context固有のGraphQL接続。共通のUsage UIはfeatures/usageが所有する。 */
 export function ConnectedCommunityUsage({ communityId }: { communityId: string }) {
@@ -29,7 +29,7 @@ export function ConnectedCommunityUsage({ communityId }: { communityId: string }
   }
 
   const hasData = Boolean(projection) && !conversionFailed && Boolean(communityPreferences.data?.me)
-  useSettingsRefreshError(Boolean(hasData && (community.error || communityPreferences.error)))
+  useCommunitySettingsRefreshError(Boolean(hasData && (community.error || communityPreferences.error)))
   const status = hasData
     ? "ready"
     : community.loading || communityPreferences.loading
