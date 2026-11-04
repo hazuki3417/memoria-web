@@ -9,7 +9,7 @@ import {
   useCommunityAccentSave,
 } from "@/features/application-shell/CommunityAccentPreviewContext"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
@@ -34,7 +34,7 @@ export function ConnectedCommunityPreferences({
     variables: { communityId },
     fetchPolicy: "cache-and-network",
   })
-  useSettingsRefreshError(Boolean(data?.community && error))
+  useCommunitySettingsRefreshError(Boolean(data?.community && error))
   const client = useApolloClient()
   const { setPreview, clearPreview } = useCommunityAccentPreview()
   const { snapshot, controller } = useCommunityAccentSave(communityId)
