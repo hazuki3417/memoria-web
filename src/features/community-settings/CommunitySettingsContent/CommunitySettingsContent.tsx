@@ -1,7 +1,7 @@
 "use client"
 
 import type { Dispatch, ReactNode, SetStateAction } from "react"
-import { CommunityGeneralContent } from "../CommunityGeneralContent"
+import { CommunityGeneralContent } from "../general/CommunityGeneralContent"
 import {
   CommunityMembersContent,
   type CommunityMember,
