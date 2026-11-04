@@ -10,7 +10,7 @@ import {
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
-import { communityAccentSchema } from "../../communityAccentSchema"
+import { communityAccentSchema } from "../communityAccentSchema"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { PageHeader } from "@/components/PageHeader"

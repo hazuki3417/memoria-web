@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from "react"
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
-import { communityAliasSchema } from "../../communityAliasSchema"
+import { communityAliasSchema } from "../communityAliasSchema"
 import { FeedbackPanel, showNotification } from "@/components/Feedback"
-import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
+import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
 import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,

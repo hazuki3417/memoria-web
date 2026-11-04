@@ -11,7 +11,7 @@ import {
   resolveSettingsFailureValidation,
   type SettingsSaveFailureKind,
 } from "@/features/settings/graphqlSettingsResult"
-import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
+import { getCommunityBlockedFeedback } from "../preferences/communityBlockedFeedback"
 
 type Inspection =
   | { status: "idle" | "checking" | "failed" }
