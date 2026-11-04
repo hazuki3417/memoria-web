@@ -5,7 +5,7 @@ import { CommunityGeneralContent } from "../general/CommunityGeneralContent"
 import {
   CommunityMembersContent,
   type CommunityMember,
-} from "../CommunityMembersContent"
+} from "../members/CommunityMembersContent"
 import { CommunityPreferencesContent } from "../preferences/CommunityPreferencesContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { useCommunityNameSettings } from "../general/useCommunityNameSettings"

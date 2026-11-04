@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import type { CommunityMember } from "../CommunityMembersContent"
+import type { CommunityMember } from "../members/CommunityMembersContent"
 import { CommunitySettingsContent } from "../CommunitySettingsContent"
 import { useMediaQuery } from "@mantine/hooks"
 import {
