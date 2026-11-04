@@ -6,7 +6,7 @@ import {
   CommunityMembersContent,
   type CommunityMember,
 } from "../CommunityMembersContent"
-import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
+import { CommunityPreferencesContent } from "../preferences/CommunityPreferencesContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { useCommunityNameSettings } from "../general/useCommunityNameSettings"
 import type { useCommunityInvitation } from "../general/useCommunityInvitation"

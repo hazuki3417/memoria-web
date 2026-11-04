@@ -1,6 +1,6 @@
 "use client"
 
-import { ConnectedCommunityPreferences } from "../ConnectedCommunityPreferences"
+import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
 import { useCommunitySettingsMembership } from "../useCommunitySettingsMembership"
 import { useCommunitySettingsActions } from "../useCommunitySettingsActions"
 import type { ReactNode } from "react"
