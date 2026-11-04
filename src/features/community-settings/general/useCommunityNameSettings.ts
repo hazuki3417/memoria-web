@@ -4,14 +4,14 @@ import { useEffect, useRef, useState, type SetStateAction } from "react"
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
-import { communityNameSchema } from "./communityNameSchema"
+import { communityNameSchema } from "../communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,
   type SettingsSaveFailureKind,
 } from "@/features/settings/graphqlSettingsResult"
-import { getCommunityBlockedFeedback } from "./communityBlockedFeedback"
+import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
 
 type Inspection =
   | { status: "idle" | "checking" | "failed" }
