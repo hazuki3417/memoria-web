@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { communityNameSchema } from "../communityNameSchema"
+import { communityNameSchema } from "./communityNameSchema"
 
 describe("communityNameSchema", () => {
   it("trims Community names and requires a nonblank value", () => {

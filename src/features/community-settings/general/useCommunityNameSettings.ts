@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type SetStateAction } from "react"
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
-import { communityNameSchema } from "../communityNameSchema"
+import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 import {
   classifySettingsSaveFailure,
