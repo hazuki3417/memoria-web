@@ -8,8 +8,8 @@ import {
   SettingsSectionLayout,
   SettingsSectionNavigation,
 } from "@/components/SettingsSectionLayout"
-import { useCommunityNameSettings } from "../useCommunityNameSettings"
-import { useCommunityInvitation } from "../useCommunityInvitation"
+import { useCommunityNameSettings } from "../general/useCommunityNameSettings"
+import { useCommunityInvitation } from "../general/useCommunityInvitation"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,

@@ -8,8 +8,8 @@ import {
 } from "../CommunityMembersContent"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
-import type { useCommunityNameSettings } from "../useCommunityNameSettings"
-import type { useCommunityInvitation } from "../useCommunityInvitation"
+import type { useCommunityNameSettings } from "../general/useCommunityNameSettings"
+import type { useCommunityInvitation } from "../general/useCommunityInvitation"
 
 type Role = "admin" | "member"
 
