@@ -5,7 +5,7 @@ import { useCommunitySettingsMembership } from "../useCommunitySettingsMembershi
 import { useCommunitySettingsActions } from "../useCommunitySettingsActions"
 import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { useSettingsRefreshError } from "@/features/settings/useSettingsRefreshError"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { useApolloClient } from "@apollo/client"
@@ -39,7 +39,7 @@ export function CommunitySettingsRoute({
 
   const hasRequiredData =
     name !== null && (!requiresMembers || members !== null)
-  useSettingsRefreshError(
+  useCommunitySettingsRefreshError(
     Boolean(
       hasRequiredData && (loadError || (requiresMembers && membersError)),
     ),
