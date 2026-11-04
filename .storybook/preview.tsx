@@ -17,7 +17,7 @@ const preview: Preview = {
       storySort: (a, b) => {
         if (a[1].title !== b[1].title) return 0;
 
-        const group = (name) =>
+        const group = (name = "") =>
           name.startsWith("Visual ·")
             ? 0
             : name.startsWith("Interaction ·")
