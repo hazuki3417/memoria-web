@@ -15,7 +15,7 @@ const preview: Preview = {
       // Keep each component's visual scenarios together before interaction tests.
       // Sorting by display name preserves story IDs and existing VRT baselines.
       storySort: (a, b) => {
-        if (a[1].title !== b[1].title) return 0;
+        if (a.title !== b.title) return 0;
 
         const group = (name = "") =>
           name.startsWith("Visual ·")
@@ -23,7 +23,7 @@ const preview: Preview = {
             : name.startsWith("Interaction ·")
               ? 1
               : 2;
-        return group(a[1].name) - group(b[1].name);
+        return group(a.name) - group(b.name);
       },
     },
     controls: {
