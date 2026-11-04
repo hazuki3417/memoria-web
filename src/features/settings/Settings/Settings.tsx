@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import { SettingsLayout, type Section } from "../SettingsLayout"
-import { SettingsSectionContent } from "../SettingsSectionContent"
+import { SettingsSectionContent } from "./SettingsSectionContent"
 import type { InspectProfile, SaveProfile } from "../profile/SettingsProfile"
 import type {
   UserPreferences,

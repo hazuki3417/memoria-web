@@ -1,5 +1,6 @@
 export { Settings } from "./Settings"
-export { ConnectedSettings } from "./ConnectedSettings"
+export { ConnectedSettings } from "./Settings/ConnectedSettings"
+export { ConnectedPersonalSettingsSection } from "./Settings/ConnectedPersonalSettingsSection"
 export { SettingsLayout } from "./SettingsLayout"
 export type { Section } from "./SettingsLayout"
 export { SettingsProfile } from "./profile/SettingsProfile"
