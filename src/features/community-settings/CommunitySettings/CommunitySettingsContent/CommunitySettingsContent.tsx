@@ -1,15 +1,15 @@
 "use client"
 
 import type { Dispatch, ReactNode, SetStateAction } from "react"
-import { CommunityGeneralContent } from "../CommunityGeneralContent"
+import { CommunityGeneralContent } from "../../general/CommunityGeneralContent"
 import {
   CommunityMembersContent,
   type CommunityMember,
-} from "../CommunityMembersContent"
-import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
+} from "../../members/CommunityMembersContent"
+import { CommunityPreferencesContent } from "../../preferences/CommunityPreferencesContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
-import type { useCommunityNameSettings } from "../useCommunityNameSettings"
-import type { useCommunityInvitation } from "../useCommunityInvitation"
+import type { useCommunityNameSettings } from "../../general/useCommunityNameSettings"
+import type { useCommunityInvitation } from "../../general/useCommunityInvitation"
 
 type Role = "admin" | "member"
 

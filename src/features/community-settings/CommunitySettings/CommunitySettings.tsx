@@ -1,21 +1,21 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import type { CommunityMember } from "../CommunityMembersContent"
-import { CommunitySettingsContent } from "../CommunitySettingsContent"
+import type { CommunityMember } from "../members/CommunityMembersContent"
+import { CommunitySettingsContent } from "./CommunitySettingsContent"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   SettingsSectionLayout,
   SettingsSectionNavigation,
 } from "@/components/SettingsSectionLayout"
-import { useCommunityNameSettings } from "../useCommunityNameSettings"
-import { useCommunityInvitation } from "../useCommunityInvitation"
+import { useCommunityNameSettings } from "../general/useCommunityNameSettings"
+import { useCommunityInvitation } from "../general/useCommunityInvitation"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
-} from "../communitySettingsSections"
+} from "./communitySettingsSections"
 
-export type { CommunitySettingsSection } from "../communitySettingsSections"
+export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
 
 export function CommunitySettings({

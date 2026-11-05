@@ -9,7 +9,7 @@ import {
   useCommunityAccentSave,
 } from "@/features/application-shell/CommunityAccentPreviewContext"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
+import { useCommunitySettingsRefreshError } from "../../useCommunitySettingsRefreshError"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"

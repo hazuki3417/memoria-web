@@ -4,7 +4,7 @@ import {
   releaseCommunityAccentPreview,
   type CommunityAccentPreview,
 } from "./communityAccentPreview"
-import { createCommunityAccentSaveController } from "@/features/community-settings/communityAccentSaveController"
+import { createCommunityAccentSaveController } from "@/features/community-settings/preferences/communityAccentSaveController"
 
 import {
   createContext,

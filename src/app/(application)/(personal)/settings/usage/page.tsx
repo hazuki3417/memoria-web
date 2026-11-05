@@ -1,4 +1,4 @@
-import { ConnectedPersonalSettingsSection } from "@/features/settings/ConnectedSettings"
+import { ConnectedPersonalSettingsSection } from "@/features/settings"
 import { ConnectedPersonalUsage } from "@/features/settings"
 
 export default function Page() {

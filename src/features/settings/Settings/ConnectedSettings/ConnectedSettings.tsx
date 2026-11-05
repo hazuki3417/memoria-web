@@ -2,13 +2,13 @@
 
 import { useApolloClient } from "@apollo/client"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { useSettingsRefreshError } from "../useSettingsRefreshError"
-import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
-import { Settings } from "../Settings"
-import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
+import { useSettingsRefreshError } from "../../useSettingsRefreshError"
+import { usePersonalSettingsActions } from "../../usePersonalSettingsActions"
+import { Settings } from ".."
+import { fromGraphqlUserPreferences } from "../../preferences/userPreferencesGraphqlAdapter"
 import { CurrentUserDocument, useCurrentUserQuery, type OperationCurrentUserQuery } from "@/infrastructure/graphql/generated"
-import { usePersonalPreferencesSession } from "../preferences/PersonalPreferencesSessionContext"
-import { resolvePersonalAccent } from "../preferences/personalAccentPreview"
+import { usePersonalPreferencesSession } from "../../preferences/PersonalPreferencesSessionContext"
+import { resolvePersonalAccent } from "../../preferences/personalAccentPreview"
 
 export function ConnectedSettings({
   section,

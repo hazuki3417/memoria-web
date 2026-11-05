@@ -1,4 +1,4 @@
-import { CommunitySettingsRoute } from "@/features/community-settings/CommunitySettingsRoute"
+import { CommunitySettingsRoute } from "@/features/community-settings"
 
 export default async function Page({
   params,

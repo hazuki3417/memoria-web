@@ -3,7 +3,7 @@
 import { Alert, Button, Stack } from "@mantine/core"
 import { useParams } from "next/navigation"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
-import { CommunityDeletionConfirmation } from "@/features/community-settings/CommunityDeletionConfirmation"
+import { CommunityDeletionConfirmation } from "@/features/community-settings"
 import {
   MyCommunitiesDocument,
   useAcceptCommunityDeletionMutation,
