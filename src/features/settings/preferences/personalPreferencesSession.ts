@@ -1,10 +1,11 @@
+import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import {
   classifySettingsSaveFailure,
-  resolveSettingsFailureValidation,
+  getSettingsInputViolations,
 } from "@/infrastructure/graphql/settingsMutationResult"
 
 export type PreferencesFailure = "unknown" | "retryable" | "blocked" | "validation" | null
@@ -82,7 +83,7 @@ export function createPersonalPreferencesSession() {
         const failure = classifySettingsSaveFailure(error)
         const validation =
           failure === "validation"
-            ? resolveSettingsFailureValidation(error, Object.keys(attempted))
+            ? resolveFormFailureValidation(getSettingsInputViolations(error), Object.keys(attempted))
             : null
         emit({
           failure,
