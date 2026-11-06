@@ -61,6 +61,7 @@ export function CommunitySettingsRoute({
     <CommunitySettings
       key={communityId}
       communityId={communityId}
+      invitationMode="unavailable"
       communityAccentColor={communityAccentColor}
       communityName={name ?? undefined}
       contentOverride={
