@@ -453,3 +453,27 @@ export const NameContextChangeReset: Story = {
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
+
+/** Preview invitation state must not cross the production Community key boundary. */
+export const InvitationContextChangeReset: Story = {
+  name: "Interaction · Community切替でInvitation状態を初期化",
+  tags: ["interaction"],
+  render: (args) => <CommunitySwitchFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("未発行")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "招待URLを発行" }))
+    await expect(canvas.getByText("有効")).toBeVisible()
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityを切り替える" }),
+    )
+    await expect(canvas.getByText("未発行")).toBeVisible()
+    await expect(canvas.getByRole("textbox", { name: "招待URL" })).toHaveValue("-")
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityを切り替える" }),
+    )
+    await expect(canvas.getByText("未発行")).toBeVisible()
+  },
+}
