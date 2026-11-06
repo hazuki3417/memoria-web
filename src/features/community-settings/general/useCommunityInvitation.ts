@@ -75,11 +75,11 @@ export function useCommunityInvitation(communityId: string, previewEnabled = tru
     invitationUrl,
     expiresAt: previewEnabled ? expiresAt : "",
     active,
-    busy,
+    busy: previewEnabled ? busy : false,
     issue,
     copyInvitation,
     confirm: previewEnabled ? confirm : null,
-    setConfirm,
+    setConfirm: previewEnabled ? setConfirm : (() => undefined),
     changeInvitation,
   }
 }
