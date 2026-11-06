@@ -3,17 +3,10 @@
 import { useState, type ReactNode } from "react"
 import type { CommunityMember } from "../members/CommunityMembersContent"
 import { CommunitySettingsContent } from "./CommunitySettingsContent"
-import { useMediaQuery } from "@mantine/hooks"
-import {
-  SettingsSectionLayout,
-  SettingsSectionNavigation,
-} from "@/components/SettingsSectionLayout"
 import { useCommunityNameSettings } from "../general/useCommunityNameSettings"
 import { useCommunityInvitation } from "../general/useCommunityInvitation"
-import {
-  getCommunitySettingsSections,
-  type CommunitySettingsSection,
-} from "./communitySettingsSections"
+import type { CommunitySettingsSection } from "./communitySettingsSections"
+import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
 
 export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
@@ -57,35 +50,20 @@ export function CommunitySettings({
   const [previewSection, setPreviewSection] =
     useState<CommunitySettingsSection>(section)
   const currentSection = onNavigate ? section : previewSection
-  const navigate = (target: (typeof sections)[number]) => {
-    if (onNavigate) onNavigate(target.href)
-    else setPreviewSection(target.id as CommunitySettingsSection)
-  }
-  const compact = useMediaQuery("(max-width: 48em)")
   const isAdmin = role === "admin"
   const [accent, setAccent] = useState("#7950f2")
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
   const invitation = useCommunityInvitation(communityId)
 
-  const sections = getCommunitySettingsSections(communityId)
-
   return (
-    <SettingsSectionLayout
-      compact={compact}
-      navigation={
-        <SettingsSectionNavigation
-          section={currentSection}
-          sections={sections}
-          compact={compact}
-          ariaLabel="Community設定画面"
-          desktopAriaLabel="Community設定"
-          accentColor={communityAccentColor ?? "var(--mantine-color-violet-6)"}
-          onSectionChange={(value) => {
-            const target = sections.find((item) => item.id === value)
-            if (target) navigate(target)
-          }}
-        />
-      }
+    <CommunitySettingsLayout
+      communityId={communityId}
+      section={currentSection}
+      accentColor={communityAccentColor}
+      onSectionChange={(next, href) => {
+        if (onNavigate) onNavigate(href)
+        else setPreviewSection(next)
+      }}
     >
       {contentOverride ?? (
         <CommunitySettingsContent
@@ -105,6 +83,6 @@ export function CommunitySettings({
           setAccent={setAccent}
         />
       )}
-    </SettingsSectionLayout>
+    </CommunitySettingsLayout>
   )
 }
