@@ -1,13 +1,13 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { SettingsLayout, type Section } from "../SettingsLayout"
-import { SettingsSectionContent } from "./SettingsSectionContent"
-import type { InspectProfile, SaveProfile } from "../profile/SettingsProfile"
+import { SettingsLayout, type Section } from "../../SettingsLayout"
+import { SettingsSectionContent } from "../SettingsSectionContent"
+import type { InspectProfile, SaveProfile } from "../../profile/SettingsProfile"
 import type {
   UserPreferences,
   UserPreferencesPatch,
-} from "../preferences/userPreferences"
+} from "../../preferences/userPreferences"
 
 export type SettingsViewProps = {
   section: Section
@@ -38,18 +38,6 @@ export function SettingsView({
   personalAccentColor,
   onSectionChange,
 }: SettingsViewProps) {
-  section: Section
-  saveProfile?: SaveProfile
-  inspectProfile?: InspectProfile
-  profileNickname?: string
-  initialPreferences?: UserPreferences
-  savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
-  inspectPreferences?: () => Promise<UserPreferences>
-  usageContent?: ReactNode
-  accountContent?: ReactNode
-  contentOverride?: ReactNode
-  personalAccentColor?: string
-}) {
   return (
     <SettingsLayout
       accentColor={personalAccentColor}
