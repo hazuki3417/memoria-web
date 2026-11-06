@@ -1,8 +1,9 @@
+import { resolveFormFailureValidation } from "@/ui/formValidation"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import { getCommunityBlockedFeedback } from "./communityBlockedFeedback"
 import {
   classifySettingsSaveFailure,
-  resolveSettingsFailureValidation,
+  getSettingsInputViolations,
 } from "@/infrastructure/graphql/settingsMutationResult"
 
 export type AccentFailure = "rejected" | "blocked" | "unknown" | null
@@ -123,7 +124,7 @@ export function createCommunityAccentSaveController() {
           clearPreview(entry)
           const validation =
             kind === "validation"
-              ? resolveSettingsFailureValidation(error, ["accentColor"])
+              ? resolveFormFailureValidation(getSettingsInputViolations(error), ["accentColor"])
               : null
           update(id, {
             status: "attention",
