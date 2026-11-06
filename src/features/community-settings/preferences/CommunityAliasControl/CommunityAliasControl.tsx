@@ -1,3 +1,4 @@
+import { resolveFormFailureValidation } from "@/ui/formValidation"
 "use client"
 
 import { Box, Button, Stack, TextInput } from "@mantine/core"
@@ -10,7 +11,7 @@ import { FeedbackPanel, showNotification } from "@/components/Feedback"
 import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
 import {
   classifySettingsSaveFailure,
-  resolveSettingsFailureValidation,
+  getSettingsInputViolations,
   type SettingsSaveFailureKind,
 } from "@/infrastructure/graphql/settingsMutationResult"
 
@@ -117,7 +118,7 @@ export function CommunityAliasControl({
     } catch (error) {
       const kind = classifySettingsSaveFailure(error)
       if (kind === "validation") {
-        const result = resolveSettingsFailureValidation(error, ["alias"])
+        const result = resolveFormFailureValidation(getSettingsInputViolations(error), ["alias"])
         if (result.fieldErrors.alias) {
           setError("alias", { type: "server", message: result.fieldErrors.alias })
         }
