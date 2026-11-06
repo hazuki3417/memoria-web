@@ -20,6 +20,7 @@ type Confirmation = "reissue" | "revoke" | null
 
 export type CommunityInvitationSectionProps = {
   isAdmin: boolean
+  available: boolean
   active: boolean
   invitation: InvitationState
   invitationUrl: string
@@ -34,6 +35,7 @@ export type CommunityInvitationSectionProps = {
 
 export function CommunityInvitationSection({
   isAdmin,
+  available,
   active,
   invitation,
   invitationUrl,
@@ -45,6 +47,28 @@ export function CommunityInvitationSection({
   setConfirm,
   changeInvitation,
 }: CommunityInvitationSectionProps) {
+  // Do not display Invitation credentials or clipboard actions after role loss.
+  if (!isAdmin)
+    return (
+      <Box>
+        <SectionHeader>招待URL</SectionHeader>
+        <Text size="sm" c="dimmed">
+          招待URLの発行と管理はAdministratorのみ行えます。
+        </Text>
+      </Box>
+    )
+
+  // The production Invitation API is not connected; do not simulate success.
+  if (!available)
+    return (
+      <Box>
+        <SectionHeader>招待URL</SectionHeader>
+        <Text size="sm" c="dimmed">
+          招待URLの管理機能は現在利用できません。
+        </Text>
+      </Box>
+    )
+
   return (
     <>
       <Box>
