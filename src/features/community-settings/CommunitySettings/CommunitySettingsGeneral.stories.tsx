@@ -477,3 +477,50 @@ export const InvitationContextChangeReset: Story = {
     await expect(canvas.getByText("未発行")).toBeVisible()
   },
 }
+
+
+/** Switching from Administrator to Member must immediately hide an issued preview secret. */
+function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettings>) {
+  const [role, setRole] = useState<"admin" | "member">("admin")
+  return (
+    <>
+      <Button onClick={() => setRole((current) => current === "admin" ? "member" : "admin")}>
+        Roleを切り替える
+      </Button>
+      <CommunitySettings {...args} role={role} />
+    </>
+  )
+}
+
+export const InvitationRoleChangeSecretProtection: Story = {
+  name: "Interaction · Memberへの変更でInvitation URLを非表示",
+  tags: ["interaction"],
+  render: (args) => <InvitationRoleChangeFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "招待URLを発行" }))
+    await expect(canvas.getByRole("textbox", { name: "招待URL" })).toHaveValue(
+      expect.stringContaining("https://example.com/invitations/"),
+    )
+
+    await userEvent.click(canvas.getByRole("button", { name: "Roleを切り替える" }))
+    await expect(canvas.getByText("招待URLの発行と管理はAdministratorのみ行えます。")).toBeVisible()
+    await expect(canvas.queryByRole("textbox", { name: "招待URL" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "招待URLをコピー" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "再発行" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "無効化" })).not.toBeInTheDocument()
+  },
+}
+
+export const InvitationProductionUnavailable: Story = {
+  name: "Interaction · 本番では仮Invitationを発行しない",
+  tags: ["interaction"],
+  args: { invitationMode: "unavailable" },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("招待URLの管理機能は現在利用できません。")).toBeVisible()
+    await expect(canvas.queryByRole("textbox", { name: "招待URL" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "招待URLを発行" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "招待URLをコピー" })).not.toBeInTheDocument()
+  },
+}
