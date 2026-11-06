@@ -1,5 +1,6 @@
-import { resolveFormFailureValidation } from "@/ui/formValidation"
 "use client"
+
+import { resolveFormFailureValidation } from "@/ui/formValidation"
 
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { useEffect, useRef, useState } from "react"
