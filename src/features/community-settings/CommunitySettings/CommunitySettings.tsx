@@ -28,6 +28,7 @@ export function CommunitySettings({
   preferencesContent,
   contentOverride,
   communityAccentColor,
+  invitationMode = "preview",
 }: {
   role?: Role
   communityId?: string
@@ -46,13 +47,14 @@ export function CommunitySettings({
   preferencesContent?: ReactNode
   contentOverride?: ReactNode
   communityAccentColor?: string
+  invitationMode?: "preview" | "unavailable"
 }) {
   const { currentSection, onSectionChange } =
     useCommunitySettingsSectionNavigation({ section, onNavigate })
   const isAdmin = role === "admin"
   const [accent, setAccent] = useState("#7950f2")
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
-  const invitation = useCommunityInvitation(communityId)
+  const invitation = useCommunityInvitation(communityId, invitationMode === "preview")
 
   return (
     <CommunitySettingsView
@@ -61,6 +63,7 @@ export function CommunitySettings({
       isAdmin={isAdmin}
       name={name}
       invitation={invitation}
+      invitationAvailable={invitationMode === "preview"}
       members={members}
       onChangeMemberRole={onChangeMemberRole}
       onRemoveMember={onRemoveMember}
