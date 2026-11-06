@@ -37,5 +37,16 @@ describe("Community Invitationの本番／Preview境界", () => {
     expect(invitation.invitation).toBe("none")
     expect(invitation.invitationUrl).toBe("")
     expect(invitation.active).toBe(false)
+    expect(invitation.busy).toBe(false)
+  })
+
+  it("未接続モードの確認更新はPreviewへ切り替えても残らない", () => {
+    act(() => root.render(createElement(Harness, { previewEnabled: false })))
+
+    act(() => invitation.setConfirm("reissue"))
+    expect(invitation.confirm).toBeNull()
+
+    act(() => root.render(createElement(Harness, { previewEnabled: true })))
+    expect(invitation.confirm).toBeNull()
   })
 })
