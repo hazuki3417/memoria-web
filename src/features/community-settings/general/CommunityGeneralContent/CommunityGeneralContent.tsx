@@ -34,7 +34,11 @@ export function CommunityGeneralContent({
         description="Communityの基本情報と管理"
       />
       <CommunityNameSection {...name} isAdmin={isAdmin} />
-      <CommunityInvitationSection {...invitation} isAdmin={isAdmin} available={invitationAvailable} />
+      <CommunityInvitationSection
+        {...invitation}
+        isAdmin={isAdmin}
+        available={invitationAvailable}
+      />
       {isAdmin && <CommunityDangerZone communityId={communityId} />}
     </Stack>
   )
