@@ -5,16 +5,20 @@ import { showNotification } from "@/components/Feedback"
 
 type InvitationState = "none" | "active" | "expired" | "revoked"
 
-export function useCommunityInvitation(communityId: string) {
+/** Preview-only simulation; production must not generate or operate fake Invitation URLs. */
+export function useCommunityInvitation(communityId: string, previewEnabled = true) {
   const [invitation, setInvitation] = useState<InvitationState>("none")
   const [expiresAt, setExpiresAt] = useState("")
   const [generation, setGeneration] = useState(0)
   const [confirm, setConfirm] = useState<"reissue" | "revoke" | null>(null)
   const [busy, setBusy] = useState(false)
-  const invitationUrl = `https://example.com/invitations/${communityId}-demo-${generation}`
-  const active = invitation === "active"
+  const invitationUrl = previewEnabled
+    ? `https://example.com/invitations/${communityId}-demo-${generation}`
+    : ""
+  const active = previewEnabled && invitation === "active"
 
   const issue = () => {
+    if (!previewEnabled) return
     setBusy(true)
     setGeneration((current) => current + 1)
     setInvitation("active")
@@ -33,6 +37,7 @@ export function useCommunityInvitation(communityId: string) {
   }
 
   const changeInvitation = () => {
+    if (!previewEnabled) return
     if (confirm === "revoke") {
       setInvitation("revoked")
       setExpiresAt("")
@@ -48,7 +53,7 @@ export function useCommunityInvitation(communityId: string) {
   }
 
   const copyInvitation = async () => {
-    if (!active) return
+    if (!previewEnabled || !active) return
     try {
       await navigator.clipboard.writeText(invitationUrl)
       showNotification({
@@ -66,14 +71,14 @@ export function useCommunityInvitation(communityId: string) {
   }
 
   return {
-    invitation,
+    invitation: previewEnabled ? invitation : ("none" as const),
     invitationUrl,
-    expiresAt,
+    expiresAt: previewEnabled ? expiresAt : "",
     active,
     busy,
     issue,
     copyInvitation,
-    confirm,
+    confirm: previewEnabled ? confirm : null,
     setConfirm,
     changeInvitation,
   }
