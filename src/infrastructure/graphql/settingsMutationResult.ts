@@ -89,51 +89,9 @@ export function classifySettingsSaveFailure(error: unknown): SettingsSaveFailure
   return "unknown"
 }
 
-const validationMessages: Record<string, string> = {
-  REQUIRED: "必須項目です。",
-  INVALID_FORMAT: "入力形式を確認してください。",
-  INVALID_VALUE: "入力内容を確認してください。",
-  TOO_LONG: "文字数が上限を超えています。",
-  OUT_OF_RANGE: "指定された範囲内で入力してください。",
-  INVALID_COMBINATION: "入力内容の組み合わせを確認してください。",
-}
-
-/**
- * The API's paths are relative to the mutation input, not GraphQL errors[].path.
- * Do not expose raw server messages/codes or guess unknown paths as field errors.
- */
-export function resolveSettingsValidation(
-  error: SettingsInputValidationError,
-  fieldNames: readonly string[],
-): { fieldErrors: Record<string, string>; formError: boolean } {
-  const fieldErrors: Record<string, string> = {}
-  let formError = false
-  for (const violation of error.violations) {
-    const field =
-      violation.scope === "FIELD" &&
-      violation.inputPaths.length === 1 &&
-      violation.inputPaths[0]?.segments.length === 1
-        ? violation.inputPaths[0]?.segments[0]
-        : undefined
-    const message = validationMessages[violation.code]
-    if (field && fieldNames.includes(field) && message) {
-      fieldErrors[field] = message
-    } else {
-      // Unknown public codes and paths cannot be attributed to a specific input.
-      formError = true
-    }
-  }
-  if (error.violations.length === 0) formError = true
-  return { fieldErrors, formError }
-}
-
-/** GraphQL Request/Execution VALIDATION/CONFLICT lacks input field paths.
- * Present those as a Form error, never invent a Field validation path. */
-export function resolveSettingsFailureValidation(
+/** Expose only typed rejection data to Form presentation; never infer field paths from GraphQL errors. */
+export function getSettingsInputViolations(
   error: unknown,
-  fields: readonly string[],
-): { fieldErrors: Record<string, string>; formError: boolean } {
-  return error instanceof SettingsInputValidationError
-    ? resolveSettingsValidation(error, fields)
-    : { fieldErrors: {}, formError: true }
+): ReadonlyArray<SettingsInputViolation> | null {
+  return error instanceof SettingsInputValidationError ? error.violations : null
 }
