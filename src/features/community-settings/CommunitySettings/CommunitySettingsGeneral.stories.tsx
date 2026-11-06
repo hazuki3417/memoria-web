@@ -500,7 +500,7 @@ export const InvitationRoleChangeSecretProtection: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "招待URLを発行" }))
     await expect(canvas.getByRole("textbox", { name: "招待URL" })).toHaveValue(
-      expect.stringContaining("https://example.com/invitations/"),
+      "https://example.com/invitations/photo-club-demo-1",
     )
 
     await userEvent.click(canvas.getByRole("button", { name: "Roleを切り替える" }))
