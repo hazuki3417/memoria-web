@@ -19,6 +19,7 @@ export function CommunitySettingsContent({
   isAdmin,
   name,
   invitation,
+  invitationAvailable,
   members,
   onChangeMemberRole,
   onRemoveMember,
@@ -34,6 +35,7 @@ export function CommunitySettingsContent({
   isAdmin: boolean
   name: ReturnType<typeof useCommunityNameSettings>
   invitation: ReturnType<typeof useCommunityInvitation>
+  invitationAvailable: boolean
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
   onRemoveMember?: (userId: string) => Promise<boolean>
@@ -50,6 +52,7 @@ export function CommunitySettingsContent({
         <CommunityGeneralContent
           name={name}
           invitation={invitation}
+          invitationAvailable={invitationAvailable}
           communityId={communityId}
           isAdmin={isAdmin}
         />
