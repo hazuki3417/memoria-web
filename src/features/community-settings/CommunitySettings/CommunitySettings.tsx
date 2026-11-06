@@ -6,6 +6,7 @@ import { CommunitySettingsView } from "./CommunitySettingsView"
 import { useCommunityNameSettings } from "../general/useCommunityNameSettings"
 import { useCommunityInvitation } from "../general/useCommunityInvitation"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
+import { useCommunitySettingsSectionNavigation } from "./useCommunitySettingsSectionNavigation"
 
 export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
@@ -46,9 +47,8 @@ export function CommunitySettings({
   contentOverride?: ReactNode
   communityAccentColor?: string
 }) {
-  const [previewSection, setPreviewSection] =
-    useState<CommunitySettingsSection>(section)
-  const currentSection = onNavigate ? section : previewSection
+  const { currentSection, onSectionChange } =
+    useCommunitySettingsSectionNavigation({ section, onNavigate })
   const isAdmin = role === "admin"
   const [accent, setAccent] = useState("#7950f2")
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
@@ -72,10 +72,7 @@ export function CommunitySettings({
       setAccent={setAccent}
       contentOverride={contentOverride}
       accentColor={communityAccentColor}
-      onSectionChange={(next, href) => {
-        if (onNavigate) onNavigate(href)
-        else setPreviewSection(next)
-      }}
+      onSectionChange={onSectionChange}
     />
   )
 }
