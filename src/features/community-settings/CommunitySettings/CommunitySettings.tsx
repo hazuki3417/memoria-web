@@ -55,7 +55,8 @@ export function CommunitySettings({
   const [accent, setAccent] = useState("#7950f2")
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
   // URL-controlled consumers must not silently opt into the Preview simulation.
-  const previewInvitation = invitationMode === "preview" || (invitationMode === undefined && !onNavigate)
+  const previewInvitation =
+    invitationMode === "preview" || (invitationMode === undefined && !onNavigate)
   const invitation = useCommunityInvitation(communityId, previewInvitation)
 
   return (
