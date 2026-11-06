@@ -1,9 +1,9 @@
+import { resolveFormInputValidation, resolveFormFailureValidation } from "@/ui/formValidation"
 import { describe, expect, it } from "vitest"
 import {
   SettingsInputValidationError,
   classifySettingsSaveFailure,
-  resolveSettingsValidation,
-  resolveSettingsFailureValidation,
+  getSettingsInputViolations,
 } from "./settingsMutationResult"
 
 describe("Hybrid settings input rejection", () => {
@@ -28,18 +28,18 @@ describe("Hybrid settings input rejection", () => {
       { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["unknown"] }] },
       { scope: "FIELD_GROUP", code: "INVALID_COMBINATION", inputPaths: [{ segments: ["nickname"] }] },
     ])
-    expect(resolveSettingsValidation(error, ["nickname"])).toEqual({
+    expect(resolveFormInputValidation(error, ["nickname"])).toEqual({
       fieldErrors: { nickname: "必須項目です。" },
       formError: true,
     })
   })
 
   it("treats FORM, unknown paths and missing violations as Form errors", () => {
-    expect(resolveSettingsValidation(new SettingsInputValidationError([]), ["name"])).toEqual({
+    expect(resolveFormInputValidation(new SettingsInputValidationError([]), ["name"])).toEqual({
       fieldErrors: {},
       formError: true,
     })
-    expect(resolveSettingsValidation(new SettingsInputValidationError([
+    expect(resolveFormInputValidation(new SettingsInputValidationError([
       { scope: "FORM", code: "INVALID_VALUE", inputPaths: [] },
     ]), ["name"]).formError).toBe(true)
   })
@@ -48,7 +48,7 @@ describe("Hybrid settings input rejection", () => {
     const error = new SettingsInputValidationError([
       { scope: "FIELD", code: "FUTURE_UNKNOWN_CODE", inputPaths: [{ segments: ["nickname"] }] },
     ])
-    expect(resolveSettingsValidation(error, ["nickname"])).toEqual({
+    expect(resolveFormInputValidation(error, ["nickname"])).toEqual({
       fieldErrors: {},
       formError: true,
     })
@@ -89,7 +89,7 @@ describe("Hybrid settings input rejection", () => {
     for (const code of ["VALIDATION", "CONFLICT"]) {
       const error = { graphQLErrors: [{ extensions: { code } }] }
       expect(classifySettingsSaveFailure(error)).toBe("validation")
-      expect(resolveSettingsFailureValidation(error, ["nickname"])).toEqual({
+      expect(resolveFormFailureValidation(getSettingsInputViolations(error), ["nickname"])).toEqual({
         fieldErrors: {},
         formError: true,
       })
