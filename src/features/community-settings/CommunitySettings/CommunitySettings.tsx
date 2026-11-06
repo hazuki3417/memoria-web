@@ -2,11 +2,10 @@
 
 import { useState, type ReactNode } from "react"
 import type { CommunityMember } from "../members/CommunityMembersContent"
-import { CommunitySettingsContent } from "./CommunitySettingsContent"
+import { CommunitySettingsView } from "./CommunitySettingsView"
 import { useCommunityNameSettings } from "../general/useCommunityNameSettings"
 import { useCommunityInvitation } from "../general/useCommunityInvitation"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
-import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
 
 export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
@@ -56,33 +55,27 @@ export function CommunitySettings({
   const invitation = useCommunityInvitation(communityId)
 
   return (
-    <CommunitySettingsLayout
-      communityId={communityId}
+    <CommunitySettingsView
       section={currentSection}
+      communityId={communityId}
+      isAdmin={isAdmin}
+      name={name}
+      invitation={invitation}
+      members={members}
+      onChangeMemberRole={onChangeMemberRole}
+      onRemoveMember={onRemoveMember}
+      onLeaveCommunity={onLeaveCommunity}
+      onLeaveSuccess={onLeaveSuccess}
+      preferencesContent={preferencesContent}
+      usageContent={usageContent}
+      accent={accent}
+      setAccent={setAccent}
+      contentOverride={contentOverride}
       accentColor={communityAccentColor}
       onSectionChange={(next, href) => {
         if (onNavigate) onNavigate(href)
         else setPreviewSection(next)
       }}
-    >
-      {contentOverride ?? (
-        <CommunitySettingsContent
-          section={currentSection}
-          communityId={communityId}
-          isAdmin={isAdmin}
-          name={name}
-          invitation={invitation}
-          members={members}
-          onChangeMemberRole={onChangeMemberRole}
-          onRemoveMember={onRemoveMember}
-          onLeaveCommunity={onLeaveCommunity}
-          onLeaveSuccess={onLeaveSuccess}
-          preferencesContent={preferencesContent}
-          usageContent={usageContent}
-          accent={accent}
-          setAccent={setAccent}
-        />
-      )}
-    </CommunitySettingsLayout>
+    />
   )
 }
