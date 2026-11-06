@@ -3,7 +3,7 @@ import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunityAliasControl } from "./CommunityAliasControl"
-import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
+import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
   title: "Features/Community Settings/Community Alias",

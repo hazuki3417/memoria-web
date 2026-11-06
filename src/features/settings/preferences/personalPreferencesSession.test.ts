@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
-import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
+import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 import { createPersonalPreferencesSession } from "./personalPreferencesSession"
 import { defaultUserPreferences } from "./userPreferences"
 

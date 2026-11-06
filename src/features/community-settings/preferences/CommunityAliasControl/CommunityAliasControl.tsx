@@ -12,7 +12,7 @@ import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,
   type SettingsSaveFailureKind,
-} from "@/features/settings/graphqlSettingsResult"
+} from "@/infrastructure/graphql/settingsMutationResult"
 
 type Inspection =
   | { status: "idle" | "checking" | "failed" }
