@@ -16,7 +16,8 @@ export type CommunityGeneralContentProps = {
   isAdmin: boolean
   communityId: string
   name: Omit<CommunityNameSectionProps, "isAdmin">
-  invitation: Omit<CommunityInvitationSectionProps, "isAdmin">
+  invitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
+  invitationAvailable: boolean
 }
 
 export function CommunityGeneralContent({
@@ -24,6 +25,7 @@ export function CommunityGeneralContent({
   communityId,
   name,
   invitation,
+  invitationAvailable,
 }: CommunityGeneralContentProps) {
   return (
     <Stack gap="xl">
@@ -32,7 +34,7 @@ export function CommunityGeneralContent({
         description="Communityの基本情報と管理"
       />
       <CommunityNameSection {...name} isAdmin={isAdmin} />
-      <CommunityInvitationSection {...invitation} isAdmin={isAdmin} />
+      <CommunityInvitationSection {...invitation} isAdmin={isAdmin} available={invitationAvailable} />
       {isAdmin && <CommunityDangerZone communityId={communityId} />}
     </Stack>
   )
