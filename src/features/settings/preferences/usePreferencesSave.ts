@@ -1,5 +1,6 @@
-import { resolveFormFailureValidation } from "@/ui/formValidation"
 "use client"
+
+import { resolveFormFailureValidation } from "@/ui/formValidation"
 
 import { useEffect, useRef, useState } from "react"
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
