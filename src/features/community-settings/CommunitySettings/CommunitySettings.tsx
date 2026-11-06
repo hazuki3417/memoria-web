@@ -28,7 +28,7 @@ export function CommunitySettings({
   preferencesContent,
   contentOverride,
   communityAccentColor,
-  invitationMode = "preview",
+  invitationMode,
 }: {
   role?: Role
   communityId?: string
@@ -54,7 +54,9 @@ export function CommunitySettings({
   const isAdmin = role === "admin"
   const [accent, setAccent] = useState("#7950f2")
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
-  const invitation = useCommunityInvitation(communityId, invitationMode === "preview")
+  // URL-controlled consumers must not silently opt into the Preview simulation.
+  const previewInvitation = invitationMode === "preview" || (invitationMode === undefined && !onNavigate)
+  const invitation = useCommunityInvitation(communityId, previewInvitation)
 
   return (
     <CommunitySettingsView
@@ -63,7 +65,7 @@ export function CommunitySettings({
       isAdmin={isAdmin}
       name={name}
       invitation={invitation}
-      invitationAvailable={invitationMode === "preview"}
+      invitationAvailable={previewInvitation}
       members={members}
       onChangeMemberRole={onChangeMemberRole}
       onRemoveMember={onRemoveMember}
