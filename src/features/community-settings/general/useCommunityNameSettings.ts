@@ -1,3 +1,4 @@
+import { resolveFormFailureValidation } from "@/ui/formValidation"
 "use client"
 
 import { useEffect, useRef, useState, type SetStateAction } from "react"
@@ -8,7 +9,7 @@ import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 import {
   classifySettingsSaveFailure,
-  resolveSettingsFailureValidation,
+  getSettingsInputViolations,
   type SettingsSaveFailureKind,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { getCommunityBlockedFeedback } from "../preferences/communityBlockedFeedback"
@@ -115,7 +116,7 @@ export function useCommunityNameSettings({
       } catch (error) {
         const kind = classifySettingsSaveFailure(error)
         if (kind === "validation") {
-          const result = resolveSettingsFailureValidation(error, ["name"])
+          const result = resolveFormFailureValidation(getSettingsInputViolations(error), ["name"])
           if (result.fieldErrors.name) {
             setError("name", { type: "server", message: result.fieldErrors.name })
           }
