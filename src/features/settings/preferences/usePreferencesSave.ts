@@ -8,7 +8,7 @@ import type { SaveStatusState } from "@/components/SaveStatus"
 import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,
-} from "../graphqlSettingsResult"
+} from "@/infrastructure/graphql/settingsMutationResult"
 import type { PreferencesFailure } from "./personalPreferencesSession"
 import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 

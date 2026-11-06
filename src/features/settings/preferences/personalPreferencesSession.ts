@@ -5,7 +5,7 @@ import type { SaveStatusState } from "@/components/SaveStatus"
 import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,
-} from "../graphqlSettingsResult"
+} from "@/infrastructure/graphql/settingsMutationResult"
 
 export type PreferencesFailure = "unknown" | "retryable" | "blocked" | "validation" | null
 export type PreferencesSessionSnapshot = Readonly<{

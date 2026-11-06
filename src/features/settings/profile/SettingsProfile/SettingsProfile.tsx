@@ -13,7 +13,7 @@ import { SectionHeader } from "@/components/SectionHeader"
 import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,
-} from "../../graphqlSettingsResult"
+} from "@/infrastructure/graphql/settingsMutationResult"
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
 

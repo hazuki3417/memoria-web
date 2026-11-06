@@ -10,7 +10,7 @@ import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,
   type SettingsSaveFailureKind,
-} from "@/features/settings/graphqlSettingsResult"
+} from "@/infrastructure/graphql/settingsMutationResult"
 import { getCommunityBlockedFeedback } from "../preferences/communityBlockedFeedback"
 
 type Inspection =

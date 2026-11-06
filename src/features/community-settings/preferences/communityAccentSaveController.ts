@@ -3,7 +3,7 @@ import { getCommunityBlockedFeedback } from "./communityBlockedFeedback"
 import {
   classifySettingsSaveFailure,
   resolveSettingsFailureValidation,
-} from "@/features/settings/graphqlSettingsResult"
+} from "@/infrastructure/graphql/settingsMutationResult"
 
 export type AccentFailure = "rejected" | "blocked" | "unknown" | null
 export type AccentSnapshot = Readonly<{
