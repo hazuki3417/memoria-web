@@ -524,3 +524,16 @@ export const InvitationProductionUnavailable: Story = {
     await expect(canvas.queryByRole("button", { name: "招待URLをコピー" })).not.toBeInTheDocument()
   },
 }
+
+/** URL-controlled consumers do not opt into the Preview-only Invitation simulation by default. */
+export const InvitationUrlControlledUnavailable: Story = {
+  name: "Interaction · URL制御ではInvitationデモが既定で無効",
+  tags: ["interaction"],
+  args: { onNavigate: fn() },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("招待URLの管理機能は現在利用できません。")).toBeVisible()
+    await expect(canvas.queryByRole("textbox", { name: "招待URL" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "招待URLを発行" })).not.toBeInTheDocument()
+  },
+}
