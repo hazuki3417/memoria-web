@@ -396,3 +396,60 @@ export const NameFormValidationVisual: Story = {
     await expect(canvas.getByRole("alert")).toBeVisible()
   },
 }
+
+/** Mirrors the production key={communityId} remount boundary without a Router mock. */
+function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettings>) {
+  const [communityId, setCommunityId] = useState("photo-club")
+  const communityName =
+    communityId === "photo-club" ? "家族のアルバム" : "旅行の思い出"
+  return (
+    <>
+      <Button
+        onClick={() =>
+          setCommunityId((id) =>
+            id === "photo-club" ? "travel-club" : "photo-club",
+          )
+        }
+      >
+        Communityを切り替える
+      </Button>
+      <CommunitySettings
+        {...args}
+        key={communityId}
+        communityId={communityId}
+        communityName={communityName}
+      />
+    </>
+  )
+}
+
+/** Context changes must not reuse the previous Community's RHF draft. */
+export const NameContextChangeReset: Story = {
+  name: "Interaction · Community切替で編集Draftを初期化",
+  tags: ["interaction"],
+  render: (args) => <CommunitySwitchFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "編集中のCommunity名")
+    await expect(input).toHaveValue("編集中のCommunity名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityを切り替える" }),
+    )
+    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue(
+      "旅行の思い出",
+    )
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityを切り替える" }),
+    )
+    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue(
+      "家族のアルバム",
+    )
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
