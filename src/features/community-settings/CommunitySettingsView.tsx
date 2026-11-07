@@ -1,9 +1,9 @@
 "use client"
 
 import type { ComponentProps, ReactNode } from "react"
-import { CommunitySettingsLayout } from "../CommunitySettingsLayout"
-import { CommunitySettingsContent } from "../CommunitySettingsContent"
-import type { CommunitySettingsSection } from "../communitySettingsSections"
+import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
+import { CommunitySettingsContent } from "./CommunitySettingsContent"
+import type { CommunitySettingsSection } from "./communitySettingsSections"
 
 type CommunitySettingsViewProps = ComponentProps<typeof CommunitySettingsContent> & {
   contentOverride?: ReactNode

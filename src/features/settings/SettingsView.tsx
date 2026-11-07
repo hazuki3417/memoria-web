@@ -1,13 +1,13 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { SettingsLayout, type Section } from "../SettingsLayout"
-import { SettingsSectionContent } from "../SettingsSectionContent"
-import type { InspectProfile, SaveProfile } from "../profile/SettingsProfile"
+import { SettingsLayout, type Section } from "./SettingsLayout"
+import { SettingsSectionContent } from "./SettingsSectionContent"
+import type { InspectProfile, SaveProfile } from "./profile/SettingsProfile"
 import type {
   UserPreferences,
   UserPreferencesPatch,
-} from "../preferences/userPreferences"
+} from "./preferences/userPreferences"
 
 export type SettingsViewProps = {
   section: Section
