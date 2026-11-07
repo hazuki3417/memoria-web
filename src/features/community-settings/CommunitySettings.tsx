@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import type { CommunityMember } from "../members/CommunityMembersContent"
-import { CommunitySettingsView } from "./CommunitySettingsView"
-import { useCommunityNameSettings } from "../general/useCommunityNameSettings"
-import { useCommunityInvitation } from "../general/useCommunityInvitation"
-import type { CommunitySettingsSection } from "./communitySettingsSections"
-import { useCommunitySettingsSectionNavigation } from "./useCommunitySettingsSectionNavigation"
+import type { CommunityMember } from "./members/CommunityMembersContent"
+import { CommunitySettingsView } from "./CommunitySettings/CommunitySettingsView"
+import { useCommunityNameSettings } from "./general/useCommunityNameSettings"
+import { useCommunityInvitation } from "./general/useCommunityInvitation"
+import type { CommunitySettingsSection } from "./CommunitySettings/communitySettingsSections"
+import { useCommunitySettingsSectionNavigation } from "./CommunitySettings/useCommunitySettingsSectionNavigation"
 
-export type { CommunitySettingsSection } from "./communitySettingsSections"
+export type { CommunitySettingsSection } from "./CommunitySettings/communitySettingsSections"
 type Role = "admin" | "member"
 
 export function CommunitySettings({
