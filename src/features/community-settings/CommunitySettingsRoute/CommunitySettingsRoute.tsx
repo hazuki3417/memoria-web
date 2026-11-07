@@ -1,11 +1,11 @@
 "use client"
 
-import { ConnectedCommunityPreferences } from "../../preferences/ConnectedCommunityPreferences"
-import { useCommunitySettingsMembership } from "../../useCommunitySettingsMembership"
-import { useCommunitySettingsActions } from "../../useCommunitySettingsActions"
+import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
+import { useCommunitySettingsMembership } from "../useCommunitySettingsMembership"
+import { useCommunitySettingsActions } from "../useCommunitySettingsActions"
 import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { useCommunitySettingsRefreshError } from "../../useCommunitySettingsRefreshError"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { useApolloClient } from "@apollo/client"
@@ -14,7 +14,7 @@ import { useCommunity } from "@/features/community/CommunityProvider"
 import {
   CommunitySettings,
   type CommunitySettingsSection,
-} from ".."
+} from "../CommunitySettings"
 
 export function CommunitySettingsRoute({
   communityId,

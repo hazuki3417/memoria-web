@@ -2,13 +2,13 @@
 
 import { useState, type ReactNode } from "react"
 import type { CommunityMember } from "./members/CommunityMembersContent"
-import { CommunitySettingsView } from "./CommunitySettings/CommunitySettingsView"
+import { CommunitySettingsView } from "./CommunitySettingsView"
 import { useCommunityNameSettings } from "./general/useCommunityNameSettings"
 import { useCommunityInvitation } from "./general/useCommunityInvitation"
-import type { CommunitySettingsSection } from "./CommunitySettings/communitySettingsSections"
-import { useCommunitySettingsSectionNavigation } from "./CommunitySettings/useCommunitySettingsSectionNavigation"
+import type { CommunitySettingsSection } from "./communitySettingsSections"
+import { useCommunitySettingsSectionNavigation } from "./useCommunitySettingsSectionNavigation"
 
-export type { CommunitySettingsSection } from "./CommunitySettings/communitySettingsSections"
+export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
 
 export function CommunitySettings({
