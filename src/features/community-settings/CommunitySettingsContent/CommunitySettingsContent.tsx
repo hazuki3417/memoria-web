@@ -1,15 +1,15 @@
 "use client"
 
 import type { Dispatch, ReactNode, SetStateAction } from "react"
-import { CommunityGeneralContent } from "../../general/CommunityGeneralContent"
+import { CommunityGeneralContent } from "../general/CommunityGeneralContent"
 import {
   CommunityMembersContent,
   type CommunityMember,
-} from "../../members/CommunityMembersContent"
-import { CommunityPreferencesContent } from "../../preferences/CommunityPreferencesContent"
+} from "../members/CommunityMembersContent"
+import { CommunityPreferencesContent } from "../preferences/CommunityPreferencesContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
-import type { useCommunityNameSettings } from "../../general/useCommunityNameSettings"
-import type { useCommunityInvitation } from "../../general/useCommunityInvitation"
+import type { useCommunityNameSettings } from "../general/useCommunityNameSettings"
+import type { useCommunityInvitation } from "../general/useCommunityInvitation"
 
 type Role = "admin" | "member"
 
@@ -19,6 +19,7 @@ export function CommunitySettingsContent({
   isAdmin,
   name,
   invitation,
+  invitationAvailable,
   members,
   onChangeMemberRole,
   onRemoveMember,
@@ -34,6 +35,7 @@ export function CommunitySettingsContent({
   isAdmin: boolean
   name: ReturnType<typeof useCommunityNameSettings>
   invitation: ReturnType<typeof useCommunityInvitation>
+  invitationAvailable: boolean
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
   onRemoveMember?: (userId: string) => Promise<boolean>
@@ -50,6 +52,7 @@ export function CommunitySettingsContent({
         <CommunityGeneralContent
           name={name}
           invitation={invitation}
+          invitationAvailable={invitationAvailable}
           communityId={communityId}
           isAdmin={isAdmin}
         />

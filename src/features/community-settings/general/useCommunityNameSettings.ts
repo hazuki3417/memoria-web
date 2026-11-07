@@ -1,5 +1,7 @@
 "use client"
 
+import { resolveFormFailureValidation } from "@/ui/formValidation"
+
 import { useEffect, useRef, useState, type SetStateAction } from "react"
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -8,9 +10,9 @@ import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 import {
   classifySettingsSaveFailure,
-  resolveSettingsFailureValidation,
+  getSettingsInputViolations,
   type SettingsSaveFailureKind,
-} from "@/features/settings/graphqlSettingsResult"
+} from "@/infrastructure/graphql/settingsMutationResult"
 import { getCommunityBlockedFeedback } from "../preferences/communityBlockedFeedback"
 
 type Inspection =
@@ -115,7 +117,7 @@ export function useCommunityNameSettings({
       } catch (error) {
         const kind = classifySettingsSaveFailure(error)
         if (kind === "validation") {
-          const result = resolveSettingsFailureValidation(error, ["name"])
+          const result = resolveFormFailureValidation(getSettingsInputViolations(error), ["name"])
           if (result.fieldErrors.name) {
             setError("name", { type: "server", message: result.fieldErrors.name })
           }

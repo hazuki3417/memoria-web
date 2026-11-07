@@ -1,3 +1,4 @@
+import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { ApolloClient, ApolloLink, InMemoryCache, Observable } from "@apollo/client"
 import { GraphQLError } from "graphql"
 import { describe, expect, it } from "vitest"
@@ -11,8 +12,8 @@ import {
   SettingsInputValidationError,
   classifySettingsSaveFailure,
   requireSettingsMutationOutcome,
-  resolveSettingsFailureValidation,
-} from "./graphqlSettingsResult"
+  getSettingsInputViolations,
+} from "./settingsMutationResult"
 
 function clientFor(data: Record<string, unknown> | null, codes: string[] = []) {
   const link = new ApolloLink(
@@ -82,7 +83,7 @@ describe("Settings Hybrid Result: Apollo partial-response integration", () => {
       throw new Error("Typed validation result missing")
     const failure = new SettingsInputValidationError(outcome.violations)
     expect(classifySettingsSaveFailure(failure)).toBe("validation")
-    expect(resolveSettingsFailureValidation(failure, ["personalAccentColor"])).toEqual({
+    expect(resolveFormFailureValidation(getSettingsInputViolations(failure), ["personalAccentColor"])).toEqual({
       fieldErrors: { personalAccentColor: "入力形式を確認してください。" },
       formError: false,
     })

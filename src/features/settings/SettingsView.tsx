@@ -1,28 +1,15 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
-import { SettingsLayout, type Section } from "../SettingsLayout"
+import { SettingsLayout, type Section } from "./SettingsLayout"
 import { SettingsSectionContent } from "./SettingsSectionContent"
-import type { InspectProfile, SaveProfile } from "../profile/SettingsProfile"
+import type { InspectProfile, SaveProfile } from "./profile/SettingsProfile"
 import type {
   UserPreferences,
   UserPreferencesPatch,
-} from "../preferences/userPreferences"
+} from "./preferences/userPreferences"
 
-export function Settings({
-  section,
-  saveProfile,
-  inspectProfile,
-  profileNickname,
-  initialPreferences,
-  savePreferences,
-  inspectPreferences,
-  usageContent,
-  accountContent,
-  contentOverride,
-  personalAccentColor,
-}: {
+export type SettingsViewProps = {
   section: Section
   saveProfile?: SaveProfile
   inspectProfile?: InspectProfile
@@ -34,13 +21,28 @@ export function Settings({
   accountContent?: ReactNode
   contentOverride?: ReactNode
   personalAccentColor?: string
-}) {
-  const router = useRouter()
+  onSectionChange: (section: Section) => void
+}
+
+export function SettingsView({
+  section,
+  saveProfile,
+  inspectProfile,
+  profileNickname,
+  initialPreferences,
+  savePreferences,
+  inspectPreferences,
+  usageContent,
+  accountContent,
+  contentOverride,
+  personalAccentColor,
+  onSectionChange,
+}: SettingsViewProps) {
   return (
     <SettingsLayout
       accentColor={personalAccentColor}
       section={section}
-      onSectionChange={(next) => router.push(`/settings/${next}`)}
+      onSectionChange={onSectionChange}
     >
       {contentOverride ?? (
         <SettingsSectionContent

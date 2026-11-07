@@ -8,7 +8,7 @@ import {
   type OperationSaveUserPreferencesMutationVariables,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
-import { SettingsInputValidationError, requireSettingsMutationOutcome } from "./graphqlSettingsResult"
+import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
 import type { UserPreferencesPatch } from "./preferences/userPreferences"
 import {
   fromGraphqlUserPreferences,

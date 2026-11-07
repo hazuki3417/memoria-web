@@ -13,7 +13,7 @@ import { useCommunitySettingsRefreshError } from "../../useCommunitySettingsRefr
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
-import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/features/settings/graphqlSettingsResult"
+import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
 import {
   CommunityMySettingsDocument,
   UpdateCommunitySettingsDocument,

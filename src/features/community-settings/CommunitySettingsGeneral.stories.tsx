@@ -3,7 +3,7 @@ import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunitySettings } from "./CommunitySettings"
-import { SettingsInputValidationError } from "@/features/settings/graphqlSettingsResult"
+import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
   title: "Features/Community Settings/Settings",
@@ -394,5 +394,146 @@ export const NameFormValidationVisual: Story = {
     await expect(await canvas.findByRole("alert")).toBeVisible()
     await userEvent.type(input, "を再編集")
     await expect(canvas.getByRole("alert")).toBeVisible()
+  },
+}
+
+/** Mirrors the production key={communityId} remount boundary without a Router mock. */
+function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettings>) {
+  const [communityId, setCommunityId] = useState("photo-club")
+  const communityName =
+    communityId === "photo-club" ? "家族のアルバム" : "旅行の思い出"
+  return (
+    <>
+      <Button
+        onClick={() =>
+          setCommunityId((id) =>
+            id === "photo-club" ? "travel-club" : "photo-club",
+          )
+        }
+      >
+        Communityを切り替える
+      </Button>
+      <CommunitySettings
+        {...args}
+        key={communityId}
+        communityId={communityId}
+        communityName={communityName}
+      />
+    </>
+  )
+}
+
+/** Context changes must not reuse the previous Community's RHF draft. */
+export const NameContextChangeReset: Story = {
+  name: "Interaction · Community切替で編集Draftを初期化",
+  tags: ["interaction"],
+  render: (args) => <CommunitySwitchFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "編集中のCommunity名")
+    await expect(input).toHaveValue("編集中のCommunity名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityを切り替える" }),
+    )
+    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue(
+      "旅行の思い出",
+    )
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityを切り替える" }),
+    )
+    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue(
+      "家族のアルバム",
+    )
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+/** Preview invitation state must not cross the production Community key boundary. */
+export const InvitationContextChangeReset: Story = {
+  name: "Interaction · Community切替でInvitation状態を初期化",
+  tags: ["interaction"],
+  render: (args) => <CommunitySwitchFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("未発行")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "招待URLを発行" }))
+    await expect(canvas.getByText("有効")).toBeVisible()
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityを切り替える" }),
+    )
+    await expect(canvas.getByText("未発行")).toBeVisible()
+    await expect(canvas.getByRole("textbox", { name: "招待URL" })).toHaveValue("-")
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Communityを切り替える" }),
+    )
+    await expect(canvas.getByText("未発行")).toBeVisible()
+  },
+}
+
+
+/** Switching from Administrator to Member must immediately hide an issued preview secret. */
+function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettings>) {
+  const [role, setRole] = useState<"admin" | "member">("admin")
+  return (
+    <>
+      <Button onClick={() => setRole((current) => current === "admin" ? "member" : "admin")}>
+        Roleを切り替える
+      </Button>
+      <CommunitySettings {...args} role={role} />
+    </>
+  )
+}
+
+export const InvitationRoleChangeSecretProtection: Story = {
+  name: "Interaction · Memberへの変更でInvitation URLを非表示",
+  tags: ["interaction"],
+  render: (args) => <InvitationRoleChangeFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "招待URLを発行" }))
+    await expect(canvas.getByRole("textbox", { name: "招待URL" })).toHaveValue(
+      "https://example.com/invitations/photo-club-demo-1",
+    )
+
+    await userEvent.click(canvas.getByRole("button", { name: "Roleを切り替える" }))
+    await expect(canvas.getByText("招待URLの発行と管理はAdministratorのみ行えます。")).toBeVisible()
+    await expect(canvas.queryByRole("textbox", { name: "招待URL" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "招待URLをコピー" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "再発行" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "無効化" })).not.toBeInTheDocument()
+  },
+}
+
+export const InvitationProductionUnavailable: Story = {
+  name: "Interaction · 本番では仮Invitationを発行しない",
+  tags: ["interaction"],
+  args: { invitationMode: "unavailable" },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("招待URLの管理機能は現在利用できません。")).toBeVisible()
+    await expect(canvas.queryByRole("textbox", { name: "招待URL" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "招待URLを発行" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "招待URLをコピー" })).not.toBeInTheDocument()
+  },
+}
+
+/** URL-controlled consumers do not opt into the Preview-only Invitation simulation by default. */
+export const InvitationUrlControlledUnavailable: Story = {
+  name: "Interaction · URL制御ではInvitationデモが既定で無効",
+  tags: ["interaction"],
+  args: { onNavigate: fn() },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText("招待URLの管理機能は現在利用できません。")).toBeVisible()
+    await expect(canvas.queryByRole("textbox", { name: "招待URL" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "招待URLを発行" })).not.toBeInTheDocument()
   },
 }

@@ -1,5 +1,7 @@
 "use client"
 
+import { resolveFormFailureValidation } from "@/ui/formValidation"
+
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { useEffect, useRef, useState } from "react"
 import { useController, useForm } from "react-hook-form"
@@ -12,8 +14,8 @@ import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import {
   classifySettingsSaveFailure,
-  resolveSettingsFailureValidation,
-} from "../../graphqlSettingsResult"
+  getSettingsInputViolations,
+} from "@/infrastructure/graphql/settingsMutationResult"
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
 
@@ -156,7 +158,7 @@ export function SettingsProfile({
     } catch (error) {
       const kind = classifySettingsSaveFailure(error)
       if (kind === "validation") {
-        const result = resolveSettingsFailureValidation(error, ["nickname"])
+        const result = resolveFormFailureValidation(getSettingsInputViolations(error), ["nickname"])
         if (result.fieldErrors.nickname) {
           setError("nickname", {
             type: "server",

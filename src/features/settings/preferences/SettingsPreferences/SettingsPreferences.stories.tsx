@@ -5,7 +5,7 @@ import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { SettingsPreferences } from "./SettingsPreferences"
 import { defaultUserPreferences, type UserPreferencesPatch } from "../userPreferences"
 import { PersonalPreferencesSessionProvider } from "../PersonalPreferencesSessionContext"
-import { SettingsInputValidationError } from "../../graphqlSettingsResult"
+import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
   title: "features/settings/preferences/SettingsPreferences",

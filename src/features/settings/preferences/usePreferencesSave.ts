@@ -1,5 +1,7 @@
 "use client"
 
+import { resolveFormFailureValidation } from "@/ui/formValidation"
+
 import { useEffect, useRef, useState } from "react"
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import { usePersonalPreferencesSession } from "./PersonalPreferencesSessionContext"
@@ -7,8 +9,8 @@ import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import {
   classifySettingsSaveFailure,
-  resolveSettingsFailureValidation,
-} from "../graphqlSettingsResult"
+  getSettingsInputViolations,
+} from "@/infrastructure/graphql/settingsMutationResult"
 import type { PreferencesFailure } from "./personalPreferencesSession"
 import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 
@@ -81,7 +83,7 @@ export function usePreferencesSave(
         setLocalBlockedFeedback(kind === "blocked" ? getPreferencesBlockedFeedback(error) : null)
         setLocalValidation(
           kind === "validation"
-            ? resolveSettingsFailureValidation(error, Object.keys(attempted))
+            ? resolveFormFailureValidation(getSettingsInputViolations(error), Object.keys(attempted))
             : null,
         )
       },
