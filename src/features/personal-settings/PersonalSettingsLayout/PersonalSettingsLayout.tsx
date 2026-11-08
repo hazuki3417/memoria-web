@@ -7,11 +7,11 @@ import {
   SettingsSectionNavigation,
 } from "@/components/SettingsSectionLayout"
 
-import { personalSettingsSections, type Section } from "../personalSettingsSections"
+import { personalSettingsSections, type PersonalSettingsSection } from "../personalSettingsSections"
 
 type PersonalSettingsLayoutProps = {
-  section: Section
-  onSectionChange: (section: Section) => void
+  section: PersonalSettingsSection
+  onSectionChange: (section: PersonalSettingsSection) => void
   children: ReactNode
   accentColor?: string
 }

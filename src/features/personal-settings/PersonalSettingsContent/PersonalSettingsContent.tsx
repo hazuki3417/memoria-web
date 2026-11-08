@@ -4,7 +4,7 @@ import { Button } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import Link from "next/link"
 import type { ReactNode } from "react"
-import type { Section } from "../personalSettingsSections"
+import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { SettingsProfile, type InspectProfile, type SaveProfile } from "../profile/SettingsProfile"
 import { SettingsPreferences } from "../preferences/SettingsPreferences"
 import { SettingsAccount } from "../account/SettingsAccount"
@@ -19,7 +19,7 @@ async function unavailableProfileSave(): Promise<void> {
 }
 
 export type PersonalSettingsContentProps = {
-  section: Section
+  section: PersonalSettingsSection
   saveProfile?: SaveProfile
   inspectProfile?: InspectProfile
   profileNickname?: string

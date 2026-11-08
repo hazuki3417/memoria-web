@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 import { PersonalSettingsLayout } from "./PersonalSettingsLayout"
-import type { Section } from "./personalSettingsSections"
+import type { PersonalSettingsSection } from "./personalSettingsSections"
 import { PersonalSettingsContent } from "./PersonalSettingsContent"
 import type { InspectProfile, SaveProfile } from "./profile/SettingsProfile"
 import type {
@@ -11,7 +11,7 @@ import type {
 } from "./preferences/userPreferences"
 
 export type PersonalSettingsViewProps = {
-  section: Section
+  section: PersonalSettingsSection
   saveProfile?: SaveProfile
   inspectProfile?: InspectProfile
   profileNickname?: string
@@ -22,7 +22,7 @@ export type PersonalSettingsViewProps = {
   accountContent?: ReactNode
   contentOverride?: ReactNode
   personalAccentColor?: string
-  onSectionChange: (section: Section) => void
+  onSectionChange: (section: PersonalSettingsSection) => void
 }
 
 export function PersonalSettingsView({
