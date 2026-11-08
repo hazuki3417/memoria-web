@@ -12,6 +12,7 @@ import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBo
 import { useCommunitySettingsRefreshError } from "../../useCommunitySettingsRefreshError"
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
+import { useCommunityAliasConnection } from "../useCommunityAliasConnection"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
 import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
 import {
@@ -20,7 +21,6 @@ import {
   type OperationUpdateCommunitySettingsMutation,
   type OperationUpdateCommunitySettingsMutationVariables,
   useCommunityMySettingsQuery,
-  useUpdateCommunitySettingsMutation,
 } from "@/infrastructure/graphql/generated"
 
 const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
@@ -38,7 +38,7 @@ export function ConnectedCommunityPreferences({
   const client = useApolloClient()
   const { setPreview, clearPreview } = useCommunityAccentPreview()
   const { snapshot, controller } = useCommunityAccentSave(communityId)
-  const [save] = useUpdateCommunitySettingsMutation()
+  const { inspectAlias, saveAlias } = useCommunityAliasConnection(communityId)
 
   useEffect(() => {
     const color = data?.community?.mySettings.accentColor
@@ -204,38 +204,8 @@ export function ConnectedCommunityPreferences({
         aliasControl={
           <CommunityAliasControl
             savedAlias={data.community.mySettings.alias}
-            onInspect={async () => {
-              const current = await client.query({
-                query: CommunityMySettingsDocument,
-                variables: { communityId },
-                fetchPolicy: "no-cache",
-              })
-              if (!current.data?.community) throw new Error("Community unavailable")
-              return current.data.community.mySettings.alias
-            }}
-            onSave={async (alias) => {
-              const result = await save({
-                fetchPolicy: "no-cache",
-                errorPolicy: "all",
-                variables: { input: { communityId, alias } },
-              })
-              const outcome = requireSettingsMutationOutcome(result.data?.updateCommunitySettings, result)
-              if (outcome?.__typename === "InputValidationFailure")
-                throw new SettingsInputValidationError(outcome.violations)
-              const settings =
-                outcome?.__typename === "UpdateCommunitySettingsSuccess"
-                  ? outcome.settings
-                  : undefined
-              if (!settings || settings.alias !== alias) {
-                throw new Error("Community alias save unconfirmed")
-              }
-              commitCommunitySettingsPatch(client.cache, communityId, {
-                alias: settings.alias,
-              })
-              // Both subscribed views share the normalized Community fragment.
-              // Refetching either after this write may reintroduce an older
-              // Accent/Alias snapshot while the other field is in flight.
-            }}
+            onInspect={inspectAlias}
+            onSave={saveAlias}
           />
         }
         setAccent={() => undefined}
