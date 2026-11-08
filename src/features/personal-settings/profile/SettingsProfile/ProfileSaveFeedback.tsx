@@ -33,68 +33,68 @@ export function ProfileSaveFeedback({
 
   return (
     <>
-          {saveState === "retryable-error" && (
-            <FeedbackPanel
-              kind="error"
-              title="プロフィールを保存できませんでした"
-              role="alert"
-            >
-              入力した名前は保持しています。下の「再試行」ボタンからもう一度保存できます。
-            </FeedbackPanel>
-          )}
-          {formInvalid && (
-            <FeedbackPanel
-              kind="error"
-              title="入力内容を確認してください"
-              role="alert"
-            >
-              入力した値を受け付けられませんでした。内容を見直して、もう一度保存してください。
-              編集しただけでは問題が解消したとは限りません。
-            </FeedbackPanel>
-          )}
-          {isUnknown && (
-            <FeedbackPanel
-              kind="warning"
-              title="プロフィールの保存結果を確認できませんでした"
-              role="alert"
-              actions={
-                onInspect ? (
+      {saveState === "retryable-error" && (
+        <FeedbackPanel
+          kind="error"
+          title="プロフィールを保存できませんでした"
+          role="alert"
+        >
+          入力した名前は保持しています。下の「再試行」ボタンからもう一度保存できます。
+        </FeedbackPanel>
+      )}
+      {formInvalid && (
+        <FeedbackPanel
+          kind="error"
+          title="入力内容を確認してください"
+          role="alert"
+        >
+          入力した値を受け付けられませんでした。内容を見直して、もう一度保存してください。
+          編集しただけでは問題が解消したとは限りません。
+        </FeedbackPanel>
+      )}
+      {isUnknown && (
+        <FeedbackPanel
+          kind="warning"
+          title="プロフィールの保存結果を確認できませんでした"
+          role="alert"
+          actions={
+            onInspect ? (
+              <>
+                <Button
+                  size="xs"
+                  variant="light"
+                  loading={inspection.status === "checking"}
+                  onClick={() => void inspectCurrentProfile()}
+                >
+                  {inspection.status === "idle" ||
+                  inspection.status === "failed" ||
+                  inspection.status === "checking"
+                    ? "現在の状態を確認"
+                    : "もう一度確認"}
+                </Button>
+                {inspection.status === "matches" && (
+                  <Button size="xs" onClick={confirmObservedProfile}>
+                    確認完了
+                  </Button>
+                )}
+                {inspection.status === "differs" && (
                   <>
                     <Button
                       size="xs"
-                      variant="light"
-                      loading={inspection.status === "checking"}
-                      onClick={() => void inspectCurrentProfile()}
+                      disabled={!canRetryInspected}
+                      onClick={() => void save()}
                     >
-                      {inspection.status === "idle" ||
-                      inspection.status === "failed" ||
-                      inspection.status === "checking"
-                        ? "現在の状態を確認"
-                        : "もう一度確認"}
+                      もう一度保存
                     </Button>
-                    {inspection.status === "matches" && (
-                      <Button size="xs" onClick={confirmObservedProfile}>
-                        確認完了
-                      </Button>
-                    )}
-                    {inspection.status === "differs" && (
-                      <>
-                        <Button
-                          size="xs"
-                          disabled={!canRetryInspected}
-                          onClick={() => void save()}
-                        >
-                          もう一度保存
-                        </Button>
-                        <Button
-                          size="xs"
-                          variant="subtle"
-                          color="gray"
-                          onClick={discardUnconfirmedDraft}
-                        >
-                          変更を破棄
-                        </Button>
-                      </>
+                    <Button
+                      size="xs"
+                      variant="subtle"
+                      color="gray"
+                      onClick={discardUnconfirmedDraft}
+                    >
+                      変更を破棄
+                    </Button>
+                  </>
                     )}
                   </>
                 ) : undefined
