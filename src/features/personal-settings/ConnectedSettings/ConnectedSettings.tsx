@@ -4,7 +4,7 @@ import { useApolloClient } from "@apollo/client"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "../useSettingsRefreshError"
 import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
-import { Settings } from "../Settings"
+import { PersonalSettings } from "../PersonalSettings"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
 import { CurrentUserDocument, useCurrentUserQuery, type OperationCurrentUserQuery } from "@/infrastructure/graphql/generated"
 import { usePersonalPreferencesSession } from "../preferences/PersonalPreferencesSessionContext"
@@ -25,7 +25,7 @@ export function ConnectedSettings({
     : undefined
   const state = !data?.me ? (loading ? "loading" : "error") : "ready"
   return (
-    <Settings
+    <PersonalSettings
       key={section}
       section={section}
       personalAccentColor={resolvePersonalAccent(

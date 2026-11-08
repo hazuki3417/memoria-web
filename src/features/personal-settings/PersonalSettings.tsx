@@ -1,16 +1,16 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { SettingsView, type SettingsViewProps } from "./SettingsView"
+import { PersonalSettingsView, type PersonalSettingsViewProps } from "./PersonalSettingsView"
 
 /** Connects Personal Settings navigation to Next.js without owning its UI. */
-export function Settings({
+export function PersonalSettings({
   section,
   ...props
-}: Omit<SettingsViewProps, "onSectionChange">) {
+}: Omit<PersonalSettingsViewProps, "onSectionChange">) {
   const router = useRouter()
   return (
-    <SettingsView
+    <PersonalSettingsView
       {...props}
       section={section}
       onSectionChange={(next) => router.push(`/settings/${next}`)}

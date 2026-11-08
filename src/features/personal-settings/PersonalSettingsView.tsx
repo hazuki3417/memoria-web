@@ -9,7 +9,7 @@ import type {
   UserPreferencesPatch,
 } from "./preferences/userPreferences"
 
-export type SettingsViewProps = {
+export type PersonalSettingsViewProps = {
   section: Section
   saveProfile?: SaveProfile
   inspectProfile?: InspectProfile
@@ -24,7 +24,7 @@ export type SettingsViewProps = {
   onSectionChange: (section: Section) => void
 }
 
-export function SettingsView({
+export function PersonalSettingsView({
   section,
   saveProfile,
   inspectProfile,
@@ -37,7 +37,7 @@ export function SettingsView({
   contentOverride,
   personalAccentColor,
   onSectionChange,
-}: SettingsViewProps) {
+}: PersonalSettingsViewProps) {
   return (
     <SettingsLayout
       accentColor={personalAccentColor}

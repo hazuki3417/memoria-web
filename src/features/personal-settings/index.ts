@@ -1,4 +1,4 @@
-export { Settings } from "./Settings"
+export { PersonalSettings } from "./PersonalSettings"
 export { ConnectedSettings } from "./ConnectedSettings"
 export { ConnectedPersonalSettingsSection } from "./ConnectedPersonalSettingsSection"
 export { SettingsLayout } from "./SettingsLayout"

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "../useSettingsRefreshError"
-import { Settings } from "../Settings"
+import { PersonalSettings } from "../PersonalSettings"
 import { useCurrentUserQuery } from "@/infrastructure/graphql/generated"
 import { usePersonalPreferencesSession } from "../preferences/PersonalPreferencesSessionContext"
 import { resolvePersonalAccent } from "../preferences/personalAccentPreview"
@@ -27,7 +27,7 @@ export function ConnectedPersonalSettingsSection({
       </PageStatusBoundary>
     ) : undefined
   return (
-    <Settings
+    <PersonalSettings
       section={section}
       usageContent={usageContent}
       accountContent={accountContent}
