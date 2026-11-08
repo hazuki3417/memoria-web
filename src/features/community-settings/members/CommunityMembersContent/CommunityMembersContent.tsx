@@ -1,39 +1,32 @@
 "use client"
 
-import { useMemo, useState } from "react"
 import {
-  Badge,
-  Box,
-  Button,
-  Group,
-  Menu,
-  Modal,
-  Radio,
-  ScrollArea,
-  Stack,
-  Table,
-  Text,
-  TextInput,
+  Badge, Box, Button, Group, Menu, Modal, Radio, ScrollArea, Stack,
+  Table, Text, TextInput,
 } from "@mantine/core"
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { FeedbackPanel } from "@/components/Feedback"
-import { showNotification } from "@/components/Feedback"
 import { UsageSortHeader } from "@/features/usage/UsageSortHeader"
-
 import type { CommunityMember } from "@/features/community/CommunityProvider"
+import {
+  useCommunityMembersState,
+  COMMUNITY_MEMBER_LIMIT,
+  COMMUNITY_ADMIN_LIMIT,
+  type CommunityMembersActions,
+} from "./useCommunityMembersState"
+
 export type { CommunityMember } from "@/features/community/CommunityProvider"
-export const COMMUNITY_MEMBER_LIMIT = 30
-export const COMMUNITY_ADMIN_LIMIT = 3
+export { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "./useCommunityMembersState"
+
 const previewMembers: CommunityMember[] = [
   { id: "self", name: "ユーザー", role: "admin", isSelf: true },
   { id: "m1", name: "山田 花子", role: "admin" },
   { id: "m2", name: "佐藤 葵", role: "member" },
   { id: "m3", name: "鈴木 太郎", role: "member" },
 ]
-type SortKey = "name" | "role"
-type MemberSort = { key: SortKey; direction: "asc" | "desc" } | null
+
 // The API defines the default order: self first, then nickname ascending.
 export function CommunityMembersContent({
   members = previewMembers,
@@ -41,127 +34,19 @@ export function CommunityMembersContent({
   onLeaveSuccess,
   onChangeRole,
   onRemoveMember,
-}: {
-  members?: CommunityMember[]
-  onLeave?: () => Promise<void>
-  onLeaveSuccess?: () => void
-  onChangeRole?: (userId: string, role: "admin" | "member") => Promise<boolean>
-  onRemoveMember?: (userId: string) => Promise<boolean>
-}) {
-  const [query, setQuery] = useState("")
-  const [sort, setSort] = useState<MemberSort>(null)
-  const [opened, setOpened] = useState(false)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState("")
-  const [done, setDone] = useState(false)
-  const [roleTarget, setRoleTarget] = useState<CommunityMember | null>(null)
-  const [selectedRole, setSelectedRole] = useState<"admin" | "member">("member")
-  const [roleBusy, setRoleBusy] = useState(false)
-  const [roleError, setRoleError] = useState(false)
-  const [removeTarget, setRemoveTarget] = useState<CommunityMember | null>(null)
-  const [removeBusy, setRemoveBusy] = useState(false)
-  const [removeError, setRemoveError] = useState(false)
-  const self = members.find((member) => member.isSelf)
-  const adminCount = members.filter((member) => member.role === "admin").length
-  const memberLimitReached = members.length >= COMMUNITY_MEMBER_LIMIT
-  const adminLimitReached = adminCount >= COMMUNITY_ADMIN_LIMIT
-  const blocked = self?.role === "admin" && adminCount <= 1
-  const rows = useMemo(
-    () =>
-      members
-        .filter((member) =>
-          member.name
-            .toLocaleLowerCase("ja-JP")
-            .includes(query.trim().toLocaleLowerCase("ja-JP")),
-        )
-        .sort((a, b) => {
-          if (!sort) return 0 // Preserve the API's self-first, then name order.
-          const left = sort.key === "name" ? a.name : a.role
-          const right = sort.key === "name" ? b.name : b.role
-          const result = left.localeCompare(right, "ja-JP", { numeric: true })
-          return sort.direction === "asc" ? result : -result
-        }),
-    [members, query, sort],
-  )
+}: { members?: CommunityMember[] } & CommunityMembersActions) {
+  const {
+    query, setQuery, sort, opened, setOpened, busy, error, done,
+    roleTarget, setRoleTarget, selectedRole, setSelectedRole, roleBusy, roleError,
+    setRoleError, removeTarget, setRemoveTarget, removeBusy, removeError,
+    setRemoveError, self, adminCount, memberLimitReached, adminLimitReached,
+    blocked, rows, changeSort, ariaSort, close, leave, confirmRoleChange, confirmRemoval,
+  } = useCommunityMembersState({
+    members, onLeave, onLeaveSuccess, onChangeRole, onRemoveMember,
+  })
   const visibleRowCount = 4
   const tableRowHeight = 48
   const tableHeaderHeight = 44
-  const changeSort = (key: SortKey) => {
-    setSort((current) => {
-      if (current?.key !== key) return { key, direction: "asc" }
-      if (current.direction === "asc") return { key, direction: "desc" }
-      return null
-    })
-  }
-  const ariaSort = (key: SortKey): "ascending" | "descending" | "none" =>
-    sort?.key === key
-      ? sort.direction === "asc"
-        ? "ascending"
-        : "descending"
-      : "none"
-  const close = () => {
-    if (!busy) {
-      setOpened(false)
-      setError("")
-    }
-  }
-  const leave = async () => {
-    if (!onLeave || blocked || busy) return
-    setBusy(true)
-    setError("")
-    try {
-      await onLeave()
-      setDone(true)
-      setOpened(false)
-      showNotification({
-        kind: "success",
-        title: "Communityを退会",
-        description: "Communityから退会しました。",
-      })
-      onLeaveSuccess?.()
-    } catch {
-      setError(
-        "退会処理に失敗しました。現在の参加状況を確認して再試行してください。",
-      )
-    } finally {
-      setBusy(false)
-    }
-  }
-  const confirmRoleChange = async () => {
-    if (
-      !roleTarget ||
-      !onChangeRole ||
-      roleBusy ||
-      roleError ||
-      selectedRole === roleTarget.role ||
-      (selectedRole === "admin" && adminLimitReached) ||
-      (selectedRole === "member" &&
-        roleTarget.role === "admin" &&
-        adminCount <= 1)
-    )
-      return
-    setRoleBusy(true)
-    try {
-      if (await onChangeRole(roleTarget.id, selectedRole)) setRoleTarget(null)
-      else setRoleError(true)
-    } catch {
-      setRoleError(true)
-    } finally {
-      setRoleBusy(false)
-    }
-  }
-  const confirmRemoval = async () => {
-    if (!removeTarget || !onRemoveMember || removeBusy || removeError) return
-    setRemoveBusy(true)
-    try {
-      if (await onRemoveMember(removeTarget.id)) setRemoveTarget(null)
-      else setRemoveError(true)
-    } catch {
-      setRemoveError(true)
-    } finally {
-      setRemoveBusy(false)
-    }
-  }
   return (
     <Stack gap="xl">
       <PageHeader
