@@ -8,7 +8,6 @@ import type { CommunityMember } from "@/features/community/CommunityProvider"
 export const COMMUNITY_MEMBER_LIMIT = 30
 export const COMMUNITY_ADMIN_LIMIT = 3
 
-
 export type CommunityMembersActions = {
   onLeave?: () => Promise<void>
   onLeaveSuccess?: () => void
@@ -16,7 +15,7 @@ export type CommunityMembersActions = {
   onRemoveMember?: (userId: string) => Promise<boolean>
 }
 
-/** Owns member search/sort, capability limits, and confirmation operations. */
+/** Composes table state with membership limits and management operations. */
 export function useCommunityMembersState({
   members,
   onLeave,
