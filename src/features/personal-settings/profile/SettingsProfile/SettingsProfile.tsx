@@ -25,7 +25,8 @@ export function SettingsProfile({
   initialNickname?: string
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
-}) {  const {
+}) {
+  const {
     field,
     fieldState,
     validation,
