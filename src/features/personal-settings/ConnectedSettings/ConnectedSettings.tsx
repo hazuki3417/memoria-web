@@ -3,39 +3,34 @@
 import { useApolloClient } from "@apollo/client"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "../useSettingsRefreshError"
+import { usePersonalSettingsReadState } from "../usePersonalSettingsReadState"
 import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
 import { PersonalSettings } from "../PersonalSettings"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
-import { CurrentUserDocument, useCurrentUserQuery, type OperationCurrentUserQuery } from "@/infrastructure/graphql/generated"
-import { usePersonalPreferencesSession } from "../preferences/PersonalPreferencesSessionContext"
-import { resolvePersonalAccent } from "../preferences/personalAccentPreview"
+import { CurrentUserDocument, type OperationCurrentUserQuery } from "@/infrastructure/graphql/generated"
 
 export function ConnectedSettings({
   section,
 }: {
   section: "profile" | "preferences"
 }) {
-  const { snapshot: personalSession } = usePersonalPreferencesSession()
-  const { data, loading, error } = useCurrentUserQuery()
+  const { data, loading, error, personalAccentColor, loadState } =
+    usePersonalSettingsReadState()
   const client = useApolloClient()
   useSettingsRefreshError(Boolean(data?.me && error))
   const { saveProfile, savePreferences } = usePersonalSettingsActions()
   const preferences = data?.me
     ? fromGraphqlUserPreferences(data.me.preferences)
     : undefined
-  const state = !data?.me ? (loading ? "loading" : "error") : "ready"
   return (
     <PersonalSettings
       key={section}
       section={section}
-      personalAccentColor={resolvePersonalAccent(
-        data?.me?.preferences.personalAccentColor,
-        personalSession,
-      )}
+      personalAccentColor={personalAccentColor}
       profileNickname={data?.me?.profile.nickname}
       contentOverride={
-        state !== "ready" ? (
-          <PageStatusBoundary state={state} label="Personal設定を読み込み中">
+        loadState !== "ready" ? (
+          <PageStatusBoundary state={loadState} label="Personal設定を読み込み中">
             {null}
           </PageStatusBoundary>
         ) : undefined
