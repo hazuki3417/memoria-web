@@ -14,5 +14,5 @@ export function usePersonalSettingsReadState() {
   )
   const loadState = !data?.me ? (loading ? "loading" : "error") : "ready"
 
-  return { data, loading, error, personalAccentColor, loadState }
+  return { data, error, personalAccentColor, loadState }
 }

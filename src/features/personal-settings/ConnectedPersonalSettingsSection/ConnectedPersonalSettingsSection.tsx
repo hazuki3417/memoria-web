@@ -14,7 +14,7 @@ export function ConnectedPersonalSettingsSection({
   section: "account" | "usage"
   usageContent?: ReactNode
 }) {
-  const { data, loading, error, personalAccentColor, loadState } =
+  const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
   useSettingsRefreshError(Boolean(data?.me && error))
   const accountContent =

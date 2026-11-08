@@ -14,7 +14,7 @@ export function ConnectedSettings({
 }: {
   section: "profile" | "preferences"
 }) {
-  const { data, loading, error, personalAccentColor, loadState } =
+  const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
   const client = useApolloClient()
   useSettingsRefreshError(Boolean(data?.me && error))
