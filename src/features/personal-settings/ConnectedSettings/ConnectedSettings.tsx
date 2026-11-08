@@ -1,13 +1,12 @@
 "use client"
 
-import { useApolloClient } from "@apollo/client"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useSettingsRefreshError } from "../useSettingsRefreshError"
 import { usePersonalSettingsReadState } from "../usePersonalSettingsReadState"
+import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
 import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
 import { PersonalSettings } from "../PersonalSettings"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
-import { CurrentUserDocument, type OperationCurrentUserQuery } from "@/infrastructure/graphql/generated"
 
 export function ConnectedSettings({
   section,
@@ -16,7 +15,7 @@ export function ConnectedSettings({
 }) {
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
-  const client = useApolloClient()
+  const { inspectProfile, inspectPreferences } = usePersonalSettingsInspection()
   useSettingsRefreshError(Boolean(data?.me && error))
   const { saveProfile, savePreferences } = usePersonalSettingsActions()
   const preferences = data?.me
@@ -37,25 +36,9 @@ export function ConnectedSettings({
       }
       initialPreferences={preferences}
       saveProfile={saveProfile}
-      inspectProfile={async () => {
-        // Inspection must not publish stale data to the shared CurrentUser cache.
-        const current = await client.query<OperationCurrentUserQuery>({
-          query: CurrentUserDocument,
-          fetchPolicy: "no-cache",
-        })
-        if (!current.data?.me) throw new Error("Current User unavailable")
-        return current.data.me.profile.nickname
-      }}
+      inspectProfile={inspectProfile}
       savePreferences={savePreferences}
-      inspectPreferences={async () => {
-        // Inspection must not publish stale data to the shared CurrentUser cache.
-        const current = await client.query<OperationCurrentUserQuery>({
-          query: CurrentUserDocument,
-          fetchPolicy: "no-cache",
-        })
-        if (!current.data?.me) throw new Error("Current User unavailable")
-        return fromGraphqlUserPreferences(current.data.me.preferences)
-      }}
+      inspectPreferences={inspectPreferences}
     />
   )
 }
