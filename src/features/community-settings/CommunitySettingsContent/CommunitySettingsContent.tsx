@@ -1,0 +1,84 @@
+"use client"
+
+import type { Dispatch, ReactNode, SetStateAction } from "react"
+import { CommunityGeneralContent } from "../general/CommunityGeneralContent"
+import {
+  CommunityMembersContent,
+  type CommunityMember,
+} from "../members/CommunityMembersContent"
+import { CommunityPreferencesContent } from "../preferences/CommunityPreferencesContent"
+import type { CommunitySettingsSection } from "../communitySettingsSections"
+import type { useCommunityNameSettings } from "../general/useCommunityNameSettings"
+import type { useCommunityInvitation } from "../general/useCommunityInvitation"
+
+type Role = "admin" | "member"
+
+export function CommunitySettingsContent({
+  section,
+  communityId,
+  isAdmin,
+  name,
+  invitation,
+  invitationAvailable,
+  members,
+  onChangeMemberRole,
+  onRemoveMember,
+  onLeaveCommunity,
+  onLeaveSuccess,
+  preferencesContent,
+  usageContent,
+  accent,
+  setAccent,
+}: {
+  section: CommunitySettingsSection
+  communityId: string
+  isAdmin: boolean
+  name: ReturnType<typeof useCommunityNameSettings>
+  invitation: ReturnType<typeof useCommunityInvitation>
+  invitationAvailable: boolean
+  members?: CommunityMember[]
+  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
+  onLeaveCommunity?: () => Promise<void>
+  onLeaveSuccess?: () => void
+  preferencesContent?: ReactNode
+  usageContent?: ReactNode
+  accent: string
+  setAccent: Dispatch<SetStateAction<string>>
+}) {
+  switch (section) {
+    case "general":
+      return (
+        <CommunityGeneralContent
+          name={name}
+          invitation={invitation}
+          invitationAvailable={invitationAvailable}
+          communityId={communityId}
+          isAdmin={isAdmin}
+        />
+      )
+    case "members":
+      return (
+        <CommunityMembersContent
+          members={members}
+          onChangeRole={onChangeMemberRole}
+          onRemoveMember={onRemoveMember}
+          onLeave={onLeaveCommunity}
+          onLeaveSuccess={onLeaveSuccess}
+        />
+      )
+    case "usage":
+      return <>{usageContent}</>
+    case "preferences":
+      return (
+        <>
+          {preferencesContent ?? (
+            <CommunityPreferencesContent
+              accent={accent}
+              setAccent={setAccent}
+            />
+          )}
+        </>
+      )
+  }
+}

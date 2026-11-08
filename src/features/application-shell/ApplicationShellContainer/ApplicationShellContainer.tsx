@@ -22,9 +22,9 @@ import {
   useCommunityAccentPreview,
 } from "../CommunityAccentPreviewContext"
 import { resolveCommunityAccent } from "../communityAccentPreview"
-import { PersonalPreferencesSessionProvider } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
-import { usePersonalPreferencesSession } from "@/features/settings/preferences/PersonalPreferencesSessionContext"
-import { resolvePersonalAccent } from "@/features/settings/preferences/personalAccentPreview"
+import { PersonalPreferencesSessionProvider } from "@/features/personal-settings/preferences/PersonalPreferencesSessionContext"
+import { usePersonalPreferencesSession } from "@/features/personal-settings/preferences/PersonalPreferencesSessionContext"
+import { resolvePersonalAccent } from "@/features/personal-settings/preferences/personalAccentPreview"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,

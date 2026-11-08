@@ -9,7 +9,7 @@ import {
   SettingsPreferences,
   SettingsAccount,
   type Section,
-} from "@/features/settings"
+} from "@/features/personal-settings"
 import { UsageContent, type UsageScenario } from "./UsageContent"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"

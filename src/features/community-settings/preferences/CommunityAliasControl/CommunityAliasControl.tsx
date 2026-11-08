@@ -1,5 +1,7 @@
 "use client"
 
+import { resolveFormFailureValidation } from "@/ui/formValidation"
+
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { useEffect, useRef, useState } from "react"
 import { useController, useForm } from "react-hook-form"
@@ -10,9 +12,9 @@ import { FeedbackPanel, showNotification } from "@/components/Feedback"
 import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
 import {
   classifySettingsSaveFailure,
-  resolveSettingsFailureValidation,
+  getSettingsInputViolations,
   type SettingsSaveFailureKind,
-} from "@/features/settings/graphqlSettingsResult"
+} from "@/infrastructure/graphql/settingsMutationResult"
 
 type Inspection =
   | { status: "idle" | "checking" | "failed" }
@@ -117,7 +119,7 @@ export function CommunityAliasControl({
     } catch (error) {
       const kind = classifySettingsSaveFailure(error)
       if (kind === "validation") {
-        const result = resolveSettingsFailureValidation(error, ["alias"])
+        const result = resolveFormFailureValidation(getSettingsInputViolations(error), ["alias"])
         if (result.fieldErrors.alias) {
           setError("alias", { type: "server", message: result.fieldErrors.alias })
         }

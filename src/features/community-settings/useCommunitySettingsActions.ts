@@ -1,7 +1,7 @@
 "use client"
 
 import { showNotification } from "@/components/Feedback"
-import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/features/settings/graphqlSettingsResult"
+import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
 import {
   MyCommunitiesDocument,
   CommunityMembersDocument,

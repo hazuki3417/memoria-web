@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useMyCommunitiesQuery } from "@/infrastructure/graphql/generated"
-import type { CommunitySettingsSection } from "./CommunitySettings/communitySettingsSections"
+import type { CommunitySettingsSection } from "./communitySettingsSections"
 
 /** Resolve current membership and preserve the Preferences membership-loss redirect. */
 export function useCommunitySettingsMembership(
