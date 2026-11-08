@@ -37,23 +37,14 @@ export function SettingsProfile({
     field,
     fieldState,
     validation,
-    normalized,
     dirty,
     invalid,
     showClientError,
     isSaving,
     isBlocked,
     isUnknown,
-    canRetryInspected,
     saveLabel,
-    saveState,
-    formInvalid,
-    blockedFeedback,
-    inspection,
     save,
-    inspectCurrentProfile,
-    confirmObservedProfile,
-    discardUnconfirmedDraft,
     onDraftChange,
   } = form
 
@@ -66,7 +57,11 @@ export function SettingsProfile({
       <Box>
         <SectionHeader>基本情報</SectionHeader>
         <Stack gap="md" maw={540}>
-          <ProfileSaveFeedback model={form} onInspect={onInspect} blockedMessage={blockedMessage} />
+          <ProfileSaveFeedback
+            model={form}
+            onInspect={onInspect}
+            blockedMessage={blockedMessage}
+          />
           <TextInput
             label="ニックネーム"
             description="Memoriaで表示する名前です。"
