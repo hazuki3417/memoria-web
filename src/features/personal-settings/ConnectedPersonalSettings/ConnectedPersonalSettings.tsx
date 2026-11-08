@@ -8,7 +8,7 @@ import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
 import { PersonalSettings } from "../PersonalSettings"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
 
-export function ConnectedSettings({
+export function ConnectedPersonalSettings({
   section,
 }: {
   section: "profile" | "preferences"

@@ -1,5 +1,5 @@
-import { ConnectedSettings } from "@/features/personal-settings"
+import { ConnectedPersonalSettings } from "@/features/personal-settings"
 
 export default function Page() {
-  return <ConnectedSettings section="preferences" />
+  return <ConnectedPersonalSettings section="preferences" />
 }

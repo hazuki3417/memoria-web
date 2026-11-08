@@ -5,7 +5,7 @@ import {
 } from "@/components/SettingsSectionLayout"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { getCommunitySettingsSections } from "@/features/community-settings/communitySettingsSections"
-import { SettingsLayout } from ".."
+import { PersonalSettingsLayout } from ".."
 
 export function LayoutStory({
   context,
@@ -25,9 +25,9 @@ export function LayoutStory({
     // Render the real Personal settings navigation with a content-only boundary.
     return (
       <Box h={500}>
-        <SettingsLayout section="account" onSectionChange={() => undefined}>
+        <PersonalSettingsLayout section="account" onSectionChange={() => undefined}>
           {content}
-        </SettingsLayout>
+        </PersonalSettingsLayout>
       </Box>
     )
   }

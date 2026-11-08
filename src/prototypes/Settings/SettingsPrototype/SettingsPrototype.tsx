@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react"
 import { Button, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
-  SettingsLayout,
+  PersonalSettingsLayout,
   SettingsProfile,
   SettingsPreferences,
   SettingsAccount,
@@ -116,9 +116,9 @@ export function SettingsPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <SettingsLayout section={section} onSectionChange={setSection}>
+      <PersonalSettingsLayout section={section} onSectionChange={setSection}>
         {content}
-      </SettingsLayout>
+      </PersonalSettingsLayout>
       <Text
         pos="absolute"
         style={{

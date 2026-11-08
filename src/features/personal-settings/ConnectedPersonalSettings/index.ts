@@ -1,2 +1,2 @@
-export { ConnectedSettings } from "./ConnectedSettings"
+export { ConnectedPersonalSettings } from "./ConnectedPersonalSettings"
 export { ConnectedPersonalSettingsSection } from "../ConnectedPersonalSettingsSection"

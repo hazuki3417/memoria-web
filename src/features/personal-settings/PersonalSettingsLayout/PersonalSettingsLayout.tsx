@@ -22,19 +22,19 @@ const sections = [
   { id: "usage", label: "利用状況", icon: IconChartBar },
 ] satisfies { id: Section; label: string; icon: typeof IconUser }[]
 
-type SettingsLayoutProps = {
+type PersonalSettingsLayoutProps = {
   section: Section
   onSectionChange: (section: Section) => void
   children: ReactNode
   accentColor?: string
 }
 
-export function SettingsLayout({
+export function PersonalSettingsLayout({
   section,
   onSectionChange,
   children,
   accentColor,
-}: SettingsLayoutProps) {
+}: PersonalSettingsLayoutProps) {
   const compact = useMediaQuery("(max-width: 48em)")
 
   return (

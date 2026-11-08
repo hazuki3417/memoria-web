@@ -4,7 +4,7 @@ import { Button } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import Link from "next/link"
 import type { ReactNode } from "react"
-import type { Section } from "../SettingsLayout"
+import type { Section } from "../PersonalSettingsLayout"
 import { SettingsProfile, type InspectProfile, type SaveProfile } from "../profile/SettingsProfile"
 import { SettingsPreferences } from "../preferences/SettingsPreferences"
 import { SettingsAccount } from "../account/SettingsAccount"
@@ -18,7 +18,7 @@ async function unavailableProfileSave(): Promise<void> {
   throw new Error("Profile save unavailable")
 }
 
-export type SettingsSectionContentProps = {
+export type PersonalSettingsContentProps = {
   section: Section
   saveProfile?: SaveProfile
   inspectProfile?: InspectProfile
@@ -31,7 +31,7 @@ export type SettingsSectionContentProps = {
 }
 
 /** Selects the existing section UI without owning routing, data fetching or page layout. */
-export function SettingsSectionContent({
+export function PersonalSettingsContent({
   section,
   saveProfile,
   inspectProfile,
@@ -41,7 +41,7 @@ export function SettingsSectionContent({
   inspectPreferences,
   usageContent,
   accountContent,
-}: SettingsSectionContentProps) {
+}: PersonalSettingsContentProps) {
   const compact = useMediaQuery("(max-width: 48em)")
   switch (section) {
     case "profile":
