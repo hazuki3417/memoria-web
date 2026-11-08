@@ -1,14 +1,13 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
+import { useCommunityMemberTableState } from "./useCommunityMemberTableState"
 import { showNotification } from "@/components/Feedback"
 import type { CommunityMember } from "@/features/community/CommunityProvider"
 
 export const COMMUNITY_MEMBER_LIMIT = 30
 export const COMMUNITY_ADMIN_LIMIT = 3
 
-type SortKey = "name" | "role"
-type MemberSort = { key: SortKey; direction: "asc" | "desc" } | null
 
 export type CommunityMembersActions = {
   onLeave?: () => Promise<void>
@@ -25,8 +24,8 @@ export function useCommunityMembersState({
   onChangeRole,
   onRemoveMember,
 }: { members: CommunityMember[] } & CommunityMembersActions) {
-  const [query, setQuery] = useState("")
-  const [sort, setSort] = useState<MemberSort>(null)
+  const { query, setQuery, sort, setSort, rows, changeSort, ariaSort } =
+    useCommunityMemberTableState(members)
   const [opened, setOpened] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
@@ -43,36 +42,6 @@ export function useCommunityMembersState({
   const memberLimitReached = members.length >= COMMUNITY_MEMBER_LIMIT
   const adminLimitReached = adminCount >= COMMUNITY_ADMIN_LIMIT
   const blocked = self?.role === "admin" && adminCount <= 1
-  const rows = useMemo(
-    () =>
-      members
-        .filter((member) =>
-          member.name
-            .toLocaleLowerCase("ja-JP")
-            .includes(query.trim().toLocaleLowerCase("ja-JP")),
-        )
-        .sort((a, b) => {
-          if (!sort) return 0 // Preserve the API's self-first, then name order.
-          const left = sort.key === "name" ? a.name : a.role
-          const right = sort.key === "name" ? b.name : b.role
-          const result = left.localeCompare(right, "ja-JP", { numeric: true })
-          return sort.direction === "asc" ? result : -result
-        }),
-    [members, query, sort],
-  )
-  const changeSort = (key: SortKey) => {
-    setSort((current) => {
-      if (current?.key !== key) return { key, direction: "asc" }
-      if (current.direction === "asc") return { key, direction: "desc" }
-      return null
-    })
-  }
-  const ariaSort = (key: SortKey): "ascending" | "descending" | "none" =>
-    sort?.key === key
-      ? sort.direction === "asc"
-        ? "ascending"
-        : "descending"
-      : "none"
   const close = () => {
     if (!busy) {
       setOpened(false)
