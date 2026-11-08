@@ -12,7 +12,6 @@ export function CommunityMemberManagementDialogs({
   state,
   onLeave,
   onChangeRole,
-  onRemoveMember,
 }: { state: MembersState } & CommunityMembersActions) {
   return (
     <>
