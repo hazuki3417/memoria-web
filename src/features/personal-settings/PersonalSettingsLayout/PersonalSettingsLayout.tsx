@@ -1,26 +1,13 @@
 "use client"
 
 import { useMediaQuery } from "@mantine/hooks"
-import {
-  IconChartBar,
-  IconSettings,
-  IconUser,
-  IconUserCircle,
-} from "@tabler/icons-react"
 import type { ReactNode } from "react"
 import {
   SettingsSectionLayout,
   SettingsSectionNavigation,
 } from "@/components/SettingsSectionLayout"
 
-export type Section = "profile" | "account" | "preferences" | "usage"
-
-const sections = [
-  { id: "profile", label: "プロフィール", icon: IconUser },
-  { id: "account", label: "アカウント", icon: IconUserCircle },
-  { id: "preferences", label: "環境設定", icon: IconSettings },
-  { id: "usage", label: "利用状況", icon: IconChartBar },
-] satisfies { id: Section; label: string; icon: typeof IconUser }[]
+import { personalSettingsSections, type Section } from "../personalSettingsSections"
 
 type PersonalSettingsLayoutProps = {
   section: Section
@@ -43,7 +30,7 @@ export function PersonalSettingsLayout({
       navigation={
         <SettingsSectionNavigation
           section={section}
-          sections={sections}
+          sections={personalSettingsSections}
           compact={compact}
           ariaLabel="設定画面"
           desktopAriaLabel="設定"

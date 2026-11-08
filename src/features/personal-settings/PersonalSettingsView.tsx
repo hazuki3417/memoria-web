@@ -1,7 +1,8 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { PersonalSettingsLayout, type Section } from "./PersonalSettingsLayout"
+import { PersonalSettingsLayout } from "./PersonalSettingsLayout"
+import type { Section } from "./personalSettingsSections"
 import { PersonalSettingsContent } from "./PersonalSettingsContent"
 import type { InspectProfile, SaveProfile } from "./profile/SettingsProfile"
 import type {
