@@ -2,13 +2,12 @@ import { Box, Button } from "@mantine/core"
 import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
-import { CommunitySettingsView } from "../CommunitySettingsView"
 import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
   title: "Features/Community Settings/Settings",
-  component: CommunitySettingsView,
+  component: CommunitySettingsStoryNavigation,
   render: (args) => <CommunitySettingsStoryNavigation {...args} />,
   args: {
     onSectionChange: () => undefined,
@@ -29,7 +28,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof CommunitySettingsView>
+} satisfies Meta<typeof CommunitySettingsStoryNavigation>
 export default meta
 type Story = StoryObj<typeof meta>
 
@@ -178,7 +177,7 @@ export const NameTrimmedUnchanged: Story = {
 
 /** Simulate a new query result without remounting the RHF form. */
 function CommunityNameRefreshFixture(
-  args: ComponentProps<typeof CommunitySettingsView>,
+  args: ComponentProps<typeof CommunitySettingsStoryNavigation>,
 ) {
   const [name, setName] = useState(args.communityName ?? "家族のアルバム")
   return (
@@ -226,7 +225,7 @@ export const NameRefreshWhileEditing: Story = {
 
 /** Complete a pending save after the user has made a second edit. */
 function CommunityNamePendingSaveFixture(
-  args: ComponentProps<typeof CommunitySettingsView>,
+  args: ComponentProps<typeof CommunitySettingsStoryNavigation>,
 ) {
   const resolveSave = useRef<((saved: string) => void) | null>(null)
   return (
@@ -402,7 +401,7 @@ export const NameFormValidationVisual: Story = {
 }
 
 /** Mirrors the production key={communityId} remount boundary without a Router mock. */
-function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettingsView>) {
+function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettingsStoryNavigation>) {
   const [communityId, setCommunityId] = useState("photo-club")
   const communityName =
     communityId === "photo-club" ? "家族のアルバム" : "旅行の思い出"
@@ -484,7 +483,7 @@ export const InvitationContextChangeReset: Story = {
 
 
 /** Switching from Administrator to Member must immediately hide an issued preview secret. */
-function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettingsView>) {
+function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettingsStoryNavigation>) {
   const [role, setRole] = useState<"admin" | "member">("admin")
   return (
     <>
