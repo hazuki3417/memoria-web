@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import type { CommunityMember } from "./members/CommunityMembersContent"
+import type { CommunityMember } from "./members"
 import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
 import { CommunitySettingsContent } from "./CommunitySettingsContent"
 import type { CommunityInvitationSectionProps } from "./general/CommunityInvitationSection"

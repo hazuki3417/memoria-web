@@ -3,9 +3,9 @@
 import type { ReactNode } from "react"
 import { CommunityGeneralContent } from "../general/CommunityGeneralContent"
 import {
-  CommunityMembersContent,
+  CommunityMembers,
   type CommunityMember,
-} from "../members/CommunityMembersContent"
+} from "../members"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { CommunityNameSectionProps } from "../general/CommunityNameSection"
 import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
@@ -56,7 +56,7 @@ export function CommunitySettingsContent({
       )
     case "members":
       return (
-        <CommunityMembersContent
+        <CommunityMembers
           members={members}
           onChangeRole={onChangeMemberRole}
           onRemoveMember={onRemoveMember}
