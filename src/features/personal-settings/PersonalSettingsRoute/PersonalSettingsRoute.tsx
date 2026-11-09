@@ -1,14 +1,23 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useMediaQuery } from "@mantine/hooks"
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
+import { PersonalProfile } from "../profile"
+import { PersonalPreferences } from "../preferences"
+import { Account } from "../account"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
 import { usePersonalSettingsActions } from "./usePersonalSettingsActions"
 import { usePersonalSettingsInspection } from "./usePersonalSettingsInspection"
 import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
+
+// Never simulate Production persistence when no save callback is available.
+async function unavailableProfileSave(): Promise<void> {
+  throw new Error("Profile save unavailable")
+}
 
 type ProfilePreferencesSection = Extract<
   PersonalSettingsSection,
@@ -55,9 +64,24 @@ function ProfilePreferencesConnection({
   const { inspectProfile, inspectPreferences } = usePersonalSettingsInspection()
   usePersonalSettingsRefreshError(Boolean(data?.me && error))
   const { saveProfile, savePreferences } = usePersonalSettingsActions()
+  const compact = useMediaQuery("(max-width: 48em)")
   const preferences = data?.me
     ? fromGraphqlUserPreferences(data.me.preferences)
     : undefined
+  const content = section === "profile" ? (
+    <PersonalProfile
+      onSave={saveProfile ?? unavailableProfileSave}
+      onInspect={inspectProfile}
+      initialNickname={data?.me?.profile.nickname}
+    />
+  ) : (
+    <PersonalPreferences
+      compact={compact}
+      initialPreferences={preferences}
+      onSave={savePreferences}
+      onInspect={inspectPreferences}
+    />
+  )
 
   return (
     <PersonalSettingsView
@@ -65,13 +89,8 @@ function ProfilePreferencesConnection({
       section={section}
       onSectionChange={onSectionChange}
       personalAccentColor={personalAccentColor}
-      profileNickname={data?.me?.profile.nickname}
       loadState={loadState}
-      initialPreferences={preferences}
-      saveProfile={saveProfile}
-      inspectProfile={inspectProfile}
-      savePreferences={savePreferences}
-      inspectPreferences={inspectPreferences}
+      content={content}
     />
   )
 }
@@ -91,7 +110,7 @@ function AccountUsageConnection({
     <PersonalSettingsView
       section={section}
       onSectionChange={onSectionChange}
-      usageContent={section === "usage" ? <ConnectedPersonalUsage /> : undefined}
+      content={section === "usage" ? <ConnectedPersonalUsage /> : <Account />}
       loadState={section === "account" ? loadState : "ready"}
       personalAccentColor={personalAccentColor}
     />

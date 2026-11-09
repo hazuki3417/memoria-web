@@ -8,6 +8,7 @@ import { useCommunityNameInspection } from "./useCommunityNameInspection"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { CommunitySettingsView } from "../CommunitySettingsView"
+import { renderCommunitySettingsSection } from "../communitySettingsSectionContent"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
@@ -36,27 +37,31 @@ export function CommunitySettingsRoute({
       </LoadingBoundary>
     )
 
+  const content = renderCommunitySettingsSection({
+    section,
+    communityId,
+    invitationMode: "unavailable",
+    communityName: name ?? undefined,
+    members: members ?? undefined,
+    role: members?.find((member) => member.isSelf)?.role ?? "member",
+    usageContent: section === "usage" ? <ConnectedCommunityUsage communityId={communityId} /> : undefined,
+    preferencesContent: section === "preferences" ? <ConnectedCommunityPreferences communityId={communityId} /> : undefined,
+    onRemoveMember,
+    onLeaveCommunity,
+    onLeaveSuccess: () => router.push("/dashboard"),
+    onChangeMemberRole,
+    onSaveName,
+    onInspectName,
+  })
+
   return (
     <CommunitySettingsView
       key={communityId}
       communityId={communityId}
-      invitationMode="unavailable"
-      communityAccentColor={communityAccentColor}
-      communityName={name ?? undefined}
-      loadState={loadState}
-      members={members ?? undefined}
-      role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
-      usageContent={section === "usage" ? <ConnectedCommunityUsage communityId={communityId} /> : undefined}
-      preferencesContent={
-        section === "preferences" ? (
-          <ConnectedCommunityPreferences communityId={communityId} />
-        ) : undefined
-      }
-      onRemoveMember={onRemoveMember}
-      onLeaveCommunity={onLeaveCommunity}
-      onLeaveSuccess={() => router.push("/dashboard")}
-      onChangeMemberRole={onChangeMemberRole}
+      communityAccentColor={communityAccentColor}
+      loadState={loadState}
+      content={content}
       onSectionChange={(nextSection) => {
         const target = getCommunitySettingsSections(communityId).find(
           (item) => item.id === nextSection,
