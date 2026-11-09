@@ -17,10 +17,7 @@ export type PersonalSettingsRouteProps =
   | { section: EditableSection }
   | { section: ReadOnlySection; usageContent?: ReactNode }
 
-/**
- * Production connection entry for Personal Settings.
- * Section-specific data/action requirements remain in their respective owners.
- */
+/** Personal設定のProduction接続入口。Section固有の取得・操作は個別の接続Componentが所有する。 */
 export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
   if (props.section === "profile" || props.section === "preferences") {
     return <EditablePersonalSettingsConnection section={props.section} />
@@ -33,7 +30,7 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
   )
 }
 
-/** Profile/Preferences require mutation and inspection in addition to CurrentUser. */
+/** Profile/PreferencesはCurrentUserに加えて保存と結果確認を接続する。 */
 function EditablePersonalSettingsConnection({ section }: { section: EditableSection }) {
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
@@ -66,7 +63,7 @@ function EditablePersonalSettingsConnection({ section }: { section: EditableSect
   )
 }
 
-/** Account uses CurrentUser status; Usage owns its own section data/loading. */
+/** AccountはCurrentUser状態を参照し、Usage固有の取得・LoadingはSection側が所有する。 */
 function ReadOnlyPersonalSettingsConnection({
   section,
   usageContent,
