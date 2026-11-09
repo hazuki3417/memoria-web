@@ -7,9 +7,6 @@ import {
 
 export type PersonalSettingsSection = "profile" | "account" | "preferences" | "usage"
 
-/** Compatibility alias retained for existing Settings consumers. */
-export type Section = PersonalSettingsSection
-
 export const personalSettingsSections = [
   { id: "profile", label: "プロフィール", icon: IconUser },
   { id: "account", label: "アカウント", icon: IconUserCircle },
