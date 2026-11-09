@@ -25,26 +25,7 @@ const unavailableInvitation: InvitationModel = {
   changeInvitation: () => undefined,
 }
 
-export function CommunitySettings({
-  role = "admin",
-  communityId = "photo-club",
-  section = "general",
-  onSectionChange,
-  communityName,
-  onSaveName,
-  onInspectName,
-  members,
-  onChangeMemberRole,
-  onRemoveMember,
-  onLeaveCommunity,
-  onLeaveSuccess,
-  usageContent,
-  preferencesContent,
-  contentOverride,
-  communityAccentColor,
-  invitationMode,
-  invitation,
-}: {
+export type CommunitySettingsProps = {
   role?: Role
   communityId?: string
   section?: CommunitySettingsSection
@@ -64,7 +45,28 @@ export function CommunitySettings({
   communityAccentColor?: string
   invitationMode?: "preview" | "unavailable"
   invitation?: InvitationModel
-}) {
+}
+
+export function CommunitySettings({
+  role = "admin",
+  communityId = "photo-club",
+  section = "general",
+  onSectionChange,
+  communityName,
+  onSaveName,
+  onInspectName,
+  members,
+  onChangeMemberRole,
+  onRemoveMember,
+  onLeaveCommunity,
+  onLeaveSuccess,
+  usageContent,
+  preferencesContent,
+  contentOverride,
+  communityAccentColor,
+  invitationMode,
+  invitation,
+}: CommunitySettingsProps) {
   const isAdmin = role === "admin"
   // Keep the Form mounted across section changes so edited and unknown-outcome drafts survive Navigation.
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
