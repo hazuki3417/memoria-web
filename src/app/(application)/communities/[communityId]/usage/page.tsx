@@ -1,6 +1,4 @@
-import {
-  CommunitySettingsRoute,
-} from "@/features/community-settings"
+import { CommunitySettingsRoute } from "@/features/community-settings"
 
 export default async function Page({
   params,
@@ -8,10 +6,5 @@ export default async function Page({
   params: Promise<{ communityId: string }>
 }) {
   const { communityId } = await params
-  return (
-    <CommunitySettingsRoute
-      communityId={communityId}
-      section="usage"
-    />
-  )
+  return <CommunitySettingsRoute communityId={communityId} section="usage" />
 }
