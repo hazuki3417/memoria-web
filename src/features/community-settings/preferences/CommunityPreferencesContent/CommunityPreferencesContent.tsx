@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING, type SaveStatusState } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import { useCommunityAccentForm } from "../useCommunityAccentForm"
+import { useCommunityAccentForm } from "./useCommunityAccentForm"
 
 export function CommunityPreferencesContent({
   accent,
