@@ -1,12 +1,11 @@
 import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
-import { CommunitySettingsView } from "../CommunitySettingsView"
 import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 
 const meta = {
   title: "Features/Community Settings/Members",
-  component: CommunitySettingsView,
+  component: CommunitySettingsStoryNavigation,
   render: (args) => <CommunitySettingsStoryNavigation {...args} />,
   args: {
     onSectionChange: () => undefined,
@@ -27,7 +26,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof CommunitySettingsView>
+} satisfies Meta<typeof CommunitySettingsStoryNavigation>
 export default meta
 type Story = StoryObj<typeof meta>
 
