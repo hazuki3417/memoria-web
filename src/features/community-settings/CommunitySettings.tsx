@@ -3,7 +3,7 @@
 import type { ReactNode } from "react"
 import type { CommunityMember } from "./members/CommunityMembersContent"
 import { CommunitySettingsView } from "./CommunitySettingsView"
-import { useCommunityNameSettings } from "./general/useCommunityNameSettings"
+import { useCommunityNameSettings } from "./useCommunityNameSettings"
 import type { CommunityInvitationSectionProps } from "./general/CommunityInvitationSection"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
 
