@@ -56,6 +56,7 @@ export function UsageFormatBreakdownSection({
       label={label}
       direction={sort?.key === key ? sort.direction : null}
       align={key === "format" ? "left" : "right"}
+      disabled={false}
       onSort={() => onSort(key)}
     />
   )
