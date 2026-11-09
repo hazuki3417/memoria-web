@@ -19,7 +19,6 @@ export type PersonalSettingsViewProps = {
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
   inspectPreferences?: () => Promise<UserPreferences>
   usageContent?: ReactNode
-  accountContent?: ReactNode
   contentOverride?: ReactNode
   personalAccentColor?: string
   onSectionChange: (section: PersonalSettingsSection) => void
@@ -34,7 +33,6 @@ export function PersonalSettingsView({
   savePreferences,
   inspectPreferences,
   usageContent,
-  accountContent,
   contentOverride,
   personalAccentColor,
   onSectionChange,
@@ -55,7 +53,6 @@ export function PersonalSettingsView({
           savePreferences={savePreferences}
           inspectPreferences={inspectPreferences}
           usageContent={usageContent}
-          accountContent={accountContent}
         />
       )}
     </PersonalSettingsLayout>

@@ -97,7 +97,7 @@ function AccountUsageConnection({
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
   usePersonalSettingsRefreshError(Boolean(data?.me && error))
-  const accountContent =
+  const contentOverride =
     section === "account" && loadState !== "ready" ? (
       <PageStatusBoundary state={loadState} label="Personal設定を読み込み中">
         {null}
@@ -109,7 +109,7 @@ function AccountUsageConnection({
       section={section}
       onSectionChange={onSectionChange}
       usageContent={usageContent}
-      accountContent={accountContent}
+      contentOverride={contentOverride}
       personalAccentColor={personalAccentColor}
     />
   )

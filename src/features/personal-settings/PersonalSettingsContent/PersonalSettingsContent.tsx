@@ -25,7 +25,6 @@ export type PersonalSettingsContentProps = {
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
   inspectPreferences?: () => Promise<UserPreferences>
   usageContent?: ReactNode
-  accountContent?: ReactNode
 }
 
 /** Selects the existing section UI without owning routing, data fetching or page layout. */
@@ -38,7 +37,6 @@ export function PersonalSettingsContent({
   savePreferences,
   inspectPreferences,
   usageContent,
-  accountContent,
 }: PersonalSettingsContentProps) {
   const compact = useMediaQuery("(max-width: 48em)")
   switch (section) {
@@ -62,12 +60,6 @@ export function PersonalSettingsContent({
     case "usage":
       return <>{usageContent ?? null}</>
     case "account":
-      return (
-        <>
-          {accountContent ?? (
-            <Account />
-          )}
-        </>
-      )
+      return <Account />
   }
 }
