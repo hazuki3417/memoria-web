@@ -1,12 +1,9 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { useSettingsRefreshError } from "../useSettingsRefreshError"
-import { usePersonalSettingsReadState } from "../usePersonalSettingsReadState"
-import { PersonalSettings } from "../PersonalSettings"
+import { PersonalSettingsRoute } from "../PersonalSettingsRoute"
 
-/** Account requires CurrentUser; Usage handles its own data and loading state. */
+/** Compatibility entry for Account/Usage section consumers. */
 export function ConnectedPersonalSettingsSection({
   section,
   usageContent,
@@ -14,21 +11,5 @@ export function ConnectedPersonalSettingsSection({
   section: "account" | "usage"
   usageContent?: ReactNode
 }) {
-  const { data, error, personalAccentColor, loadState } =
-    usePersonalSettingsReadState()
-  useSettingsRefreshError(Boolean(data?.me && error))
-  const accountContent =
-    section === "account" && loadState !== "ready" ? (
-      <PageStatusBoundary state={loadState} label="Personal設定を読み込み中">
-        {null}
-      </PageStatusBoundary>
-    ) : undefined
-  return (
-    <PersonalSettings
-      section={section}
-      usageContent={usageContent}
-      accountContent={accountContent}
-      personalAccentColor={personalAccentColor}
-    />
-  )
+  return <PersonalSettingsRoute section={section} usageContent={usageContent} />
 }
