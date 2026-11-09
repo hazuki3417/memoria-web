@@ -79,62 +79,58 @@ export function UsageFormatBreakdownSection({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-                  </Table.Tr>
-                ))}
               {sortedBreakdown.map((item) => (
-                  <Table.Tr key={item.format}>
-                    <Table.Td>
-                      <Group gap="xs" wrap="nowrap">
-                        <Box
-                          w={12}
-                          h={12}
-                          bg={`var(--mantine-color-${formatColors[item.format] ?? "gray"}-6)`}
-                          style={{ flexShrink: 0 }}
-                          aria-hidden="true"
-                        />
-                        <Text size="sm">{item.format}</Text>
-                      </Group>
-                    </Table.Td>
-                    <Table.Td ta="right">
-                      {item.count.toLocaleString("ja-JP")} 件
-                    </Table.Td>
-                    <Table.Td ta="right">
-                      {displayMode === "size" ? (
-                        <UsageFileSize
-                          bytes={item.sizeBytes}
-                          fileSizeUnit={fileSizeUnit}
-                        />
-                      ) : (
-                        `${usagePercent(item.sizeBytes, usage.limitBytes)}%`
-                      )}
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
+                <Table.Tr key={item.format}>
+                  <Table.Td>
+                    <Group gap="xs" wrap="nowrap">
+                      <Box
+                        w={12}
+                        h={12}
+                        bg={`var(--mantine-color-${formatColors[item.format] ?? "gray"}-6)`}
+                        style={{ flexShrink: 0 }}
+                        aria-hidden="true"
+                      />
+                      <Text size="sm">{item.format}</Text>
+                    </Group>
+                  </Table.Td>
+                  <Table.Td ta="right">
+                    {item.count.toLocaleString("ja-JP")} 件
+                  </Table.Td>
+                  <Table.Td ta="right">
+                    {displayMode === "size" ? (
+                      <UsageFileSize
+                        bytes={item.sizeBytes}
+                        fileSizeUnit={fileSizeUnit}
+                      />
+                    ) : (
+                      `${usagePercent(item.sizeBytes, usage.limitBytes)}%`
+                    )}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
             </Table.Tbody>
             <Table.Tfoot
-                style={{
-                  borderTop: "2px solid var(--mantine-color-default-border)",
-                }}
-              >
-                <Table.Tr>
-                  <Table.Th>合計</Table.Th>
-                  <>
-                      <Table.Th ta="right">
-                        {usage.mediaCount.toLocaleString("ja-JP")} 件
-                      </Table.Th>
-                      <Table.Th ta="right">
-                        {displayMode === "size" ? (
-                          <UsageFileSize
-                            bytes={usage.usedBytes}
-                            fileSizeUnit={fileSizeUnit}
-                          />
-                        ) : (
-                          `${usagePercent(usage.usedBytes, usage.limitBytes)}%`
-                        )}
-                      </Table.Th>
-                    </>
-                </Table.Tr>
-              </Table.Tfoot>
+              style={{
+                borderTop: "2px solid var(--mantine-color-default-border)",
+              }}
+            >
+              <Table.Tr>
+                <Table.Th>合計</Table.Th>
+                <Table.Th ta="right">
+                  {usage.mediaCount.toLocaleString("ja-JP")} 件
+                </Table.Th>
+                <Table.Th ta="right">
+                  {displayMode === "size" ? (
+                    <UsageFileSize
+                      bytes={usage.usedBytes}
+                      fileSizeUnit={fileSizeUnit}
+                    />
+                  ) : (
+                    `${usagePercent(usage.usedBytes, usage.limitBytes)}%`
+                  )}
+                </Table.Th>
+              </Table.Tr>
+            </Table.Tfoot>
           </Table>
         </Box>
       )}
