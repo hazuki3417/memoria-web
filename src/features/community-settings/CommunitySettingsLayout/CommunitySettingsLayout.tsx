@@ -14,7 +14,7 @@ import {
 type CommunitySettingsLayoutProps = {
   communityId: string
   section: CommunitySettingsSection
-  onSectionChange: (section: CommunitySettingsSection, href: string) => void
+  onSectionChange: (section: CommunitySettingsSection) => void
   accentColor?: string
   children: ReactNode
 }
@@ -41,10 +41,7 @@ export function CommunitySettingsLayout({
           ariaLabel="Community設定画面"
           desktopAriaLabel="Community設定"
           accentColor={accentColor ?? "var(--mantine-color-violet-6)"}
-          onSectionChange={(value) => {
-            const target = sections.find((item) => item.id === value)
-            if (target) onSectionChange(target.id, target.href)
-          }}
+          onSectionChange={onSectionChange}
         />
       }
     >

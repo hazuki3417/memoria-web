@@ -9,7 +9,10 @@ import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBo
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import type { CommunitySettingsSection } from "../communitySettingsSections"
+import {
+  getCommunitySettingsSections,
+  type CommunitySettingsSection,
+} from "../communitySettingsSections"
 
 export type CommunitySettingsRouteProps = {
   communityId: string
@@ -66,7 +69,12 @@ export function CommunitySettingsRoute({
       onLeaveCommunity={onLeaveCommunity}
       onLeaveSuccess={() => router.push("/dashboard")}
       onChangeMemberRole={onChangeMemberRole}
-      onSectionChange={(_section, href) => router.push(href)}
+      onSectionChange={(nextSection) => {
+        const target = getCommunitySettingsSections(communityId).find(
+          (item) => item.id === nextSection,
+        )
+        if (target) router.push(target.href)
+      }}
       onSaveName={onSaveName}
       onInspectName={onInspectName}
     />

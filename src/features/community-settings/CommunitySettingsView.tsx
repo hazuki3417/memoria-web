@@ -28,7 +28,7 @@ export type CommunitySettingsViewProps = {
   role?: Role
   communityId?: string
   section?: CommunitySettingsSection
-  onSectionChange: (section: CommunitySettingsSection, href: string) => void
+  onSectionChange: (section: CommunitySettingsSection) => void
   communityName?: string
   onSaveName?: (name: string) => Promise<string>
   onInspectName?: () => Promise<string>

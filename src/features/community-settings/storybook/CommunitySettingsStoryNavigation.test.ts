@@ -6,7 +6,7 @@ import type { CommunitySettingsSection } from "../communitySettingsSections"
 
 type NavigationProps = {
   section?: CommunitySettingsSection
-  onSectionChange: (section: CommunitySettingsSection, href: string) => void
+  onSectionChange: (section: CommunitySettingsSection) => void
   preferencesContent?: unknown
   invitation?: { invitationUrl: string }
 }
@@ -38,7 +38,7 @@ describe("Community Settings Storybook Navigation Adapter", () => {
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
     expect(rendered.section).toBe("general")
 
-    act(() => rendered.onSectionChange("members", "/communities/photo-club/members"))
+    act(() => rendered.onSectionChange("members"))
     expect(rendered.section).toBe("members")
     expect(onSectionChange).not.toHaveBeenCalled()
 
