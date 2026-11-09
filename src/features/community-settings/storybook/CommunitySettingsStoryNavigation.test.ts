@@ -1,4 +1,4 @@
-import { act, createElement } from "react"
+import { act, createElement, isValidElement, type ReactElement, type ReactNode } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { CommunitySettingsStoryNavigation } from "./CommunitySettingsStoryNavigation"
@@ -7,8 +7,7 @@ import type { CommunitySettingsSection } from "../communitySettingsSections"
 type NavigationProps = {
   section?: CommunitySettingsSection
   onSectionChange: (section: CommunitySettingsSection) => void
-  preferencesContent?: unknown
-  invitation?: { invitationUrl: string }
+  content: ReactNode
 }
 
 let rendered: NavigationProps
@@ -37,6 +36,8 @@ describe("Community Settings Storybook Navigation Adapter", () => {
     const props = { section: "general" as const, onSectionChange }
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
     expect(rendered.section).toBe("general")
+    expect(isValidElement(rendered.content)).toBe(true)
+    expect((rendered.content as ReactElement<{ invitation: { invitationUrl: string } }>).props.invitation.invitationUrl).toContain("photo-club-demo-")
 
     act(() => rendered.onSectionChange("members"))
     expect(rendered.section).toBe("members")
@@ -56,7 +57,6 @@ describe("Community Settings Storybook Navigation Adapter", () => {
       ),
     )
     expect(rendered.section).toBe("preferences")
-    expect(rendered.preferencesContent).toBeTruthy()
-    expect(rendered.invitation?.invitationUrl).toContain("photo-club-demo-")
+    expect(isValidElement(rendered.content)).toBe(true)
   })
 })
