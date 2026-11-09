@@ -1,6 +1,6 @@
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import { expect, userEvent, within } from "storybook/test"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
 import {
@@ -67,9 +67,9 @@ export const Loading: Story = {
   name: "Visual · Loading Table",
   tags: ["visual"],
   render: () => (
-    <PageStatusBoundary state="loading" label="利用状況を読み込み中">
+    <SettingsContentStatus state="loading" label="利用状況を読み込み中">
       {null}
-    </PageStatusBoundary>
+    </SettingsContentStatus>
   ),
 }
 
@@ -144,7 +144,7 @@ export const LoadingContract: Story = {
   render: () => (
     <PageStatusBoundary state="loading" label="利用状況を読み込み中">
       {null}
-    </PageStatusBoundary>
+    </SettingsContentStatus>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

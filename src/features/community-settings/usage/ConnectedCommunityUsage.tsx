@@ -1,7 +1,6 @@
 "use client"
 
-import { Button, Center } from "@mantine/core"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import {
   useCommunityUsageQuery,
   useCurrentUserQuery,
@@ -46,36 +45,22 @@ export function ConnectedCommunityUsage({ communityId }: { communityId: string }
   }
 
   return (
-    <>
-      {status === "ready" ? (
-        <Usage
-          key={communityId}
-          scope="community"
-          usage={usage}
-          fileSizeUnit={
-            communityPreferences.data?.me?.preferences.fileSizeUnit === "BINARY"
-              ? "BINARY"
-              : "DECIMAL"
-          }
-        />
-      ) : (
-        <>
-          <PageStatusBoundary
-            state={status}
-            label="利用状況を読み込み中"
-            errorTitle="利用状況を取得できませんでした"
-          >
-            {null}
-          </PageStatusBoundary>
-          {status === "error" && (
-            <Center>
-              <Button variant="light" onClick={onRetry}>
-                再試行
-              </Button>
-            </Center>
-          )}
-        </>
-      )}
-    </>
+    <SettingsContentStatus
+      state={status}
+      label="利用状況を読み込み中"
+      errorTitle="利用状況を取得できませんでした"
+      onRetry={onRetry}
+    >
+      <Usage
+        key={communityId}
+        scope="community"
+        usage={usage}
+        fileSizeUnit={
+          communityPreferences.data?.me?.preferences.fileSizeUnit === "BINARY"
+            ? "BINARY"
+            : "DECIMAL"
+        }
+      />
+    </SettingsContentStatus>
   )
 }

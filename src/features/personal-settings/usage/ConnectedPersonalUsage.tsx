@@ -1,7 +1,6 @@
 "use client"
 
-import { Button, Center } from "@mantine/core"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import { usePersonalUsageQuery } from "@/infrastructure/graphql/generated"
 import { Usage, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
@@ -33,35 +32,21 @@ export function ConnectedPersonalUsage() {
   }
 
   return (
-    <>
-      {status === "ready" ? (
-        <Usage
-          scope="personal"
-          usage={usage}
-          fileSizeUnit={
-            personal.data?.me?.preferences.fileSizeUnit === "BINARY"
-              ? "BINARY"
-              : "DECIMAL"
-          }
-        />
-      ) : (
-        <>
-          <PageStatusBoundary
-            state={status}
-            label="利用状況を読み込み中"
-            errorTitle="利用状況を取得できませんでした"
-          >
-            {null}
-          </PageStatusBoundary>
-          {status === "error" && (
-            <Center>
-              <Button variant="light" onClick={onRetry}>
-                再試行
-              </Button>
-            </Center>
-          )}
-        </>
-      )}
-    </>
+    <SettingsContentStatus
+      state={status}
+      label="利用状況を読み込み中"
+      errorTitle="利用状況を取得できませんでした"
+      onRetry={onRetry}
+    >
+      <Usage
+        scope="personal"
+        usage={usage}
+        fileSizeUnit={
+          personal.data?.me?.preferences.fileSizeUnit === "BINARY"
+            ? "BINARY"
+            : "DECIMAL"
+        }
+      />
+    </SettingsContentStatus>
   )
 }

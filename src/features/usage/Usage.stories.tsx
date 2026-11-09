@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { Button, Center, Group } from "@mantine/core"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
+import { Button, Group } from "@mantine/core"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { Usage } from "./Usage"
@@ -41,22 +41,14 @@ function UsageStatusStory({
   onRetry?: () => void
 }) {
   return (
-    <>
-      <PageStatusBoundary
-        state={state}
-        label="利用状況を読み込み中"
-        errorTitle={onRetry ? "利用状況を取得できませんでした" : undefined}
-      >
-        {null}
-      </PageStatusBoundary>
-      {state === "error" && onRetry && (
-        <Center>
-          <Button variant="light" onClick={onRetry}>
-            再試行
-          </Button>
-        </Center>
-      )}
-    </>
+    <SettingsContentStatus
+      state={state}
+      label="利用状況を読み込み中"
+      errorTitle={onRetry ? "利用状況を取得できませんでした" : undefined}
+      onRetry={onRetry}
+    >
+      {null}
+    </SettingsContentStatus>
   )
 }
 
