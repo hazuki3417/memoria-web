@@ -1,6 +1,6 @@
 "use client"
 
-import { useCommunityMemberTableState } from "./useCommunityMemberTableState"
+import { useCommunityMemberTableState } from "./CommunityMembersTableSection/useCommunityMemberTableState"
 import { useCommunityLeaveState } from "./useCommunityLeaveState"
 import { useCommunityRoleChangeState } from "./useCommunityRoleChangeState"
 import { useCommunityMemberRemovalState } from "./useCommunityMemberRemovalState"
