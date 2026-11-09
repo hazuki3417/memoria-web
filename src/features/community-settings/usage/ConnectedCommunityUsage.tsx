@@ -1,5 +1,7 @@
 "use client"
 
+import { Button, Center } from "@mantine/core"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import {
   useCommunityUsageQuery,
   useCurrentUserQuery,
@@ -36,23 +38,44 @@ export function ConnectedCommunityUsage({ communityId }: { communityId: string }
       ? "loading"
       : "error"
 
+  const onRetry = () => {
+    void Promise.all([
+      community.refetch().catch(() => undefined),
+      communityPreferences.refetch().catch(() => undefined),
+    ])
+  }
+
   return (
-    <Usage
-      key={communityId}
-      scope="community"
-      usage={usage}
-      status={status}
-      fileSizeUnit={
-        communityPreferences.data?.me?.preferences.fileSizeUnit === "BINARY"
-          ? "BINARY"
-          : "DECIMAL"
-      }
-      onRetry={() => {
-        void Promise.all([
-          community.refetch().catch(() => undefined),
-          communityPreferences.refetch().catch(() => undefined),
-        ])
-      }}
-    />
+    <>
+      {status === "ready" ? (
+        <Usage
+          key={communityId}
+          scope="community"
+          usage={usage}
+          fileSizeUnit={
+            communityPreferences.data?.me?.preferences.fileSizeUnit === "BINARY"
+              ? "BINARY"
+              : "DECIMAL"
+          }
+        />
+      ) : (
+        <>
+          <PageStatusBoundary
+            state={status}
+            label="利用状況を読み込み中"
+            errorTitle="利用状況を取得できませんでした"
+          >
+            {null}
+          </PageStatusBoundary>
+          {status === "error" && (
+            <Center>
+              <Button variant="light" onClick={onRetry}>
+                再試行
+              </Button>
+            </Center>
+          )}
+        </>
+      )}
+    </>
   )
 }
