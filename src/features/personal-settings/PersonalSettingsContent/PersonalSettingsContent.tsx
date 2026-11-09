@@ -1,8 +1,6 @@
 "use client"
 
-import { Button } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import Link from "next/link"
 import type { ReactNode } from "react"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { PersonalProfile, type InspectProfile, type SaveProfile } from "../profile"
@@ -67,18 +65,7 @@ export function PersonalSettingsContent({
       return (
         <>
           {accountContent ?? (
-            <PersonalAccount
-              deletionAction={
-                <Button
-                  component={Link}
-                  href="/settings/account/delete"
-                  color="red"
-                  size="sm"
-                >
-                  アカウントを削除する
-                </Button>
-              }
-            />
+            <PersonalAccount />
           )}
         </>
       )
