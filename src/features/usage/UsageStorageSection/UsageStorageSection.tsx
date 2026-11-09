@@ -1,23 +1,21 @@
 "use client"
 
-import { Box, Group, Progress, Skeleton, Stack, Text } from "@mantine/core"
+import { Box, Group, Progress, Stack, Text } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import type { FileSizeUnit } from "../formatFileSize"
 import { UsageFileSize } from "../UsageFileSize"
 import { usagePercent } from "../usagePercent"
 import { defaultUsageSort, sortUsageFormats } from "../sortUsageFormats"
 import { usageFormatColors as formatColors } from "../usageFormatColors"
-import type { UsageData, UsageStatus } from "../usageTypes"
+import type { UsageData } from "../usageTypes"
 import type { UsageDisplayMode } from "../usageDisplayMode"
 
 export function UsageStorageSection({
   usage,
-  status,
   fileSizeUnit,
   displayMode = "size",
 }: {
   usage: UsageData
-  status: UsageStatus
   fileSizeUnit: FileSizeUnit
   displayMode?: UsageDisplayMode
 }) {
@@ -27,10 +25,7 @@ export function UsageStorageSection({
       <Stack gap="sm">
         <Group justify="space-between" align="center" wrap="wrap">
           <Text size="sm">使用済み</Text>
-          {status === "loading" ? (
-            <Skeleton w={92} h={16} radius="sm" />
-          ) : (
-            <Text size="sm" ta="right">
+          <Text size="sm" ta="right">
               {displayMode === "size" ? (
                 <UsageFileSize
                   bytes={usage.usedBytes}
@@ -40,14 +35,10 @@ export function UsageStorageSection({
                 `${usagePercent(usage.usedBytes, usage.limitBytes)}%`
               )}
             </Text>
-          )}
         </Group>
         <Group justify="space-between" align="center" wrap="wrap">
           <Text size="sm">空き容量</Text>
-          {status === "loading" ? (
-            <Skeleton w={92} h={16} radius="sm" />
-          ) : (
-            <Text size="sm" ta="right">
+          <Text size="sm" ta="right">
               {displayMode === "size" ? (
                 <UsageFileSize
                   bytes={Math.max(0, usage.limitBytes - usage.usedBytes)}
@@ -62,12 +53,8 @@ export function UsageStorageSection({
                   .replace(/\.0$/, "")}%`
               )}
             </Text>
-          )}
         </Group>
-        {status === "loading" ? (
-          <Skeleton h={12} radius="xl" />
-        ) : (
-          <Progress.Root
+        <Progress.Root
             size="md"
             aria-label={`ストレージ使用率 ${usagePercent(usage.usedBytes, usage.limitBytes)}%、ファイル形式別内訳`}
           >
@@ -88,19 +75,14 @@ export function UsageStorageSection({
               />
             )}
           </Progress.Root>
-        )}
         <Group justify="space-between" align="center" wrap="wrap">
           <Text size="sm">容量上限</Text>
-          {status === "loading" ? (
-            <Skeleton w={92} h={16} radius="sm" />
-          ) : (
-            <Text size="sm" ta="right">
+          <Text size="sm" ta="right">
               <UsageFileSize
                 bytes={usage.limitBytes}
                 fileSizeUnit={fileSizeUnit}
               />
             </Text>
-          )}
         </Group>
       </Stack>
     </Box>

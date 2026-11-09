@@ -8,7 +8,6 @@ const meta = {
   component: UsageStorageSection,
   args: {
     usage: sampleUsage,
-    status: "ready",
     fileSizeUnit: "DECIMAL",
   },
 } satisfies Meta<typeof UsageStorageSection>
@@ -37,12 +36,6 @@ export const ReadyCompact: Story = {
   name: "Visual · Ready（Compact）",
   tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
-}
-
-export const Loading: Story = {
-  name: "Visual · Loading",
-  tags: ["visual"],
-  args: { status: "loading" },
 }
 
 export const Empty: Story = {

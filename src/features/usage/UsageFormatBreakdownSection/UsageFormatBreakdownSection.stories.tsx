@@ -28,7 +28,6 @@ const meta = {
   component: UsageFormatBreakdownSection,
   args: {
     usage: sampleUsage,
-    status: "ready",
     fileSizeUnit: "DECIMAL",
     displayMode: "size",
     sort: defaultUsageSort,
@@ -63,12 +62,6 @@ export const ReadyCompact: Story = {
   parameters: { viewport: { defaultViewport: "mobile1" } },
 }
 
-export const Loading: Story = {
-  name: "Visual · Loading Table",
-  tags: ["visual"],
-  args: { status: "loading" },
-}
-
 export const Empty: Story = {
   name: "Visual · 正常な0件",
   tags: ["visual"],
@@ -94,7 +87,6 @@ export const SortInteraction: Story = {
   render: (args) => (
     <SortableBreakdownStory
       usage={args.usage}
-      status={args.status}
       fileSizeUnit={args.fileSizeUnit}
       displayMode={args.displayMode}
     />
@@ -135,18 +127,3 @@ export const SortInteraction: Story = {
   },
 }
 
-export const LoadingContract: Story = {
-  name: "Interaction · Loading時の操作不可",
-  tags: ["interaction"],
-  args: { status: "loading" },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(
-      canvas.getByRole("button", { name: "使用量で並べ替え" }),
-    ).toBeDisabled()
-    await expect(
-      within(canvas.getAllByRole("row")[0]).getAllByRole("columnheader"),
-    ).toHaveLength(3)
-    await expect(canvas.getAllByRole("row")).toHaveLength(6)
-  },
-}

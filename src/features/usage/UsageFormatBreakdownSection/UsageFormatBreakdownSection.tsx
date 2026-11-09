@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { Box, Group, Skeleton, Table, Text } from "@mantine/core"
+import { Box, Group, Table, Text } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import {
   sortUsageFormats,
@@ -13,7 +13,7 @@ import { UsageFileSize } from "../UsageFileSize"
 import { UsageSortHeader } from "../UsageSortHeader"
 import { usagePercent } from "../usagePercent"
 import { usageFormatColors as formatColors } from "../usageFormatColors"
-import type { UsageData, UsageStatus } from "../usageTypes"
+import type { UsageData } from "../usageTypes"
 import type { UsageDisplayMode } from "../usageDisplayMode"
 
 // 取得成功の0件でも、分類を省略せず4形式の0件行を表示する。
@@ -26,14 +26,12 @@ const zeroFormatBreakdown = [
 
 export function UsageFormatBreakdownSection({
   usage,
-  status,
   sort,
   onSort,
   fileSizeUnit,
   displayMode = "size",
 }: {
   usage: UsageData
-  status: UsageStatus
   sort: UsageSort
   onSort: (key: UsageSortKey) => void
   fileSizeUnit: FileSizeUnit
@@ -58,16 +56,15 @@ export function UsageFormatBreakdownSection({
       label={label}
       direction={sort?.key === key ? sort.direction : null}
       align={key === "format" ? "left" : "right"}
-      disabled={status !== "ready"}
       onSort={() => onSort(key)}
     />
   )
   return (
     <>
-      {(status === "loading" || usage.formatBreakdown) && (
+      {usage.formatBreakdown && (
         <Box>
           <SectionHeader>ファイル形式別内訳</SectionHeader>
-          <Table striped highlightOnHover={status === "ready"}>
+          <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th aria-sort={ariaSort("format")}>
@@ -82,18 +79,9 @@ export function UsageFormatBreakdownSection({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {status === "loading" &&
-                ["JPEG", "PNG", "WebP", "HEIC / HEIF"].map((format) => (
-                  <Table.Tr key={`loading-${format}`}>
-                    {["format", "count", "size"].map((column) => (
-                      <Table.Td key={column}>
-                        <Skeleton h={16} radius="sm" />
-                      </Table.Td>
-                    ))}
                   </Table.Tr>
                 ))}
-              {status === "ready" &&
-                sortedBreakdown.map((item) => (
+              {sortedBreakdown.map((item) => (
                   <Table.Tr key={item.format}>
                     <Table.Td>
                       <Group gap="xs" wrap="nowrap">
@@ -123,22 +111,14 @@ export function UsageFormatBreakdownSection({
                   </Table.Tr>
                 ))}
             </Table.Tbody>
-            {(status === "ready" || status === "loading") && (
-              <Table.Tfoot
+            <Table.Tfoot
                 style={{
                   borderTop: "2px solid var(--mantine-color-default-border)",
                 }}
               >
                 <Table.Tr>
                   <Table.Th>合計</Table.Th>
-                  {status === "loading" ? (
-                    ["count", "value"].map((field) => (
-                      <Table.Th key={field} ta="right">
-                        <Skeleton h={16} radius="sm" />
-                      </Table.Th>
-                    ))
-                  ) : (
-                    <>
+                  <>
                       <Table.Th ta="right">
                         {usage.mediaCount.toLocaleString("ja-JP")} 件
                       </Table.Th>
@@ -153,10 +133,8 @@ export function UsageFormatBreakdownSection({
                         )}
                       </Table.Th>
                     </>
-                  )}
                 </Table.Tr>
               </Table.Tfoot>
-            )}
           </Table>
         </Box>
       )}
