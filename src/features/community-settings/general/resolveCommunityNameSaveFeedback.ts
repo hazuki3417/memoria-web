@@ -1,5 +1,10 @@
-import type { CommunityNameSectionProps } from "./CommunityNameSection"
 import type { SettingsSaveFailureKind } from "@/infrastructure/graphql/settingsMutationResult"
+
+export type CommunityNameSaveFeedbackModel = {
+  title: string
+  description: string
+  kind?: "error" | "warning"
+} | null
 
 export type CommunityNameInspection =
   | { status: "idle" | "checking" | "failed" }
@@ -20,7 +25,7 @@ export function resolveCommunityNameSaveFeedback({
   inspection: CommunityNameInspection
   draft: string
   hasInspector: boolean
-}): CommunityNameSectionProps["saveFeedback"] {
+}): CommunityNameSaveFeedbackModel {
   return formInvalid
     ? {
         kind: "error" as const,
