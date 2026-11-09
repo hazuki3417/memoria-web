@@ -1,4 +1,3 @@
-export { PersonalSettings } from "./PersonalSettings"
 export { PersonalSettingsRoute } from "./PersonalSettingsRoute"
 export { PersonalSettingsLayout } from "./PersonalSettingsLayout"
 export type { PersonalSettingsSection, Section } from "./PersonalSettingsLayout"
