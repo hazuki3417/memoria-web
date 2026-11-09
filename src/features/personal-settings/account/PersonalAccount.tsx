@@ -3,7 +3,7 @@ import { Box, Stack, Text } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 
-export function SettingsAccount({
+export function PersonalAccount({
   deletionAction,
 }: {
   deletionAction: ReactNode

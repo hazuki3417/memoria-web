@@ -7,7 +7,7 @@ import type { ReactNode } from "react"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { SettingsProfile, type InspectProfile, type SaveProfile } from "../profile/SettingsProfile"
 import { SettingsPreferences } from "../preferences/SettingsPreferences"
-import { SettingsAccount } from "../account/SettingsAccount"
+import { PersonalAccount } from "../account/PersonalAccount"
 import type {
   UserPreferences,
   UserPreferencesPatch,
@@ -67,7 +67,7 @@ export function PersonalSettingsContent({
       return (
         <>
           {accountContent ?? (
-            <SettingsAccount
+            <PersonalAccount
               deletionAction={
                 <Button
                   component={Link}

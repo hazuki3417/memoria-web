@@ -2,11 +2,12 @@ import { Box, Button } from "@mantine/core"
 import Link from "next/link"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, within } from "storybook/test"
-import { SettingsAccount } from "./SettingsAccount"
+import { PersonalAccount } from "./PersonalAccount"
 
 const meta = {
+  // Preserve the existing Storybook IDs during this structural refactor.
   title: "features/settings/account/SettingsAccount",
-  component: SettingsAccount,
+  component: PersonalAccount,
   args: {
     deletionAction: <Button component={Link} href="/settings/account/delete" color="red" size="sm">アカウントを削除する</Button>,
   },
@@ -17,7 +18,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof SettingsAccount>
+} satisfies Meta<typeof PersonalAccount>
 export default meta
 type Story = StoryObj<typeof meta>
 

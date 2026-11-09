@@ -7,7 +7,7 @@ import {
   PersonalSettingsLayout,
   SettingsProfile,
   SettingsPreferences,
-  SettingsAccount,
+  PersonalAccount,
   type PersonalSettingsSection,
 } from "@/features/personal-settings"
 import { UsageContent, type UsageScenario } from "./UsageContent"
@@ -67,7 +67,7 @@ export function SettingsPrototype({
       break
     case "account":
       content = (
-        <SettingsAccount
+        <PersonalAccount
           deletionAction={
             <Button variant="default" size="sm">
               アカウントを削除する
