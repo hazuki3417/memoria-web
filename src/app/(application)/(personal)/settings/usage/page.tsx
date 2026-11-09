@@ -1,9 +1,8 @@
-import { ConnectedPersonalSettingsSection } from "@/features/personal-settings"
-import { ConnectedPersonalUsage } from "@/features/personal-settings"
+import { PersonalSettingsRoute, ConnectedPersonalUsage } from "@/features/personal-settings"
 
 export default function Page() {
   return (
-    <ConnectedPersonalSettingsSection
+    <PersonalSettingsRoute
       section="usage"
       usageContent={<ConnectedPersonalUsage />}
     />
