@@ -5,7 +5,6 @@ import { useCommunityLeaveState } from "./useCommunityLeaveState"
 import { useCommunityRoleChangeState } from "./useCommunityRoleChangeState"
 import { useCommunityMemberRemovalState } from "./useCommunityMemberRemovalState"
 import type { CommunityMember } from "@/features/community/CommunityProvider"
-
 import { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "./communityMemberLimits"
 
 export type CommunityMembersActions = {
