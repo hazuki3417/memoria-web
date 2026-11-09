@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { preferencesSchema } from "./preferencesSchema"
-import { defaultUserPreferences } from "./userPreferences"
+import { defaultUserPreferences } from "../userPreferences"
 
 describe("preferencesSchema", () => {
   it("allows incomplete ColorInput drafts without saving them", () => {
