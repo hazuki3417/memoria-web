@@ -1,6 +1,6 @@
 export { PersonalSettingsRoute } from "./PersonalSettingsRoute"
 export { PersonalSettingsLayout } from "./PersonalSettingsLayout"
-export type { PersonalSettingsSection, Section } from "./PersonalSettingsLayout"
+export type { PersonalSettingsSection } from "./PersonalSettingsLayout"
 export { SettingsProfile } from "./profile/SettingsProfile"
 export { SettingsPreferences } from "./preferences/SettingsPreferences"
 export { SettingsAccount } from "./account/SettingsAccount"
