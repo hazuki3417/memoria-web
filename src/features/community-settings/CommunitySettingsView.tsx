@@ -2,7 +2,10 @@
 
 import type { ReactNode } from "react"
 import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
-import { CommunitySettingsContent, type CommunitySettingsContentProps } from "./CommunitySettingsContent"
+import {
+  CommunitySettingsContent,
+  type CommunitySettingsContentProps,
+} from "./CommunitySettingsContent"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
 
 export type CommunitySettingsViewProps = CommunitySettingsContentProps & {
