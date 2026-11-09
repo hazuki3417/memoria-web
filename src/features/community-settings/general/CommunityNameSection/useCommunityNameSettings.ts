@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type SetStateAction } from "react"
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
-import { communityNameSchema } from "../communityNameSchema"
+import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 import {
   classifySettingsSaveFailure,
@@ -14,7 +14,7 @@ import {
   type SettingsSaveFailureKind,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { getCommunityBlockedFeedback } from "../../preferences/communityBlockedFeedback"
-import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "../resolveCommunityNameSaveFeedback"
+import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
 
 /** Community名変更フォームのDraft、Validation、保存・再照会状態を所有する。 */
 export function useCommunityNameSettings({
