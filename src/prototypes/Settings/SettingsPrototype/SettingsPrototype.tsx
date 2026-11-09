@@ -4,11 +4,11 @@ import { useState, type ReactNode } from "react"
 import { Button, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
-  SettingsLayout,
+  PersonalSettingsLayout,
   SettingsProfile,
   SettingsPreferences,
   SettingsAccount,
-  type Section,
+  type PersonalSettingsSection,
 } from "@/features/personal-settings"
 import { UsageContent, type UsageScenario } from "./UsageContent"
 import { getApplicationNavigation } from "@/features/application-shell"
@@ -27,13 +27,13 @@ export function SettingsPrototype({
   initialUsageScenario = "default",
   initialUsageFileSizeUnit = "DECIMAL",
 }: {
-  initialSection?: Section
+  initialSection?: PersonalSettingsSection
   initialProfileSaveState?: ProfileSaveState
   initialUsageScenario?: UsageScenario
   initialUsageFileSizeUnit?: "DECIMAL" | "BINARY"
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
-  const [section, setSection] = useState<Section>(initialSection)
+  const [section, setSection] = useState<PersonalSettingsSection>(initialSection)
   const currentLabel = (
     {
       profile: "プロフィール",
@@ -116,9 +116,9 @@ export function SettingsPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <SettingsLayout section={section} onSectionChange={setSection}>
+      <PersonalSettingsLayout section={section} onSectionChange={setSection}>
         {content}
-      </SettingsLayout>
+      </PersonalSettingsLayout>
       <Text
         pos="absolute"
         style={{

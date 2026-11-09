@@ -1,49 +1,33 @@
 "use client"
 
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
-import { useCommunitySettingsMembership } from "../useCommunitySettingsMembership"
-import { useCommunitySettingsActions } from "../useCommunitySettingsActions"
+import { useCommunitySettingsActions } from "./useCommunitySettingsActions"
+import { useCommunitySettingsData } from "./useCommunitySettingsData"
+import { useCommunityNameInspection } from "./useCommunityNameInspection"
 import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
-import { useApolloClient } from "@apollo/client"
-import { CommunityDetailsDocument } from "@/infrastructure/graphql/generated"
-import { useCommunity } from "@/features/community/CommunityProvider"
-import {
-  CommunitySettings,
-  type CommunitySettingsSection,
-} from "../CommunitySettings"
+import { CommunitySettingsView } from "../CommunitySettingsView"
+import type { CommunitySettingsSection } from "../communitySettingsSections"
+
+export type CommunitySettingsRouteProps = {
+  communityId: string
+  section?: CommunitySettingsSection
+  usageContent?: ReactNode
+}
 
 export function CommunitySettingsRoute({
   communityId,
   section = "general",
   usageContent,
-}: {
-  communityId: string
-  section?: CommunitySettingsSection
-  usageContent?: ReactNode
-}) {
+}: CommunitySettingsRouteProps) {
   const router = useRouter()
-  const client = useApolloClient()
-  const { communityAccentColor, membershipLost } =
-    useCommunitySettingsMembership(communityId, section)
-  // UsageはCommunityの登録量を閲覧する画面であり、メンバー一覧を必要としない。
-  const requiresMembers = section === "members" || section === "general"
-  const { name, members, loadError, membersError } = useCommunity({
-    includeMembers: requiresMembers,
-  })
+  const onInspectName = useCommunityNameInspection(communityId)
+  const { communityAccentColor, membershipLost, name, members, loadState } =
+    useCommunitySettingsData(communityId, section)
   const { onRemoveMember, onLeaveCommunity, onChangeMemberRole, onSaveName } =
     useCommunitySettingsActions(communityId)
-
-  const hasRequiredData =
-    name !== null && (!requiresMembers || members !== null)
-  useCommunitySettingsRefreshError(
-    Boolean(
-      hasRequiredData && (loadError || (requiresMembers && membersError)),
-    ),
-  )
 
   if (membershipLost)
     return (
@@ -51,14 +35,9 @@ export function CommunitySettingsRoute({
         {null}
       </LoadingBoundary>
     )
-  const loadState = hasRequiredData
-    ? "ready"
-    : loadError || (requiresMembers && membersError)
-      ? "error"
-      : "loading"
 
   return (
-    <CommunitySettings
+    <CommunitySettingsView
       key={communityId}
       communityId={communityId}
       invitationMode="unavailable"
@@ -87,17 +66,9 @@ export function CommunitySettingsRoute({
       onLeaveCommunity={onLeaveCommunity}
       onLeaveSuccess={() => router.push("/dashboard")}
       onChangeMemberRole={onChangeMemberRole}
-      onNavigate={(href) => router.push(href)}
+      onSectionChange={(_section, href) => router.push(href)}
       onSaveName={onSaveName}
-      onInspectName={async () => {
-        const current = await client.query({
-          query: CommunityDetailsDocument,
-          variables: { communityId },
-          fetchPolicy: "no-cache",
-        })
-        if (!current.data?.community) throw new Error("Community not available")
-        return current.data.community.name
-      }}
+      onInspectName={onInspectName}
     />
   )
 }

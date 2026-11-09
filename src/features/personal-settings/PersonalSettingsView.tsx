@@ -1,8 +1,9 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { SettingsLayout, type Section } from "./SettingsLayout"
-import { SettingsSectionContent } from "./SettingsSectionContent"
+import { PersonalSettingsLayout } from "./PersonalSettingsLayout"
+import type { PersonalSettingsSection } from "./personalSettingsSections"
+import { PersonalSettingsContent } from "./PersonalSettingsContent"
 import type { InspectProfile, SaveProfile } from "./profile/SettingsProfile"
 import type {
   UserPreferences,
@@ -10,7 +11,7 @@ import type {
 } from "./preferences/userPreferences"
 
 export type PersonalSettingsViewProps = {
-  section: Section
+  section: PersonalSettingsSection
   saveProfile?: SaveProfile
   inspectProfile?: InspectProfile
   profileNickname?: string
@@ -21,7 +22,7 @@ export type PersonalSettingsViewProps = {
   accountContent?: ReactNode
   contentOverride?: ReactNode
   personalAccentColor?: string
-  onSectionChange: (section: Section) => void
+  onSectionChange: (section: PersonalSettingsSection) => void
 }
 
 export function PersonalSettingsView({
@@ -39,13 +40,13 @@ export function PersonalSettingsView({
   onSectionChange,
 }: PersonalSettingsViewProps) {
   return (
-    <SettingsLayout
+    <PersonalSettingsLayout
       accentColor={personalAccentColor}
       section={section}
       onSectionChange={onSectionChange}
     >
       {contentOverride ?? (
-        <SettingsSectionContent
+        <PersonalSettingsContent
           section={section}
           saveProfile={saveProfile}
           inspectProfile={inspectProfile}
@@ -57,6 +58,6 @@ export function PersonalSettingsView({
           accountContent={accountContent}
         />
       )}
-    </SettingsLayout>
+    </PersonalSettingsLayout>
   )
 }

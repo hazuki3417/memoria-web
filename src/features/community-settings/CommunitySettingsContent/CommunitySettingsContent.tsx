@@ -1,17 +1,32 @@
 "use client"
 
-import type { Dispatch, ReactNode, SetStateAction } from "react"
+import type { ReactNode } from "react"
 import { CommunityGeneralContent } from "../general/CommunityGeneralContent"
 import {
   CommunityMembersContent,
   type CommunityMember,
 } from "../members/CommunityMembersContent"
-import { CommunityPreferencesContent } from "../preferences/CommunityPreferencesContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
-import type { useCommunityNameSettings } from "../general/useCommunityNameSettings"
-import type { useCommunityInvitation } from "../general/useCommunityInvitation"
+import type { CommunityNameSectionProps } from "../general/CommunityNameSection"
+import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
 
 type Role = "admin" | "member"
+
+export type CommunitySettingsContentProps = {
+  section: CommunitySettingsSection
+  communityId: string
+  isAdmin: boolean
+  name: Omit<CommunityNameSectionProps, "isAdmin">
+  invitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
+  invitationAvailable: boolean
+  members?: CommunityMember[]
+  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
+  onLeaveCommunity?: () => Promise<void>
+  onLeaveSuccess?: () => void
+  preferencesContent?: ReactNode
+  usageContent?: ReactNode
+}
 
 export function CommunitySettingsContent({
   section,
@@ -27,25 +42,7 @@ export function CommunitySettingsContent({
   onLeaveSuccess,
   preferencesContent,
   usageContent,
-  accent,
-  setAccent,
-}: {
-  section: CommunitySettingsSection
-  communityId: string
-  isAdmin: boolean
-  name: ReturnType<typeof useCommunityNameSettings>
-  invitation: ReturnType<typeof useCommunityInvitation>
-  invitationAvailable: boolean
-  members?: CommunityMember[]
-  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
-  onRemoveMember?: (userId: string) => Promise<boolean>
-  onLeaveCommunity?: () => Promise<void>
-  onLeaveSuccess?: () => void
-  preferencesContent?: ReactNode
-  usageContent?: ReactNode
-  accent: string
-  setAccent: Dispatch<SetStateAction<string>>
-}) {
+}: CommunitySettingsContentProps) {
   switch (section) {
     case "general":
       return (
@@ -70,15 +67,6 @@ export function CommunitySettingsContent({
     case "usage":
       return <>{usageContent}</>
     case "preferences":
-      return (
-        <>
-          {preferencesContent ?? (
-            <CommunityPreferencesContent
-              accent={accent}
-              setAccent={setAccent}
-            />
-          )}
-        </>
-      )
+      return <>{preferencesContent}</>
   }
 }

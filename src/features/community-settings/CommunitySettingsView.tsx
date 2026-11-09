@@ -1,37 +1,96 @@
 "use client"
 
-import type { ComponentProps, ReactNode } from "react"
+import type { ReactNode } from "react"
+import type { CommunityMember } from "./members/CommunityMembersContent"
 import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
 import { CommunitySettingsContent } from "./CommunitySettingsContent"
+import type { CommunityInvitationSectionProps } from "./general/CommunityInvitationSection"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
 
-type CommunitySettingsViewProps = ComponentProps<typeof CommunitySettingsContent> & {
-  contentOverride?: ReactNode
-  accentColor?: string
-  onSectionChange: (section: CommunitySettingsSection, href: string) => void
+type Role = "admin" | "member"
+type InvitationModel = Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
+
+// Production Invitation API is not connected; Preview actions are never enabled by default.
+const unavailableInvitation: InvitationModel = {
+  active: false,
+  invitation: "none",
+  invitationUrl: "",
+  expiresAt: "",
+  busy: false,
+  issue: () => undefined,
+  copyInvitation: async () => undefined,
+  confirm: null,
+  setConfirm: () => undefined,
+  changeInvitation: () => undefined,
 }
 
-/** Composes the existing layout and section UI without owning form, preview or route state. */
+export type CommunitySettingsViewProps = {
+  role?: Role
+  communityId?: string
+  section?: CommunitySettingsSection
+  onSectionChange: (section: CommunitySettingsSection, href: string) => void
+  communityName?: string
+  onSaveName?: (name: string) => Promise<string>
+  onInspectName?: () => Promise<string>
+  members?: CommunityMember[]
+  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
+  onLeaveCommunity?: () => Promise<void>
+  onLeaveSuccess?: () => void
+  usageContent?: ReactNode
+  preferencesContent?: ReactNode
+  contentOverride?: ReactNode
+  communityAccentColor?: string
+  invitationMode?: "preview" | "unavailable"
+  invitation?: InvitationModel
+}
+
+/** Composes settings layout and section content without owning Form, Preview or Route state. */
 export function CommunitySettingsView({
-  section,
-  communityId,
-  contentOverride,
-  accentColor,
+  role = "admin",
+  communityId = "photo-club",
+  section = "general",
   onSectionChange,
-  ...contentProps
+  communityName,
+  onSaveName,
+  onInspectName,
+  members,
+  onChangeMemberRole,
+  onRemoveMember,
+  onLeaveCommunity,
+  onLeaveSuccess,
+  usageContent,
+  preferencesContent,
+  contentOverride,
+  communityAccentColor,
+  invitationMode,
+  invitation,
 }: CommunitySettingsViewProps) {
+  const isAdmin = role === "admin"
+  const invitationAvailable = invitationMode === "preview" && invitation !== undefined
+
   return (
     <CommunitySettingsLayout
       communityId={communityId}
       section={section}
-      accentColor={accentColor}
+      accentColor={communityAccentColor}
       onSectionChange={onSectionChange}
     >
       {contentOverride ?? (
         <CommunitySettingsContent
-          {...contentProps}
           section={section}
           communityId={communityId}
+          isAdmin={isAdmin}
+          name={{ communityName, onSaveName, onInspectName }}
+          invitation={invitation ?? unavailableInvitation}
+          invitationAvailable={invitationAvailable}
+          members={members}
+          onChangeMemberRole={onChangeMemberRole}
+          onRemoveMember={onRemoveMember}
+          onLeaveCommunity={onLeaveCommunity}
+          onLeaveSuccess={onLeaveSuccess}
+          preferencesContent={preferencesContent}
+          usageContent={usageContent}
         />
       )}
     </CommunitySettingsLayout>
