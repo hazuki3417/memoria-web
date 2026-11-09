@@ -12,6 +12,22 @@ import type { CommunityInvitationSectionProps } from "../general/CommunityInvita
 
 type Role = "admin" | "member"
 
+export type CommunitySettingsContentProps = {
+  section: CommunitySettingsSection
+  communityId: string
+  isAdmin: boolean
+  name: Omit<CommunityNameSectionProps, "isAdmin">
+  invitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
+  invitationAvailable: boolean
+  members?: CommunityMember[]
+  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
+  onLeaveCommunity?: () => Promise<void>
+  onLeaveSuccess?: () => void
+  preferencesContent?: ReactNode
+  usageContent?: ReactNode
+}
+
 export function CommunitySettingsContent({
   section,
   communityId,
@@ -26,21 +42,7 @@ export function CommunitySettingsContent({
   onLeaveSuccess,
   preferencesContent,
   usageContent,
-}: {
-  section: CommunitySettingsSection
-  communityId: string
-  isAdmin: boolean
-  name: Omit<CommunityNameSectionProps, "isAdmin">
-  invitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
-  invitationAvailable: boolean
-  members?: CommunityMember[]
-  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
-  onRemoveMember?: (userId: string) => Promise<boolean>
-  onLeaveCommunity?: () => Promise<void>
-  onLeaveSuccess?: () => void
-  preferencesContent?: ReactNode
-  usageContent?: ReactNode
-}) {
+}: CommunitySettingsContentProps) {
   switch (section) {
     case "general":
       return (
