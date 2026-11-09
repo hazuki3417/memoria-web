@@ -14,8 +14,8 @@ type NavigationProps = {
 let rendered: NavigationProps
 
 // Verify the Storybook adapter without mounting feature forms or Mantine UI.
-vi.mock("./CommunitySettings", () => ({
-  CommunitySettings: (props: NavigationProps) => {
+vi.mock("./CommunitySettingsView", () => ({
+  CommunitySettingsView: (props: NavigationProps) => {
     rendered = props
     return null
   },
