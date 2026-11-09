@@ -7,6 +7,7 @@ import type { CommunitySettingsSection } from "./communitySettingsSections"
 type NavigationProps = {
   section?: CommunitySettingsSection
   onSectionChange: (section: CommunitySettingsSection, href: string) => void
+  preferencesContent?: unknown
 }
 
 let rendered: NavigationProps
@@ -54,5 +55,6 @@ describe("Community Settings Storybook Navigation Adapter", () => {
       ),
     )
     expect(rendered.section).toBe("preferences")
+    expect(rendered.preferencesContent).toBeTruthy()
   })
 })

@@ -1,12 +1,11 @@
 "use client"
 
-import type { Dispatch, ReactNode, SetStateAction } from "react"
+import type { ReactNode } from "react"
 import { CommunityGeneralContent } from "../general/CommunityGeneralContent"
 import {
   CommunityMembersContent,
   type CommunityMember,
 } from "../members/CommunityMembersContent"
-import { CommunityPreferencesContent } from "../preferences/CommunityPreferencesContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { useCommunityNameSettings } from "../general/useCommunityNameSettings"
 import type { useCommunityInvitation } from "../general/useCommunityInvitation"
@@ -27,8 +26,6 @@ export function CommunitySettingsContent({
   onLeaveSuccess,
   preferencesContent,
   usageContent,
-  accent,
-  setAccent,
 }: {
   section: CommunitySettingsSection
   communityId: string
@@ -43,8 +40,6 @@ export function CommunitySettingsContent({
   onLeaveSuccess?: () => void
   preferencesContent?: ReactNode
   usageContent?: ReactNode
-  accent: string
-  setAccent: Dispatch<SetStateAction<string>>
 }) {
   switch (section) {
     case "general":
@@ -70,15 +65,6 @@ export function CommunitySettingsContent({
     case "usage":
       return <>{usageContent}</>
     case "preferences":
-      return (
-        <>
-          {preferencesContent ?? (
-            <CommunityPreferencesContent
-              accent={accent}
-              setAccent={setAccent}
-            />
-          )}
-        </>
-      )
+      return <>{preferencesContent}</>
   }
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type ReactNode } from "react"
+import type { ReactNode } from "react"
 import type { CommunityMember } from "./members/CommunityMembersContent"
 import { CommunitySettingsView } from "./CommunitySettingsView"
 import { useCommunityNameSettings } from "./general/useCommunityNameSettings"
@@ -49,7 +49,6 @@ export function CommunitySettings({
   invitationMode?: "preview" | "unavailable"
 }) {
   const isAdmin = role === "admin"
-  const [accent, setAccent] = useState("#7950f2")
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
   // Preview behavior is explicit; navigation strategy is supplied by the consumer.
   const previewInvitation = invitationMode === "preview"
@@ -70,8 +69,6 @@ export function CommunitySettings({
       onLeaveSuccess={onLeaveSuccess}
       preferencesContent={preferencesContent}
       usageContent={usageContent}
-      accent={accent}
-      setAccent={setAccent}
       contentOverride={contentOverride}
       accentColor={communityAccentColor}
       onSectionChange={onSectionChange}
