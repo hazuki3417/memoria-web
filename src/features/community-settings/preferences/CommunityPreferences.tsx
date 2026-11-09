@@ -9,7 +9,7 @@ import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import { useCommunityAccentForm } from "./useCommunityAccentForm"
 
-export function CommunityPreferencesContent({
+export function CommunityPreferences({
   accent,
   initialDraft,
   onAccentDraftChange,

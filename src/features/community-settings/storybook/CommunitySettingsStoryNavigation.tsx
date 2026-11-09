@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { showNotification } from "@/components/Feedback"
 import { CommunitySettingsView, type CommunitySettingsViewProps } from "../CommunitySettingsView"
-import { CommunityPreferencesContent } from "../preferences/CommunityPreferencesContent"
+import { CommunityPreferences } from "../preferences/CommunityPreferences"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 
 
@@ -111,7 +111,7 @@ export function CommunitySettingsStoryNavigation({
       section={currentSection}
       invitationMode={invitationMode}
       invitation={suppliedInvitation ?? simulatedInvitation}
-      preferencesContent={preferencesContent ?? <CommunityPreferencesContent accent={accent} setAccent={setAccent} />}
+      preferencesContent={preferencesContent ?? <CommunityPreferences accent={accent} setAccent={setAccent} />}
       onSectionChange={(next) => setCurrentSection(next)}
     />
   )

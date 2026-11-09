@@ -2,7 +2,7 @@
 
 import { Stack } from "@mantine/core"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
+import { CommunityPreferences } from "../CommunityPreferences"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
 import { useCommunityAliasConnection } from "./useCommunityAliasConnection"
@@ -34,7 +34,7 @@ export function ConnectedCommunityPreferences({
 
   return (
     <Stack gap="sm">
-      <CommunityPreferencesContent
+      <CommunityPreferences
         key={communityId}
         accent={accent}
         initialDraft={lastDraft}
