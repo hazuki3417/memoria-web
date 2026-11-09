@@ -1,8 +1,8 @@
 "use client"
 
-import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { PersonalSettingsView } from "../PersonalSettingsView"
+import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
 import { usePersonalSettingsActions } from "./usePersonalSettingsActions"
@@ -18,7 +18,7 @@ type AccountUsageSection = Extract<PersonalSettingsSection, "account" | "usage">
 
 export type PersonalSettingsRouteProps =
   | { section: ProfilePreferencesSection }
-  | { section: AccountUsageSection; usageContent?: ReactNode }
+  | { section: AccountUsageSection }
 
 /** Personal設定のProduction接続入口。Section固有の取得・操作は個別の接続Componentが所有する。 */
 export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
@@ -37,7 +37,7 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
   return (
     <AccountUsageConnection
       section={props.section}
-      usageContent={"usageContent" in props ? props.usageContent : undefined}
+      usageContent={props.section === "usage" ? <ConnectedPersonalUsage /> : undefined}
       onSectionChange={onSectionChange}
     />
   )

@@ -1,10 +1,10 @@
 "use client"
 
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
+import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { useCommunitySettingsActions } from "./useCommunitySettingsActions"
 import { useCommunitySettingsData } from "./useCommunitySettingsData"
 import { useCommunityNameInspection } from "./useCommunityNameInspection"
-import type { ReactNode } from "react"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { CommunitySettingsView } from "../CommunitySettingsView"
@@ -16,13 +16,11 @@ import {
 export type CommunitySettingsRouteProps = {
   communityId: string
   section?: CommunitySettingsSection
-  usageContent?: ReactNode
 }
 
 export function CommunitySettingsRoute({
   communityId,
   section = "general",
-  usageContent,
 }: CommunitySettingsRouteProps) {
   const router = useRouter()
   const onInspectName = useCommunityNameInspection(communityId)
@@ -49,7 +47,7 @@ export function CommunitySettingsRoute({
       members={members ?? undefined}
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}
-      usageContent={usageContent}
+      usageContent={section === "usage" ? <ConnectedCommunityUsage communityId={communityId} /> : undefined}
       preferencesContent={
         section === "preferences" ? (
           <ConnectedCommunityPreferences communityId={communityId} />
