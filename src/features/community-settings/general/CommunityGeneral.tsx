@@ -5,14 +5,14 @@ import { PageHeader } from "@/components/PageHeader"
 import {
   CommunityNameSection,
   type CommunityNameSectionProps,
-} from "../CommunityNameSection"
+} from "./CommunityNameSection"
 import {
   CommunityInvitationSection,
   type CommunityInvitationSectionProps,
-} from "../CommunityInvitationSection"
-import { CommunityDangerZone } from "../CommunityDangerZone"
+} from "./CommunityInvitationSection"
+import { CommunityDangerZone } from "./CommunityDangerZone"
 
-export type CommunityGeneralContentProps = {
+export type CommunityGeneralProps = {
   isAdmin: boolean
   communityId: string
   name: Omit<CommunityNameSectionProps, "isAdmin">
@@ -20,13 +20,13 @@ export type CommunityGeneralContentProps = {
   invitationAvailable: boolean
 }
 
-export function CommunityGeneralContent({
+export function CommunityGeneral({
   isAdmin,
   communityId,
   name,
   invitation,
   invitationAvailable,
-}: CommunityGeneralContentProps) {
+}: CommunityGeneralProps) {
   return (
     <Stack gap="xl">
       <PageHeader

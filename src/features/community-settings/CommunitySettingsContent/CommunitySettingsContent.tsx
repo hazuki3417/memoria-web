@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { CommunityGeneralContent } from "../general/CommunityGeneralContent"
+import { CommunityGeneral } from "../general/CommunityGeneral"
 import {
   CommunityMembers,
   type CommunityMember,
@@ -46,7 +46,7 @@ export function CommunitySettingsContent({
   switch (section) {
     case "general":
       return (
-        <CommunityGeneralContent
+        <CommunityGeneral
           name={name}
           invitation={invitation}
           invitationAvailable={invitationAvailable}
