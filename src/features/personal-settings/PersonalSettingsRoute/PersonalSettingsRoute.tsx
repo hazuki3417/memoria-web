@@ -10,7 +10,10 @@ import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
 import { usePersonalSettingsReadState } from "../usePersonalSettingsReadState"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
-type ProfilePreferencesSection = Extract<PersonalSettingsSection, "profile" | "preferences">
+type ProfilePreferencesSection = Extract<
+  PersonalSettingsSection,
+  "profile" | "preferences"
+>
 type AccountUsageSection = Extract<PersonalSettingsSection, "account" | "usage">
 
 export type PersonalSettingsRouteProps =
@@ -31,7 +34,11 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
 }
 
 /** Profile/PreferencesはCurrentUserに加えて保存と結果確認を接続する。 */
-function ProfilePreferencesConnection({ section }: { section: ProfilePreferencesSection }) {
+function ProfilePreferencesConnection({
+  section,
+}: {
+  section: ProfilePreferencesSection
+}) {
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
   const { inspectProfile, inspectPreferences } = usePersonalSettingsInspection()
