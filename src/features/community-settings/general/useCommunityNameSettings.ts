@@ -14,10 +14,7 @@ import {
   type SettingsSaveFailureKind,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { getCommunityBlockedFeedback } from "../preferences/communityBlockedFeedback"
-
-type Inspection =
-  | { status: "idle" | "checking" | "failed" }
-  | { status: "matches" | "differs"; name: string }
+import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
 
 /** Manual Community name save; the Form owns its Draft and recovery state. */
 export function useCommunityNameSettings({
@@ -51,7 +48,7 @@ export function useCommunityNameSettings({
   const [failure, setFailure] = useState<SettingsSaveFailureKind | null>(null)
   const [blockedFeedback, setBlockedFeedback] = useState<{ title: string; description: string } | null>(null)
   const [formInvalid, setFormInvalid] = useState(false)
-  const [inspection, setInspection] = useState<Inspection>({ status: "idle" })
+  const [inspection, setInspection] = useState<CommunityNameInspection>({ status: "idle" })
   useEffect(() => () => { inspectionGeneration.current += 1 }, [])
 
   // Protect edited/unknown drafts and confirmed writes from stale refetches.
@@ -182,40 +179,14 @@ export function useCommunityNameSettings({
   }
 
   const showClientError = fieldState.isTouched || isSubmitted
-  const saveFeedback = formInvalid
-    ? {
-        kind: "error" as const,
-        title: "入力内容を確認してください",
-        description: "入力した値を受け付けられませんでした。内容を見直し、もう一度保存してください。",
-      }
-    : failure === "blocked"
-      ? {
-          kind: "error" as const,
-          title: blockedFeedback?.title ?? "Community名を変更できません",
-          description: blockedFeedback?.description ?? "画面を再読み込みして現在の状態を確認してください。",
-        }
-      : failure === "unknown"
-        ? {
-            kind: "warning" as const,
-            title: "保存結果を確認できませんでした",
-            description:
-              inspection.status === "matches"
-                ? "現在のCommunity名は入力内容と一致しています。元の保存処理が成功した証明ではありません。確認した場合は「確認完了」を選んでください。"
-                : inspection.status === "differs"
-                  ? `現在のCommunity名は「${inspection.name}」です。入力した「${draft.trim()}」とは異なります。必要な場合だけ再保存するか、変更を破棄してください。`
-                  : inspection.status === "failed"
-                    ? "現在のCommunity名を取得できませんでした。保存を再送せず、状態の確認をやり直してください。"
-                    : onInspectName
-                      ? "入力内容は保持しています。保存結果は未確定です。現在の状態を確認してから復旧操作を選んでください。"
-                      : "入力内容は保持しています。保存結果は未確定です。入力内容を控えてから再読み込みしてください。",
-          }
-        : failure === "retryable"
-          ? {
-              kind: "error" as const,
-              title: "保存できませんでした",
-              description: "入力内容は保持されています。下の「保存」ボタンで再試行できます。",
-            }
-          : null
+  const saveFeedback = resolveCommunityNameSaveFeedback({
+    formInvalid,
+    failure,
+    blockedFeedback,
+    inspection,
+    draft,
+    hasInspector: Boolean(onInspectName),
+  })
 
   return {
     draft, setDraft, dirty, invalid, savingName, saveName,
