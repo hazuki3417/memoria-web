@@ -2,10 +2,10 @@
 
 import { Button } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
-import type { CommunityNameSectionProps } from "./CommunityNameSection"
+import type { useCommunityNameSettings } from "./useCommunityNameSettings"
 
 type Props = Pick<
-  CommunityNameSectionProps,
+  ReturnType<typeof useCommunityNameSettings>,
   | "saveFeedback"
   | "unknown"
   | "inspection"
