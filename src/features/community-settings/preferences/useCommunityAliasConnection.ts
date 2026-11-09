@@ -26,7 +26,7 @@ export function useCommunityAliasConnection(communityId: string) {
     return current.data.community.mySettings.alias
   }
 
-  const saveAlias = async (alias: string) => {
+  const saveAlias = async (alias: string | null) => {
     const result = await save({
       fetchPolicy: "no-cache",
       errorPolicy: "all",

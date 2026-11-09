@@ -1,6 +1,7 @@
 "use client"
 
 import { useCurrentUserQuery } from "@/infrastructure/graphql/generated"
+import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { usePersonalPreferencesSession } from "./preferences/PersonalPreferencesSessionContext"
 import { resolvePersonalAccent } from "./preferences/personalAccentPreview"
 
@@ -12,7 +13,7 @@ export function usePersonalSettingsReadState() {
     data?.me?.preferences.personalAccentColor,
     personalSession,
   )
-  const loadState = !data?.me ? (loading ? "loading" : "error") : "ready"
+  const loadState: PageStatus = !data?.me ? (loading ? "loading" : "error") : "ready"
 
   return { data, error, personalAccentColor, loadState }
 }

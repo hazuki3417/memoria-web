@@ -4,6 +4,7 @@ import { useCommunity } from "@/features/community/CommunityProvider"
 import { useCommunitySettingsMembership } from "./useCommunitySettingsMembership"
 import { useCommunitySettingsRefreshError } from "./useCommunitySettingsRefreshError"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
+import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
 
 /** Owns Community Settings read state and the membership-loss guard. */
 export function useCommunitySettingsData(communityId: string, section: CommunitySettingsSection) {
@@ -23,7 +24,7 @@ export function useCommunitySettingsData(communityId: string, section: Community
     ),
   )
 
-  const loadState = hasRequiredData
+  const loadState: PageStatus = hasRequiredData
     ? "ready"
     : loadError || (requiresMembers && membersError)
       ? "error"
