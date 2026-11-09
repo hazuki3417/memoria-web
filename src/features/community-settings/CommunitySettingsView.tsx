@@ -1,11 +1,11 @@
 "use client"
 
-import type { ComponentProps, ReactNode } from "react"
+import type { ReactNode } from "react"
 import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
-import { CommunitySettingsContent } from "./CommunitySettingsContent"
+import { CommunitySettingsContent, type CommunitySettingsContentProps } from "./CommunitySettingsContent"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
 
-type CommunitySettingsViewProps = ComponentProps<typeof CommunitySettingsContent> & {
+export type CommunitySettingsViewProps = CommunitySettingsContentProps & {
   contentOverride?: ReactNode
   accentColor?: string
   onSectionChange: (section: CommunitySettingsSection, href: string) => void
