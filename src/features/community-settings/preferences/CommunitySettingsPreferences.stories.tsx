@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { CommunitySettingsStoryNavigation } from "../CommunitySettingsStoryNavigation"
+import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 
 const meta = {
   title: "Features/Community Settings/Preferences",
