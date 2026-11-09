@@ -1,9 +1,9 @@
 "use client"
 
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
-import { useCommunitySettingsActions } from "../useCommunitySettingsActions"
-import { useCommunitySettingsData } from "../useCommunitySettingsData"
-import { useCommunityNameInspection } from "../general/useCommunityNameInspection"
+import { useCommunitySettingsActions } from "./useCommunitySettingsActions"
+import { useCommunitySettingsData } from "./useCommunitySettingsData"
+import { useCommunityNameInspection } from "./useCommunityNameInspection"
 import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
