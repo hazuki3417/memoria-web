@@ -8,20 +8,20 @@ import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
-import {
-  CommunitySettings,
-  type CommunitySettingsSection,
-} from "../CommunitySettings"
+import { CommunitySettings } from "../CommunitySettings"
+import type { CommunitySettingsSection } from "../communitySettingsSections"
+
+export type CommunitySettingsRouteProps = {
+  communityId: string
+  section?: CommunitySettingsSection
+  usageContent?: ReactNode
+}
 
 export function CommunitySettingsRoute({
   communityId,
   section = "general",
   usageContent,
-}: {
-  communityId: string
-  section?: CommunitySettingsSection
-  usageContent?: ReactNode
-}) {
+}: CommunitySettingsRouteProps) {
   const router = useRouter()
   const onInspectName = useCommunityNameInspection(communityId)
   const { communityAccentColor, membershipLost, name, members, loadState } =
