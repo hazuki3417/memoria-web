@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { CommunitySettingsView } from "@/features/community-settings/CommunitySettingsView"
-import { CommunitySettingsStoryNavigation } from "@/features/community-settings/CommunitySettingsStoryNavigation"
+import { CommunitySettingsStoryNavigation } from "@/features/community-settings/storybook/CommunitySettingsStoryNavigation"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
