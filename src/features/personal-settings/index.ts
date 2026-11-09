@@ -1,4 +1,5 @@
 export { PersonalSettings } from "./PersonalSettings"
+export { PersonalSettingsRoute } from "./PersonalSettingsRoute"
 export { ConnectedPersonalSettings } from "./ConnectedPersonalSettings"
 export { ConnectedPersonalSettingsSection } from "./ConnectedPersonalSettingsSection"
 export { PersonalSettingsLayout } from "./PersonalSettingsLayout"
