@@ -8,11 +8,28 @@ import { useCommunityNameInspection } from "./useCommunityNameInspection"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { renderCommunitySettingsSection } from "../communitySettingsSectionContent"
+import type { ReactNode } from "react"
+import { CommunityGeneral } from "../general/CommunityGeneral"
+import { CommunityMembers } from "../members"
+import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
 } from "../communitySettingsSections"
+
+// Production Invitation API is not connected. Preview actions remain unavailable.
+const unavailableInvitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available"> = {
+  active: false,
+  invitation: "none",
+  invitationUrl: "",
+  expiresAt: "",
+  busy: false,
+  issue: () => undefined,
+  copyInvitation: async () => undefined,
+  confirm: null,
+  setConfirm: () => undefined,
+  changeInvitation: () => undefined,
+}
 
 export type CommunitySettingsRouteProps = {
   communityId: string
@@ -37,22 +54,37 @@ export function CommunitySettingsRoute({
       </LoadingBoundary>
     )
 
-  const content = renderCommunitySettingsSection({
-    section,
-    communityId,
-    invitationMode: "unavailable",
-    communityName: name ?? undefined,
-    members: members ?? undefined,
-    role: members?.find((member) => member.isSelf)?.role ?? "member",
-    usageContent: section === "usage" ? <ConnectedCommunityUsage communityId={communityId} /> : undefined,
-    preferencesContent: section === "preferences" ? <ConnectedCommunityPreferences communityId={communityId} /> : undefined,
-    onRemoveMember,
-    onLeaveCommunity,
-    onLeaveSuccess: () => router.push("/dashboard"),
-    onChangeMemberRole,
-    onSaveName,
-    onInspectName,
-  })
+  let content: ReactNode
+  switch (section) {
+    case "general":
+      content = (
+        <CommunityGeneral
+          name={{ communityName: name ?? undefined, onSaveName, onInspectName }}
+          invitation={unavailableInvitation}
+          invitationAvailable={false}
+          communityId={communityId}
+          isAdmin={members?.find((member) => member.isSelf)?.role === "admin"}
+        />
+      )
+      break
+    case "members":
+      content = (
+        <CommunityMembers
+          members={members ?? undefined}
+          onChangeRole={onChangeMemberRole}
+          onRemoveMember={onRemoveMember}
+          onLeave={onLeaveCommunity}
+          onLeaveSuccess={() => router.push("/dashboard")}
+        />
+      )
+      break
+    case "usage":
+      content = <ConnectedCommunityUsage communityId={communityId} />
+      break
+    case "preferences":
+      content = <ConnectedCommunityPreferences communityId={communityId} />
+      break
+  }
 
   return (
     <CommunitySettingsView

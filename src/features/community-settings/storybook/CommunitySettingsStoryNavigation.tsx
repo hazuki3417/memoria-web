@@ -3,13 +3,35 @@
 import { useState } from "react"
 import { showNotification } from "@/components/Feedback"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { renderCommunitySettingsSection, type CommunitySettingsSectionProps } from "../communitySettingsSectionContent"
+import type { ReactNode } from "react"
+import { CommunityGeneral } from "../general/CommunityGeneral"
+import { CommunityMembers } from "../members"
+import type { CommunityMember } from "../members"
+import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
 import { CommunityPreferences } from "../preferences/CommunityPreferences"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
 
 
-export type CommunitySettingsStoryProps = CommunitySettingsSectionProps & {
+type Role = "admin" | "member"
+type InvitationModel = Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
+
+export type CommunitySettingsStoryProps = {
+  role?: Role
+  communityId?: string
+  section?: CommunitySettingsSection
+  communityName?: string
+  onSaveName?: (name: string) => Promise<string>
+  onInspectName?: () => Promise<string>
+  members?: CommunityMember[]
+  onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
+  onRemoveMember?: (userId: string) => Promise<boolean>
+  onLeaveCommunity?: () => Promise<void>
+  onLeaveSuccess?: () => void
+  usageContent?: ReactNode
+  preferencesContent?: ReactNode
+  invitationMode?: "preview" | "unavailable"
+  invitation?: InvitationModel
   communityAccentColor?: string
   loadState?: PageStatus
   onSectionChange: (section: CommunitySettingsSection) => void
@@ -114,15 +136,43 @@ export function CommunitySettingsStoryNavigation({
   const simulatedInvitation = useCommunityStoryInvitation(props.communityId ?? "photo-club", invitationMode === "preview")
 
   const communityId = props.communityId ?? "photo-club"
-  const content = renderCommunitySettingsSection({
-    ...props,
-    communityId,
-    section: currentSection,
-    invitationMode,
-    invitation: suppliedInvitation ?? simulatedInvitation,
-    preferencesContent:
-      preferencesContent ?? <CommunityPreferences accent={accent} setAccent={setAccent} />,
-  })
+  const invitation = suppliedInvitation ?? simulatedInvitation
+  const isAdmin = (props.role ?? "admin") === "admin"
+  let content: ReactNode
+  switch (currentSection) {
+    case "general":
+      content = (
+        <CommunityGeneral
+          name={{
+            communityName: props.communityName,
+            onSaveName: props.onSaveName,
+            onInspectName: props.onInspectName,
+          }}
+          invitation={invitation}
+          invitationAvailable={invitationMode === "preview"}
+          communityId={communityId}
+          isAdmin={isAdmin}
+        />
+      )
+      break
+    case "members":
+      content = (
+        <CommunityMembers
+          members={props.members}
+          onChangeRole={props.onChangeMemberRole}
+          onRemoveMember={props.onRemoveMember}
+          onLeave={props.onLeaveCommunity}
+          onLeaveSuccess={props.onLeaveSuccess}
+        />
+      )
+      break
+    case "usage":
+      content = <>{props.usageContent}</>
+      break
+    case "preferences":
+      content = <>{preferencesContent ?? <CommunityPreferences accent={accent} setAccent={setAccent} />}</>
+      break
+  }
 
   return (
     <CommunitySettingsView
