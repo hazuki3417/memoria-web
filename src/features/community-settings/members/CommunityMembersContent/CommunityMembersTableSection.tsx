@@ -5,7 +5,7 @@ import { IconDots, IconSearch } from "@tabler/icons-react"
 import { SectionHeader } from "@/components/SectionHeader"
 import { UsageSortHeader } from "@/features/usage/UsageSortHeader"
 import type { CommunityMember } from "@/features/community/CommunityProvider"
-import { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "./useCommunityMembersState"
+import { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "./communityMemberLimits"
 import type { useCommunityMembersState, CommunityMembersActions } from "./useCommunityMembersState"
 
 type MembersState = ReturnType<typeof useCommunityMembersState>
