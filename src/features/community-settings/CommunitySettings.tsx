@@ -6,7 +6,6 @@ import { CommunitySettingsView } from "./CommunitySettingsView"
 import { useCommunityNameSettings } from "./general/useCommunityNameSettings"
 import { useCommunityInvitation } from "./general/useCommunityInvitation"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
-import { useCommunitySettingsSectionNavigation } from "./useCommunitySettingsSectionNavigation"
 
 export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
@@ -15,7 +14,7 @@ export function CommunitySettings({
   role = "admin",
   communityId = "photo-club",
   section = "general",
-  onNavigate,
+  onSectionChange,
   communityName,
   onSaveName,
   onInspectName,
@@ -33,7 +32,7 @@ export function CommunitySettings({
   role?: Role
   communityId?: string
   section?: CommunitySettingsSection
-  onNavigate?: (href: string) => void
+  onSectionChange: (section: CommunitySettingsSection, href: string) => void
   communityName?: string
   onSaveName?: (name: string) => Promise<string>
   onInspectName?: () => Promise<string>
@@ -49,19 +48,16 @@ export function CommunitySettings({
   communityAccentColor?: string
   invitationMode?: "preview" | "unavailable"
 }) {
-  const { currentSection, onSectionChange } =
-    useCommunitySettingsSectionNavigation({ section, onNavigate })
   const isAdmin = role === "admin"
   const [accent, setAccent] = useState("#7950f2")
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
-  // URL-controlled consumers must not silently opt into the Preview simulation.
-  const previewInvitation =
-    invitationMode === "preview" || (invitationMode === undefined && !onNavigate)
+  // Preview behavior is explicit; navigation strategy is supplied by the consumer.
+  const previewInvitation = invitationMode === "preview"
   const invitation = useCommunityInvitation(communityId, previewInvitation)
 
   return (
     <CommunitySettingsView
-      section={currentSection}
+      section={section}
       communityId={communityId}
       isAdmin={isAdmin}
       name={name}

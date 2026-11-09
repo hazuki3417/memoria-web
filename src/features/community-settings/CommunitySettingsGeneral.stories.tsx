@@ -3,12 +3,16 @@ import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunitySettings } from "./CommunitySettings"
+import { CommunitySettingsStoryNavigation } from "./CommunitySettingsStoryNavigation"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
   title: "Features/Community Settings/Settings",
   component: CommunitySettings,
+  render: (args) => <CommunitySettingsStoryNavigation {...args} />,
   args: {
+    onSectionChange: () => undefined,
+    invitationMode: "preview",
     communityId: "photo-club",
     communityName: "家族のアルバム",
     role: "admin",
@@ -182,7 +186,7 @@ function CommunityNameRefreshFixture(
       <Button onClick={() => setName("サーバー更新後のCommunity名")}>
         サーバー再取得を再現
       </Button>
-      <CommunitySettings {...args} communityName={name} />
+      <CommunitySettingsStoryNavigation {...args} communityName={name} />
     </>
   )
 }
@@ -230,7 +234,7 @@ function CommunityNamePendingSaveFixture(
       <Button onClick={() => resolveSave.current?.("最初の変更")}>
         保存応答を再現
       </Button>
-      <CommunitySettings
+      <CommunitySettingsStoryNavigation
         {...args}
         onSaveName={() =>
           new Promise<string>((resolve) => {
@@ -413,7 +417,7 @@ function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettings>) 
       >
         Communityを切り替える
       </Button>
-      <CommunitySettings
+      <CommunitySettingsStoryNavigation
         {...args}
         key={communityId}
         communityId={communityId}
@@ -487,7 +491,7 @@ function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettin
       <Button onClick={() => setRole((current) => current === "admin" ? "member" : "admin")}>
         Roleを切り替える
       </Button>
-      <CommunitySettings {...args} role={role} />
+      <CommunitySettingsStoryNavigation {...args} role={role} />
     </>
   )
 }
@@ -529,7 +533,7 @@ export const InvitationProductionUnavailable: Story = {
 export const InvitationUrlControlledUnavailable: Story = {
   name: "Interaction · URL制御ではInvitationデモが既定で無効",
   tags: ["interaction"],
-  args: { onNavigate: fn() },
+  args: { invitationMode: "unavailable" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText("招待URLの管理機能は現在利用できません。")).toBeVisible()

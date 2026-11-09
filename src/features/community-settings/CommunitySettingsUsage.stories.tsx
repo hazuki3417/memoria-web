@@ -4,11 +4,15 @@ import { expect, within } from "storybook/test"
 import { Usage as UsageComponent } from "@/features/usage"
 import { sampleUsage, zeroUsage } from "@/features/usage/usageStoryFixtures"
 import { CommunitySettings } from "./CommunitySettings"
+import { CommunitySettingsStoryNavigation } from "./CommunitySettingsStoryNavigation"
 
 const meta = {
   title: "Features/Community Settings/Usage",
   component: CommunitySettings,
+  render: (args) => <CommunitySettingsStoryNavigation {...args} />,
   args: {
+    onSectionChange: () => undefined,
+    invitationMode: "preview",
     communityId: "photo-club",
     communityName: "家族のアルバム",
     role: "admin",

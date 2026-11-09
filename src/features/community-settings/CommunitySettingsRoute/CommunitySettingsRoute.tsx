@@ -66,7 +66,7 @@ export function CommunitySettingsRoute({
       onLeaveCommunity={onLeaveCommunity}
       onLeaveSuccess={() => router.push("/dashboard")}
       onChangeMemberRole={onChangeMemberRole}
-      onNavigate={(href) => router.push(href)}
+      onSectionChange={(_section, href) => router.push(href)}
       onSaveName={onSaveName}
       onInspectName={onInspectName}
     />
