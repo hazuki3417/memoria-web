@@ -8,7 +8,7 @@ import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphq
 import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
 import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
 import { usePersonalSettingsReadState } from "../usePersonalSettingsReadState"
-import { useSettingsRefreshError } from "../useSettingsRefreshError"
+import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 type EditableSection = Extract<PersonalSettingsSection, "profile" | "preferences">
 type ReadOnlySection = Extract<PersonalSettingsSection, "account" | "usage">
@@ -35,7 +35,7 @@ function EditablePersonalSettingsConnection({ section }: { section: EditableSect
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
   const { inspectProfile, inspectPreferences } = usePersonalSettingsInspection()
-  useSettingsRefreshError(Boolean(data?.me && error))
+  usePersonalSettingsRefreshError(Boolean(data?.me && error))
   const { saveProfile, savePreferences } = usePersonalSettingsActions()
   const preferences = data?.me
     ? fromGraphqlUserPreferences(data.me.preferences)
@@ -73,7 +73,7 @@ function ReadOnlyPersonalSettingsConnection({
 }) {
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
-  useSettingsRefreshError(Boolean(data?.me && error))
+  usePersonalSettingsRefreshError(Boolean(data?.me && error))
   const accountContent =
     section === "account" && loadState !== "ready" ? (
       <PageStatusBoundary state={loadState} label="Personal設定を読み込み中">
