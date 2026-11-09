@@ -8,7 +8,7 @@ import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
-import { CommunitySettings } from "../CommunitySettings"
+import { CommunitySettingsView } from "../CommunitySettingsView"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 
 export type CommunitySettingsRouteProps = {
@@ -37,7 +37,7 @@ export function CommunitySettingsRoute({
     )
 
   return (
-    <CommunitySettings
+    <CommunitySettingsView
       key={communityId}
       communityId={communityId}
       invitationMode="unavailable"
