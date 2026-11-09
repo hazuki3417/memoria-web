@@ -7,7 +7,7 @@ import type { useCommunityMembersState } from "./useCommunityMembersState"
 type MembersState = ReturnType<typeof useCommunityMembersState>
 
 /** Leave confirmation and its completion/error UI. */
-export function CommunityLeaveDialog({
+export function CommunityLeaveModal({
   state, onLeave,
 }: { state: MembersState } & Pick<CommunityMembersActions, "onLeave">) {
   const { opened, busy, error, blocked, close, leave } = state

@@ -7,7 +7,7 @@ import type { useCommunityMembersState } from "./useCommunityMembersState"
 type MembersState = ReturnType<typeof useCommunityMembersState>
 
 /** Role change confirmation and last-admin capacity guidance. */
-export function CommunityMemberRoleDialog({
+export function CommunityMemberRoleModal({
   state, onChangeRole,
 }: { state: MembersState } & Pick<CommunityMembersActions, "onChangeRole">) {
   const {

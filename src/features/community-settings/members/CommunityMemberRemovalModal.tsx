@@ -6,7 +6,7 @@ import type { useCommunityMembersState } from "./useCommunityMembersState"
 type MembersState = ReturnType<typeof useCommunityMembersState>
 
 /** Removal confirmation and result-unknown warning. */
-export function CommunityMemberRemovalDialog({ state }: { state: MembersState }) {
+export function CommunityMemberRemovalModal({ state }: { state: MembersState }) {
   const {
     removeTarget, setRemoveTarget, removeBusy, removeError, setRemoveError,
     confirmRemoval,

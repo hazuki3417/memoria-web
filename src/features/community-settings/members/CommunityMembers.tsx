@@ -3,9 +3,9 @@
 import { Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import type { CommunityMember } from "@/features/community/CommunityProvider"
-import { CommunityMemberRemovalDialog } from "./CommunityMemberRemovalDialog"
-import { CommunityMemberRoleDialog } from "./CommunityMemberRoleDialog"
-import { CommunityLeaveDialog } from "./CommunityLeaveDialog"
+import { CommunityMemberRemovalModal } from "./CommunityMemberRemovalModal"
+import { CommunityMemberRoleModal } from "./CommunityMemberRoleModal"
+import { CommunityLeaveModal } from "./CommunityLeaveModal"
 import { CommunityMembersTableSection } from "./CommunityMembersTableSection"
 import { CommunityLeaveSection } from "./CommunityLeaveSection"
 import {
@@ -45,9 +45,9 @@ export function CommunityMembers({
         onRemoveMember={onRemoveMember}
       />
       <CommunityLeaveSection state={state} onLeave={onLeave} />
-      <CommunityMemberRemovalDialog state={state} />
-      <CommunityMemberRoleDialog state={state} onChangeRole={onChangeRole} />
-      <CommunityLeaveDialog state={state} onLeave={onLeave} />
+      <CommunityMemberRemovalModal state={state} />
+      <CommunityMemberRoleModal state={state} onChangeRole={onChangeRole} />
+      <CommunityLeaveModal state={state} onLeave={onLeave} />
     </Stack>
   )
 }
