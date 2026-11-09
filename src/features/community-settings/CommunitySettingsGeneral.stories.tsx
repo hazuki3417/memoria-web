@@ -542,9 +542,9 @@ export const InvitationUrlControlledUnavailable: Story = {
   },
 }
 
-/** Community名のForm OwnerはSection遷移でunmountされない。 */
+/** Story IDは維持し、Generalを離れるとDraftが破棄される契約を検証する。 */
 export const NameDraftSurvivesNavigation: Story = {
-  name: "Interaction · Section切替でもCommunity名のDraftを保持",
+  name: "Interaction · Section切替でCommunity名のDraftを破棄",
   tags: ["interaction"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -557,14 +557,14 @@ export const NameDraftSurvivesNavigation: Story = {
     await userEvent.click(navigation.getByText("メンバー"))
     await expect(canvas.queryByRole("textbox", { name: /Community名/ })).not.toBeInTheDocument()
     await userEvent.click(navigation.getByText("一般"))
-    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue("編集中のCommunity名")
-    await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
+    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue("家族のアルバム")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
 
-/** 結果不明をSection遷移で消して再送可能にしてはならない。 */
+/** 保存結果不明の表示もGeneral離脱で破棄し、戻った際はサーバー由来の値から開始する。 */
 export const NameUnknownSurvivesNavigation: Story = {
-  name: "Interaction · Section切替でも保存結果不明を保持",
+  name: "Interaction · Section切替でCommunity名の未確定状態を破棄",
   tags: ["interaction"],
   args: { onSaveName: fn(async () => { throw new Error("timeout") }) },
   play: async ({ canvasElement, args }) => {
@@ -578,8 +578,8 @@ export const NameUnknownSurvivesNavigation: Story = {
     const navigation = within(canvas.getByRole("navigation", { name: "Community設定" }))
     await userEvent.click(navigation.getByText("メンバー"))
     await userEvent.click(navigation.getByText("一般"))
-    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue("未確定のCommunity名")
-    await expect(canvas.getByText("保存結果を確認できませんでした")).toBeVisible()
+    await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue("家族のアルバム")
+    await expect(canvas.queryByText("保存結果を確認できませんでした")).not.toBeInTheDocument()
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
     await expect(args.onSaveName).toHaveBeenCalledTimes(1)
   },
