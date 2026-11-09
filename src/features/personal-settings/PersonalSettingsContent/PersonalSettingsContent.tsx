@@ -7,7 +7,7 @@ import type { ReactNode } from "react"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { PersonalProfile, type InspectProfile, type SaveProfile } from "../profile"
 import { PersonalPreferences } from "../preferences"
-import { PersonalAccount } from "../account/PersonalAccount"
+import { PersonalAccount } from "../account"
 import type {
   UserPreferences,
   UserPreferencesPatch,
