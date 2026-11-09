@@ -2,7 +2,7 @@
 
 import { PersonalSettingsRoute } from "../PersonalSettingsRoute"
 
-/** Compatibility entry; new production pages use PersonalSettingsRoute directly. */
+/** 既存Consumer向けの互換入口。Production PageはPersonalSettingsRouteを直接利用する。 */
 export function ConnectedPersonalSettings({
   section,
 }: {
