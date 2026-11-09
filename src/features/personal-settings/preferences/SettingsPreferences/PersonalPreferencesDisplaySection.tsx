@@ -4,7 +4,7 @@ import { Box, ColorInput, Select, Stack, useMantineColorScheme } from "@mantine/
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import type { UserPreferences } from "../userPreferences"
-import type { useUserPreferences } from "../useUserPreferences"
+import type { useUserPreferences } from "./useUserPreferences"
 type PreferencesModel = ReturnType<typeof useUserPreferences>
 
 /** Shows personal appearance and formatting preferences without owning saves. */
