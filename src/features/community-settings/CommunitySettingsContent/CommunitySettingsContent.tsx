@@ -8,7 +8,7 @@ import {
 } from "../members/CommunityMembersContent"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { useCommunityNameSettings } from "../general/useCommunityNameSettings"
-import type { useCommunityInvitation } from "../general/useCommunityInvitation"
+import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
 
 type Role = "admin" | "member"
 
@@ -31,7 +31,7 @@ export function CommunitySettingsContent({
   communityId: string
   isAdmin: boolean
   name: ReturnType<typeof useCommunityNameSettings>
-  invitation: ReturnType<typeof useCommunityInvitation>
+  invitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
   invitationAvailable: boolean
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>

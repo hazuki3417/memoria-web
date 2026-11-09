@@ -8,6 +8,7 @@ type NavigationProps = {
   section?: CommunitySettingsSection
   onSectionChange: (section: CommunitySettingsSection, href: string) => void
   preferencesContent?: unknown
+  invitation?: { invitationUrl: string }
 }
 
 let rendered: NavigationProps
@@ -56,5 +57,6 @@ describe("Community Settings Storybook Navigation Adapter", () => {
     )
     expect(rendered.section).toBe("preferences")
     expect(rendered.preferencesContent).toBeTruthy()
+    expect(rendered.invitation?.invitationUrl).toContain("photo-club-demo-")
   })
 })

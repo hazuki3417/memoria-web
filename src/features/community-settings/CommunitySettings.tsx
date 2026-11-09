@@ -4,11 +4,26 @@ import type { ReactNode } from "react"
 import type { CommunityMember } from "./members/CommunityMembersContent"
 import { CommunitySettingsView } from "./CommunitySettingsView"
 import { useCommunityNameSettings } from "./general/useCommunityNameSettings"
-import { useCommunityInvitation } from "./general/useCommunityInvitation"
+import type { CommunityInvitationSectionProps } from "./general/CommunityInvitationSection"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
 
 export type { CommunitySettingsSection } from "./communitySettingsSections"
 type Role = "admin" | "member"
+type InvitationModel = Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
+
+// The production Invitation API is not connected; no Preview action is available by default.
+const unavailableInvitation: InvitationModel = {
+  active: false,
+  invitation: "none",
+  invitationUrl: "",
+  expiresAt: "",
+  busy: false,
+  issue: () => undefined,
+  copyInvitation: async () => undefined,
+  confirm: null,
+  setConfirm: () => undefined,
+  changeInvitation: () => undefined,
+}
 
 export function CommunitySettings({
   role = "admin",
@@ -28,6 +43,7 @@ export function CommunitySettings({
   contentOverride,
   communityAccentColor,
   invitationMode,
+  invitation,
 }: {
   role?: Role
   communityId?: string
@@ -47,12 +63,12 @@ export function CommunitySettings({
   contentOverride?: ReactNode
   communityAccentColor?: string
   invitationMode?: "preview" | "unavailable"
+  invitation?: InvitationModel
 }) {
   const isAdmin = role === "admin"
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
-  // Preview behavior is explicit; navigation strategy is supplied by the consumer.
-  const previewInvitation = invitationMode === "preview"
-  const invitation = useCommunityInvitation(communityId, previewInvitation)
+  // The consumer owns Invitation state; production never runs the Storybook simulation.
+  const invitationAvailable = invitationMode === "preview" && invitation !== undefined
 
   return (
     <CommunitySettingsView
@@ -60,8 +76,8 @@ export function CommunitySettings({
       communityId={communityId}
       isAdmin={isAdmin}
       name={name}
-      invitation={invitation}
-      invitationAvailable={previewInvitation}
+      invitation={invitation ?? unavailableInvitation}
+      invitationAvailable={invitationAvailable}
       members={members}
       onChangeMemberRole={onChangeMemberRole}
       onRemoveMember={onRemoveMember}
