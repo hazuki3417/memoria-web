@@ -6,8 +6,7 @@ import { useCommunityRoleChangeState } from "./useCommunityRoleChangeState"
 import { useCommunityMemberRemovalState } from "./useCommunityMemberRemovalState"
 import type { CommunityMember } from "@/features/community/CommunityProvider"
 
-export const COMMUNITY_MEMBER_LIMIT = 30
-export const COMMUNITY_ADMIN_LIMIT = 3
+import { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "./communityMemberLimits"
 
 export type CommunityMembersActions = {
   onLeave?: () => Promise<void>
