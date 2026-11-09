@@ -5,6 +5,7 @@ import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBo
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
+import { useCommunityAliasConnection } from "../useCommunityAliasConnection"
 import { CommunityAccentSaveFeedback } from "./CommunityAccentSaveFeedback"
 
 export function ConnectedCommunityPreferences({
@@ -12,8 +13,9 @@ export function ConnectedCommunityPreferences({
 }: {
   communityId: string
 }) {
-  const { data, loading, snapshot, controller, inspectAlias, saveAlias, canResave } =
+  const { data, loading, snapshot, controller, canResave } =
     useCommunityPreferencesConnection(communityId)
+  const { inspectAlias, saveAlias } = useCommunityAliasConnection(communityId)
 
   if (!data?.community) {
     return (

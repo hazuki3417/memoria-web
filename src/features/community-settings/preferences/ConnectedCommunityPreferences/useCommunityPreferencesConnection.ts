@@ -8,7 +8,6 @@ import {
 } from "@/features/application-shell/CommunityAccentPreviewContext"
 import { useCommunitySettingsRefreshError } from "../../useCommunitySettingsRefreshError"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
-import { useCommunityAliasConnection } from "../useCommunityAliasConnection"
 import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
 import {
   CommunityMySettingsDocument,
@@ -30,7 +29,6 @@ export function useCommunityPreferencesConnection(communityId: string) {
   const client = useApolloClient()
   const { setPreview, clearPreview } = useCommunityAccentPreview()
   const { snapshot, controller } = useCommunityAccentSave(communityId)
-  const { inspectAlias, saveAlias } = useCommunityAliasConnection(communityId)
 
   useEffect(() => {
     const color = data?.community?.mySettings.accentColor
@@ -87,5 +85,5 @@ export function useCommunityPreferencesConnection(communityId: string) {
   })
 
   const canResave = Boolean(snapshot.draft && isHex(snapshot.draft))
-  return { data, loading, snapshot, controller, inspectAlias, saveAlias, canResave }
+  return { data, loading, snapshot, controller, canResave }
 }
