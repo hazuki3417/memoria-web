@@ -1,5 +1,6 @@
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { expect, userEvent, within } from "storybook/test"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
 import {
@@ -60,6 +61,16 @@ export const ReadyCompact: Story = {
   name: "Visual · Ready（Compact）",
   tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+
+export const Loading: Story = {
+  name: "Visual · Loading Table",
+  tags: ["visual"],
+  render: () => (
+    <PageStatusBoundary state="loading" label="利用状況を読み込み中">
+      {null}
+    </PageStatusBoundary>
+  ),
 }
 
 export const Empty: Story = {
@@ -127,3 +138,19 @@ export const SortInteraction: Story = {
   },
 }
 
+export const LoadingContract: Story = {
+  name: "Interaction · Loading時の操作不可",
+  tags: ["interaction"],
+  render: () => (
+    <PageStatusBoundary state="loading" label="利用状況を読み込み中">
+      {null}
+    </PageStatusBoundary>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(
+      await canvas.findByRole("status", { name: "利用状況を読み込み中" }),
+    ).toBeVisible()
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
+  },
+}

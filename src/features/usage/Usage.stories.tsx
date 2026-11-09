@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { Button, Group } from "@mantine/core"
+import { Button, Center, Group } from "@mantine/core"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { Usage } from "./Usage"
@@ -30,6 +31,36 @@ function UnitPreferenceStory() {
     </>
   )
 }
+
+// Usage自体はReady表示専用。旧Story IDは共通状態表示の契約として継続検証する。
+function UsageStatusStory({
+  state,
+  onRetry,
+}: {
+  state: "loading" | "error"
+  onRetry?: () => void
+}) {
+  return (
+    <>
+      <PageStatusBoundary
+        state={state}
+        label="利用状況を読み込み中"
+        errorTitle={onRetry ? "利用状況を取得できませんでした" : undefined}
+      >
+        {null}
+      </PageStatusBoundary>
+      {state === "error" && onRetry && (
+        <Center>
+          <Button variant="light" onClick={onRetry}>
+            再試行
+          </Button>
+        </Center>
+      )}
+    </>
+  )
+}
+
+const retryAction = fn()
 
 const limitReachedUsage = {
   usedBytes: 5_000_000_000,
@@ -64,19 +95,19 @@ export const VrtEmpty: Story = {
 export const VrtLoading: Story = {
   name: "Visual · Loading",
   tags: ["visual"],
-  args: { status: "loading" },
+  render: () => <UsageStatusStory state="loading" />,
 }
 
 export const VrtError: Story = {
   name: "Visual · 取得失敗",
   tags: ["visual", "vrt"],
-  args: { status: "error" },
+  render: () => <UsageStatusStory state="error" />,
 }
 
 export const VrtErrorWithRetry: Story = {
   name: "Visual · 再試行可能な取得失敗",
   tags: ["visual"],
-  args: { status: "error", onRetry: () => undefined },
+  render: () => <UsageStatusStory state="error" onRetry={() => undefined} />,
 }
 
 export const VrtLimit: Story = {
@@ -298,7 +329,7 @@ export const UnitPreferenceChangeContract: Story = {
 export const LoadingContract: Story = {
   name: "Interaction · 共通Loader（未確定値を隠す）",
   tags: ["interaction"],
-  args: { status: "loading" },
+  render: () => <UsageStatusStory state="loading" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(
@@ -421,12 +452,13 @@ export const DisplayModeLifetimeContract: Story = {
 export const ErrorRetryUiContract: Story = {
   name: "Interaction · 再試行ボタンの通知",
   tags: ["interaction"],
-  args: { status: "error", onRetry: fn() },
-  play: async ({ canvasElement, args }) => {
+  render: () => <UsageStatusStory state="error" onRetry={retryAction} />,
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("alert")).toBeVisible()
+    retryAction.mockClear()
     await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
-    await expect(args.onRetry).toHaveBeenCalledTimes(1)
+    await expect(retryAction).toHaveBeenCalledTimes(1)
   },
 }
 
@@ -522,7 +554,7 @@ export const KeyboardDisplayModeContract: Story = {
 export const CommunityErrorContract: Story = {
   name: "Interaction · Community取得エラー",
   tags: ["interaction"],
-  args: { scope: "community", status: "error" },
+  render: () => <UsageStatusStory state="error" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("alert")).toBeVisible()

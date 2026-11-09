@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { expect, within } from "storybook/test"
 import { UsageStorageSection } from "./UsageStorageSection"
 import { sampleUsage, zeroUsage } from "../usageStoryFixtures"
@@ -36,6 +37,16 @@ export const ReadyCompact: Story = {
   name: "Visual · Ready（Compact）",
   tags: ["visual"],
   parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+
+export const Loading: Story = {
+  name: "Visual · Loading",
+  tags: ["visual"],
+  render: () => (
+    <PageStatusBoundary state="loading" label="利用状況を読み込み中">
+      {null}
+    </PageStatusBoundary>
+  ),
 }
 
 export const Empty: Story = {
