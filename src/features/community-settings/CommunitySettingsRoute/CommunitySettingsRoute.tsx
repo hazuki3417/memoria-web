@@ -68,8 +68,6 @@ export function CommunitySettingsRoute({
         )
         if (target) router.push(target.href)
       }}
-      onSaveName={onSaveName}
-      onInspectName={onInspectName}
     />
   )
 }
