@@ -142,7 +142,7 @@ export const LoadingContract: Story = {
   name: "Interaction · Loading時の操作不可",
   tags: ["interaction"],
   render: () => (
-    <PageStatusBoundary state="loading" label="利用状況を読み込み中">
+    <SettingsContentStatus state="loading" label="利用状況を読み込み中">
       {null}
     </SettingsContentStatus>
   ),
