@@ -38,7 +38,6 @@ export type CommunitySettingsProps = {
   onRemoveMember?: (userId: string) => Promise<boolean>
   onLeaveCommunity?: () => Promise<void>
   onLeaveSuccess?: () => void
-  fileSizeUnit?: "DECIMAL" | "BINARY"
   usageContent?: ReactNode
   preferencesContent?: ReactNode
   contentOverride?: ReactNode
