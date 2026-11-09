@@ -37,7 +37,6 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
   return (
     <AccountUsageConnection
       section={props.section}
-      usageContent={props.section === "usage" ? <ConnectedPersonalUsage /> : undefined}
       onSectionChange={onSectionChange}
     />
   )
@@ -80,11 +79,9 @@ function ProfilePreferencesConnection({
 /** AccountはCurrentUser状態を参照し、Usage固有の取得・LoadingはSection側が所有する。 */
 function AccountUsageConnection({
   section,
-  usageContent,
   onSectionChange,
 }: {
   section: AccountUsageSection
-  usageContent?: ReactNode
   onSectionChange: (section: PersonalSettingsSection) => void
 }) {
   const { data, error, personalAccentColor, loadState } =
@@ -94,7 +91,7 @@ function AccountUsageConnection({
     <PersonalSettingsView
       section={section}
       onSectionChange={onSectionChange}
-      usageContent={usageContent}
+      usageContent={section === "usage" ? <ConnectedPersonalUsage /> : undefined}
       loadState={section === "account" ? loadState : "ready"}
       personalAccentColor={personalAccentColor}
     />
