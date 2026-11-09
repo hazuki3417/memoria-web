@@ -5,7 +5,7 @@ import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBo
 import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
 import { CommunityAliasControl } from "../CommunityAliasControl"
 import { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
-import { useCommunityAliasConnection } from "../useCommunityAliasConnection"
+import { useCommunityAliasConnection } from "./useCommunityAliasConnection"
 import { CommunityAccentSaveFeedback } from "./CommunityAccentSaveFeedback"
 
 export function ConnectedCommunityPreferences({
