@@ -3,12 +3,13 @@ import { Notifications, notifications } from "@mantine/notifications"
 import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
-import { SettingsProfile } from "./SettingsProfile"
+import { PersonalProfile } from "./PersonalProfile"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
+  // Keep the existing Story IDs until a separately agreed catalog migration.
   title: "features/settings/profile/SettingsProfile",
-  component: SettingsProfile,
+  component: PersonalProfile,
   args: {
     initialNickname: "テストユーザー",
     onSave: fn(async () => undefined),
@@ -20,7 +21,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof SettingsProfile>
+} satisfies Meta<typeof PersonalProfile>
 export default meta
 type Story = StoryObj<typeof meta>
 
@@ -51,14 +52,14 @@ export const InitiallyRetryable: Story = {
   },
 }
 
-function ProfileRefreshFixture(args: ComponentProps<typeof SettingsProfile>) {
+function ProfileRefreshFixture(args: ComponentProps<typeof PersonalProfile>) {
   const [nickname, setNickname] = useState(args.initialNickname ?? "テストユーザー")
   return (
     <>
       <Button onClick={() => setNickname("サーバー更新後の名前")}>
         プロフィール再取得を再現
       </Button>
-      <SettingsProfile {...args} initialNickname={nickname} />
+      <PersonalProfile {...args} initialNickname={nickname} />
     </>
   )
 }
@@ -287,7 +288,7 @@ export const ProfileTrimmedUnchanged: Story = {
 
 // The unresolved Promise represents an actual in-flight mutation. Neither
 // refetches nor repeated clicks may rewrite its editable draft.
-function ProfileInFlightFixture(args: ComponentProps<typeof SettingsProfile>) {
+function ProfileInFlightFixture(args: ComponentProps<typeof PersonalProfile>) {
   const [nickname, setNickname] = useState(args.initialNickname ?? "テストユーザー")
   const resolveSave = useRef<(() => void) | null>(null)
   return (
@@ -296,7 +297,7 @@ function ProfileInFlightFixture(args: ComponentProps<typeof SettingsProfile>) {
         保存中に再取得を再現
       </Button>
       <Button onClick={() => resolveSave.current?.()}>保存応答を返す</Button>
-      <SettingsProfile
+      <PersonalProfile
         {...args}
         initialNickname={nickname}
         onSave={() =>
@@ -531,14 +532,14 @@ export const ProfileUnknownExplicitRetry: Story = {
   },
 }
 
-function PendingInspectionFixture(args: ComponentProps<typeof SettingsProfile>) {
+function PendingInspectionFixture(args: ComponentProps<typeof PersonalProfile>) {
   const resolveInspection = useRef<((value: string) => void) | null>(null)
   return (
     <>
       <Button onClick={() => resolveInspection.current?.("古い照会結果")}>
         遅延照会を返す
       </Button>
-      <SettingsProfile
+      <PersonalProfile
         {...args}
         onSave={async () => { throw new Error("uncertain") }}
         onInspect={() =>
@@ -573,11 +574,11 @@ export const ProfileUnknownStaleInspection: Story = {
 }
 
 
-function ProfileNotificationFixture(args: ComponentProps<typeof SettingsProfile>) {
+function ProfileNotificationFixture(args: ComponentProps<typeof PersonalProfile>) {
   return (
     <>
       <Notifications position="top-right" />
-      <SettingsProfile {...args} />
+      <PersonalProfile {...args} />
     </>
   )
 }

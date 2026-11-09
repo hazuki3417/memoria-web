@@ -7,13 +7,12 @@ import { useProfileForm } from "./useProfileForm"
 import { ProfileSaveFeedback } from "./ProfileSaveFeedback"
 import type { SaveProfile, InspectProfile } from "./useProfileForm"
 
-export type { SaveProfile, InspectProfile } from "./useProfileForm"
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
 const DEFAULT_BLOCKED_MESSAGE =
   "現在の状態では保存を続けられません。ページを再読み込みして、プロフィールの状態を確認してください。"
 
-export function SettingsProfile({
+export function PersonalProfile({
   onSave,
   onInspect,
   initialNickname = MOCK_PROFILE.nickname,

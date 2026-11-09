@@ -4,7 +4,7 @@ import type { ReactNode } from "react"
 import { PersonalSettingsLayout } from "./PersonalSettingsLayout"
 import type { PersonalSettingsSection } from "./personalSettingsSections"
 import { PersonalSettingsContent } from "./PersonalSettingsContent"
-import type { InspectProfile, SaveProfile } from "./profile/SettingsProfile"
+import type { InspectProfile, SaveProfile } from "./profile"
 import type {
   UserPreferences,
   UserPreferencesPatch,

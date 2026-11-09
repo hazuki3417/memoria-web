@@ -1,7 +1,7 @@
 export { PersonalSettingsRoute } from "./PersonalSettingsRoute"
 export { PersonalSettingsLayout } from "./PersonalSettingsLayout"
 export type { PersonalSettingsSection } from "./personalSettingsSections"
-export { SettingsProfile } from "./profile/SettingsProfile"
+export { PersonalProfile } from "./profile"
 export { SettingsPreferences } from "./preferences/SettingsPreferences"
 export { PersonalAccount } from "./account/PersonalAccount"
 export { ConnectedPersonalUsage } from "./usage/ConnectedPersonalUsage"

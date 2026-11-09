@@ -5,7 +5,7 @@ import { useMediaQuery } from "@mantine/hooks"
 import Link from "next/link"
 import type { ReactNode } from "react"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
-import { SettingsProfile, type InspectProfile, type SaveProfile } from "../profile/SettingsProfile"
+import { PersonalProfile, type InspectProfile, type SaveProfile } from "../profile"
 import { SettingsPreferences } from "../preferences/SettingsPreferences"
 import { PersonalAccount } from "../account/PersonalAccount"
 import type {
@@ -46,7 +46,7 @@ export function PersonalSettingsContent({
   switch (section) {
     case "profile":
       return (
-        <SettingsProfile
+        <PersonalProfile
           onSave={saveProfile ?? unavailableProfileSave}
           onInspect={inspectProfile}
           initialNickname={profileNickname}
