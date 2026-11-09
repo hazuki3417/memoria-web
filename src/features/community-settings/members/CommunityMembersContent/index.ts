@@ -1,4 +1,4 @@
-export { CommunityMembersContent } from "./CommunityMembersContent"
+export { CommunityMembersContent } from "./communityMemberLimits"
 export type { CommunityMember } from "./CommunityMembersContent"
 export {
   COMMUNITY_MEMBER_LIMIT,
