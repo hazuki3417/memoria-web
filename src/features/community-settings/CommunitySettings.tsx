@@ -3,7 +3,6 @@
 import type { ReactNode } from "react"
 import type { CommunityMember } from "./members/CommunityMembersContent"
 import { CommunitySettingsView } from "./CommunitySettingsView"
-import { useCommunityNameSettings } from "./useCommunityNameSettings"
 import type { CommunityInvitationSectionProps } from "./general/CommunityInvitationSection"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
 
@@ -67,8 +66,6 @@ export function CommunitySettings({
   invitation,
 }: CommunitySettingsProps) {
   const isAdmin = role === "admin"
-  // Keep the Form mounted across section changes so edited and unknown-outcome drafts survive Navigation.
-  const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
   // The consumer owns Invitation state; production never runs the Storybook simulation.
   const invitationAvailable = invitationMode === "preview" && invitation !== undefined
 
@@ -77,7 +74,7 @@ export function CommunitySettings({
       section={section}
       communityId={communityId}
       isAdmin={isAdmin}
-      name={name}
+      name={{ communityName, onSaveName, onInspectName }}
       invitation={invitation ?? unavailableInvitation}
       invitationAvailable={invitationAvailable}
       members={members}
