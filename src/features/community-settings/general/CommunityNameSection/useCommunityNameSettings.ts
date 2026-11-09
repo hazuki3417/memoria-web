@@ -13,7 +13,7 @@ import {
   getSettingsInputViolations,
   type SettingsSaveFailureKind,
 } from "@/infrastructure/graphql/settingsMutationResult"
-import { getCommunityBlockedFeedback } from "../../preferences/communityBlockedFeedback"
+import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
 import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
 
 /** Community名変更フォームのDraft、Validation、保存・再照会状態を所有する。 */
