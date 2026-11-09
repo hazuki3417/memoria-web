@@ -4,7 +4,7 @@ import { expect, within } from "storybook/test"
 import { Usage as UsageComponent } from "@/features/usage"
 import { sampleUsage, zeroUsage } from "@/features/usage/usageStoryFixtures"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { CommunitySettingsStoryNavigation } from "../CommunitySettingsStoryNavigation"
+import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 
 const meta = {
   title: "Features/Community Settings/Usage",
