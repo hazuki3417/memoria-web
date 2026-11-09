@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { communityAliasSchema } from "./communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
-import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
+import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
 import { classifySettingsSaveFailure, getSettingsInputViolations, type SettingsSaveFailureKind } from "@/infrastructure/graphql/settingsMutationResult"
 
 type Inspection =
