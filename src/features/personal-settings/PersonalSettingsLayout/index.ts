@@ -1,2 +1,2 @@
 export { PersonalSettingsLayout } from "./PersonalSettingsLayout"
-export type { PersonalSettingsSection, Section } from "../personalSettingsSections"
+export type { PersonalSettingsSection } from "../personalSettingsSections"
