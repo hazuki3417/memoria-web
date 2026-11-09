@@ -2,13 +2,13 @@ import { Box, Button } from "@mantine/core"
 import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
-import { CommunitySettings } from "../CommunitySettings"
+import { CommunitySettingsView } from "../CommunitySettingsView"
 import { CommunitySettingsStoryNavigation } from "../CommunitySettingsStoryNavigation"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
   title: "Features/Community Settings/Settings",
-  component: CommunitySettings,
+  component: CommunitySettingsView,
   render: (args) => <CommunitySettingsStoryNavigation {...args} />,
   args: {
     onSectionChange: () => undefined,
@@ -29,7 +29,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof CommunitySettings>
+} satisfies Meta<typeof CommunitySettingsView>
 export default meta
 type Story = StoryObj<typeof meta>
 
