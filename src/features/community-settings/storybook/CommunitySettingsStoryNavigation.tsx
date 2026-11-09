@@ -2,10 +2,18 @@
 
 import { useState } from "react"
 import { showNotification } from "@/components/Feedback"
-import { CommunitySettingsView, type CommunitySettingsViewProps } from "../CommunitySettingsView"
+import { CommunitySettingsView } from "../CommunitySettingsView"
+import { renderCommunitySettingsSection, type CommunitySettingsSectionProps } from "../communitySettingsSectionContent"
 import { CommunityPreferences } from "../preferences/CommunityPreferences"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
+import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
 
+
+export type CommunitySettingsStoryProps = CommunitySettingsSectionProps & {
+  communityAccentColor?: string
+  loadState?: PageStatus
+  onSectionChange: (section: CommunitySettingsSection) => void
+}
 
 type InvitationState = "none" | "active" | "expired" | "revoked"
 
@@ -99,19 +107,30 @@ export function CommunitySettingsStoryNavigation({
   invitationMode = "preview",
   invitation: suppliedInvitation,
   ...props
-}: CommunitySettingsViewProps) {
+}: CommunitySettingsStoryProps) {
   const [currentSection, setCurrentSection] =
     useState<CommunitySettingsSection>(section)
   const [accent, setAccent] = useState("#7950f2")
   const simulatedInvitation = useCommunityStoryInvitation(props.communityId ?? "photo-club", invitationMode === "preview")
 
+  const communityId = props.communityId ?? "photo-club"
+  const content = renderCommunitySettingsSection({
+    ...props,
+    communityId,
+    section: currentSection,
+    invitationMode,
+    invitation: suppliedInvitation ?? simulatedInvitation,
+    preferencesContent:
+      preferencesContent ?? <CommunityPreferences accent={accent} setAccent={setAccent} />,
+  })
+
   return (
     <CommunitySettingsView
-      {...props}
+      communityId={communityId}
       section={currentSection}
-      invitationMode={invitationMode}
-      invitation={suppliedInvitation ?? simulatedInvitation}
-      preferencesContent={preferencesContent ?? <CommunityPreferences accent={accent} setAccent={setAccent} />}
+      content={content}
+      loadState={props.loadState}
+      communityAccentColor={props.communityAccentColor}
       onSectionChange={(next) => setCurrentSection(next)}
     />
   )
