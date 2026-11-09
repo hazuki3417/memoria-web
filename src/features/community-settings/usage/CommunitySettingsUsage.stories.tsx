@@ -1,4 +1,5 @@
 import { Box } from "@mantine/core"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, within } from "storybook/test"
 import { Usage as UsageComponent } from "@/features/usage"
@@ -59,7 +60,9 @@ export const ErrorState: Story = {
   tags: ["visual"],
   args: {
     usageContent: (
-      <UsageComponent scope="community" usage={sampleUsage} status="error" />
+      <SettingsContentStatus state="error" label="利用状況を読み込み中">
+        <UsageComponent scope="community" usage={sampleUsage} />
+      </SettingsContentStatus>
     ),
   },
 }
@@ -69,7 +72,9 @@ export const LoadingState: Story = {
   tags: ["visual"],
   args: {
     usageContent: (
-      <UsageComponent scope="community" usage={sampleUsage} status="loading" />
+      <SettingsContentStatus state="loading" label="利用状況を読み込み中">
+        <UsageComponent scope="community" usage={sampleUsage} />
+      </SettingsContentStatus>
     ),
   },
 }
