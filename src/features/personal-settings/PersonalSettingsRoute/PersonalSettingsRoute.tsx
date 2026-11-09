@@ -14,20 +14,13 @@ import { usePersonalSettingsInspection } from "./usePersonalSettingsInspection"
 import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
-// Never simulate Production persistence when no save callback is available.
-async function unavailableProfileSave(): Promise<void> {
-  throw new Error("Profile save unavailable")
-}
-
 type ProfilePreferencesSection = Extract<
   PersonalSettingsSection,
   "profile" | "preferences"
 >
 type AccountUsageSection = Extract<PersonalSettingsSection, "account" | "usage">
 
-export type PersonalSettingsRouteProps =
-  | { section: ProfilePreferencesSection }
-  | { section: AccountUsageSection }
+export type PersonalSettingsRouteProps = { section: PersonalSettingsSection }
 
 /** Personal設定のProduction接続入口。Section固有の取得・操作は個別の接続Componentが所有する。 */
 export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
@@ -70,7 +63,7 @@ function ProfilePreferencesConnection({
     : undefined
   const content = section === "profile" ? (
     <PersonalProfile
-      onSave={saveProfile ?? unavailableProfileSave}
+      onSave={saveProfile}
       onInspect={inspectProfile}
       initialNickname={data?.me?.profile.nickname}
     />
