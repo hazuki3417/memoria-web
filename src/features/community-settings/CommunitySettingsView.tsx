@@ -1,6 +1,8 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
+import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import type { CommunityMember } from "./members"
 import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
 import { CommunityGeneral } from "./general/CommunityGeneral"
@@ -40,7 +42,7 @@ export type CommunitySettingsViewProps = {
   onLeaveSuccess?: () => void
   usageContent?: ReactNode
   preferencesContent?: ReactNode
-  contentOverride?: ReactNode
+  loadState?: PageStatus
   communityAccentColor?: string
   invitationMode?: "preview" | "unavailable"
   invitation?: InvitationModel
@@ -62,7 +64,7 @@ export function CommunitySettingsView({
   onLeaveSuccess,
   usageContent,
   preferencesContent,
-  contentOverride,
+  loadState = "ready",
   communityAccentColor,
   invitationMode,
   invitation,
@@ -110,7 +112,9 @@ export function CommunitySettingsView({
       accentColor={communityAccentColor}
       onSectionChange={onSectionChange}
     >
-      {contentOverride ?? content}
+      <SettingsContentStatus state={loadState} label="Community設定を読み込み中">
+        {content}
+      </SettingsContentStatus>
     </CommunitySettingsLayout>
   )
 }

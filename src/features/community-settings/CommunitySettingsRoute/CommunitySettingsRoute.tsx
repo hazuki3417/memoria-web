@@ -5,7 +5,6 @@ import { useCommunitySettingsActions } from "./useCommunitySettingsActions"
 import { useCommunitySettingsData } from "./useCommunitySettingsData"
 import { useCommunityNameInspection } from "./useCommunityNameInspection"
 import type { ReactNode } from "react"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { CommunitySettingsView } from "../CommunitySettingsView"
@@ -46,16 +45,7 @@ export function CommunitySettingsRoute({
       invitationMode="unavailable"
       communityAccentColor={communityAccentColor}
       communityName={name ?? undefined}
-      contentOverride={
-        loadState !== "ready" ? (
-          <PageStatusBoundary
-            state={loadState}
-            label="Community設定を読み込み中"
-          >
-            {null}
-          </PageStatusBoundary>
-        ) : undefined
-      }
+      loadState={loadState}
       members={members ?? undefined}
       role={members?.find((member) => member.isSelf)?.role ?? "member"}
       section={section}

@@ -1,6 +1,8 @@
 "use client"
 
 import { useMediaQuery } from "@mantine/hooks"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
+import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import type { ReactNode } from "react"
 import { PersonalSettingsLayout } from "./PersonalSettingsLayout"
 import type { PersonalSettingsSection } from "./personalSettingsSections"
@@ -27,7 +29,7 @@ export type PersonalSettingsViewProps = {
   savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
   inspectPreferences?: () => Promise<UserPreferences>
   usageContent?: ReactNode
-  contentOverride?: ReactNode
+  loadState?: PageStatus
   personalAccentColor?: string
   onSectionChange: (section: PersonalSettingsSection) => void
 }
@@ -41,7 +43,7 @@ export function PersonalSettingsView({
   savePreferences,
   inspectPreferences,
   usageContent,
-  contentOverride,
+  loadState = "ready",
   personalAccentColor,
   onSectionChange,
 }: PersonalSettingsViewProps) {
@@ -82,7 +84,9 @@ export function PersonalSettingsView({
       section={section}
       onSectionChange={onSectionChange}
     >
-      {contentOverride ?? content}
+      <SettingsContentStatus state={loadState} label="Personal設定を読み込み中">
+        {content}
+      </SettingsContentStatus>
     </PersonalSettingsLayout>
   )
 }

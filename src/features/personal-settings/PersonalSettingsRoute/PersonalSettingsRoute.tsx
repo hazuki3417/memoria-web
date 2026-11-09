@@ -1,7 +1,6 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useRouter } from "next/navigation"
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
@@ -68,13 +67,7 @@ function ProfilePreferencesConnection({
       onSectionChange={onSectionChange}
       personalAccentColor={personalAccentColor}
       profileNickname={data?.me?.profile.nickname}
-      contentOverride={
-        loadState !== "ready" ? (
-          <PageStatusBoundary state={loadState} label="Personal設定を読み込み中">
-            {null}
-          </PageStatusBoundary>
-        ) : undefined
-      }
+      loadState={loadState}
       initialPreferences={preferences}
       saveProfile={saveProfile}
       inspectProfile={inspectProfile}
@@ -97,19 +90,12 @@ function AccountUsageConnection({
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
   usePersonalSettingsRefreshError(Boolean(data?.me && error))
-  const contentOverride =
-    section === "account" && loadState !== "ready" ? (
-      <PageStatusBoundary state={loadState} label="Personal設定を読み込み中">
-        {null}
-      </PageStatusBoundary>
-    ) : undefined
-
   return (
     <PersonalSettingsView
       section={section}
       onSectionChange={onSectionChange}
       usageContent={usageContent}
-      contentOverride={contentOverride}
+      loadState={section === "account" ? loadState : "ready"}
       personalAccentColor={personalAccentColor}
     />
   )
