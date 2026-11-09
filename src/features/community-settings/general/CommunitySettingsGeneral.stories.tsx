@@ -3,7 +3,7 @@ import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { CommunitySettingsStoryNavigation } from "../CommunitySettingsStoryNavigation"
+import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
