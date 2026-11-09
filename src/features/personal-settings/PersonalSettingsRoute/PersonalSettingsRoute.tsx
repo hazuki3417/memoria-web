@@ -38,7 +38,7 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
   return (
     <AccountUsageConnection
       section={props.section}
-      usageContent={props.usageContent}
+      usageContent={"usageContent" in props ? props.usageContent : undefined}
       onSectionChange={onSectionChange}
     />
   )
