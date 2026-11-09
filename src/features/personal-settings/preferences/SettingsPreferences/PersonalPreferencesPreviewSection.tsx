@@ -3,7 +3,7 @@
 import { Box, Stack, Switch } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import type { useUserPreferences } from "../useUserPreferences"
+import type { useUserPreferences } from "./useUserPreferences"
 type PreferencesModel = ReturnType<typeof useUserPreferences>
 
 /** Shows Media Detail behavior options without owning the preference session. */
