@@ -5,7 +5,7 @@ import type { ReactNode } from "react"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { PersonalProfile, type InspectProfile, type SaveProfile } from "../profile"
 import { PersonalPreferences } from "../preferences"
-import { PersonalAccount } from "../account"
+import { Account } from "../account"
 import type {
   UserPreferences,
   UserPreferencesPatch,
@@ -65,7 +65,7 @@ export function PersonalSettingsContent({
       return (
         <>
           {accountContent ?? (
-            <PersonalAccount />
+            <Account />
           )}
         </>
       )

@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import { Button, Text } from "@mantine/core"
+import { Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   PersonalSettingsLayout,
   PersonalProfile,
   PersonalPreferences,
-  PersonalAccount,
+  Account,
   type PersonalSettingsSection,
 } from "@/features/personal-settings"
 import { UsageContent, type UsageScenario } from "./UsageContent"
@@ -66,15 +66,7 @@ export function SettingsPrototype({
       )
       break
     case "account":
-      content = (
-        <PersonalAccount
-          deletionAction={
-            <Button variant="default" size="sm">
-              アカウントを削除する
-            </Button>
-          }
-        />
-      )
+      content = <Account />
       break
   }
 

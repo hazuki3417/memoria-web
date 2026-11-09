@@ -1,12 +1,12 @@
 import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, within } from "storybook/test"
-import { PersonalAccount } from "./PersonalAccount"
+import { Account as AccountComponent } from "./Account"
 
 const meta = {
   // Preserve the existing Storybook IDs during this structural refactor.
   title: "features/settings/account/SettingsAccount",
-  component: PersonalAccount,
+  component: AccountComponent,
   decorators: [
     (Story) => (
       <Box maw={760} p="md">
@@ -14,7 +14,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof PersonalAccount>
+} satisfies Meta<typeof AccountComponent>
 export default meta
 type Story = StoryObj<typeof meta>
 

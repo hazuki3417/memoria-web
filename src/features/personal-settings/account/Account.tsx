@@ -3,7 +3,7 @@ import Link from "next/link"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 
-export function PersonalAccount() {
+export function Account() {
   return (
     <Stack gap="xl">
       <PageHeader title="アカウント" description="アカウントを管理します。" />

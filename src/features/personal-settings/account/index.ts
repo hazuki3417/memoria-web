@@ -1,1 +1,1 @@
-export { PersonalAccount } from "./PersonalAccount"
+export { Account } from "./Account"
