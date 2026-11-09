@@ -14,7 +14,7 @@ import {
 } from "./useCommunityMembersState"
 
 export type { CommunityMember } from "@/features/community/CommunityProvider"
-export { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "./useCommunityMembersState"
+export { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "./communityMemberLimits"
 
 const previewMembers: CommunityMember[] = [
   { id: "self", name: "ユーザー", role: "admin", isSelf: true },
