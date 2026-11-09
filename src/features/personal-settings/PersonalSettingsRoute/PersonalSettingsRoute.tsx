@@ -9,7 +9,7 @@ import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphq
 import { usePersonalSettingsActions } from "./usePersonalSettingsActions"
 import { usePersonalSettingsInspection } from "./usePersonalSettingsInspection"
 import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
-import { usePersonalSettingsRefreshError } from "./usePersonalSettingsRefreshError"
+import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 type ProfilePreferencesSection = Extract<
   PersonalSettingsSection,
