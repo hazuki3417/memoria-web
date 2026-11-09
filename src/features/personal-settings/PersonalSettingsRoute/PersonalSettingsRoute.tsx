@@ -10,20 +10,20 @@ import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
 import { usePersonalSettingsReadState } from "../usePersonalSettingsReadState"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
-type EditableSection = Extract<PersonalSettingsSection, "profile" | "preferences">
-type ReadOnlySection = Extract<PersonalSettingsSection, "account" | "usage">
+type ProfilePreferencesSection = Extract<PersonalSettingsSection, "profile" | "preferences">
+type AccountUsageSection = Extract<PersonalSettingsSection, "account" | "usage">
 
 export type PersonalSettingsRouteProps =
-  | { section: EditableSection }
-  | { section: ReadOnlySection; usageContent?: ReactNode }
+  | { section: ProfilePreferencesSection }
+  | { section: AccountUsageSection; usageContent?: ReactNode }
 
 /** Personal設定のProduction接続入口。Section固有の取得・操作は個別の接続Componentが所有する。 */
 export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
   if (props.section === "profile" || props.section === "preferences") {
-    return <EditablePersonalSettingsConnection section={props.section} />
+    return <ProfilePreferencesConnection section={props.section} />
   }
   return (
-    <ReadOnlyPersonalSettingsConnection
+    <AccountUsageConnection
       section={props.section}
       usageContent={props.usageContent}
     />
@@ -31,7 +31,7 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
 }
 
 /** Profile/PreferencesはCurrentUserに加えて保存と結果確認を接続する。 */
-function EditablePersonalSettingsConnection({ section }: { section: EditableSection }) {
+function ProfilePreferencesConnection({ section }: { section: ProfilePreferencesSection }) {
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
   const { inspectProfile, inspectPreferences } = usePersonalSettingsInspection()
@@ -64,11 +64,11 @@ function EditablePersonalSettingsConnection({ section }: { section: EditableSect
 }
 
 /** AccountはCurrentUser状態を参照し、Usage固有の取得・LoadingはSection側が所有する。 */
-function ReadOnlyPersonalSettingsConnection({
+function AccountUsageConnection({
   section,
   usageContent,
 }: {
-  section: ReadOnlySection
+  section: AccountUsageSection
   usageContent?: ReactNode
 }) {
   const { data, error, personalAccentColor, loadState } =
