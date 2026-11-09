@@ -66,6 +66,7 @@ export function CommunitySettings({
   invitation?: InvitationModel
 }) {
   const isAdmin = role === "admin"
+  // Keep the Form mounted across section changes so edited and unknown-outcome drafts survive Navigation.
   const name = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
   // The consumer owns Invitation state; production never runs the Storybook simulation.
   const invitationAvailable = invitationMode === "preview" && invitation !== undefined
