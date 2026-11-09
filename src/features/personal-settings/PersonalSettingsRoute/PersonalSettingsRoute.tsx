@@ -2,7 +2,8 @@
 
 import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { PersonalSettings } from "../PersonalSettings"
+import { useRouter } from "next/navigation"
+import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
 import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
@@ -22,13 +23,23 @@ export type PersonalSettingsRouteProps =
 
 /** Personal設定のProduction接続入口。Section固有の取得・操作は個別の接続Componentが所有する。 */
 export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
+  const router = useRouter()
+  const onSectionChange = (section: PersonalSettingsSection) => {
+    router.push(`/settings/${section}`)
+  }
   if (props.section === "profile" || props.section === "preferences") {
-    return <ProfilePreferencesConnection section={props.section} />
+    return (
+      <ProfilePreferencesConnection
+        section={props.section}
+        onSectionChange={onSectionChange}
+      />
+    )
   }
   return (
     <AccountUsageConnection
       section={props.section}
       usageContent={props.usageContent}
+      onSectionChange={onSectionChange}
     />
   )
 }
@@ -36,8 +47,10 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
 /** Profile/PreferencesはCurrentUserに加えて保存と結果確認を接続する。 */
 function ProfilePreferencesConnection({
   section,
+  onSectionChange,
 }: {
   section: ProfilePreferencesSection
+  onSectionChange: (section: PersonalSettingsSection) => void
 }) {
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
@@ -49,9 +62,10 @@ function ProfilePreferencesConnection({
     : undefined
 
   return (
-    <PersonalSettings
+    <PersonalSettingsView
       key={section}
       section={section}
+      onSectionChange={onSectionChange}
       personalAccentColor={personalAccentColor}
       profileNickname={data?.me?.profile.nickname}
       contentOverride={
@@ -74,9 +88,11 @@ function ProfilePreferencesConnection({
 function AccountUsageConnection({
   section,
   usageContent,
+  onSectionChange,
 }: {
   section: AccountUsageSection
   usageContent?: ReactNode
+  onSectionChange: (section: PersonalSettingsSection) => void
 }) {
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
@@ -89,8 +105,9 @@ function AccountUsageConnection({
     ) : undefined
 
   return (
-    <PersonalSettings
+    <PersonalSettingsView
       section={section}
+      onSectionChange={onSectionChange}
       usageContent={usageContent}
       accountContent={accountContent}
       personalAccentColor={personalAccentColor}
