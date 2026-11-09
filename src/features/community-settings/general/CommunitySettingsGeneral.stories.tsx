@@ -178,7 +178,7 @@ export const NameTrimmedUnchanged: Story = {
 
 /** Simulate a new query result without remounting the RHF form. */
 function CommunityNameRefreshFixture(
-  args: ComponentProps<typeof CommunitySettings>,
+  args: ComponentProps<typeof CommunitySettingsView>,
 ) {
   const [name, setName] = useState(args.communityName ?? "家族のアルバム")
   return (
@@ -226,7 +226,7 @@ export const NameRefreshWhileEditing: Story = {
 
 /** Complete a pending save after the user has made a second edit. */
 function CommunityNamePendingSaveFixture(
-  args: ComponentProps<typeof CommunitySettings>,
+  args: ComponentProps<typeof CommunitySettingsView>,
 ) {
   const resolveSave = useRef<((saved: string) => void) | null>(null)
   return (
@@ -402,7 +402,7 @@ export const NameFormValidationVisual: Story = {
 }
 
 /** Mirrors the production key={communityId} remount boundary without a Router mock. */
-function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettings>) {
+function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettingsView>) {
   const [communityId, setCommunityId] = useState("photo-club")
   const communityName =
     communityId === "photo-club" ? "家族のアルバム" : "旅行の思い出"
@@ -484,7 +484,7 @@ export const InvitationContextChangeReset: Story = {
 
 
 /** Switching from Administrator to Member must immediately hide an issued preview secret. */
-function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettings>) {
+function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettingsView>) {
   const [role, setRole] = useState<"admin" | "member">("admin")
   return (
     <>
