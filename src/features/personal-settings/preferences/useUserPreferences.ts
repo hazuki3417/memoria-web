@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { preferencesSchema } from "./preferencesSchema"
 import { usePreferencesSave } from "./usePreferencesSave"
-import type { UserPreferences, UserPreferencesPatch } from "../userPreferences"
+import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type PreferencesFormValues = z.input<typeof preferencesSchema>

@@ -3,16 +3,16 @@
 import { resolveFormFailureValidation } from "@/ui/formValidation"
 
 import { useEffect, useRef, useState } from "react"
-import { createPreferencesSaveQueue } from "../preferencesSaveQueue"
-import { usePersonalPreferencesSession } from "../PersonalPreferencesSessionContext"
-import type { UserPreferences, UserPreferencesPatch } from "../userPreferences"
+import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
+import { usePersonalPreferencesSession } from "./PersonalPreferencesSessionContext"
+import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import {
   classifySettingsSaveFailure,
   getSettingsInputViolations,
 } from "@/infrastructure/graphql/settingsMutationResult"
-import type { PreferencesFailure } from "../personalPreferencesSession"
-import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "../preferencesBlockedFeedback"
+import type { PreferencesFailure } from "./personalPreferencesSession"
+import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type SaveError = PreferencesFailure

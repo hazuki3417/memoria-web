@@ -6,7 +6,7 @@ import Link from "next/link"
 import type { ReactNode } from "react"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { PersonalProfile, type InspectProfile, type SaveProfile } from "../profile"
-import { SettingsPreferences } from "../preferences/SettingsPreferences"
+import { PersonalPreferences } from "../preferences"
 import { PersonalAccount } from "../account/PersonalAccount"
 import type {
   UserPreferences,
@@ -54,7 +54,7 @@ export function PersonalSettingsContent({
       )
     case "preferences":
       return (
-        <SettingsPreferences
+        <PersonalPreferences
           compact={compact}
           initialPreferences={initialPreferences}
           onSave={savePreferences}

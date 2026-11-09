@@ -4,12 +4,12 @@ import { Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
 import { useUserPreferences } from "./useUserPreferences"
-import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "../userPreferences"
+import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
 import { PersonalPreferencesSaveFeedback } from "./PersonalPreferencesSaveFeedback"
 import { PersonalPreferencesDisplaySection } from "./PersonalPreferencesDisplaySection"
 import { PersonalPreferencesPreviewSection } from "./PersonalPreferencesPreviewSection"
 
-export function SettingsPreferences({
+export function PersonalPreferences({
   compact,
   initialPreferences = defaultUserPreferences,
   onSave,
