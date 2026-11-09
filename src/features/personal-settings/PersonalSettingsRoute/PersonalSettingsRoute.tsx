@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation"
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
-import { usePersonalSettingsActions } from "../usePersonalSettingsActions"
-import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
-import { usePersonalSettingsReadState } from "../usePersonalSettingsReadState"
-import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
+import { usePersonalSettingsActions } from "./usePersonalSettingsActions"
+import { usePersonalSettingsInspection } from "./usePersonalSettingsInspection"
+import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
+import { usePersonalSettingsRefreshError } from "./usePersonalSettingsRefreshError"
 
 type ProfilePreferencesSection = Extract<
   PersonalSettingsSection,
