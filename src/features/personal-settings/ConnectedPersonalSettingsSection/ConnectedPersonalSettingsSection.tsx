@@ -3,7 +3,7 @@
 import type { ReactNode } from "react"
 import { PersonalSettingsRoute } from "../PersonalSettingsRoute"
 
-/** Compatibility entry for Account/Usage section consumers. */
+/** Account/Usageの既存Consumer向け互換入口。 */
 export function ConnectedPersonalSettingsSection({
   section,
   usageContent,
