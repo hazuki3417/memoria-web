@@ -2,7 +2,7 @@
 
 import { usePersonalUsageQuery } from "@/infrastructure/graphql/generated"
 import { Usage, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
-import { useSettingsRefreshError } from "../useSettingsRefreshError"
+import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 /** Personal Context固有のGraphQL接続。共通のUsage UIはfeatures/usageが所有する。 */
 export function ConnectedPersonalUsage() {
@@ -23,7 +23,7 @@ export function ConnectedPersonalUsage() {
   }
 
   const hasData = Boolean(projection) && !conversionFailed
-  useSettingsRefreshError(Boolean(hasData && personal.error))
+  usePersonalSettingsRefreshError(Boolean(hasData && personal.error))
   const status = hasData ? "ready" : personal.loading ? "loading" : "error"
 
   return (
