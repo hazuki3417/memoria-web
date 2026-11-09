@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react"
 import { useController, useForm, type FieldPathValue } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
-import { preferencesSchema } from "../preferencesSchema"
+import { preferencesSchema } from "./preferencesSchema"
 import { usePreferencesSave } from "./usePreferencesSave"
 import type { UserPreferences, UserPreferencesPatch } from "../userPreferences"
 
