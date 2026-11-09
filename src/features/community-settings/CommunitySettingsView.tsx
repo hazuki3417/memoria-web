@@ -3,7 +3,8 @@
 import type { ReactNode } from "react"
 import type { CommunityMember } from "./members"
 import { CommunitySettingsLayout } from "./CommunitySettingsLayout"
-import { CommunitySettingsContent } from "./CommunitySettingsContent"
+import { CommunityGeneral } from "./general/CommunityGeneral"
+import { CommunityMembers } from "./members"
 import type { CommunityInvitationSectionProps } from "./general/CommunityInvitationSection"
 import type { CommunitySettingsSection } from "./communitySettingsSections"
 
@@ -69,6 +70,39 @@ export function CommunitySettingsView({
   const isAdmin = role === "admin"
   const invitationAvailable = invitationMode === "preview" && invitation !== undefined
 
+  let content: ReactNode
+
+  switch (section) {
+    case "general":
+      content = (
+        <CommunityGeneral
+          name={{ communityName, onSaveName, onInspectName }}
+          invitation={invitation ?? unavailableInvitation}
+          invitationAvailable={invitationAvailable}
+          communityId={communityId}
+          isAdmin={isAdmin}
+        />
+      )
+      break
+    case "members":
+      content = (
+        <CommunityMembers
+          members={members}
+          onChangeRole={onChangeMemberRole}
+          onRemoveMember={onRemoveMember}
+          onLeave={onLeaveCommunity}
+          onLeaveSuccess={onLeaveSuccess}
+        />
+      )
+      break
+    case "usage":
+      content = <>{usageContent}</>
+      break
+    case "preferences":
+      content = <>{preferencesContent}</>
+      break
+  }
+
   return (
     <CommunitySettingsLayout
       communityId={communityId}
@@ -76,23 +110,7 @@ export function CommunitySettingsView({
       accentColor={communityAccentColor}
       onSectionChange={onSectionChange}
     >
-      {contentOverride ?? (
-        <CommunitySettingsContent
-          section={section}
-          communityId={communityId}
-          isAdmin={isAdmin}
-          name={{ communityName, onSaveName, onInspectName }}
-          invitation={invitation ?? unavailableInvitation}
-          invitationAvailable={invitationAvailable}
-          members={members}
-          onChangeMemberRole={onChangeMemberRole}
-          onRemoveMember={onRemoveMember}
-          onLeaveCommunity={onLeaveCommunity}
-          onLeaveSuccess={onLeaveSuccess}
-          preferencesContent={preferencesContent}
-          usageContent={usageContent}
-        />
-      )}
+      {contentOverride ?? content}
     </CommunitySettingsLayout>
   )
 }
