@@ -1,40 +1,27 @@
 "use client"
 
-import { PersonalSettingsView } from "../PersonalSettingsView"
-import { PersonalProfile } from "./PersonalProfile"
+import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
+import { PersonalProfileSection } from "./PersonalProfileSection"
 import { usePersonalProfileSave } from "./usePersonalProfileSave"
 import { usePersonalSettingsInspection } from "../PersonalSettingsRoute/usePersonalSettingsInspection"
-import { usePersonalSettingsReadState } from "../PersonalSettingsRoute/usePersonalSettingsReadState"
-import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
-import type { PersonalSettingsSection } from "../personalSettingsSections"
 
-/** Profile固有の保存・確認を接続する。共通CurrentUser取得とPreview解決は維持。 */
+/** Profile固有の保存・確認ActionをSectionへ接続する。 */
 export function ConnectedPersonalProfile({
-  onSectionChange,
+  status,
+  initialNickname,
 }: {
-  onSectionChange: (section: PersonalSettingsSection) => void
+  status: PageStatus
+  initialNickname?: string
 }) {
-  const { data, error, personalAccentColor, loadState } =
-    usePersonalSettingsReadState()
   const { inspectProfile } = usePersonalSettingsInspection()
   const { saveProfile } = usePersonalProfileSave()
-  usePersonalSettingsRefreshError(Boolean(data?.me && error))
 
   return (
-    <PersonalSettingsView
-      key="profile"
-      section="profile"
-      onSectionChange={onSectionChange}
-      personalAccentColor={personalAccentColor}
-      loadState={loadState}
-      content={
-        <PersonalProfile
-          onSave={saveProfile}
-          onInspect={inspectProfile}
-          initialNickname={data?.me?.profile.nickname}
-        />
-      }
+    <PersonalProfileSection
+      status={status}
+      onSave={saveProfile}
+      onInspect={inspectProfile}
+      initialNickname={initialNickname}
     />
   )
 }
-

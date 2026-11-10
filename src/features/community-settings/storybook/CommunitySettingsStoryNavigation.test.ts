@@ -37,7 +37,8 @@ describe("Community Settings Storybook Navigation Adapter", () => {
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
     expect(rendered.section).toBe("general")
     expect(isValidElement(rendered.content)).toBe(true)
-    expect((rendered.content as ReactElement<{ invitation: { invitationUrl: string } }>).props.invitation.invitationUrl).toContain("photo-club-demo-")
+    const sectionContent = (rendered.content as ReactElement<{ children: ReactNode }>).props.children
+    expect((sectionContent as ReactElement<{ invitation: { invitationUrl: string } }>).props.invitation.invitationUrl).toContain("photo-club-demo-")
 
     act(() => rendered.onSectionChange("members"))
     expect(rendered.section).toBe("members")

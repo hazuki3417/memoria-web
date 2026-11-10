@@ -38,8 +38,8 @@ export function ConnectedPersonalUsage() {
       usage={usage}
       fileSizeUnit={
         personal.data?.me?.preferences.fileSizeUnit === "BINARY"
-            ? "BINARY"
-            : "DECIMAL"
+          ? "BINARY"
+          : "DECIMAL"
       }
     />
   )

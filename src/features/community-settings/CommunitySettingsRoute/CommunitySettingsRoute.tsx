@@ -1,14 +1,15 @@
 "use client"
 
+import type { ReactNode } from "react"
+import { useRouter } from "next/navigation"
+import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { ConnectedCommunityGeneral } from "../general/ConnectedCommunityGeneral"
 import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
-import { useCommunitySettingsData } from "./useCommunitySettingsData"
-import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
-import { useRouter } from "next/navigation"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import type { ReactNode } from "react"
+import { CommunitySettingsContextBoundary } from "./CommunitySettingsContextBoundary"
+import { useCommunitySettingsData } from "./useCommunitySettingsData"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
@@ -19,6 +20,7 @@ export type CommunitySettingsRouteProps = {
   section?: CommunitySettingsSection
 }
 
+/** Community Contextの可用性、Section選択、Navigation、Viewを構成する。 */
 export function CommunitySettingsRoute({
   communityId,
   section = "general",
@@ -68,8 +70,11 @@ export function CommunitySettingsRoute({
       communityId={communityId}
       section={section}
       communityAccentColor={communityAccentColor}
-      loadState={loadState}
-      content={content}
+      content={
+        <CommunitySettingsContextBoundary status={loadState}>
+          {content}
+        </CommunitySettingsContextBoundary>
+      }
       onSectionChange={(nextSection) => {
         const target = getCommunitySettingsSections(communityId).find(
           (item) => item.id === nextSection,

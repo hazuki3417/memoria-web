@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { CommunitySettingsView } from "../CommunitySettingsView"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import type { ReactNode } from "react"
 import { CommunityGeneral } from "../general/CommunityGeneral"
 import { CommunityMembers } from "../members"
@@ -97,8 +98,11 @@ export function CommunitySettingsStoryNavigation({
     <CommunitySettingsView
       communityId={communityId}
       section={currentSection}
-      content={content}
-      loadState={props.loadState}
+      content={
+        <SettingsContentStatus state={props.loadState ?? "ready"} label="Community設定を読み込み中">
+          {content}
+        </SettingsContentStatus>
+      }
       communityAccentColor={props.communityAccentColor}
       onSectionChange={(next) => setCurrentSection(next)}
     />
