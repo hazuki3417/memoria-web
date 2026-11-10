@@ -9,15 +9,12 @@ import { PersonalPreferences } from "../preferences"
 import { Account } from "../account"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
-import { usePersonalSettingsActions } from "./usePersonalSettingsActions"
+import { usePersonalProfileSave } from "../profile/usePersonalProfileSave"
+import { usePersonalPreferencesSave } from "../preferences/usePersonalPreferencesSave"
 import { usePersonalSettingsInspection } from "./usePersonalSettingsInspection"
 import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
-type ProfilePreferencesSection = Extract<
-  PersonalSettingsSection,
-  "profile" | "preferences"
->
 type AccountUsageSection = Extract<PersonalSettingsSection, "account" | "usage">
 
 export type PersonalSettingsRouteProps = { section: PersonalSettingsSection }
@@ -28,13 +25,11 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
   const onSectionChange = (section: PersonalSettingsSection) => {
     router.push(`/settings/${section}`)
   }
-  if (props.section === "profile" || props.section === "preferences") {
-    return (
-      <ProfilePreferencesConnection
-        section={props.section}
-        onSectionChange={onSectionChange}
-      />
-    )
+  if (props.section === "profile") {
+    return <ProfileConnection onSectionChange={onSectionChange} />
+  }
+  if (props.section === "preferences") {
+    return <PreferencesConnection onSectionChange={onSectionChange} />
   }
   return (
     <AccountUsageConnection
@@ -44,46 +39,67 @@ export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
   )
 }
 
-/** Profile/PreferencesはCurrentUserに加えて保存と結果確認を接続する。 */
-function ProfilePreferencesConnection({
-  section,
+/** Profile固有の保存・確認を接続する。共通CurrentUser取得とPreview解決は維持。 */
+function ProfileConnection({
   onSectionChange,
 }: {
-  section: ProfilePreferencesSection
   onSectionChange: (section: PersonalSettingsSection) => void
 }) {
   const { data, error, personalAccentColor, loadState } =
     usePersonalSettingsReadState()
-  const { inspectProfile, inspectPreferences } = usePersonalSettingsInspection()
+  const { inspectProfile } = usePersonalSettingsInspection()
+  const { saveProfile } = usePersonalProfileSave()
   usePersonalSettingsRefreshError(Boolean(data?.me && error))
-  const { saveProfile, savePreferences } = usePersonalSettingsActions()
+
+  return (
+    <PersonalSettingsView
+      key="profile"
+      section="profile"
+      onSectionChange={onSectionChange}
+      personalAccentColor={personalAccentColor}
+      loadState={loadState}
+      content={
+        <PersonalProfile
+          onSave={saveProfile}
+          onInspect={inspectProfile}
+          initialNickname={data?.me?.profile.nickname}
+        />
+      }
+    />
+  )
+}
+
+/** Preferences固有の保存・確認・Viewport依存を接続する。 */
+function PreferencesConnection({
+  onSectionChange,
+}: {
+  onSectionChange: (section: PersonalSettingsSection) => void
+}) {
+  const { data, error, personalAccentColor, loadState } =
+    usePersonalSettingsReadState()
+  const { inspectPreferences } = usePersonalSettingsInspection()
+  const { savePreferences } = usePersonalPreferencesSave()
+  usePersonalSettingsRefreshError(Boolean(data?.me && error))
   const compact = useMediaQuery("(max-width: 48em)")
   const preferences = data?.me
     ? fromGraphqlUserPreferences(data.me.preferences)
     : undefined
-  const content = section === "profile" ? (
-    <PersonalProfile
-      onSave={saveProfile}
-      onInspect={inspectProfile}
-      initialNickname={data?.me?.profile.nickname}
-    />
-  ) : (
-    <PersonalPreferences
-      compact={compact}
-      initialPreferences={preferences}
-      onSave={savePreferences}
-      onInspect={inspectPreferences}
-    />
-  )
 
   return (
     <PersonalSettingsView
-      key={section}
-      section={section}
+      key="preferences"
+      section="preferences"
       onSectionChange={onSectionChange}
       personalAccentColor={personalAccentColor}
       loadState={loadState}
-      content={content}
+      content={
+        <PersonalPreferences
+          compact={compact}
+          initialPreferences={preferences}
+          onSave={savePreferences}
+          onInspect={inspectPreferences}
+        />
+      }
     />
   )
 }

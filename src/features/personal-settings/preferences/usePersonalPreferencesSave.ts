@@ -6,35 +6,22 @@ import {
   SaveUserPreferencesDocument,
   type OperationSaveUserPreferencesMutation,
   type OperationSaveUserPreferencesMutationVariables,
-  useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
-import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
-import type { UserPreferencesPatch } from "../preferences/userPreferences"
+import {
+  SettingsInputValidationError,
+  requireSettingsMutationOutcome,
+} from "@/infrastructure/graphql/settingsMutationResult"
+import type { UserPreferencesPatch } from "./userPreferences"
 import {
   fromGraphqlUserPreferences,
   toGraphqlUserPreferencesPatch,
-} from "../preferences/userPreferencesGraphqlAdapter"
+} from "./userPreferencesGraphqlAdapter"
 
-/** Owns Personal Settings writes; reading and presentation remain separate. */
-export function usePersonalSettingsActions() {
+/** Preferences保存と確定した値の返却を所有する。 */
+export function usePersonalPreferencesSave() {
   const client = useApolloClient()
-  const [updateProfile] = useUpdateMemoriaUserProfileMutation()
 
   return {
-    saveProfile: async (nickname: string) => {
-      const result = await updateProfile({
-        variables: { input: { nickname } },
-        errorPolicy: "all",
-      })
-      const outcome = requireSettingsMutationOutcome(result.data?.updateUserProfile, result)
-      if (outcome?.__typename === "InputValidationFailure")
-        throw new SettingsInputValidationError(outcome.violations)
-      if (outcome?.__typename !== "UpdateUserProfileSuccess")
-        throw new Error("Profile update unconfirmed")
-      void client
-        .refetchQueries({ include: [CurrentUserDocument] })
-        .catch(() => undefined)
-    },
     savePreferences: async (patch: UserPreferencesPatch) => {
       const input = toGraphqlUserPreferencesPatch(patch)
       const result = await client.mutate<
