@@ -37,7 +37,7 @@ export function ConnectedPersonalUsage() {
       scope="personal"
       usage={usage}
       fileSizeUnit={
-          personal.data?.me?.preferences.fileSizeUnit === "BINARY"
+        personal.data?.me?.preferences.fileSizeUnit === "BINARY"
             ? "BINARY"
             : "DECIMAL"
       }
