@@ -3,6 +3,7 @@ import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { CommunitySettingsStoryNavigation } from "./CommunitySettingsStoryNavigation"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
+import type { SettingsSectionResult } from "@/ui/SettingsSectionHost"
 
 type NavigationProps = {
   section?: CommunitySettingsSection
@@ -37,7 +38,10 @@ describe("Community Settings Storybook Navigation Adapter", () => {
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
     expect(rendered.section).toBe("general")
     expect(isValidElement(rendered.content)).toBe(true)
-    const sectionContent = (rendered.content as ReactElement<{ children: ReactNode }>).props.children
+    const hostChildren = (rendered.content as ReactElement<{
+      children: (render: (state: SettingsSectionResult) => ReactNode) => ReactNode
+    }>).props.children
+    const sectionContent = hostChildren((state) => state.status === "ready" ? state.content : null)
     expect((sectionContent as ReactElement<{ invitation: { invitationUrl: string } }>).props.invitation.invitationUrl).toContain("photo-club-demo-")
 
     act(() => rendered.onSectionChange("members"))

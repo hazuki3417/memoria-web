@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
+import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import type { ReactNode } from "react"
 import { CommunityGeneral } from "../general/CommunityGeneral"
 import { CommunityMembers } from "../members"
@@ -35,6 +35,7 @@ export type CommunitySettingsStoryProps = {
   invitation?: InvitationModel
   communityAccentColor?: string
   loadState?: PageStatus
+  usageState?: PageStatus
   onSectionChange: (section: CommunitySettingsSection) => void
 }
 
@@ -99,9 +100,17 @@ export function CommunitySettingsStoryNavigation({
       communityId={communityId}
       section={currentSection}
       content={
-        <SettingsContentStatus state={props.loadState ?? "ready"} label="Community設定を読み込み中">
-          {content}
-        </SettingsContentStatus>
+        <SettingsSectionHost
+          label={currentSection === "usage" ? "利用状況を読み込み中" : "Community設定を読み込み中"}
+          errorTitle={currentSection === "usage" && !props.usageState ? "利用状況を取得できませんでした" : undefined}
+        >
+          {(render) => {
+            const state = currentSection === "usage"
+              ? props.usageState ?? props.loadState ?? "ready"
+              : props.loadState ?? "ready"
+            return render(state === "ready" ? { status: "ready", content } : { status: state })
+          }}
+        </SettingsSectionHost>
       }
       communityAccentColor={props.communityAccentColor}
       onSectionChange={(next) => setCurrentSection(next)}

@@ -3,52 +3,36 @@ import { Button } from "@mantine/core"
 import { MockedProvider } from "@apollo/client/testing"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
-import {
-  CommunityUsageDocument,
-  CurrentUserDocument,
-} from "@/infrastructure/graphql/generated"
+import { CommunitySettingsUsageDocument } from "@/infrastructure/graphql/generated"
+import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import { ConnectedCommunityUsage } from "./ConnectedCommunityUsage"
 import { graphqlUsageFixture, emptyGraphqlUsageFixture } from "@/features/usage/usageStoryFixtures"
 
 
 const communityRequest = {
-  query: CommunityUsageDocument,
+  query: CommunitySettingsUsageDocument,
   variables: { communityId: "club-a" },
 }
-const communitySuccess = {
+const communitySuccessFor = (
+  unit: "DECIMAL" | "BINARY",
+  usageProjection = graphqlUsageFixture,
+) => ({
   request: communityRequest,
-  result: { data: { communityUsage: graphqlUsageFixture } },
-}
+  result: {
+    data: {
+      communityUsage: usageProjection,
+      me: { id: "user-a", preferences: { fileSizeUnit: unit } },
+    },
+  },
+})
+const communitySuccess = communitySuccessFor("DECIMAL")
+const communityBinary = communitySuccessFor("BINARY")
+const communityEmptySuccess = communitySuccessFor("DECIMAL", emptyGraphqlUsageFixture)
 const communityFailure = {
   request: communityRequest,
   error: new Error("Usage取得失敗"),
 }
-const communityEmptySuccess = {
-  request: communityRequest,
-  result: { data: { communityUsage: emptyGraphqlUsageFixture } },
-}
 const communityLoading = { ...communitySuccess, delay: 15_000 }
-
-const communityPreferences = (unit: "DECIMAL" | "BINARY") => ({
-  request: { query: CurrentUserDocument },
-  result: {
-    data: {
-      me: {
-        id: "user-a",
-        profile: { nickname: "ユーザー" },
-        preferences: {
-          personalAccentColor: "#0000FF",
-          dateFormat: "YYYY_MM_DD",
-          fileSizeUnit: unit,
-          mediaThumbnailSize: "MEDIUM",
-          mediaDetailNavigationWrap: false,
-          mediaDetailInitialInfoWide: true,
-          mediaDetailInitialInfoMedium: false,
-        },
-      },
-    },
-  },
-})
 
 // NV-04: 同一画面でCommunity IDが変わっても別Communityの集計値を表示しない。
 const otherCommunityUsage = {
@@ -63,19 +47,27 @@ const otherCommunityUsage = {
 }
 
 
+function ConnectedCommunityUsageStory({ communityId }: { communityId: string }) {
+  return (
+    <SettingsSectionHost label="利用状況を読み込み中" errorTitle="利用状況を取得できませんでした">
+      {(render) => <ConnectedCommunityUsage communityId={communityId} render={render} />}
+    </SettingsSectionHost>
+  )
+}
+
 function CommunitySwitchScenario() {
   const [communityId, setCommunityId] = useState("club-a")
   return (
     <>
       <Button onClick={() => setCommunityId("club-b")}>Community Bへ切り替え</Button>
-      <ConnectedCommunityUsage communityId={communityId} />
+      <ConnectedCommunityUsageStory communityId={communityId} />
     </>
   )
 }
 
 const meta = {
   title: "features/community-settings/usage/ConnectedCommunityUsage",
-  component: ConnectedCommunityUsage,
+  component: ConnectedCommunityUsageStory,
   args: { communityId: "club-a" },
 } satisfies Meta<typeof ConnectedCommunityUsage>
 export default meta
@@ -88,7 +80,7 @@ export const CommunityReady: Story = {
   decorators: [
     (Story) => (
       <MockedProvider
-        mocks={[communitySuccess, communityPreferences("DECIMAL")]}
+        mocks={[communitySuccess]}
         addTypename={false}
       >
         <Story />
@@ -113,7 +105,7 @@ export const CommunityBinary: Story = {
   decorators: [
     (Story) => (
       <MockedProvider
-        mocks={[communitySuccess, communityPreferences("BINARY")]}
+        mocks={[communityBinary]}
         addTypename={false}
       >
         <Story />
@@ -137,10 +129,7 @@ export const CommunityEmpty: Story = {
   decorators: [
     (Story) => (
       <MockedProvider
-        mocks={[
-          communityEmptySuccess,
-          communityPreferences("DECIMAL"),
-        ]}
+        mocks={[communityEmptySuccess]}
         addTypename={false}
       >
         <Story />
@@ -170,7 +159,7 @@ export const CommunityLoading: Story = {
   decorators: [
     (Story) => (
       <MockedProvider
-        mocks={[communityLoading, communityPreferences("DECIMAL")]}
+        mocks={[communityLoading]}
         addTypename={false}
       >
         <Story />
@@ -194,11 +183,7 @@ export const CommunityRetry: Story = {
   decorators: [
     (Story) => (
       <MockedProvider
-        mocks={[
-          communityFailure,
-          communitySuccess,
-          communityPreferences("DECIMAL"),
-        ]}
+        mocks={[communityFailure, communitySuccess]}
         addTypename={false}
       >
         <Story />
@@ -225,11 +210,7 @@ export const CommunityRetryFailure: Story = {
   decorators: [
     (Story) => (
       <MockedProvider
-        mocks={[
-          communityFailure,
-          communityFailure,
-          communityPreferences("DECIMAL"),
-        ]}
+        mocks={[communityFailure, communityFailure]}
         addTypename={false}
       >
         <Story />
@@ -245,23 +226,15 @@ export const CommunityRetryFailure: Story = {
   },
 }
 
-// SS-02/03・UN-02: Usageが取得できてもCurrentUser Preferencesが失敗した場合は
-// 単位を推測して確定表示せず、再試行で双方を復旧してから集計を表示する。
+// SS-02/03・UN-02: Combined Usage/Preferences Queryの失敗時には表示せず、
+// 再試行で正しい単位も含めて復旧する。
 export const CommunityPreferencesRetry: Story = {
   name: "Interaction · Preferences取得失敗から再取得成功",
   tags: ["interaction"],
   decorators: [
     (Story) => (
       <MockedProvider
-        mocks={[
-          communitySuccess,
-          communitySuccess,
-          {
-            request: { query: CurrentUserDocument },
-            error: new Error("Preferences取得失敗"),
-          },
-          communityPreferences("BINARY"),
-        ]}
+        mocks={[communityFailure, communityBinary]}
         addTypename={false}
       >
         <Story />
@@ -295,12 +268,11 @@ export const CommunitySwitch: Story = {
           communitySuccess,
           {
             request: {
-              query: CommunityUsageDocument,
+              query: CommunitySettingsUsageDocument,
               variables: { communityId: "club-b" },
             },
-            result: { data: { communityUsage: otherCommunityUsage } },
+            result: { data: { communityUsage: otherCommunityUsage, me: { id: "user-a", preferences: { fileSizeUnit: "DECIMAL" } } } },
           },
-          communityPreferences("DECIMAL"),
         ]}
         addTypename={false}
       >

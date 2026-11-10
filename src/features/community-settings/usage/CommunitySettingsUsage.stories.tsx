@@ -1,5 +1,4 @@
 import { Box } from "@mantine/core"
-import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, within } from "storybook/test"
 import { Usage as UsageComponent } from "@/features/usage"
@@ -58,11 +57,7 @@ export const ErrorState: Story = {
   name: "Visual · 取得失敗",
   tags: ["visual"],
   args: {
-    usageContent: (
-      <SettingsContentStatus state="error" label="利用状況を読み込み中">
-        <UsageComponent scope="community" usage={sampleUsage} />
-      </SettingsContentStatus>
-    ),
+    usageState: "error",
   },
 }
 
@@ -70,10 +65,6 @@ export const LoadingState: Story = {
   name: "Visual · 読み込み中",
   tags: ["visual"],
   args: {
-    usageContent: (
-      <SettingsContentStatus state="loading" label="利用状況を読み込み中">
-        <UsageComponent scope="community" usage={sampleUsage} />
-      </SettingsContentStatus>
-    ),
+    usageState: "loading",
   },
 }
