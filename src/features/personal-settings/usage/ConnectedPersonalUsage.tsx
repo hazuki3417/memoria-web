@@ -1,8 +1,7 @@
 "use client"
 
 import { usePersonalUsageQuery } from "@/infrastructure/graphql/generated"
-import { emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
-import { UsageSection } from "@/features/usage/UsageSection"
+import { UsageSection, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 /** Personal Context固有のGraphQL接続。共通のUsage UIはfeatures/usageが所有する。 */
