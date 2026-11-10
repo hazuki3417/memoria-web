@@ -1,7 +1,7 @@
 "use client"
 
 import { useApolloClient } from "@apollo/client"
-import { CommunityDetailsDocument } from "@/infrastructure/graphql/generated"
+import { CommunitySettingsNameInspectionDocument } from "@/infrastructure/graphql/generated"
 
 /** Inspect Community name independently of Apollo cache updates. */
 export function useCommunityNameInspection(communityId: string) {
@@ -9,7 +9,7 @@ export function useCommunityNameInspection(communityId: string) {
 
   return async () => {
     const current = await client.query({
-      query: CommunityDetailsDocument,
+      query: CommunitySettingsNameInspectionDocument,
       variables: { communityId },
       fetchPolicy: "no-cache",
     })

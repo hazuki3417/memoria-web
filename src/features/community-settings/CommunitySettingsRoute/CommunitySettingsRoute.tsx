@@ -3,13 +3,13 @@
 import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
+import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { ConnectedCommunityGeneral } from "../general/ConnectedCommunityGeneral"
 import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
-import { useCommunitySettingsData } from "./useCommunitySettingsData"
+import { useCommunitySettingsMembership } from "./useCommunitySettingsMembership"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
@@ -20,14 +20,14 @@ export type CommunitySettingsRouteProps = {
   section?: CommunitySettingsSection
 }
 
-/** Community Contextの可用性、Section選択、Navigation、Viewを構成する。 */
+/** Selects one Controller; only membership and navigation remain in Route. */
 export function CommunitySettingsRoute({
   communityId,
   section = "general",
 }: CommunitySettingsRouteProps) {
   const router = useRouter()
-  const { communityAccentColor, membershipLost, name, members, loadState } =
-    useCommunitySettingsData(communityId, section)
+  const { communityAccentColor, membershipLost } =
+    useCommunitySettingsMembership(communityId, section)
 
   if (membershipLost)
     return (
@@ -36,31 +36,37 @@ export function CommunitySettingsRoute({
       </LoadingBoundary>
     )
 
-  let content: ReactNode
+  let controller: (render: SettingsSectionRender) => ReactNode
+  let label = "Community設定を読み込み中"
+  let errorTitle: string | undefined
+
   switch (section) {
     case "general":
-      content = (
-        <ConnectedCommunityGeneral
-          communityId={communityId}
-          name={name}
-          isAdmin={members?.find((member) => member.isSelf)?.role === "admin"}
-        />
+      controller = (render) => (
+        <ConnectedCommunityGeneral communityId={communityId} render={render} />
       )
       break
     case "members":
-      content = (
+      controller = (render) => (
         <ConnectedCommunityMembers
           communityId={communityId}
-          members={members ?? undefined}
           onLeaveSuccess={() => router.push("/dashboard")}
+          render={render}
         />
       )
       break
     case "usage":
-      content = <ConnectedCommunityUsage communityId={communityId} />
+      label = "利用状況を読み込み中"
+      errorTitle = "利用状況を取得できませんでした"
+      controller = (render) => (
+        <ConnectedCommunityUsage communityId={communityId} render={render} />
+      )
       break
     case "preferences":
-      content = <ConnectedCommunityPreferences communityId={communityId} />
+      label = "Community環境設定を読み込み中"
+      controller = (render) => (
+        <ConnectedCommunityPreferences communityId={communityId} render={render} />
+      )
       break
   }
 
@@ -71,9 +77,9 @@ export function CommunitySettingsRoute({
       section={section}
       communityAccentColor={communityAccentColor}
       content={
-        <SettingsContentStatus state={loadState} label="Community設定を読み込み中">
-          {content}
-        </SettingsContentStatus>
+        <SettingsSectionHost label={label} errorTitle={errorTitle}>
+          {controller}
+        </SettingsSectionHost>
       }
       onSectionChange={(nextSection) => {
         const target = getCommunitySettingsSections(communityId).find(

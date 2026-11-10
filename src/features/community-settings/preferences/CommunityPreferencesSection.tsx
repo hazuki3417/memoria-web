@@ -1,38 +1,32 @@
 "use client"
 
 import { Stack } from "@mantine/core"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { CommunityPreferences } from "./CommunityPreferences"
 import { CommunityAliasControl } from "./CommunityAliasControl"
 import { CommunityAccentSaveFeedback } from "./ConnectedCommunityPreferences/CommunityAccentSaveFeedback"
 import type { useCommunityPreferencesConnection } from "./ConnectedCommunityPreferences/useCommunityPreferencesConnection"
 import type { useCommunityAliasConnection } from "./ConnectedCommunityPreferences/useCommunityAliasConnection"
 
-/** Preferences固有の取得状態とForm・Feedback UIのCompositionを所有する。 */
+type Connection = ReturnType<typeof useCommunityPreferencesConnection>
+
+/** Ready-only UI composition; status is exclusively the shared Host's concern. */
 export function CommunityPreferencesSection({
   communityId,
-  model,
+  settings,
+  snapshot,
+  controller,
+  canResave,
   alias,
 }: {
   communityId: string
-  model: ReturnType<typeof useCommunityPreferencesConnection>
+  settings: { accentColor: string; alias: string | null }
+  snapshot: Connection["snapshot"]
+  controller: Connection["controller"]
+  canResave: boolean
   alias: ReturnType<typeof useCommunityAliasConnection>
 }) {
-  const { data, loading, snapshot, controller, canResave } = model
-
-  if (!data?.community) {
-    return (
-      <PageStatusBoundary
-        state={loading ? "loading" : "error"}
-        label="Community環境設定を読み込み中"
-      >
-        {null}
-      </PageStatusBoundary>
-    )
-  }
-
   const failure = snapshot.failure
-  const accent = snapshot.confirmed ?? data.community.mySettings.accentColor
+  const accent = snapshot.confirmed ?? settings.accentColor
   const lastDraft = snapshot.draft ?? accent
 
   return (
@@ -58,7 +52,7 @@ export function CommunityPreferencesSection({
         }
         aliasControl={
           <CommunityAliasControl
-            savedAlias={data.community.mySettings.alias}
+            savedAlias={settings.alias}
             onInspect={alias.inspectAlias}
             onSave={alias.saveAlias}
           />

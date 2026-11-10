@@ -18,6 +18,7 @@ vi.mock("@/components/Feedback", () => ({
 vi.mock("@/infrastructure/graphql/generated", () => ({
   MyCommunitiesDocument: { kind: "Document", name: "myCommunities" },
   CommunityMembersDocument: { kind: "Document", name: "communityMembers" },
+  CommunitySettingsMembersDocument: { kind: "Document", name: "communitySettingsMembers" },
   CommunityMemberRole: { Admin: "ADMIN", Member: "MEMBER" },
   useChangeCommunityMemberRoleMutation: () => [mocks.changeRole],
   useRemoveCommunityMemberMutation: () => [mocks.remove],
@@ -66,7 +67,7 @@ describe("Communityメンバー管理のMutation契約", () => {
         awaitRefetchQueries: true,
       }),
     )
-    expect(mocks.remove.mock.calls[0][0].refetchQueries).toHaveLength(1)
+    expect(mocks.remove.mock.calls[0][0].refetchQueries).toHaveLength(2)
     expect(mocks.notify).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "success" }),
     )
@@ -100,7 +101,7 @@ describe("Communityメンバー管理のMutation契約", () => {
         awaitRefetchQueries: true,
       }),
     )
-    expect(mocks.changeRole.mock.calls[0][0].refetchQueries).toHaveLength(1)
+    expect(mocks.changeRole.mock.calls[0][0].refetchQueries).toHaveLength(2)
     expect(mocks.notify).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "success" }),
     )

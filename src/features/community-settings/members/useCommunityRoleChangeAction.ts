@@ -1,7 +1,7 @@
 "use client"
 
 import { showNotification } from "@/components/Feedback"
-import { CommunityMembersDocument, CommunityMemberRole, useChangeCommunityMemberRoleMutation } from "@/infrastructure/graphql/generated"
+import { CommunityMembersDocument, CommunitySettingsMembersDocument, CommunityMemberRole, useChangeCommunityMemberRoleMutation } from "@/infrastructure/graphql/generated"
 
 /** Owns role mutation and its existing cache refresh/feedback semantics. */
 export function useCommunityRoleChangeAction(communityId: string) {
@@ -23,7 +23,7 @@ export function useCommunityRoleChangeAction(communityId: string) {
                 : CommunityMemberRole.Member,
           },
         },
-        refetchQueries: [CommunityMembersDocument],
+        refetchQueries: [CommunityMembersDocument, CommunitySettingsMembersDocument],
         awaitRefetchQueries: true,
       })
       if (!result.data?.changeCommunityMemberRole.success) {

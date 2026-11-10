@@ -23,7 +23,7 @@ const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 export function useCommunityPreferencesConnection(communityId: string) {
   const { data, loading, error } = useCommunityMySettingsQuery({
     variables: { communityId },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
   })
   useCommunitySettingsRefreshError(Boolean(data?.community && error))
   const client = useApolloClient()

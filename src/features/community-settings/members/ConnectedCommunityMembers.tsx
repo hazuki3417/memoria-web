@@ -1,33 +1,64 @@
 "use client"
 
+import { useCommunitySettingsMembersQuery } from "@/infrastructure/graphql/generated"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { CommunityMembers, type CommunityMember } from "./index"
 import { useCommunityMemberRemovalAction } from "./useCommunityMemberRemovalAction"
 import { useCommunityLeaveAction } from "./useCommunityLeaveAction"
 import { useCommunityRoleChangeAction } from "./useCommunityRoleChangeAction"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
-type ConnectedCommunityMembersProps = {
-  communityId: string
-  members?: CommunityMember[]
-  onLeaveSuccess: () => void
-}
-
-/** Members固有のMutationだけを生成し、既存の通知・再取得・退会後Navigationを維持する。 */
+/** Members owns only the selected listing and relevant member actions. */
 export function ConnectedCommunityMembers({
   communityId,
-  members,
   onLeaveSuccess,
-}: ConnectedCommunityMembersProps) {
+  render,
+}: {
+  communityId: string
+  onLeaveSuccess: () => void
+  render: SettingsSectionRender
+}) {
+  const query = useCommunitySettingsMembersQuery({
+    variables: { communityId },
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+  })
   const { onRemoveMember } = useCommunityMemberRemovalAction(communityId)
   const { onLeaveCommunity } = useCommunityLeaveAction(communityId)
   const { onChangeMemberRole } = useCommunityRoleChangeAction(communityId)
+  const members = query.data?.communityMembers
+  const selfId = query.data?.me?.id
+  const ready = Boolean(query.data?.community && members && selfId !== undefined)
 
-  return (
-    <CommunityMembers
-      members={members}
-      onChangeRole={onChangeMemberRole}
-      onRemoveMember={onRemoveMember}
-      onLeave={onLeaveCommunity}
-      onLeaveSuccess={onLeaveSuccess}
-    />
-  )
+  useCommunitySettingsRefreshError(Boolean(ready && query.error))
+  if (!ready || !members || selfId === undefined) {
+    return render(
+      query.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void query.refetch().catch(() => undefined) },
+          },
+    )
+  }
+
+  const viewMembers: CommunityMember[] = members.map((member) => ({
+    id: member.userId,
+    name: member.nickname,
+    role: member.role,
+    isSelf: member.userId === selfId,
+  }))
+
+  return render({
+    status: "ready",
+    content: (
+      <CommunityMembers
+        members={viewMembers}
+        onChangeRole={onChangeRole}
+        onRemoveMember={onRemoveMember}
+        onLeave={onLeaveCommunity}
+        onLeaveSuccess={onLeaveSuccess}
+      />
+    ),
+  })
 }

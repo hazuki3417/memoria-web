@@ -1,7 +1,7 @@
 "use client"
 
 import { showNotification } from "@/components/Feedback"
-import { CommunityMembersDocument, useRemoveCommunityMemberMutation } from "@/infrastructure/graphql/generated"
+import { CommunityMembersDocument, CommunitySettingsMembersDocument, useRemoveCommunityMemberMutation } from "@/infrastructure/graphql/generated"
 
 /** Owns the member-removal mutation and existing refresh/feedback semantics. */
 export function useCommunityMemberRemovalAction(communityId: string) {
@@ -11,7 +11,7 @@ export function useCommunityMemberRemovalAction(communityId: string) {
     try {
       const result = await removeMember({
         variables: { input: { communityId, userId } },
-        refetchQueries: [CommunityMembersDocument],
+        refetchQueries: [CommunityMembersDocument, CommunitySettingsMembersDocument],
         awaitRefetchQueries: true,
       })
       if (!result.data?.removeCommunityMember.success) {
