@@ -1,13 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
-import { useCommunityNameAction } from "../general/useCommunityNameAction"
-import { useCommunityMemberRemovalAction } from "../members/useCommunityMemberRemovalAction"
-import { useCommunityLeaveAction } from "../members/useCommunityLeaveAction"
-import { useCommunityRoleChangeAction } from "../members/useCommunityRoleChangeAction"
+import { useCommunityMemberRemovalAction } from "./useCommunityMemberRemovalAction"
+import { useCommunityLeaveAction } from "./useCommunityLeaveAction"
+import { useCommunityRoleChangeAction } from "./useCommunityRoleChangeAction"
 
 const mocks = vi.hoisted(() => ({
-  rename: vi.fn(),
   changeRole: vi.fn(),
   remove: vi.fn(),
   leave: vi.fn(),
@@ -21,14 +19,12 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   MyCommunitiesDocument: { kind: "Document", name: "myCommunities" },
   CommunityMembersDocument: { kind: "Document", name: "communityMembers" },
   CommunityMemberRole: { Admin: "ADMIN", Member: "MEMBER" },
-  useUpdateCommunityMutation: () => [mocks.rename],
   useChangeCommunityMemberRoleMutation: () => [mocks.changeRole],
   useRemoveCommunityMemberMutation: () => [mocks.remove],
   useLeaveCommunityMutation: () => [mocks.leave],
 }))
 
-type Actions = ReturnType<typeof useCommunityNameAction> &
-  ReturnType<typeof useCommunityMemberRemovalAction> &
+type Actions = ReturnType<typeof useCommunityMemberRemovalAction> &
   ReturnType<typeof useCommunityLeaveAction> &
   ReturnType<typeof useCommunityRoleChangeAction>
 let root: Root
@@ -44,7 +40,6 @@ beforeEach(async () => {
     root.render(
       createElement(() => {
         actions = {
-          ...useCommunityNameAction("community-1"),
           ...useCommunityMemberRemovalAction("community-1"),
           ...useCommunityLeaveAction("community-1"),
           ...useCommunityRoleChangeAction("community-1"),
@@ -59,56 +54,7 @@ afterEach(async () => {
   host.remove()
 })
 
-describe("Community設定のMutation契約", () => {
-  it("Community名変更の成功は確定名を返し、MyCommunitiesの再取得を要求する", async () => {
-    mocks.rename.mockResolvedValue({
-      data: {
-        updateCommunity: {
-          __typename: "UpdateCommunitySuccess",
-          community: { id: "community-1", name: "新しい名前" },
-        },
-      },
-    })
-    expect(await actions.onSaveName("新しい名前")).toBe("新しい名前")
-    expect(mocks.rename).toHaveBeenCalledWith(
-      expect.objectContaining({
-        variables: {
-          input: { communityId: "community-1", name: "新しい名前" },
-        },
-        awaitRefetchQueries: false,
-      }),
-    )
-    expect(mocks.rename.mock.calls[0][0].refetchQueries).toHaveLength(1)
-    expect(mocks.notify).not.toHaveBeenCalled()
-  })
-
-  it("Community名変更の応答欠落と通信失敗をFormに伝搬し、接続層から重複通知しない", async () => {
-    mocks.rename
-      .mockResolvedValueOnce({ data: null })
-      .mockRejectedValueOnce(new Error("network"))
-    await expect(actions.onSaveName("変更")).rejects.toThrow("Settings mutation outcome unavailable")
-    await expect(actions.onSaveName("変更")).rejects.toThrow("network")
-    expect(mocks.notify).not.toHaveBeenCalled()
-  })
-
-  it("Community名のTyped ValidationをField Path付きでFormへ伝達する", async () => {
-    mocks.rename.mockResolvedValue({
-      data: {
-        updateCommunity: {
-          __typename: "InputValidationFailure",
-          violations: [{
-            scope: "FIELD", code: "REQUIRED", inputPaths: [{ segments: ["name"] }],
-          }],
-        },
-      },
-    })
-    await expect(actions.onSaveName("変更")).rejects.toMatchObject({
-      kind: "validation",
-      violations: [{ code: "REQUIRED" }],
-    })
-    expect(mocks.notify).not.toHaveBeenCalled()
-  })
-
+describe("Communityメンバー管理のMutation契約", () => {
   it("メンバー除外成功はtrueと成功通知、CommunityMembersの再取得", async () => {
     mocks.remove.mockResolvedValue({
       data: { removeCommunityMember: { success: true } },
