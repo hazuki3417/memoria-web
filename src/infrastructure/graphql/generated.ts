@@ -1410,6 +1410,86 @@ export type OperationPersonalUsageQuery = {
   } | null
 }
 
+export type OperationPersonalSettingsAccentQueryVariables = Exact<{ [key: string]: never }>
+
+export type OperationPersonalSettingsAccentQuery = {
+  me: { id: string; preferences: { personalAccentColor: string } } | null
+}
+
+export type OperationPersonalSettingsProfileQueryVariables = Exact<{ [key: string]: never }>
+
+export type OperationPersonalSettingsProfileQuery = {
+  me: { id: string; profile: { nickname: string } } | null
+}
+
+export type OperationPersonalSettingsPreferencesQueryVariables = Exact<{ [key: string]: never }>
+
+export type OperationPersonalSettingsPreferencesQuery = {
+  me: {
+    id: string
+    preferences: {
+      personalAccentColor: string
+      dateFormat: OperationDateFormat
+      fileSizeUnit: OperationFileSizeUnit
+      mediaThumbnailSize: OperationMediaThumbnailSize
+      mediaDetailNavigationWrap: boolean
+      mediaDetailInitialInfoWide: boolean
+      mediaDetailInitialInfoMedium: boolean
+    }
+  } | null
+}
+
+export type OperationCommunitySettingsMembershipQueryVariables = Exact<{ [key: string]: never }>
+
+export type OperationCommunitySettingsMembershipQuery = {
+  myCommunities: Array<{ id: string; mySettings: { accentColor: string } }>
+}
+
+export type OperationCommunitySettingsGeneralQueryVariables = Exact<{
+  communityId: string | number
+}>
+
+export type OperationCommunitySettingsGeneralQuery = {
+  community: { id: string; name: string } | null
+  communityMembers: Array<{ userId: string; role: OperationCommunityMemberRole }>
+  me: { id: string } | null
+}
+
+export type OperationCommunitySettingsMembersQueryVariables = Exact<{
+  communityId: string | number
+}>
+
+export type OperationCommunitySettingsMembersQuery = {
+  community: { id: string } | null
+  communityMembers: Array<{ userId: string; nickname: string; role: OperationCommunityMemberRole }>
+  me: { id: string } | null
+}
+
+export type OperationCommunitySettingsUsageQueryVariables = Exact<{
+  communityId: string | number
+}>
+
+export type OperationCommunitySettingsUsageQuery = {
+  communityUsage: {
+    mediaCount: number
+    storage: { usedBytes: string; effectiveLimitBytes: string }
+    formatBreakdown: Array<{
+      format: OperationOriginalImageFormat
+      mediaCount: number
+      usedBytes: string
+    }>
+  }
+  me: { id: string; preferences: { fileSizeUnit: OperationFileSizeUnit } } | null
+}
+
+export type OperationCommunitySettingsNameInspectionQueryVariables = Exact<{
+  communityId: string | number
+}>
+
+export type OperationCommunitySettingsNameInspectionQuery = {
+  community: { id: string; name: string } | null
+}
+
 export const CommunitySettingsCacheFragmentDoc = gql`
     fragment CommunitySettingsCache on Community {
   mySettings {
@@ -4102,3 +4182,819 @@ export type PersonalUsageQueryResult = Apollo.QueryResult<
   OperationPersonalUsageQuery,
   OperationPersonalUsageQueryVariables
 >
+
+export const PersonalSettingsAccentDocument = gql`
+    query PersonalSettingsAccent { me { id preferences { personalAccentColor } } }
+    `
+
+/**
+ * __usePersonalSettingsAccentQuery__
+ *
+ * To run a query within a React component, call `usePersonalSettingsAccentQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePersonalSettingsAccentQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePersonalSettingsAccentQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePersonalSettingsAccentQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    OperationPersonalSettingsAccentQuery,
+    OperationPersonalSettingsAccentQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationPersonalSettingsAccentQuery,
+    OperationPersonalSettingsAccentQueryVariables
+  >(PersonalSettingsAccentDocument, options)
+}
+export function usePersonalSettingsAccentLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationPersonalSettingsAccentQuery,
+    OperationPersonalSettingsAccentQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationPersonalSettingsAccentQuery,
+    OperationPersonalSettingsAccentQueryVariables
+  >(PersonalSettingsAccentDocument, options)
+}
+// @ts-expect-error
+export function usePersonalSettingsAccentSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationPersonalSettingsAccentQuery,
+    OperationPersonalSettingsAccentQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationPersonalSettingsAccentQuery,
+  OperationPersonalSettingsAccentQueryVariables
+>
+export function usePersonalSettingsAccentSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationPersonalSettingsAccentQuery,
+        OperationPersonalSettingsAccentQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationPersonalSettingsAccentQuery | undefined,
+  OperationPersonalSettingsAccentQueryVariables
+>
+export function usePersonalSettingsAccentSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationPersonalSettingsAccentQuery,
+        OperationPersonalSettingsAccentQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationPersonalSettingsAccentQuery,
+    OperationPersonalSettingsAccentQueryVariables
+  >(PersonalSettingsAccentDocument, options)
+}
+export type PersonalSettingsAccentQueryHookResult = ReturnType<typeof usePersonalSettingsAccentQuery>
+export type PersonalSettingsAccentLazyQueryHookResult = ReturnType<
+  typeof usePersonalSettingsAccentLazyQuery
+>
+export type PersonalSettingsAccentSuspenseQueryHookResult = ReturnType<
+  typeof usePersonalSettingsAccentSuspenseQuery
+>
+export type PersonalSettingsAccentQueryResult = Apollo.QueryResult<
+  OperationPersonalSettingsAccentQuery,
+  OperationPersonalSettingsAccentQueryVariables
+>
+
+export const PersonalSettingsProfileDocument = gql`
+    query PersonalSettingsProfile { me { id profile { nickname } } }
+    `
+
+/**
+ * __usePersonalSettingsProfileQuery__
+ *
+ * To run a query within a React component, call `usePersonalSettingsProfileQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePersonalSettingsProfileQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePersonalSettingsProfileQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePersonalSettingsProfileQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    OperationPersonalSettingsProfileQuery,
+    OperationPersonalSettingsProfileQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationPersonalSettingsProfileQuery,
+    OperationPersonalSettingsProfileQueryVariables
+  >(PersonalSettingsProfileDocument, options)
+}
+export function usePersonalSettingsProfileLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationPersonalSettingsProfileQuery,
+    OperationPersonalSettingsProfileQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationPersonalSettingsProfileQuery,
+    OperationPersonalSettingsProfileQueryVariables
+  >(PersonalSettingsProfileDocument, options)
+}
+// @ts-expect-error
+export function usePersonalSettingsProfileSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationPersonalSettingsProfileQuery,
+    OperationPersonalSettingsProfileQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationPersonalSettingsProfileQuery,
+  OperationPersonalSettingsProfileQueryVariables
+>
+export function usePersonalSettingsProfileSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationPersonalSettingsProfileQuery,
+        OperationPersonalSettingsProfileQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationPersonalSettingsProfileQuery | undefined,
+  OperationPersonalSettingsProfileQueryVariables
+>
+export function usePersonalSettingsProfileSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationPersonalSettingsProfileQuery,
+        OperationPersonalSettingsProfileQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationPersonalSettingsProfileQuery,
+    OperationPersonalSettingsProfileQueryVariables
+  >(PersonalSettingsProfileDocument, options)
+}
+export type PersonalSettingsProfileQueryHookResult = ReturnType<typeof usePersonalSettingsProfileQuery>
+export type PersonalSettingsProfileLazyQueryHookResult = ReturnType<
+  typeof usePersonalSettingsProfileLazyQuery
+>
+export type PersonalSettingsProfileSuspenseQueryHookResult = ReturnType<
+  typeof usePersonalSettingsProfileSuspenseQuery
+>
+export type PersonalSettingsProfileQueryResult = Apollo.QueryResult<
+  OperationPersonalSettingsProfileQuery,
+  OperationPersonalSettingsProfileQueryVariables
+>
+
+export const PersonalSettingsPreferencesDocument = gql`
+    query PersonalSettingsPreferences {
+  me { id preferences {
+    personalAccentColor
+    dateFormat
+    fileSizeUnit
+    mediaThumbnailSize
+    mediaDetailNavigationWrap
+    mediaDetailInitialInfoWide
+    mediaDetailInitialInfoMedium
+  } }
+}
+    `
+
+/**
+ * __usePersonalSettingsPreferencesQuery__
+ *
+ * To run a query within a React component, call `usePersonalSettingsPreferencesQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePersonalSettingsPreferencesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePersonalSettingsPreferencesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePersonalSettingsPreferencesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    OperationPersonalSettingsPreferencesQuery,
+    OperationPersonalSettingsPreferencesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationPersonalSettingsPreferencesQuery,
+    OperationPersonalSettingsPreferencesQueryVariables
+  >(PersonalSettingsPreferencesDocument, options)
+}
+export function usePersonalSettingsPreferencesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationPersonalSettingsPreferencesQuery,
+    OperationPersonalSettingsPreferencesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationPersonalSettingsPreferencesQuery,
+    OperationPersonalSettingsPreferencesQueryVariables
+  >(PersonalSettingsPreferencesDocument, options)
+}
+// @ts-expect-error
+export function usePersonalSettingsPreferencesSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationPersonalSettingsPreferencesQuery,
+    OperationPersonalSettingsPreferencesQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationPersonalSettingsPreferencesQuery,
+  OperationPersonalSettingsPreferencesQueryVariables
+>
+export function usePersonalSettingsPreferencesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationPersonalSettingsPreferencesQuery,
+        OperationPersonalSettingsPreferencesQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationPersonalSettingsPreferencesQuery | undefined,
+  OperationPersonalSettingsPreferencesQueryVariables
+>
+export function usePersonalSettingsPreferencesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationPersonalSettingsPreferencesQuery,
+        OperationPersonalSettingsPreferencesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationPersonalSettingsPreferencesQuery,
+    OperationPersonalSettingsPreferencesQueryVariables
+  >(PersonalSettingsPreferencesDocument, options)
+}
+export type PersonalSettingsPreferencesQueryHookResult = ReturnType<typeof usePersonalSettingsPreferencesQuery>
+export type PersonalSettingsPreferencesLazyQueryHookResult = ReturnType<
+  typeof usePersonalSettingsPreferencesLazyQuery
+>
+export type PersonalSettingsPreferencesSuspenseQueryHookResult = ReturnType<
+  typeof usePersonalSettingsPreferencesSuspenseQuery
+>
+export type PersonalSettingsPreferencesQueryResult = Apollo.QueryResult<
+  OperationPersonalSettingsPreferencesQuery,
+  OperationPersonalSettingsPreferencesQueryVariables
+>
+
+export const CommunitySettingsMembershipDocument = gql`
+    query CommunitySettingsMembership {
+  myCommunities { id mySettings { accentColor } }
+}
+    `
+
+/**
+ * __useCommunitySettingsMembershipQuery__
+ *
+ * To run a query within a React component, call `useCommunitySettingsMembershipQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommunitySettingsMembershipQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommunitySettingsMembershipQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCommunitySettingsMembershipQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    OperationCommunitySettingsMembershipQuery,
+    OperationCommunitySettingsMembershipQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationCommunitySettingsMembershipQuery,
+    OperationCommunitySettingsMembershipQueryVariables
+  >(CommunitySettingsMembershipDocument, options)
+}
+export function useCommunitySettingsMembershipLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationCommunitySettingsMembershipQuery,
+    OperationCommunitySettingsMembershipQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationCommunitySettingsMembershipQuery,
+    OperationCommunitySettingsMembershipQueryVariables
+  >(CommunitySettingsMembershipDocument, options)
+}
+// @ts-expect-error
+export function useCommunitySettingsMembershipSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationCommunitySettingsMembershipQuery,
+    OperationCommunitySettingsMembershipQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsMembershipQuery,
+  OperationCommunitySettingsMembershipQueryVariables
+>
+export function useCommunitySettingsMembershipSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsMembershipQuery,
+        OperationCommunitySettingsMembershipQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsMembershipQuery | undefined,
+  OperationCommunitySettingsMembershipQueryVariables
+>
+export function useCommunitySettingsMembershipSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsMembershipQuery,
+        OperationCommunitySettingsMembershipQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationCommunitySettingsMembershipQuery,
+    OperationCommunitySettingsMembershipQueryVariables
+  >(CommunitySettingsMembershipDocument, options)
+}
+export type CommunitySettingsMembershipQueryHookResult = ReturnType<
+  typeof useCommunitySettingsMembershipQuery
+>
+export type CommunitySettingsMembershipLazyQueryHookResult = ReturnType<
+  typeof useCommunitySettingsMembershipLazyQuery
+>
+export type CommunitySettingsMembershipSuspenseQueryHookResult = ReturnType<
+  typeof useCommunitySettingsMembershipSuspenseQuery
+>
+export type CommunitySettingsMembershipQueryResult = Apollo.QueryResult<
+  OperationCommunitySettingsMembershipQuery,
+  OperationCommunitySettingsMembershipQueryVariables
+>
+
+export const CommunitySettingsGeneralDocument = gql`
+    query CommunitySettingsGeneral($communityId: ID!) {
+  community(communityId: $communityId) { id name }
+  communityMembers(communityId: $communityId) { userId role }
+  me { id }
+}
+    `
+
+/**
+ * __useCommunitySettingsGeneralQuery__
+ *
+ * To run a query within a React component, call `useCommunitySettingsGeneralQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommunitySettingsGeneralQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommunitySettingsGeneralQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useCommunitySettingsGeneralQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OperationCommunitySettingsGeneralQuery,
+    OperationCommunitySettingsGeneralQueryVariables
+  > &
+    (
+      | {
+          variables: OperationCommunitySettingsGeneralQueryVariables
+          skip?: boolean
+        }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationCommunitySettingsGeneralQuery,
+    OperationCommunitySettingsGeneralQueryVariables
+  >(CommunitySettingsGeneralDocument, options)
+}
+export function useCommunitySettingsGeneralLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationCommunitySettingsGeneralQuery,
+    OperationCommunitySettingsGeneralQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationCommunitySettingsGeneralQuery,
+    OperationCommunitySettingsGeneralQueryVariables
+  >(CommunitySettingsGeneralDocument, options)
+}
+// @ts-expect-error
+export function useCommunitySettingsGeneralSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationCommunitySettingsGeneralQuery,
+    OperationCommunitySettingsGeneralQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsGeneralQuery,
+  OperationCommunitySettingsGeneralQueryVariables
+>
+export function useCommunitySettingsGeneralSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsGeneralQuery,
+        OperationCommunitySettingsGeneralQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsGeneralQuery | undefined,
+  OperationCommunitySettingsGeneralQueryVariables
+>
+export function useCommunitySettingsGeneralSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsGeneralQuery,
+        OperationCommunitySettingsGeneralQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationCommunitySettingsGeneralQuery,
+    OperationCommunitySettingsGeneralQueryVariables
+  >(CommunitySettingsGeneralDocument, options)
+}
+export type CommunitySettingsGeneralQueryHookResult = ReturnType<
+  typeof useCommunitySettingsGeneralQuery
+>
+export type CommunitySettingsGeneralLazyQueryHookResult = ReturnType<
+  typeof useCommunitySettingsGeneralLazyQuery
+>
+export type CommunitySettingsGeneralSuspenseQueryHookResult = ReturnType<
+  typeof useCommunitySettingsGeneralSuspenseQuery
+>
+export type CommunitySettingsGeneralQueryResult = Apollo.QueryResult<
+  OperationCommunitySettingsGeneralQuery,
+  OperationCommunitySettingsGeneralQueryVariables
+>
+
+export const CommunitySettingsMembersDocument = gql`
+    query CommunitySettingsMembers($communityId: ID!) {
+  community(communityId: $communityId) { id }
+  communityMembers(communityId: $communityId) { userId nickname role }
+  me { id }
+}
+    `
+
+/**
+ * __useCommunitySettingsMembersQuery__
+ *
+ * To run a query within a React component, call `useCommunitySettingsMembersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommunitySettingsMembersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommunitySettingsMembersQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useCommunitySettingsMembersQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OperationCommunitySettingsMembersQuery,
+    OperationCommunitySettingsMembersQueryVariables
+  > &
+    (
+      | {
+          variables: OperationCommunitySettingsMembersQueryVariables
+          skip?: boolean
+        }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationCommunitySettingsMembersQuery,
+    OperationCommunitySettingsMembersQueryVariables
+  >(CommunitySettingsMembersDocument, options)
+}
+export function useCommunitySettingsMembersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationCommunitySettingsMembersQuery,
+    OperationCommunitySettingsMembersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationCommunitySettingsMembersQuery,
+    OperationCommunitySettingsMembersQueryVariables
+  >(CommunitySettingsMembersDocument, options)
+}
+// @ts-expect-error
+export function useCommunitySettingsMembersSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationCommunitySettingsMembersQuery,
+    OperationCommunitySettingsMembersQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsMembersQuery,
+  OperationCommunitySettingsMembersQueryVariables
+>
+export function useCommunitySettingsMembersSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsMembersQuery,
+        OperationCommunitySettingsMembersQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsMembersQuery | undefined,
+  OperationCommunitySettingsMembersQueryVariables
+>
+export function useCommunitySettingsMembersSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsMembersQuery,
+        OperationCommunitySettingsMembersQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationCommunitySettingsMembersQuery,
+    OperationCommunitySettingsMembersQueryVariables
+  >(CommunitySettingsMembersDocument, options)
+}
+export type CommunitySettingsMembersQueryHookResult = ReturnType<
+  typeof useCommunitySettingsMembersQuery
+>
+export type CommunitySettingsMembersLazyQueryHookResult = ReturnType<
+  typeof useCommunitySettingsMembersLazyQuery
+>
+export type CommunitySettingsMembersSuspenseQueryHookResult = ReturnType<
+  typeof useCommunitySettingsMembersSuspenseQuery
+>
+export type CommunitySettingsMembersQueryResult = Apollo.QueryResult<
+  OperationCommunitySettingsMembersQuery,
+  OperationCommunitySettingsMembersQueryVariables
+>
+
+export const CommunitySettingsUsageDocument = gql`
+    query CommunitySettingsUsage($communityId: ID!) {
+  communityUsage(communityId: $communityId) {
+    mediaCount
+    storage { usedBytes effectiveLimitBytes }
+    formatBreakdown { format mediaCount usedBytes }
+  }
+  me { id preferences { fileSizeUnit } }
+}
+    `
+
+/**
+ * __useCommunitySettingsUsageQuery__
+ *
+ * To run a query within a React component, call `useCommunitySettingsUsageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommunitySettingsUsageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommunitySettingsUsageQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useCommunitySettingsUsageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OperationCommunitySettingsUsageQuery,
+    OperationCommunitySettingsUsageQueryVariables
+  > &
+    (
+      | {
+          variables: OperationCommunitySettingsUsageQueryVariables
+          skip?: boolean
+        }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationCommunitySettingsUsageQuery,
+    OperationCommunitySettingsUsageQueryVariables
+  >(CommunitySettingsUsageDocument, options)
+}
+export function useCommunitySettingsUsageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationCommunitySettingsUsageQuery,
+    OperationCommunitySettingsUsageQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationCommunitySettingsUsageQuery,
+    OperationCommunitySettingsUsageQueryVariables
+  >(CommunitySettingsUsageDocument, options)
+}
+// @ts-expect-error
+export function useCommunitySettingsUsageSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationCommunitySettingsUsageQuery,
+    OperationCommunitySettingsUsageQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsUsageQuery,
+  OperationCommunitySettingsUsageQueryVariables
+>
+export function useCommunitySettingsUsageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsUsageQuery,
+        OperationCommunitySettingsUsageQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsUsageQuery | undefined,
+  OperationCommunitySettingsUsageQueryVariables
+>
+export function useCommunitySettingsUsageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsUsageQuery,
+        OperationCommunitySettingsUsageQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationCommunitySettingsUsageQuery,
+    OperationCommunitySettingsUsageQueryVariables
+  >(CommunitySettingsUsageDocument, options)
+}
+export type CommunitySettingsUsageQueryHookResult = ReturnType<
+  typeof useCommunitySettingsUsageQuery
+>
+export type CommunitySettingsUsageLazyQueryHookResult = ReturnType<
+  typeof useCommunitySettingsUsageLazyQuery
+>
+export type CommunitySettingsUsageSuspenseQueryHookResult = ReturnType<
+  typeof useCommunitySettingsUsageSuspenseQuery
+>
+export type CommunitySettingsUsageQueryResult = Apollo.QueryResult<
+  OperationCommunitySettingsUsageQuery,
+  OperationCommunitySettingsUsageQueryVariables
+>
+
+export const CommunitySettingsNameInspectionDocument = gql`
+    query CommunitySettingsNameInspection($communityId: ID!) {
+  community(communityId: $communityId) { id name }
+}
+    `
+
+/**
+ * __useCommunitySettingsNameInspectionQuery__
+ *
+ * To run a query within a React component, call `useCommunitySettingsNameInspectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommunitySettingsNameInspectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommunitySettingsNameInspectionQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useCommunitySettingsNameInspectionQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OperationCommunitySettingsNameInspectionQuery,
+    OperationCommunitySettingsNameInspectionQueryVariables
+  > &
+    (
+      | {
+          variables: OperationCommunitySettingsNameInspectionQueryVariables
+          skip?: boolean
+        }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<
+    OperationCommunitySettingsNameInspectionQuery,
+    OperationCommunitySettingsNameInspectionQueryVariables
+  >(CommunitySettingsNameInspectionDocument, options)
+}
+export function useCommunitySettingsNameInspectionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OperationCommunitySettingsNameInspectionQuery,
+    OperationCommunitySettingsNameInspectionQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    OperationCommunitySettingsNameInspectionQuery,
+    OperationCommunitySettingsNameInspectionQueryVariables
+  >(CommunitySettingsNameInspectionDocument, options)
+}
+// @ts-expect-error
+export function useCommunitySettingsNameInspectionSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    OperationCommunitySettingsNameInspectionQuery,
+    OperationCommunitySettingsNameInspectionQueryVariables
+  >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsNameInspectionQuery,
+  OperationCommunitySettingsNameInspectionQueryVariables
+>
+export function useCommunitySettingsNameInspectionSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsNameInspectionQuery,
+        OperationCommunitySettingsNameInspectionQueryVariables
+      >,
+): Apollo.UseSuspenseQueryResult<
+  OperationCommunitySettingsNameInspectionQuery | undefined,
+  OperationCommunitySettingsNameInspectionQueryVariables
+>
+export function useCommunitySettingsNameInspectionSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        OperationCommunitySettingsNameInspectionQuery,
+        OperationCommunitySettingsNameInspectionQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<
+    OperationCommunitySettingsNameInspectionQuery,
+    OperationCommunitySettingsNameInspectionQueryVariables
+  >(CommunitySettingsNameInspectionDocument, options)
+}
+export type CommunitySettingsNameInspectionQueryHookResult = ReturnType<
+  typeof useCommunitySettingsNameInspectionQuery
+>
+export type CommunitySettingsNameInspectionLazyQueryHookResult = ReturnType<
+  typeof useCommunitySettingsNameInspectionLazyQuery
+>
+export type CommunitySettingsNameInspectionSuspenseQueryHookResult = ReturnType<
+  typeof useCommunitySettingsNameInspectionSuspenseQuery
+>
+export type CommunitySettingsNameInspectionQueryResult = Apollo.QueryResult<
+  OperationCommunitySettingsNameInspectionQuery,
+  OperationCommunitySettingsNameInspectionQueryVariables
+>
+

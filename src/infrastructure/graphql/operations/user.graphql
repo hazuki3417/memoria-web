@@ -43,3 +43,27 @@ query PersonalUsage {
     }
   }
 }
+
+# Section-scoped authoritative settings reads.
+query PersonalSettingsAccent {
+  me { id preferences { personalAccentColor } }
+}
+
+query PersonalSettingsProfile {
+  me { id profile { nickname } }
+}
+
+query PersonalSettingsPreferences {
+  me {
+    id
+    preferences {
+      personalAccentColor
+      dateFormat
+      fileSizeUnit
+      mediaThumbnailSize
+      mediaDetailNavigationWrap
+      mediaDetailInitialInfoWide
+      mediaDetailInitialInfoMedium
+    }
+  }
+}
