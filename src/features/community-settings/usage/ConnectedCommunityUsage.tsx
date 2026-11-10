@@ -51,7 +51,7 @@ export function ConnectedCommunityUsage({ communityId }: { communityId: string }
       scope="community"
       usage={usage}
       fileSizeUnit={
-          communityPreferences.data?.me?.preferences.fileSizeUnit === "BINARY"
+        communityPreferences.data?.me?.preferences.fileSizeUnit === "BINARY"
             ? "BINARY"
             : "DECIMAL"
       }
