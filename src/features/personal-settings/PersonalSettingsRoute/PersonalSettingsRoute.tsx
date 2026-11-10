@@ -7,7 +7,8 @@ import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { ConnectedPersonalProfile } from "../profile/ConnectedPersonalProfile"
 import { ConnectedPersonalPreferences } from "../preferences/ConnectedPersonalPreferences"
 import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
-import { PersonalAccountSection } from "../account/PersonalAccountSection"
+import { Account } from "../account/Account"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
@@ -28,22 +29,16 @@ export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
   switch (section) {
     case "profile":
       content = (
-        <ConnectedPersonalProfile
-          status={loadState}
-          initialNickname={data?.me?.profile.nickname}
-        />
+        <ConnectedPersonalProfile initialNickname={data?.me?.profile.nickname} />
       )
       break
     case "preferences":
       content = (
-        <ConnectedPersonalPreferences
-          status={loadState}
-          preferences={data?.me?.preferences}
-        />
+        <ConnectedPersonalPreferences preferences={data?.me?.preferences} />
       )
       break
     case "account":
-      content = <PersonalAccountSection status={loadState} />
+      content = <Account />
       break
     case "usage":
       // Usageは専用Queryの状態を表示する。CurrentUser取得状態では遮らない。
@@ -55,7 +50,15 @@ export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
     <PersonalSettingsView
       key={section}
       section={section}
-      content={content}
+      content={
+        section === "usage" ? (
+          content
+        ) : (
+          <SettingsContentStatus state={loadState} label="Personal設定を読み込み中">
+            {content}
+          </SettingsContentStatus>
+        )
+      }
       personalAccentColor={personalAccentColor}
       onSectionChange={onSectionChange}
     />
