@@ -1,8 +1,8 @@
 "use client"
 
-import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import { usePersonalUsageQuery } from "@/infrastructure/graphql/generated"
-import { Usage, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
+import { emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
+import { UsageSection } from "@/features/usage/UsageSection"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 /** Personal Context固有のGraphQL接続。共通のUsage UIはfeatures/usageが所有する。 */
@@ -32,14 +32,10 @@ export function ConnectedPersonalUsage() {
   }
 
   return (
-    <SettingsContentStatus
-      state={status}
-      label="利用状況を読み込み中"
-      errorTitle="利用状況を取得できませんでした"
+    <UsageSection
+      status={status}
       onRetry={onRetry}
-    >
-      <Usage
-        scope="personal"
+      scope="personal"
         usage={usage}
         fileSizeUnit={
           personal.data?.me?.preferences.fileSizeUnit === "BINARY"
@@ -47,6 +43,5 @@ export function ConnectedPersonalUsage() {
             : "DECIMAL"
         }
       />
-    </SettingsContentStatus>
   )
 }
