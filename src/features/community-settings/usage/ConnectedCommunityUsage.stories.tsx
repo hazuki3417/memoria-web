@@ -69,7 +69,7 @@ const meta = {
   title: "features/community-settings/usage/ConnectedCommunityUsage",
   component: ConnectedCommunityUsageStory,
   args: { communityId: "club-a" },
-} satisfies Meta<typeof ConnectedCommunityUsage>
+} satisfies Meta<typeof ConnectedCommunityUsageStory>
 export default meta
 type Story = StoryObj<typeof meta>
 

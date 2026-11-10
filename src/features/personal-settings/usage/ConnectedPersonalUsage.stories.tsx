@@ -37,7 +37,7 @@ const personalLoading = { ...personalDecimal, delay: 15_000 }
 const meta = {
   title: "features/settings/usage/ConnectedPersonalUsage",
   component: ConnectedPersonalUsageStory,
-} satisfies Meta<typeof ConnectedPersonalUsage>
+} satisfies Meta<typeof ConnectedPersonalUsageStory>
 export default meta
 type Story = StoryObj<typeof meta>
 
