@@ -36,12 +36,12 @@ export function ConnectedPersonalUsage() {
       status={status}
       onRetry={onRetry}
       scope="personal"
-        usage={usage}
-        fileSizeUnit={
+      usage={usage}
+      fileSizeUnit={
           personal.data?.me?.preferences.fileSizeUnit === "BINARY"
             ? "BINARY"
             : "DECIMAL"
-        }
-      />
+      }
+    />
   )
 }
