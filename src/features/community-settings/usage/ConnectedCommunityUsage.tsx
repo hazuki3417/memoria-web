@@ -49,13 +49,13 @@ export function ConnectedCommunityUsage({ communityId }: { communityId: string }
       status={status}
       onRetry={onRetry}
       key={communityId}
-        scope="community"
-        usage={usage}
-        fileSizeUnit={
+      scope="community"
+      usage={usage}
+      fileSizeUnit={
           communityPreferences.data?.me?.preferences.fileSizeUnit === "BINARY"
             ? "BINARY"
             : "DECIMAL"
-        }
-      />
+      }
+    />
   )
 }
