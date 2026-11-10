@@ -1,11 +1,11 @@
 "use client"
 
-import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import {
   useCommunityUsageQuery,
   useCurrentUserQuery,
 } from "@/infrastructure/graphql/generated"
-import { Usage, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
+import { emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
+import { UsageSection } from "@/features/usage/UsageSection"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
 /** Community Context固有のGraphQL接続。共通のUsage UIはfeatures/usageが所有する。 */
@@ -45,14 +45,10 @@ export function ConnectedCommunityUsage({ communityId }: { communityId: string }
   }
 
   return (
-    <SettingsContentStatus
-      state={status}
-      label="利用状況を読み込み中"
-      errorTitle="利用状況を取得できませんでした"
+    <UsageSection
+      status={status}
       onRetry={onRetry}
-    >
-      <Usage
-        key={communityId}
+      key={communityId}
         scope="community"
         usage={usage}
         fileSizeUnit={
@@ -61,6 +57,5 @@ export function ConnectedCommunityUsage({ communityId }: { communityId: string }
             : "DECIMAL"
         }
       />
-    </SettingsContentStatus>
   )
 }
