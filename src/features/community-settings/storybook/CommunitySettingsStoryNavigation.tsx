@@ -101,7 +101,9 @@ export function CommunitySettingsStoryNavigation({
       section={currentSection}
       content={
         <SettingsSectionHost
-          label={currentSection === "usage" ? "利用状況を読み込み中" : "Community設定を読み込み中"}
+          label={currentSection === "usage" && props.usageState !== undefined
+            ? "利用状況を読み込み中"
+            : "Community設定を読み込み中"}
         >
           {(render) => {
             const state = currentSection === "usage"
