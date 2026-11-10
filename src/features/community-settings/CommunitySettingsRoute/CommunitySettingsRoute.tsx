@@ -1,35 +1,18 @@
 "use client"
 
+import { ConnectedCommunityGeneral } from "../general/ConnectedCommunityGeneral"
+import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
-import { useCommunitySettingsActions } from "./useCommunitySettingsActions"
 import { useCommunitySettingsData } from "./useCommunitySettingsData"
-import { useCommunityNameInspection } from "./useCommunityNameInspection"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { useRouter } from "next/navigation"
 import { CommunitySettingsView } from "../CommunitySettingsView"
 import type { ReactNode } from "react"
-import { CommunityGeneral } from "../general/CommunityGeneral"
-import { CommunityMembers } from "../members"
-import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
 } from "../communitySettingsSections"
-
-// Production Invitation API is not connected. Preview actions remain unavailable.
-const unavailableInvitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available"> = {
-  active: false,
-  invitation: "none",
-  invitationUrl: "",
-  expiresAt: "",
-  busy: false,
-  issue: () => undefined,
-  copyInvitation: async () => undefined,
-  confirm: null,
-  setConfirm: () => undefined,
-  changeInvitation: () => undefined,
-}
 
 export type CommunitySettingsRouteProps = {
   communityId: string
@@ -41,11 +24,8 @@ export function CommunitySettingsRoute({
   section = "general",
 }: CommunitySettingsRouteProps) {
   const router = useRouter()
-  const onInspectName = useCommunityNameInspection(communityId)
   const { communityAccentColor, membershipLost, name, members, loadState } =
     useCommunitySettingsData(communityId, section)
-  const { onRemoveMember, onLeaveCommunity, onChangeMemberRole, onSaveName } =
-    useCommunitySettingsActions(communityId)
 
   if (membershipLost)
     return (
@@ -58,22 +38,18 @@ export function CommunitySettingsRoute({
   switch (section) {
     case "general":
       content = (
-        <CommunityGeneral
-          name={{ communityName: name ?? undefined, onSaveName, onInspectName }}
-          invitation={unavailableInvitation}
-          invitationAvailable={false}
+        <ConnectedCommunityGeneral
           communityId={communityId}
+          name={name}
           isAdmin={members?.find((member) => member.isSelf)?.role === "admin"}
         />
       )
       break
     case "members":
       content = (
-        <CommunityMembers
+        <ConnectedCommunityMembers
+          communityId={communityId}
           members={members ?? undefined}
-          onChangeRole={onChangeMemberRole}
-          onRemoveMember={onRemoveMember}
-          onLeave={onLeaveCommunity}
           onLeaveSuccess={() => router.push("/dashboard")}
         />
       )

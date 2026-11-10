@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
-import { useCommunitySettingsActions } from "./useCommunitySettingsActions"
+import { useCommunityNameAction } from "../general/useCommunityNameAction"
+import { useCommunityMemberRemovalAction } from "../members/useCommunityMemberRemovalAction"
+import { useCommunityLeaveAction } from "../members/useCommunityLeaveAction"
+import { useCommunityRoleChangeAction } from "../members/useCommunityRoleChangeAction"
 
 const mocks = vi.hoisted(() => ({
   rename: vi.fn(),
@@ -24,7 +27,10 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   useLeaveCommunityMutation: () => [mocks.leave],
 }))
 
-type Actions = ReturnType<typeof useCommunitySettingsActions>
+type Actions = ReturnType<typeof useCommunityNameAction> &
+  ReturnType<typeof useCommunityMemberRemovalAction> &
+  ReturnType<typeof useCommunityLeaveAction> &
+  ReturnType<typeof useCommunityRoleChangeAction>
 let root: Root
 let host: HTMLDivElement
 let actions!: Actions
@@ -37,7 +43,12 @@ beforeEach(async () => {
   await act(async () => {
     root.render(
       createElement(() => {
-        actions = useCommunitySettingsActions("community-1")
+        actions = {
+          ...useCommunityNameAction("community-1"),
+          ...useCommunityMemberRemovalAction("community-1"),
+          ...useCommunityLeaveAction("community-1"),
+          ...useCommunityRoleChangeAction("community-1"),
+        }
         return null
       }),
     )
