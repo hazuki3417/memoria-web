@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { showNotification } from "@/components/Feedback"
-import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
 
 type InvitationState = "none" | "active" | "expired" | "revoked"
 
