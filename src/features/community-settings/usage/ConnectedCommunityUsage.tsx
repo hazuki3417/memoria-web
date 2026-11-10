@@ -4,8 +4,7 @@ import {
   useCommunityUsageQuery,
   useCurrentUserQuery,
 } from "@/infrastructure/graphql/generated"
-import { emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
-import { UsageSection } from "@/features/usage/UsageSection"
+import { UsageSection, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
 /** Community Context固有のGraphQL接続。共通のUsage UIはfeatures/usageが所有する。 */
