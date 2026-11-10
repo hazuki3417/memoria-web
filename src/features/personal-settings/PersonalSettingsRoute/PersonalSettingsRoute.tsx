@@ -2,47 +2,45 @@
 
 import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
+import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { ConnectedPersonalProfile } from "../profile/ConnectedPersonalProfile"
 import { ConnectedPersonalPreferences } from "../preferences/ConnectedPersonalPreferences"
 import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
 import { Account } from "../account/Account"
-import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
-import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 export type PersonalSettingsRouteProps = { section: PersonalSettingsSection }
 
-/** Section選択、共通CurrentUser状態、Navigation、ViewのCompositionを所有する。 */
+/** Selects one Controller; the same Host governs every Section status. */
 export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
   const router = useRouter()
-  const { data, error, personalAccentColor, loadState } =
-    usePersonalSettingsReadState()
-  usePersonalSettingsRefreshError(Boolean(data?.me && error))
+  const { personalAccentColor } = usePersonalSettingsReadState()
 
   const onSectionChange = (nextSection: PersonalSettingsSection) => {
     router.push(`/settings/${nextSection}`)
   }
 
-  let content: ReactNode
+  let controller: (render: SettingsSectionRender) => ReactNode
+  let label = "Personal設定を読み込み中"
+  let errorTitle: string | undefined
+
   switch (section) {
     case "profile":
-      content = (
-        <ConnectedPersonalProfile initialNickname={data?.me?.profile.nickname} />
-      )
+      controller = (render) => <ConnectedPersonalProfile render={render} />
       break
     case "preferences":
-      content = (
-        <ConnectedPersonalPreferences preferences={data?.me?.preferences} />
-      )
+      controller = (render) => <ConnectedPersonalPreferences render={render} />
       break
     case "account":
-      content = <Account />
+      // The deletion entry UI requires no Section data Query.
+      controller = (render) => render({ status: "ready", content: <Account /> })
       break
     case "usage":
-      // Usageは専用Queryの状態を表示する。CurrentUser取得状態では遮らない。
-      content = <ConnectedPersonalUsage />
+      label = "利用状況を読み込み中"
+      errorTitle = "利用状況を取得できませんでした"
+      controller = (render) => <ConnectedPersonalUsage render={render} />
       break
   }
 
@@ -51,13 +49,9 @@ export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
       key={section}
       section={section}
       content={
-        section === "usage" ? (
-          content
-        ) : (
-          <SettingsContentStatus state={loadState} label="Personal設定を読み込み中">
-            {content}
-          </SettingsContentStatus>
-        )
+        <SettingsSectionHost label={label} errorTitle={errorTitle}>
+          {controller}
+        </SettingsSectionHost>
       }
       personalAccentColor={personalAccentColor}
       onSectionChange={onSectionChange}

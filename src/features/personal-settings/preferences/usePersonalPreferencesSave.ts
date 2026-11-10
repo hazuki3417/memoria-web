@@ -3,6 +3,8 @@
 import { useApolloClient } from "@apollo/client"
 import {
   CurrentUserDocument,
+  PersonalSettingsAccentDocument,
+  PersonalSettingsPreferencesDocument,
   SaveUserPreferencesDocument,
   type OperationSaveUserPreferencesMutation,
   type OperationSaveUserPreferencesMutationVariables,
@@ -38,7 +40,7 @@ export function usePersonalPreferencesSave() {
       // into an unknown outcome or trigger a duplicate settings write.
       void client
         .refetchQueries({
-          include: [CurrentUserDocument],
+          include: [CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument],
         })
         .catch(() => undefined)
       return confirmed

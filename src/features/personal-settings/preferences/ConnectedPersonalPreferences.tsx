@@ -1,29 +1,46 @@
 "use client"
 
 import { useMediaQuery } from "@mantine/hooks"
+import { usePersonalSettingsPreferencesQuery } from "@/infrastructure/graphql/generated"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { PersonalPreferences } from "./PersonalPreferences"
 import { fromGraphqlUserPreferences } from "./userPreferencesGraphqlAdapter"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
 import { usePersonalSettingsInspection } from "../PersonalSettingsRoute/usePersonalSettingsInspection"
+import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
-/** Preferences固有の保存・確認・GraphQL変換・Viewport依存を接続する。 */
-export function ConnectedPersonalPreferences({
-  preferences,
-}: {
-  preferences?: Parameters<typeof fromGraphqlUserPreferences>[0]
-}) {
+/** Preferences-scoped authoritative read, save and display projection. */
+export function ConnectedPersonalPreferences({ render }: { render: SettingsSectionRender }) {
+  const preferences = usePersonalSettingsPreferencesQuery({
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+  })
   const { inspectPreferences } = usePersonalSettingsInspection()
   const { savePreferences } = usePersonalPreferencesSave()
   const compact = useMediaQuery("(max-width: 48em)")
+  const values = preferences.data?.me?.preferences
 
-  return (
-    <PersonalPreferences
-      compact={compact}
-      initialPreferences={
-        preferences ? fromGraphqlUserPreferences(preferences) : undefined
-      }
-      onSave={savePreferences}
-      onInspect={inspectPreferences}
-    />
-  )
+  usePersonalSettingsRefreshError(Boolean(values && preferences.error))
+  if (!values) {
+    return render(
+      preferences.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void preferences.refetch().catch(() => undefined) },
+          },
+    )
+  }
+
+  return render({
+    status: "ready",
+    content: (
+      <PersonalPreferences
+        compact={compact}
+        initialPreferences={fromGraphqlUserPreferences(values)}
+        onSave={savePreferences}
+        onInspect={inspectPreferences}
+      />
+    ),
+  })
 }

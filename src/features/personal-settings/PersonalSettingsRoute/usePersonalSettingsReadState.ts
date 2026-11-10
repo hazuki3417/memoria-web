@@ -1,19 +1,22 @@
 "use client"
 
-import { useCurrentUserQuery } from "@/infrastructure/graphql/generated"
-import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
+import { usePersonalSettingsAccentQuery } from "@/infrastructure/graphql/generated"
 import { usePersonalPreferencesSession } from "../preferences/PersonalPreferencesSessionContext"
 import { resolvePersonalAccent } from "../preferences/personalAccentPreview"
+import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
-/** Owns the CurrentUser read and Personal accent preview resolution. */
+/** Only the navigation accent is shared; active Sections own their data. */
 export function usePersonalSettingsReadState() {
   const { snapshot: personalSession } = usePersonalPreferencesSession()
-  const { data, loading, error } = useCurrentUserQuery()
-  const personalAccentColor = resolvePersonalAccent(
-    data?.me?.preferences.personalAccentColor,
-    personalSession,
-  )
-  const loadState: PageStatus = !data?.me ? (loading ? "loading" : "error") : "ready"
+  const { data, error } = usePersonalSettingsAccentQuery({
+    fetchPolicy: "network-only",
+  })
+  usePersonalSettingsRefreshError(Boolean(data?.me && error))
 
-  return { data, error, personalAccentColor, loadState }
+  return {
+    personalAccentColor: resolvePersonalAccent(
+      data?.me?.preferences.personalAccentColor,
+      personalSession,
+    ),
+  }
 }

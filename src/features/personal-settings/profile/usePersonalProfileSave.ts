@@ -3,6 +3,7 @@
 import { useApolloClient } from "@apollo/client"
 import {
   CurrentUserDocument,
+  PersonalSettingsProfileDocument,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
 import {
@@ -27,7 +28,7 @@ export function usePersonalProfileSave() {
       if (outcome?.__typename !== "UpdateUserProfileSuccess")
         throw new Error("Profile update unconfirmed")
       void client
-        .refetchQueries({ include: [CurrentUserDocument] })
+        .refetchQueries({ include: [CurrentUserDocument, PersonalSettingsProfileDocument] })
         .catch(() => undefined)
     },
   }
