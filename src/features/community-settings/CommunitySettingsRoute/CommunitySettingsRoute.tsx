@@ -8,7 +8,7 @@ import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { CommunitySettingsContextBoundary } from "./CommunitySettingsContextBoundary"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import { useCommunitySettingsData } from "./useCommunitySettingsData"
 import {
   getCommunitySettingsSections,
@@ -71,9 +71,9 @@ export function CommunitySettingsRoute({
       section={section}
       communityAccentColor={communityAccentColor}
       content={
-        <CommunitySettingsContextBoundary status={loadState}>
+        <SettingsContentStatus state={loadState} label="Community設定を読み込み中">
           {content}
-        </CommunitySettingsContextBoundary>
+        </SettingsContentStatus>
       }
       onSectionChange={(nextSection) => {
         const target = getCommunitySettingsSections(communityId).find(
