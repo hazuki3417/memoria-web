@@ -36,12 +36,9 @@ export function PersonalProfile({
     field,
     fieldState,
     validation,
-    dirty,
-    invalid,
+    canSubmit,
     showClientError,
     isSaving,
-    isBlocked,
-    isUnknown,
     saveLabel,
     save,
     onDraftChange,
@@ -82,7 +79,7 @@ export function PersonalProfile({
           <Button
             size="sm"
             style={{ alignSelf: "flex-start" }}
-            disabled={!dirty || invalid || isSaving || isBlocked || isUnknown}
+            disabled={!canSubmit}
             loading={isSaving}
             onClick={() => void save()}
           >
