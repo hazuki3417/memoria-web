@@ -1,10 +1,6 @@
 import { resolveFormFailureValidation } from "@/ui/formValidation"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
-import {
-  classifySettingsSaveFailure,
-  getSettingsInputViolations,
-} from "@/infrastructure/graphql/settingsMutationResult"
+import { getAutoSaveFailure } from "@/ui/AutoSave"
 
 export type AccentFailure = "rejected" | "blocked" | "unknown" | null
 export type AccentSnapshot = Readonly<{
@@ -113,23 +109,23 @@ export function createCommunityAccentSaveController() {
             validation: null,
           })
         } catch (error) {
-          const kind = classifySettingsSaveFailure(error)
+          const result = getAutoSaveFailure(error)
           const failure: AccentFailure =
-            kind === "unknown"
+            result.kind === "unknown"
               ? "unknown"
-              : kind === "blocked"
+              : result.kind === "blocked"
                 ? "blocked"
                 : "rejected"
           entry.desired = null
           clearPreview(entry)
           const validation =
-            kind === "validation"
-              ? resolveFormFailureValidation(getSettingsInputViolations(error), ["accentColor"])
+            result.kind === "validation"
+              ? resolveFormFailureValidation(result.violations, ["accentColor"])
               : null
           update(id, {
             status: "attention",
             failure,
-            blockedFeedback: failure === "blocked" ? getCommunityBlockedFeedback(error, "Community設定") : null,
+            blockedFeedback: result.kind === "blocked" ? result.feedback : null,
             validation,
             observedMatches: false,
             inspected: false,
