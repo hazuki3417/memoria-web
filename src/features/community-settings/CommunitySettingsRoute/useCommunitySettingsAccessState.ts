@@ -1,12 +1,12 @@
 "use client"
 
-import { useCommunitySettingsAccessStateQuery } from "@/infrastructure/graphql/generated"
+import { useCommunitySettingsMembershipQuery } from "@/infrastructure/graphql/generated"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 import { getCommunityMembershipStatus } from "./communityMembershipStatus"
 
 /** Resolve membership for every Community Settings section before mounting its Controller. */
 export function useCommunitySettingsAccessState(communityId: string) {
-  const { data, loading, error, refetch } = useCommunitySettingsAccessStateQuery({
+  const { data, loading, error, refetch } = useCommunitySettingsMembershipQuery({
     fetchPolicy: "network-only",
   })
   const membership = data?.myCommunities.find((item) => item.id === communityId)
