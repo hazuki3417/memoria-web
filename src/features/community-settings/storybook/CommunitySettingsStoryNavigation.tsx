@@ -5,6 +5,7 @@ import { CommunitySettingsView } from "../CommunitySettingsView"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import type { ReactNode } from "react"
 import { CommunityGeneral } from "../general/CommunityGeneral"
+import { resolveCommunityNameSaveResult } from "../general/resolveCommunityNameSaveResult"
 import { CommunityMembers } from "../members"
 import type { CommunityMember } from "../members"
 import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
@@ -66,7 +67,9 @@ export function CommunitySettingsStoryNavigation({
         <CommunityGeneral
           name={{
             communityName: props.communityName,
-            onSaveName: props.onSaveName,
+            onSaveName: props.onSaveName
+              ? (name) => resolveCommunityNameSaveResult(() => props.onSaveName!(name))
+              : undefined,
             onInspectName: props.onInspectName,
           }}
           invitation={invitation}
