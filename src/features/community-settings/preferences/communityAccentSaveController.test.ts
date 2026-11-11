@@ -13,7 +13,7 @@ const tick = async () => {
 
 describe("session Community Accent save controller", () => {
   it("preserves the draft and status after view listeners unmount", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     const save = vi.fn().mockResolvedValue("#ABCDEF")
     const subscriber = vi.fn()
     const confirm = vi.fn()
@@ -38,7 +38,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("preserves an incomplete draft and does not send it", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     const save = vi.fn()
     controller.initialize(id, "#112233")
     controller.edit(id, "#123")
@@ -52,7 +52,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("does not save a superseded queued color after a newer HEX draft becomes incomplete", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     let resolveFirst: ((value: string) => void) | undefined
     const save = vi.fn().mockImplementationOnce(
       () =>
@@ -84,7 +84,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("never automatically resends an unknown write and requires observation", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     const save = vi
       .fn()
       .mockRejectedValueOnce(
@@ -124,7 +124,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("requires a fresh inspection if an unknown Accent draft changes", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     const save = vi
       .fn()
       .mockRejectedValue(
@@ -161,7 +161,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("does not send a newer valid draft automatically while Unknown recovery is required", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     const save = vi
       .fn()
       .mockRejectedValue(
@@ -194,7 +194,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("allows explicit completion on an observed match without a second mutation", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     const save = vi
       .fn()
       .mockRejectedValueOnce(
@@ -227,7 +227,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("ignores a stale inspection failure after a newer draft was inspected", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     let rejectFirst: ((error: Error) => void) | undefined
     const observe = vi
       .fn()
@@ -270,7 +270,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("ignores an older inspection result when a newer inspection of the same draft finishes", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     let resolveFirst: ((value: string) => void) | undefined
     const observe = vi
       .fn()
@@ -311,7 +311,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("ignores older inspection failures when a newer inspection of the same draft succeeds", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     let rejectFirst: ((error: Error) => void) | undefined
     const observe = vi
       .fn()
@@ -352,7 +352,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("invalidates a matching observation while a fresh inspection is pending", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     let resolveRefresh: ((value: string) => void) | undefined
     const observe = vi
       .fn()
@@ -396,7 +396,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("does not roll back a confirmed mutation when an older query result arrives", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     controller.initialize(id, "#112233")
     controller.configure(id, {
       save: vi.fn().mockResolvedValue("#ABCDEF"),
@@ -414,7 +414,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("requires manual retry after a rejected mutation and keeps Draft on error", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     // An explicitly retryable result is distinguishable from an unclassified
     // GraphQL execution error, which must remain Unknown Outcome.
     const rejected = new SaveActionError({ status: "retryable" })
@@ -456,7 +456,7 @@ describe("session Community Accent save controller", () => {
         { extensions: { code: "INTERNAL_SERVER_ERROR" } },
       ],
     ]) {
-      const controller = createCommunityAccentSaveController()
+      const controller = createCommunityAccentSaveController(0)
       const save = vi.fn().mockRejectedValue(
         new SaveActionError(resolveCommunityAccentSaveFailure({ graphQLErrors })),
       )
@@ -483,7 +483,7 @@ describe("session Community Accent save controller", () => {
 
   it("blocks retry on an authenticated/authorized execution rejection", async () => {
     for (const code of ["UNAUTHENTICATED", "FORBIDDEN", "USER_DELETING"]) {
-      const controller = createCommunityAccentSaveController()
+      const controller = createCommunityAccentSaveController(0)
       const save = vi.fn().mockRejectedValue(
         new SaveActionError(resolveCommunityAccentSaveFailure({
           graphQLErrors: [{ extensions: { code } }],
@@ -521,7 +521,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("discards an errored draft without pretending to cancel an unknown mutation", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     controller.initialize(id, "#112233")
     controller.configure(id, {
       save: vi.fn().mockRejectedValue(new Error("unconfirmed")),
@@ -541,7 +541,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("does not leak Draft or failure state between communities", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     controller.initialize("community-a", "#112233")
     controller.initialize("community-b", "#445566")
     controller.edit("community-a", "#1")
@@ -554,7 +554,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("preserves newer Draft when an old in-flight mutation completes", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     let resolveFirst: ((value: string) => void) | undefined
     const save = vi
       .fn()
@@ -585,7 +585,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("retains Typed accent Field Validation with its Draft after rejection", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     const save = vi.fn().mockRejectedValue(
       new SaveActionError(resolveCommunityAccentSaveFailure(
         new SettingsInputValidationError([
@@ -615,7 +615,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("isolates a late unknown failure from another Community's successful save", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     let rejectOld: ((reason: unknown) => void) | undefined
     const newRelease = vi.fn()
     controller.initialize("community-a", "#112233")
@@ -654,7 +654,7 @@ describe("session Community Accent save controller", () => {
   })
 
   it("keeps the new Community independent when an old Community mutation settles late", async () => {
-    const controller = createCommunityAccentSaveController()
+    const controller = createCommunityAccentSaveController(0)
     let resolveOld: ((value: string) => void) | undefined
     const oldRelease = vi.fn()
     const newRelease = vi.fn()
@@ -694,4 +694,123 @@ describe("session Community Accent save controller", () => {
     expect(oldRelease).toHaveBeenCalled()
   })
 
+})
+
+describe("Community Accentの遅延Trigger", () => {
+  it("Previewを即時反映し、最後の入力から400ms後に最新HEXだけを保存する", async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = createCommunityAccentSaveController(400)
+      const save = vi.fn().mockResolvedValue("#445566")
+      const preview = vi.fn().mockReturnValue(1)
+      controller.initialize(id, "#112233")
+      controller.configure(id, {
+        save,
+        observe: vi.fn(),
+        preview,
+        release: vi.fn(),
+      })
+
+      controller.edit(id, "#AABBCC")
+      expect(preview).toHaveBeenCalledWith("#AABBCC")
+      expect(save).not.toHaveBeenCalled()
+      await vi.advanceTimersByTimeAsync(300)
+      controller.edit(id, "#445566")
+      expect(preview).toHaveBeenCalledWith("#445566")
+      expect(controller.getSnapshot(id)).toMatchObject({ draft: "#445566", status: "pending" })
+      await vi.advanceTimersByTimeAsync(399)
+      expect(save).not.toHaveBeenCalled()
+      await vi.advanceTimersByTimeAsync(1)
+      expect(save).toHaveBeenCalledExactlyOnceWith("#445566")
+      expect(controller.getSnapshot(id)).toMatchObject({
+        confirmed: "#445566",
+        draft: "#445566",
+        status: "saved",
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("通信中の最新入力が期限に達しても先の保存完了まで直列化する", async () => {
+    vi.useFakeTimers()
+    try {
+      let resolveFirst: ((value: string) => void) | undefined
+      const save = vi.fn()
+        .mockImplementationOnce(() => new Promise<string>((resolve) => { resolveFirst = resolve }))
+        .mockResolvedValueOnce("#445566")
+      const controller = createCommunityAccentSaveController(400)
+      controller.initialize(id, "#112233")
+      controller.configure(id, {
+        save,
+        observe: vi.fn(),
+        preview: vi.fn().mockReturnValue(1),
+        release: vi.fn(),
+      })
+      controller.edit(id, "#AABBCC")
+      await vi.advanceTimersByTimeAsync(400)
+      expect(save).toHaveBeenCalledExactlyOnceWith("#AABBCC")
+      controller.edit(id, "#445566")
+      await vi.advanceTimersByTimeAsync(400)
+      expect(save).toHaveBeenCalledTimes(1)
+      resolveFirst?.("#AABBCC")
+      await tick()
+      expect(save).toHaveBeenCalledTimes(2)
+      expect(save).toHaveBeenLastCalledWith("#445566")
+      expect(controller.getSnapshot(id)).toMatchObject({
+        confirmed: "#445566",
+        draft: "#445566",
+        status: "saved",
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("未完成HEXが最新になった場合は予約済みの保存を実行しない", async () => {
+    vi.useFakeTimers()
+    try {
+      const save = vi.fn()
+      const release = vi.fn()
+      const controller = createCommunityAccentSaveController(400)
+      controller.initialize(id, "#112233")
+      controller.configure(id, { save, observe: vi.fn(), preview: vi.fn().mockReturnValue(1), release })
+      controller.edit(id, "#AABBCC")
+      controller.edit(id, "#123")
+      await vi.advanceTimersByTimeAsync(1000)
+      expect(save).not.toHaveBeenCalled()
+      expect(release).toHaveBeenCalledTimes(1)
+      expect(controller.getSnapshot(id)).toMatchObject({ draft: "#123", status: "pending" })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("結果不明で停止したあと、新しい入力を自動再送しない", async () => {
+    vi.useFakeTimers()
+    try {
+      const save = vi.fn().mockRejectedValue(new Error("lost response"))
+      const controller = createCommunityAccentSaveController(400)
+      controller.initialize(id, "#112233")
+      controller.configure(id, {
+        save,
+        observe: vi.fn(),
+        preview: vi.fn().mockReturnValue(1),
+        release: vi.fn(),
+      })
+      controller.edit(id, "#AABBCC")
+      await vi.advanceTimersByTimeAsync(400)
+      expect(controller.getSnapshot(id)).toMatchObject({ status: "attention", failure: "unknown" })
+      controller.edit(id, "#445566")
+      await vi.advanceTimersByTimeAsync(1000)
+      expect(save).toHaveBeenCalledTimes(1)
+      expect(controller.getSnapshot(id)).toMatchObject({
+        confirmed: "#112233",
+        draft: "#445566",
+        failure: "unknown",
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })
