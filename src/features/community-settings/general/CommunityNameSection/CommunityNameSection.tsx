@@ -4,11 +4,12 @@ import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { CommunityNameSaveFeedback } from "./CommunityNameSaveFeedback"
 import { useCommunityNameSettings } from "./useCommunityNameSettings"
+import type { ExplicitSaveResult } from "@/ui/ExplicitSave"
 
 export type CommunityNameSectionProps = {
   isAdmin: boolean
   communityName?: string
-  onSaveName?: (name: string) => Promise<string>
+  onSaveName?: (name: string) => Promise<ExplicitSaveResult<string>>
   onInspectName?: () => Promise<string>
 }
 
