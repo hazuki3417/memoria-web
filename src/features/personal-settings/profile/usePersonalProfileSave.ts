@@ -18,7 +18,7 @@ export function usePersonalProfileSave() {
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
 
   return {
-    saveProfile: (nickname: string) => resolveProfileSaveResult(nickname, async () => {
+    saveProfile: (nickname: string) => resolveProfileSaveResult(async () => {
       const result = await updateProfile({
         variables: { input: { nickname } },
         errorPolicy: "all",
@@ -31,6 +31,7 @@ export function usePersonalProfileSave() {
       void client
         .refetchQueries({ include: [CurrentUserDocument, PersonalSettingsProfileDocument] })
         .catch(() => undefined)
+      return outcome.user.profile.nickname
     }),
   }
 }
