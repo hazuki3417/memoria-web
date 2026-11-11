@@ -3,11 +3,26 @@ import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunityAliasControl } from "./CommunityAliasControl"
+import { resolveCommunityAliasSaveResult } from "../resolveCommunityAliasSaveResult"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
+
+type AliasStoryProps = Omit<ComponentProps<typeof CommunityAliasControl>, "onSave"> & {
+  onSave: (alias: string | null) => Promise<void>
+}
+
+/** Storybook's throwable callback is adapted outside the real Form UI. */
+function AliasStory({ onSave, ...props }: AliasStoryProps) {
+  return (
+    <CommunityAliasControl
+      {...props}
+      onSave={(alias) => resolveCommunityAliasSaveResult(alias, () => onSave(alias))}
+    />
+  )
+}
 
 const meta = {
   title: "Features/Community Settings/Community Alias",
-  component: CommunityAliasControl,
+  component: AliasStory,
   args: {
     savedAlias: "元の別名",
     onSave: fn(async () => undefined),
@@ -19,7 +34,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof CommunityAliasControl>
+} satisfies Meta<typeof AliasStory>
 export default meta
 type Story = StoryObj<typeof meta>
 
@@ -141,7 +156,7 @@ export const AliasUnknownOutcome: Story = {
 }
 
 function AliasRefreshFixture(
-  args: ComponentProps<typeof CommunityAliasControl>,
+  args: ComponentProps<typeof AliasStory>,
 ) {
   const [alias, setAlias] = useState(args.savedAlias)
   return (
@@ -149,7 +164,7 @@ function AliasRefreshFixture(
       <Button onClick={() => setAlias("取得した新しい別名")}>
         Alias再取得を再現
       </Button>
-      <CommunityAliasControl {...args} savedAlias={alias} />
+      <AliasStory {...args} savedAlias={alias} />
     </>
   )
 }
