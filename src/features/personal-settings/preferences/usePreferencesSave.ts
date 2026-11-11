@@ -7,12 +7,9 @@ import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import { usePersonalPreferencesSession } from "./PersonalPreferencesSessionContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import {
-  classifySettingsSaveFailure,
-  getSettingsInputViolations,
-} from "@/infrastructure/graphql/settingsMutationResult"
+import { getAutoSaveFailure } from "@/ui/AutoSave"
 import type { PreferencesFailure } from "./personalPreferencesSession"
-import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
+import type { PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type SaveError = PreferencesFailure
@@ -78,12 +75,12 @@ export function usePreferencesSave(
       },
       (error, attempted) => {
         if (!mounted) return
-        const kind = classifySettingsSaveFailure(error)
-        setLocalError(kind)
-        setLocalBlockedFeedback(kind === "blocked" ? getPreferencesBlockedFeedback(error) : null)
+        const failure = getAutoSaveFailure(error)
+        setLocalError(failure.kind)
+        setLocalBlockedFeedback(failure.kind === "blocked" ? failure.feedback : null)
         setLocalValidation(
-          kind === "validation"
-            ? resolveFormFailureValidation(getSettingsInputViolations(error), Object.keys(attempted))
+          failure.kind === "validation"
+            ? resolveFormFailureValidation(failure.violations, Object.keys(attempted))
             : null,
         )
       },
