@@ -54,7 +54,7 @@ export function ConnectedCommunityMembers({
     content: (
       <CommunityMembers
         members={viewMembers}
-        onChangeRole={onChangeRole}
+        onChangeRole={onChangeMemberRole}
         onRemoveMember={onRemoveMember}
         onLeave={onLeaveCommunity}
         onLeaveSuccess={onLeaveSuccess}
