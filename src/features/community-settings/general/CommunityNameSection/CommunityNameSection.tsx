@@ -24,6 +24,7 @@ export function CommunityNameSection({
     invalid,
     dirty,
     savingName,
+    isInputDisabled,
     saveName,
     fieldError,
     onNameBlur,
@@ -57,7 +58,7 @@ export function CommunityNameSection({
           onChange={(event) => setDraft(event.currentTarget.value)}
           onBlur={onNameBlur}
           error={fieldError}
-          disabled={!isAdmin}
+          disabled={!isAdmin || isInputDisabled}
           required
         />
         {isAdmin && (
