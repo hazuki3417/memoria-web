@@ -38,6 +38,7 @@ export function PersonalProfile({
     canSubmit,
     showClientError,
     isSaving,
+    isBlocked,
     saveLabel,
     save,
     onDraftChange,
