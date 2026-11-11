@@ -4,12 +4,29 @@ import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { PersonalProfile } from "./PersonalProfile"
+import { resolveProfileSaveResult } from "./resolveProfileSaveResult"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
+
+type ProfileStoryProps = Omit<ComponentProps<typeof PersonalProfile>, "onSave"> & {
+  onSave: (nickname: string) => Promise<void>
+}
+
+/** Storybook's throwable callback is adapted outside the real Form UI. */
+function ProfileStory({ onSave, ...props }: ProfileStoryProps) {
+  return (
+    <PersonalProfile
+      {...props}
+      onSave={(nickname) =>
+        resolveProfileSaveResult(nickname, () => onSave(nickname), props.blockedMessage)
+      }
+    />
+  )
+}
 
 const meta = {
   // Keep the existing Story IDs until a separately agreed catalog migration.
   title: "features/settings/profile/SettingsProfile",
-  component: PersonalProfile,
+  component: ProfileStory,
   args: {
     initialNickname: "テストユーザー",
     onSave: fn(async () => undefined),
@@ -21,7 +38,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof PersonalProfile>
+} satisfies Meta<typeof ProfileStory>
 export default meta
 type Story = StoryObj<typeof meta>
 
@@ -52,14 +69,14 @@ export const InitiallyRetryable: Story = {
   },
 }
 
-function ProfileRefreshFixture(args: ComponentProps<typeof PersonalProfile>) {
+function ProfileRefreshFixture(args: ComponentProps<typeof ProfileStory>) {
   const [nickname, setNickname] = useState(args.initialNickname ?? "テストユーザー")
   return (
     <>
       <Button onClick={() => setNickname("サーバー更新後の名前")}>
         プロフィール再取得を再現
       </Button>
-      <PersonalProfile {...args} initialNickname={nickname} />
+      <ProfileStory {...args} initialNickname={nickname} />
     </>
   )
 }
@@ -288,7 +305,7 @@ export const ProfileTrimmedUnchanged: Story = {
 
 // The unresolved Promise represents an actual in-flight mutation. Neither
 // refetches nor repeated clicks may rewrite its editable draft.
-function ProfileInFlightFixture(args: ComponentProps<typeof PersonalProfile>) {
+function ProfileInFlightFixture(args: ComponentProps<typeof ProfileStory>) {
   const [nickname, setNickname] = useState(args.initialNickname ?? "テストユーザー")
   const resolveSave = useRef<(() => void) | null>(null)
   return (
@@ -297,7 +314,7 @@ function ProfileInFlightFixture(args: ComponentProps<typeof PersonalProfile>) {
         保存中に再取得を再現
       </Button>
       <Button onClick={() => resolveSave.current?.()}>保存応答を返す</Button>
-      <PersonalProfile
+      <ProfileStory
         {...args}
         initialNickname={nickname}
         onSave={() =>
@@ -532,14 +549,14 @@ export const ProfileUnknownExplicitRetry: Story = {
   },
 }
 
-function PendingInspectionFixture(args: ComponentProps<typeof PersonalProfile>) {
+function PendingInspectionFixture(args: ComponentProps<typeof ProfileStory>) {
   const resolveInspection = useRef<((value: string) => void) | null>(null)
   return (
     <>
       <Button onClick={() => resolveInspection.current?.("古い照会結果")}>
         遅延照会を返す
       </Button>
-      <PersonalProfile
+      <ProfileStory
         {...args}
         onSave={async () => { throw new Error("uncertain") }}
         onInspect={() =>
@@ -574,11 +591,11 @@ export const ProfileUnknownStaleInspection: Story = {
 }
 
 
-function ProfileNotificationFixture(args: ComponentProps<typeof PersonalProfile>) {
+function ProfileNotificationFixture(args: ComponentProps<typeof ProfileStory>) {
   return (
     <>
       <Notifications position="top-right" />
-      <PersonalProfile {...args} />
+      <ProfileStory {...args} />
     </>
   )
 }
