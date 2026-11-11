@@ -132,6 +132,7 @@ export function useExplicitSave<T>({
 
   const resetFromObservation = (expectedStatus: "matches" | "differs") => {
     if (!isUnknown || inspection.status !== expectedStatus) return
+    if (inspection.status !== "matches" && inspection.status !== "differs") return
     if (expectedStatus === "matches" && !Object.is(inspection.value, readDraft())) return
     inspectionGeneration.current += 1
     adopt(inspection.value)
