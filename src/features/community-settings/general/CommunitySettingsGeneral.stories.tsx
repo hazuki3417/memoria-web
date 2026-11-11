@@ -83,6 +83,7 @@ export const NameSaving: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(args.onSaveName).toHaveBeenCalledWith("新しいCommunity名")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await expect(input).toBeDisabled()
   },
 }
 
@@ -223,7 +224,7 @@ export const NameRefreshWhileEditing: Story = {
   },
 }
 
-/** Complete a pending save after the user has made a second edit. */
+/** Complete a pending save while its editable input remains locked. */
 function CommunityNamePendingSaveFixture(
   args: ComponentProps<typeof CommunitySettingsStoryNavigation>,
 ) {
@@ -246,7 +247,7 @@ function CommunityNamePendingSaveFixture(
 }
 
 export const NameEditedDuringSave: Story = {
-  name: "Interaction · 保存中の新しい入力を保存応答から保護",
+  name: "Interaction · Community名保存中は入力を停止し確定値へ復帰",
   tags: ["interaction"],
   render: (args) => <CommunityNamePendingSaveFixture {...args} />,
   play: async ({ canvasElement }) => {
@@ -255,13 +256,15 @@ export const NameEditedDuringSave: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, "最初の変更")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
-    await userEvent.clear(input)
-    await userEvent.type(input, "保存中の追加変更")
+    await expect(input).toBeDisabled()
+    await expect(input).toHaveValue("最初の変更")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
     await userEvent.click(
       canvas.getByRole("button", { name: "保存応答を再現" }),
     )
-    await expect(input).toHaveValue("保存中の追加変更")
-    await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
+    await waitFor(() => expect(input).toBeEnabled())
+    await expect(input).toHaveValue("最初の変更")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
 
@@ -375,6 +378,7 @@ export const NameBlockedForbidden: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(await canvas.findByRole("alert")).toHaveTextContent("この操作を行う権限がありません")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await expect(input).toBeDisabled()
   },
 }
 
