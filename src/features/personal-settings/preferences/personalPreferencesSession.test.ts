@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
-import { AutoSaveActionError } from "@/ui/AutoSave"
-import { resolvePreferencesAutoSaveFailure } from "./resolvePreferencesAutoSaveFailure"
+import { SaveActionError } from "@/ui/SaveAction"
+import { resolvePreferencesSaveFailure } from "./resolvePreferencesSaveFailure"
 import { createPersonalPreferencesSession } from "./personalPreferencesSession"
 import { defaultUserPreferences } from "./userPreferences"
 
@@ -300,7 +300,7 @@ describe("Personal Preferences session controller", () => {
     try {
       const controller = createPersonalPreferencesSession()
       const save = vi.fn().mockRejectedValue(
-        new AutoSaveActionError(resolvePreferencesAutoSaveFailure({
+        new SaveActionError(resolvePreferencesSaveFailure({
           graphQLErrors: [{ extensions: { code: "USER_DELETING" }, message: "private" }],
         })),
       )
@@ -356,7 +356,7 @@ describe("Personal Preferences session controller", () => {
     try {
       const controller = createPersonalPreferencesSession()
       const save = vi.fn().mockRejectedValue(
-        new AutoSaveActionError(resolvePreferencesAutoSaveFailure(
+        new SaveActionError(resolvePreferencesSaveFailure(
           new SettingsInputValidationError([
             { scope: "FIELD", code: "INVALID_VALUE", inputPaths: [{ segments: ["fileSizeUnit"] }] },
           ]),
