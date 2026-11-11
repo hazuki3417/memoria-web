@@ -9,7 +9,7 @@ import { ConnectedPersonalProfile } from "../profile/ConnectedPersonalProfile"
 import { ConnectedPersonalPreferences } from "../preferences/ConnectedPersonalPreferences"
 import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
 import { Account } from "../account/Account"
-import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
+import { usePersonalSettingsAccentColor } from "./usePersonalSettingsAccentColor"
 
 const sectionStatusMessages = {
   profile: {
@@ -36,7 +36,7 @@ export type PersonalSettingsRouteProps = { section: PersonalSettingsSection }
 /** Selects one Controller; the same Host governs every Section status. */
 export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
   const router = useRouter()
-  const { personalAccentColor } = usePersonalSettingsReadState()
+  const { personalAccentColor } = usePersonalSettingsAccentColor()
 
   const onSectionChange = (nextSection: PersonalSettingsSection) => {
     router.push(`/settings/${nextSection}`)
