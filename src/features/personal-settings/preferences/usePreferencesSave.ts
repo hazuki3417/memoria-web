@@ -7,7 +7,7 @@ import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import { usePersonalPreferencesSession } from "./PersonalPreferencesSessionContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import { getAutoSaveFailure } from "@/ui/AutoSave"
+import { getSaveActionFailure } from "@/ui/SaveAction"
 import type { PreferencesFailure } from "./personalPreferencesSession"
 import type { PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 
@@ -75,11 +75,11 @@ export function usePreferencesSave(
       },
       (error, attempted) => {
         if (!mounted) return
-        const failure = getAutoSaveFailure(error)
-        setLocalError(failure.kind)
-        setLocalBlockedFeedback(failure.kind === "blocked" ? failure.feedback : null)
+        const failure = getSaveActionFailure(error)
+        setLocalError(failure.status)
+        setLocalBlockedFeedback(failure.status === "blocked" ? failure.feedback : null)
         setLocalValidation(
-          failure.kind === "validation"
+          failure.status === "validation"
             ? resolveFormFailureValidation(failure.violations, Object.keys(attempted))
             : null,
         )
