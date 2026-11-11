@@ -1,6 +1,6 @@
 import { resolveFormFailureValidation } from "@/ui/formValidation"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import { getAutoSaveFailure } from "@/ui/AutoSave"
+import { getSaveActionFailure } from "@/ui/SaveAction"
 
 export type AccentFailure = "rejected" | "blocked" | "unknown" | null
 export type AccentSnapshot = Readonly<{
@@ -109,23 +109,23 @@ export function createCommunityAccentSaveController() {
             validation: null,
           })
         } catch (error) {
-          const result = getAutoSaveFailure(error)
+          const result = getSaveActionFailure(error)
           const failure: AccentFailure =
-            result.kind === "unknown"
+            result.status === "unknown"
               ? "unknown"
-              : result.kind === "blocked"
+              : result.status === "blocked"
                 ? "blocked"
                 : "rejected"
           entry.desired = null
           clearPreview(entry)
           const validation =
-            result.kind === "validation"
+            result.status === "validation"
               ? resolveFormFailureValidation(result.violations, ["accentColor"])
               : null
           update(id, {
             status: "attention",
             failure,
-            blockedFeedback: result.kind === "blocked" ? result.feedback : null,
+            blockedFeedback: result.status === "blocked" ? result.feedback : null,
             validation,
             observedMatches: false,
             inspected: false,
