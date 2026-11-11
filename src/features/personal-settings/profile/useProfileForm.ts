@@ -182,7 +182,7 @@ export function useProfileForm({
     blockedFeedback: saveAction.blockedFeedback,
     inspection,
     save: submit,
-    inspectCurrentProfile: saveAction.inspectCurrent,
+    inspectCurrentProfile: async () => { await saveAction.inspectCurrent?.() },
     confirmObservedProfile: saveAction.confirmObservation,
     discardUnconfirmedDraft: saveAction.discardUnconfirmed,
     onDraftChange,
