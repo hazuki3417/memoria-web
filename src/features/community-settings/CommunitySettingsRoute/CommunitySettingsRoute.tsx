@@ -10,7 +10,7 @@ import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { useCommunitySettingsMembership } from "./useCommunitySettingsMembership"
+import { useCommunitySettingsAccessState } from "./useCommunitySettingsAccessState"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
@@ -47,7 +47,7 @@ export function CommunitySettingsRoute({
 }: CommunitySettingsRouteProps) {
   const router = useRouter()
   const { communityAccentColor, status: membershipStatus, retry: retryMembership } =
-    useCommunitySettingsMembership(communityId)
+    useCommunitySettingsAccessState(communityId)
 
   if (membershipStatus === "not-member")
     return (
