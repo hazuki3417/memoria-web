@@ -319,6 +319,24 @@ export const AliasBlockedUserDeleting: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(await canvas.findByRole("alert")).toHaveTextContent("アカウントの削除処理中です")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await expect(input).toBeDisabled()
+  },
+}
+
+export const AliasSavingStopsInput: Story = {
+  name: "Interaction · Alias保存中は入力と重複保存を停止",
+  tags: ["interaction"],
+  args: { onSave: fn(() => new Promise<void>(() => undefined)) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "保存待ちの別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(args.onSave).toHaveBeenCalledExactlyOnceWith("保存待ちの別名")
+    await expect(input).toBeDisabled()
+    await expect(input).toHaveValue("保存待ちの別名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
 
