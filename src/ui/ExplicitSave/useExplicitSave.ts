@@ -68,7 +68,7 @@ export function useExplicitSave<T>({
   const save = async (value: T) => {
     if (!canSave || pendingSave.current || !Object.is(readDraft(), value)) return
     pendingSave.current = true
-    inspectionGeneration.current += 1
+    const generation = ++inspectionGeneration.current
     setInspection({ status: "idle" })
     setBlockedFeedback(null)
     setStatus("saving")
@@ -81,6 +81,8 @@ export function useExplicitSave<T>({
     } finally {
       pendingSave.current = false
     }
+    // The old Form may have unmounted during the request (e.g. a Context switch).
+    if (generation !== inspectionGeneration.current) return
     switch (result.status) {
       case "confirmed":
         adopt(result.value)
