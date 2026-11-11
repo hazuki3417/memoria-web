@@ -6,7 +6,7 @@ import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { PersonalPreferences } from "./PersonalPreferences"
 import { fromGraphqlUserPreferences } from "./userPreferencesGraphqlAdapter"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
-import { usePersonalSettingsInspection } from "../PersonalSettingsRoute/usePersonalSettingsInspection"
+import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 /** Preferences-scoped authoritative read, save and display projection. */
