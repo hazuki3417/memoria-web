@@ -39,32 +39,41 @@ export function useCommunityPreferencesConnection(communityId: string) {
 
   useEffect(() => {
     controller.configure(communityId, {
-      save: async (next) => requireConfirmedSave(await resolveSaveAction(async () => {
-          // The session queue must survive the settings view unmount.
-          // ApolloClient.mutate is independent of the useMutation hook lifetime.
-          const result = await client.mutate<
-            OperationUpdateCommunitySettingsMutation,
-            OperationUpdateCommunitySettingsMutationVariables
-          >({
-            mutation: UpdateCommunitySettingsDocument,
-            fetchPolicy: "no-cache",
-            errorPolicy: "all",
-            variables: { input: { communityId, accentColor: next } },
-          })
-          const outcome = requireSettingsMutationOutcome(result.data?.updateCommunitySettings, result)
-          if (outcome?.__typename === "InputValidationFailure")
-            throw new SettingsInputValidationError(outcome.violations)
-          const confirmed =
-            outcome?.__typename === "UpdateCommunitySettingsSuccess"
-              ? outcome.settings.accentColor
-              : undefined
-          if (!confirmed || !isHex(confirmed))
-            throw new Error("Accent save response invalid")
-          commitCommunitySettingsPatch(client.cache, communityId, {
-            accentColor: confirmed.toUpperCase(),
-          })
-          return confirmed
-      }, resolveCommunityAccentSaveFailure)),
+      save: async (next) =>
+        requireConfirmedSave(
+          await resolveSaveAction(
+            async () => {
+              // The session queue must survive the settings view unmount.
+              // ApolloClient.mutate is independent of the useMutation hook lifetime.
+              const result = await client.mutate<
+                OperationUpdateCommunitySettingsMutation,
+                OperationUpdateCommunitySettingsMutationVariables
+              >({
+                mutation: UpdateCommunitySettingsDocument,
+                fetchPolicy: "no-cache",
+                errorPolicy: "all",
+                variables: { input: { communityId, accentColor: next } },
+              })
+              const outcome = requireSettingsMutationOutcome(
+                result.data?.updateCommunitySettings,
+                result,
+              )
+              if (outcome?.__typename === "InputValidationFailure")
+                throw new SettingsInputValidationError(outcome.violations)
+              const confirmed =
+                outcome?.__typename === "UpdateCommunitySettingsSuccess"
+                  ? outcome.settings.accentColor
+                  : undefined
+              if (!confirmed || !isHex(confirmed))
+                throw new Error("Accent save response invalid")
+              commitCommunitySettingsPatch(client.cache, communityId, {
+                accentColor: confirmed.toUpperCase(),
+              })
+              return confirmed
+            },
+            resolveCommunityAccentSaveFailure,
+          ),
+        ),
       observe: async () => {
         const result = await client.query({
           query: CommunityMySettingsDocument,
