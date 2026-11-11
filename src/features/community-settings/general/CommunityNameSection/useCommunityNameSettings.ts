@@ -5,7 +5,7 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
+import { useExplicitSave, resolveConfirmedSourceSync, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
 import type { SaveActionResult } from "@/ui/SaveAction"
 import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
@@ -82,14 +82,18 @@ export function useCommunityNameSettings({
     if (communityName === undefined || previousSource.current === communityName)
       return
     previousSource.current = communityName
-    if (saveAction.isUnknown) return
-    if (awaitingSourceEcho.current !== null) {
-      if (communityName !== awaitingSourceEcho.current) return
-      awaitingSourceEcho.current = null
-    }
-    const draftIsEdited = getValues("name").trim() !== savedName.current
+    const decision = resolveConfirmedSourceSync({
+      source: communityName,
+      expectedEcho: awaitingSourceEcho.current,
+      baseline: savedName.current,
+      draft: getValues("name").trim(),
+      isUnknown: saveAction.isUnknown,
+      canResetDraft: !saveAction.isSaving,
+    })
+    if (!decision.adopt) return
+    awaitingSourceEcho.current = null
     savedName.current = communityName
-    if (!draftIsEdited && !saveAction.isSaving) reset({ name: communityName })
+    if (decision.resetDraft) reset({ name: communityName })
   }, [communityName, saveAction.isUnknown, saveAction.isSaving, getValues, reset])
 
   const setDraft = (next: SetStateAction<string>) => {
