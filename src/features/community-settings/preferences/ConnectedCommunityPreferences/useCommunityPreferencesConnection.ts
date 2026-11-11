@@ -21,7 +21,7 @@ const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 
 /** Owns the Community preferences query, saving session and Apollo cache synchronization. */
 export function useCommunityPreferencesConnection(communityId: string) {
-  const { data, loading, error } = useCommunityMySettingsQuery({
+  const { data, loading, error, refetch } = useCommunityMySettingsQuery({
     variables: { communityId },
     fetchPolicy: "network-only",
   })
@@ -85,5 +85,5 @@ export function useCommunityPreferencesConnection(communityId: string) {
   })
 
   const canResave = Boolean(snapshot.draft && isHex(snapshot.draft))
-  return { data, loading, snapshot, controller, canResave }
+  return { data, loading, refetch, snapshot, controller, canResave }
 }
