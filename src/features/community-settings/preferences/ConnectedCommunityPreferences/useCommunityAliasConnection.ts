@@ -10,7 +10,7 @@ import {
   requireSettingsMutationOutcome,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
-import { resolveCommunityAliasSaveResult } from "../../resolveCommunityAliasSaveResult"
+import { resolveCommunityAliasSaveResult } from "../resolveCommunityAliasSaveResult"
 
 /** Owns Community Alias observation and mutation without stale refetch side effects. */
 export function useCommunityAliasConnection(communityId: string) {
