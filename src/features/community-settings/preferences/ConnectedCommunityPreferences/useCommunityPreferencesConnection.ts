@@ -8,8 +8,8 @@ import {
 } from "@/features/application-shell/CommunityAccentPreviewContext"
 import { useCommunitySettingsRefreshError } from "../../useCommunitySettingsRefreshError"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
-import { AutoSaveActionError } from "@/ui/AutoSave"
-import { resolveCommunityAccentAutoSaveFailure } from "../resolveCommunityAccentAutoSaveFailure"
+import { resolveSaveAction, requireConfirmedSave } from "@/ui/SaveAction"
+import { resolveCommunityAccentSaveFailure } from "../resolveCommunityAccentSaveFailure"
 import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
 import {
   CommunityMySettingsDocument,
@@ -39,8 +39,7 @@ export function useCommunityPreferencesConnection(communityId: string) {
 
   useEffect(() => {
     controller.configure(communityId, {
-      save: async (next) => {
-        try {
+      save: async (next) => requireConfirmedSave(await resolveSaveAction(async () => {
           // The session queue must survive the settings view unmount.
           // ApolloClient.mutate is independent of the useMutation hook lifetime.
           const result = await client.mutate<
@@ -65,10 +64,7 @@ export function useCommunityPreferencesConnection(communityId: string) {
             accentColor: confirmed.toUpperCase(),
           })
           return confirmed
-        } catch (error) {
-          throw new AutoSaveActionError(resolveCommunityAccentAutoSaveFailure(error))
-        }
-      },
+      }, resolveCommunityAccentSaveFailure)),
       observe: async () => {
         const result = await client.query({
           query: CommunityMySettingsDocument,
