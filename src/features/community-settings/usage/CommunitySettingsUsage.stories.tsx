@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Box, Button } from "@mantine/core"
 import { MockedProvider } from "@apollo/client/testing"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Decorator, Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import { Usage as UsageComponent } from "@/features/usage"
 import {
@@ -15,8 +15,8 @@ import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 import { ConnectedCommunityUsage } from "./ConnectedCommunityUsage"
 
-const visualDecorators = [
-  (Story: () => React.JSX.Element) => (
+const visualDecorators: Decorator[] = [
+  (Story) => (
     <Box h={600}>
       <Story />
     </Box>
