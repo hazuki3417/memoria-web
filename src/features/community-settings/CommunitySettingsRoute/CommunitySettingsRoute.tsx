@@ -2,7 +2,8 @@
 
 import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
-import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
+import { CommunityMembershipUnavailable } from "./CommunityMembershipUnavailable"
 import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { ConnectedCommunityGeneral } from "../general/ConnectedCommunityGeneral"
 import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
@@ -45,14 +46,26 @@ export function CommunitySettingsRoute({
   section = "general",
 }: CommunitySettingsRouteProps) {
   const router = useRouter()
-  const { communityAccentColor, membershipLost } =
-    useCommunitySettingsMembership(communityId, section)
+  const { communityAccentColor, status: membershipStatus, retry: retryMembership } =
+    useCommunitySettingsMembership(communityId)
 
-  if (membershipLost)
+  if (membershipStatus === "not-member")
     return (
-      <LoadingBoundary loading label="Communityの利用権限を確認中">
+      <CommunityMembershipUnavailable
+        onReturnToDashboard={() => router.push("/dashboard")}
+      />
+    )
+
+  if (membershipStatus !== "ready")
+    return (
+      <SettingsContentStatus
+        state={membershipStatus}
+        label="Communityの所属状況を確認中"
+        errorTitle="Communityの所属状況を確認できませんでした"
+        onRetry={retryMembership}
+      >
         {null}
-      </LoadingBoundary>
+      </SettingsContentStatus>
     )
 
   let controller: (render: SettingsSectionRender) => ReactNode
