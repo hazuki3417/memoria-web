@@ -1,7 +1,7 @@
 import { Box, Button } from "@mantine/core"
 import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
