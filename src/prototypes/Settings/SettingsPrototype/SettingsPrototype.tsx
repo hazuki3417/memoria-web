@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react"
 import { Text } from "@mantine/core"
-import type { ExplicitSaveResult } from "@/ui/ExplicitSave"
+import type { SaveActionResult } from "@/ui/SaveAction"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   PersonalSettingsLayout,
@@ -18,7 +18,7 @@ import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShel
 type ProfileSaveState = "idle" | "saving" | "retryable-error" | "blocked"
 
 // Storybook / Prototype専用。製品本体へモックの成功動作を混入させない。
-async function saveMockProfile(nickname: string): Promise<ExplicitSaveResult<string>> {
+async function saveMockProfile(nickname: string): Promise<SaveActionResult<string>> {
   await new Promise((resolve) => setTimeout(resolve, 500))
   return { status: "confirmed", value: nickname }
 }
