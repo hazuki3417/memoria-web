@@ -38,7 +38,7 @@ export function PersonalProfile({
     canSubmit,
     showClientError,
     isSaving,
-    isBlocked,
+    isInputDisabled,
     saveLabel,
     save,
     onDraftChange,
@@ -74,7 +74,7 @@ export function PersonalProfile({
                   : undefined
             }
             required
-            disabled={isSaving || isBlocked}
+            disabled={isInputDisabled}
           />
           <Button
             size="sm"
