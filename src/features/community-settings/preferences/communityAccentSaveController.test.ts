@@ -786,6 +786,28 @@ describe("Community Accentの遅延Trigger", () => {
     }
   })
 
+  it("Shell終了時は未送信の保存予約を破棄する", async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = createCommunityAccentSaveController(400)
+      const save = vi.fn()
+      controller.initialize(id, "#112233")
+      controller.configure(id, {
+        save,
+        observe: vi.fn(),
+        preview: vi.fn().mockReturnValue(1),
+        release: vi.fn(),
+      })
+      controller.edit(id, "#AABBCC")
+      expect(controller.getSnapshot(id).draft).toBe("#AABBCC")
+      controller.dispose()
+      await vi.advanceTimersByTimeAsync(1000)
+      expect(save).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("結果不明で停止したあと、新しい入力を自動再送しない", async () => {
     vi.useFakeTimers()
     try {
