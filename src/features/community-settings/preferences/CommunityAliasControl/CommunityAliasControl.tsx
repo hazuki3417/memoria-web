@@ -15,8 +15,8 @@ export function CommunityAliasControl({
 }) {
   const model = useCommunityAliasForm({ savedAlias, onSave, onInspect })
   const {
-    field, fieldState, text, saving, isInputDisabled, failure, validation,
-    showClientError, changed, invalid, save, onAliasChange,
+    field, fieldState, text, saving, isInputDisabled, validation,
+    showClientError, canSubmit, save, onAliasChange,
   } = model
 
   return (
@@ -45,7 +45,7 @@ export function CommunityAliasControl({
         <Button
           size="sm"
           loading={saving}
-          disabled={!changed || invalid || saving || failure === "unknown" || failure === "blocked"}
+          disabled={!canSubmit}
           onClick={() => void save()}
         >
           保存
