@@ -175,6 +175,7 @@ export function useProfileForm({
     normalized,
     dirty,
     invalid,
+    canSubmit: saveAction.canSubmit,
     showClientError: fieldState.isTouched || isSubmitted,
     isSaving: saveAction.isSaving,
     isBlocked: saveAction.isBlocked,
