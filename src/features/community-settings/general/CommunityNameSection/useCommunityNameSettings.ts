@@ -163,6 +163,7 @@ export function useCommunityNameSettings({
     setDraft,
     dirty,
     invalid,
+    canSubmit: saveAction.canSubmit,
     savingName: saveAction.isSaving,
     isInputDisabled: saveAction.isInputDisabled,
     saveName,
