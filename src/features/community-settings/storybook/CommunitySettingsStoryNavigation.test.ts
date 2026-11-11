@@ -1,14 +1,14 @@
-import { act, createElement } from "react"
+import { act, createElement, isValidElement, type ReactElement, type ReactNode } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { CommunitySettingsStoryNavigation } from "./CommunitySettingsStoryNavigation"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
+import type { SettingsSectionResult } from "@/ui/SettingsSectionHost"
 
 type NavigationProps = {
   section?: CommunitySettingsSection
-  onSectionChange: (section: CommunitySettingsSection, href: string) => void
-  preferencesContent?: unknown
-  invitation?: { invitationUrl: string }
+  onSectionChange: (section: CommunitySettingsSection) => void
+  content: ReactNode
 }
 
 let rendered: NavigationProps
@@ -37,13 +37,37 @@ describe("Community Settings Storybook Navigation Adapter", () => {
     const props = { section: "general" as const, onSectionChange }
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
     expect(rendered.section).toBe("general")
+    expect(isValidElement(rendered.content)).toBe(true)
+    const hostChildren = (rendered.content as ReactElement<{
+      children: (render: (state: SettingsSectionResult) => ReactNode) => ReactNode
+    }>).props.children
+    const sectionContent = hostChildren((state) => state.status === "ready" ? state.content : null)
+    expect((sectionContent as ReactElement<{ invitation: { invitationUrl: string } }>).props.invitation.invitationUrl).toContain("photo-club-demo-")
 
-    act(() => rendered.onSectionChange("members", "/communities/photo-club/members"))
+    act(() => rendered.onSectionChange("members"))
     expect(rendered.section).toBe("members")
     expect(onSectionChange).not.toHaveBeenCalled()
 
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
     expect(rendered.section).toBe("members")
+  })
+
+  it("Usage固有のLoadingと共通ContextのLoadingは正しいラベルに分ける", () => {
+    const props = {
+      section: "usage" as const,
+      loadState: "loading" as const,
+      onSectionChange: vi.fn(),
+    }
+    act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
+    expect((rendered.content as ReactElement<{ label: string }>).props.label)
+      .toBe("Community設定を読み込み中")
+
+    act(() => root.render(createElement(CommunitySettingsStoryNavigation, {
+      ...props,
+      usageState: "loading",
+    })))
+    expect((rendered.content as ReactElement<{ label: string }>).props.label)
+      .toBe("利用状況を読み込み中")
   })
 
   it("初期Sectionを外から受け取る", () => {
@@ -56,7 +80,6 @@ describe("Community Settings Storybook Navigation Adapter", () => {
       ),
     )
     expect(rendered.section).toBe("preferences")
-    expect(rendered.preferencesContent).toBeTruthy()
-    expect(rendered.invitation?.invitationUrl).toContain("photo-club-demo-")
+    expect(isValidElement(rendered.content)).toBe(true)
   })
 })

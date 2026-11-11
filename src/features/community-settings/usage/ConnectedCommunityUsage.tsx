@@ -1,23 +1,24 @@
 "use client"
 
-import {
-  useCommunityUsageQuery,
-  useCurrentUserQuery,
-} from "@/infrastructure/graphql/generated"
+import { useCommunitySettingsUsageQuery } from "@/infrastructure/graphql/generated"
 import { Usage, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
-/** Community Context固有のGraphQL接続。共通のUsage UIはfeatures/usageが所有する。 */
-export function ConnectedCommunityUsage({ communityId }: { communityId: string }) {
-  const community = useCommunityUsageQuery({
+/** One scoped read obtains the Usage and unit required by the active Section. */
+export function ConnectedCommunityUsage({
+  communityId,
+  render,
+}: {
+  communityId: string
+  render: SettingsSectionRender
+}) {
+  const query = useCommunitySettingsUsageQuery({
     variables: { communityId },
-    skip: !communityId,
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
-  const communityPreferences = useCurrentUserQuery()
-  const projection = community.data?.communityUsage
-
+  const projection = query.data?.communityUsage
   let usage: UsageData = emptyUsage
   let conversionFailed = false
   if (projection) {
@@ -28,31 +29,28 @@ export function ConnectedCommunityUsage({ communityId }: { communityId: string }
     }
   }
 
-  const hasData = Boolean(projection) && !conversionFailed && Boolean(communityPreferences.data?.me)
-  useCommunitySettingsRefreshError(Boolean(hasData && (community.error || communityPreferences.error)))
-  const status = hasData
-    ? "ready"
-    : community.loading || communityPreferences.loading
-      ? "loading"
-      : "error"
+  const ready = Boolean(projection) && !conversionFailed && Boolean(query.data?.me)
+  useCommunitySettingsRefreshError(Boolean(ready && query.error))
+  if (!ready) {
+    return render(
+      query.loading && !conversionFailed
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void query.refetch().catch(() => undefined) },
+          },
+    )
+  }
 
-  return (
-    <Usage
-      key={communityId}
-      scope="community"
-      usage={usage}
-      status={status}
-      fileSizeUnit={
-        communityPreferences.data?.me?.preferences.fileSizeUnit === "BINARY"
-          ? "BINARY"
-          : "DECIMAL"
-      }
-      onRetry={() => {
-        void Promise.all([
-          community.refetch().catch(() => undefined),
-          communityPreferences.refetch().catch(() => undefined),
-        ])
-      }}
-    />
-  )
+  return render({
+    status: "ready",
+    content: (
+      <Usage
+        key={communityId}
+        scope="community"
+        usage={usage}
+        fileSizeUnit={query.data?.me?.preferences.fileSizeUnit === "BINARY" ? "BINARY" : "DECIMAL"}
+      />
+    ),
+  })
 }

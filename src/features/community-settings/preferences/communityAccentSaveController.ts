@@ -1,6 +1,6 @@
 import { resolveFormFailureValidation } from "@/ui/formValidation"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import { getCommunityBlockedFeedback } from "./communityBlockedFeedback"
+import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
 import {
   classifySettingsSaveFailure,
   getSettingsInputViolations,

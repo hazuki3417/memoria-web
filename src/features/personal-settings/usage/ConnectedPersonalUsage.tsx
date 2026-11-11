@@ -2,12 +2,13 @@
 
 import { usePersonalUsageQuery } from "@/infrastructure/graphql/generated"
 import { Usage, emptyUsage, mapUsageProjection, type UsageData } from "@/features/usage"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
-/** Personal Context固有のGraphQL接続。共通のUsage UIはfeatures/usageが所有する。 */
-export function ConnectedPersonalUsage() {
+/** Usage-scoped read and retry; status UI belongs to the common Host. */
+export function ConnectedPersonalUsage({ render }: { render: SettingsSectionRender }) {
   const personal = usePersonalUsageQuery({
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
 
@@ -24,21 +25,30 @@ export function ConnectedPersonalUsage() {
 
   const hasData = Boolean(projection) && !conversionFailed
   usePersonalSettingsRefreshError(Boolean(hasData && personal.error))
-  const status = hasData ? "ready" : personal.loading ? "loading" : "error"
 
-  return (
-    <Usage
-      scope="personal"
-      usage={usage}
-      status={status}
-      fileSizeUnit={
-        personal.data?.me?.preferences.fileSizeUnit === "BINARY"
-          ? "BINARY"
-          : "DECIMAL"
-      }
-      onRetry={() => {
-        void personal.refetch().catch(() => undefined)
-      }}
-    />
-  )
+  if (!hasData) {
+    return render(
+      personal.loading && !conversionFailed
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void personal.refetch().catch(() => undefined) },
+          },
+    )
+  }
+
+  return render({
+    status: "ready",
+    content: (
+      <Usage
+        scope="personal"
+        usage={usage}
+        fileSizeUnit={
+          personal.data?.me?.preferences.fileSizeUnit === "BINARY"
+            ? "BINARY"
+            : "DECIMAL"
+        }
+      />
+    ),
+  })
 }

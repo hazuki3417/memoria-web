@@ -3,39 +3,18 @@
 import type { ReactNode } from "react"
 import { PersonalSettingsLayout } from "./PersonalSettingsLayout"
 import type { PersonalSettingsSection } from "./personalSettingsSections"
-import { PersonalSettingsContent } from "./PersonalSettingsContent"
-import type { InspectProfile, SaveProfile } from "./profile/SettingsProfile"
-import type {
-  UserPreferences,
-  UserPreferencesPatch,
-} from "./preferences/userPreferences"
 
 export type PersonalSettingsViewProps = {
   section: PersonalSettingsSection
-  saveProfile?: SaveProfile
-  inspectProfile?: InspectProfile
-  profileNickname?: string
-  initialPreferences?: UserPreferences
-  savePreferences?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
-  inspectPreferences?: () => Promise<UserPreferences>
-  usageContent?: ReactNode
-  accountContent?: ReactNode
-  contentOverride?: ReactNode
+  content: ReactNode
   personalAccentColor?: string
   onSectionChange: (section: PersonalSettingsSection) => void
 }
 
+/** Layoutへの接続のみを所有し、各Sectionの取得状態は解釈しない。 */
 export function PersonalSettingsView({
   section,
-  saveProfile,
-  inspectProfile,
-  profileNickname,
-  initialPreferences,
-  savePreferences,
-  inspectPreferences,
-  usageContent,
-  accountContent,
-  contentOverride,
+  content,
   personalAccentColor,
   onSectionChange,
 }: PersonalSettingsViewProps) {
@@ -45,19 +24,7 @@ export function PersonalSettingsView({
       section={section}
       onSectionChange={onSectionChange}
     >
-      {contentOverride ?? (
-        <PersonalSettingsContent
-          section={section}
-          saveProfile={saveProfile}
-          inspectProfile={inspectProfile}
-          profileNickname={profileNickname}
-          initialPreferences={initialPreferences}
-          savePreferences={savePreferences}
-          inspectPreferences={inspectPreferences}
-          usageContent={usageContent}
-          accountContent={accountContent}
-        />
-      )}
+      {content}
     </PersonalSettingsLayout>
   )
 }

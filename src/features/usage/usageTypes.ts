@@ -7,4 +7,3 @@ export type UsageData = {
   formatBreakdown?: UsageFormatItem[]
 }
 
-export type UsageStatus = "ready" | "loading" | "error"

@@ -68,3 +68,34 @@ mutation UpdateCommunitySettings($input: UpdateCommunitySettingsInput!) {
 fragment CommunitySettingsCache on Community {
   mySettings { accentColor alias }
 }
+
+# Only the navigation accent and membership identity belong to the Route.
+query CommunitySettingsMembership {
+  myCommunities { id mySettings { accentColor } }
+}
+
+query CommunitySettingsGeneral($communityId: ID!) {
+  community(communityId: $communityId) { id name }
+  communityMembers(communityId: $communityId) { userId role }
+  me { id }
+}
+
+query CommunitySettingsMembers($communityId: ID!) {
+  community(communityId: $communityId) { id }
+  communityMembers(communityId: $communityId) { userId nickname role }
+  me { id }
+}
+
+query CommunitySettingsUsage($communityId: ID!) {
+  communityUsage(communityId: $communityId) {
+    mediaCount
+    storage { usedBytes effectiveLimitBytes }
+    formatBreakdown { format mediaCount usedBytes }
+  }
+  me { id preferences { fileSizeUnit } }
+}
+
+# Authoritative name inspection does not request members or unused timestamps.
+query CommunitySettingsNameInspection($communityId: ID!) {
+  community(communityId: $communityId) { id name }
+}

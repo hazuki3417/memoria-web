@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { CommunitySettingsView } from "@/features/community-settings/CommunitySettingsView"
 import { CommunitySettingsStoryNavigation } from "@/features/community-settings/storybook/CommunitySettingsStoryNavigation"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
@@ -13,7 +12,7 @@ const communityContext = {
 
 const meta = {
   title: "Design Prototypes/Community Settings",
-  component: CommunitySettingsView,
+  component: CommunitySettingsStoryNavigation,
   render: (args) => <CommunitySettingsStoryNavigation {...args} />,
   parameters: { layout: "fullscreen" },
   decorators: [
@@ -31,7 +30,7 @@ const meta = {
       </PrototypeApplicationShell>
     ),
   ],
-} satisfies Meta<typeof CommunitySettingsView>
+} satisfies Meta<typeof CommunitySettingsStoryNavigation>
 
 export default meta
 type Story = StoryObj<typeof meta>

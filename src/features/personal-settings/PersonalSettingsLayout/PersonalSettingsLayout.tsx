@@ -7,7 +7,7 @@ import {
   SettingsSectionNavigation,
 } from "@/components/SettingsSectionLayout"
 
-import { personalSettingsSections, type PersonalSettingsSection } from "../personalSettingsSections"
+import { getPersonalSettingsSections, type PersonalSettingsSection } from "../personalSettingsSections"
 
 type PersonalSettingsLayoutProps = {
   section: PersonalSettingsSection
@@ -23,6 +23,7 @@ export function PersonalSettingsLayout({
   accentColor,
 }: PersonalSettingsLayoutProps) {
   const compact = useMediaQuery("(max-width: 48em)")
+  const sections = getPersonalSettingsSections()
 
   return (
     <SettingsSectionLayout
@@ -30,7 +31,7 @@ export function PersonalSettingsLayout({
       navigation={
         <SettingsSectionNavigation
           section={section}
-          sections={personalSettingsSections}
+          sections={sections}
           compact={compact}
           ariaLabel="設定画面"
           desktopAriaLabel="設定"

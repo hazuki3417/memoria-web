@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import { expect, within } from "storybook/test"
 import { UsageStorageSection } from "./UsageStorageSection"
 import { sampleUsage, zeroUsage } from "../usageStoryFixtures"
@@ -8,7 +9,6 @@ const meta = {
   component: UsageStorageSection,
   args: {
     usage: sampleUsage,
-    status: "ready",
     fileSizeUnit: "DECIMAL",
   },
 } satisfies Meta<typeof UsageStorageSection>
@@ -42,7 +42,11 @@ export const ReadyCompact: Story = {
 export const Loading: Story = {
   name: "Visual · Loading",
   tags: ["visual"],
-  args: { status: "loading" },
+  render: () => (
+    <SettingsContentStatus state="loading" label="利用状況を読み込み中">
+      {null}
+    </SettingsContentStatus>
+  ),
 }
 
 export const Empty: Story = {

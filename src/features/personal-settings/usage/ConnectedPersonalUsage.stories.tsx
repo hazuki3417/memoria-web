@@ -4,6 +4,15 @@ import { expect, userEvent, within } from "storybook/test"
 import { PersonalUsageDocument } from "@/infrastructure/graphql/generated"
 import { graphqlUsageFixture, emptyGraphqlUsageFixture } from "@/features/usage/usageStoryFixtures"
 import { ConnectedPersonalUsage } from "./ConnectedPersonalUsage"
+import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
+
+function ConnectedPersonalUsageStory() {
+  return (
+    <SettingsSectionHost label="利用状況を読み込み中" errorTitle="利用状況を取得できませんでした">
+      {(render) => <ConnectedPersonalUsage render={render} />}
+    </SettingsSectionHost>
+  )
+}
 
 const personalSuccessFor = (
   unit: "DECIMAL" | "BINARY",
@@ -27,8 +36,8 @@ const personalLoading = { ...personalDecimal, delay: 15_000 }
 
 const meta = {
   title: "features/settings/usage/ConnectedPersonalUsage",
-  component: ConnectedPersonalUsage,
-} satisfies Meta<typeof ConnectedPersonalUsage>
+  component: ConnectedPersonalUsageStory,
+} satisfies Meta<typeof ConnectedPersonalUsageStory>
 export default meta
 type Story = StoryObj<typeof meta>
 

@@ -1,116 +1,78 @@
 "use client"
 
-import type { ReactNode } from "react"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useRouter } from "next/navigation"
+import type { ReactNode } from "react"
+import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
-import { fromGraphqlUserPreferences } from "../preferences/userPreferencesGraphqlAdapter"
-import { usePersonalSettingsActions } from "./usePersonalSettingsActions"
-import { usePersonalSettingsInspection } from "./usePersonalSettingsInspection"
-import { usePersonalSettingsReadState } from "./usePersonalSettingsReadState"
-import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
+import { ConnectedPersonalProfile } from "../profile/ConnectedPersonalProfile"
+import { ConnectedPersonalPreferences } from "../preferences/ConnectedPersonalPreferences"
+import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
+import { Account } from "../account/Account"
+import { usePersonalSettingsAccentColor } from "./usePersonalSettingsAccentColor"
 
-type ProfilePreferencesSection = Extract<
-  PersonalSettingsSection,
-  "profile" | "preferences"
->
-type AccountUsageSection = Extract<PersonalSettingsSection, "account" | "usage">
+const sectionStatusMessages = {
+  profile: {
+    label: "プロフィールを読み込み中",
+    errorTitle: "プロフィールを取得できませんでした",
+  },
+  preferences: {
+    label: "環境設定を読み込み中",
+    errorTitle: "環境設定を取得できませんでした",
+  },
+  account: {
+    // Account renders Ready without a Section data Query.
+    label: "アカウント設定を読み込み中",
+    errorTitle: "アカウント設定を取得できませんでした",
+  },
+  usage: {
+    label: "利用状況を読み込み中",
+    errorTitle: "利用状況を取得できませんでした",
+  },
+} satisfies Record<PersonalSettingsSection, { label: string; errorTitle: string }>
 
-export type PersonalSettingsRouteProps =
-  | { section: ProfilePreferencesSection }
-  | { section: AccountUsageSection; usageContent?: ReactNode }
+export type PersonalSettingsRouteProps = { section: PersonalSettingsSection }
 
-/** Personal設定のProduction接続入口。Section固有の取得・操作は個別の接続Componentが所有する。 */
-export function PersonalSettingsRoute(props: PersonalSettingsRouteProps) {
+/** Selects one Controller; the same Host governs every Section status. */
+export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
   const router = useRouter()
-  const onSectionChange = (section: PersonalSettingsSection) => {
-    router.push(`/settings/${section}`)
-  }
-  if (props.section === "profile" || props.section === "preferences") {
-    return (
-      <ProfilePreferencesConnection
-        section={props.section}
-        onSectionChange={onSectionChange}
-      />
-    )
-  }
-  return (
-    <AccountUsageConnection
-      section={props.section}
-      usageContent={"usageContent" in props ? props.usageContent : undefined}
-      onSectionChange={onSectionChange}
-    />
-  )
-}
+  const { personalAccentColor } = usePersonalSettingsAccentColor()
 
-/** Profile/PreferencesはCurrentUserに加えて保存と結果確認を接続する。 */
-function ProfilePreferencesConnection({
-  section,
-  onSectionChange,
-}: {
-  section: ProfilePreferencesSection
-  onSectionChange: (section: PersonalSettingsSection) => void
-}) {
-  const { data, error, personalAccentColor, loadState } =
-    usePersonalSettingsReadState()
-  const { inspectProfile, inspectPreferences } = usePersonalSettingsInspection()
-  usePersonalSettingsRefreshError(Boolean(data?.me && error))
-  const { saveProfile, savePreferences } = usePersonalSettingsActions()
-  const preferences = data?.me
-    ? fromGraphqlUserPreferences(data.me.preferences)
-    : undefined
+  const onSectionChange = (nextSection: PersonalSettingsSection) => {
+    router.push(`/settings/${nextSection}`)
+  }
+
+  let controller: (render: SettingsSectionRender) => ReactNode
+
+  switch (section) {
+    case "profile":
+      controller = (render) => <ConnectedPersonalProfile render={render} />
+      break
+    case "preferences":
+      controller = (render) => <ConnectedPersonalPreferences render={render} />
+      break
+    case "account":
+      // The deletion entry UI requires no Section data Query.
+      controller = (render) => render({ status: "ready", content: <Account /> })
+      break
+    case "usage":
+      controller = (render) => <ConnectedPersonalUsage render={render} />
+      break
+  }
+
+  const { label, errorTitle } = sectionStatusMessages[section]
 
   return (
     <PersonalSettingsView
       key={section}
       section={section}
-      onSectionChange={onSectionChange}
-      personalAccentColor={personalAccentColor}
-      profileNickname={data?.me?.profile.nickname}
-      contentOverride={
-        loadState !== "ready" ? (
-          <PageStatusBoundary state={loadState} label="Personal設定を読み込み中">
-            {null}
-          </PageStatusBoundary>
-        ) : undefined
+      content={
+        <SettingsSectionHost label={label} errorTitle={errorTitle}>
+          {controller}
+        </SettingsSectionHost>
       }
-      initialPreferences={preferences}
-      saveProfile={saveProfile}
-      inspectProfile={inspectProfile}
-      savePreferences={savePreferences}
-      inspectPreferences={inspectPreferences}
-    />
-  )
-}
-
-/** AccountはCurrentUser状態を参照し、Usage固有の取得・LoadingはSection側が所有する。 */
-function AccountUsageConnection({
-  section,
-  usageContent,
-  onSectionChange,
-}: {
-  section: AccountUsageSection
-  usageContent?: ReactNode
-  onSectionChange: (section: PersonalSettingsSection) => void
-}) {
-  const { data, error, personalAccentColor, loadState } =
-    usePersonalSettingsReadState()
-  usePersonalSettingsRefreshError(Boolean(data?.me && error))
-  const accountContent =
-    section === "account" && loadState !== "ready" ? (
-      <PageStatusBoundary state={loadState} label="Personal設定を読み込み中">
-        {null}
-      </PageStatusBoundary>
-    ) : undefined
-
-  return (
-    <PersonalSettingsView
-      section={section}
-      onSectionChange={onSectionChange}
-      usageContent={usageContent}
-      accountContent={accountContent}
       personalAccentColor={personalAccentColor}
+      onSectionChange={onSectionChange}
     />
   )
 }

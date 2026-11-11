@@ -1,5 +1,6 @@
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 import { expect, userEvent, within } from "storybook/test"
 import { UsageFormatBreakdownSection } from "./UsageFormatBreakdownSection"
 import {
@@ -28,7 +29,6 @@ const meta = {
   component: UsageFormatBreakdownSection,
   args: {
     usage: sampleUsage,
-    status: "ready",
     fileSizeUnit: "DECIMAL",
     displayMode: "size",
     sort: defaultUsageSort,
@@ -66,7 +66,11 @@ export const ReadyCompact: Story = {
 export const Loading: Story = {
   name: "Visual · Loading Table",
   tags: ["visual"],
-  args: { status: "loading" },
+  render: () => (
+    <SettingsContentStatus state="loading" label="利用状況を読み込み中">
+      {null}
+    </SettingsContentStatus>
+  ),
 }
 
 export const Empty: Story = {
@@ -94,7 +98,6 @@ export const SortInteraction: Story = {
   render: (args) => (
     <SortableBreakdownStory
       usage={args.usage}
-      status={args.status}
       fileSizeUnit={args.fileSizeUnit}
       displayMode={args.displayMode}
     />
@@ -138,15 +141,16 @@ export const SortInteraction: Story = {
 export const LoadingContract: Story = {
   name: "Interaction · Loading時の操作不可",
   tags: ["interaction"],
-  args: { status: "loading" },
+  render: () => (
+    <SettingsContentStatus state="loading" label="利用状況を読み込み中">
+      {null}
+    </SettingsContentStatus>
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(
-      canvas.getByRole("button", { name: "使用量で並べ替え" }),
-    ).toBeDisabled()
-    await expect(
-      within(canvas.getAllByRole("row")[0]).getAllByRole("columnheader"),
-    ).toHaveLength(3)
-    await expect(canvas.getAllByRole("row")).toHaveLength(6)
+      await canvas.findByRole("status", { name: "利用状況を読み込み中" }),
+    ).toBeVisible()
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument()
   },
 }

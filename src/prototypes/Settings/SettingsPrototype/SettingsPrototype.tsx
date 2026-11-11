@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import { Button, Text } from "@mantine/core"
+import { Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   PersonalSettingsLayout,
-  SettingsProfile,
-  SettingsPreferences,
-  SettingsAccount,
+  PersonalProfile,
+  PersonalPreferences,
+  Account,
   type PersonalSettingsSection,
 } from "@/features/personal-settings"
 import { UsageContent, type UsageScenario } from "./UsageContent"
@@ -47,7 +47,7 @@ export function SettingsPrototype({
   switch (section) {
     case "profile":
       content = (
-        <SettingsProfile
+        <PersonalProfile
           onSave={saveMockProfile}
           initialSaveState={initialProfileSaveState}
           blockedMessage="Userの状態が変わったため、この画面での変更を続けられません。ページを再読み込みして現在の状態を確認してください。"
@@ -55,7 +55,7 @@ export function SettingsPrototype({
       )
       break
     case "preferences":
-      content = <SettingsPreferences compact={compact} />
+      content = <PersonalPreferences compact={compact} />
       break
     case "usage":
       content = (
@@ -66,15 +66,7 @@ export function SettingsPrototype({
       )
       break
     case "account":
-      content = (
-        <SettingsAccount
-          deletionAction={
-            <Button variant="default" size="sm">
-              アカウントを削除する
-            </Button>
-          }
-        />
-      )
+      content = <Account />
       break
   }
 

@@ -1,67 +1,44 @@
 "use client"
 
-import { Stack } from "@mantine/core"
-import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import { CommunityPreferencesContent } from "../CommunityPreferencesContent"
-import { CommunityAliasControl } from "../CommunityAliasControl"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
+import { CommunityPreferencesSection } from "../CommunityPreferencesSection"
 import { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
 import { useCommunityAliasConnection } from "./useCommunityAliasConnection"
-import { CommunityAccentSaveFeedback } from "./CommunityAccentSaveFeedback"
 
+/** Query/Mutation/session stays mounted while the Host renders Loading/Error. */
 export function ConnectedCommunityPreferences({
   communityId,
+  render,
 }: {
   communityId: string
+  render: SettingsSectionRender
 }) {
-  const { data, loading, snapshot, controller, canResave } =
-    useCommunityPreferencesConnection(communityId)
-  const { inspectAlias, saveAlias } = useCommunityAliasConnection(communityId)
+  const model = useCommunityPreferencesConnection(communityId)
+  const alias = useCommunityAliasConnection(communityId)
+  const settings = model.data?.community?.mySettings
 
-  if (!data?.community) {
-    return (
-      <PageStatusBoundary
-        state={loading ? "loading" : "error"}
-        label="Community環境設定を読み込み中"
-      >
-        {null}
-      </PageStatusBoundary>
+  if (!settings) {
+    return render(
+      model.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void model.refetch().catch(() => undefined) },
+          },
     )
   }
 
-  const failure = snapshot.failure
-  const accent = snapshot.confirmed ?? data.community.mySettings.accentColor
-  const lastDraft = snapshot.draft ?? accent
-
-  return (
-    <Stack gap="sm">
-      <CommunityPreferencesContent
-        key={communityId}
-        accent={accent}
-        initialDraft={lastDraft}
-        isPreview={false}
-        preserveDraftOnAccentChange={failure !== null}
-        saveStatus={failure ? "attention" : snapshot.status}
-        accentError={snapshot.validation?.fieldErrors.accentColor}
-        onAccentDraftChange={(value) => controller.edit(communityId, value)}
-        saveFeedback={
-          failure ? (
-            <CommunityAccentSaveFeedback
-              communityId={communityId}
-              snapshot={snapshot}
-              controller={controller}
-              canResave={canResave}
-            />
-          ) : undefined
-        }
-        aliasControl={
-          <CommunityAliasControl
-            savedAlias={data.community.mySettings.alias}
-            onInspect={inspectAlias}
-            onSave={saveAlias}
-          />
-        }
-        setAccent={() => undefined}
+  return render({
+    status: "ready",
+    content: (
+      <CommunityPreferencesSection
+        communityId={communityId}
+        settings={settings}
+        snapshot={model.snapshot}
+        controller={model.controller}
+        canResave={model.canResave}
+        alias={alias}
       />
-    </Stack>
-  )
+    ),
+  })
 }

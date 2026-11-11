@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Usage, type UsageData } from "@/features/usage"
+import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
 
 // Deterministic Storybook sample data; these values are not product values.
 const MOCK_USAGE: UsageData = {
@@ -76,6 +77,11 @@ export function UsageContent({
   }
 
   return (
-    <Usage usage={usage} fileSizeUnit={fileSizeUnit} status={status} />
+    <SettingsContentStatus
+      state={status}
+      label="利用状況を読み込み中"
+    >
+      <Usage usage={usage} fileSizeUnit={fileSizeUnit} />
+    </SettingsContentStatus>
   )
 }
