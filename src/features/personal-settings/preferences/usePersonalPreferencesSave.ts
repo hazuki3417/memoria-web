@@ -14,6 +14,8 @@ import {
   requireSettingsMutationOutcome,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import type { UserPreferencesPatch } from "./userPreferences"
+import { AutoSaveActionError } from "@/ui/AutoSave"
+import { resolvePreferencesAutoSaveFailure } from "./resolvePreferencesAutoSaveFailure"
 import {
   fromGraphqlUserPreferences,
   toGraphqlUserPreferencesPatch,
@@ -25,6 +27,7 @@ export function usePersonalPreferencesSave() {
 
   return {
     savePreferences: async (patch: UserPreferencesPatch) => {
+      try {
       const input = toGraphqlUserPreferencesPatch(patch)
       const result = await client.mutate<
         OperationSaveUserPreferencesMutation,
@@ -44,6 +47,9 @@ export function usePersonalPreferencesSave() {
         })
         .catch(() => undefined)
       return confirmed
+      } catch (error) {
+        throw new AutoSaveActionError(resolvePreferencesAutoSaveFailure(error))
+      }
     },
   }
 }
