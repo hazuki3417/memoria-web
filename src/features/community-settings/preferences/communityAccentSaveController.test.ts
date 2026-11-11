@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
-import { AutoSaveActionError } from "@/ui/AutoSave"
-import { resolveCommunityAccentAutoSaveFailure } from "./resolveCommunityAccentAutoSaveFailure"
+import { SaveActionError } from "@/ui/SaveAction"
+import { resolveCommunityAccentSaveFailure } from "./resolveCommunityAccentSaveFailure"
 import { createCommunityAccentSaveController } from "./communityAccentSaveController"
 
 const id = "community-1"
@@ -417,7 +417,7 @@ describe("session Community Accent save controller", () => {
     const controller = createCommunityAccentSaveController()
     // An explicitly retryable result is distinguishable from an unclassified
     // GraphQL execution error, which must remain Unknown Outcome.
-    const rejected = new AutoSaveActionError({ kind: "retryable" })
+    const rejected = new SaveActionError({ status: "retryable" })
     const save = vi
       .fn()
       .mockRejectedValueOnce(rejected)
@@ -458,7 +458,7 @@ describe("session Community Accent save controller", () => {
     ]) {
       const controller = createCommunityAccentSaveController()
       const save = vi.fn().mockRejectedValue(
-        new AutoSaveActionError(resolveCommunityAccentAutoSaveFailure({ graphQLErrors })),
+        new SaveActionError(resolveCommunityAccentSaveFailure({ graphQLErrors })),
       )
       controller.initialize(id, "#112233")
       controller.configure(id, {
@@ -485,7 +485,7 @@ describe("session Community Accent save controller", () => {
     for (const code of ["UNAUTHENTICATED", "FORBIDDEN", "USER_DELETING"]) {
       const controller = createCommunityAccentSaveController()
       const save = vi.fn().mockRejectedValue(
-        new AutoSaveActionError(resolveCommunityAccentAutoSaveFailure({
+        new SaveActionError(resolveCommunityAccentSaveFailure({
           graphQLErrors: [{ extensions: { code } }],
         })),
       )
@@ -587,7 +587,7 @@ describe("session Community Accent save controller", () => {
   it("retains Typed accent Field Validation with its Draft after rejection", async () => {
     const controller = createCommunityAccentSaveController()
     const save = vi.fn().mockRejectedValue(
-      new AutoSaveActionError(resolveCommunityAccentAutoSaveFailure(
+      new SaveActionError(resolveCommunityAccentSaveFailure(
         new SettingsInputValidationError([
           { scope: "FIELD", code: "INVALID_FORMAT", inputPaths: [{ segments: ["accentColor"] }] },
         ]),
