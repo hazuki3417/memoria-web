@@ -30,7 +30,6 @@ export function PersonalProfile({
     onInspect,
     initialNickname,
     initialSaveState,
-    blockedMessage,
   })
   const {
     field,
