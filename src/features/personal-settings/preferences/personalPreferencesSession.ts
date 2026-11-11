@@ -1,12 +1,9 @@
 import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
-import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
+import type { PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
+import { getAutoSaveFailure } from "@/ui/AutoSave"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import {
-  classifySettingsSaveFailure,
-  getSettingsInputViolations,
-} from "@/infrastructure/graphql/settingsMutationResult"
 
 export type PreferencesFailure = "unknown" | "retryable" | "blocked" | "validation" | null
 export type PreferencesSessionSnapshot = Readonly<{
@@ -80,14 +77,15 @@ export function createPersonalPreferencesSession() {
         emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null, blockedFeedback: null, validation: null })
       },
       (error, attempted) => {
-        const failure = classifySettingsSaveFailure(error)
+        const result = getAutoSaveFailure(error)
+        const failure = result.kind
         const validation =
-          failure === "validation"
-            ? resolveFormFailureValidation(getSettingsInputViolations(error), Object.keys(attempted))
+          result.kind === "validation"
+            ? resolveFormFailureValidation(result.violations, Object.keys(attempted))
             : null
         emit({
           failure,
-          blockedFeedback: failure === "blocked" ? getPreferencesBlockedFeedback(error) : null,
+          blockedFeedback: result.kind === "blocked" ? result.feedback : null,
           validation,
           saveStatus: "attention",
           inspected: false,
