@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
+import { AutoSaveActionError } from "@/ui/AutoSave"
+import { resolveCommunityAccentAutoSaveFailure } from "./resolveCommunityAccentAutoSaveFailure"
 import { createCommunityAccentSaveController } from "./communityAccentSaveController"
 
 const id = "community-1"
@@ -415,7 +417,7 @@ describe("session Community Accent save controller", () => {
     const controller = createCommunityAccentSaveController()
     // An explicitly retryable result is distinguishable from an unclassified
     // GraphQL execution error, which must remain Unknown Outcome.
-    const rejected = { kind: "retryable" }
+    const rejected = new AutoSaveActionError({ kind: "retryable" })
     const save = vi
       .fn()
       .mockRejectedValueOnce(rejected)
@@ -455,7 +457,9 @@ describe("session Community Accent save controller", () => {
       ],
     ]) {
       const controller = createCommunityAccentSaveController()
-      const save = vi.fn().mockRejectedValue({ graphQLErrors })
+      const save = vi.fn().mockRejectedValue(
+        new AutoSaveActionError(resolveCommunityAccentAutoSaveFailure({ graphQLErrors })),
+      )
       controller.initialize(id, "#112233")
       controller.configure(id, {
         save,
@@ -480,9 +484,11 @@ describe("session Community Accent save controller", () => {
   it("blocks retry on an authenticated/authorized execution rejection", async () => {
     for (const code of ["UNAUTHENTICATED", "FORBIDDEN", "USER_DELETING"]) {
       const controller = createCommunityAccentSaveController()
-      const save = vi.fn().mockRejectedValue({
-        graphQLErrors: [{ extensions: { code } }],
-      })
+      const save = vi.fn().mockRejectedValue(
+        new AutoSaveActionError(resolveCommunityAccentAutoSaveFailure({
+          graphQLErrors: [{ extensions: { code } }],
+        })),
+      )
       controller.initialize(id, "#112233")
       controller.configure(id, {
         save,
@@ -580,9 +586,13 @@ describe("session Community Accent save controller", () => {
 
   it("retains Typed accent Field Validation with its Draft after rejection", async () => {
     const controller = createCommunityAccentSaveController()
-    const save = vi.fn().mockRejectedValue(new SettingsInputValidationError([
-      { scope: "FIELD", code: "INVALID_FORMAT", inputPaths: [{ segments: ["accentColor"] }] },
-    ]))
+    const save = vi.fn().mockRejectedValue(
+      new AutoSaveActionError(resolveCommunityAccentAutoSaveFailure(
+        new SettingsInputValidationError([
+          { scope: "FIELD", code: "INVALID_FORMAT", inputPaths: [{ segments: ["accentColor"] }] },
+        ]),
+      )),
+    )
     controller.initialize(id, "#112233")
     controller.configure(id, {
       save,
