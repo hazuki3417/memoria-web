@@ -5,7 +5,7 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
+import { useExplicitSave, resolveConfirmedSourceSync, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
 import type { SaveActionResult } from "@/ui/SaveAction"
 import { communityAliasSchema } from "./communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
@@ -87,14 +87,18 @@ export function useCommunityAliasForm({
     const source = savedAlias ?? ""
     if (previousSourceAlias.current === source) return
     previousSourceAlias.current = source
-    if (saveAction.isUnknown) return
-    if (awaitingSourceEcho.current !== null) {
-      if (source !== awaitingSourceEcho.current) return
-      awaitingSourceEcho.current = null
-    }
-    const draftIsEdited = getValues("alias").trim() !== savedBaseline.current
+    const decision = resolveConfirmedSourceSync({
+      source,
+      expectedEcho: awaitingSourceEcho.current,
+      baseline: savedBaseline.current,
+      draft: getValues("alias").trim(),
+      isUnknown: saveAction.isUnknown,
+      canResetDraft: !saveAction.isSaving,
+    })
+    if (!decision.adopt) return
+    awaitingSourceEcho.current = null
     savedBaseline.current = source
-    if (!draftIsEdited && !saveAction.isSaving) reset({ alias: source })
+    if (decision.resetDraft) reset({ alias: source })
   }, [savedAlias, saveAction.isUnknown, saveAction.isSaving, getValues, reset])
 
   const submit = handleSubmit(async ({ alias }) => {
