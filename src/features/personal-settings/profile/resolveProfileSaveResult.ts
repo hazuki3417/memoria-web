@@ -1,20 +1,17 @@
-import type { SaveActionResult } from "@/ui/SaveAction"
+import { resolveSaveAction, type SaveActionFailure } from "@/ui/SaveAction"
 import {
   classifySettingsSaveFailure,
   getSettingsInputViolations,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
 
-/** Convert a Profile update into a user-visible result at the action boundary. */
-export async function resolveProfileSaveResult(
+/** Adapt Profile mutation success and known failure to the shared Action result. */
+export function resolveProfileSaveResult(
   persist: () => Promise<string>,
   blockedMessage?: string,
-): Promise<SaveActionResult<string>> {
-  try {
-    return { status: "confirmed", value: await persist() }
-  } catch (error) {
-    const kind = classifySettingsSaveFailure(error)
-    switch (kind) {
+) {
+  return resolveSaveAction(persist, (error): SaveActionFailure => {
+    switch (classifySettingsSaveFailure(error)) {
       case "validation":
         return { status: "validation", violations: getSettingsInputViolations(error) }
       case "blocked":
@@ -24,5 +21,5 @@ export async function resolveProfileSaveResult(
       case "unknown":
         return { status: "unknown" }
     }
-  }
+  })
 }
