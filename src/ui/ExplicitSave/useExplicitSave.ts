@@ -2,15 +2,12 @@
 
 import { useEffect, useRef, useState } from "react"
 import type { FormInputViolation } from "../formValidation"
+import type { SaveActionResult } from "@/ui/SaveAction"
 
 export type ExplicitSaveStatus = "idle" | "saving" | "retryable" | "blocked" | "unknown"
 
-export type ExplicitSaveResult<T> =
-  | { status: "confirmed"; value: T }
-  | { status: "validation"; violations: ReadonlyArray<FormInputViolation> | null }
-  | { status: "retryable" }
-  | { status: "blocked"; feedback: { title: string; description: string } | null }
-  | { status: "unknown" }
+/** The trigger is explicit; the Action result is shared with autosave. */
+export type ExplicitSaveResult<T> = SaveActionResult<T>
 
 export type ExplicitSaveInspection<T> =
   | { status: "idle" | "checking" | "failed" }
