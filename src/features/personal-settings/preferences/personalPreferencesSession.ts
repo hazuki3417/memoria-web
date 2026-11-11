@@ -2,7 +2,7 @@ import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
-import { getAutoSaveFailure } from "@/ui/AutoSave"
+import { getSaveActionFailure } from "@/ui/SaveAction"
 import type { SaveStatusState } from "@/components/SaveStatus"
 
 export type PreferencesFailure = "unknown" | "retryable" | "blocked" | "validation" | null
@@ -77,15 +77,15 @@ export function createPersonalPreferencesSession() {
         emit({ confirmed: nextConfirmed, draftPatch: nextDraft, failure: null, blockedFeedback: null, validation: null })
       },
       (error, attempted) => {
-        const result = getAutoSaveFailure(error)
-        const failure = result.kind
+        const result = getSaveActionFailure(error)
+        const failure = result.status
         const validation =
-          result.kind === "validation"
+          result.status === "validation"
             ? resolveFormFailureValidation(result.violations, Object.keys(attempted))
             : null
         emit({
           failure,
-          blockedFeedback: result.kind === "blocked" ? result.feedback : null,
+          blockedFeedback: result.status === "blocked" ? result.feedback : null,
           validation,
           saveStatus: "attention",
           inspected: false,
