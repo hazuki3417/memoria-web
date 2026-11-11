@@ -14,7 +14,7 @@ import {
   type SettingsSaveFailureKind,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
-import { resolveCommunityNameSaveFeedback } from "./resolveCommunityNameSaveFeedback"
+import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
 
 /** Community名のRHF Draft、確認済みBaselineと取得値同期を所有する。 */
 export function useCommunityNameSettings({
@@ -134,7 +134,7 @@ export function useCommunityNameSettings({
   })
   const saveName = () => { void submit() }
 
-  const inspection =
+  const inspection: CommunityNameInspection =
     saveAction.inspection.status === "matches" ||
     saveAction.inspection.status === "differs"
       ? {
