@@ -23,6 +23,8 @@ type Entry = {
   snapshot: AccentSnapshot
   desired: string | null
   running: boolean
+  ready: boolean
+  timer?: ReturnType<typeof setTimeout>
   inspectionGeneration: number
   previewOwner: number | null
   save?: SaveAccent
@@ -51,7 +53,7 @@ const normalized = (value: string) => value.toUpperCase()
  * All entries are scoped by Community ID and all listeners are detachable.
  * A failed/unknown write never triggers an automatic retry.
  */
-export function createCommunityAccentSaveController() {
+export function createCommunityAccentSaveController(delayMs = 400) {
   const entries = new Map<string, Entry>()
   const listeners = new Map<string, Set<() => void>>()
 
@@ -62,6 +64,7 @@ export function createCommunityAccentSaveController() {
         snapshot: emptySnapshot,
         desired: null,
         running: false,
+        ready: false,
         inspectionGeneration: 0,
         previewOwner: null,
       }
@@ -87,64 +90,97 @@ export function createCommunityAccentSaveController() {
     }
   }
 
+  const cancelScheduledSave = (entry: Entry) => {
+    if (entry.timer !== undefined) clearTimeout(entry.timer)
+    entry.timer = undefined
+    entry.ready = false
+  }
+
+  // Delay only the trigger. The Action and its confirmed result remain the same.
+  const scheduleSave = (id: string) => {
+    const entry = entryFor(id)
+    cancelScheduledSave(entry)
+    if (delayMs <= 0) {
+      entry.ready = true
+      void drain(id)
+      return
+    }
+    entry.timer = setTimeout(() => {
+      entry.timer = undefined
+      entry.ready = true
+      void drain(id)
+    }, delayMs)
+  }
+
   async function drain(id: string) {
     const entry = entryFor(id)
-    if (entry.running || entry.desired === null || entry.snapshot.failure)
+    if (
+      entry.running ||
+      !entry.ready ||
+      entry.desired === null ||
+      entry.snapshot.failure
+    )
       return
     entry.running = true
+    entry.ready = false
+    const selected = entry.desired
+    entry.desired = null
     update(id, { status: "saving" })
     try {
-      while (entry.desired !== null && !entry.snapshot.failure) {
-        const selected = entry.desired
+      try {
+        if (!entry.save) throw new Error("Accent save function unavailable")
+        const confirmed = normalized(await entry.save(selected))
+        if (!hex(confirmed)) throw new Error("Accent save response invalid")
+        // A confirmed response updates only its own saved value. Newer edits
+        // keep the immediate preview and wait for their debounce to elapse.
+        update(id, {
+          confirmed,
+          status: entry.desired === null ? "saved" : "pending",
+          validation: null,
+        })
+      } catch (error) {
+        const result = getSaveActionFailure(error)
+        const failure: AccentFailure =
+          result.status === "unknown"
+            ? "unknown"
+            : result.status === "blocked"
+              ? "blocked"
+              : "rejected"
         entry.desired = null
-        try {
-          if (!entry.save) throw new Error("Accent save function unavailable")
-          const confirmed = normalized(await entry.save(selected))
-          if (!hex(confirmed)) throw new Error("Accent save response invalid")
-          // The caller updates the Apollo confirmed cache only for successful results.
-          // Newer pending edits always retain their own preview and Draft.
-          update(id, {
-            confirmed,
-            status: entry.desired === null ? "saved" : "saving",
-            validation: null,
-          })
-        } catch (error) {
-          const result = getSaveActionFailure(error)
-          const failure: AccentFailure =
-            result.status === "unknown"
-              ? "unknown"
-              : result.status === "blocked"
-                ? "blocked"
-                : "rejected"
-          entry.desired = null
-          clearPreview(entry)
-          const validation =
-            result.status === "validation"
-              ? resolveFormFailureValidation(result.violations, ["accentColor"])
-              : null
-          update(id, {
-            status: "attention",
-            failure,
-            blockedFeedback: result.status === "blocked" ? result.feedback : null,
-            validation,
-            observedMatches: false,
-            inspected: false,
-          })
-          return
-        }
+        cancelScheduledSave(entry)
+        clearPreview(entry)
+        const validation =
+          result.status === "validation"
+            ? resolveFormFailureValidation(result.violations, ["accentColor"])
+            : null
+        update(id, {
+          status: "attention",
+          failure,
+          blockedFeedback: result.status === "blocked" ? result.feedback : null,
+          validation,
+          observedMatches: false,
+          inspected: false,
+        })
+        return
       }
-      clearPreview(entry)
-      update(id, {
-        status:
-          entry.snapshot.draft !== null &&
-          entry.snapshot.confirmed !== null &&
-          normalized(entry.snapshot.draft) !==
-            normalized(entry.snapshot.confirmed)
-            ? "pending"
-            : "saved",
-      })
+
+      if (entry.desired === null) {
+        clearPreview(entry)
+        update(id, {
+          status:
+            entry.snapshot.draft !== null &&
+            entry.snapshot.confirmed !== null &&
+            normalized(entry.snapshot.draft) !== normalized(entry.snapshot.confirmed)
+              ? "pending"
+              : "saved",
+        })
+      }
     } finally {
       entry.running = false
+      // If the next edit's debounce elapsed while the first request was
+      // in-flight, save only the latest value after the first has settled.
+      if (entry.ready && entry.desired !== null && !entry.snapshot.failure)
+        void drain(id)
     }
   }
 
@@ -197,6 +233,7 @@ export function createCommunityAccentSaveController() {
         // The in-flight request cannot be cancelled, but no stale queued
         // mutation should start after it settles.
         entry.desired = null
+        cancelScheduledSave(entry)
         clearPreview(entry)
         update(id, {
           status: entry.snapshot.failure
@@ -211,12 +248,14 @@ export function createCommunityAccentSaveController() {
         // Explicit user recovery is required, especially for unknown outcomes.
         // A new valid edit must not re-enable an older queued mutation.
         entry.desired = null
+        cancelScheduledSave(entry)
         update(id, { status: "attention" })
         return
       }
       const color = normalized(value)
       if (color === entry.snapshot.confirmed && !entry.running) {
         entry.desired = null
+        cancelScheduledSave(entry)
         clearPreview(entry)
         update(id, { status: "idle" })
         return
@@ -224,7 +263,7 @@ export function createCommunityAccentSaveController() {
       entry.desired = color
       if (entry.preview) entry.previewOwner = entry.preview(color)
       update(id, { status: entry.running ? "saving" : "pending" })
-      void drain(id)
+      scheduleSave(id)
     },
     async inspect(id: string) {
       const entry = entryFor(id)
@@ -296,6 +335,8 @@ export function createCommunityAccentSaveController() {
         return
       // Unknown is never retried without a separate explicit user click.
       entry.desired = normalized(entry.snapshot.draft)
+      cancelScheduledSave(entry)
+      entry.ready = true
       update(id, {
         failure: null,
         blockedFeedback: null,
@@ -312,6 +353,7 @@ export function createCommunityAccentSaveController() {
       // Never allow an in-flight write to be dismissed as definitively cancelled.
       if (entry.running) return
       entry.desired = null
+      cancelScheduledSave(entry)
       clearPreview(entry)
       update(id, {
         draft: entry.snapshot.confirmed,
