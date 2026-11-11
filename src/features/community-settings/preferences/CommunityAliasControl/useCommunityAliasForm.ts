@@ -5,15 +5,9 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, type ExplicitSaveResult } from "@/ui/ExplicitSave"
+import { useExplicitSave, type ExplicitSaveResult, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
 import { communityAliasSchema } from "./communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
-import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
-import {
-  classifySettingsSaveFailure,
-  getSettingsInputViolations,
-  type SettingsSaveFailureKind,
-} from "@/infrastructure/graphql/settingsMutationResult"
 
 type AliasInspection =
   | { status: "idle" | "checking" | "failed" }
@@ -26,7 +20,7 @@ export function useCommunityAliasForm({
   onInspect,
 }: {
   savedAlias: string | null
-  onSave: (alias: string | null) => Promise<void>
+  onSave: (alias: string | null) => Promise<ExplicitSaveResult<string | null>>
   onInspect?: () => Promise<string | null>
 }) {
   const {
@@ -63,34 +57,12 @@ export function useCommunityAliasForm({
     clearErrors("alias")
   }
 
-  const action = async (alias: string | null): Promise<ExplicitSaveResult<string | null>> => {
-    try {
-      await onSave(alias)
-      return { status: "confirmed", value: alias }
-    } catch (error) {
-      const kind = classifySettingsSaveFailure(error)
-      switch (kind) {
-        case "validation":
-          return { status: "validation", violations: getSettingsInputViolations(error) }
-        case "blocked":
-          return {
-            status: "blocked",
-            feedback: getCommunityBlockedFeedback(error, "Community別名"),
-          }
-        case "retryable":
-          return { status: "retryable" }
-        case "unknown":
-          return { status: "unknown" }
-      }
-    }
-  }
-
   const saveAction = useExplicitSave({
     draft,
     changed,
     invalid,
     readDraft: () => getValues("alias").trim() || null,
-    action,
+    action: onSave,
     inspect: onInspect,
     adopt: adoptCurrentAlias,
     onValidation: (violations) => {
@@ -147,7 +119,7 @@ export function useCommunityAliasForm({
         }
       : saveAction.inspection
 
-  const failure: SettingsSaveFailureKind | null =
+  const failure: Exclude<ExplicitSaveStatus, "idle" | "saving"> | null =
     saveAction.status === "retryable" ||
     saveAction.status === "blocked" ||
     saveAction.status === "unknown"
