@@ -7,13 +7,11 @@ import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
 
 /** Convert a Profile update into a user-visible result at the action boundary. */
 export async function resolveProfileSaveResult(
-  nickname: string,
-  persist: () => Promise<void>,
+  persist: () => Promise<string>,
   blockedMessage?: string,
 ): Promise<ExplicitSaveResult<string>> {
   try {
-    await persist()
-    return { status: "confirmed", value: nickname }
+    return { status: "confirmed", value: await persist() }
   } catch (error) {
     const kind = classifySettingsSaveFailure(error)
     switch (kind) {
