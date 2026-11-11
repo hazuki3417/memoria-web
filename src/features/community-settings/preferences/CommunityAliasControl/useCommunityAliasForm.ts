@@ -5,7 +5,7 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, resolveConfirmedSourceSync, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
+import { useExplicitSave, resolveConfirmedSourceSync } from "@/ui/ExplicitSave"
 import type { SaveActionResult } from "@/ui/SaveAction"
 import { communityAliasSchema } from "./communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
@@ -124,18 +124,11 @@ export function useCommunityAliasForm({
         }
       : saveAction.inspection
 
-  const failure: Exclude<ExplicitSaveStatus, "idle" | "saving"> | null =
-    saveAction.status === "retryable" ||
-    saveAction.status === "blocked" ||
-    saveAction.status === "unknown"
-      ? saveAction.status
-      : null
-
   return {
     field, fieldState, text,
     saving: saveAction.isSaving,
     isInputDisabled: saveAction.isInputDisabled,
-    failure, formInvalid,
+    failure: saveAction.failure, formInvalid,
     blockedFeedback: saveAction.blockedFeedback,
     inspection,
     inspect: async () => { await saveAction.inspectCurrent?.() },
