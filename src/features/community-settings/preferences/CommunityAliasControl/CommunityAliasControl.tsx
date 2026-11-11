@@ -3,7 +3,7 @@
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { useCommunityAliasForm } from "./useCommunityAliasForm"
 import { CommunityAliasSaveFeedback } from "./CommunityAliasSaveFeedback"
-import type { ExplicitSaveResult } from "@/ui/ExplicitSave"
+import type { SaveActionResult } from "@/ui/SaveAction"
 
 export function CommunityAliasControl({
   savedAlias,
@@ -11,7 +11,7 @@ export function CommunityAliasControl({
   onInspect,
 }: {
   savedAlias: string | null
-  onSave: (alias: string | null) => Promise<ExplicitSaveResult<string | null>>
+  onSave: (alias: string | null) => Promise<SaveActionResult<string | null>>
   onInspect?: () => Promise<string | null>
 }) {
   const model = useCommunityAliasForm({ savedAlias, onSave, onInspect })
