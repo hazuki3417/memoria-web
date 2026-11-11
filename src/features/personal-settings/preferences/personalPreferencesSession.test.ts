@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
+import { AutoSaveActionError } from "@/ui/AutoSave"
+import { resolvePreferencesAutoSaveFailure } from "./resolvePreferencesAutoSaveFailure"
 import { createPersonalPreferencesSession } from "./personalPreferencesSession"
 import { defaultUserPreferences } from "./userPreferences"
 
@@ -297,9 +299,11 @@ describe("Personal Preferences session controller", () => {
     vi.useFakeTimers()
     try {
       const controller = createPersonalPreferencesSession()
-      const save = vi.fn().mockRejectedValue({
-        graphQLErrors: [{ extensions: { code: "USER_DELETING" }, message: "private" }],
-      })
+      const save = vi.fn().mockRejectedValue(
+        new AutoSaveActionError(resolvePreferencesAutoSaveFailure({
+          graphQLErrors: [{ extensions: { code: "USER_DELETING" }, message: "private" }],
+        })),
+      )
       controller.configure(save)
       controller.hydrate(defaultUserPreferences)
       controller.edit({ fileSizeUnit: "BINARY" })
@@ -351,9 +355,13 @@ describe("Personal Preferences session controller", () => {
     vi.useFakeTimers()
     try {
       const controller = createPersonalPreferencesSession()
-      const save = vi.fn().mockRejectedValue(new SettingsInputValidationError([
-        { scope: "FIELD", code: "INVALID_VALUE", inputPaths: [{ segments: ["fileSizeUnit"] }] },
-      ]))
+      const save = vi.fn().mockRejectedValue(
+        new AutoSaveActionError(resolvePreferencesAutoSaveFailure(
+          new SettingsInputValidationError([
+            { scope: "FIELD", code: "INVALID_VALUE", inputPaths: [{ segments: ["fileSizeUnit"] }] },
+          ]),
+        )),
+      )
       controller.configure(save)
       controller.hydrate(defaultUserPreferences)
       controller.edit({ fileSizeUnit: "BINARY" })
