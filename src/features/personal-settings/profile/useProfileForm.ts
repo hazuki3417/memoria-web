@@ -7,11 +7,9 @@ import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { useExplicitSave, type ExplicitSaveResult } from "@/ui/ExplicitSave"
 import { profileSchema } from "./profileSchema"
-import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
 import { showNotification } from "@/components/Feedback"
-import { classifySettingsSaveFailure, getSettingsInputViolations } from "@/infrastructure/graphql/settingsMutationResult"
 
-export type SaveProfile = (nickname: string) => Promise<void>
+export type SaveProfile = (nickname: string) => Promise<ExplicitSaveResult<string>>
 export type InspectProfile = () => Promise<string>
 
 type ProfileInspection =
@@ -24,13 +22,11 @@ export function useProfileForm({
   onInspect,
   initialNickname,
   initialSaveState,
-  blockedMessage,
 }: {
   onSave: SaveProfile
   onInspect?: InspectProfile
   initialNickname: string
   initialSaveState: "idle" | "saving" | "retryable-error" | "blocked"
-  blockedMessage: string
 }) {
   const {
     control,
@@ -68,36 +64,12 @@ export function useProfileForm({
     clearErrors("nickname")
   }
 
-  // Existing Story callbacks are throwing operations. Translate their meaning
-  // at the Feature boundary so the shared save coordinator stays transport-free.
-  const action = async (nickname: string): Promise<ExplicitSaveResult<string>> => {
-    try {
-      await onSave(nickname)
-      return { status: "confirmed", value: nickname }
-    } catch (error) {
-      const kind = classifySettingsSaveFailure(error)
-      switch (kind) {
-        case "validation":
-          return { status: "validation", violations: getSettingsInputViolations(error) }
-        case "blocked":
-          return {
-            status: "blocked",
-            feedback: getProfileBlockedFeedback(error, blockedMessage),
-          }
-        case "retryable":
-          return { status: "retryable" }
-        case "unknown":
-          return { status: "unknown" }
-      }
-    }
-  }
-
   const saveAction = useExplicitSave({
     draft: normalized,
     changed: dirty,
     invalid,
     readDraft: () => getValues("nickname").trim(),
-    action,
+    action: onSave,
     inspect: onInspect,
     adopt: adoptNickname,
     onValidation: (violations) => {
