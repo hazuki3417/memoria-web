@@ -10,6 +10,7 @@ import {
   requireSettingsMutationOutcome,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { resolveCommunityAliasSaveResult } from "../../resolveCommunityAliasSaveResult"
 
 /** Owns Community Alias observation and mutation without stale refetch side effects. */
 export function useCommunityAliasConnection(communityId: string) {
@@ -26,7 +27,7 @@ export function useCommunityAliasConnection(communityId: string) {
     return current.data.community.mySettings.alias
   }
 
-  const saveAlias = async (alias: string | null) => {
+  const saveAlias = (alias: string | null) => resolveCommunityAliasSaveResult(alias, async () => {
     const result = await save({
       fetchPolicy: "no-cache",
       errorPolicy: "all",
@@ -48,7 +49,7 @@ export function useCommunityAliasConnection(communityId: string) {
     // Both subscribed views share the normalized Community fragment.
     // Refetching either after this write may reintroduce an older
     // Accent/Alias snapshot while the other field is in flight.
-  }
+  })
 
   return { inspectAlias, saveAlias }
 }
