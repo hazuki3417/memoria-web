@@ -52,6 +52,7 @@ export function useExplicitSave<T>({
   const isSaving = status === "saving"
   const isBlocked = status === "blocked"
   const isUnknown = status === "unknown"
+  const failure = status === "retryable" || isBlocked || isUnknown ? status : null
   const canResaveInspected =
     isUnknown &&
     inspection.status === "differs" &&
@@ -143,6 +144,7 @@ export function useExplicitSave<T>({
 
   return {
     status,
+    failure,
     inspection,
     blockedFeedback,
     isSaving,
