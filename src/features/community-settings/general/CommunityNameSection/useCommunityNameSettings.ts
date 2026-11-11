@@ -5,7 +5,7 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, resolveConfirmedSourceSync, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
+import { useExplicitSave, resolveConfirmedSourceSync } from "@/ui/ExplicitSave"
 import type { SaveActionResult } from "@/ui/SaveAction"
 import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
@@ -119,16 +119,9 @@ export function useCommunityNameSettings({
           name: saveAction.inspection.value,
         }
       : saveAction.inspection
-  const failure: Exclude<ExplicitSaveStatus, "idle" | "saving"> | null =
-    saveAction.status === "retryable" ||
-    saveAction.status === "blocked" ||
-    saveAction.status === "unknown"
-      ? saveAction.status
-      : null
-
   const saveFeedback = resolveCommunityNameSaveFeedback({
     formInvalid,
-    failure,
+    failure: saveAction.failure,
     blockedFeedback: saveAction.blockedFeedback,
     inspection,
     draft,
