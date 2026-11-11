@@ -152,6 +152,7 @@ export function useProfileForm({
     showClientError: fieldState.isTouched || isSubmitted,
     isSaving: saveAction.isSaving,
     isBlocked: saveAction.isBlocked,
+    isInputDisabled: saveAction.isInputDisabled,
     isUnknown: saveAction.isUnknown,
     canRetryInspected: saveAction.canResaveInspected,
     saveLabel,
