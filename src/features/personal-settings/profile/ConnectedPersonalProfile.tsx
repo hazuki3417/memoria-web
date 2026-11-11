@@ -4,7 +4,7 @@ import { usePersonalSettingsProfileQuery } from "@/infrastructure/graphql/genera
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { PersonalProfile } from "./PersonalProfile"
 import { usePersonalProfileSave } from "./usePersonalProfileSave"
-import { usePersonalSettingsInspection } from "../PersonalSettingsRoute/usePersonalSettingsInspection"
+import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 /** Profile-scoped authoritative read, actions and status interpretation. */
