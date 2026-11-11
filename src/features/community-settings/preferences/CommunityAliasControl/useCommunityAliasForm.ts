@@ -9,15 +9,15 @@ import { useExplicitSave, type ExplicitSaveResult } from "@/ui/ExplicitSave"
 import { communityAliasSchema } from "./communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
 import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
-type AliasInspection =
-  | { status: "idle" | "checking" | "failed" }
-  | { status: "matches" | "differs"; alias: string | null }
-
 import {
   classifySettingsSaveFailure,
   getSettingsInputViolations,
   type SettingsSaveFailureKind,
 } from "@/infrastructure/graphql/settingsMutationResult"
+
+type AliasInspection =
+  | { status: "idle" | "checking" | "failed" }
+  | { status: "matches" | "differs"; alias: string | null }
 
 /** Community AliasのRHF Draft、確認済みBaselineと取得値同期を所有する。 */
 export function useCommunityAliasForm({
