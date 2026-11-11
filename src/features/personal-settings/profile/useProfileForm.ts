@@ -5,11 +5,12 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, type ExplicitSaveResult } from "@/ui/ExplicitSave"
+import { useExplicitSave } from "@/ui/ExplicitSave"
+import type { SaveActionResult } from "@/ui/SaveAction"
 import { profileSchema } from "./profileSchema"
 import { showNotification } from "@/components/Feedback"
 
-export type SaveProfile = (nickname: string) => Promise<ExplicitSaveResult<string>>
+export type SaveProfile = (nickname: string) => Promise<SaveActionResult<string>>
 export type InspectProfile = () => Promise<string>
 
 type ProfileInspection =
