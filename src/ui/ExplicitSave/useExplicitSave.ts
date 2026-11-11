@@ -62,12 +62,8 @@ export function useExplicitSave<T>({
     inspection.status === "differs" &&
     !invalid &&
     !Object.is(draft, inspection.value)
-  const canSave =
-    !invalid &&
-    !isSaving &&
-    !isBlocked &&
-    (!isUnknown || canResaveInspected) &&
-    (changed || canResaveInspected)
+  const canSubmit = changed && !invalid && !isSaving && !isBlocked && !isUnknown
+  const canSave = canSubmit || (canResaveInspected && !isSaving && !isBlocked)
 
   const save = async (value: T) => {
     if (!canSave || pendingSave.current || !Object.is(readDraft(), value)) return
@@ -156,6 +152,7 @@ export function useExplicitSave<T>({
     isBlocked,
     isUnknown,
     isInputDisabled: isSaving || isBlocked,
+    canSubmit,
     canSave,
     canResaveInspected,
     save,
