@@ -18,7 +18,14 @@ export function ConnectedCommunityPreferences({
   const settings = model.data?.community?.mySettings
 
   if (!settings) {
-    return render(model.loading ? { status: "loading" } : { status: "error" })
+    return render(
+      model.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void model.refetch().catch(() => undefined) },
+          },
+    )
   }
 
   return render({
