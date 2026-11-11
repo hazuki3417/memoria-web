@@ -14,6 +14,10 @@ import { classifySettingsSaveFailure, getSettingsInputViolations } from "@/infra
 export type SaveProfile = (nickname: string) => Promise<void>
 export type InspectProfile = () => Promise<string>
 
+type ProfileInspection =
+  | { status: "idle" | "checking" | "failed" }
+  | { status: "matches" | "differs"; nickname: string }
+
 /** Owns Profile RHF, its confirmed baseline and server refresh synchronization. */
 export function useProfileForm({
   onSave,
@@ -155,7 +159,7 @@ export function useProfileForm({
   if (saveAction.status === "retryable") saveLabel = "再試行"
   else if (saveAction.isSaving) saveLabel = "更新中"
 
-  const inspection =
+  const inspection: ProfileInspection =
     saveAction.inspection.status === "matches" ||
     saveAction.inspection.status === "differs"
       ? {
