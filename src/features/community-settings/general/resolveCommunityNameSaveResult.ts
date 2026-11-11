@@ -1,19 +1,14 @@
-import type { SaveActionResult } from "@/ui/SaveAction"
+import { resolveSaveAction, type SaveActionFailure } from "@/ui/SaveAction"
 import {
   classifySettingsSaveFailure,
   getSettingsInputViolations,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
 
-/** Convert the confirmed Community name or failure into a Form-facing result. */
-export async function resolveCommunityNameSaveResult(
-  persist: () => Promise<string>,
-): Promise<SaveActionResult<string>> {
-  try {
-    return { status: "confirmed", value: await persist() }
-  } catch (error) {
-    const kind = classifySettingsSaveFailure(error)
-    switch (kind) {
+/** Adapt confirmed server Community name and failures to the shared Action result. */
+export function resolveCommunityNameSaveResult(persist: () => Promise<string>) {
+  return resolveSaveAction(persist, (error): SaveActionFailure => {
+    switch (classifySettingsSaveFailure(error)) {
       case "validation":
         return { status: "validation", violations: getSettingsInputViolations(error) }
       case "blocked":
@@ -23,5 +18,5 @@ export async function resolveCommunityNameSaveResult(
       case "unknown":
         return { status: "unknown" }
     }
-  }
+  })
 }
