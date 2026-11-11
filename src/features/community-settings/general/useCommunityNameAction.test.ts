@@ -50,7 +50,7 @@ describe("Community名のMutation契約", () => {
         },
       },
     })
-    expect(await actions.onSaveName("新しい名前")).toBe("新しい名前")
+    expect(await actions.onSaveName("新しい名前")).toEqual({ status: "confirmed", value: "新しい名前" })
     expect(mocks.rename).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
@@ -63,12 +63,12 @@ describe("Community名のMutation契約", () => {
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
-  it("Community名変更の応答欠落と通信失敗をFormに伝搬し、接続層から重複通知しない", async () => {
+  it("Community名変更の応答欠落と通信失敗をUnknownとして返し、重複通知しない", async () => {
     mocks.rename
       .mockResolvedValueOnce({ data: null })
       .mockRejectedValueOnce(new Error("network"))
-    await expect(actions.onSaveName("変更")).rejects.toThrow("Settings mutation outcome unavailable")
-    await expect(actions.onSaveName("変更")).rejects.toThrow("network")
+    await expect(actions.onSaveName("変更")).resolves.toEqual({ status: "unknown" })
+    await expect(actions.onSaveName("変更")).resolves.toEqual({ status: "unknown" })
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
@@ -83,9 +83,20 @@ describe("Community名のMutation契約", () => {
         },
       },
     })
-    await expect(actions.onSaveName("変更")).rejects.toMatchObject({
-      kind: "validation",
+    await expect(actions.onSaveName("変更")).resolves.toMatchObject({
+      status: "validation",
       violations: [{ code: "REQUIRED" }],
+    })
+    expect(mocks.notify).not.toHaveBeenCalled()
+  })
+
+  it("公開された権限ErrorをBlockedとして返し、Formへ再送を促さない", async () => {
+    mocks.rename.mockRejectedValue({
+      graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }],
+    })
+    await expect(actions.onSaveName("変更")).resolves.toMatchObject({
+      status: "blocked",
+      feedback: { title: "Community名を変更できません" },
     })
     expect(mocks.notify).not.toHaveBeenCalled()
   })
