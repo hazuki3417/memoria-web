@@ -15,6 +15,25 @@ import {
   type CommunitySettingsSection,
 } from "../communitySettingsSections"
 
+const sectionStatusMessages = {
+  general: {
+    label: "一般設定を読み込み中",
+    errorTitle: "一般設定を取得できませんでした",
+  },
+  members: {
+    label: "メンバー情報を読み込み中",
+    errorTitle: "メンバー情報を取得できませんでした",
+  },
+  preferences: {
+    label: "Community環境設定を読み込み中",
+    errorTitle: "Community環境設定を取得できませんでした",
+  },
+  usage: {
+    label: "利用状況を読み込み中",
+    errorTitle: "利用状況を取得できませんでした",
+  },
+} satisfies Record<CommunitySettingsSection, { label: string; errorTitle: string }>
+
 export type CommunitySettingsRouteProps = {
   communityId: string
   section?: CommunitySettingsSection
@@ -37,8 +56,6 @@ export function CommunitySettingsRoute({
     )
 
   let controller: (render: SettingsSectionRender) => ReactNode
-  let label = "Community設定を読み込み中"
-  let errorTitle: string | undefined
 
   switch (section) {
     case "general":
@@ -56,19 +73,18 @@ export function CommunitySettingsRoute({
       )
       break
     case "usage":
-      label = "利用状況を読み込み中"
-      errorTitle = "利用状況を取得できませんでした"
       controller = (render) => (
         <ConnectedCommunityUsage communityId={communityId} render={render} />
       )
       break
     case "preferences":
-      label = "Community環境設定を読み込み中"
       controller = (render) => (
         <ConnectedCommunityPreferences communityId={communityId} render={render} />
       )
       break
   }
+
+  const { label, errorTitle } = sectionStatusMessages[section]
 
   return (
     <CommunitySettingsView
