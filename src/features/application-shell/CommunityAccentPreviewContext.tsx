@@ -10,6 +10,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -41,6 +42,7 @@ export function CommunityAccentPreviewProvider({
     Record<string, NonNullable<CommunityAccentPreview>>
   >({})
   const saveController = useRef(createCommunityAccentSaveController()).current
+  useEffect(() => () => saveController.dispose(), [saveController])
   const nextOwner = useRef(0)
   const setPreview = useCallback((communityId: string, color: string) => {
     const owner = ++nextOwner.current
