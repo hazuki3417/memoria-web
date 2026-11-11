@@ -21,15 +21,13 @@ export function CommunityNameSection({
   const {
     draft,
     setDraft,
-    invalid,
-    dirty,
+    canSubmit,
     savingName,
     isInputDisabled,
     saveName,
     fieldError,
     onNameBlur,
     saveFeedback,
-    saveBlocked,
     unknown,
     inspection,
     inspectName,
@@ -65,7 +63,7 @@ export function CommunityNameSection({
           <Box>
             <Button
               size="sm"
-              disabled={!dirty || invalid || savingName || saveBlocked}
+              disabled={!canSubmit}
               loading={savingName}
               onClick={saveName}
             >
