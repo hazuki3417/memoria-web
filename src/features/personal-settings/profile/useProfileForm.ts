@@ -5,7 +5,7 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave } from "@/ui/ExplicitSave"
+import { useExplicitSave, resolveConfirmedSourceSync } from "@/ui/ExplicitSave"
 import type { SaveActionResult } from "@/ui/SaveAction"
 import { profileSchema } from "./profileSchema"
 import { showNotification } from "@/components/Feedback"
@@ -99,20 +99,18 @@ export function useProfileForm({
   useEffect(() => {
     if (previousSourceNickname.current === initialNickname) return
     previousSourceNickname.current = initialNickname
-    if (saveAction.isUnknown) return
-    if (awaitingSourceEcho.current !== null) {
-      if (initialNickname !== awaitingSourceEcho.current) return
-      awaitingSourceEcho.current = null
-    }
-    const draftIsEdited = getValues("nickname").trim() !== saved.current
+    const decision = resolveConfirmedSourceSync({
+      source: initialNickname,
+      expectedEcho: awaitingSourceEcho.current,
+      baseline: saved.current,
+      draft: getValues("nickname").trim(),
+      isUnknown: saveAction.isUnknown,
+      canResetDraft: !saveAction.isSaving && saveAction.status !== "retryable",
+    })
+    if (!decision.adopt) return
+    awaitingSourceEcho.current = null
     saved.current = initialNickname
-    if (
-      !draftIsEdited &&
-      !saveAction.isSaving &&
-      saveAction.status !== "retryable"
-    ) {
-      reset({ nickname: initialNickname })
-    }
+    if (decision.resetDraft) reset({ nickname: initialNickname })
   }, [initialNickname, getValues, reset, saveAction.status, saveAction.isSaving, saveAction.isUnknown])
 
   const onDraftChange = (event: ChangeEvent<HTMLInputElement>) => {
