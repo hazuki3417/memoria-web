@@ -14,8 +14,8 @@ import {
   requireSettingsMutationOutcome,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import type { UserPreferencesPatch } from "./userPreferences"
-import { AutoSaveActionError } from "@/ui/AutoSave"
-import { resolvePreferencesAutoSaveFailure } from "./resolvePreferencesAutoSaveFailure"
+import { resolveSaveAction } from "@/ui/SaveAction"
+import { resolvePreferencesSaveFailure } from "./resolvePreferencesSaveFailure"
 import {
   fromGraphqlUserPreferences,
   toGraphqlUserPreferencesPatch,
@@ -26,8 +26,7 @@ export function usePersonalPreferencesSave() {
   const client = useApolloClient()
 
   return {
-    savePreferences: async (patch: UserPreferencesPatch) => {
-      try {
+    savePreferences: (patch: UserPreferencesPatch) => resolveSaveAction(async () => {
         const input = toGraphqlUserPreferencesPatch(patch)
         const result = await client.mutate<
           OperationSaveUserPreferencesMutation,
@@ -47,9 +46,6 @@ export function usePersonalPreferencesSave() {
           })
           .catch(() => undefined)
         return confirmed
-      } catch (error) {
-        throw new AutoSaveActionError(resolvePreferencesAutoSaveFailure(error))
-      }
-    },
+    }, resolvePreferencesSaveFailure),
   }
 }
