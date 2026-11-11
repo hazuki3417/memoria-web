@@ -5,7 +5,8 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, type ExplicitSaveResult, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
+import { useExplicitSave, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
+import type { SaveActionResult } from "@/ui/SaveAction"
 import { communityAliasSchema } from "./communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
 
@@ -20,7 +21,7 @@ export function useCommunityAliasForm({
   onInspect,
 }: {
   savedAlias: string | null
-  onSave: (alias: string | null) => Promise<ExplicitSaveResult<string | null>>
+  onSave: (alias: string | null) => Promise<SaveActionResult<string | null>>
   onInspect?: () => Promise<string | null>
 }) {
   const {
