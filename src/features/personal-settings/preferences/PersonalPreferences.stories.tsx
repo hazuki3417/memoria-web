@@ -6,8 +6,8 @@ import { PersonalPreferences } from "./PersonalPreferences"
 import { defaultUserPreferences, type UserPreferencesPatch } from "./userPreferences"
 import { PersonalPreferencesSessionProvider } from "./PersonalPreferencesSessionContext"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
-import { AutoSaveActionError } from "@/ui/AutoSave"
-import { resolvePreferencesAutoSaveFailure } from "./resolvePreferencesAutoSaveFailure"
+import { resolveSaveAction, requireConfirmedSave } from "@/ui/SaveAction"
+import { resolvePreferencesSaveFailure } from "./resolvePreferencesSaveFailure"
 
 /** Story callbacks may reject with transport mocks; Production Form sees only Action errors. */
 function PreferencesStory({
@@ -19,13 +19,9 @@ function PreferencesStory({
       {...props}
       onSave={
         onSave
-          ? async (patch) => {
-              try {
-                return await onSave(patch)
-              } catch (error) {
-                throw new AutoSaveActionError(resolvePreferencesAutoSaveFailure(error))
-              }
-            }
+          ? async (patch) => requireConfirmedSave(
+              await resolveSaveAction(() => onSave(patch), resolvePreferencesSaveFailure),
+            )
           : undefined
       }
     />
