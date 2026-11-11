@@ -1,4 +1,4 @@
-import type { ExplicitSaveResult } from "@/ui/ExplicitSave"
+import type { SaveActionResult } from "@/ui/SaveAction"
 import {
   classifySettingsSaveFailure,
   getSettingsInputViolations,
@@ -9,7 +9,7 @@ import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
 export async function resolveProfileSaveResult(
   persist: () => Promise<string>,
   blockedMessage?: string,
-): Promise<ExplicitSaveResult<string>> {
+): Promise<SaveActionResult<string>> {
   try {
     return { status: "confirmed", value: await persist() }
   } catch (error) {
