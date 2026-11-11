@@ -168,6 +168,7 @@ export function useCommunityAliasForm({
     normalized, validation,
     showClientError: fieldState.isTouched || isSubmitted,
     changed, invalid,
+    canSubmit: saveAction.canSubmit,
     save: submit, onAliasChange,
   }
 }
