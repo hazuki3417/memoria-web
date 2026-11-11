@@ -22,12 +22,12 @@ vi.mock("../CommunityPreferencesSection", () => ({
 describe("ConnectedCommunityPreferencesのSection取得状態", () => {
   let root: Root
   let element: HTMLDivElement
-  let result: SettingsSectionResult | undefined
+  let results: SettingsSectionResult[]
 
   beforeEach(() => {
     element = document.createElement("div")
     root = createRoot(element)
-    result = undefined
+    results = []
     mocks.connection.mockReset()
     mocks.alias.mockClear()
   })
@@ -42,7 +42,7 @@ describe("ConnectedCommunityPreferencesのSection取得状態", () => {
         createElement(ConnectedCommunityPreferences, {
           communityId: "club-a",
           render: (next) => {
-            result = next
+            results.push(next)
             return next.status === "ready" ? next.content : null
           },
         }),
@@ -53,7 +53,7 @@ describe("ConnectedCommunityPreferencesのSection取得状態", () => {
   it("初回取得中はReady UIをMountしない", () => {
     mocks.connection.mockReturnValue({ data: undefined, loading: true })
     renderSection()
-    expect(result).toEqual({ status: "loading" })
+    expect(results.at(-1)).toEqual({ status: "loading" })
     expect(element.textContent).not.toContain("Community Preferences")
   })
 
@@ -62,9 +62,10 @@ describe("ConnectedCommunityPreferencesのSection取得状態", () => {
     mocks.connection.mockReturnValue({ data: undefined, loading: false, refetch })
     renderSection()
 
-    if (result?.status !== "error") throw new Error("Section must be error")
-    expect(result.retry).toBeTypeOf("function")
-    await act(async () => result.retry?.())
+    const errorResult = results.at(-1)
+    if (errorResult?.status !== "error") throw new Error("Section must be error")
+    expect(errorResult.retry).toBeTypeOf("function")
+    await act(async () => errorResult.retry?.())
     expect(refetch).toHaveBeenCalledTimes(1)
   })
 
@@ -79,7 +80,7 @@ describe("ConnectedCommunityPreferencesのSection取得状態", () => {
       canResave: false,
     })
     renderSection()
-    expect(result?.status).toBe("ready")
+    expect(results.at(-1)?.status).toBe("ready")
     expect(element.textContent).toContain("Community Preferences")
   })
 })
