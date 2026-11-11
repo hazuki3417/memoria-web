@@ -6,8 +6,6 @@ import type { SaveActionResult } from "@/ui/SaveAction"
 
 export type ExplicitSaveStatus = "idle" | "saving" | "retryable" | "blocked" | "unknown"
 
-/** The trigger is explicit; the Action result is shared with autosave. */
-export type ExplicitSaveResult<T> = SaveActionResult<T>
 
 export type ExplicitSaveInspection<T> =
   | { status: "idle" | "checking" | "failed" }
@@ -33,7 +31,7 @@ export function useExplicitSave<T>({
   changed: boolean
   invalid: boolean
   readDraft: () => T
-  action: (value: T) => Promise<ExplicitSaveResult<T>>
+  action: (value: T) => Promise<SaveActionResult<T>>
   inspect?: () => Promise<T>
   adopt: (value: T) => void
   onValidation: (violations: ReadonlyArray<FormInputViolation> | null) => void
@@ -69,7 +67,7 @@ export function useExplicitSave<T>({
     setInspection({ status: "idle" })
     setBlockedFeedback(null)
     setStatus("saving")
-    let result: ExplicitSaveResult<T>
+    let result: SaveActionResult<T>
     try {
       result = await action(value)
     } catch {
