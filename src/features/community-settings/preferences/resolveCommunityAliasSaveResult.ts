@@ -1,4 +1,4 @@
-import type { ExplicitSaveResult } from "@/ui/ExplicitSave"
+import type { SaveActionResult } from "@/ui/SaveAction"
 import {
   classifySettingsSaveFailure,
   getSettingsInputViolations,
@@ -9,7 +9,7 @@ import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
 export async function resolveCommunityAliasSaveResult(
   alias: string | null,
   persist: () => Promise<void>,
-): Promise<ExplicitSaveResult<string | null>> {
+): Promise<SaveActionResult<string | null>> {
   try {
     await persist()
     return { status: "confirmed", value: alias }
