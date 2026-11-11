@@ -1,11 +1,11 @@
 "use client"
 
-import { resolveFormFailureValidation } from "@/ui/formValidation"
-
 import { useEffect, useRef, useState, type SetStateAction } from "react"
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
+import { resolveFormFailureValidation } from "@/ui/formValidation"
+import { useExplicitSave, type ExplicitSaveResult } from "@/ui/ExplicitSave"
 import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 import {
@@ -14,9 +14,9 @@ import {
   type SettingsSaveFailureKind,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
-import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
+import { resolveCommunityNameSaveFeedback } from "./resolveCommunityNameSaveFeedback"
 
-/** Community名変更フォームのDraft、Validation、保存・再照会状態を所有する。 */
+/** Community名のRHF Draft、確認済みBaselineと取得値同期を所有する。 */
 export function useCommunityNameSettings({
   communityName,
   onSaveName,
@@ -43,166 +43,142 @@ export function useCommunityNameSettings({
   const savedName = useRef(initialName)
   const previousSource = useRef(communityName)
   const awaitingSourceEcho = useRef<string | null>(null)
-  const inspectionGeneration = useRef(0)
-  const [savingName, setSavingName] = useState(false)
-  const [failure, setFailure] = useState<SettingsSaveFailureKind | null>(null)
-  const [blockedFeedback, setBlockedFeedback] = useState<{ title: string; description: string } | null>(null)
   const [formInvalid, setFormInvalid] = useState(false)
-  const [inspection, setInspection] = useState<CommunityNameInspection>({ status: "idle" })
-  useEffect(() => () => { inspectionGeneration.current += 1 }, [])
+
+  const draft = field.value
+  const normalized = draft.trim()
+  const dirty = normalized !== savedName.current
+  const invalid = !communityNameSchema.safeParse({ name: draft }).success
+
+  const adoptCurrentName = (current: string) => {
+    savedName.current = current
+    awaitingSourceEcho.current = communityName === current ? null : current
+    reset({ name: current })
+    clearErrors("name")
+    setFormInvalid(false)
+  }
+
+  const action = async (value: string): Promise<ExplicitSaveResult<string>> => {
+    try {
+      const confirmed = onSaveName ? await onSaveName(value) : value
+      return { status: "confirmed", value: confirmed }
+    } catch (error) {
+      const kind = classifySettingsSaveFailure(error)
+      switch (kind) {
+        case "validation":
+          return { status: "validation", violations: getSettingsInputViolations(error) }
+        case "blocked":
+          return {
+            status: "blocked",
+            feedback: getCommunityBlockedFeedback(error, "Community名"),
+          }
+        case "retryable":
+          return { status: "retryable" }
+        case "unknown":
+          return { status: "unknown" }
+      }
+    }
+  }
+
+  const saveAction = useExplicitSave({
+    draft: normalized,
+    changed: dirty,
+    invalid,
+    readDraft: () => getValues("name").trim(),
+    action,
+    inspect: onInspectName,
+    adopt: adoptCurrentName,
+    onValidation: (violations) => {
+      const result = resolveFormFailureValidation(violations, ["name"])
+      if (result.fieldErrors.name) {
+        setError("name", { type: "server", message: result.fieldErrors.name })
+      }
+      setFormInvalid(result.formError)
+    },
+    onConfirmed: () => {
+      showNotification({
+        kind: "success",
+        title: "Community名を変更",
+        description: "Community名を変更しました。",
+      })
+    },
+  })
 
   // Protect edited/unknown drafts and confirmed writes from stale refetches.
   useEffect(() => {
     if (communityName === undefined || previousSource.current === communityName)
       return
     previousSource.current = communityName
-    if (failure === "unknown") return
+    if (saveAction.isUnknown) return
     if (awaitingSourceEcho.current !== null) {
       if (communityName !== awaitingSourceEcho.current) return
       awaitingSourceEcho.current = null
     }
     const draftIsEdited = getValues("name").trim() !== savedName.current
     savedName.current = communityName
-    if (!draftIsEdited && !savingName) reset({ name: communityName })
-  }, [communityName, failure, savingName, getValues, reset])
-
-  const draft = field.value
-  const dirty = draft.trim() !== savedName.current
-  const invalid = !communityNameSchema.safeParse({ name: draft }).success
-  const canResaveInspected =
-    failure === "unknown" &&
-    inspection.status === "differs" &&
-    !invalid &&
-    draft.trim() !== inspection.name
+    if (!draftIsEdited && !saveAction.isSaving) reset({ name: communityName })
+  }, [communityName, saveAction.isUnknown, saveAction.isSaving, getValues, reset])
 
   const setDraft = (next: SetStateAction<string>) => {
     field.onChange(typeof next === "function" ? next(field.value) : next)
     clearErrors("name")
-    if (failure === "unknown") {
-      inspectionGeneration.current += 1
-      setInspection({ status: "idle" })
-    }
-    // A server Form error is not resolved merely by editing. Retain the
-    // persistent explanation until the next confirmed submit.
+    saveAction.onDraftChange()
+    // Form-level server error persists until a confirmed new submit.
   }
 
-  const saveName = () => {
-    if (
-      savingName ||
-      failure === "blocked" ||
-      (failure === "unknown" && !canResaveInspected)
-    ) return
-    void handleSubmit(async ({ name: updated }) => {
-      if (updated === savedName.current && !canResaveInspected) return
-      inspectionGeneration.current += 1
-      setInspection({ status: "idle" })
-      setSavingName(true)
-      setFailure(null)
-      setBlockedFeedback(null)
-      setFormInvalid(false)
-      clearErrors("name")
-      try {
-        const confirmed = onSaveName ? await onSaveName(updated) : updated
-        savedName.current = confirmed
-        awaitingSourceEcho.current = communityName === confirmed ? null : confirmed
-        if (getValues("name").trim() === updated) reset({ name: confirmed })
-        showNotification({
-          kind: "success",
-          title: "Community名を変更",
-          description: "Community名を変更しました。",
-        })
-      } catch (error) {
-        const kind = classifySettingsSaveFailure(error)
-        if (kind === "validation") {
-          const result = resolveFormFailureValidation(getSettingsInputViolations(error), ["name"])
-          if (result.fieldErrors.name) {
-            setError("name", { type: "server", message: result.fieldErrors.name })
-          }
-          setFormInvalid(result.formError)
-        } else {
-          setFailure(kind)
-          if (kind === "blocked") {
-            setBlockedFeedback(getCommunityBlockedFeedback(error, "Community名"))
-          }
-        }
-      } finally {
-        setSavingName(false)
-      }
-    })()
-  }
-
-  const inspectName = async () => {
-    if (failure !== "unknown" || !onInspectName || inspection.status === "checking")
-      return
-    const generation = ++inspectionGeneration.current
-    const draftAtStart = getValues("name").trim()
-    setInspection({ status: "checking" })
-    try {
-      const current = await onInspectName()
-      if (
-        generation !== inspectionGeneration.current ||
-        getValues("name").trim() !== draftAtStart
-      ) return
-      setInspection({
-        status: current === draftAtStart ? "matches" : "differs",
-        name: current,
-      })
-    } catch {
-      if (
-        generation !== inspectionGeneration.current ||
-        getValues("name").trim() !== draftAtStart
-      ) return
-      setInspection({ status: "failed" })
-    }
-  }
-
-  const adoptCurrentName = (current: string) => {
-    inspectionGeneration.current += 1
-    savedName.current = current
-    awaitingSourceEcho.current = communityName === current ? null : current
-    reset({ name: current })
-    clearErrors("name")
-    setFailure(null)
+  const submit = handleSubmit(async ({ name }) => {
+    if (!saveAction.canSave) return
     setFormInvalid(false)
-    setInspection({ status: "idle" })
-  }
+    clearErrors("name")
+    await saveAction.save(name)
+  })
+  const saveName = () => { void submit() }
 
-  const confirmObservation = () => {
-    if (failure !== "unknown" || inspection.status !== "matches") return
-    if (inspection.name !== getValues("name").trim()) return
-    // A matching read proves only the current value, not the old Mutation.
-    adoptCurrentName(inspection.name)
-  }
-  const discardUnconfirmed = () => {
-    if (failure !== "unknown" || inspection.status !== "differs") return
-    adoptCurrentName(inspection.name)
-  }
+  const inspection =
+    saveAction.inspection.status === "matches" ||
+    saveAction.inspection.status === "differs"
+      ? {
+          status: saveAction.inspection.status,
+          name: saveAction.inspection.value,
+        }
+      : saveAction.inspection
+  const failure: SettingsSaveFailureKind | null =
+    saveAction.status === "retryable" ||
+    saveAction.status === "blocked" ||
+    saveAction.status === "unknown"
+      ? saveAction.status
+      : null
 
-  const showClientError = fieldState.isTouched || isSubmitted
   const saveFeedback = resolveCommunityNameSaveFeedback({
     formInvalid,
     failure,
-    blockedFeedback,
+    blockedFeedback: saveAction.blockedFeedback,
     inspection,
     draft,
     hasInspector: Boolean(onInspectName),
   })
 
   return {
-    draft, setDraft, dirty, invalid, savingName, saveName,
+    draft,
+    setDraft,
+    dirty,
+    invalid,
+    savingName: saveAction.isSaving,
+    isInputDisabled: saveAction.isInputDisabled,
+    saveName,
     fieldError: fieldState.error?.type === "server"
       ? fieldState.error.message
-      : showClientError && invalid
+      : (fieldState.isTouched || isSubmitted) && invalid
         ? "Community名を入力してください"
         : undefined,
     onNameBlur: field.onBlur,
     saveFeedback,
-    saveBlocked: failure === "blocked" || failure === "unknown",
-    inspectName: onInspectName ? inspectName : undefined,
+    saveBlocked: saveAction.isBlocked || saveAction.isUnknown,
+    inspectName: saveAction.inspectCurrent,
     inspection,
-    confirmObservation,
-    discardUnconfirmed,
-    canResaveInspected,
-    unknown: failure === "unknown",
+    confirmObservation: saveAction.confirmObservation,
+    discardUnconfirmed: saveAction.discardUnconfirmed,
+    canResaveInspected: saveAction.canResaveInspected,
+    unknown: saveAction.isUnknown,
   }
 }
