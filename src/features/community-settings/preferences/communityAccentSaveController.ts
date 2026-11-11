@@ -185,6 +185,10 @@ export function createCommunityAccentSaveController(delayMs = 400) {
   }
 
   return {
+    /** Stop unsent triggers when the authenticated Shell itself is released. */
+    dispose() {
+      for (const entry of entries.values()) cancelScheduledSave(entry)
+    },
     getSnapshot(id: string): AccentSnapshot {
       return entryFor(id).snapshot
     },
