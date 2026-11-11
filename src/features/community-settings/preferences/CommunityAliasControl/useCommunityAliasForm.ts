@@ -157,7 +157,7 @@ export function useCommunityAliasForm({
     failure, formInvalid,
     blockedFeedback: saveAction.blockedFeedback,
     inspection,
-    inspect: saveAction.inspectCurrent,
+    inspect: async () => { await saveAction.inspectCurrent?.() },
     canResaveInspected: saveAction.canResaveInspected,
     confirmObservation: saveAction.confirmObservation,
     discardUnconfirmed: saveAction.discardUnconfirmed,
