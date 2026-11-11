@@ -9,6 +9,10 @@ import { useExplicitSave, type ExplicitSaveResult } from "@/ui/ExplicitSave"
 import { communityAliasSchema } from "./communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
 import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
+type AliasInspection =
+  | { status: "idle" | "checking" | "failed" }
+  | { status: "matches" | "differs"; alias: string | null }
+
 import {
   classifySettingsSaveFailure,
   getSettingsInputViolations,
@@ -134,7 +138,7 @@ export function useCommunityAliasForm({
     // Form-level server errors remain visible until another submit.
   }
 
-  const inspection =
+  const inspection: AliasInspection =
     saveAction.inspection.status === "matches" ||
     saveAction.inspection.status === "differs"
       ? {
