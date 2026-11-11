@@ -3,6 +3,7 @@
 import { useMediaQuery } from "@mantine/hooks"
 import { usePersonalSettingsPreferencesQuery } from "@/infrastructure/graphql/generated"
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
+import { requireConfirmedSave } from "@/ui/SaveAction"
 import { PersonalPreferences } from "./PersonalPreferences"
 import { fromGraphqlUserPreferences } from "./userPreferencesGraphqlAdapter"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
@@ -38,7 +39,7 @@ export function ConnectedPersonalPreferences({ render }: { render: SettingsSecti
       <PersonalPreferences
         compact={compact}
         initialPreferences={fromGraphqlUserPreferences(values)}
-        onSave={savePreferences}
+        onSave={async (patch) => requireConfirmedSave(await savePreferences(patch))}
         onInspect={inspectPreferences}
       />
     ),
