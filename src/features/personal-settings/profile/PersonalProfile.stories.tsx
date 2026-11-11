@@ -17,7 +17,10 @@ function ProfileStory({ onSave, ...props }: ProfileStoryProps) {
     <PersonalProfile
       {...props}
       onSave={(nickname) =>
-        resolveProfileSaveResult(nickname, () => onSave(nickname), props.blockedMessage)
+        resolveProfileSaveResult(async () => {
+          await onSave(nickname)
+          return nickname
+        }, props.blockedMessage)
       }
     />
   )
