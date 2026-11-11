@@ -5,15 +5,9 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, type ExplicitSaveResult } from "@/ui/ExplicitSave"
+import { useExplicitSave, type ExplicitSaveResult, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
 import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
-import {
-  classifySettingsSaveFailure,
-  getSettingsInputViolations,
-  type SettingsSaveFailureKind,
-} from "@/infrastructure/graphql/settingsMutationResult"
-import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
 import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
 
 /** Community名のRHF Draft、確認済みBaselineと取得値同期を所有する。 */
@@ -23,7 +17,7 @@ export function useCommunityNameSettings({
   onInspectName,
 }: {
   communityName?: string
-  onSaveName?: (name: string) => Promise<string>
+  onSaveName?: (name: string) => Promise<ExplicitSaveResult<string>>
   onInspectName?: () => Promise<string>
 }) {
   const initialName = communityName ?? "家族のアルバム"
@@ -58,34 +52,12 @@ export function useCommunityNameSettings({
     setFormInvalid(false)
   }
 
-  const action = async (value: string): Promise<ExplicitSaveResult<string>> => {
-    try {
-      const confirmed = onSaveName ? await onSaveName(value) : value
-      return { status: "confirmed", value: confirmed }
-    } catch (error) {
-      const kind = classifySettingsSaveFailure(error)
-      switch (kind) {
-        case "validation":
-          return { status: "validation", violations: getSettingsInputViolations(error) }
-        case "blocked":
-          return {
-            status: "blocked",
-            feedback: getCommunityBlockedFeedback(error, "Community名"),
-          }
-        case "retryable":
-          return { status: "retryable" }
-        case "unknown":
-          return { status: "unknown" }
-      }
-    }
-  }
-
   const saveAction = useExplicitSave({
     draft: normalized,
     changed: dirty,
     invalid,
     readDraft: () => getValues("name").trim(),
-    action,
+    action: onSaveName ?? (async (name: string) => ({ status: "confirmed" as const, value: name })),
     inspect: onInspectName,
     adopt: adoptCurrentName,
     onValidation: (violations) => {
@@ -142,7 +114,7 @@ export function useCommunityNameSettings({
           name: saveAction.inspection.value,
         }
       : saveAction.inspection
-  const failure: SettingsSaveFailureKind | null =
+  const failure: Exclude<ExplicitSaveStatus, "idle" | "saving"> | null =
     saveAction.status === "retryable" ||
     saveAction.status === "blocked" ||
     saveAction.status === "unknown"
