@@ -2,8 +2,7 @@
 
 import { useCommunitySettingsMembershipQuery } from "@/infrastructure/graphql/generated"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
-
-export type CommunityMembershipStatus = "loading" | "error" | "not-member" | "ready"
+import { getCommunityMembershipStatus } from "./communityMembershipStatus"
 
 /** Resolve membership for every Community Settings section before mounting its Controller. */
 export function useCommunitySettingsMembership(communityId: string) {
@@ -14,13 +13,12 @@ export function useCommunitySettingsMembership(communityId: string) {
 
   useCommunitySettingsRefreshError(Boolean(data && error))
 
-  const status: CommunityMembershipStatus = loading
-    ? "loading"
-    : error || !data
-      ? "error"
-      : membership
-        ? "ready"
-        : "not-member"
+  const status = getCommunityMembershipStatus({
+    loading,
+    failed: Boolean(error),
+    hasData: Boolean(data),
+    isMember: Boolean(membership),
+  })
 
   return {
     status,
