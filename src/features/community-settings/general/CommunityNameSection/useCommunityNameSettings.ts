@@ -5,7 +5,8 @@ import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { useExplicitSave, type ExplicitSaveResult, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
+import { useExplicitSave, type ExplicitSaveStatus } from "@/ui/ExplicitSave"
+import type { SaveActionResult } from "@/ui/SaveAction"
 import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
 import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
@@ -17,7 +18,7 @@ export function useCommunityNameSettings({
   onInspectName,
 }: {
   communityName?: string
-  onSaveName?: (name: string) => Promise<ExplicitSaveResult<string>>
+  onSaveName?: (name: string) => Promise<SaveActionResult<string>>
   onInspectName?: () => Promise<string>
 }) {
   const initialName = communityName ?? "家族のアルバム"
