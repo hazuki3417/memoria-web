@@ -28,25 +28,25 @@ export function usePersonalPreferencesSave() {
   return {
     savePreferences: async (patch: UserPreferencesPatch) => {
       try {
-      const input = toGraphqlUserPreferencesPatch(patch)
-      const result = await client.mutate<
-        OperationSaveUserPreferencesMutation,
-        OperationSaveUserPreferencesMutationVariables
-      >({ mutation: SaveUserPreferencesDocument, variables: { input }, errorPolicy: "all" })
-      const outcome = requireSettingsMutationOutcome(result.data?.updateUserPreferences, result)
-      if (outcome?.__typename === "InputValidationFailure")
-        throw new SettingsInputValidationError(outcome.violations)
-      if (outcome?.__typename !== "UpdateUserPreferencesSuccess")
-        throw new Error("Preferences update unconfirmed")
-      const confirmed = fromGraphqlUserPreferences(outcome.preferences)
-      // A follow-up Query failure cannot turn an already confirmed Mutation
-      // into an unknown outcome or trigger a duplicate settings write.
-      void client
-        .refetchQueries({
-          include: [CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument],
-        })
-        .catch(() => undefined)
-      return confirmed
+        const input = toGraphqlUserPreferencesPatch(patch)
+        const result = await client.mutate<
+          OperationSaveUserPreferencesMutation,
+          OperationSaveUserPreferencesMutationVariables
+        >({ mutation: SaveUserPreferencesDocument, variables: { input }, errorPolicy: "all" })
+        const outcome = requireSettingsMutationOutcome(result.data?.updateUserPreferences, result)
+        if (outcome?.__typename === "InputValidationFailure")
+          throw new SettingsInputValidationError(outcome.violations)
+        if (outcome?.__typename !== "UpdateUserPreferencesSuccess")
+          throw new Error("Preferences update unconfirmed")
+        const confirmed = fromGraphqlUserPreferences(outcome.preferences)
+        // A follow-up Query failure cannot turn an already confirmed Mutation
+        // into an unknown outcome or trigger a duplicate settings write.
+        void client
+          .refetchQueries({
+            include: [CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument],
+          })
+          .catch(() => undefined)
+        return confirmed
       } catch (error) {
         throw new AutoSaveActionError(resolvePreferencesAutoSaveFailure(error))
       }
