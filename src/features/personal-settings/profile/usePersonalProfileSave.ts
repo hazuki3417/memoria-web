@@ -6,6 +6,7 @@ import {
   PersonalSettingsProfileDocument,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
+import { resolveProfileSaveResult } from "./resolveProfileSaveResult"
 import {
   SettingsInputValidationError,
   requireSettingsMutationOutcome,
@@ -17,7 +18,7 @@ export function usePersonalProfileSave() {
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
 
   return {
-    saveProfile: async (nickname: string) => {
+    saveProfile: (nickname: string) => resolveProfileSaveResult(nickname, async () => {
       const result = await updateProfile({
         variables: { input: { nickname } },
         errorPolicy: "all",
@@ -30,6 +31,6 @@ export function usePersonalProfileSave() {
       void client
         .refetchQueries({ include: [CurrentUserDocument, PersonalSettingsProfileDocument] })
         .catch(() => undefined)
-    },
+    }),
   }
 }
