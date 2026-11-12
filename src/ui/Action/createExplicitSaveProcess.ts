@@ -44,11 +44,11 @@ export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = 
         // A broken presentation subscriber must not block remote execution.
       }
     })
-  };
+  }
 
   const onInspectionChange = (inspection: Inspection<Observed>) => {
     publish({ ...snapshot, inspection })
-  };
+  }
 
   const inspectionPart = recovery
     ? createInspectionRecovery<Input, Observed>({
@@ -59,16 +59,16 @@ export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = 
 
   const getSnapshot = () => {
     return snapshot
-  };
+  }
 
   const subscribe = (listener: () => void) => {
     if (closed) return () => undefined
     listeners.add(listener)
     const unsubscribe = () => {
       listeners.delete(listener)
-    };
+    }
     return unsubscribe
-  };
+  }
 
   const submit = async (input: Input): Promise<ActionOutcome<Success, Rejection> | null> => {
     if (closed || snapshot.busy) return null
@@ -83,23 +83,23 @@ export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = 
     }
     publish({ ...snapshot, busy: false })
     return outcome
-  };
+  }
 
   const inspect = async (input: Input): Promise<Inspection<Observed>> => {
     if (closed || !inspectionPart || snapshot.busy) return snapshot.inspection
     return inspectionPart.run(input)
-  };
+  }
 
   const invalidateInspection = () => {
     inspectionPart?.invalidate()
-  };
+  }
 
   const close = () => {
     closed = true
     inspectionPart?.close()
     listeners.clear()
     // A remote in-flight mutation is not cancelled by closing the view.
-  };
+  }
 
   return {
     getSnapshot,
@@ -109,7 +109,7 @@ export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = 
     invalidateInspection,
     close,
   }
-};
+}
 
 export type ExplicitSaveProcess<Input, Success, Rejection, Observed> =
   ReturnType<typeof createExplicitSaveProcess<Input, Success, Rejection, Observed>>
