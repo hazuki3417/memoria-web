@@ -14,7 +14,7 @@ import {
 import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
 import type { ProfileSaveRejection, SaveProfile } from "./profileSaveOutcome"
 
-/** Profile更新のGraphQL結果をAction Outcomeに分類し、確定値照会も提供する。 */
+/** Profile保存を共通Actionとして実行し、更新結果の判定と結果不明時の現状確認を画面へ提供する。 */
 export const usePersonalProfileSave = () => {
   const client = useApolloClient()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
@@ -74,5 +74,6 @@ export const usePersonalProfileSave = () => {
     return result.data.me.profile.nickname
   }
 
+  /** Nicknameの保存操作と、保存状態が不明な場合に現在値を確認する操作を提供する。 */
   return { saveProfile, inspectProfile }
 }
