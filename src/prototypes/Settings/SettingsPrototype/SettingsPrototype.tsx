@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
+import type { SaveProfile } from "@/features/personal-settings/profile/profileSaveOutcome"
 import { Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
@@ -17,8 +18,9 @@ import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShel
 type ProfileSaveState = "idle" | "saving" | "retryable-error" | "blocked"
 
 // Storybook / Prototype専用。製品本体へモックの成功動作を混入させない。
-async function saveMockProfile(): Promise<void> {
+const saveMockProfile: SaveProfile = async (nickname) => {
   await new Promise((resolve) => setTimeout(resolve, 500))
+  return { kind: "success", value: nickname }
 }
 
 export function SettingsPrototype({
