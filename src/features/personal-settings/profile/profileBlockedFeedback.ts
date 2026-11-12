@@ -1,5 +1,5 @@
 import { getGraphQLErrorCodes } from "@/infrastructure/graphql/getGraphQLErrorCodes"
-import { resolveErrorCodeFeedback } from "@/ui/errorFeedback"
+import { resolveErrorCodeFeedback } from "@/ui/error-feedback"
 
 /** 保存継続不可と確定した公開エラーコードを、利用者向けの案内へ変換する。 */
 export type ProfileBlockedFeedback = {
