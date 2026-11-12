@@ -1,7 +1,7 @@
 import { getGraphQLErrorCodes } from "@/infrastructure/graphql/getGraphQLErrorCodes"
 import { resolveErrorCodeFeedback } from "@/ui/error-feedback"
 
-/** 保存継続不可と確定した公開エラーコードを、利用者向けの案内へ変換する。 */
+/** Profileを保存できないときに利用者へ示す見出しと説明を表す。 */
 export type ProfileBlockedFeedback = {
   title: string
   description: string
