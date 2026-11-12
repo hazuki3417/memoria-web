@@ -109,7 +109,7 @@ export function useCommunityNameSettings({
     clearErrors("name")
     await saveAction.save(name)
   })
-  const saveName = () => { void submit() }
+  const save = () => { void submit() }
 
   const inspection: CommunityNameInspection =
     saveAction.inspection.status === "matches" ||
@@ -126,9 +126,9 @@ export function useCommunityNameSettings({
     dirty,
     invalid,
     canSubmit: saveAction.canSubmit,
-    savingName: saveAction.isSaving,
+    isSaving: saveAction.isSaving,
     isInputDisabled: saveAction.isInputDisabled,
-    saveName,
+    save,
     fieldError: fieldState.error?.type === "server"
       ? fieldState.error.message
       : (fieldState.isTouched || isSubmitted) && invalid
@@ -138,12 +138,10 @@ export function useCommunityNameSettings({
     formInvalid,
     failure: saveAction.failure,
     blockedFeedback: saveAction.blockedFeedback,
-    saveBlocked: saveAction.isBlocked || saveAction.isUnknown,
-    inspectName: saveAction.inspectCurrent,
+    inspect: saveAction.inspectCurrent,
     inspection,
     confirmObservation: saveAction.confirmObservation,
     discardUnconfirmed: saveAction.discardUnconfirmed,
     canResaveInspected: saveAction.canResaveInspected,
-    unknown: saveAction.isUnknown,
   }
 }
