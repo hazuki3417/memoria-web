@@ -37,7 +37,13 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
 
   function publish(next: ExplicitSaveSnapshot<Observed>) {
     snapshot = next
-    if (!closed) listeners.forEach((listener) => listener())
+    if (!closed) listeners.forEach((listener) => {
+      try {
+        listener()
+      } catch {
+        // A broken presentation subscriber must not block remote execution.
+      }
+    })
   }
 
   const inspectionPart = recovery
