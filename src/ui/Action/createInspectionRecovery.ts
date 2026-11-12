@@ -2,16 +2,23 @@ export type InspectionResult<Observed> =
   | { kind: "idle" | "checking" | "failed" }
   | { kind: "matches" | "differs"; value: Observed }
 
+/** 照会値とAction入力を比較するRecoveryの共通契約。 */
+export type InspectionRecoveryPolicy<Input, Observed> = {
+  inspect: () => Promise<Observed>
+  matches: (observed: Observed, input: Input) => boolean
+}
+
+type InspectionRecoveryConfig<Input, Observed> =
+  InspectionRecoveryPolicy<Input, Observed> & {
+    onChange?: (snapshot: InspectionResult<Observed>) => void
+  }
+
 /** 現在値の照会と入力との比較を担い、古い照会結果の反映を防ぐRecovery部品を生成する。 */
 export const createInspectionRecovery = <Input, Observed>({
   inspect,
   matches,
   onChange,
-}: {
-  inspect: () => Promise<Observed>
-  matches: (observed: Observed, input: Input) => boolean
-  onChange?: (snapshot: InspectionResult<Observed>) => void
-}) => {
+}: InspectionRecoveryConfig<Input, Observed>) => {
   let state: InspectionResult<Observed> = { kind: "idle" }
   let revision = 0
   let closed = false
