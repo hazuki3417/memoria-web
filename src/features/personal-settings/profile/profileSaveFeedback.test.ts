@@ -29,7 +29,7 @@ describe("Profile保存Feedbackの単一表示", () => {
       status: { kind: "retryable-error" },
     })
     expect(feedback?.type).toBe("retryable")
-    expect(feedback?.description).toContain("再試行")
+    expect(feedback?.description).toBe("再試行してください。")
   })
 
   it("結果不明は入力エラーより優先し、自動再送を防ぐ説明を返す", () => {
@@ -40,8 +40,7 @@ describe("Profile保存Feedbackの単一表示", () => {
     })
     expect(feedback?.type).toBe("unknown")
     expect(feedback?.kind).toBe("warning")
-    expect(feedback?.description).toContain("自動で再送しません")
-    expect(feedback?.description).toContain("成功した証明ではありません")
+    expect(feedback?.description).toBe("保存結果は不明です。自動で再送せず、現在の状態を確認してください。")
   })
 
   it("結果不明の案内は照会状態を引数にせず共通の説明を返す", () => {
