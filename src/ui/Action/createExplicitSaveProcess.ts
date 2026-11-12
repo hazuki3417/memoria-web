@@ -1,8 +1,10 @@
 import type { Action, ActionOutcome } from "./actionOutcome"
+import {
+  createInspectionRecovery,
+  type InspectionResult,
+} from "./createInspectionRecovery"
 
-export type Inspection<Observed> =
-  | { kind: "idle" | "checking" | "failed" }
-  | { kind: "matches" | "differs"; value: Observed }
+export type Inspection<Observed> = InspectionResult<Observed>
 
 export type ExplicitSaveSnapshot<Observed> = Readonly<{
   busy: boolean
@@ -10,9 +12,11 @@ export type ExplicitSaveSnapshot<Observed> = Readonly<{
 }>
 
 /**
- * Reusable, framework-independent composition of a single-flight Action and
- * an optional authoritative read. The factory owns ordering/lifetime; callers
- * inject domain-specific execution, comparison and presentation.
+ * Factory for explicit-save processes.
+ *
+ * The Action and optional inspection policy are injected; single-flight,
+ * exception uncertainty, recovery invalidation and teardown are composed
+ * consistently. The process never interprets application-specific reasons.
  */
 export function createExplicitSaveProcess<Input, Success, Rejection, Observed = never>({
   execute,
@@ -29,7 +33,6 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
     inspection: { kind: "idle" },
   }
   let closed = false
-  let inspectionVersion = 0
   const listeners = new Set<() => void>()
 
   function publish(next: ExplicitSaveSnapshot<Observed>) {
@@ -37,23 +40,23 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
     if (!closed) listeners.forEach((listener) => listener())
   }
 
-  function invalidateInspection() {
-    inspectionVersion += 1
-    if (!closed && snapshot.inspection.kind !== "idle") {
-      publish({ ...snapshot, inspection: { kind: "idle" } })
-    }
-  }
+  const inspectionPart = recovery
+    ? createInspectionRecovery<Input, Observed>({
+        ...recovery,
+        onChange: (inspection) => publish({ ...snapshot, inspection }),
+      })
+    : null
 
   return {
     getSnapshot: () => snapshot,
     subscribe(listener: () => void) {
       if (closed) return () => undefined
       listeners.add(listener)
-      return () => listeners.delete(listener)
+      return () => { listeners.delete(listener) }
     },
     async submit(input: Input): Promise<ActionOutcome<Success, Rejection> | null> {
       if (closed || snapshot.busy) return null
-      invalidateInspection()
+      inspectionPart?.invalidate()
       publish({ ...snapshot, busy: true })
       let outcome: ActionOutcome<Success, Rejection>
       try {
@@ -66,31 +69,17 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
       return outcome
     },
     async inspect(input: Input): Promise<Inspection<Observed>> {
-      if (closed || !recovery || snapshot.busy) return snapshot.inspection
-      const version = ++inspectionVersion
-      publish({ ...snapshot, inspection: { kind: "checking" } })
-      try {
-        const value = await recovery.inspect()
-        if (closed || version !== inspectionVersion) return snapshot.inspection
-        const inspection: Inspection<Observed> = {
-          kind: recovery.matches(value, input) ? "matches" : "differs",
-          value,
-        }
-        publish({ ...snapshot, inspection })
-        return inspection
-      } catch {
-        if (closed || version !== inspectionVersion) return snapshot.inspection
-        const inspection: Inspection<Observed> = { kind: "failed" }
-        publish({ ...snapshot, inspection })
-        return inspection
-      }
+      if (closed || !inspectionPart || snapshot.busy) return snapshot.inspection
+      return inspectionPart.run(input)
     },
-    invalidateInspection,
+    invalidateInspection() {
+      inspectionPart?.invalidate()
+    },
     close() {
       closed = true
-      inspectionVersion += 1
+      inspectionPart?.close()
       listeners.clear()
-      // An in-flight remote mutation is not cancelled by closing the view.
+      // A remote in-flight mutation is not cancelled by closing the view.
     },
   }
 }
