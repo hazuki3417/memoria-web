@@ -6,10 +6,7 @@ import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshEr
 import { PersonalProfile } from "./PersonalProfile"
 import { usePersonalProfileSave } from "./usePersonalProfileSave"
 
-/**
- * Composes the Profile Query, mutation Action, and recovery read.
- * The screen only mounts after the required server data is available.
- */
+/** Profileの取得・保存Action・復旧照会を接続し、取得状態に応じて画面を構成する。 */
 export function ConnectedPersonalProfile({
   render,
 }: {
