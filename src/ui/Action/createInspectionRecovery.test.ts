@@ -7,8 +7,8 @@ function deferred<T>() {
   return { promise, resolve }
 }
 
-describe("createInspectionRecovery", () => {
-  it("compares authoritative observations using an injected policy", async () => {
+describe("結果照会Recovery（createInspectionRecovery）", () => {
+  it("注入した比較規則で現在値と入力の一致・不一致を判定する", async () => {
     const controller = createInspectionRecovery({
       inspect: async () => ({ nickname: "server" }),
       matches: (observed, input: string) => observed.nickname === input,
@@ -23,7 +23,7 @@ describe("createInspectionRecovery", () => {
     })
   })
 
-  it("invalidates a stale observation without reporting it as a confirmed write", async () => {
+  it("古い照会を無効化し、現在値の一致を保存成功として扱わない", async () => {
     const deferredRead = deferred<string>()
     const onChange = vi.fn()
     const controller = createInspectionRecovery({
@@ -38,7 +38,7 @@ describe("createInspectionRecovery", () => {
     expect(onChange).toHaveBeenCalledTimes(2)
   })
 
-  it("cannot update a closed process when a pending read completes", async () => {
+  it("終了後に照会が完了しても状態や通知を更新しない", async () => {
     const deferredRead = deferred<string>()
     const onChange = vi.fn()
     const controller = createInspectionRecovery({
@@ -54,7 +54,7 @@ describe("createInspectionRecovery", () => {
     expect(onChange).toHaveBeenCalledTimes(1)
   })
 
-  it("represents read errors without rewriting Action outcomes", async () => {
+  it("照会失敗を独立した状態として表し、Actionの成立結果を変更しない", async () => {
     const controller = createInspectionRecovery({
       inspect: async (): Promise<string> => { throw Error("read failed") },
       matches: (value: string, input: string) => value === input,
