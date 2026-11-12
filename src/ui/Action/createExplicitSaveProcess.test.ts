@@ -63,7 +63,7 @@ describe("明示保存Process（createExplicitSaveProcess）", () => {
   it("復旧照会を注入でき、古い照会結果は無効化できる", async () => {
     const observed = deferred<string>()
     const process = createExplicitSaveProcess({
-      execute: async (input: string) => ({ kind: "unknown" as const }),
+      execute: async (_input: string) => ({ kind: "unknown" as const }),
       recovery: {
         inspect: () => observed.promise,
         matches: (current: string, input: string) => current === input,
