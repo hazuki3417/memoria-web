@@ -28,7 +28,9 @@ export function CommunityNameSection({
     saveName,
     fieldError,
     onNameBlur,
-    saveFeedback,
+    formInvalid,
+    failure,
+    blockedFeedback,
     unknown,
     inspection,
     inspectName,
@@ -42,7 +44,10 @@ export function CommunityNameSection({
       <SectionHeader>基本情報</SectionHeader>
       <Stack gap="md" maw={540}>
         <CommunityNameSaveFeedback
-          saveFeedback={saveFeedback}
+          formInvalid={formInvalid}
+          failure={failure}
+          blockedFeedback={blockedFeedback}
+          draft={draft}
           unknown={unknown}
           inspection={inspection}
           inspectName={inspectName}
