@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
-import type { SettingsSaveFailureKind } from "@/infrastructure/graphql/settingsMutationResult"
+import type { ExplicitSaveFailureStatus } from "@/ui/ExplicitSave"
 
 function feedback({
   failure = null,
@@ -10,7 +10,7 @@ function feedback({
   draft = "新しい名前",
   blockedFeedback = null,
 }: {
-  failure?: SettingsSaveFailureKind | null
+  failure?: ExplicitSaveFailureStatus | null
   formInvalid?: boolean
   inspection?: CommunityNameInspection
   hasInspector?: boolean
