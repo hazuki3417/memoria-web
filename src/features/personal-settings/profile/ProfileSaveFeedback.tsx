@@ -4,7 +4,22 @@ import { Button, Stack } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { useProfileForm } from "./useProfileForm"
 
-type FormModel = ReturnType<typeof useProfileForm>
+/** Presentation receives only the state and actions it renders. */
+type FormModel = Pick<
+  ReturnType<typeof useProfileForm>,
+  | "saveState"
+  | "formInvalid"
+  | "isUnknown"
+  | "inspection"
+  | "inspectCurrentProfile"
+  | "confirmObservedProfile"
+  | "canRetryInspected"
+  | "save"
+  | "discardUnconfirmedDraft"
+  | "normalized"
+  | "isBlocked"
+  | "blockedFeedback"
+>
 
 /** Renders Profile save failures and explicit resolution actions. */
 export function ProfileSaveFeedback({
