@@ -25,10 +25,8 @@ export function usePersonalProfileSave() {
         errorPolicy: "all",
       })
     } catch (error) {
-      // Errors with no typed result are not proof the mutation was rejected.
-      if (error instanceof SettingsGraphQLExecutionError) {
-        return { kind: "unknown" }
-      }
+      // Only an explicitly blocking authorization/account-state contract can
+      // establish rejection without the operation's typed result.
       const kind = classifySettingsSaveFailure(error)
       if (kind === "blocked") {
         return { kind: "rejected", reason: { kind, error } }
@@ -48,6 +46,16 @@ export function usePersonalProfileSave() {
       }
     }
     if (result?.__typename !== "UpdateUserProfileSuccess") {
+      // A known authorization/account-state rejection may appear in GraphQL
+      // errors without a typed result under errorPolicy "all".
+      if (response.errors?.length) {
+        const failure = new SettingsGraphQLExecutionError(response.errors)
+        if (classifySettingsSaveFailure(failure) === "blocked") {
+          return { kind: "rejected", reason: { kind: "blocked", error: failure } }
+        }
+      }
+      // Unrelated partial data, missing results and other execution errors
+      // do not establish whether the remote mutation committed.
       return { kind: "unknown" }
     }
 
