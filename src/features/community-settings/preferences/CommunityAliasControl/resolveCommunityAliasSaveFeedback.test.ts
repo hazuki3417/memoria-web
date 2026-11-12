@@ -51,11 +51,11 @@ describe("Community別名の明示保存Feedback", () => {
   })
 
   it("Unknown時は一致・不一致・照会失敗を区別し、nullを設定なしと表示する", () => {
-    expect(feedback({ failure: "unknown", inspection: { status: "matches", alias: "新しい別名" } }))
+    expect(feedback({ failure: "unknown", inspection: { status: "matches", value: "新しい別名" } }))
       .toMatchObject({ kind: "warning", title: "保存結果を確認できませんでした" })
-    expect(feedback({ failure: "unknown", inspection: { status: "matches", alias: "新しい別名" } })?.description)
+    expect(feedback({ failure: "unknown", inspection: { status: "matches", value: "新しい別名" } })?.description)
       .toContain("成功した証明ではありません")
-    expect(feedback({ failure: "unknown", inspection: { status: "differs", alias: null } })?.description)
+    expect(feedback({ failure: "unknown", inspection: { status: "differs", value: null } })?.description)
       .toContain("「設定なし」")
     expect(feedback({ failure: "unknown", inspection: { status: "failed" } })?.description)
       .toContain("取得できませんでした")
