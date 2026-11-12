@@ -5,10 +5,8 @@ type Inputs = Parameters<typeof resolveProfileSaveFeedback>[0]
 
 function feedback(overrides: Partial<Inputs> = {}) {
   return resolveProfileSaveFeedback({
-    saveState: "idle",
+    failure: null,
     formInvalid: false,
-    isUnknown: false,
-    isBlocked: false,
     blockedFeedback: null,
     inspection: { status: "idle" },
     normalized: "未保存の名前",
@@ -24,25 +22,25 @@ describe("Profile保存のFeedback表示モデル", () => {
   })
 
   it("再試行可能エラーとForm Validationが同時にあれば既存の2パネルを保持する", () => {
-    expect(feedback({ saveState: "retryable-error", formInvalid: true })
+    expect(feedback({ failure: "retryable", formInvalid: true })
       .map((section) => section.id)).toEqual(["retryable", "validation"])
   })
 
   it("Blocked時には固有の理由または呼び出し元の既定文言を使う", () => {
-    expect(feedback({ isBlocked: true })[0]).toMatchObject({
+    expect(feedback({ failure: "blocked" })[0]).toMatchObject({
       id: "blocked",
       kind: "error",
       title: "プロフィールを変更できません",
       description: "プロフィールを更新できません",
     })
-    expect(feedback({ isBlocked: true, blockedFeedback: {
+    expect(feedback({ failure: "blocked", blockedFeedback: {
       title: "権限なし", description: "編集不可",
     } })[0]).toMatchObject({ title: "権限なし", description: "編集不可" })
   })
 
   it("Unknownは保存成功と断定せず、照会一致を説明する", () => {
     const section = feedback({
-      isUnknown: true,
+      failure: "unknown",
       inspection: { status: "matches", nickname: "未保存の名前" },
     })[0]
     expect(section).toMatchObject({
@@ -56,22 +54,22 @@ describe("Profile保存のFeedback表示モデル", () => {
 
   it("照会不一致・失敗時は既存の説明を出す", () => {
     expect(feedback({
-      isUnknown: true,
+      failure: "unknown",
       inspection: { status: "differs", nickname: "サーバーの名前" },
     })[0]?.details?.[0]).toContain("サーバーの名前")
     expect(feedback({
-      isUnknown: true,
+      failure: "unknown",
       inspection: { status: "failed" },
     })[0]?.details?.[0]).toContain("状態の確認をやり直してください")
   })
 
   it("照会できない画面では入力控えと再読み込みを案内する", () => {
-    expect(feedback({ isUnknown: true, hasInspector: false })[0]?.details)
+    expect(feedback({ failure: "unknown", hasInspector: false })[0]?.details)
       .toEqual([expect.stringContaining("入力内容を控えてから")])
   })
 
   it("UnknownとForm Validationが重なっても既存の独立したPanelを保持する", () => {
-    expect(feedback({ isUnknown: true, formInvalid: true })
+    expect(feedback({ failure: "unknown", formInvalid: true })
       .map((section) => section.id)).toEqual(["validation", "unknown"])
   })
 })
