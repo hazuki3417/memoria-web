@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest"
 import { createActionAdapter } from "./createActionAdapter"
 
-describe("createActionAdapter", () => {
-  it("maps an injected operation response to the supplied success evidence", async () => {
+describe("Action Adapter（createActionAdapter）", () => {
+  it("注入した結果分類に従い、操作の成功結果を返す", async () => {
     const execute = vi.fn(async (input: number) => ({ confirmed: input + 1 }))
     const action = createActionAdapter({
       execute,
@@ -12,7 +12,7 @@ describe("createActionAdapter", () => {
     expect(execute).toHaveBeenCalledExactlyOnceWith(2)
   })
 
-  it("never treats transport failure as a confirmed rejection by default", async () => {
+  it("通信処理が失敗しても、未成立が確定したものとして扱わない", async () => {
     const action = createActionAdapter({
       execute: async (_: string): Promise<number> => { throw Error("timeout") },
       classify: (response) => ({ kind: "success" as const, value: response }),
@@ -20,7 +20,7 @@ describe("createActionAdapter", () => {
     expect(await action("draft")).toEqual({ kind: "unknown" })
   })
 
-  it("allows operation-specific typed rejection evidence to be injected", async () => {
+  it("操作固有の判定を注入し、未成立が確認できた理由を返す", async () => {
     const action = createActionAdapter({
       execute: async () => ({ typename: "ValidationFailure" }),
       classify: () => ({
@@ -34,7 +34,7 @@ describe("createActionAdapter", () => {
     })
   })
 
-  it("runs post-success synchronization without making the confirmed outcome uncertain", async () => {
+  it("成功後の同期処理が失敗しても、確定した成功結果を維持する", async () => {
     const afterSuccess = vi.fn(async () => { throw Error("refetch failed") })
     const action = createActionAdapter({
       execute: async (input: string) => input,
@@ -45,7 +45,7 @@ describe("createActionAdapter", () => {
     expect(afterSuccess).toHaveBeenCalledExactlyOnceWith("canonical", "canonical")
   })
 
-  it("preserves explicit evidence while handling unexpected classifier failures as unknown", async () => {
+  it("明示的な拒否結果を保持し、結果分類の予期しない例外は成否不明として扱う", async () => {
     const operation = createActionAdapter({
       execute: async (): Promise<string> => { throw Error("auth") },
       classify: (value) => ({ kind: "success" as const, value }),
