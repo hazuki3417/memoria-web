@@ -41,9 +41,9 @@ describe("Community名の保存・復旧Feedback", () => {
   })
 
   it("結果不明の現在値確認・再保存判断を状態別に説明する", () => {
-    expect(feedback({ failure: "unknown", inspection: { status: "matches", name: "新しい名前" } })?.description)
+    expect(feedback({ failure: "unknown", inspection: { status: "matches", value: "新しい名前" } })?.description)
       .toContain("成功した証明ではありません")
-    expect(feedback({ failure: "unknown", inspection: { status: "differs", name: "サーバー名" }, draft: "  新しい名前  " })?.description)
+    expect(feedback({ failure: "unknown", inspection: { status: "differs", value: "サーバー名" }, draft: "  新しい名前  " })?.description)
       .toContain("「サーバー名」")
     expect(feedback({ failure: "unknown", inspection: { status: "failed" } })?.description)
       .toContain("取得できませんでした")
