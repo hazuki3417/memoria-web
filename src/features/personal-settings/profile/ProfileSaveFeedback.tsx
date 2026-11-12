@@ -107,7 +107,7 @@ export function ProfileSaveFeedback({
             )}
             {inspection.kind === "differs" && (
               <span>
-                現在のニックネームは「{inspection.nickname}」です。入力内容の「{normalized}」とは異なります。必要な場合だけ、もう一度保存するか、変更を破棄してください。
+                現在のニックネームは「{inspection.value}」です。入力内容の「{normalized}」とは異なります。必要な場合だけ、もう一度保存するか、変更を破棄してください。
               </span>
             )}
             {inspection.kind === "failed" && (
