@@ -4,11 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import type { Action } from "./actionOutcome"
 import { createExplicitSaveProcess } from "./createExplicitSaveProcess"
 
-/**
- * React binding for the pure Process Factory.
- * All consumers get the same subscription, latest-callback and teardown
- * behavior without reimplementing lifecycle effects in their Features.
- */
+/** 明示保存Processの生成・購読・終了をReactに接続する共通Hook。 */
 export const useExplicitSaveProcess = <Input, Success, Rejection, Observed = never>({
   execute,
   recovery,
@@ -57,8 +53,7 @@ export const useExplicitSaveProcess = <Input, Success, Rejection, Observed = nev
     process.getSnapshot,
   )
 
-  // React StrictMode replays effect cleanup during development. Delay the
-  // irreversible close for a microtask so that replay does not close the owner.
+  // StrictModeのEffect再実行では実際のUnmountまでProcessを閉じないようにする。
   const mounted = useRef(false)
   useEffect(() => {
     mounted.current = true
