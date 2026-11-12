@@ -1,3 +1,5 @@
+import { getGraphQLErrorCodes } from "./getGraphQLErrorCodes"
+
 /** Expected domain failure from a successfully executed GraphQL mutation. */
 export type SettingsInputViolation = {
   scope: string
@@ -62,14 +64,7 @@ export function classifySettingsSaveFailure(error: unknown): SettingsSaveFailure
         : "errors" in error && Array.isArray(error.errors)
           ? error.errors
           : []
-    const codes = errors.map((item) => {
-      if (typeof item !== "object" || item === null || !("extensions" in item))
-        return null
-      const extensions = item.extensions
-      if (typeof extensions !== "object" || extensions === null || !("code" in extensions))
-        return null
-      return typeof extensions.code === "string" ? extensions.code : null
-    })
+    const codes = getGraphQLErrorCodes(errors)
     if (codes.length > 0) {
       // Mixed or unknown errors do not prove that a mutation was rejected.
       const blocked = [
