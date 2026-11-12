@@ -153,6 +153,12 @@ const saveMissingResult = {
   request: mutationRequest,
   result: { data: { updateUserProfile: null } },
 }
+const saveBlocked = {
+  request: mutationRequest,
+  result: {
+    errors: [{ message: "Operation is blocked", extensions: { code: "USER_DELETING" } }],
+  },
+}
 const saveUnknown = {
   request: mutationRequest,
   error: new Error("transport response unavailable"),
@@ -249,6 +255,31 @@ export const MutationMissingTypedResult: Story = {
       "プロフィールの保存結果を確認できませんでした",
     )
     await expect(input).toHaveValue("変更した名前")
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
+
+
+export const MutationBlocked: Story = {
+  name: "Integration · APIのBlockedでは編集と再送を停止",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[profileSuccess, saveBlocked]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "アカウントの削除処理中です",
+    )
+    await expect(input).toBeDisabled()
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
   },
 }
