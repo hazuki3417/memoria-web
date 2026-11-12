@@ -11,13 +11,7 @@ export type ExplicitSaveSnapshot<Observed> = Readonly<{
   inspection: Inspection<Observed>
 }>
 
-/**
- * Factory for explicit-save processes.
- *
- * The Action and optional inspection policy are injected; single-flight,
- * exception uncertainty, recovery invalidation and teardown are composed
- * consistently. The process never interprets application-specific reasons.
- */
+/** Actionと任意の状態照会を組み合わせ、重複実行防止と終了処理を備えた明示保存Processを生成する。 */
 export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = never>({
   execute,
   recovery,
@@ -41,7 +35,7 @@ export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = 
       try {
         listener()
       } catch {
-        // A broken presentation subscriber must not block remote execution.
+        // 表示側の購読処理の例外が遠隔操作を妨げないようにする。
       }
     })
   }
@@ -78,7 +72,7 @@ export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = 
     try {
       outcome = await execute(input)
     } catch {
-      // An unclassified exception cannot prove a remote write failed.
+      // 分類できない例外は操作の不成立を証明しない。
       outcome = { kind: "unknown" }
     }
     publish({ ...snapshot, busy: false })
@@ -98,7 +92,7 @@ export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = 
     closed = true
     inspectionPart?.close()
     listeners.clear()
-    // A remote in-flight mutation is not cancelled by closing the view.
+    // 画面終了によって実行中の遠隔操作を取り消したことにはしない。
   }
 
   return {
