@@ -1,3 +1,6 @@
+import { getGraphQLErrorCodes } from "@/infrastructure/graphql/getGraphQLErrorCodes"
+import { resolveErrorCodeFeedback } from "@/ui/errorFeedback"
+
 /** 保存継続不可と確定した公開エラーコードを、利用者向けの案内へ変換する。 */
 export type ProfileBlockedFeedback = {
   title: string
@@ -32,36 +35,24 @@ const messages = {
   },
 } as const satisfies Record<string, ProfileBlockedFeedback>
 
-type PublicCode = keyof typeof messages
-
-function getCodes(error: unknown): string[] {
-  if (!error || typeof error !== "object") return []
-  const source =
-    "graphQLErrors" in error ? error.graphQLErrors :
-    "errors" in error ? error.errors : undefined
-  if (!Array.isArray(source)) return []
-
-  return source.map((item: unknown) => {
-    if (!item || typeof item !== "object" || !("extensions" in item)) return ""
-    const extensions = item.extensions
-    return extensions && typeof extensions === "object" && "code" in extensions &&
-      typeof extensions.code === "string" ? extensions.code : ""
-  })
-}
-
-export function getProfileBlockedFeedback(
+/** GraphQLの公開エラーコードをProfile固有の案内へ変換し、不明な場合は安全な説明を返す。 */
+export const getProfileBlockedFeedback = (
   error: unknown,
   fallbackDescription =
     "現在の状態では保存を続けられません。ページを再読み込みして、プロフィールの状態を確認してください。",
-): ProfileBlockedFeedback {
-  const codes = getCodes(error)
-  const code = codes[0]
-  if (
-    code &&
-    codes.every((candidate) => candidate === code) &&
-    Object.prototype.hasOwnProperty.call(messages, code)
-  ) {
-    return messages[code as PublicCode]
-  }
-  return { title: "プロフィールを変更できません", description: fallbackDescription }
+): ProfileBlockedFeedback => {
+  const source =
+    error && typeof error === "object"
+      ? "graphQLErrors" in error
+        ? error.graphQLErrors
+        : "errors" in error
+          ? error.errors
+          : undefined
+      : undefined
+  const codes = Array.isArray(source) ? getGraphQLErrorCodes(source) : []
+  return resolveErrorCodeFeedback<ProfileBlockedFeedback>(
+    codes,
+    messages,
+    { title: "プロフィールを変更できません", description: fallbackDescription },
+  )
 }
