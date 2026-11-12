@@ -56,14 +56,17 @@ export function useProfileForm({
   const [inspection, setInspection] = useState<Inspection>({ kind: "idle" })
   const [formInvalid, setFormInvalid] = useState(false)
 
-  // Only non-form concerns use refs: the in-flight mutation guard,
-  // stale asynchronous inspection, and the remote Query echo.
+  // Non-form refs are limited to asynchronous operation lifetime/ordering
+  // and server Query echo protection; RHF owns draft, errors, and baseline.
   const inFlight = useRef(false)
+  const alive = useRef(true)
   const inspectVersion = useRef(0)
   const queryEcho = useRef({ observed: initialNickname, confirmed: null as string | null })
 
   useEffect(() => {
+    alive.current = true
     return () => {
+      alive.current = false
       inspectVersion.current += 1
     }
   }, [])
@@ -125,6 +128,7 @@ export function useProfileForm({
       inFlight.current = false
     }
 
+    if (!alive.current) return
     if (outcome.kind === "success") {
       adopt(outcome.value)
       showNotification({
@@ -166,10 +170,10 @@ export function useProfileForm({
     setInspection({ kind: "checking" })
     try {
       const current = await onInspect()
-      if (version !== inspectVersion.current || getValues("nickname").trim() !== attempted) return
+      if (!alive.current || version !== inspectVersion.current || getValues("nickname").trim() !== attempted) return
       setInspection({ kind: current === attempted ? "matches" : "differs", nickname: current })
     } catch {
-      if (version !== inspectVersion.current || getValues("nickname").trim() !== attempted) return
+      if (!alive.current || version !== inspectVersion.current || getValues("nickname").trim() !== attempted) return
       setInspection({ kind: "failed" })
     }
   }
