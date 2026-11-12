@@ -87,7 +87,7 @@ export const getProfileSaveFeedback = ({
     : null
 
   const feedback = resolveSaveFeedback(type, messages)
-  if (!feedback || feedback.type !== "blocked" || status.kind !== "blocked") return feedback
+  if (feedback?.type !== "blocked" || status.kind !== "blocked") return feedback
 
   return {
     ...feedback,
