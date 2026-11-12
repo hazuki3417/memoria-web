@@ -10,75 +10,106 @@ const base = {
   blockedMessage: "画面を再読み込みしてください",
 }
 
-describe("Profile保存のFeedback定義", () => {
-  it("保存前の通常状態ではFeedbackを表示しない", () => {
-    expect(getProfileSaveFeedback(base)).toEqual([])
+describe("Profile保存Feedbackの単一表示", () => {
+  it("通常状態と保存中にはFeedbackを表示しない", () => {
+    expect(getProfileSaveFeedback(base)).toBeNull()
+    expect(getProfileSaveFeedback({ ...base, status: { kind: "saving" } })).toBeNull()
   })
 
-  it("再試行可能な失敗とフォーム全体の検証エラーは順序を維持して表示する", () => {
-    const feedbacks = getProfileSaveFeedback({
+  it("入力検証と再試行可能エラーが重なった場合は具体的な検証案内を1件だけ返す", () => {
+    const feedback = getProfileSaveFeedback({
       ...base,
       status: { kind: "retryable-error" },
       formInvalid: true,
     })
-    expect(feedbacks.map(({ id }) => id)).toEqual(["retryable", "validation"])
-    expect(feedbacks.every(({ kind }) => kind === "error")).toBe(true)
+    expect(feedback?.type).toBe("validation")
+    expect(feedback?.kind).toBe("error")
   })
 
-  it("結果不明時には自動再送しない理由と確認手段を案内する", () => {
-    const feedbacks = getProfileSaveFeedback({
+  it("検証エラーがない場合は保存失敗の再試行を案内する", () => {
+    const feedback = getProfileSaveFeedback({
+      ...base,
+      status: { kind: "retryable-error" },
+    })
+    expect(feedback?.type).toBe("retryable")
+    expect(feedback?.description).toContain("再試行")
+  })
+
+  it("結果不明は入力エラーより優先し、自動再送を防ぐ説明を返す", () => {
+    const feedback = getProfileSaveFeedback({
+      ...base,
+      status: { kind: "unknown" },
+      formInvalid: true,
+    })
+    expect(feedback?.type).toBe("unknown")
+    expect(feedback?.kind).toBe("warning")
+    expect(feedback?.description).toContain("自動で再送しません")
+  })
+
+  it("照会できない場合は入力の保全と再読み込みを案内する", () => {
+    const feedback = getProfileSaveFeedback({
       ...base,
       status: { kind: "unknown" },
       canInspect: false,
     })
-    expect(feedbacks).toHaveLength(1)
-    expect(feedbacks[0].kind).toBe("warning")
-    expect(feedbacks[0].description).toContain("自動で再送しません")
-    expect(feedbacks[0].details).toContain(
-      "この画面では現在の状態を照会できません。入力内容を控えてから画面を再読み込みしてください。",
-    )
+    expect(feedback?.description).toContain("入力内容を控えて")
+    expect(feedback?.description).toContain("自動で再送しません")
   })
 
-  it("現在値が一致しても前回の保存成功と断定しない", () => {
-    const feedbacks = getProfileSaveFeedback({
+  it("現在値が一致しても以前の保存成功と断定しない", () => {
+    const feedback = getProfileSaveFeedback({
       ...base,
       status: { kind: "unknown" },
       inspection: { kind: "matches", value: "入力した名前" },
     })
-    expect(feedbacks[0].details?.[0]).toContain("成功した証明ではありません")
+    expect(feedback?.description).toContain("成功した証明ではありません")
   })
 
-  it("現在値が異なる場合は比較する名前と再保存・破棄の選択を示す", () => {
-    const feedbacks = getProfileSaveFeedback({
+  it("現在値が異なる場合は再保存と破棄を案内する", () => {
+    const feedback = getProfileSaveFeedback({
       ...base,
       status: { kind: "unknown" },
       inspection: { kind: "differs", value: "現在の名前" },
     })
-    expect(feedbacks[0].details?.[0]).toContain("現在の名前")
-    expect(feedbacks[0].details?.[0]).toContain("入力した名前")
-    expect(feedbacks[0].details?.[0]).toContain("変更を破棄")
+    expect(feedback?.description).toContain("現在の名前")
+    expect(feedback?.description).toContain("入力した名前")
+    expect(feedback?.description).toContain("変更を破棄")
   })
 
-  it("照会失敗では保存操作を再送せず確認をやり直すよう案内する", () => {
-    const feedbacks = getProfileSaveFeedback({
+  it("照会失敗では保存を再送せず、確認のやり直しを案内する", () => {
+    const feedback = getProfileSaveFeedback({
       ...base,
       status: { kind: "unknown" },
       inspection: { kind: "failed" },
     })
-    expect(feedbacks[0].details?.[0]).toContain("保存操作は再送せず")
+    expect(feedback?.description).toContain("保存を再送せず")
   })
 
-  it("保存不可の表示ではFeature固有のメッセージを優先し、不足時だけFallbackする", () => {
-    const feedback = { title: "ログインが必要です", description: "" }
-    const result = getProfileSaveFeedback({
+  it("保存不可は入力エラーより優先し、Featureの具体的な案内を利用する", () => {
+    const feedback = getProfileSaveFeedback({
       ...base,
-      status: { kind: "blocked", feedback },
+      formInvalid: true,
+      status: {
+        kind: "blocked",
+        feedback: { title: "ログインが必要です", description: "ログインしてください" },
+      },
     })
-    expect(result).toEqual([{
-      id: "blocked",
+    expect(feedback).toEqual({
+      type: "blocked",
       kind: "error",
       title: "ログインが必要です",
-      description: "画面を再読み込みしてください",
-    }])
+      description: "ログインしてください",
+    })
+  })
+
+  it("保存不可の説明が空の場合はFeatureが渡したFallbackを利用する", () => {
+    const feedback = getProfileSaveFeedback({
+      ...base,
+      status: {
+        kind: "blocked",
+        feedback: { title: "変更できません", description: "" },
+      },
+    })
+    expect(feedback?.description).toBe("画面を再読み込みしてください")
   })
 })
