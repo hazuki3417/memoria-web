@@ -16,42 +16,42 @@ type ProfileFeedbackInput = Pick<ProfileForm, "status" | "formInvalid"> & {
 const messages = {
   validation: {
     title: "入力内容を確認してください",
-    description: "入力した内容を確認して、もう一度保存してください。",
+    description: "入力内容を確認してください。",
   },
   retryable: {
     title: "プロフィールを保存できませんでした",
-    description: "入力内容は保持しています。下の「再試行」からもう一度保存できます。",
+    description: "入力内容は保持しています。「再試行」を選んでください。",
   },
   unknown: {
     title: "プロフィールの保存結果を確認できませんでした",
-    description: "入力内容は保持しています。保存結果は未確定のため自動で再送しません。現在の状態を確認し、必要な操作を選んでください。値が一致しても元の保存処理が成功した証明ではありません。画面から確認できない場合は入力内容を控えてページを再読み込みしてください。",
+    description: "保存結果は未確定です。自動で再送しません。現在の状態を確認してください。値が一致しても、保存が成功した証明ではありません。確認できない場合は入力を控えて再読み込みしてください。",
   },
   blocked: {
     title: "プロフィールを変更できません",
-    description: "ページを再読み込みして現在の状態を確認してください。",
+    description: "ページを再読み込みして状態を確認してください。",
   },
 } satisfies SaveFeedbackMessages
 
 const blockedMessages = {
   UNAUTHENTICATED: {
     title: "ログインが必要です",
-    description: "現在のログイン状態ではプロフィールを更新できません。もう一度ログインしてから、プロフィールを確認してください。",
+    description: "再度ログインしてから確認してください。",
   },
   USER_REGISTRATION_REQUIRED: {
     title: "アカウント登録が必要です",
-    description: "プロフィールを変更するにはアカウントの登録を完了してください。登録済みの場合は、現在の状態を確認してください。",
+    description: "アカウント登録を完了してください。",
   },
   USER_DELETING: {
     title: "アカウントの削除処理中です",
-    description: "削除処理中のためプロフィールは更新できません。保存操作を繰り返さず、アカウントの状態を確認してください。",
+    description: "保存を繰り返さず、アカウントの状態を確認してください。",
   },
   FORBIDDEN: {
     title: "プロフィールを変更できません",
-    description: "この操作を行う権限がありません。現在のアカウントや権限を確認してください。",
+    description: "アカウントの権限を確認してください。",
   },
   NOT_FOUND: {
     title: "プロフィールを確認できません",
-    description: "現在の状態ではプロフィールを更新できません。ページを再読み込みして状態を確認してください。",
+    description: "ページを再読み込みして状態を確認してください。",
   },
 } satisfies Record<string, { title: string; description: string }>
 
