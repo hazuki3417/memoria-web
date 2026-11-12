@@ -617,7 +617,7 @@ export const ProfileSuccessNotification: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "更新" }))
     await expect(args.onSave).toHaveBeenCalledTimes(1)
     await waitFor(() => {
-      expect(page.getByText("プロフィールを更新しました。")).toBeVisible()
+      return expect(page.getByText("プロフィールを更新しました。")).toBeVisible()
     })
     await expect(page.getAllByText("プロフィールを更新しました。")).toHaveLength(1)
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
