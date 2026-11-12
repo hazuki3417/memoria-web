@@ -16,7 +16,7 @@ export function CommunityAliasControl({
 }) {
   const model = useCommunityAliasForm({ savedAlias, onSave, onInspect })
   const {
-    field, fieldState, text, saving, isInputDisabled, validation,
+    field, fieldState, text, isSaving, isInputDisabled, validation,
     showClientError, canSubmit, save, onAliasChange,
   } = model
 
