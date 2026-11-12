@@ -3,7 +3,7 @@ export type InspectionResult<Observed> =
   | { kind: "matches" | "differs"; value: Observed }
 
 /** A reusable, scope-limited read/reconciliation part, independent of React. */
-export function createInspectionRecovery<Input, Observed>({
+export const createInspectionRecovery = <Input, Observed>({
   inspect,
   matches,
   onChange,
@@ -11,12 +11,12 @@ export function createInspectionRecovery<Input, Observed>({
   inspect: () => Promise<Observed>
   matches: (observed: Observed, input: Input) => boolean
   onChange?: (snapshot: InspectionResult<Observed>) => void
-}) {
+}) => {
   let state: InspectionResult<Observed> = { kind: "idle" }
   let revision = 0
   let closed = false
 
-  function publish(value: InspectionResult<Observed>) {
+  const publish = (value: InspectionResult<Observed>) => {
     if (closed) return
     state = value
     try {
@@ -24,18 +24,18 @@ export function createInspectionRecovery<Input, Observed>({
     } catch {
       // Observers cannot alter the result of an authoritative read.
     }
-  }
+  };
 
-  function getSnapshot() {
+  const getSnapshot = () => {
     return state
-  }
+  };
 
-  function invalidate() {
+  const invalidate = () => {
     revision += 1
     if (state.kind !== "idle") publish({ kind: "idle" })
-  }
+  };
 
-  async function run(input: Input): Promise<InspectionResult<Observed>> {
+  const run = async (input: Input): Promise<InspectionResult<Observed>> => {
     if (closed) return state
     const request = ++revision
     publish({ kind: "checking" })
@@ -48,12 +48,12 @@ export function createInspectionRecovery<Input, Observed>({
       publish({ kind: "failed" })
     }
     return state
-  }
+  };
 
-  function close() {
+  const close = () => {
     closed = true
     revision += 1
-  }
+  };
 
   return { getSnapshot, invalidate, run, close }
-}
+};
