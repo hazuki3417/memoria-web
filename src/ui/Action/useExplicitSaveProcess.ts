@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { createExplicitSaveProcess, type ExplicitSaveProcessConfig } from "./createExplicitSaveProcess"
 
-/** 明示保存Processの生成・購読・終了をReactに接続する共通Hook。 */
+/** 明示保存Processの操作と状態をReact画面から共通の方法で利用できるようにし、購読・終了処理の重複実装をなくす。 */
 export const useExplicitSaveProcess = <Input, Success, Rejection, Observed = never>({
   execute,
   recovery,
@@ -58,5 +58,6 @@ export const useExplicitSaveProcess = <Input, Success, Rejection, Observed = nev
     }
   }, [process])
 
+  /** 保存操作・復旧照会を実行するProcessと、画面表示に利用する現在の実行状態を提供する。 */
   return { process, snapshot }
 }
