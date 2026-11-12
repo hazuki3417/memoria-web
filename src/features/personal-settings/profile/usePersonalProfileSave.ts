@@ -11,70 +11,51 @@ import {
   SettingsGraphQLExecutionError,
   classifySettingsSaveFailure,
 } from "@/infrastructure/graphql/settingsMutationResult"
-import type { SaveProfile } from "./profileSaveOutcome"
+import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
+import type { ProfileSaveRejection, SaveProfile } from "./profileSaveOutcome"
 
-/** The operation adapter owns Typed Result classification, not form UI state. */
+/** Only the GraphQL Operation-specific details belong to this adapter. */
 export function usePersonalProfileSave() {
   const client = useApolloClient()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
 
-  const saveProfile: SaveProfile = async (nickname) => {
-    let response: Awaited<ReturnType<typeof updateProfile>>
-    try {
-      response = await updateProfile({
-        variables: { input: { nickname } },
-        errorPolicy: "all",
-      })
-    } catch (error) {
-      // Only an explicitly blocking authorization/account-state contract can
-      // establish rejection without the operation's typed result.
-      const kind = classifySettingsSaveFailure(error)
-      if (kind === "blocked") {
-        return { kind: "rejected", reason: { kind, error } }
-      }
-      if (kind === "retryable") {
-        // Only an explicit known-nonexecuted marker can be safely retryable.
-        return { kind: "rejected", reason: { kind } }
-      }
-      return { kind: "unknown" }
-    }
-
-    const result = response.data?.updateUserProfile
-    if (result?.__typename === "InputValidationFailure") {
-      return {
-        kind: "rejected",
-        reason: { kind: "validation", violations: result.violations },
-      }
-    }
-    if (result?.__typename !== "UpdateUserProfileSuccess") {
-      // A known authorization/account-state rejection may appear in GraphQL
-      // errors without a typed result under errorPolicy "all".
-      if (response.errors?.length) {
-        const failure = new SettingsGraphQLExecutionError(response.errors)
-        if (classifySettingsSaveFailure(failure) === "blocked") {
-          return { kind: "rejected", reason: { kind: "blocked", error: failure } }
-        }
-      }
-      // Unrelated partial data, missing results and other execution errors
-      // do not establish whether the remote mutation committed.
-      return { kind: "unknown" }
-    }
-
-    // Query synchronization is a separate operation. Never change a confirmed
-    // mutation success into unknown because a follow-up refresh failed.
-    try {
-      void client
-        .refetchQueries({ include: [CurrentUserDocument, PersonalSettingsProfileDocument] })
-        .catch(() => undefined)
-    } catch {
-      // The mutation is already confirmed; the existing refresh-error
-      // boundary is responsible for any separately observable Query failure.
-    }
-    return { kind: "success", value: result.user.profile.nickname }
+  function classifyBlocked(error: unknown): ActionOutcome<string, ProfileSaveRejection> {
+    const kind = classifySettingsSaveFailure(error)
+    if (kind === "blocked") return { kind: "rejected", reason: { kind, error } }
+    if (kind === "retryable") return { kind: "rejected", reason: { kind } }
+    return { kind: "unknown" }
   }
 
+  const saveProfile: SaveProfile = createActionAdapter({
+    execute: (nickname: string) =>
+      updateProfile({
+        variables: { input: { nickname } },
+        errorPolicy: "all",
+      }),
+    classify: (response): ActionOutcome<string, ProfileSaveRejection> => {
+      const result = response.data?.updateUserProfile
+      if (result?.__typename === "UpdateUserProfileSuccess") {
+        return { kind: "success", value: result.user.profile.nickname }
+      }
+      if (result?.__typename === "InputValidationFailure") {
+        return {
+          kind: "rejected",
+          reason: { kind: "validation", violations: result.violations },
+        }
+      }
+      if (response.errors?.length) {
+        return classifyBlocked(new SettingsGraphQLExecutionError(response.errors))
+      }
+      return { kind: "unknown" }
+    },
+    classifyError: classifyBlocked,
+    // This is deliberately outside confirmed operation classification.
+    afterSuccess: () => client.refetchQueries({
+      include: [CurrentUserDocument, PersonalSettingsProfileDocument],
+    }).then(() => undefined),
+  })
+
   async function inspectProfile(): Promise<string> {
-    // A recovery read must not mutate Apollo Cache or claim the old write succeeded.
     const result = await client.query<OperationPersonalSettingsProfileQuery>({
       query: PersonalSettingsProfileDocument,
       fetchPolicy: "no-cache",
