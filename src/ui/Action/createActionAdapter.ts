@@ -4,7 +4,7 @@ import type { Action, ActionOutcome } from "./actionOutcome"
  * Builds an Action from an operation-specific transport and evidence mapper.
  * The shared adapter knows nothing about GraphQL, domains or UI.
  */
-export function createActionAdapter<Input, Response, Success, Rejection>({
+export const createActionAdapter = <Input, Response, Success, Rejection>({
   execute,
   classify,
   classifyError,
@@ -16,8 +16,8 @@ export function createActionAdapter<Input, Response, Success, Rejection>({
   classifyError?: (error: unknown) => ActionOutcome<Success, Rejection>
   /** Post-action sync is not part of the confirmed mutation outcome. */
   afterSuccess?: (success: Success, input: Input) => void | Promise<void>
-}): Action<Input, Success, Rejection> {
-  async function run(input: Input): Promise<ActionOutcome<Success, Rejection>> {
+}): Action<Input, Success, Rejection> => {
+  const run = async (input: Input): Promise<ActionOutcome<Success, Rejection>> => {
     let result: Response
     try {
       result = await execute(input)
@@ -46,7 +46,7 @@ export function createActionAdapter<Input, Response, Success, Rejection>({
       }
     }
     return outcome
-  }
+  };
 
   return run
-}
+};
