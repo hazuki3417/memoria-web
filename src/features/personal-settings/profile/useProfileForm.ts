@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useRef, useState, useSyncExternalStore, type ChangeEvent } from "react"
+import { useEffect, useRef, useState, type ChangeEvent } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
 import { showNotification } from "@/components/Feedback"
-import { createExplicitSaveProcess } from "@/ui/Action"
+import { useExplicitSaveProcess } from "@/ui/Action"
 import { resolveFormInputValidation } from "@/ui/formValidation"
 import { profileSchema } from "./profileSchema"
 import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
@@ -45,22 +45,14 @@ export function useProfileForm({
   const validation = profileSchema.safeParse({ nickname })
   const invalid = !validation.success
 
-  const saveRef = useRef(onSave)
-  const inspectRef = useRef(onInspect)
-  saveRef.current = onSave
-  inspectRef.current = onInspect
-
-  const [process] = useState(() => createExplicitSaveProcess<string, string, ProfileSaveRejection, string>({
-    execute: (input) => saveRef.current(input),
-    recovery: {
-      inspect: () => {
-        if (!inspectRef.current) return Promise.reject(new Error("Profile inspection unavailable"))
-        return inspectRef.current()
-      },
-      matches: (observed, submitted) => observed === submitted,
-    },
-  }))
-  const processState = useSyncExternalStore(process.subscribe, process.getSnapshot, process.getSnapshot)
+  const { process, snapshot: processState } = useExplicitSaveProcess<
+    string, string, ProfileSaveRejection, string
+  >({
+    execute: onSave,
+    recovery: onInspect
+      ? { inspect: onInspect, matches: (observed, submitted) => observed === submitted }
+      : undefined,
+  })
 
   const [status, setStatus] = useState<SaveStatus>(
     initialSaveState === "blocked"
@@ -75,7 +67,6 @@ export function useProfileForm({
     alive.current = true
     return () => {
       alive.current = false
-      process.close()
     }
   }, [process])
 
