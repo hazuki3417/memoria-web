@@ -7,4 +7,4 @@ export type ProfileSaveRejection =
   | { kind: "blocked"; error: unknown }
   | { kind: "retryable" }
 
-export type SaveProfile = Action<string, void, ProfileSaveRejection>
+export type SaveProfile = Action<string, string, ProfileSaveRejection>
