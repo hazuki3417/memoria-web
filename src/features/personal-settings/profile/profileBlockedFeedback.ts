@@ -1,7 +1,4 @@
-/**
- * Public code -> UI guidance for an operation that has already been
- * classified as blocked. This module never decides whether a write succeeded.
- */
+/** 保存継続不可と確定した公開エラーコードを、利用者向けの案内へ変換する。 */
 export type ProfileBlockedFeedback = {
   title: string
   description: string
