@@ -23,17 +23,16 @@ export function CommunityNameSection({
     draft,
     setDraft,
     canSubmit,
-    savingName,
+    isSaving,
     isInputDisabled,
-    saveName,
+    save,
     fieldError,
     onNameBlur,
     formInvalid,
     failure,
     blockedFeedback,
-    unknown,
     inspection,
-    inspectName,
+    inspect,
     confirmObservation,
     discardUnconfirmed,
     canResaveInspected,
@@ -48,13 +47,12 @@ export function CommunityNameSection({
           failure={failure}
           blockedFeedback={blockedFeedback}
           draft={draft}
-          unknown={unknown}
           inspection={inspection}
-          inspectName={inspectName}
+          inspect={inspect}
           confirmObservation={confirmObservation}
           discardUnconfirmed={discardUnconfirmed}
           canResaveInspected={canResaveInspected}
-          saveName={saveName}
+          save={save}
         />
         <TextInput
           label="Community名"
@@ -70,8 +68,8 @@ export function CommunityNameSection({
             <Button
               size="sm"
               disabled={!canSubmit}
-              loading={savingName}
-              onClick={saveName}
+              loading={isSaving}
+              onClick={save}
             >
               保存
             </Button>
