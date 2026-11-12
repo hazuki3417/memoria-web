@@ -82,7 +82,7 @@ describe("Profile保存Feedbackの単一表示", () => {
       status: { kind: "unknown" },
       inspection: { kind: "failed" },
     })
-    expect(feedback?.description).toContain("保存を再送せず")
+    expect(feedback?.description).toContain("保存操作は再送せず")
   })
 
   it("保存不可は入力エラーより優先し、Featureの具体的な案内を利用する", () => {
