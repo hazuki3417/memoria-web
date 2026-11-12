@@ -5,7 +5,7 @@ import { Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
   PersonalSettingsLayout,
-  PersonalProfile,
+  ProfileView,
   PersonalPreferences,
   Account,
   type PersonalSettingsSection,
@@ -47,7 +47,7 @@ export function SettingsPrototype({
   switch (section) {
     case "profile":
       content = (
-        <PersonalProfile
+        <ProfileView
           onSave={saveMockProfile}
           initialSaveState={initialProfileSaveState}
           blockedMessage="Userの状態が変わったため、この画面での変更を続けられません。ページを再読み込みして現在の状態を確認してください。"
