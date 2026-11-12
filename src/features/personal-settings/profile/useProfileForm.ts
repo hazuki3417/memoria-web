@@ -45,12 +45,16 @@ export function useProfileForm({
   const validation = profileSchema.safeParse({ nickname })
   const invalid = !validation.success
 
+  function matchesNickname(observed: string, submitted: string) {
+    return observed === submitted
+  }
+
   const { process, snapshot: processState } = useExplicitSaveProcess<
     string, string, ProfileSaveRejection, string
   >({
     execute: onSave,
     recovery: onInspect
-      ? { inspect: onInspect, matches: (observed, submitted) => observed === submitted }
+      ? { inspect: onInspect, matches: matchesNickname }
       : undefined,
   })
 
@@ -101,7 +105,7 @@ export function useProfileForm({
     setStatus({ kind: "idle" })
   }
 
-  const save = handleSubmit(async ({ nickname: input }) => {
+  async function submitNickname({ nickname: input }: z.output<typeof profileSchema>) {
     if (
       process.getSnapshot().busy ||
       blocked ||
@@ -147,7 +151,9 @@ export function useProfileForm({
           break
       }
     }
-  })
+  }
+
+  const save = handleSubmit(submitNickname)
 
   async function inspectCurrentProfile() {
     if (!unknown || !onInspect || inspection.kind === "checking") return
@@ -169,6 +175,12 @@ export function useProfileForm({
     if (unknown && inspection.kind === "differs") adopt(inspection.value)
   }
 
+  function onDraftChange(event: ChangeEvent<HTMLInputElement>) {
+    field.onChange(event)
+    clearErrors("nickname")
+    if (status.kind === "unknown") process.invalidateInspection()
+  }
+
   return {
     field,
     fieldState,
@@ -186,11 +198,7 @@ export function useProfileForm({
     canRetryInspected,
     saveLabel: saving ? "更新中" : status.kind === "retryable-error" ? "再試行" : "更新",
     save,
-    onDraftChange(event: ChangeEvent<HTMLInputElement>) {
-      field.onChange(event)
-      clearErrors("nickname")
-      if (status.kind === "unknown") process.invalidateInspection()
-    },
+    onDraftChange,
     inspectCurrentProfile,
     confirmObservedProfile,
     discardUnconfirmedDraft,
