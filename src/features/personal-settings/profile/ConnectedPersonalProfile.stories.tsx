@@ -284,3 +284,55 @@ export const MutationBlocked: Story = {
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
   },
 }
+
+
+export const MutationCanonicalNickname: Story = {
+  name: "Integration · 保存レスポンスの確定値をRHF Baselineに採用",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[
+          profileSuccess,
+          {
+            request: mutationRequest,
+            result: {
+              data: {
+                updateUserProfile: {
+                  __typename: "UpdateUserProfileSuccess",
+                  user: {
+                    id: "user-a",
+                    profile: { nickname: "サーバーで確定した名前" },
+                  },
+                },
+              },
+            },
+          },
+          {
+            request,
+            result: {
+              data: {
+                me: {
+                  id: "user-a",
+                  profile: { nickname: "サーバーで確定した名前" },
+                },
+              },
+            },
+          },
+        ]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await waitFor(() => expect(input).toHaveValue("サーバーで確定した名前"))
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+  },
+}
