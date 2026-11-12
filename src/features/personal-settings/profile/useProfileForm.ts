@@ -17,7 +17,7 @@ type SaveStatus =
   | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
   | { kind: "blocked"; feedback: ReturnType<typeof getProfileBlockedFeedback> }
 
-/** RHFでProfileの入力・検証・保存済み基準値を管理し、保存と照会は共通Processに委ねる。 */
+/** ProfileのNickname編集・入力検証・明示保存・結果不明時の復旧操作を画面から利用できるようにする。 */
 export const useProfileForm = ({
   onSave,
   onInspect,
@@ -179,6 +179,7 @@ export const useProfileForm = ({
     if (status.kind === "unknown") process.invalidateInspection()
   }
 
+  /** 入力状態と検証結果、保存可否・Feedback状態、保存・復旧に必要な画面操作を提供する。 */
   return {
     field,
     fieldState,
