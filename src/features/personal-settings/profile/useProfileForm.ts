@@ -17,7 +17,7 @@ type SaveStatus =
   | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
   | { kind: "blocked"; feedback: ReturnType<typeof getProfileBlockedFeedback> }
 
-/** RHF owns form values; the injected process owns execution and inspection. */
+/** RHFでProfileの入力・検証・保存済み基準値を管理し、保存と照会は共通Processに委ねる。 */
 export const useProfileForm = ({
   onSave,
   onInspect,
@@ -166,7 +166,7 @@ export const useProfileForm = ({
       inspection.kind === "matches" &&
       getValues("nickname").trim() === inspection.value
     ) {
-      // Current server observation is not proof of the earlier mutation.
+      // 現在値が一致しても以前のMutationが成功した証拠にはならない。
       adopt(inspection.value)
     }
   }
