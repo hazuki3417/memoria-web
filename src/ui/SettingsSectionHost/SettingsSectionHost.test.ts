@@ -24,23 +24,23 @@ vi.mock("@/components/SettingsContentStatus/SettingsContentStatus", () => ({
 }))
 
 function Controller({
-      render,
-      status,
-      onMounted,
-    }: {
-      render: SettingsSectionRender
-      status: "loading" | "ready"
-      onMounted: () => void
-    }) {
-      useEffect(() => {
-        onMounted()
-      }, [onMounted])
-      return render(
-        status === "ready"
-          ? { status: "ready", content: createElement("span", null, "Profile UI") }
-          : { status: "loading" },
-      )
-    }
+  render,
+  status,
+  onMounted,
+}: {
+  render: SettingsSectionRender
+  status: "loading" | "ready"
+  onMounted: () => void
+}) {
+  useEffect(() => {
+    onMounted()
+  }, [onMounted])
+  return render(
+    status === "ready"
+      ? { status: "ready", content: createElement("span", null, "Profile UI") }
+      : { status: "loading" },
+  )
+}
 
 describe("SettingsSectionHost", () => {
   let root: Root
@@ -58,8 +58,9 @@ describe("SettingsSectionHost", () => {
   it("keeps the controller mounted while its ready-only content is hidden", () => {
     let mounted = 0
 
-
-    const onMounted = () => { mounted += 1 }
+    const onMounted = () => {
+      mounted += 1
+    }
     const show = (status: "loading" | "ready") => {
       act(() =>
         root.render(
