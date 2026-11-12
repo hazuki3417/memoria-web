@@ -1,265 +1,218 @@
 "use client"
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react"
-import { useController, useForm } from "react-hook-form"
+import { useEffect, useRef, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
-import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { profileSchema } from "./profileSchema"
-import { getProfileBlockedFeedback, type ProfileBlockedFeedback } from "./profileBlockedFeedback"
 import { showNotification } from "@/components/Feedback"
+import { resolveFormInputValidation } from "@/ui/formValidation"
+import { profileSchema } from "./profileSchema"
+import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
 import type { SaveProfile } from "./profileSaveOutcome"
 
 export type InspectProfile = () => Promise<string>
 
 type Inspection =
-  | { status: "idle" | "checking" | "failed" }
-  | { status: "matches" | "differs"; nickname: string }
+  | { kind: "idle" | "checking" | "failed" }
+  | { kind: "matches" | "differs"; nickname: string }
 
-/** Owns Profile form draft, save/inspection state and stale-query protection. */
+type SaveStatus =
+  | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
+  | { kind: "blocked"; feedback: ReturnType<typeof getProfileBlockedFeedback> }
+
 export function useProfileForm({
   onSave,
   onInspect,
   initialNickname,
-  initialSaveState,
+  initialSaveState = "idle",
   blockedMessage,
 }: {
   onSave: SaveProfile
   onInspect?: InspectProfile
   initialNickname: string
-  initialSaveState: "idle" | "saving" | "retryable-error" | "blocked"
+  initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage: string
 }) {
-  const {
-    control,
-    reset,
-    getValues,
-    handleSubmit,
-    setError,
-    clearErrors,
-    formState: { isSubmitted },
-  } = useForm<
-    z.input<typeof profileSchema>,
-    unknown,
-    z.output<typeof profileSchema>
-  >({
+  const form = useForm<z.input<typeof profileSchema>, unknown, z.output<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     mode: "onChange",
     defaultValues: { nickname: initialNickname },
   })
+  const { control, reset, getValues, handleSubmit, setError, clearErrors } = form
   const { field, fieldState } = useController({ control, name: "nickname" })
-  const saved = useRef(initialNickname)
-  const previousSourceNickname = useRef(initialNickname)
-  // Keep a newly confirmed name authoritative until the shared Query echoes it.
-  const awaitingSourceEcho = useRef<string | null>(null)
-  const inspectionGeneration = useRef(0)
-  const submitting = useRef(false)
-  const mounted = useRef(true)
+  const nickname = useWatch({ control, name: "nickname" }) ?? initialNickname
+  const normalized = nickname.trim()
+  const baseline = form.formState.defaultValues?.nickname ?? initialNickname
+  // Dirty is semantic: whitespace around an otherwise unchanged nickname is not a change.
+  const dirty = normalized !== baseline.trim()
+  const validation = profileSchema.safeParse({ nickname })
+  const invalid = !validation.success
 
-  const [saveState, setSaveState] = useState<
-    "idle" | "saving" | "retryable-error" | "blocked" | "unknown"
-  >(initialSaveState)
+  const [status, setStatus] = useState<SaveStatus>(
+    initialSaveState === "blocked"
+      ? { kind: "blocked", feedback: getProfileBlockedFeedback(null, blockedMessage) }
+      : { kind: initialSaveState },
+  )
+  const [inspection, setInspection] = useState<Inspection>({ kind: "idle" })
   const [formInvalid, setFormInvalid] = useState(false)
-  const [blockedFeedback, setBlockedFeedback] =
-    useState<ProfileBlockedFeedback | null>(null)
-  const [inspection, setInspection] = useState<Inspection>({ status: "idle" })
+
+  // Only non-form concerns use refs: the in-flight mutation guard,
+  // stale asynchronous inspection, and the remote Query echo.
+  const inFlight = useRef(false)
+  const inspectVersion = useRef(0)
+  const queryEcho = useRef({ observed: initialNickname, confirmed: null as string | null })
 
   useEffect(() => {
-    mounted.current = true
     return () => {
-      mounted.current = false
-      inspectionGeneration.current += 1
+      inspectVersion.current += 1
     }
   }, [])
 
-  // Untouched Draft follows fresh data. In-flight / failed / unknown Drafts do
-  // not get replaced by a background Query. A stale cache echo cannot undo a
-  // successful save or an explicitly confirmed server observation.
   useEffect(() => {
-    if (previousSourceNickname.current === initialNickname) return
-    previousSourceNickname.current = initialNickname
-    if (saveState === "unknown") return
-    if (awaitingSourceEcho.current !== null) {
-      if (initialNickname !== awaitingSourceEcho.current) return
-      awaitingSourceEcho.current = null
+    if (queryEcho.current.observed === initialNickname) return
+    queryEcho.current.observed = initialNickname
+    if (queryEcho.current.confirmed !== null) {
+      if (initialNickname !== queryEcho.current.confirmed) return
+      queryEcho.current.confirmed = null
     }
-    const draftIsEdited = getValues("nickname").trim() !== saved.current
-    saved.current = initialNickname
-    if (
-      !draftIsEdited &&
-      saveState !== "saving" &&
-      saveState !== "retryable-error"
-    ) {
+    // Server data may refresh while editing; RHF remains authoritative for draft.
+    if (!form.formState.isDirty && !inFlight.current && status.kind === "idle") {
       reset({ nickname: initialNickname })
     }
-  }, [initialNickname, getValues, reset, saveState])
+  }, [initialNickname, form.formState.isDirty, reset, status.kind])
 
-  const validation = profileSchema.safeParse({ nickname: field.value })
-  const normalized = field.value.trim()
-  const dirty = normalized !== saved.current
-  const invalid = !validation.success
-  const showClientError = fieldState.isTouched || isSubmitted
-  const isSaving = saveState === "saving"
-  const isBlocked = saveState === "blocked"
-  const isUnknown = saveState === "unknown"
+  const saving = form.formState.isSubmitting || status.kind === "saving"
+  const blocked = status.kind === "blocked"
+  const unknown = status.kind === "unknown"
   const canRetryInspected =
-    isUnknown &&
-    inspection.status === "differs" &&
+    unknown &&
+    inspection.kind === "differs" &&
     !invalid &&
     normalized !== inspection.nickname
 
-  let saveLabel = "更新"
-  if (saveState === "retryable-error") {
-    saveLabel = "再試行"
-  } else if (isSaving) {
-    saveLabel = "更新中"
-  }
-
-  function adoptCurrentNickname(nickname: string) {
-    inspectionGeneration.current += 1
-    saved.current = nickname
-    awaitingSourceEcho.current = initialNickname === nickname ? null : nickname
+  function adopt(nickname: string) {
+    inspectVersion.current += 1
+    queryEcho.current.confirmed = nickname === initialNickname ? null : nickname
     reset({ nickname })
-    setInspection({ status: "idle" })
-    setSaveState("idle")
+    clearErrors()
     setFormInvalid(false)
-    clearErrors("nickname")
+    setInspection({ kind: "idle" })
+    setStatus({ kind: "idle" })
   }
 
-  const save = handleSubmit(async ({ nickname }) => {
+  const save = handleSubmit(async ({ nickname: confirmedInput }) => {
     if (
-      submitting.current ||
-      isSaving ||
-      isBlocked ||
-      (isUnknown && !canRetryInspected) ||
+      inFlight.current || blocked || saving ||
+      (unknown && !canRetryInspected) ||
       (!dirty && !canRetryInspected)
-    )
-      return
+    ) return
 
-    submitting.current = true
-    inspectionGeneration.current += 1
-    setInspection({ status: "idle" })
-    setSaveState("saving")
-    setBlockedFeedback(null)
+    inFlight.current = true
+    inspectVersion.current += 1
+    setStatus({ kind: "saving" })
+    setInspection({ kind: "idle" })
     setFormInvalid(false)
     clearErrors("nickname")
+
+    // Action input is the normalized RHF snapshot. An exception without an
+    // Outcome is not evidence that a remote mutation was rejected.
     let outcome: Awaited<ReturnType<SaveProfile>>
     try {
-      outcome = await onSave(nickname)
+      outcome = await onSave(confirmedInput)
     } catch {
-      // A failed adapter with no classified operation outcome is unconfirmed.
       outcome = { kind: "unknown" }
+    } finally {
+      inFlight.current = false
     }
-    submitting.current = false
-    // The request may finish after this Section has been unmounted.
-    if (!mounted.current) return
+
     if (outcome.kind === "success") {
-      adoptCurrentNickname(nickname)
+      adopt(confirmedInput)
       showNotification({
         kind: "success",
         title: "プロフィールを保存",
         description: "プロフィールを更新しました。",
       })
-    } else if (outcome.kind === "rejected") {
-      const { reason } = outcome
-      if (reason.kind === "validation") {
-        const result = resolveFormFailureValidation(reason.violations, ["nickname"])
-        if (result.fieldErrors.nickname) {
-          setError("nickname", {
-            type: "server",
-            message: result.fieldErrors.nickname,
-          })
-        }
-        setFormInvalid(result.formError)
-        setSaveState("idle")
-      } else if (reason.kind === "blocked") {
-        setBlockedFeedback(getProfileBlockedFeedback(reason.error, blockedMessage))
-        setSaveState("blocked")
-      } else {
-        setSaveState("retryable-error")
-      }
+    } else if (outcome.kind === "unknown") {
+      setStatus({ kind: "unknown" })
     } else {
-      setSaveState("unknown")
+      const reason = outcome.reason
+      switch (reason.kind) {
+        case "validation": {
+          const errors = resolveFormInputValidation({ violations: reason.violations }, ["nickname"])
+          if (errors.fieldErrors.nickname) {
+            setError("nickname", { type: "server", message: errors.fieldErrors.nickname })
+          }
+          setFormInvalid(errors.formError)
+          setStatus({ kind: "idle" })
+          break
+        }
+        case "blocked":
+          setStatus({
+            kind: "blocked",
+            feedback: getProfileBlockedFeedback(reason.error, blockedMessage),
+          })
+          break
+        case "retryable":
+          setStatus({ kind: "retryable-error" })
+          break
+      }
     }
   })
 
   async function inspectCurrentProfile() {
-    if (!isUnknown || !onInspect || inspection.status === "checking") return
-    const generation = ++inspectionGeneration.current
-    const draftAtStart = getValues("nickname").trim()
-    setInspection({ status: "checking" })
+    if (!onInspect || !unknown || inspection.kind === "checking") return
+    const version = ++inspectVersion.current
+    const attempted = getValues("nickname").trim()
+    setInspection({ kind: "checking" })
     try {
-      const currentNickname = await onInspect()
-      if (
-        generation !== inspectionGeneration.current ||
-        getValues("nickname").trim() !== draftAtStart
-      )
-        return
-      setInspection({
-        status: currentNickname === draftAtStart ? "matches" : "differs",
-        nickname: currentNickname,
-      })
+      const current = await onInspect()
+      if (version !== inspectVersion.current || getValues("nickname").trim() !== attempted) return
+      setInspection({ kind: current === attempted ? "matches" : "differs", nickname: current })
     } catch {
-      if (
-        generation !== inspectionGeneration.current ||
-        getValues("nickname").trim() !== draftAtStart
-      )
-        return
-      setInspection({ status: "failed" })
+      if (version !== inspectVersion.current || getValues("nickname").trim() !== attempted) return
+      setInspection({ kind: "failed" })
     }
   }
 
   function confirmObservedProfile() {
-    if (
-      !isUnknown ||
-      inspection.status !== "matches" ||
-      inspection.nickname !== getValues("nickname").trim()
-    )
-      return
-    // A matching read is an observation, NOT evidence that the old write
-    // succeeded. Intentionally do not emit a success Notification here.
-    adoptCurrentNickname(inspection.nickname)
+    if (unknown && inspection.kind === "matches" &&
+      getValues("nickname").trim() === inspection.nickname) {
+      // A matching observation is not proof that the previous mutation succeeded.
+      adopt(inspection.nickname)
+    }
   }
 
   function discardUnconfirmedDraft() {
-    if (!isUnknown || inspection.status !== "differs") return
-    // Discard is an explicit decision to adopt the inspected server value.
-    adoptCurrentNickname(inspection.nickname)
-  }
-
-
-  const onDraftChange = (event: ChangeEvent<HTMLInputElement>) => {
-    field.onChange(event)
-    clearErrors("nickname")
-    if (isUnknown) {
-      inspectionGeneration.current += 1
-      setInspection({ status: "idle" })
-    }
-    // A form-level server rejection remains visible until another
-    // confirmed submit. Editing alone cannot prove it is resolved.
+    if (unknown && inspection.kind === "differs") adopt(inspection.nickname)
   }
 
   return {
     field,
     fieldState,
     validation,
-    normalized,
     dirty,
     invalid,
-    showClientError,
-    isSaving,
-    isBlocked,
-    isUnknown,
-    canRetryInspected,
-    saveLabel,
-    saveState,
-    formInvalid,
-    blockedFeedback,
+    showClientError: fieldState.isTouched || form.formState.isSubmitted,
+    saving,
+    blocked,
+    unknown,
+    status,
     inspection,
+    formInvalid,
+    normalized,
+    canRetryInspected,
+    saveLabel: saving ? "更新中" : status.kind === "retryable-error" ? "再試行" : "更新",
     save,
+    onDraftChange(event: React.ChangeEvent<HTMLInputElement>) {
+      field.onChange(event)
+      clearErrors("nickname")
+      if (status.kind === "unknown") {
+        inspectVersion.current += 1
+        setInspection({ kind: "idle" })
+      }
+    },
     inspectCurrentProfile,
     confirmObservedProfile,
     discardUnconfirmedDraft,
-    onDraftChange,
   }
 }
