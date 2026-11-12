@@ -14,7 +14,7 @@ import {
 import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
 import type { ProfileSaveRejection, SaveProfile } from "./profileSaveOutcome"
 
-/** Only the GraphQL Operation-specific details belong to this adapter. */
+/** Profile更新のGraphQL結果をAction Outcomeに分類し、確定値照会も提供する。 */
 export const usePersonalProfileSave = () => {
   const client = useApolloClient()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
