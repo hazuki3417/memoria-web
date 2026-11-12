@@ -1,7 +1,7 @@
 import { MockedProvider } from "@apollo/client/testing"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, userEvent, within } from "storybook/test"
-import { PersonalSettingsProfileDocument } from "@/infrastructure/graphql/generated"
+import { expect, userEvent, waitFor, within } from "storybook/test"
+import { PersonalSettingsProfileDocument, UpdateMemoriaUserProfileDocument } from "@/infrastructure/graphql/generated"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import { ConnectedPersonalProfile } from "./ConnectedPersonalProfile"
 
@@ -107,5 +107,111 @@ export const ErrorRetry: Story = {
       await canvas.findByRole("textbox", { name: /ニックネーム/ }),
     ).toHaveValue("サーバー最新の名前")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+
+/** The real Feature -> generated Apollo Mutation -> Outcome -> Form path. */
+const mutationRequest = {
+  query: UpdateMemoriaUserProfileDocument,
+  variables: { input: { nickname: "変更した名前" } },
+}
+
+const saveSuccess = {
+  request: mutationRequest,
+  result: {
+    data: {
+      updateUserProfile: {
+        __typename: "UpdateUserProfileSuccess",
+        user: { id: "user-a", profile: { nickname: "変更した名前" } },
+      },
+    },
+  },
+}
+const saveValidation = {
+  request: mutationRequest,
+  result: {
+    data: {
+      updateUserProfile: {
+        __typename: "InputValidationFailure",
+        violations: [
+          { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["nickname"] }] },
+        ],
+      },
+    },
+  },
+}
+const saveUnknown = {
+  request: mutationRequest,
+  error: new Error("transport response unavailable"),
+}
+
+export const MutationSuccess: Story = {
+  name: "Integration · Typed Successから保存済み状態へ",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[profileSuccess, saveSuccess]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await waitFor(() =>
+      expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled(),
+    )
+    await expect(input).toHaveValue("変更した名前")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const MutationTypedValidation: Story = {
+  name: "Integration · Typed ValidationをField Errorへ反映",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[profileSuccess, saveValidation]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByText("文字数が上限を超えています。")).toBeVisible()
+    await expect(input).toHaveValue("変更した名前")
+  },
+}
+
+export const MutationTransportUnknown: Story = {
+  name: "Integration · 通信結果不明では自動再送しない",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[profileSuccess, saveUnknown]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "プロフィールの保存結果を確認できませんでした",
+    )
+    await expect(input).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeEnabled()
   },
 }
