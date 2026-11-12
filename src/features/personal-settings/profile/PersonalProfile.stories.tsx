@@ -10,12 +10,20 @@ import type { ProfileSaveRejection } from "./profileSaveOutcome"
 type ProfileOutcome = ActionOutcome<void, ProfileSaveRejection>
 const success = (): ProfileOutcome => ({ kind: "success", value: undefined })
 const unknown = (): ProfileOutcome => ({ kind: "unknown" })
-const validation = (violations: Extract<ProfileSaveRejection, { kind: "validation" }>["violations"]): ProfileOutcome =>
-  ({ kind: "rejected", reason: { kind: "validation", violations } })
-const blocked = (error: unknown): ProfileOutcome =>
-  ({ kind: "rejected", reason: { kind: "blocked", error } })
-const retryable = (): ProfileOutcome =>
-  ({ kind: "rejected", reason: { kind: "retryable" })
+const validation = (
+  violations: Extract<ProfileSaveRejection, { kind: "validation" }>["violations"],
+): ProfileOutcome => ({
+  kind: "rejected",
+  reason: { kind: "validation", violations },
+})
+const blocked = (error: unknown): ProfileOutcome => ({
+  kind: "rejected",
+  reason: { kind: "blocked", error },
+})
+const retryable = (): ProfileOutcome => ({
+  kind: "rejected",
+  reason: { kind: "retryable" },
+})
 
 const meta = {
   // Keep the existing Story IDs until a separately agreed catalog migration.
