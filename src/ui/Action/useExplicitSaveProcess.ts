@@ -1,20 +1,13 @@
 "use client"
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
-import type { Action } from "./actionOutcome"
-import { createExplicitSaveProcess } from "./createExplicitSaveProcess"
+import { createExplicitSaveProcess, type ExplicitSaveProcessConfig } from "./createExplicitSaveProcess"
 
 /** 明示保存Processの生成・購読・終了をReactに接続する共通Hook。 */
 export const useExplicitSaveProcess = <Input, Success, Rejection, Observed = never>({
   execute,
   recovery,
-}: {
-  execute: Action<Input, Success, Rejection>
-  recovery?: {
-    inspect: () => Promise<Observed>
-    matches: (observed: Observed, submitted: Input) => boolean
-  }
-}) => {
+}: ExplicitSaveProcessConfig<Input, Success, Rejection, Observed>) => {
   const executeRef = useRef(execute)
   const recoveryRef = useRef(recovery)
 
