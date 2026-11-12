@@ -4,7 +4,18 @@ import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { PersonalProfile } from "./PersonalProfile"
-import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
+import type { ActionOutcome } from "@/ui/Action"
+import type { ProfileSaveRejection } from "./profileSaveOutcome"
+
+type ProfileOutcome = ActionOutcome<void, ProfileSaveRejection>
+const success = (): ProfileOutcome => ({ kind: "success", value: undefined })
+const unknown = (): ProfileOutcome => ({ kind: "unknown" })
+const validation = (violations: Extract<ProfileSaveRejection, { kind: "validation" }>["violations"]): ProfileOutcome =>
+  ({ kind: "rejected", reason: { kind: "validation", violations } })
+const blocked = (error: unknown): ProfileOutcome =>
+  ({ kind: "rejected", reason: { kind: "blocked", error } })
+const retryable = (): ProfileOutcome =>
+  ({ kind: "rejected", reason: { kind: "retryable" })
 
 const meta = {
   // Keep the existing Story IDs until a separately agreed catalog migration.
@@ -12,7 +23,7 @@ const meta = {
   component: PersonalProfile,
   args: {
     initialNickname: "テストユーザー",
-    onSave: fn(async () => undefined),
+    onSave: fn(async () => success()),
   },
   decorators: [
     (Story) => (
@@ -131,7 +142,7 @@ export const ProfileInitiallyBlocked: Story = {
 export const ProfileSaveContract: Story = {
   name: "Interaction · プロフィール保存",
   tags: ["interaction"],
-  args: { onSave: fn(async () => undefined) },
+  args: { onSave: fn(async () => success()) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
@@ -168,13 +179,13 @@ export const ProfileSaveFailed: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn()
-      .mockRejectedValueOnce({ kind: "retryable" })
-      .mockResolvedValue(undefined),
+      .mockResolvedValueOnce(retryable())
+      .mockResolvedValue(success()),
   },
   play: async ({ canvasElement, args }) => {
     args.onSave?.mockReset()
-    args.onSave?.mockRejectedValueOnce({ kind: "retryable" })
-    args.onSave?.mockResolvedValue(undefined)
+    args.onSave?.mockResolvedValueOnce(retryable())
+    args.onSave?.mockResolvedValue(success())
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
     await userEvent.clear(input)
@@ -193,7 +204,7 @@ export const ProfileServerFieldValidation: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw new SettingsInputValidationError([
+      return validation([
         { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["nickname"] }] },
       ])
     }),
@@ -214,7 +225,7 @@ export const ProfileUnknownOutcome: Story = {
   name: "Interaction · Unknown照会一致で明示確認・二重送信なし",
   tags: ["interaction"],
   args: {
-    onSave: fn(async () => { throw new Error("network timeout") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => "変更した名前"),
   },
   play: async ({ canvasElement, args }) => {
@@ -250,7 +261,7 @@ export const ProfileSaveBlocked: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw { kind: "blocked" }
+      return blocked({ kind: "blocked" })
     }),
   },
   play: async ({ canvasElement }) => {
@@ -301,8 +312,8 @@ function ProfileInFlightFixture(args: ComponentProps<typeof PersonalProfile>) {
         {...args}
         initialNickname={nickname}
         onSave={() =>
-          new Promise<void>((resolve) => {
-            resolveSave.current = resolve
+          new Promise<ProfileOutcome>((resolve) => {
+            resolveSave.current = () => resolve(success())
           })
         }
       />
@@ -334,7 +345,7 @@ export const ProfileInFlightContract: Story = {
 export const ProfileNormalizedSave: Story = {
   name: "Interaction · Trim後の名前のみ送信・確定",
   tags: ["interaction"],
-  args: { onSave: fn(async () => undefined) },
+  args: { onSave: fn(async () => success()) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
@@ -352,7 +363,7 @@ export const ProfileServerFormValidation: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw new SettingsInputValidationError([
+      return validation([
         { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
       ])
     }),
@@ -383,7 +394,7 @@ export const ProfileGraphqlDeletingBlocked: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw { graphQLErrors: [{ extensions: { code: "USER_DELETING" } }] }
+      return blocked({ graphQLErrors: [{ extensions: { code: "USER_DELETING" } }] })
     }),
   },
   play: async ({ canvasElement, args }) => {
@@ -407,7 +418,7 @@ export const ProfileGraphqlInternalUnknown: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw { graphQLErrors: [{ extensions: { code: "INTERNAL" } }] }
+      return unknown()
     }),
     onInspect: fn(async () => "現在のサーバー値"),
   },
@@ -459,7 +470,7 @@ export const ProfileUnknownInspectFailure: Story = {
   name: "Interaction · Unknown照会失敗はDraft保持と再照会のみ",
   tags: ["interaction"],
   args: {
-    onSave: fn(async () => { throw new Error("request result missing") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => { throw new Error("read failed") }),
   },
   play: async ({ canvasElement, args }) => {
@@ -482,7 +493,7 @@ export const ProfileUnknownDiscard: Story = {
   name: "Interaction · 不一致の現在値を選んでDraftを破棄",
   tags: ["interaction"],
   args: {
-    onSave: fn(async () => { throw new Error("uncertain") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => "確認した現在値"),
   },
   play: async ({ canvasElement, args }) => {
@@ -507,14 +518,14 @@ export const ProfileUnknownExplicitRetry: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn()
-      .mockRejectedValueOnce(new Error("uncertain"))
-      .mockResolvedValue(undefined),
+      .mockResolvedValueOnce(unknown())
+      .mockResolvedValue(success()),
     onInspect: fn(async () => "以前の名前"),
   },
   play: async ({ canvasElement, args }) => {
     args.onSave?.mockReset()
-    args.onSave?.mockRejectedValueOnce(new Error("uncertain"))
-    args.onSave?.mockResolvedValue(undefined)
+    args.onSave?.mockResolvedValueOnce(unknown())
+    args.onSave?.mockResolvedValue(success())
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
     await userEvent.clear(input)
@@ -541,7 +552,7 @@ function PendingInspectionFixture(args: ComponentProps<typeof PersonalProfile>) 
       </Button>
       <PersonalProfile
         {...args}
-        onSave={async () => { throw new Error("uncertain") }}
+        onSave={async () => { return unknown() }}
         onInspect={() =>
           new Promise<string>((resolve) => {
             resolveInspection.current = resolve
@@ -586,7 +597,7 @@ function ProfileNotificationFixture(args: ComponentProps<typeof PersonalProfile>
 export const ProfileSuccessNotification: Story = {
   name: "Interaction · 明示保存の成功通知は確定後に一度だけ",
   tags: ["interaction"],
-  args: { onSave: fn(async () => undefined) },
+  args: { onSave: fn(async () => success()) },
   render: (args) => <ProfileNotificationFixture {...args} />,
   play: async ({ canvasElement, args }) => {
     notifications.clean()
@@ -610,7 +621,7 @@ export const ProfileUnknownInspectionInvalidation: Story = {
   name: "Interaction · 現在値確認のあと再編集したら確認を無効化",
   tags: ["interaction"],
   args: {
-    onSave: fn(async () => { throw new Error("result missing") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => "保存されたか不明"),
   },
   play: async ({ canvasElement, args }) => {
@@ -653,7 +664,7 @@ export const ProfileFormErrorVisual: Story = {
   tags: ["visual"],
   args: {
     onSave: fn(async () => {
-      throw new SettingsInputValidationError([
+      return validation([
         { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
       ])
     }),
@@ -671,7 +682,7 @@ export const ProfileFormErrorVisual: Story = {
 export const ProfileRetryableVisual: Story = {
   name: "Visual · Profile Retryable Error",
   tags: ["visual"],
-  args: { onSave: fn(async () => { throw { kind: "retryable" } }) },
+  args: { onSave: fn(async () => { return retryable() }) },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
@@ -687,7 +698,7 @@ export const ProfileUnknownDiffersVisual: Story = {
   name: "Visual · Profile Unknown Current vs Draft",
   tags: ["visual"],
   args: {
-    onSave: fn(async () => { throw new Error("unknown") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => "確認した現在値"),
   },
   play: async ({ canvasElement }) => {
@@ -707,7 +718,7 @@ export const ProfileUnknownMatchesVisual: Story = {
   name: "Visual · Profile Unknown Current Matches Draft",
   tags: ["visual"],
   args: {
-    onSave: fn(async () => { throw new Error("unknown") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => "入力した名前"),
   },
   play: async ({ canvasElement }) => {
@@ -728,7 +739,7 @@ export const ProfileBlockedVisual: Story = {
   tags: ["visual"],
   args: {
     onSave: fn(async () => {
-      throw { graphQLErrors: [{ extensions: { code: "UNAUTHENTICATED" } }] }
+      return blocked({ graphQLErrors: [{ extensions: { code: "UNAUTHENTICATED" } }] })
     }),
   },
   play: async ({ canvasElement }) => {
