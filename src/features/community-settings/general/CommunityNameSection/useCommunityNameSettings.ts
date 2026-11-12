@@ -9,7 +9,6 @@ import { useExplicitSave, resolveConfirmedSourceSync } from "@/ui/ExplicitSave"
 import type { SaveActionResult } from "@/ui/SaveAction"
 import { communityNameSchema } from "./communityNameSchema"
 import { showNotification } from "@/components/Feedback"
-import type { CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
 
 /** Community名のRHF Draft、確認済みBaselineと取得値同期を所有する。 */
 export function useCommunityNameSettings({
@@ -109,16 +108,7 @@ export function useCommunityNameSettings({
     clearErrors("name")
     await saveAction.save(name)
   })
-  const save = () => { void submit() }
-
-  const inspection: CommunityNameInspection =
-    saveAction.inspection.status === "matches" ||
-    saveAction.inspection.status === "differs"
-      ? {
-          status: saveAction.inspection.status,
-          name: saveAction.inspection.value,
-        }
-      : { status: saveAction.inspection.status }
+  const save = submit
 
   return {
     draft,
@@ -139,7 +129,7 @@ export function useCommunityNameSettings({
     failure: saveAction.failure,
     blockedFeedback: saveAction.blockedFeedback,
     inspect: saveAction.inspectCurrent,
-    inspection,
+    inspection: saveAction.inspection,
     confirmObservation: saveAction.confirmObservation,
     discardUnconfirmed: saveAction.discardUnconfirmed,
     canResaveInspected: saveAction.canResaveInspected,
