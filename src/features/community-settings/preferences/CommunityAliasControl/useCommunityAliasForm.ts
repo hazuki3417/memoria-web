@@ -10,10 +10,6 @@ import type { SaveActionResult } from "@/ui/SaveAction"
 import { communityAliasSchema } from "./communityAliasSchema"
 import { showNotification } from "@/components/Feedback"
 
-type AliasInspection =
-  | { status: "idle" | "checking" | "failed" }
-  | { status: "matches" | "differs"; alias: string | null }
-
 /** Community AliasのRHF Draft、確認済みBaselineと取得値同期を所有する。 */
 export function useCommunityAliasForm({
   savedAlias,
@@ -115,22 +111,13 @@ export function useCommunityAliasForm({
     // Form-level server errors remain visible until another submit.
   }
 
-  const inspection: AliasInspection =
-    saveAction.inspection.status === "matches" ||
-    saveAction.inspection.status === "differs"
-      ? {
-          status: saveAction.inspection.status,
-          alias: saveAction.inspection.value,
-        }
-      : { status: saveAction.inspection.status }
-
   return {
     field, fieldState, text,
     isSaving: saveAction.isSaving,
     isInputDisabled: saveAction.isInputDisabled,
     failure: saveAction.failure, formInvalid,
     blockedFeedback: saveAction.blockedFeedback,
-    inspection,
+    inspection: saveAction.inspection,
     inspect: async () => { await saveAction.inspectCurrent?.() },
     canResaveInspected: saveAction.canResaveInspected,
     confirmObservation: saveAction.confirmObservation,
