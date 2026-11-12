@@ -2,12 +2,13 @@
 
 import { Button, Stack } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
+import { getProfileSaveFeedback, type ProfileFeedbackItem } from "./profileSaveFeedback"
 import type { useProfileForm, InspectProfile } from "./useProfileForm"
 
 type ProfileForm = ReturnType<typeof useProfileForm>
 
-/** Profile保存の失敗・成否不明・変更不可を利用者に伝え、必要な再試行や確認の導線を提供する。 */
-export function ProfileSaveFeedback({
+/** 保存状態を利用者向けの案内として表示し、結果不明時の照会・確認・再保存・破棄を提供する。 */
+export const ProfileSaveFeedback = ({
   model,
   onInspect,
   blockedMessage,
@@ -15,7 +16,7 @@ export function ProfileSaveFeedback({
   model: ProfileForm
   onInspect?: InspectProfile
   blockedMessage: string
-}) {
+}) => {
   const {
     status,
     inspection,
@@ -28,111 +29,78 @@ export function ProfileSaveFeedback({
     save,
   } = model
 
+  const feedbacks = getProfileSaveFeedback({
+    status,
+    inspection,
+    formInvalid,
+    normalized,
+    canInspect: Boolean(onInspect),
+    blockedMessage,
+  })
+
+  const getActions = (feedback: ProfileFeedbackItem) => {
+    if (feedback.id !== "unknown" || !onInspect) return undefined
+
+    return (
+      <>
+        <Button
+          size="xs"
+          variant="light"
+          loading={inspection.kind === "checking"}
+          onClick={() => void inspectCurrentProfile()}
+        >
+          {inspection.kind === "idle" ||
+          inspection.kind === "failed" ||
+          inspection.kind === "checking"
+            ? "現在の状態を確認"
+            : "もう一度確認"}
+        </Button>
+        {inspection.kind === "matches" && (
+          <Button size="xs" onClick={confirmObservedProfile}>
+            確認完了
+          </Button>
+        )}
+        {inspection.kind === "differs" && (
+          <>
+            <Button
+              size="xs"
+              disabled={!canRetryInspected}
+              onClick={() => void save()}
+            >
+              もう一度保存
+            </Button>
+            <Button
+              size="xs"
+              variant="subtle"
+              color="gray"
+              onClick={discardUnconfirmedDraft}
+            >
+              変更を破棄
+            </Button>
+          </>
+        )}
+      </>
+    )
+  }
+
   return (
     <>
-      {status.kind === "retryable-error" && (
+      {feedbacks.map((feedback) => (
         <FeedbackPanel
-          kind="error"
-          title="プロフィールを保存できませんでした"
+          key={feedback.id}
+          kind={feedback.kind}
+          title={feedback.title}
           role="alert"
+          actions={getActions(feedback)}
         >
-          入力した名前は保持しています。下の「再試行」ボタンからもう一度保存できます。
+          {feedback.id === "unknown" ? (
+            <Stack gap="xs">
+              <span>{feedback.description}</span>
+              {feedback.details?.map((detail) => <span key={detail}>{detail}</span>)}
+            </Stack>
+          ) : feedback.description}
         </FeedbackPanel>
-      )}
-      {formInvalid && (
-        <FeedbackPanel
-          kind="error"
-          title="入力内容を確認してください"
-          role="alert"
-        >
-          入力した値を受け付けられませんでした。内容を見直して、もう一度保存してください。
-          編集しただけでは問題が解消したとは限りません。
-        </FeedbackPanel>
-      )}
-      {status.kind === "unknown" && (
-        <FeedbackPanel
-          kind="warning"
-          title="プロフィールの保存結果を確認できませんでした"
-          role="alert"
-          actions={
-            onInspect ? (
-              <>
-                <Button
-                  size="xs"
-                  variant="light"
-                  loading={inspection.kind === "checking"}
-                  onClick={() => void inspectCurrentProfile()}
-                >
-                  {inspection.kind === "idle" ||
-                  inspection.kind === "failed" ||
-                  inspection.kind === "checking"
-                    ? "現在の状態を確認"
-                    : "もう一度確認"}
-                </Button>
-                {inspection.kind === "matches" && (
-                  <Button size="xs" onClick={confirmObservedProfile}>
-                    確認完了
-                  </Button>
-                )}
-                {inspection.kind === "differs" && (
-                  <>
-                    <Button
-                      size="xs"
-                      disabled={!canRetryInspected}
-                      onClick={() => void save()}
-                    >
-                      もう一度保存
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="subtle"
-                      color="gray"
-                      onClick={discardUnconfirmedDraft}
-                    >
-                      変更を破棄
-                    </Button>
-                  </>
-                )}
-              </>
-            ) : undefined
-          }
-        >
-          <Stack gap="xs">
-            <span>
-              入力した名前は保持しています。前の保存が成功したかは分からないため、自動で再送しません。
-            </span>
-            {inspection.kind === "matches" && (
-              <span>
-                現在のプロフィールは入力内容と一致しています。元の保存処理が成功した証明ではありません。内容を確認した場合は「確認完了」を選んでください。
-              </span>
-            )}
-            {inspection.kind === "differs" && (
-              <span>
-                現在のニックネームは「{inspection.value}」です。入力内容の「{normalized}」とは異なります。必要な場合だけ、もう一度保存するか、変更を破棄してください。
-              </span>
-            )}
-            {inspection.kind === "failed" && (
-              <span>
-                現在のプロフィールを取得できませんでした。保存操作は再送せず、状態の確認をやり直してください。
-              </span>
-            )}
-            {!onInspect && (
-              <span>
-                この画面では現在の状態を照会できません。入力内容を控えてから画面を再読み込みしてください。
-              </span>
-            )}
-          </Stack>
-        </FeedbackPanel>
-      )}
-      {status.kind === "blocked" && (
-        <FeedbackPanel
-          kind="error"
-          title={status.feedback.title}
-          role="alert"
-        >
-          {status.feedback.description || blockedMessage}
-        </FeedbackPanel>
-      )}
+      ))}
     </>
   )
 }
