@@ -1,10 +1,13 @@
-/** Public GraphQL codes carry meaning; never copy server error messages into UI. */
+/**
+ * Public code -> UI guidance for an operation that has already been
+ * classified as blocked. This module never decides whether a write succeeded.
+ */
 export type ProfileBlockedFeedback = {
   title: string
   description: string
 }
 
-const BLOCKED_FEEDBACK = {
+const messages = {
   UNAUTHENTICATED: {
     title: "ログインが必要です",
     description:
@@ -32,56 +35,36 @@ const BLOCKED_FEEDBACK = {
   },
 } as const satisfies Record<string, ProfileBlockedFeedback>
 
-type ProfileBlockedCode = keyof typeof BLOCKED_FEEDBACK
+type PublicCode = keyof typeof messages
 
-const GENERIC_FEEDBACK: ProfileBlockedFeedback = {
-  title: "プロフィールを変更できません",
-  description:
-    "現在の状態では保存を続けられません。ページを再読み込みして、プロフィールの状態を確認してください。",
-}
+function getCodes(error: unknown): string[] {
+  if (!error || typeof error !== "object") return []
+  const source =
+    "graphQLErrors" in error ? error.graphQLErrors :
+    "errors" in error ? error.errors : undefined
+  if (!Array.isArray(source)) return []
 
-function publicGraphqlCodes(error: unknown): Array<string | null> {
-  if (typeof error !== "object" || error === null) return []
-  const errors =
-    "graphQLErrors" in error && Array.isArray(error.graphQLErrors)
-      ? error.graphQLErrors
-      : "errors" in error && Array.isArray(error.errors)
-        ? error.errors
-        : []
-  return errors.map((item: unknown) => {
-    if (typeof item !== "object" || item === null || !("extensions" in item))
-      return null
+  return source.map((item: unknown) => {
+    if (!item || typeof item !== "object" || !("extensions" in item)) return ""
     const extensions = item.extensions
-    if (
-      typeof extensions !== "object" ||
-      extensions === null ||
-      !("code" in extensions)
-    )
-      return null
-    return typeof extensions.code === "string" ? extensions.code : null
+    return extensions && typeof extensions === "object" && "code" in extensions &&
+      typeof extensions.code === "string" ? extensions.code : ""
   })
 }
 
-/**
- * A mixed list of errors cannot be assigned a single specific explanation.
- * The caller must first establish the blocked classification.
- */
 export function getProfileBlockedFeedback(
   error: unknown,
-  fallbackDescription?: string,
+  fallbackDescription =
+    "現在の状態では保存を続けられません。ページを再読み込みして、プロフィールの状態を確認してください。",
 ): ProfileBlockedFeedback {
-  const codes = publicGraphqlCodes(error)
+  const codes = getCodes(error)
   const code = codes[0]
   if (
-    code !== undefined &&
-    code !== null &&
+    code &&
     codes.every((candidate) => candidate === code) &&
-    Object.prototype.hasOwnProperty.call(BLOCKED_FEEDBACK, code)
+    Object.prototype.hasOwnProperty.call(messages, code)
   ) {
-    return BLOCKED_FEEDBACK[code as ProfileBlockedCode]
+    return messages[code as PublicCode]
   }
-  return {
-    ...GENERIC_FEEDBACK,
-    description: fallbackDescription ?? GENERIC_FEEDBACK.description,
-  }
+  return { title: "プロフィールを変更できません", description: fallbackDescription }
 }
