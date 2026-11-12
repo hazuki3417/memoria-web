@@ -122,7 +122,7 @@ export function useCommunityAliasForm({
           status: saveAction.inspection.status,
           alias: saveAction.inspection.value,
         }
-      : saveAction.inspection
+      : { status: saveAction.inspection.status }
 
   return {
     field, fieldState, text,
