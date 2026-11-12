@@ -45,7 +45,7 @@ export function CommunityAliasControl({
       <Box>
         <Button
           size="sm"
-          loading={saving}
+          loading={isSaving}
           disabled={!canSubmit}
           onClick={() => void save()}
         >
