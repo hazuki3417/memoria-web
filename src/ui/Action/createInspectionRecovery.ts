@@ -26,29 +26,34 @@ export function createInspectionRecovery<Input, Observed>({
     }
   }
 
-  return {
-    getSnapshot: () => state,
-    invalidate() {
-      revision += 1
-      if (state.kind !== "idle") publish({ kind: "idle" })
-    },
-    async run(input: Input): Promise<InspectionResult<Observed>> {
-      if (closed) return state
-      const request = ++revision
-      publish({ kind: "checking" })
-      try {
-        const value = await inspect()
-        if (closed || request !== revision) return state
-        publish({ kind: matches(value, input) ? "matches" : "differs", value })
-      } catch {
-        if (closed || request !== revision) return state
-        publish({ kind: "failed" })
-      }
-      return state
-    },
-    close() {
-      closed = true
-      revision += 1
-    },
+  function getSnapshot() {
+    return state
   }
+
+  function invalidate() {
+    revision += 1
+    if (state.kind !== "idle") publish({ kind: "idle" })
+  }
+
+  async function run(input: Input): Promise<InspectionResult<Observed>> {
+    if (closed) return state
+    const request = ++revision
+    publish({ kind: "checking" })
+    try {
+      const value = await inspect()
+      if (closed || request !== revision) return state
+      publish({ kind: matches(value, input) ? "matches" : "differs", value })
+    } catch {
+      if (closed || request !== revision) return state
+      publish({ kind: "failed" })
+    }
+    return state
+  }
+
+  function close() {
+    closed = true
+    revision += 1
+  }
+
+  return { getSnapshot, invalidate, run, close }
 }
