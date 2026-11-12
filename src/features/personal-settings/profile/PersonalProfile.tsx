@@ -10,7 +10,7 @@ import type { SaveProfile } from "./profileSaveOutcome"
 const blockedDescription =
   "現在の状態では保存を続けられません。ページを再読み込みして、プロフィールの状態を確認してください。"
 
-/** Profileの入力・保存操作・結果Feedbackを設定画面に表示する。 */
+/** 利用者がNicknameを編集・保存し、保存失敗や結果不明時の案内と復旧操作を利用できる画面を提供する。 */
 export function PersonalProfile({
   onSave,
   onInspect,
