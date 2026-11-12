@@ -164,8 +164,15 @@ const saveUnknown = {
   error: new Error("transport response unavailable"),
 }
 
+const saveExecutionUnknown = {
+  request: mutationRequest,
+  result: {
+    errors: [new GraphQLError("Execution failure", { extensions: { code: "INTERNAL" } })],
+  },
+}
+
 export const MutationSuccess: Story = {
-  name: "Integration · Typed Successから保存済み状態へ",
+  name: "Interaction · Typed Successから保存済み状態へ",
   tags: ["interaction"],
   decorators: [
     (Story) => (
@@ -189,7 +196,7 @@ export const MutationSuccess: Story = {
 }
 
 export const MutationTypedValidation: Story = {
-  name: "Integration · Typed ValidationをField Errorへ反映",
+  name: "Interaction · Typed ValidationをField Errorへ反映",
   tags: ["interaction"],
   decorators: [
     (Story) => (
@@ -210,7 +217,7 @@ export const MutationTypedValidation: Story = {
 }
 
 export const MutationTransportUnknown: Story = {
-  name: "Integration · 通信結果不明では自動再送しない",
+  name: "Interaction · 通信結果不明では自動再送しない",
   tags: ["interaction"],
   decorators: [
     (Story) => (
@@ -235,8 +242,40 @@ export const MutationTransportUnknown: Story = {
 }
 
 
+
+export const MutationExecutionUnknown: Story = {
+  name: "Interaction · GraphQL実行エラー後は状態照会から手動復旧",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[profileSuccess, saveExecutionUnknown, profileSuccess]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "プロフィールの保存結果を確認できませんでした",
+    )
+    await expect(input).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "変更を破棄" })).toBeVisible()
+    await expect(input).toHaveValue("変更した名前")
+  },
+}
+
 export const MutationMissingTypedResult: Story = {
-  name: "Integration · Typed Result欠落でも成功と誤判定しない",
+  name: "Interaction · Typed Result欠落でも成功と誤判定しない",
   tags: ["interaction"],
   decorators: [
     (Story) => (
@@ -261,7 +300,7 @@ export const MutationMissingTypedResult: Story = {
 
 
 export const MutationBlocked: Story = {
-  name: "Integration · APIのBlockedでは編集と再送を停止",
+  name: "Interaction · APIのBlockedでは編集と再送を停止",
   tags: ["interaction"],
   decorators: [
     (Story) => (
@@ -286,7 +325,7 @@ export const MutationBlocked: Story = {
 
 
 export const MutationCanonicalNickname: Story = {
-  name: "Integration · 保存レスポンスの確定値をRHF Baselineに採用",
+  name: "Interaction · 保存レスポンスの確定値をRHF Baselineに採用",
   tags: ["interaction"],
   decorators: [
     (Story) => (
