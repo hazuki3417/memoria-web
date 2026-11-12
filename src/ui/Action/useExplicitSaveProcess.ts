@@ -9,7 +9,7 @@ import { createExplicitSaveProcess } from "./createExplicitSaveProcess"
  * All consumers get the same subscription, latest-callback and teardown
  * behavior without reimplementing lifecycle effects in their Features.
  */
-export function useExplicitSaveProcess<Input, Success, Rejection, Observed = never>({
+export const useExplicitSaveProcess = <Input, Success, Rejection, Observed = never>({
   execute,
   recovery,
 }: {
@@ -18,7 +18,7 @@ export function useExplicitSaveProcess<Input, Success, Rejection, Observed = nev
     inspect: () => Promise<Observed>
     matches: (observed: Observed, submitted: Input) => boolean
   }
-}) {
+}) => {
   const executeRef = useRef(execute)
   const recoveryRef = useRef(recovery)
 
@@ -27,27 +27,27 @@ export function useExplicitSaveProcess<Input, Success, Rejection, Observed = nev
     recoveryRef.current = recovery
   }, [execute, recovery])
 
-  function executeLatest(input: Input) {
+  const executeLatest = (input: Input) => {
     return executeRef.current(input)
-  }
+  };
 
-  function inspectLatest() {
+  const inspectLatest = () => {
     const current = recoveryRef.current
     return current
       ? current.inspect()
       : Promise.reject(new Error("Inspection unavailable"))
-  }
+  };
 
-  function matchesLatest(observed: Observed, input: Input) {
+  const matchesLatest = (observed: Observed, input: Input) => {
     return recoveryRef.current?.matches(observed, input) ?? false
-  }
+  };
 
-  function createProcess() {
+  const createProcess = () => {
     return createExplicitSaveProcess<Input, Success, Rejection, Observed>({
       execute: executeLatest,
       recovery: recovery ? { inspect: inspectLatest, matches: matchesLatest } : undefined,
     })
-  }
+  };
 
   const [process] = useState(createProcess)
 
@@ -71,4 +71,4 @@ export function useExplicitSaveProcess<Input, Success, Rejection, Observed = nev
   }, [process])
 
   return { process, snapshot }
-}
+};
