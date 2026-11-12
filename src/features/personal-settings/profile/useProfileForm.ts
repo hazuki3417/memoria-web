@@ -1,25 +1,23 @@
 "use client"
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore, type ChangeEvent } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
 import { showNotification } from "@/components/Feedback"
+import { createExplicitSaveProcess } from "@/ui/Action"
 import { resolveFormInputValidation } from "@/ui/formValidation"
 import { profileSchema } from "./profileSchema"
 import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
-import type { SaveProfile } from "./profileSaveOutcome"
+import type { SaveProfile, ProfileSaveRejection } from "./profileSaveOutcome"
 
 export type InspectProfile = () => Promise<string>
-
-type Inspection =
-  | { kind: "idle" | "checking" | "failed" }
-  | { kind: "matches" | "differs"; nickname: string }
 
 type SaveStatus =
   | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
   | { kind: "blocked"; feedback: ReturnType<typeof getProfileBlockedFeedback> }
 
+/** RHF owns form values; the injected process owns execution and inspection. */
 export function useProfileForm({
   onSave,
   onInspect,
@@ -43,33 +41,43 @@ export function useProfileForm({
   const nickname = useWatch({ control, name: "nickname" }) ?? initialNickname
   const normalized = nickname.trim()
   const baseline = form.formState.defaultValues?.nickname ?? initialNickname
-  // Dirty is semantic: whitespace around an otherwise unchanged nickname is not a change.
   const dirty = normalized !== baseline.trim()
   const validation = profileSchema.safeParse({ nickname })
   const invalid = !validation.success
+
+  const saveRef = useRef(onSave)
+  const inspectRef = useRef(onInspect)
+  saveRef.current = onSave
+  inspectRef.current = onInspect
+
+  const [process] = useState(() => createExplicitSaveProcess<string, string, ProfileSaveRejection, string>({
+    execute: (input) => saveRef.current(input),
+    recovery: {
+      inspect: () => {
+        if (!inspectRef.current) return Promise.reject(new Error("Profile inspection unavailable"))
+        return inspectRef.current()
+      },
+      matches: (observed, submitted) => observed === submitted,
+    },
+  }))
+  const processState = useSyncExternalStore(process.subscribe, process.getSnapshot, process.getSnapshot)
 
   const [status, setStatus] = useState<SaveStatus>(
     initialSaveState === "blocked"
       ? { kind: "blocked", feedback: getProfileBlockedFeedback(null, blockedMessage) }
       : { kind: initialSaveState },
   )
-  const [inspection, setInspection] = useState<Inspection>({ kind: "idle" })
   const [formInvalid, setFormInvalid] = useState(false)
-
-  // Non-form refs are limited to asynchronous operation lifetime/ordering
-  // and server Query echo protection; RHF owns draft, errors, and baseline.
-  const inFlight = useRef(false)
   const alive = useRef(true)
-  const inspectVersion = useRef(0)
   const queryEcho = useRef({ observed: initialNickname, confirmed: null as string | null })
 
   useEffect(() => {
     alive.current = true
     return () => {
       alive.current = false
-      inspectVersion.current += 1
+      process.close()
     }
-  }, [])
+  }, [process])
 
   useEffect(() => {
     if (queryEcho.current.observed === initialNickname) return
@@ -78,57 +86,44 @@ export function useProfileForm({
       if (initialNickname !== queryEcho.current.confirmed) return
       queryEcho.current.confirmed = null
     }
-    // Server data may refresh while editing; RHF remains authoritative for draft.
-    if (!form.formState.isDirty && !inFlight.current && status.kind === "idle") {
+    if (!form.formState.isDirty && !processState.busy && status.kind === "idle") {
       reset({ nickname: initialNickname })
     }
-  }, [initialNickname, form.formState.isDirty, reset, status.kind])
+  }, [initialNickname, form.formState.isDirty, reset, processState.busy, status.kind])
 
-  const saving = form.formState.isSubmitting || status.kind === "saving"
+  const saving = processState.busy || status.kind === "saving" || form.formState.isSubmitting
   const blocked = status.kind === "blocked"
   const unknown = status.kind === "unknown"
+  const inspection = processState.inspection
   const canRetryInspected =
     unknown &&
     inspection.kind === "differs" &&
     !invalid &&
-    normalized !== inspection.nickname
+    normalized !== inspection.value
 
-  function adopt(nickname: string) {
-    inspectVersion.current += 1
-    queryEcho.current.confirmed = nickname === initialNickname ? null : nickname
-    reset({ nickname })
+  function adopt(value: string) {
+    process.invalidateInspection()
+    queryEcho.current.confirmed = value === initialNickname ? null : value
+    reset({ nickname: value })
     clearErrors()
     setFormInvalid(false)
-    setInspection({ kind: "idle" })
     setStatus({ kind: "idle" })
   }
 
-  const save = handleSubmit(async ({ nickname: confirmedInput }) => {
+  const save = handleSubmit(async ({ nickname: input }) => {
     if (
-      inFlight.current || blocked || saving ||
+      process.getSnapshot().busy ||
+      blocked ||
+      status.kind === "saving" ||
       (unknown && !canRetryInspected) ||
       (!dirty && !canRetryInspected)
     ) return
 
-    inFlight.current = true
-    inspectVersion.current += 1
-    setStatus({ kind: "saving" })
-    setInspection({ kind: "idle" })
     setFormInvalid(false)
     clearErrors("nickname")
+    const outcome = await process.submit(input)
+    if (!alive.current || outcome === null) return
 
-    // Action input is the normalized RHF snapshot. An exception without an
-    // Outcome is not evidence that a remote mutation was rejected.
-    let outcome: Awaited<ReturnType<SaveProfile>>
-    try {
-      outcome = await onSave(confirmedInput)
-    } catch {
-      outcome = { kind: "unknown" }
-    } finally {
-      inFlight.current = false
-    }
-
-    if (!alive.current) return
     if (outcome.kind === "success") {
       adopt(outcome.value)
       showNotification({
@@ -164,30 +159,23 @@ export function useProfileForm({
   })
 
   async function inspectCurrentProfile() {
-    if (!onInspect || !unknown || inspection.kind === "checking") return
-    const version = ++inspectVersion.current
-    const attempted = getValues("nickname").trim()
-    setInspection({ kind: "checking" })
-    try {
-      const current = await onInspect()
-      if (!alive.current || version !== inspectVersion.current || getValues("nickname").trim() !== attempted) return
-      setInspection({ kind: current === attempted ? "matches" : "differs", nickname: current })
-    } catch {
-      if (!alive.current || version !== inspectVersion.current || getValues("nickname").trim() !== attempted) return
-      setInspection({ kind: "failed" })
-    }
+    if (!unknown || !onInspect || inspection.kind === "checking") return
+    await process.inspect(getValues("nickname").trim())
   }
 
   function confirmObservedProfile() {
-    if (unknown && inspection.kind === "matches" &&
-      getValues("nickname").trim() === inspection.nickname) {
-      // A matching observation is not proof that the previous mutation succeeded.
-      adopt(inspection.nickname)
+    if (
+      unknown &&
+      inspection.kind === "matches" &&
+      getValues("nickname").trim() === inspection.value
+    ) {
+      // Current server observation is not proof of the earlier mutation.
+      adopt(inspection.value)
     }
   }
 
   function discardUnconfirmedDraft() {
-    if (unknown && inspection.kind === "differs") adopt(inspection.nickname)
+    if (unknown && inspection.kind === "differs") adopt(inspection.value)
   }
 
   return {
@@ -210,10 +198,7 @@ export function useProfileForm({
     onDraftChange(event: ChangeEvent<HTMLInputElement>) {
       field.onChange(event)
       clearErrors("nickname")
-      if (status.kind === "unknown") {
-        inspectVersion.current += 1
-        setInspection({ kind: "idle" })
-      }
+      if (status.kind === "unknown") process.invalidateInspection()
     },
     inspectCurrentProfile,
     confirmObservedProfile,
