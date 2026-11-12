@@ -15,10 +15,8 @@ export type ProfileFeedbackSection = {
  * Multiple simultaneous panels are preserved from the existing UI contract.
  */
 export function resolveProfileSaveFeedback({
-  saveState,
+  failure,
   formInvalid,
-  isUnknown,
-  isBlocked,
   blockedFeedback,
   inspection,
   normalized,
@@ -26,10 +24,8 @@ export function resolveProfileSaveFeedback({
   hasInspector,
 }: Pick<
   FormModel,
-  | "saveState"
+  | "failure"
   | "formInvalid"
-  | "isUnknown"
-  | "isBlocked"
   | "blockedFeedback"
   | "inspection"
   | "normalized"
@@ -39,7 +35,7 @@ export function resolveProfileSaveFeedback({
 }): ProfileFeedbackSection[] {
   const feedback: ProfileFeedbackSection[] = []
 
-  if (saveState === "retryable-error") {
+  if (failure === "retryable") {
     feedback.push({
       id: "retryable",
       kind: "error",
@@ -59,7 +55,7 @@ export function resolveProfileSaveFeedback({
     })
   }
 
-  if (isUnknown) {
+  if (failure === "unknown") {
     const details: string[] = []
 
     if (inspection.status === "matches") {
@@ -93,7 +89,7 @@ export function resolveProfileSaveFeedback({
     })
   }
 
-  if (isBlocked) {
+  if (failure === "blocked") {
     feedback.push({
       id: "blocked",
       kind: "error",
