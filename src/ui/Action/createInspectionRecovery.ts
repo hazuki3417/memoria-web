@@ -13,7 +13,7 @@ type InspectionRecoveryConfig<Input, Observed> =
     onChange?: (snapshot: InspectionResult<Observed>) => void
   }
 
-/** 現在値の照会と入力との比較を担い、古い照会結果の反映を防ぐRecovery部品を生成する。 */
+/** 保存結果が不明な場合に現在値との一致を利用者が確認できるよう、照会・比較・古い照会の失効を提供する。 */
 export const createInspectionRecovery = <Input, Observed>({
   inspect,
   matches,
