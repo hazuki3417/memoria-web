@@ -12,6 +12,7 @@ import {
   classifySettingsSaveFailure,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
+import { classifyProfileMutationResult } from "./classifyProfileMutationResult"
 import type { ProfileSaveRejection, SaveProfile } from "./profileSaveOutcome"
 
 /** Profile保存を共通Actionとして実行し、更新結果の判定と結果不明時の現状確認を画面へ提供する。 */
@@ -37,15 +38,7 @@ export const useProfileSave = () => {
     response: Awaited<ReturnType<typeof execute>>,
   ): ActionOutcome<string, ProfileSaveRejection> => {
     const result = response.data?.updateUserProfile
-    if (result?.__typename === "UpdateUserProfileSuccess") {
-      return { kind: "success", value: result.user.profile.nickname }
-    }
-    if (result?.__typename === "InputValidationFailure") {
-      return {
-        kind: "rejected",
-        reason: { kind: "validation", violations: result.violations },
-      }
-    }
+    if (result) return classifyProfileMutationResult(result)
     if (response.errors?.length) {
       return classifyBlocked(new SettingsGraphQLExecutionError(response.errors))
     }
