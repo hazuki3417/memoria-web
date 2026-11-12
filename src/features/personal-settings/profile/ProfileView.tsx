@@ -29,7 +29,6 @@ export const ProfileView = ({
     onInspect,
     initialNickname,
     initialSaveState,
-    blockedMessage,
   })
 
   const { field, fieldState, validation } = form
