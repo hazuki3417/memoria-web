@@ -2,29 +2,35 @@
 
 import { usePersonalSettingsProfileQuery } from "@/infrastructure/graphql/generated"
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
+import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 import { PersonalProfile } from "./PersonalProfile"
 import { usePersonalProfileSave } from "./usePersonalProfileSave"
-import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
-import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
-/** Profile-scoped authoritative read, actions and status interpretation. */
-export function ConnectedPersonalProfile({ render }: { render: SettingsSectionRender }) {
-  const profile = usePersonalSettingsProfileQuery({
+/**
+ * Composes the Profile Query, mutation Action, and recovery read.
+ * The screen only mounts after the required server data is available.
+ */
+export function ConnectedPersonalProfile({
+  render,
+}: {
+  render: SettingsSectionRender
+}) {
+  const query = usePersonalSettingsProfileQuery({
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
-  const { inspectProfile } = usePersonalSettingsInspection()
-  const { saveProfile } = usePersonalProfileSave()
-  const nickname = profile.data?.me?.profile.nickname
+  const { saveProfile, inspectProfile } = usePersonalProfileSave()
+  const nickname = query.data?.me?.profile.nickname
 
-  usePersonalSettingsRefreshError(Boolean(nickname !== undefined && profile.error))
+  usePersonalSettingsRefreshError(nickname !== undefined && Boolean(query.error))
+
   if (nickname === undefined) {
     return render(
-      profile.loading
+      query.loading
         ? { status: "loading" }
         : {
             status: "error",
-            retry: () => { void profile.refetch().catch(() => undefined) },
+            retry: () => { void query.refetch().catch(() => undefined) },
           },
     )
   }
@@ -33,9 +39,9 @@ export function ConnectedPersonalProfile({ render }: { render: SettingsSectionRe
     status: "ready",
     content: (
       <PersonalProfile
+        initialNickname={nickname}
         onSave={saveProfile}
         onInspect={inspectProfile}
-        initialNickname={nickname}
       />
     ),
   })
