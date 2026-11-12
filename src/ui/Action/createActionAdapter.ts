@@ -17,7 +17,7 @@ export function createActionAdapter<Input, Response, Success, Rejection>({
   /** Post-action sync is not part of the confirmed mutation outcome. */
   afterSuccess?: (success: Success, input: Input) => void | Promise<void>
 }): Action<Input, Success, Rejection> {
-  return async (input) => {
+  async function run(input: Input): Promise<ActionOutcome<Success, Rejection>> {
     let result: Response
     try {
       result = await execute(input)
@@ -47,4 +47,6 @@ export function createActionAdapter<Input, Response, Success, Rejection>({
     }
     return outcome
   }
+
+  return run
 }
