@@ -7,29 +7,61 @@ import {
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
 import {
-  SettingsInputValidationError,
-  requireSettingsMutationOutcome,
+  SettingsGraphQLExecutionError,
+  classifySettingsSaveFailure,
 } from "@/infrastructure/graphql/settingsMutationResult"
+import type { SaveProfile } from "./profileSaveOutcome"
 
-/** Profile保存と確定後のCurrentUser再取得を所有する。 */
+/** Classifies the typed operation result and keeps follow-up Query separate. */
 export function usePersonalProfileSave() {
   const client = useApolloClient()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
 
-  return {
-    saveProfile: async (nickname: string) => {
-      const result = await updateProfile({
+  const saveProfile: SaveProfile = async (nickname) => {
+    try {
+      const response = await updateProfile({
         variables: { input: { nickname } },
         errorPolicy: "all",
       })
-      const outcome = requireSettingsMutationOutcome(result.data?.updateUserProfile, result)
-      if (outcome?.__typename === "InputValidationFailure")
-        throw new SettingsInputValidationError(outcome.violations)
-      if (outcome?.__typename !== "UpdateUserProfileSuccess")
-        throw new Error("Profile update unconfirmed")
+
+      const result = response.data?.updateUserProfile
+      if (result?.__typename === "InputValidationFailure") {
+        return {
+          kind: "rejected",
+          reason: { kind: "validation", violations: result.violations },
+        }
+      }
+      if (result?.__typename !== "UpdateUserProfileSuccess") {
+        // Missing/unknown result, even alongside GraphQL errors, is not proof
+        // that this operation did not execute.
+        return { kind: "unknown" }
+      }
+
+      // The mutation succeeded. Query synchronization is a separate action;
+      // a failed refetch must not change the mutation outcome.
       void client
         .refetchQueries({ include: [CurrentUserDocument, PersonalSettingsProfileDocument] })
         .catch(() => undefined)
-    },
+
+      return { kind: "success", value: undefined }
+    } catch (error) {
+      if (error instanceof SettingsGraphQLExecutionError) {
+        return { kind: "unknown" }
+      }
+
+      // Explicitly blocking authorization/account state errors can stop
+      // further operation. Other transport failures are always unconfirmed.
+      const kind = classifySettingsSaveFailure(error)
+      if (kind === "blocked") {
+        return { kind: "rejected", reason: { kind, error } }
+      }
+      if (kind === "retryable") {
+        // Used only when an adapter explicitly guarantees non-execution.
+        return { kind: "rejected", reason: { kind } }
+      }
+      return { kind: "unknown" }
+    }
   }
+
+  return { saveProfile }
 }
