@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
-import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
+import { SettingsGraphQLExecutionError, SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 import { profileSaveAction } from "./profileSaveAction"
 
 describe("profileSaveAction", () => {
@@ -46,6 +46,16 @@ describe("profileSaveAction", () => {
 
   it("does not treat a missing response or timeout as confirmed rejection", async () => {
     const save = vi.fn(async () => { throw new Error("network timeout") })
+    expect(await profileSaveAction(save)("nickname")).toEqual({ kind: "unknown" })
+    expect(save).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps missing typed results unknown even with GraphQL validation errors", async () => {
+    const save = vi.fn(async () => {
+      throw new SettingsGraphQLExecutionError([
+        { extensions: { code: "VALIDATION" } },
+      ])
+    })
     expect(await profileSaveAction(save)("nickname")).toEqual({ kind: "unknown" })
     expect(save).toHaveBeenCalledTimes(1)
   })
