@@ -1,6 +1,7 @@
 "use client"
 
-import { Button, Stack } from "@mantine/core"
+import { Stack } from "@mantine/core"
+import { ExplicitSaveRecoveryActions } from "@/ui/ExplicitSave"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { useProfileForm } from "./useProfileForm"
 
@@ -59,46 +60,16 @@ export function ProfileSaveFeedback({
           role="alert"
           actions={
             onInspect ? (
-              <>
-                <Button
-                  size="xs"
-                  variant="light"
-                  loading={inspection.status === "checking"}
-                  onClick={() => void inspectCurrentProfile()}
-                >
-                  {inspection.status === "idle" ||
-                  inspection.status === "failed" ||
-                  inspection.status === "checking"
-                    ? "現在の状態を確認"
-                    : "もう一度確認"}
-                </Button>
-                {inspection.status === "matches" && (
-                  <Button size="xs" onClick={confirmObservedProfile}>
-                    確認完了
-                  </Button>
-                )}
-                {inspection.status === "differs" && (
-                  <>
-                    <Button
-                      size="xs"
-                      disabled={!canRetryInspected}
-                      onClick={() => void save()}
-                    >
-                      もう一度保存
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="subtle"
-                      color="gray"
-                      onClick={discardUnconfirmedDraft}
-                    >
-                      変更を破棄
-                    </Button>
-                  </>
-                    )}
-                  </>
-                ) : undefined
-              }
+              <ExplicitSaveRecoveryActions
+                inspectionStatus={inspection.status}
+                onInspect={inspectCurrentProfile}
+                onConfirm={confirmObservedProfile}
+                onResave={save}
+                onDiscard={discardUnconfirmedDraft}
+                canResave={canRetryInspected}
+              />
+            ) : undefined
+          }
             >
               <Stack gap="xs">
                 <span>
