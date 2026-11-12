@@ -2,11 +2,11 @@
 
 import { ExplicitSaveRecoveryActions } from "@/ui/ExplicitSave"
 import { FeedbackPanel } from "@/components/Feedback"
-import type { useCommunityNameSettings } from "./useCommunityNameSettings"
+import type { useCommunityNameForm } from "./useCommunityNameForm"
 import { resolveCommunityNameSaveFeedback } from "./resolveCommunityNameSaveFeedback"
 
 type Props = Pick<
-  ReturnType<typeof useCommunityNameSettings>,
+  ReturnType<typeof useCommunityNameForm>,
   | "formInvalid"
   | "failure"
   | "blockedFeedback"
