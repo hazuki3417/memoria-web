@@ -5,7 +5,8 @@ import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { useProfileForm } from "./useProfileForm"
 import { ProfileSaveFeedback } from "./ProfileSaveFeedback"
-import type { SaveProfile, InspectProfile } from "./useProfileForm"
+import type { InspectProfile } from "./useProfileForm"
+import type { SaveProfile } from "./profileSaveOutcome"
 
 
 const MOCK_PROFILE = { nickname: "ユーザー" }
