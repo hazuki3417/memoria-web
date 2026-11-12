@@ -30,9 +30,7 @@ export const ProfileSaveFeedback = ({
 
   const feedback = getProfileSaveFeedback({
     status,
-    inspection,
     formInvalid,
-    normalized,
     blockedMessage,
   })
 
