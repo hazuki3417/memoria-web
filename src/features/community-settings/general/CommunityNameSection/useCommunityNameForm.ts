@@ -1,0 +1,137 @@
+"use client"
+
+import { useEffect, useRef, useState, type SetStateAction } from "react"
+import { useController, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { resolveFormFailureValidation } from "@/ui/formValidation"
+import { useExplicitSave, resolveConfirmedSourceSync } from "@/ui/ExplicitSave"
+import type { SaveActionResult } from "@/ui/SaveAction"
+import { communityNameSchema } from "./communityNameSchema"
+import { showNotification } from "@/components/Feedback"
+
+/** Community名のRHF Draft、確認済みBaselineと取得値同期を所有する。 */
+export function useCommunityNameForm({
+  communityName,
+  onSaveName,
+  onInspectName,
+}: {
+  communityName?: string
+  onSaveName?: (name: string) => Promise<SaveActionResult<string>>
+  onInspectName?: () => Promise<string>
+}) {
+  const initialName = communityName ?? "家族のアルバム"
+  const {
+    control, reset, getValues, handleSubmit, setError, clearErrors,
+    formState: { isSubmitted },
+  } = useForm<
+    z.input<typeof communityNameSchema>,
+    unknown,
+    z.output<typeof communityNameSchema>
+  >({
+    resolver: zodResolver(communityNameSchema),
+    mode: "onChange",
+    defaultValues: { name: initialName },
+  })
+  const { field, fieldState } = useController({ control, name: "name" })
+  const savedName = useRef(initialName)
+  const previousSource = useRef(communityName)
+  const awaitingSourceEcho = useRef<string | null>(null)
+  const [formInvalid, setFormInvalid] = useState(false)
+
+  const draft = field.value
+  const normalized = draft.trim()
+  const dirty = normalized !== savedName.current
+  const invalid = !communityNameSchema.safeParse({ name: draft }).success
+
+  const adoptCurrentName = (current: string) => {
+    savedName.current = current
+    awaitingSourceEcho.current = communityName === current ? null : current
+    reset({ name: current })
+    clearErrors("name")
+    setFormInvalid(false)
+  }
+
+  const saveAction = useExplicitSave({
+    draft: normalized,
+    changed: dirty,
+    invalid,
+    readDraft: () => getValues("name").trim(),
+    action: onSaveName ?? (async (name: string) => ({ status: "confirmed" as const, value: name })),
+    inspect: onInspectName,
+    adopt: adoptCurrentName,
+    onValidation: (violations) => {
+      const result = resolveFormFailureValidation(violations, ["name"])
+      if (result.fieldErrors.name) {
+        setError("name", { type: "server", message: result.fieldErrors.name })
+      }
+      setFormInvalid(result.formError)
+    },
+    onConfirmed: () => {
+      showNotification({
+        kind: "success",
+        title: "Community名を変更",
+        description: "Community名を変更しました。",
+      })
+    },
+  })
+
+  // Protect edited/unknown drafts and confirmed writes from stale refetches.
+  useEffect(() => {
+    if (communityName === undefined || previousSource.current === communityName)
+      return
+    previousSource.current = communityName
+    const decision = resolveConfirmedSourceSync({
+      source: communityName,
+      expectedEcho: awaitingSourceEcho.current,
+      baseline: savedName.current,
+      draft: getValues("name").trim(),
+      isUnknown: saveAction.isUnknown,
+      canResetDraft: !saveAction.isSaving,
+    })
+    if (!decision.adopt) return
+    awaitingSourceEcho.current = null
+    savedName.current = communityName
+    if (decision.resetDraft) reset({ name: communityName })
+  }, [communityName, saveAction.isUnknown, saveAction.isSaving, getValues, reset])
+
+  const setDraft = (next: SetStateAction<string>) => {
+    field.onChange(typeof next === "function" ? next(field.value) : next)
+    clearErrors("name")
+    saveAction.onDraftChange()
+    // Form-level server error persists until a confirmed new submit.
+  }
+
+  const submit = handleSubmit(async ({ name }) => {
+    if (!saveAction.canSave) return
+    setFormInvalid(false)
+    clearErrors("name")
+    await saveAction.save(name)
+  })
+  const save = submit
+
+  return {
+    draft,
+    setDraft,
+    dirty,
+    invalid,
+    canSubmit: saveAction.canSubmit,
+    isSaving: saveAction.isSaving,
+    isInputDisabled: saveAction.isInputDisabled,
+    save,
+    fieldError: fieldState.error?.type === "server"
+      ? fieldState.error.message
+      : (fieldState.isTouched || isSubmitted) && invalid
+        ? "Community名を入力してください"
+        : undefined,
+    onNameBlur: field.onBlur,
+    formInvalid,
+    failure: saveAction.failure,
+    blockedFeedback: saveAction.blockedFeedback,
+    inspect: saveAction.inspectCurrent,
+    inspection: saveAction.inspection,
+    confirmObservation: saveAction.confirmObservation,
+    discardUnconfirmed: saveAction.discardUnconfirmed,
+    canResaveInspected: saveAction.canResaveInspected,
+  }
+}
