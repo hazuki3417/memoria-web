@@ -161,7 +161,7 @@ function PreferencesSessionRoundTripFixture(
 ) {
   const [show, setShow] = useState(true)
   return (
-    <PreferencesStorySessionProvider>
+    <PersonalPreferencesSessionProvider>
       <Button onClick={() => setShow((previous) => !previous)}>
         {show ? "設定画面から移動" : "設定画面へ戻る"}
       </Button>
@@ -303,7 +303,7 @@ function PreferencesFeedbackSessionFixture(
   args: ComponentProps<typeof PreferencesStory>,
 ) {
   return (
-    <PreferencesStorySessionProvider>
+    <PersonalPreferencesSessionProvider>
       <PreferencesStory {...args} />
     </PersonalPreferencesSessionProvider>
   )
