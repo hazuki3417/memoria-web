@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ChangeEvent } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
@@ -203,7 +203,7 @@ export function useProfileForm({
     canRetryInspected,
     saveLabel: saving ? "更新中" : status.kind === "retryable-error" ? "再試行" : "更新",
     save,
-    onDraftChange(event: React.ChangeEvent<HTMLInputElement>) {
+    onDraftChange(event: ChangeEvent<HTMLInputElement>) {
       field.onChange(event)
       clearErrors("nickname")
       if (status.kind === "unknown") {
