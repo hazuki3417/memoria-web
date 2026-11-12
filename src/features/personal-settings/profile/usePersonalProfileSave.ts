@@ -70,7 +70,7 @@ export function usePersonalProfileSave() {
       // The mutation is already confirmed; the existing refresh-error
       // boundary is responsible for any separately observable Query failure.
     }
-    return { kind: "success", value: undefined }
+    return { kind: "success", value: result.user.profile.nickname }
   }
 
   async function inspectProfile(): Promise<string> {
