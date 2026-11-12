@@ -6,3 +6,4 @@ export type { ExplicitSaveProcess, ExplicitSaveSnapshot, Inspection } from "./cr
 export { createActionAdapter } from "./createActionAdapter"
 export { createInspectionRecovery } from "./createInspectionRecovery"
 export type { InspectionResult } from "./createInspectionRecovery"
+export { useExplicitSaveProcess } from "./useExplicitSaveProcess"
