@@ -11,13 +11,12 @@ type Props = Pick<
   | "failure"
   | "blockedFeedback"
   | "draft"
-  | "unknown"
   | "inspection"
-  | "inspectName"
+  | "inspect"
   | "confirmObservation"
   | "discardUnconfirmed"
   | "canResaveInspected"
-  | "saveName"
+  | "save"
 >
 
 /** Owns the confirmation/retry/discard feedback UI, not the form's recovery state. */
@@ -26,13 +25,12 @@ export function CommunityNameSaveFeedback({
   failure,
   blockedFeedback,
   draft,
-  unknown = false,
   inspection,
-  inspectName,
+  inspect,
   confirmObservation,
   discardUnconfirmed,
   canResaveInspected = false,
-  saveName,
+  save,
 }: Props) {
   const feedback = resolveCommunityNameSaveFeedback({
     formInvalid,
@@ -40,7 +38,7 @@ export function CommunityNameSaveFeedback({
     blockedFeedback,
     inspection,
     draft,
-    hasInspector: Boolean(inspectName),
+    hasInspector: Boolean(inspect),
   })
   if (!feedback) return null
 
@@ -50,12 +48,12 @@ export function CommunityNameSaveFeedback({
       title={feedback.title}
       role="alert"
       actions={
-        unknown && inspectName ? (
+        failure === "unknown" && inspect ? (
           <ExplicitSaveRecoveryActions
-            inspectionStatus={inspection?.status ?? "idle"}
-            onInspect={inspectName}
+            inspectionStatus={inspection.status}
+            onInspect={inspect}
             onConfirm={confirmObservation}
-            onResave={saveName}
+            onResave={save}
             onDiscard={discardUnconfirmed}
             canResave={canResaveInspected}
           />
