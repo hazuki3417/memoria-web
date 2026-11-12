@@ -3,7 +3,7 @@
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { CommunityNameSaveFeedback } from "./CommunityNameSaveFeedback"
-import { useCommunityNameSettings } from "./useCommunityNameSettings"
+import { useCommunityNameForm } from "./useCommunityNameForm"
 import type { SaveActionResult } from "@/ui/SaveAction"
 
 export type CommunityNameSectionProps = {
@@ -36,7 +36,7 @@ export function CommunityNameSection({
     confirmObservation,
     discardUnconfirmed,
     canResaveInspected,
-  } = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
+  } = useCommunityNameForm({ communityName, onSaveName, onInspectName })
 
   return (
     <Box>
