@@ -5,3 +5,4 @@ export type {
 } from "./useExplicitSave"
 export { resolveConfirmedSourceSync } from "./resolveConfirmedSourceSync"
 export { ExplicitSaveRecoveryActions } from "./ExplicitSaveRecoveryActions"
+export type { ExplicitSaveFeedbackModel, ExplicitSaveFailureStatus } from "./feedbackModel"
