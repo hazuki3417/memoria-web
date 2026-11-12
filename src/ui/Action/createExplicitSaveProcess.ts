@@ -18,7 +18,7 @@ export type ExplicitSaveProcessConfig<Input, Success, Rejection, Observed = neve
   recovery?: InspectionRecoveryPolicy<Input, Observed>
 }
 
-/** Actionと任意の状態照会を組み合わせ、重複実行防止と終了処理を備えた明示保存Processを生成する。 */
+/** 明示保存で必要な重複送信防止・結果不明後の照会・終了処理を共通化し、各Featureが同じ保存プロセスを構成できるようにする。 */
 export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = never>({
   execute,
   recovery,
