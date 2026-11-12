@@ -77,10 +77,12 @@ describe("createAutoSaveQueue", () => {
     })
   })
 
-  it.each([
+  const nonSuccess: Array<[string, Result]> = [
     ["rejected", rejected()],
     ["unknown", unknown()],
-  ])("stops on %s without submitting later patches", async (_label, result) => {
+  ]
+
+  it.each(nonSuccess)("stops on %s without submitting later patches", async (_label, result) => {
     vi.useFakeTimers()
     const first = deferred<Result>()
     const execute = vi.fn()
