@@ -2,6 +2,7 @@ import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { useExplicitSave } from "./useExplicitSave"
+import type { FormInputViolation } from "../formValidation"
 
 type Save = ReturnType<typeof useExplicitSave<string>>
 type Action = (value: string) => Promise<
@@ -27,7 +28,7 @@ describe("明示保存の共通Hook", () => {
   let inspect: ReturnType<typeof vi.fn<() => Promise<string>>>
   let adopt: ReturnType<typeof vi.fn<(value: string) => void>>
   let onConfirmed: ReturnType<typeof vi.fn<(value: string) => void>>
-  let onValidation: ReturnType<typeof vi.fn>
+  let onValidation: ReturnType<typeof vi.fn<(violations: ReadonlyArray<FormInputViolation> | null) => void>>
 
   function Harness({ initialStatus = "idle" }: {
     initialStatus?: "idle" | "saving" | "retryable" | "blocked" | "unknown"
@@ -59,7 +60,7 @@ describe("明示保存の共通Hook", () => {
     inspect = vi.fn<() => Promise<string>>()
     adopt = vi.fn<(value: string) => void>()
     onConfirmed = vi.fn<(value: string) => void>()
-    onValidation = vi.fn()
+    onValidation = vi.fn<(violations: ReadonlyArray<FormInputViolation> | null) => void>()
     host = document.createElement("div")
     document.body.append(host)
     root = createRoot(host)
