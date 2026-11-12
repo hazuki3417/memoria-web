@@ -1,5 +1,6 @@
 import type { Action, ActionOutcome } from "@/ui/Action"
 import {
+  SettingsGraphQLExecutionError,
   classifySettingsSaveFailure,
   getSettingsInputViolations,
   type SettingsInputViolation,
@@ -23,6 +24,11 @@ export function profileSaveAction(
       await save(nickname)
       return { kind: "success", value: undefined }
     } catch (error) {
+      // GraphQL execution errors without a typed mutation result do not
+      // establish that the write was rejected, regardless of error codes.
+      if (error instanceof SettingsGraphQLExecutionError) {
+        return { kind: "unknown" }
+      }
       const kind = classifySettingsSaveFailure(error)
       if (kind === "validation") {
         return {
