@@ -69,7 +69,7 @@ export function CommunityNameSection({
               size="sm"
               disabled={!canSubmit}
               loading={isSaving}
-              onClick={save}
+              onClick={() => void save()}
             >
               保存
             </Button>
