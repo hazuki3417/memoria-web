@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, expectTypeOf, it, vi } from "vitest"
 import { createExplicitSaveProcess } from "./createExplicitSaveProcess"
 
 function deferred<T>() {
@@ -8,6 +8,30 @@ function deferred<T>() {
 }
 
 describe("createExplicitSaveProcess", () => {
+  it("infers an operation input and an independently shaped recovery observation", async () => {
+    const execute = async (input: { nickname: string }) => ({
+      kind: "success" as const,
+      value: input.nickname,
+    })
+    const inspect = async () => ({ nickname: "server", revision: 1 })
+    const matches = (observed: { nickname: string; revision: number }, input: { nickname: string }) =>
+      observed.nickname === input.nickname
+    const process = createExplicitSaveProcess({
+      execute,
+      recovery: { inspect, matches },
+    })
+
+    expectTypeOf<Parameters<typeof process.submit>[0]>().toEqualTypeOf<{ nickname: string }>()
+    expectTypeOf<Awaited<ReturnType<typeof process.inspect>>>().toEqualTypeOf<
+      { kind: "idle" | "checking" | "failed" } |
+      { kind: "matches" | "differs"; value: { nickname: string; revision: number } }
+    >()
+    expect(await process.inspect({ nickname: "server" })).toEqual({
+      kind: "matches",
+      value: { nickname: "server", revision: 1 },
+    })
+  })
+
   it("executes an injected Action and returns its confirmed result", async () => {
     const execute = vi.fn(async (input: string) => ({ kind: "success" as const, value: input }))
     const process = createExplicitSaveProcess({ execute })
