@@ -26,33 +26,43 @@ export function usePersonalProfileSave() {
     return { kind: "unknown" }
   }
 
-  const saveProfile: SaveProfile = createActionAdapter({
-    execute: (nickname: string) =>
-      updateProfile({
-        variables: { input: { nickname } },
-        errorPolicy: "all",
-      }),
-    classify: (response): ActionOutcome<string, ProfileSaveRejection> => {
-      const result = response.data?.updateUserProfile
-      if (result?.__typename === "UpdateUserProfileSuccess") {
-        return { kind: "success", value: result.user.profile.nickname }
+  function execute(nickname: string) {
+    return updateProfile({
+      variables: { input: { nickname } },
+      errorPolicy: "all",
+    })
+  }
+
+  function classify(
+    response: Awaited<ReturnType<typeof execute>>,
+  ): ActionOutcome<string, ProfileSaveRejection> {
+    const result = response.data?.updateUserProfile
+    if (result?.__typename === "UpdateUserProfileSuccess") {
+      return { kind: "success", value: result.user.profile.nickname }
+    }
+    if (result?.__typename === "InputValidationFailure") {
+      return {
+        kind: "rejected",
+        reason: { kind: "validation", violations: result.violations },
       }
-      if (result?.__typename === "InputValidationFailure") {
-        return {
-          kind: "rejected",
-          reason: { kind: "validation", violations: result.violations },
-        }
-      }
-      if (response.errors?.length) {
-        return classifyBlocked(new SettingsGraphQLExecutionError(response.errors))
-      }
-      return { kind: "unknown" }
-    },
-    classifyError: classifyBlocked,
-    // This is deliberately outside confirmed operation classification.
-    afterSuccess: () => client.refetchQueries({
+    }
+    if (response.errors?.length) {
+      return classifyBlocked(new SettingsGraphQLExecutionError(response.errors))
+    }
+    return { kind: "unknown" }
+  }
+
+  async function afterSuccess() {
+    await client.refetchQueries({
       include: [CurrentUserDocument, PersonalSettingsProfileDocument],
-    }).then(() => undefined),
+    })
+  }
+
+  const saveProfile: SaveProfile = createActionAdapter({
+    execute,
+    classify,
+    classifyError: classifyBlocked,
+    afterSuccess,
   })
 
   async function inspectProfile(): Promise<string> {
