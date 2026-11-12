@@ -149,6 +149,10 @@ const saveValidation = {
     },
   },
 }
+const saveMissingResult = {
+  request: mutationRequest,
+  result: { data: { updateUserProfile: null } },
+}
 const saveUnknown = {
   request: mutationRequest,
   error: new Error("transport response unavailable"),
@@ -221,5 +225,30 @@ export const MutationTransportUnknown: Story = {
     await expect(input).toBeEnabled()
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
     await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeEnabled()
+  },
+}
+
+
+export const MutationMissingTypedResult: Story = {
+  name: "Integration · Typed Result欠落でも成功と誤判定しない",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[profileSuccess, saveMissingResult]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "プロフィールの保存結果を確認できませんでした",
+    )
+    await expect(input).toHaveValue("変更した名前")
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
   },
 }
