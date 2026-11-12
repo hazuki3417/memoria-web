@@ -7,8 +7,8 @@ function deferred<T>() {
   return { promise, resolve }
 }
 
-describe("createExplicitSaveProcess", () => {
-  it("infers an operation input and an independently shaped recovery observation", async () => {
+describe("明示保存Process（createExplicitSaveProcess）", () => {
+  it("Action入力と異なる構造の照会結果を型推論し、一致判定に利用できる", async () => {
     const execute = async (input: { nickname: string }) => ({
       kind: "success" as const,
       value: input.nickname,
@@ -32,7 +32,7 @@ describe("createExplicitSaveProcess", () => {
     })
   })
 
-  it("executes an injected Action and returns its confirmed result", async () => {
+  it("注入したActionを実行し、確定した成功結果を返す", async () => {
     const execute = vi.fn(async (input: string) => ({ kind: "success" as const, value: input }))
     const process = createExplicitSaveProcess({ execute })
     expect(await process.submit("name")).toEqual({ kind: "success", value: "name" })
@@ -40,7 +40,7 @@ describe("createExplicitSaveProcess", () => {
     expect(process.getSnapshot().busy).toBe(false)
   })
 
-  it("prevents concurrent attempts without implicitly queueing or retrying", async () => {
+  it("保存中の再送を防ぎ、後続操作を暗黙にQueue登録・再試行しない", async () => {
     const waiting = deferred<{ kind: "success"; value: string }>()
     const execute = vi.fn((_input: string) => waiting.promise)
     const process = createExplicitSaveProcess({ execute })
@@ -52,7 +52,7 @@ describe("createExplicitSaveProcess", () => {
     expect(execute).toHaveBeenCalledTimes(1)
   })
 
-  it("converts unclassified execution exceptions to unknown", async () => {
+  it("分類できない実行例外を成否不明として返す", async () => {
     const process = createExplicitSaveProcess({
       execute: async () => { throw Error("network timeout") },
     })
@@ -60,7 +60,7 @@ describe("createExplicitSaveProcess", () => {
     expect(process.getSnapshot().busy).toBe(false)
   })
 
-  it("allows recovery components to be injected and invalidated", async () => {
+  it("復旧照会を注入でき、古い照会結果は無効化できる", async () => {
     const observed = deferred<string>()
     const process = createExplicitSaveProcess({
       execute: async (input: string) => ({ kind: "unknown" as const }),
@@ -77,7 +77,7 @@ describe("createExplicitSaveProcess", () => {
     expect(process.getSnapshot().inspection).toEqual({ kind: "idle" })
   })
 
-  it("reports an authoritative observation without claiming mutation success", async () => {
+  it("現在値を照会して一致を判定しても、Mutation成功と断定しない", async () => {
     const process = createExplicitSaveProcess({
       execute: async (_: string) => ({ kind: "unknown" as const }),
       recovery: {
@@ -89,7 +89,7 @@ describe("createExplicitSaveProcess", () => {
     expect(await process.inspect("server value")).toEqual({ kind: "matches", value: "server value" })
   })
 
-  it("stops notifying after close but does not cancel the in-flight mutation", async () => {
+  it("終了後は購読通知を止めるが、実行中の遠隔操作は中断しない", async () => {
     const waiting = deferred<{ kind: "success"; value: number }>()
     const listener = vi.fn()
     const process = createExplicitSaveProcess({
@@ -105,7 +105,7 @@ describe("createExplicitSaveProcess", () => {
     expect(await process.submit(2)).toBeNull()
   })
 
-  it("notifies subscribers when execution state changes", async () => {
+  it("実行状態が変化したとき購読者へ通知する", async () => {
     const events: boolean[] = []
     const process = createExplicitSaveProcess({ execute: async (input: string) =>
       ({ kind: "success" as const, value: input }) })
