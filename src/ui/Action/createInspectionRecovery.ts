@@ -2,7 +2,7 @@ export type InspectionResult<Observed> =
   | { kind: "idle" | "checking" | "failed" }
   | { kind: "matches" | "differs"; value: Observed }
 
-/** A reusable, scope-limited read/reconciliation part, independent of React. */
+/** 現在値の照会と入力との比較を担い、古い照会結果の反映を防ぐRecovery部品を生成する。 */
 export const createInspectionRecovery = <Input, Observed>({
   inspect,
   matches,
@@ -22,7 +22,7 @@ export const createInspectionRecovery = <Input, Observed>({
     try {
       onChange?.(state)
     } catch {
-      // Observers cannot alter the result of an authoritative read.
+      // 購読側の例外によって照会結果を変更しない。
     }
   }
 
