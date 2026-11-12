@@ -46,47 +46,68 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
     })
   }
 
+  function onInspectionChange(inspection: Inspection<Observed>) {
+    publish({ ...snapshot, inspection })
+  }
+
   const inspectionPart = recovery
     ? createInspectionRecovery<Input, Observed>({
         ...recovery,
-        onChange: (inspection) => publish({ ...snapshot, inspection }),
+        onChange: onInspectionChange,
       })
     : null
 
+  function getSnapshot() {
+    return snapshot
+  }
+
+  function subscribe(listener: () => void) {
+    if (closed) return () => undefined
+    listeners.add(listener)
+    function unsubscribe() {
+      listeners.delete(listener)
+    }
+    return unsubscribe
+  }
+
+  async function submit(input: Input): Promise<ActionOutcome<Success, Rejection> | null> {
+    if (closed || snapshot.busy) return null
+    inspectionPart?.invalidate()
+    publish({ ...snapshot, busy: true })
+    let outcome: ActionOutcome<Success, Rejection>
+    try {
+      outcome = await execute(input)
+    } catch {
+      // An unclassified exception cannot prove a remote write failed.
+      outcome = { kind: "unknown" }
+    }
+    publish({ ...snapshot, busy: false })
+    return outcome
+  }
+
+  async function inspect(input: Input): Promise<Inspection<Observed>> {
+    if (closed || !inspectionPart || snapshot.busy) return snapshot.inspection
+    return inspectionPart.run(input)
+  }
+
+  function invalidateInspection() {
+    inspectionPart?.invalidate()
+  }
+
+  function close() {
+    closed = true
+    inspectionPart?.close()
+    listeners.clear()
+    // A remote in-flight mutation is not cancelled by closing the view.
+  }
+
   return {
-    getSnapshot: () => snapshot,
-    subscribe(listener: () => void) {
-      if (closed) return () => undefined
-      listeners.add(listener)
-      return () => { listeners.delete(listener) }
-    },
-    async submit(input: Input): Promise<ActionOutcome<Success, Rejection> | null> {
-      if (closed || snapshot.busy) return null
-      inspectionPart?.invalidate()
-      publish({ ...snapshot, busy: true })
-      let outcome: ActionOutcome<Success, Rejection>
-      try {
-        outcome = await execute(input)
-      } catch {
-        // An unclassified exception cannot prove a remote write failed.
-        outcome = { kind: "unknown" }
-      }
-      publish({ ...snapshot, busy: false })
-      return outcome
-    },
-    async inspect(input: Input): Promise<Inspection<Observed>> {
-      if (closed || !inspectionPart || snapshot.busy) return snapshot.inspection
-      return inspectionPart.run(input)
-    },
-    invalidateInspection() {
-      inspectionPart?.invalidate()
-    },
-    close() {
-      closed = true
-      inspectionPart?.close()
-      listeners.clear()
-      // A remote in-flight mutation is not cancelled by closing the view.
-    },
+    getSnapshot,
+    subscribe,
+    submit,
+    inspect,
+    invalidateInspection,
+    close,
   }
 }
 
