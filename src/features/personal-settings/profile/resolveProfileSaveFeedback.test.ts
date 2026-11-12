@@ -41,7 +41,7 @@ describe("Profile保存のFeedback表示モデル", () => {
   it("Unknownは保存成功と断定せず、照会一致を説明する", () => {
     const section = feedback({
       failure: "unknown",
-      inspection: { status: "matches", nickname: "未保存の名前" },
+      inspection: { status: "matches", value: "未保存の名前" },
     })[0]
     expect(section).toMatchObject({
       id: "unknown", kind: "warning",
@@ -55,7 +55,7 @@ describe("Profile保存のFeedback表示モデル", () => {
   it("照会不一致・失敗時は既存の説明を出す", () => {
     expect(feedback({
       failure: "unknown",
-      inspection: { status: "differs", nickname: "サーバーの名前" },
+      inspection: { status: "differs", value: "サーバーの名前" },
     })[0]?.details?.[0]).toContain("サーバーの名前")
     expect(feedback({
       failure: "unknown",
