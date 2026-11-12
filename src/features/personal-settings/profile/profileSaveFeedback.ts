@@ -1,6 +1,11 @@
 import { getGraphQLErrorCodes } from "@/infrastructure/graphql/getGraphQLErrorCodes"
 import { resolveErrorCodeFeedback } from "@/ui/error-feedback"
-import { resolveSaveFeedback, type SaveFeedback, type SaveFeedbackMessages, type SaveFeedbackType } from "@/ui/save-feedback"
+import {
+  resolveSaveFeedback,
+  type SaveFeedback,
+  type SaveFeedbackMessages,
+  type SaveFeedbackType,
+} from "@/ui/save-feedback"
 import type { useProfileForm } from "./useProfileForm"
 
 type ProfileForm = ReturnType<typeof useProfileForm>
@@ -19,7 +24,7 @@ const messages = {
   },
   unknown: {
     title: "プロフィールの保存結果を確認できませんでした",
-    description: "入力内容は保持しています。保存結果は未確定のため自動で再送しません。現在の状態を確認し、必要な操作を選んでください。値が一致しても元の保存処理が成功した証明ではありません。",
+    description: "入力内容は保持しています。保存結果は未確定のため自動で再送しません。現在の状態を確認し、必要な操作を選んでください。値が一致しても元の保存処理が成功した証明ではありません。画面から確認できない場合は入力内容を控えてページを再読み込みしてください。",
   },
   blocked: {
     title: "プロフィールを変更できません",
