@@ -1,13 +1,12 @@
 import type {
   ExplicitSaveFailureStatus,
   ExplicitSaveFeedbackModel,
+  ExplicitSaveInspection,
 } from "@/ui/ExplicitSave"
 
 export type CommunityNameSaveFeedbackModel = ExplicitSaveFeedbackModel | null
 
-export type CommunityNameInspection =
-  | { status: "idle" | "checking" | "failed" }
-  | { status: "matches" | "differs"; name: string }
+export type CommunityNameInspection = ExplicitSaveInspection<string>
 
 /** Derives Community name feedback from the Form's save/recovery state. */
 export function resolveCommunityNameSaveFeedback({
@@ -51,7 +50,7 @@ export function resolveCommunityNameSaveFeedback({
       description =
         "現在のCommunity名は入力内容と一致しています。元の保存処理が成功した証明ではありません。確認した場合は「確認完了」を選んでください。"
     } else if (inspection.status === "differs") {
-      description = `現在のCommunity名は「${inspection.name}」です。入力した「${draft.trim()}」とは異なります。必要な場合だけ再保存するか、変更を破棄してください。`
+      description = `現在のCommunity名は「${inspection.value}」です。入力した「${draft.trim()}」とは異なります。必要な場合だけ再保存するか、変更を破棄してください。`
     } else if (inspection.status === "failed") {
       description =
         "現在のCommunity名を取得できませんでした。保存を再送せず、状態の確認をやり直してください。"
