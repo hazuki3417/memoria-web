@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@mantine/core"
+import { ExplicitSaveRecoveryActions } from "@/ui/ExplicitSave"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { useCommunityNameSettings } from "./useCommunityNameSettings"
 
@@ -36,44 +36,14 @@ export function CommunityNameSaveFeedback({
       role="alert"
       actions={
         unknown && inspectName ? (
-          <>
-            <Button
-              size="xs"
-              variant="light"
-              loading={inspection?.status === "checking"}
-              onClick={() => void inspectName()}
-            >
-              {inspection?.status === "matches" || inspection?.status === "differs"
-                ? "もう一度確認"
-                : "現在の状態を確認"}
-            </Button>
-            {inspection?.status === "matches" && confirmObservation && (
-              <Button size="xs" onClick={confirmObservation}>
-                確認完了
-              </Button>
-            )}
-            {inspection?.status === "differs" && (
-              <>
-                <Button
-                  size="xs"
-                  disabled={!canResaveInspected}
-                  onClick={saveName}
-                >
-                  もう一度保存
-                </Button>
-                {discardUnconfirmed && (
-                  <Button
-                    size="xs"
-                    variant="subtle"
-                    color="gray"
-                    onClick={discardUnconfirmed}
-                  >
-                    変更を破棄
-                  </Button>
-                )}
-              </>
-            )}
-          </>
+          <ExplicitSaveRecoveryActions
+            inspectionStatus={inspection?.status ?? "idle"}
+            onInspect={inspectName}
+            onConfirm={confirmObservation}
+            onResave={saveName}
+            onDiscard={discardUnconfirmed}
+            canResave={canResaveInspected}
+          />
         ) : undefined
       }
     >
