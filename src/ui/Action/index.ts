@@ -1,3 +1,5 @@
 export type { Action, ActionOutcome } from "./actionOutcome"
 export { createAutoSaveQueue } from "./autoSaveQueue"
 export type { AutoSaveAttempt, AutoSaveQueue } from "./autoSaveQueue"
+export { createExplicitSaveProcess } from "./createExplicitSaveProcess"
+export type { ExplicitSaveProcess, ExplicitSaveSnapshot, Inspection } from "./createExplicitSaveProcess"
