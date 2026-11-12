@@ -46,7 +46,19 @@ export function useExplicitSaveProcess<Input, Success, Rejection, Observed = nev
     process.getSnapshot,
   )
 
-  useEffect(() => () => process.close(), [process])
+  // In React StrictMode, Effect setup/cleanup is replayed in development.
+  // Defer irreversible close one microtask so the replayed setup can retain
+  // the same Process; a real unmount still releases the owner.
+  const mounted = useRef(false)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+      void Promise.resolve().then(() => {
+        if (!mounted.current) process.close()
+      })
+    }
+  }, [process])
 
   return { process, snapshot }
 }
