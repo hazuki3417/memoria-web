@@ -21,7 +21,6 @@ export const ProfileSaveFeedback = ({
     status,
     inspection,
     formInvalid,
-    normalized,
     canRetryInspected,
     inspectCurrentProfile,
     confirmObservedProfile,
@@ -34,7 +33,6 @@ export const ProfileSaveFeedback = ({
     inspection,
     formInvalid,
     normalized,
-    canInspect: Boolean(onInspect),
     blockedMessage,
   })
 
