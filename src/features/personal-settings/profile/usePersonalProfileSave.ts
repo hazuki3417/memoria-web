@@ -24,14 +24,14 @@ export const usePersonalProfileSave = () => {
     if (kind === "blocked") return { kind: "rejected", reason: { kind, error } }
     if (kind === "retryable") return { kind: "rejected", reason: { kind } }
     return { kind: "unknown" }
-  };
+  }
 
   const execute = (nickname: string) => {
     return updateProfile({
       variables: { input: { nickname } },
       errorPolicy: "all",
     })
-  };
+  }
 
   const classify = (
     response: Awaited<ReturnType<typeof execute>>,
@@ -50,13 +50,13 @@ export const usePersonalProfileSave = () => {
       return classifyBlocked(new SettingsGraphQLExecutionError(response.errors))
     }
     return { kind: "unknown" }
-  };
+  }
 
   const afterSuccess = async () => {
     await client.refetchQueries({
       include: [CurrentUserDocument, PersonalSettingsProfileDocument],
     })
-  };
+  }
 
   const saveProfile: SaveProfile = createActionAdapter({
     execute,
@@ -72,7 +72,7 @@ export const usePersonalProfileSave = () => {
     })
     if (!result.data?.me) throw new Error("Current profile unavailable")
     return result.data.me.profile.nickname
-  };
+  }
 
   return { saveProfile, inspectProfile }
-};
+}
