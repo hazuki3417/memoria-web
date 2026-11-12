@@ -1,4 +1,5 @@
-import type { Action, ActionOutcome } from "./actionOutcome"
+import type { Action } from "./action"
+import type { ActionOutcome } from "./actionOutcome"
 import {
   createInspectionRecovery,
   type InspectionResult,
