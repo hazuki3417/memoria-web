@@ -4,3 +4,4 @@ export type {
   ExplicitSaveStatus,
 } from "./useExplicitSave"
 export { resolveConfirmedSourceSync } from "./resolveConfirmedSourceSync"
+export { ExplicitSaveRecoveryActions } from "./ExplicitSaveRecoveryActions"
