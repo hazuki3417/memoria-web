@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { resolveCommunityAliasSaveFeedback } from "./resolveCommunityAliasSaveFeedback"
-import type { ExplicitSaveFailureStatus } from "@/ui/ExplicitSave"
+import type { ExplicitSaveFailureStatus, ExplicitSaveInspection } from "@/ui/ExplicitSave"
 
 function feedback({
   failure = null,
@@ -12,9 +12,7 @@ function feedback({
 }: {
   failure?: ExplicitSaveFailureStatus | null
   formInvalid?: boolean
-  inspection?:
-    | { status: "idle" | "checking" | "failed" }
-    | { status: "matches" | "differs"; alias: string | null }
+  inspection?: ExplicitSaveInspection<string | null>
   hasInspector?: boolean
   normalized?: string
   blockedFeedback?: { title: string; description: string } | null
