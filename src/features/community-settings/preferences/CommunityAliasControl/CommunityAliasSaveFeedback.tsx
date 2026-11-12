@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@mantine/core"
+import { ExplicitSaveRecoveryActions } from "@/ui/ExplicitSave"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { useCommunityAliasForm } from "./useCommunityAliasForm"
 
@@ -36,40 +36,14 @@ export function CommunityAliasSaveFeedback({
           }
           actions={
             failure === "unknown" && onInspect ? (
-              <>
-                <Button
-                  size="xs"
-                  variant="light"
-                  loading={inspection.status === "checking"}
-                  onClick={() => void inspect()}
-                >
-                  {inspection.status === "matches" || inspection.status === "differs"
-                    ? "もう一度確認"
-                    : "現在の状態を確認"}
-                </Button>
-                {inspection.status === "matches" && (
-                  <Button size="xs" onClick={confirmObservation}>確認完了</Button>
-                )}
-                {inspection.status === "differs" && (
-                  <>
-                    <Button
-                      size="xs"
-                      disabled={!canResaveInspected}
-                      onClick={() => void save()}
-                    >
-                      もう一度保存
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="subtle"
-                      color="gray"
-                      onClick={discardUnconfirmed}
-                    >
-                      変更を破棄
-                    </Button>
-                  </>
-                )}
-              </>
+              <ExplicitSaveRecoveryActions
+                inspectionStatus={inspection.status}
+                onInspect={inspect}
+                onConfirm={confirmObservation}
+                onResave={save}
+                onDiscard={discardUnconfirmed}
+                canResave={canResaveInspected}
+              />
             ) : undefined
           }
         >
