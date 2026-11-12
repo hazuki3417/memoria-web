@@ -18,7 +18,7 @@ export type ExplicitSaveSnapshot<Observed> = Readonly<{
  * exception uncertainty, recovery invalidation and teardown are composed
  * consistently. The process never interprets application-specific reasons.
  */
-export function createExplicitSaveProcess<Input, Success, Rejection, Observed = never>({
+export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = never>({
   execute,
   recovery,
 }: {
@@ -27,7 +27,7 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
     inspect: () => Promise<Observed>
     matches: (observed: Observed, submitted: Input) => boolean
   }
-}) {
+}) => {
   let snapshot: ExplicitSaveSnapshot<Observed> = {
     busy: false,
     inspection: { kind: "idle" },
@@ -35,7 +35,7 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
   let closed = false
   const listeners = new Set<() => void>()
 
-  function publish(next: ExplicitSaveSnapshot<Observed>) {
+  const publish = (next: ExplicitSaveSnapshot<Observed>) => {
     snapshot = next
     if (!closed) listeners.forEach((listener) => {
       try {
@@ -44,11 +44,11 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
         // A broken presentation subscriber must not block remote execution.
       }
     })
-  }
+  };
 
-  function onInspectionChange(inspection: Inspection<Observed>) {
+  const onInspectionChange = (inspection: Inspection<Observed>) => {
     publish({ ...snapshot, inspection })
-  }
+  };
 
   const inspectionPart = recovery
     ? createInspectionRecovery<Input, Observed>({
@@ -57,20 +57,20 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
       })
     : null
 
-  function getSnapshot() {
+  const getSnapshot = () => {
     return snapshot
-  }
+  };
 
-  function subscribe(listener: () => void) {
+  const subscribe = (listener: () => void) => {
     if (closed) return () => undefined
     listeners.add(listener)
-    function unsubscribe() {
+    const unsubscribe = () => {
       listeners.delete(listener)
-    }
+    };
     return unsubscribe
-  }
+  };
 
-  async function submit(input: Input): Promise<ActionOutcome<Success, Rejection> | null> {
+  const submit = async (input: Input): Promise<ActionOutcome<Success, Rejection> | null> => {
     if (closed || snapshot.busy) return null
     inspectionPart?.invalidate()
     publish({ ...snapshot, busy: true })
@@ -83,23 +83,23 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
     }
     publish({ ...snapshot, busy: false })
     return outcome
-  }
+  };
 
-  async function inspect(input: Input): Promise<Inspection<Observed>> {
+  const inspect = async (input: Input): Promise<Inspection<Observed>> => {
     if (closed || !inspectionPart || snapshot.busy) return snapshot.inspection
     return inspectionPart.run(input)
-  }
+  };
 
-  function invalidateInspection() {
+  const invalidateInspection = () => {
     inspectionPart?.invalidate()
-  }
+  };
 
-  function close() {
+  const close = () => {
     closed = true
     inspectionPart?.close()
     listeners.clear()
     // A remote in-flight mutation is not cancelled by closing the view.
-  }
+  };
 
   return {
     getSnapshot,
@@ -109,7 +109,7 @@ export function createExplicitSaveProcess<Input, Success, Rejection, Observed = 
     invalidateInspection,
     close,
   }
-}
+};
 
 export type ExplicitSaveProcess<Input, Success, Rejection, Observed> =
   ReturnType<typeof createExplicitSaveProcess<Input, Success, Rejection, Observed>>
