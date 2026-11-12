@@ -7,8 +7,8 @@ import { PersonalProfile } from "./PersonalProfile"
 import type { ActionOutcome } from "@/ui/Action"
 import type { ProfileSaveRejection } from "./profileSaveOutcome"
 
-type ProfileOutcome = ActionOutcome<void, ProfileSaveRejection>
-const success = (): ProfileOutcome => ({ kind: "success", value: undefined })
+type ProfileOutcome = ActionOutcome<string, ProfileSaveRejection>
+const success = (nickname: string): ProfileOutcome => ({ kind: "success", value: nickname })
 const unknown = (): ProfileOutcome => ({ kind: "unknown" })
 const validation = (
   violations: Extract<ProfileSaveRejection, { kind: "validation" }>["violations"],
@@ -31,7 +31,7 @@ const meta = {
   component: PersonalProfile,
   args: {
     initialNickname: "テストユーザー",
-    onSave: fn(async () => success()),
+    onSave: fn(async (nickname: string) => success(nickname)),
   },
   decorators: [
     (Story) => (
@@ -150,7 +150,7 @@ export const ProfileInitiallyBlocked: Story = {
 export const ProfileSaveContract: Story = {
   name: "Interaction · プロフィール保存",
   tags: ["interaction"],
-  args: { onSave: fn(async () => success()) },
+  args: { onSave: fn(async (nickname: string) => success(nickname)) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
@@ -188,12 +188,12 @@ export const ProfileSaveFailed: Story = {
   args: {
     onSave: fn()
       .mockResolvedValueOnce(retryable())
-      .mockResolvedValue(success()),
+      .mockImplementation((nickname: string) => Promise.resolve(success(nickname))),
   },
   play: async ({ canvasElement, args }) => {
     args.onSave?.mockReset()
     args.onSave?.mockResolvedValueOnce(retryable())
-    args.onSave?.mockResolvedValue(success())
+    args.onSave?.mockImplementation((nickname: string) => Promise.resolve(success(nickname)))
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
     await userEvent.clear(input)
@@ -319,9 +319,9 @@ function ProfileInFlightFixture(args: ComponentProps<typeof PersonalProfile>) {
       <PersonalProfile
         {...args}
         initialNickname={nickname}
-        onSave={() =>
+        onSave={(nickname) =>
           new Promise<ProfileOutcome>((resolve) => {
-            resolveSave.current = () => resolve(success())
+            resolveSave.current = () => resolve(success(nickname))
           })
         }
       />
@@ -353,7 +353,7 @@ export const ProfileInFlightContract: Story = {
 export const ProfileNormalizedSave: Story = {
   name: "Interaction · Trim後の名前のみ送信・確定",
   tags: ["interaction"],
-  args: { onSave: fn(async () => success()) },
+  args: { onSave: fn(async (nickname: string) => success(nickname)) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
@@ -527,13 +527,13 @@ export const ProfileUnknownExplicitRetry: Story = {
   args: {
     onSave: fn()
       .mockResolvedValueOnce(unknown())
-      .mockResolvedValue(success()),
+      .mockImplementation((nickname: string) => Promise.resolve(success(nickname))),
     onInspect: fn(async () => "以前の名前"),
   },
   play: async ({ canvasElement, args }) => {
     args.onSave?.mockReset()
     args.onSave?.mockResolvedValueOnce(unknown())
-    args.onSave?.mockResolvedValue(success())
+    args.onSave?.mockImplementation((nickname: string) => Promise.resolve(success(nickname)))
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
     await userEvent.clear(input)
@@ -605,7 +605,7 @@ function ProfileNotificationFixture(args: ComponentProps<typeof PersonalProfile>
 export const ProfileSuccessNotification: Story = {
   name: "Interaction · 明示保存の成功通知は確定後に一度だけ",
   tags: ["interaction"],
-  args: { onSave: fn(async () => success()) },
+  args: { onSave: fn(async (nickname: string) => success(nickname)) },
   render: (args) => <ProfileNotificationFixture {...args} />,
   play: async ({ canvasElement, args }) => {
     notifications.clean()
