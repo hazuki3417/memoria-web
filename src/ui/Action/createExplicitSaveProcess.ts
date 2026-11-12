@@ -2,6 +2,7 @@ import type { Action, ActionOutcome } from "./actionOutcome"
 import {
   createInspectionRecovery,
   type InspectionResult,
+  type InspectionRecoveryPolicy,
 } from "./createInspectionRecovery"
 
 export type Inspection<Observed> = InspectionResult<Observed>
@@ -11,17 +12,16 @@ export type ExplicitSaveSnapshot<Observed> = Readonly<{
   inspection: Inspection<Observed>
 }>
 
+export type ExplicitSaveProcessConfig<Input, Success, Rejection, Observed = never> = {
+  execute: Action<Input, Success, Rejection>
+  recovery?: InspectionRecoveryPolicy<Input, Observed>
+}
+
 /** Actionと任意の状態照会を組み合わせ、重複実行防止と終了処理を備えた明示保存Processを生成する。 */
 export const createExplicitSaveProcess = <Input, Success, Rejection, Observed = never>({
   execute,
   recovery,
-}: {
-  execute: Action<Input, Success, Rejection>
-  recovery?: {
-    inspect: () => Promise<Observed>
-    matches: (observed: Observed, submitted: Input) => boolean
-  }
-}) => {
+}: ExplicitSaveProcessConfig<Input, Success, Rejection, Observed>) => {
   let snapshot: ExplicitSaveSnapshot<Observed> = {
     busy: false,
     inspection: { kind: "idle" },
