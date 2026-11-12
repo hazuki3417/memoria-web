@@ -29,25 +29,25 @@ export const useExplicitSaveProcess = <Input, Success, Rejection, Observed = nev
 
   const executeLatest = (input: Input) => {
     return executeRef.current(input)
-  };
+  }
 
   const inspectLatest = () => {
     const current = recoveryRef.current
     return current
       ? current.inspect()
       : Promise.reject(new Error("Inspection unavailable"))
-  };
+  }
 
   const matchesLatest = (observed: Observed, input: Input) => {
     return recoveryRef.current?.matches(observed, input) ?? false
-  };
+  }
 
   const createProcess = () => {
     return createExplicitSaveProcess<Input, Success, Rejection, Observed>({
       execute: executeLatest,
       recovery: recovery ? { inspect: inspectLatest, matches: matchesLatest } : undefined,
     })
-  };
+  }
 
   const [process] = useState(createProcess)
 
@@ -71,4 +71,4 @@ export const useExplicitSaveProcess = <Input, Success, Rejection, Observed = nev
   }, [process])
 
   return { process, snapshot }
-};
+}
