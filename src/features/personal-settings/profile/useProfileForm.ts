@@ -47,7 +47,7 @@ export const useProfileForm = ({
 
   const matchesNickname = (observed: string, submitted: string) => {
     return observed === submitted
-  };
+  }
 
   const { process, snapshot: processState } = useExplicitSaveProcess<
     string, string, ProfileSaveRejection, string
@@ -103,7 +103,7 @@ export const useProfileForm = ({
     clearErrors()
     setFormInvalid(false)
     setStatus({ kind: "idle" })
-  };
+  }
 
   const submitNickname = async ({ nickname: input }: z.output<typeof profileSchema>) => {
     if (
@@ -151,14 +151,14 @@ export const useProfileForm = ({
           break
       }
     }
-  };
+  }
 
   const save = handleSubmit(submitNickname)
 
   const inspectCurrentProfile = async () => {
     if (!unknown || !onInspect || inspection.kind === "checking") return
     await process.inspect(getValues("nickname").trim())
-  };
+  }
 
   const confirmObservedProfile = () => {
     if (
@@ -169,17 +169,17 @@ export const useProfileForm = ({
       // Current server observation is not proof of the earlier mutation.
       adopt(inspection.value)
     }
-  };
+  }
 
   const discardUnconfirmedDraft = () => {
     if (unknown && inspection.kind === "differs") adopt(inspection.value)
-  };
+  }
 
   const onDraftChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.onChange(event)
     clearErrors("nickname")
     if (status.kind === "unknown") process.invalidateInspection()
-  };
+  }
 
   return {
     field,
@@ -203,4 +203,4 @@ export const useProfileForm = ({
     confirmObservedProfile,
     discardUnconfirmedDraft,
   }
-};
+}
