@@ -8,9 +8,8 @@ import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { profileSchema } from "./profileSchema"
 import { getProfileBlockedFeedback, type ProfileBlockedFeedback } from "./profileBlockedFeedback"
 import { showNotification } from "@/components/Feedback"
-import { profileSaveAction } from "./profileSaveAction"
+import type { SaveProfile } from "./profileSaveOutcome"
 
-export type SaveProfile = (nickname: string) => Promise<void>
 export type InspectProfile = () => Promise<string>
 
 type Inspection =
@@ -136,7 +135,13 @@ export function useProfileForm({
     setBlockedFeedback(null)
     setFormInvalid(false)
     clearErrors("nickname")
-    const outcome = await profileSaveAction(onSave)(nickname)
+    let outcome: Awaited<ReturnType<SaveProfile>>
+    try {
+      outcome = await onSave(nickname)
+    } catch {
+      // A failed adapter with no classified operation outcome is unconfirmed.
+      outcome = { kind: "unknown" }
+    }
     if (outcome.kind === "success") {
       adoptCurrentNickname(nickname)
       showNotification({
