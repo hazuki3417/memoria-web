@@ -19,24 +19,20 @@ export function ProfileSaveFeedback({
   blockedMessage: string
 }) {
   const {
-    saveState,
+    failure,
     formInvalid,
-    isUnknown,
-    isBlocked,
     blockedFeedback,
     inspection,
     normalized,
-    inspectCurrentProfile,
-    confirmObservedProfile,
-    canRetryInspected,
+    inspect,
+    confirmObservation,
+    canResaveInspected,
     save,
-    discardUnconfirmedDraft,
+    discardUnconfirmed,
   } = model
   const feedback = resolveProfileSaveFeedback({
-    saveState,
+    failure,
     formInvalid,
-    isUnknown,
-    isBlocked,
     blockedFeedback,
     inspection,
     normalized,
@@ -56,11 +52,11 @@ export function ProfileSaveFeedback({
             section.id === "unknown" && onInspect ? (
               <ExplicitSaveRecoveryActions
                 inspectionStatus={inspection.status}
-                onInspect={inspectCurrentProfile}
-                onConfirm={confirmObservedProfile}
+                onInspect={inspect}
+                onConfirm={confirmObservation}
                 onResave={save}
-                onDiscard={discardUnconfirmedDraft}
-                canResave={canRetryInspected}
+                onDiscard={discardUnconfirmed}
+                canResave={canResaveInspected}
               />
             ) : undefined
           }
