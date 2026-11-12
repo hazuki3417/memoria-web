@@ -8,7 +8,7 @@ import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { profileSchema } from "./profileSchema"
 import { getProfileBlockedFeedback, type ProfileBlockedFeedback } from "./profileBlockedFeedback"
 import { showNotification } from "@/components/Feedback"
-import { classifySettingsSaveFailure, getSettingsInputViolations } from "@/infrastructure/graphql/settingsMutationResult"
+import { profileSaveAction } from "./profileSaveAction"
 
 export type SaveProfile = (nickname: string) => Promise<void>
 export type InspectProfile = () => Promise<string>
@@ -136,18 +136,18 @@ export function useProfileForm({
     setBlockedFeedback(null)
     setFormInvalid(false)
     clearErrors("nickname")
-    try {
-      await onSave(nickname)
+    const outcome = await profileSaveAction(onSave)(nickname)
+    if (outcome.kind === "success") {
       adoptCurrentNickname(nickname)
       showNotification({
         kind: "success",
         title: "プロフィールを保存",
         description: "プロフィールを更新しました。",
       })
-    } catch (error) {
-      const kind = classifySettingsSaveFailure(error)
-      if (kind === "validation") {
-        const result = resolveFormFailureValidation(getSettingsInputViolations(error), ["nickname"])
+    } else if (outcome.kind === "rejected") {
+      const { reason } = outcome
+      if (reason.kind === "validation") {
+        const result = resolveFormFailureValidation(reason.violations, ["nickname"])
         if (result.fieldErrors.nickname) {
           setError("nickname", {
             type: "server",
@@ -156,12 +156,14 @@ export function useProfileForm({
         }
         setFormInvalid(result.formError)
         setSaveState("idle")
-      } else if (kind === "blocked") {
-        setBlockedFeedback(getProfileBlockedFeedback(error, blockedMessage))
+      } else if (reason.kind === "blocked") {
+        setBlockedFeedback(getProfileBlockedFeedback(reason.error, blockedMessage))
         setSaveState("blocked")
       } else {
-        setSaveState(kind === "retryable" ? "retryable-error" : "unknown")
+        setSaveState("retryable-error")
       }
+    } else {
+      setSaveState("unknown")
     }
   })
 
