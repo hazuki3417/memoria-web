@@ -67,7 +67,7 @@ export const useProfileForm = ({
     return () => {
       alive.current = false
     }
-  }, [process])
+  }, [])
 
   useEffect(() => {
     if (queryEcho.current.observed === initialNickname) return
