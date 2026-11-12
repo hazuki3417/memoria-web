@@ -6,6 +6,7 @@ type ProfileFeedbackInput = Pick<ProfileForm, "status" | "formInvalid" | "inspec
   blockedMessage: string
 }
 
+/** 保存状態に応じて表示する1件の案内と、追加説明の情報を提供する。 */
 export type ProfileFeedbackItem = {
   id: "retryable" | "validation" | "unknown" | "blocked"
   kind: "error" | "warning"
