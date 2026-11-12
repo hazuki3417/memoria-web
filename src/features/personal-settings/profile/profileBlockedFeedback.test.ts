@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest"
 import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
 
-describe("getProfileBlockedFeedback", () => {
+describe("Profileの保存不可エラーに対応する案内", () => {
   it.each([
     ["UNAUTHENTICATED", "ログインが必要です"],
     ["USER_REGISTRATION_REQUIRED", "アカウント登録が必要です"],
     ["USER_DELETING", "アカウントの削除処理中です"],
     ["FORBIDDEN", "プロフィールを変更できません"],
     ["NOT_FOUND", "プロフィールを確認できません"],
-  ])("maps public %s without exposing raw server messages", (code, title) => {
+  ])("公開コード%sに対応した安全な案内を返し、内部メッセージを公開しない", (code, title) => {
     const feedback = getProfileBlockedFeedback({
       graphQLErrors: [
         { extensions: { code }, message: "INTERNAL PRIVATE EXPLANATION" },
@@ -18,7 +18,7 @@ describe("getProfileBlockedFeedback", () => {
     expect(feedback.description).not.toContain("INTERNAL PRIVATE EXPLANATION")
   })
 
-  it("does not invent a single cause from mixed or unrecognized codes", () => {
+  it("エラーコードが混在・不明な場合は単一の原因を断定しない", () => {
     const feedback = getProfileBlockedFeedback({
       errors: [
         { extensions: { code: "UNAUTHENTICATED" } },
@@ -34,7 +34,7 @@ describe("getProfileBlockedFeedback", () => {
     ).toBe("プロフィールを変更できません")
   })
 
-  it("preserves a feature-provided fallback for legacy blocked errors", () => {
+  it("公開コードがない場合はFeatureが指定したFallbackを利用する", () => {
     expect(getProfileBlockedFeedback({ kind: "blocked" }, "特別な案内").description)
       .toBe("特別な案内")
   })
