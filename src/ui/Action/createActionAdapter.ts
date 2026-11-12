@@ -1,4 +1,5 @@
-import type { Action, ActionOutcome } from "./actionOutcome"
+import type { Action } from "./action"
+import type { ActionOutcome } from "./actionOutcome"
 
 export type ActionAdapterConfig<Input, Response, Success, Rejection> = {
   execute: (input: Input) => Promise<Response>
