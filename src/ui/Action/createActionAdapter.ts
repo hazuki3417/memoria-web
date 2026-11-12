@@ -1,9 +1,6 @@
 import type { Action, ActionOutcome } from "./actionOutcome"
 
-/**
- * Builds an Action from an operation-specific transport and evidence mapper.
- * The shared adapter knows nothing about GraphQL, domains or UI.
- */
+/** 実行処理と結果分類を注入し、ドメインや通信方式に依存しないActionを生成する。 */
 export const createActionAdapter = <Input, Response, Success, Rejection>({
   execute,
   classify,
@@ -12,9 +9,9 @@ export const createActionAdapter = <Input, Response, Success, Rejection>({
 }: {
   execute: (input: Input) => Promise<Response>
   classify: (response: Response) => ActionOutcome<Success, Rejection>
-  /** Only return a rejection here when the error proves non-execution. */
+  
   classifyError?: (error: unknown) => ActionOutcome<Success, Rejection>
-  /** Post-action sync is not part of the confirmed mutation outcome. */
+  
   afterSuccess?: (success: Success, input: Input) => void | Promise<void>
 }): Action<Input, Success, Rejection> => {
   const run = async (input: Input): Promise<ActionOutcome<Success, Rejection>> => {
@@ -38,11 +35,11 @@ export const createActionAdapter = <Input, Response, Success, Rejection>({
     }
 
     if (outcome.kind === "success" && afterSuccess) {
-      // A confirmed operation must not be rolled back by follow-up sync.
+      // 後続の同期失敗によって確定済みの操作結果を変更しない。
       try {
         void Promise.resolve(afterSuccess(outcome.value, input)).catch(() => undefined)
       } catch {
-        // Refresh/notification is not part of the operation evidence.
+        
       }
     }
     return outcome
