@@ -64,12 +64,12 @@ describe("SettingsSectionHost", () => {
     const show = (status: "loading" | "ready") => {
       act(() =>
         root.render(
-          createElement(
-            SettingsSectionHost,
-            { label: "読み込み中" },
-            (render: SettingsSectionRender) =>
+          createElement(SettingsSectionHost, {
+            label: "読み込み中",
+            // biome-ignore lint/correctness/noChildrenProp: createElement needs this required prop for TypeScript overload resolution.
+            children: (render: SettingsSectionRender) =>
               createElement(Controller, { render, status, onMounted }),
-          ),
+          }),
         ),
       )
     }
@@ -87,11 +87,12 @@ describe("SettingsSectionHost", () => {
     const retry = vi.fn()
     act(() =>
       root.render(
-        createElement(
-          SettingsSectionHost,
-          { label: "読み込み中" },
-          (render: SettingsSectionRender) => render({ status: "error", retry }),
-        ),
+        createElement(SettingsSectionHost, {
+          label: "読み込み中",
+          // biome-ignore lint/correctness/noChildrenProp: createElement needs this required prop for TypeScript overload resolution.
+          children: (render: SettingsSectionRender) =>
+            render({ status: "error", retry }),
+        }),
       ),
     )
     expect(element.querySelector('[data-state="error"]')).not.toBeNull()
