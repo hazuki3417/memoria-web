@@ -9,7 +9,7 @@ import { useExplicitSaveProcess } from "@/ui/Action"
 import { resolveFormInputValidation } from "@/ui/formValidation"
 import { profileSchema } from "./profileSchema"
 import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
-import type { SaveProfile, ProfileSaveRejection } from "./profileSaveOutcome"
+import type { SaveProfile } from "./profileSaveOutcome"
 
 export type InspectProfile = () => Promise<string>
 
@@ -49,9 +49,7 @@ export const useProfileForm = ({
     return observed === submitted
   }
 
-  const { process, snapshot: processState } = useExplicitSaveProcess<
-    string, string, ProfileSaveRejection, string
-  >({
+  const { process, snapshot: processState } = useExplicitSaveProcess({
     execute: onSave,
     recovery: onInspect
       ? { inspect: onInspect, matches: matchesNickname }
