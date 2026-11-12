@@ -1,3 +1,4 @@
+import { resolveSaveFeedback, type SaveFeedback, type SaveFeedbackMessages, type SaveFeedbackType } from "@/ui/save-feedback"
 import type { useProfileForm } from "./useProfileForm"
 
 type ProfileForm = ReturnType<typeof useProfileForm>
@@ -6,34 +7,26 @@ type ProfileFeedbackInput = Pick<ProfileForm, "status" | "formInvalid" | "inspec
   blockedMessage: string
 }
 
-/** 保存状態に応じて表示する1件の案内と、追加説明の情報を提供する。 */
-export type ProfileFeedbackItem = {
-  id: "retryable" | "validation" | "unknown" | "blocked"
-  kind: "error" | "warning"
-  title: string
-  description: string
-  details?: readonly string[]
-}
-
 const messages = {
-  retryable: {
-    kind: "error",
-    title: "プロフィールを保存できませんでした",
-    description: "入力した名前は保持しています。下の「再試行」ボタンからもう一度保存できます。",
-  },
   validation: {
-    kind: "error",
     title: "入力内容を確認してください",
-    description: "入力した値を受け付けられませんでした。内容を見直して、もう一度保存してください。 編集しただけでは問題が解消したとは限りません。",
+    description: "入力した内容を確認して、もう一度保存してください。",
+  },
+  retryable: {
+    title: "プロフィールを保存できませんでした",
+    description: "入力内容は保持しています。下の「再試行」からもう一度保存できます。",
   },
   unknown: {
-    kind: "warning",
     title: "プロフィールの保存結果を確認できませんでした",
-    description: "入力した名前は保持しています。前の保存が成功したかは分からないため、自動で再送しません。",
+    description: "入力内容は保持しています。保存結果が不明なため、自動で再送しません。現在の状態を確認してください。",
   },
-} as const satisfies Record<"retryable" | "validation" | "unknown", Pick<ProfileFeedbackItem, "kind" | "title" | "description">>
+  blocked: {
+    title: "プロフィールを変更できません",
+    description: "ページを再読み込みして現在の状態を確認してください。",
+  },
+} satisfies SaveFeedbackMessages
 
-/** 保存状態・入力検証・現状照会に応じた案内を、表示順序を保つFeedback一覧として提供する。 */
+/** Profileの保存状態から利用者に必要な案内を一件だけ選び、照会結果に応じた説明を補う。 */
 export const getProfileSaveFeedback = ({
   status,
   formInvalid,
@@ -41,42 +34,54 @@ export const getProfileSaveFeedback = ({
   normalized,
   canInspect,
   blockedMessage,
-}: ProfileFeedbackInput): ProfileFeedbackItem[] => {
-  const items: ProfileFeedbackItem[] = []
+}: ProfileFeedbackInput): SaveFeedback | null => {
+  // 保存結果が不明・保存不可の場合は、その安全な復旧案内を入力エラーより優先する。
+  const type: SaveFeedbackType | null =
+    status.kind === "blocked" ? "blocked"
+    : status.kind === "unknown" ? "unknown"
+    : formInvalid ? "validation"
+    : status.kind === "retryable-error" ? "retryable"
+    : null
 
-  if (status.kind === "retryable-error") {
-    items.push({ id: "retryable", ...messages.retryable })
+  const feedback = resolveSaveFeedback(type, messages)
+  if (!feedback) return null
+
+  if (feedback.type === "blocked") {
+    return {
+      ...feedback,
+      title: status.kind === "blocked" ? status.feedback.title : feedback.title,
+      description: status.kind === "blocked"
+        ? status.feedback.description || blockedMessage
+        : feedback.description,
+    }
   }
 
-  if (formInvalid) {
-    items.push({ id: "validation", ...messages.validation })
+  if (feedback.type !== "unknown") return feedback
+
+  if (!canInspect) {
+    return {
+      ...feedback,
+      description: "入力内容は保持しています。保存結果が不明なため、自動で再送しません。入力内容を控えてからページを再読み込みしてください。",
+    }
   }
 
-  if (status.kind === "unknown") {
-    const details: string[] = []
-    if (inspection.kind === "matches") {
-      details.push("現在のプロフィールは入力内容と一致しています。元の保存処理が成功した証明ではありません。内容を確認した場合は「確認完了」を選んでください。")
-    }
-    if (inspection.kind === "differs") {
-      details.push(`現在のニックネームは「${inspection.value}」です。入力内容の「${normalized}」とは異なります。必要な場合だけ、もう一度保存するか、変更を破棄してください。`)
-    }
-    if (inspection.kind === "failed") {
-      details.push("現在のプロフィールを取得できませんでした。保存操作は再送せず、状態の確認をやり直してください。")
-    }
-    if (!canInspect) {
-      details.push("この画面では現在の状態を照会できません。入力内容を控えてから画面を再読み込みしてください。")
-    }
-    items.push({ id: "unknown", ...messages.unknown, details })
+  switch (inspection.kind) {
+    case "matches":
+      return {
+        ...feedback,
+        description: "現在のプロフィールは入力内容と一致しています。ただし、前回の保存が成功した証明ではありません。確認した場合は「確認完了」を選んでください。",
+      }
+    case "differs":
+      return {
+        ...feedback,
+        description: `現在のニックネーム「${inspection.value}」と入力内容「${normalized}」が異なります。必要な場合だけ再保存するか、変更を破棄してください。`,
+      }
+    case "failed":
+      return {
+        ...feedback,
+        description: "現在のプロフィールを取得できませんでした。保存を再送せず、状態の確認をやり直してください。",
+      }
+    default:
+      return feedback
   }
-
-  if (status.kind === "blocked") {
-    items.push({
-      id: "blocked",
-      kind: "error",
-      title: status.feedback.title,
-      description: status.feedback.description || blockedMessage,
-    })
-  }
-
-  return items
 }
