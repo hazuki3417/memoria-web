@@ -22,8 +22,8 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe("createAutoSaveQueue", () => {
-  it("combines pending fields and prefers the latest value", async () => {
+describe("自動保存Queue（createAutoSaveQueue）", () => {
+  it("送信待ちの変更を項目単位で合流し、同じ項目は最後の値で保存する", async () => {
     vi.useFakeTimers()
     const execute = vi.fn(async (_patch: Patch) => success())
     const queue = createAutoSaveQueue({ execute, delayMs: 400 })
@@ -40,7 +40,7 @@ describe("createAutoSaveQueue", () => {
     await queue.close()
   })
 
-  it("flushes pending changes on close without waiting for debounce", async () => {
+  it("終了時にはDebounceの待機をせず、未送信変更を送信する", async () => {
     vi.useFakeTimers()
     const execute = vi.fn(async (_patch: Patch) => success())
     const queue = createAutoSaveQueue({ execute })
@@ -52,7 +52,7 @@ describe("createAutoSaveQueue", () => {
     expect(execute).toHaveBeenCalledTimes(1)
   })
 
-  it("drains changes accepted during an in-flight attempt in order", async () => {
+  it("保存中に受けた変更は、先行保存の成功後に順番どおり送信する", async () => {
     vi.useFakeTimers()
     const first = deferred<Result>()
     const execute = vi.fn()
@@ -78,11 +78,11 @@ describe("createAutoSaveQueue", () => {
   })
 
   const nonSuccess: Array<[string, Result]> = [
-    ["rejected", rejected()],
-    ["unknown", unknown()],
+    ["拒否が確定した", rejected()],
+    ["成否が不明な", unknown()],
   ]
 
-  it.each(nonSuccess)("stops on %s without submitting later patches", async (_label, result) => {
+  it.each(nonSuccess)("%s場合は後続の変更を送信しない", async (_label, result) => {
     vi.useFakeTimers()
     const first = deferred<Result>()
     const execute = vi.fn()
@@ -112,7 +112,7 @@ describe("createAutoSaveQueue", () => {
     expect(execute).toHaveBeenCalledTimes(1)
   })
 
-  it("treats a thrown error as unknown and never automatically retries", async () => {
+  it("実行時に例外が発生した場合は結果不明とし、自動で再送しない", async () => {
     const execute = vi.fn().mockRejectedValue(new Error("lost response"))
     const onResult = vi.fn()
     const queue = createAutoSaveQueue<Patch, void, string>({
@@ -130,7 +130,7 @@ describe("createAutoSaveQueue", () => {
     })
   })
 
-  it("is idempotent while closing, and ignores further edits", async () => {
+  it("終了処理を重複実行せず、終了開始後の変更は受け付けない", async () => {
     const first = deferred<Result>()
     const execute = vi.fn(() => first.promise)
     const queue = createAutoSaveQueue<Patch, void, string>({ execute })
@@ -145,7 +145,7 @@ describe("createAutoSaveQueue", () => {
     expect(execute).toHaveBeenCalledTimes(1)
   })
 
-  it("does not turn a successful write into failure if observation throws", async () => {
+  it("結果通知で例外が発生しても、保存成功の結果を変更しない", async () => {
     const execute = vi.fn(async (_patch: Patch) => success())
     const onResult = vi.fn(() => {
       throw new Error("view went away")
@@ -156,7 +156,7 @@ describe("createAutoSaveQueue", () => {
     expect(execute).toHaveBeenCalledTimes(1)
   })
 
-  it("does not mutate the submitted patch when later fields change", async () => {
+  it("送信後に別の変更を受け付けても送信済みPatchを変更しない", async () => {
     vi.useFakeTimers()
     const first = deferred<Result>()
     const seen: Patch[] = []
