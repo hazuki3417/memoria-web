@@ -55,6 +55,7 @@ describe("明示保存の共通Hook", () => {
   }
 
   beforeEach(async () => {
+    vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true)
     currentDraft = "編集中"
     action = vi.fn<Action>()
     inspect = vi.fn<() => Promise<string>>()
@@ -70,6 +71,7 @@ describe("明示保存の共通Hook", () => {
   afterEach(async () => {
     await act(async () => root.unmount())
     host.remove()
+    vi.unstubAllGlobals()
   })
 
   it("確定した保存結果を一度だけ採用・通知する", async () => {
