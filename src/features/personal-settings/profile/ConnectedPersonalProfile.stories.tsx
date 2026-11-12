@@ -128,6 +128,14 @@ const saveSuccess = {
     },
   },
 }
+const profileAfterSave = {
+  request,
+  result: {
+    data: {
+      me: { id: "user-a", profile: { nickname: "変更した名前" } },
+    },
+  },
+}
 const saveValidation = {
   request: mutationRequest,
   result: {
@@ -151,7 +159,7 @@ export const MutationSuccess: Story = {
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider mocks={[profileSuccess, saveSuccess]} addTypename={false}>
+      <MockedProvider mocks={[profileSuccess, saveSuccess, profileAfterSave]} addTypename={false}>
         <Story />
       </MockedProvider>
     ),
