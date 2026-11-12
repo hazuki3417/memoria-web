@@ -69,7 +69,7 @@ export const getProfileSaveFeedback = ({
     case "matches":
       return {
         ...feedback,
-        description: "現在のプロフィールは入力内容と一致しています。ただし、前回の保存が成功した証明ではありません。確認した場合は「確認完了」を選んでください。",
+        description: "現在のプロフィールは入力内容と一致しています。ただし、元の保存処理が成功した証明ではありません。確認した場合は「確認完了」を選んでください。",
       }
     case "differs":
       return {
@@ -79,7 +79,7 @@ export const getProfileSaveFeedback = ({
     case "failed":
       return {
         ...feedback,
-        description: "現在のプロフィールを取得できませんでした。保存を再送せず、状態の確認をやり直してください。",
+        description: "現在のプロフィールを取得できませんでした。保存操作は再送せず、状態の確認をやり直してください。",
       }
     default:
       return feedback
