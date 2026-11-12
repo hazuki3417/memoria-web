@@ -18,7 +18,7 @@ type SaveStatus =
   | { kind: "blocked"; feedback: ReturnType<typeof getProfileBlockedFeedback> }
 
 /** RHF owns form values; the injected process owns execution and inspection. */
-export function useProfileForm({
+export const useProfileForm = ({
   onSave,
   onInspect,
   initialNickname,
@@ -30,7 +30,7 @@ export function useProfileForm({
   initialNickname: string
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage: string
-}) {
+}) => {
   const form = useForm<z.input<typeof profileSchema>, unknown, z.output<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     mode: "onChange",
@@ -45,9 +45,9 @@ export function useProfileForm({
   const validation = profileSchema.safeParse({ nickname })
   const invalid = !validation.success
 
-  function matchesNickname(observed: string, submitted: string) {
+  const matchesNickname = (observed: string, submitted: string) => {
     return observed === submitted
-  }
+  };
 
   const { process, snapshot: processState } = useExplicitSaveProcess<
     string, string, ProfileSaveRejection, string
@@ -96,16 +96,16 @@ export function useProfileForm({
     !invalid &&
     normalized !== inspection.value
 
-  function adopt(value: string) {
+  const adopt = (value: string) => {
     process.invalidateInspection()
     queryEcho.current.confirmed = value === initialNickname ? null : value
     reset({ nickname: value })
     clearErrors()
     setFormInvalid(false)
     setStatus({ kind: "idle" })
-  }
+  };
 
-  async function submitNickname({ nickname: input }: z.output<typeof profileSchema>) {
+  const submitNickname = async ({ nickname: input }: z.output<typeof profileSchema>) => {
     if (
       process.getSnapshot().busy ||
       blocked ||
@@ -151,16 +151,16 @@ export function useProfileForm({
           break
       }
     }
-  }
+  };
 
   const save = handleSubmit(submitNickname)
 
-  async function inspectCurrentProfile() {
+  const inspectCurrentProfile = async () => {
     if (!unknown || !onInspect || inspection.kind === "checking") return
     await process.inspect(getValues("nickname").trim())
-  }
+  };
 
-  function confirmObservedProfile() {
+  const confirmObservedProfile = () => {
     if (
       unknown &&
       inspection.kind === "matches" &&
@@ -169,17 +169,17 @@ export function useProfileForm({
       // Current server observation is not proof of the earlier mutation.
       adopt(inspection.value)
     }
-  }
+  };
 
-  function discardUnconfirmedDraft() {
+  const discardUnconfirmedDraft = () => {
     if (unknown && inspection.kind === "differs") adopt(inspection.value)
-  }
+  };
 
-  function onDraftChange(event: ChangeEvent<HTMLInputElement>) {
+  const onDraftChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.onChange(event)
     clearErrors("nickname")
     if (status.kind === "unknown") process.invalidateInspection()
-  }
+  };
 
   return {
     field,
@@ -203,4 +203,4 @@ export function useProfileForm({
     confirmObservedProfile,
     discardUnconfirmedDraft,
   }
-}
+};
