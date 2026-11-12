@@ -24,16 +24,16 @@ export const createInspectionRecovery = <Input, Observed>({
     } catch {
       // Observers cannot alter the result of an authoritative read.
     }
-  };
+  }
 
   const getSnapshot = () => {
     return state
-  };
+  }
 
   const invalidate = () => {
     revision += 1
     if (state.kind !== "idle") publish({ kind: "idle" })
-  };
+  }
 
   const run = async (input: Input): Promise<InspectionResult<Observed>> => {
     if (closed) return state
@@ -48,12 +48,12 @@ export const createInspectionRecovery = <Input, Observed>({
       publish({ kind: "failed" })
     }
     return state
-  };
+  }
 
   const close = () => {
     closed = true
     revision += 1
-  };
+  }
 
   return { getSnapshot, invalidate, run, close }
-};
+}
