@@ -6,7 +6,7 @@ import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshEr
 import { PersonalProfile } from "./PersonalProfile"
 import { usePersonalProfileSave } from "./usePersonalProfileSave"
 
-/** Profileの取得・保存Action・復旧照会を接続し、取得状態に応じて画面を構成する。 */
+/** Profile設定画面に必要なデータ取得・保存・現状照会を接続し、取得状態に応じて適切な画面を提供する。 */
 export function ConnectedPersonalProfile({
   render,
 }: {
