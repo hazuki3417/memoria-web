@@ -15,27 +15,27 @@ import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
 import type { ProfileSaveRejection, SaveProfile } from "./profileSaveOutcome"
 
 /** Only the GraphQL Operation-specific details belong to this adapter. */
-export function usePersonalProfileSave() {
+export const usePersonalProfileSave = () => {
   const client = useApolloClient()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
 
-  function classifyBlocked(error: unknown): ActionOutcome<string, ProfileSaveRejection> {
+  const classifyBlocked = (error: unknown): ActionOutcome<string, ProfileSaveRejection> => {
     const kind = classifySettingsSaveFailure(error)
     if (kind === "blocked") return { kind: "rejected", reason: { kind, error } }
     if (kind === "retryable") return { kind: "rejected", reason: { kind } }
     return { kind: "unknown" }
-  }
+  };
 
-  function execute(nickname: string) {
+  const execute = (nickname: string) => {
     return updateProfile({
       variables: { input: { nickname } },
       errorPolicy: "all",
     })
-  }
+  };
 
-  function classify(
+  const classify = (
     response: Awaited<ReturnType<typeof execute>>,
-  ): ActionOutcome<string, ProfileSaveRejection> {
+  ): ActionOutcome<string, ProfileSaveRejection> => {
     const result = response.data?.updateUserProfile
     if (result?.__typename === "UpdateUserProfileSuccess") {
       return { kind: "success", value: result.user.profile.nickname }
@@ -50,13 +50,13 @@ export function usePersonalProfileSave() {
       return classifyBlocked(new SettingsGraphQLExecutionError(response.errors))
     }
     return { kind: "unknown" }
-  }
+  };
 
-  async function afterSuccess() {
+  const afterSuccess = async () => {
     await client.refetchQueries({
       include: [CurrentUserDocument, PersonalSettingsProfileDocument],
     })
-  }
+  };
 
   const saveProfile: SaveProfile = createActionAdapter({
     execute,
@@ -65,14 +65,14 @@ export function usePersonalProfileSave() {
     afterSuccess,
   })
 
-  async function inspectProfile(): Promise<string> {
+  const inspectProfile = async (): Promise<string> => {
     const result = await client.query<OperationPersonalSettingsProfileQuery>({
       query: PersonalSettingsProfileDocument,
       fetchPolicy: "no-cache",
     })
     if (!result.data?.me) throw new Error("Current profile unavailable")
     return result.data.me.profile.nickname
-  }
+  };
 
   return { saveProfile, inspectProfile }
-}
+};
