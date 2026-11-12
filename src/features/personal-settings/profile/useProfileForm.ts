@@ -126,7 +126,7 @@ export function useProfileForm({
     }
 
     if (outcome.kind === "success") {
-      adopt(confirmedInput)
+      adopt(outcome.value)
       showNotification({
         kind: "success",
         title: "プロフィールを保存",
