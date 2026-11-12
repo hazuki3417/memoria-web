@@ -760,3 +760,27 @@ export const ProfileBlockedVisual: Story = {
     await expect(input).toBeDisabled()
   },
 }
+
+
+export const UnexpectedActionError: Story = {
+  name: "Interaction · Action例外は未確認扱いで自動再送しない",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => {
+      throw new Error("Unexpected adapter failure")
+    }),
+    onInspect: fn(async () => "現在の名前"),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更した名前")
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "プロフィールの保存結果を確認できませんでした",
+    )
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+    await expect(input).toHaveValue("変更した名前")
+  },
+}
