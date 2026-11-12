@@ -19,7 +19,11 @@ export function createInspectionRecovery<Input, Observed>({
   function publish(value: InspectionResult<Observed>) {
     if (closed) return
     state = value
-    onChange?.(state)
+    try {
+      onChange?.(state)
+    } catch {
+      // Observers cannot alter the result of an authoritative read.
+    }
   }
 
   return {
