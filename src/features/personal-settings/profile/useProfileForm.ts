@@ -137,7 +137,7 @@ export function useProfileForm({
           status: saveAction.inspection.status,
           nickname: saveAction.inspection.value,
         }
-      : saveAction.inspection
+      : { status: saveAction.inspection.status }
 
   return {
     field,
