@@ -19,7 +19,13 @@ export function ProfileSaveFeedback({
   blockedMessage: string
 }) {
   const {
+    saveState,
+    formInvalid,
+    isUnknown,
+    isBlocked,
+    blockedFeedback,
     inspection,
+    normalized,
     inspectCurrentProfile,
     confirmObservedProfile,
     canRetryInspected,
@@ -27,7 +33,13 @@ export function ProfileSaveFeedback({
     discardUnconfirmedDraft,
   } = model
   const feedback = resolveProfileSaveFeedback({
-    ...model,
+    saveState,
+    formInvalid,
+    isUnknown,
+    isBlocked,
+    blockedFeedback,
+    inspection,
+    normalized,
     hasInspector: Boolean(onInspect),
     blockedMessage,
   })
