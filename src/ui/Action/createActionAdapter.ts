@@ -8,7 +8,7 @@ export type ActionAdapterConfig<Input, Response, Success, Rejection> = {
   afterSuccess?: (success: Success, input: Input) => void | Promise<void>
 }
 
-/** 実行処理と結果分類を注入し、ドメインや通信方式に依存しないActionを生成する。 */
+/** API固有の実行・結果判定を注入し、異なる通信手段でも共通の確定／拒否／結果不明のAction契約を利用できるようにする。 */
 export const createActionAdapter = <Input, Response, Success, Rejection>({
   execute,
   classify,
