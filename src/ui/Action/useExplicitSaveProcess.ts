@@ -20,9 +20,11 @@ export function useExplicitSaveProcess<Input, Success, Rejection, Observed = nev
   }
 }) {
   const executeRef = useRef(execute)
-  executeRef.current = execute
   const recoveryRef = useRef(recovery)
-  recoveryRef.current = recovery
+  useEffect(() => {
+    executeRef.current = execute
+    recoveryRef.current = recovery
+  }, [execute, recovery])
 
   const [process] = useState(() => createExplicitSaveProcess<Input, Success, Rejection, Observed>({
     execute: (input) => executeRef.current(input),
