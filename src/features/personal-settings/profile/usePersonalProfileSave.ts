@@ -4,6 +4,7 @@ import { useApolloClient } from "@apollo/client"
 import {
   CurrentUserDocument,
   PersonalSettingsProfileDocument,
+  type OperationPersonalSettingsProfileQuery,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
 import {
@@ -72,5 +73,15 @@ export function usePersonalProfileSave() {
     return { kind: "success", value: undefined }
   }
 
-  return { saveProfile }
+  async function inspectProfile(): Promise<string> {
+    // A recovery read must not mutate Apollo Cache or claim the old write succeeded.
+    const result = await client.query<OperationPersonalSettingsProfileQuery>({
+      query: PersonalSettingsProfileDocument,
+      fetchPolicy: "no-cache",
+    })
+    if (!result.data?.me) throw new Error("Current profile unavailable")
+    return result.data.me.profile.nickname
+  }
+
+  return { saveProfile, inspectProfile }
 }
