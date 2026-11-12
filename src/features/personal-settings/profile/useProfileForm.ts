@@ -8,14 +8,13 @@ import { showNotification } from "@/components/Feedback"
 import { useExplicitSaveProcess } from "@/ui/Action"
 import { resolveFormInputValidation } from "@/ui/formValidation"
 import { profileSchema } from "./profileSchema"
-import { getProfileBlockedFeedback } from "./profileBlockedFeedback"
 import type { SaveProfile } from "./profileSaveOutcome"
 
 export type InspectProfile = () => Promise<string>
 
 type SaveStatus =
   | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
-  | { kind: "blocked"; feedback: ReturnType<typeof getProfileBlockedFeedback> }
+  | { kind: "blocked"; error: unknown }
 
 /** ProfileのNickname編集・入力検証・明示保存・結果不明時の復旧操作を画面から利用できるようにする。 */
 export const useProfileForm = ({
@@ -23,13 +22,11 @@ export const useProfileForm = ({
   onInspect,
   initialNickname,
   initialSaveState = "idle",
-  blockedMessage,
 }: {
   onSave: SaveProfile
   onInspect?: InspectProfile
   initialNickname: string
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
-  blockedMessage: string
 }) => {
   const form = useForm<z.input<typeof profileSchema>, unknown, z.output<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -58,7 +55,7 @@ export const useProfileForm = ({
 
   const [status, setStatus] = useState<SaveStatus>(
     initialSaveState === "blocked"
-      ? { kind: "blocked", feedback: getProfileBlockedFeedback(null, blockedMessage) }
+      ? { kind: "blocked", error: null }
       : { kind: initialSaveState },
   )
   const [formInvalid, setFormInvalid] = useState(false)
@@ -141,7 +138,7 @@ export const useProfileForm = ({
         case "blocked":
           setStatus({
             kind: "blocked",
-            feedback: getProfileBlockedFeedback(reason.error, blockedMessage),
+            error: reason.error,
           })
           break
         case "retryable":
