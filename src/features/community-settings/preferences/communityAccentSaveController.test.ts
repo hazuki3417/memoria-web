@@ -808,6 +808,115 @@ describe("Community Accentの遅延Trigger", () => {
     }
   })
 
+  it("先行保存が完了しても後続Draftの400ms待機を短縮しない", async () => {
+    vi.useFakeTimers()
+    try {
+      let resolveFirst: ((value: string) => void) | undefined
+      const save = vi.fn()
+        .mockImplementationOnce(() => new Promise<string>((resolve) => { resolveFirst = resolve }))
+        .mockResolvedValueOnce("#445566")
+      const controller = createCommunityAccentSaveController(400)
+      controller.initialize(id, "#112233")
+      controller.configure(id, {
+        save,
+        observe: vi.fn(),
+        preview: vi.fn().mockReturnValue(1),
+        release: vi.fn(),
+      })
+
+      controller.edit(id, "#AABBCC")
+      await vi.advanceTimersByTimeAsync(400)
+      expect(save).toHaveBeenCalledExactlyOnceWith("#AABBCC")
+      controller.edit(id, "#445566")
+      await vi.advanceTimersByTimeAsync(100)
+      resolveFirst?.("#AABBCC")
+      await tick()
+      expect(controller.getSnapshot(id)).toMatchObject({
+        confirmed: "#AABBCC",
+        draft: "#445566",
+        status: "pending",
+      })
+      expect(save).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(299)
+      expect(save).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(1)
+      expect(save).toHaveBeenNthCalledWith(2, "#445566")
+      expect(controller.getSnapshot(id)).toMatchObject({
+        confirmed: "#445566",
+        draft: "#445566",
+        status: "saved",
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("CommunityごとのDebounce時刻が独立し、別Communityの編集で延長されない", async () => {
+    vi.useFakeTimers()
+    try {
+      const saveA = vi.fn().mockResolvedValue("#AABBCC")
+      const saveB = vi.fn().mockResolvedValue("#DDEEFF")
+      const controller = createCommunityAccentSaveController(400)
+      controller.initialize("community-a", "#112233")
+      controller.initialize("community-b", "#334455")
+      controller.configure("community-a", {
+        save: saveA,
+        observe: vi.fn(),
+        preview: vi.fn().mockReturnValue(1),
+        release: vi.fn(),
+      })
+      controller.configure("community-b", {
+        save: saveB,
+        observe: vi.fn(),
+        preview: vi.fn().mockReturnValue(2),
+        release: vi.fn(),
+      })
+      controller.edit("community-a", "#AABBCC")
+      await vi.advanceTimersByTimeAsync(250)
+      controller.edit("community-b", "#DDEEFF")
+      await vi.advanceTimersByTimeAsync(150)
+      expect(saveA).toHaveBeenCalledExactlyOnceWith("#AABBCC")
+      expect(saveB).not.toHaveBeenCalled()
+      expect(controller.getSnapshot("community-a").confirmed).toBe("#AABBCC")
+      await vi.advanceTimersByTimeAsync(249)
+      expect(saveB).not.toHaveBeenCalled()
+      await vi.advanceTimersByTimeAsync(1)
+      expect(saveB).toHaveBeenCalledExactlyOnceWith("#DDEEFF")
+      expect(controller.getSnapshot("community-b").confirmed).toBe("#DDEEFF")
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("未送信の選択を確定済みHEXに戻した場合は保存予約とPreviewを解除する", async () => {
+    vi.useFakeTimers()
+    try {
+      const save = vi.fn()
+      const release = vi.fn()
+      const controller = createCommunityAccentSaveController(400)
+      controller.initialize(id, "#112233")
+      controller.configure(id, {
+        save,
+        observe: vi.fn(),
+        preview: vi.fn().mockReturnValue(3),
+        release,
+      })
+      controller.edit(id, "#AABBCC")
+      await vi.advanceTimersByTimeAsync(200)
+      controller.edit(id, "#112233")
+      await vi.advanceTimersByTimeAsync(800)
+      expect(save).not.toHaveBeenCalled()
+      expect(release).toHaveBeenCalledWith(3)
+      expect(controller.getSnapshot(id)).toMatchObject({
+        confirmed: "#112233",
+        draft: "#112233",
+        status: "idle",
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("結果不明で停止したあと、新しい入力を自動再送しない", async () => {
     vi.useFakeTimers()
     try {
