@@ -20,7 +20,7 @@ type AutoSaveQueueConfig<Patch, Success, Rejection> = {
   delayMs?: number
 }
 
-/** 変更の合流・Debounce・直列実行と終了時Flushを担う、自動保存Queueを生成する。 */
+/** 連続する設定変更を自動保存し、未送信変更の合流・送信順序・離脱時の送信試行を共通化するQueueを提供する。 */
 export const createAutoSaveQueue = <
   Patch extends object,
   Success,
