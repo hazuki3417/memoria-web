@@ -8,7 +8,7 @@ export const resolveErrorCodeFeedback = <Feedback>(
   if (
     code &&
     codes.every((candidate) => candidate === code) &&
-    Object.prototype.hasOwnProperty.call(messages, code)
+    Object.hasOwn(messages, code)
   ) {
     return messages[code]
   }
