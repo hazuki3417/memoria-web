@@ -1,6 +1,6 @@
 "use client"
 
-import { Badge, Box, Button, Group, Menu, ScrollArea, Stack, Table, Text, TextInput } from "@mantine/core"
+import { Badge, Box, Button, Group, Menu, ScrollArea, Table, Text, TextInput } from "@mantine/core"
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { SectionHeader } from "@/components/SectionHeader"
 import { UsageSortHeader } from "@/features/usage/UsageSortHeader"
