@@ -21,26 +21,35 @@ export function useExplicitSaveProcess<Input, Success, Rejection, Observed = nev
 }) {
   const executeRef = useRef(execute)
   const recoveryRef = useRef(recovery)
+
   useEffect(() => {
     executeRef.current = execute
     recoveryRef.current = recovery
   }, [execute, recovery])
 
-  const [process] = useState(() => createExplicitSaveProcess<Input, Success, Rejection, Observed>({
-    execute: (input) => executeRef.current(input),
-    recovery: recovery
-      ? {
-          inspect: () => {
-            const current = recoveryRef.current
-            return current
-              ? current.inspect()
-              : Promise.reject(new Error("Inspection unavailable"))
-          },
-          matches: (observed, input) =>
-            recoveryRef.current?.matches(observed, input) ?? false,
-        }
-      : undefined,
-  }))
+  function executeLatest(input: Input) {
+    return executeRef.current(input)
+  }
+
+  function inspectLatest() {
+    const current = recoveryRef.current
+    return current
+      ? current.inspect()
+      : Promise.reject(new Error("Inspection unavailable"))
+  }
+
+  function matchesLatest(observed: Observed, input: Input) {
+    return recoveryRef.current?.matches(observed, input) ?? false
+  }
+
+  function createProcess() {
+    return createExplicitSaveProcess<Input, Success, Rejection, Observed>({
+      execute: executeLatest,
+      recovery: recovery ? { inspect: inspectLatest, matches: matchesLatest } : undefined,
+    })
+  }
+
+  const [process] = useState(createProcess)
 
   const snapshot = useSyncExternalStore(
     process.subscribe,
@@ -48,9 +57,8 @@ export function useExplicitSaveProcess<Input, Success, Rejection, Observed = nev
     process.getSnapshot,
   )
 
-  // In React StrictMode, Effect setup/cleanup is replayed in development.
-  // Defer irreversible close one microtask so the replayed setup can retain
-  // the same Process; a real unmount still releases the owner.
+  // React StrictMode replays effect cleanup during development. Delay the
+  // irreversible close for a microtask so that replay does not close the owner.
   const mounted = useRef(false)
   useEffect(() => {
     mounted.current = true
