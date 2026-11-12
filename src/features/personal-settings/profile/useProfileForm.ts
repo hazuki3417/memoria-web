@@ -53,6 +53,8 @@ export function useProfileForm({
   // Keep a newly confirmed name authoritative until the shared Query echoes it.
   const awaitingSourceEcho = useRef<string | null>(null)
   const inspectionGeneration = useRef(0)
+  const submitting = useRef(false)
+  const mounted = useRef(true)
 
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "retryable-error" | "blocked" | "unknown"
@@ -62,8 +64,12 @@ export function useProfileForm({
     useState<ProfileBlockedFeedback | null>(null)
   const [inspection, setInspection] = useState<Inspection>({ status: "idle" })
 
-  useEffect(() => () => {
-    inspectionGeneration.current += 1
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+      inspectionGeneration.current += 1
+    }
   }, [])
 
   // Untouched Draft follows fresh data. In-flight / failed / unknown Drafts do
@@ -122,6 +128,7 @@ export function useProfileForm({
 
   const save = handleSubmit(async ({ nickname }) => {
     if (
+      submitting.current ||
       isSaving ||
       isBlocked ||
       (isUnknown && !canRetryInspected) ||
@@ -129,6 +136,7 @@ export function useProfileForm({
     )
       return
 
+    submitting.current = true
     inspectionGeneration.current += 1
     setInspection({ status: "idle" })
     setSaveState("saving")
@@ -142,6 +150,9 @@ export function useProfileForm({
       // A failed adapter with no classified operation outcome is unconfirmed.
       outcome = { kind: "unknown" }
     }
+    submitting.current = false
+    // The request may finish after this Section has been unmounted.
+    if (!mounted.current) return
     if (outcome.kind === "success") {
       adoptCurrentNickname(nickname)
       showNotification({
