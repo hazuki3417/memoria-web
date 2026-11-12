@@ -446,7 +446,7 @@ export const ProfileGraphqlInternalUnknown: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
     await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
     await expect(canvas.getByRole("alert")).toHaveTextContent(
-      "現在のサーバー値",
+      "保存結果は未確定",
     )
     await expect(canvas.getByRole("button", { name: "変更を破棄" })).toBeVisible()
     await expect(args.onSave).toHaveBeenCalledTimes(1)
@@ -489,7 +489,7 @@ export const ProfileUnknownInspectFailure: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "更新" }))
     await expect(await canvas.findByRole("alert")).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(await canvas.findByText("現在のプロフィールを取得できませんでした。保存操作は再送せず、状態の確認をやり直してください。")).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("保存結果は未確定")
     await expect(input).toHaveValue("保存できたか不明")
     await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
     await expect(args.onSave).toHaveBeenCalledTimes(1)
@@ -718,7 +718,7 @@ export const ProfileUnknownDiffersVisual: Story = {
     await expect(await canvas.findByRole("alert")).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
     await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
-    await expect(canvas.getByRole("alert")).toHaveTextContent("確認した現在値")
+    await expect(canvas.getByRole("alert")).toHaveTextContent("保存結果は未確定")
   },
 }
 
