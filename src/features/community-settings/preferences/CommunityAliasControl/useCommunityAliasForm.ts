@@ -126,7 +126,7 @@ export function useCommunityAliasForm({
 
   return {
     field, fieldState, text,
-    saving: saveAction.isSaving,
+    isSaving: saveAction.isSaving,
     isInputDisabled: saveAction.isInputDisabled,
     failure: saveAction.failure, formInvalid,
     blockedFeedback: saveAction.blockedFeedback,
