@@ -118,7 +118,7 @@ export function useCommunityNameSettings({
           status: saveAction.inspection.status,
           name: saveAction.inspection.value,
         }
-      : saveAction.inspection
+      : { status: saveAction.inspection.status }
   const saveFeedback = resolveCommunityNameSaveFeedback({
     formInvalid,
     failure: saveAction.failure,
