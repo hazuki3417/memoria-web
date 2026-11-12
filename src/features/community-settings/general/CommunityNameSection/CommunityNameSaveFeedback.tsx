@@ -3,10 +3,14 @@
 import { ExplicitSaveRecoveryActions } from "@/ui/ExplicitSave"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { useCommunityNameSettings } from "./useCommunityNameSettings"
+import { resolveCommunityNameSaveFeedback } from "./resolveCommunityNameSaveFeedback"
 
 type Props = Pick<
   ReturnType<typeof useCommunityNameSettings>,
-  | "saveFeedback"
+  | "formInvalid"
+  | "failure"
+  | "blockedFeedback"
+  | "draft"
   | "unknown"
   | "inspection"
   | "inspectName"
@@ -18,7 +22,10 @@ type Props = Pick<
 
 /** Owns the confirmation/retry/discard feedback UI, not the form's recovery state. */
 export function CommunityNameSaveFeedback({
-  saveFeedback,
+  formInvalid,
+  failure,
+  blockedFeedback,
+  draft,
   unknown = false,
   inspection,
   inspectName,
@@ -27,12 +34,20 @@ export function CommunityNameSaveFeedback({
   canResaveInspected = false,
   saveName,
 }: Props) {
-  if (!saveFeedback) return null
+  const feedback = resolveCommunityNameSaveFeedback({
+    formInvalid,
+    failure,
+    blockedFeedback,
+    inspection,
+    draft,
+    hasInspector: Boolean(inspectName),
+  })
+  if (!feedback) return null
 
   return (
     <FeedbackPanel
-      kind={saveFeedback.kind ?? "error"}
-      title={saveFeedback.title}
+      kind={feedback.kind}
+      title={feedback.title}
       role="alert"
       actions={
         unknown && inspectName ? (
@@ -47,7 +62,7 @@ export function CommunityNameSaveFeedback({
         ) : undefined
       }
     >
-      {saveFeedback.description}
+      {feedback.description}
     </FeedbackPanel>
   )
 }
