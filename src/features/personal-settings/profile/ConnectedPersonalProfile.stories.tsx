@@ -1,4 +1,5 @@
 import { MockedProvider } from "@apollo/client/testing"
+import { GraphQLError } from "graphql"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, waitFor, within } from "storybook/test"
 import { PersonalSettingsProfileDocument, UpdateMemoriaUserProfileDocument } from "@/infrastructure/graphql/generated"
@@ -156,7 +157,7 @@ const saveMissingResult = {
 const saveBlocked = {
   request: mutationRequest,
   result: {
-    errors: [{ message: "Operation is blocked", extensions: { code: "USER_DELETING" } }],
+    errors: [new GraphQLError("Operation is blocked", { extensions: { code: "USER_DELETING" } })],
   },
 }
 const saveUnknown = {
