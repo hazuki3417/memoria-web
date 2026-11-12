@@ -6,6 +6,7 @@ import type { useProfileForm, InspectProfile } from "./useProfileForm"
 
 type ProfileForm = ReturnType<typeof useProfileForm>
 
+/** Profile保存の失敗・結果不明・操作制限を画面内に表示し、復旧操作を提供する。 */
 export function ProfileSaveFeedback({
   model,
   onInspect,
