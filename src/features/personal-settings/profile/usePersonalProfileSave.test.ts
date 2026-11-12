@@ -61,6 +61,24 @@ describe("Profile保存ActionのMutation結果", () => {
     expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
   })
 
+  it("Mutation確定後の再取得失敗でも保存成功を取り消さない", async () => {
+    mocks.mutate.mockResolvedValue({
+      data: {
+        updateUserProfile: {
+          __typename: "UpdateUserProfileSuccess",
+          user: { profile: { nickname: "確定した名前" } },
+        },
+      },
+    })
+    mocks.refetchQueries.mockRejectedValue(new Error("refresh failed"))
+    await expect(action.saveProfile("送信した名前")).resolves.toEqual({
+      status: "confirmed",
+      value: "確定した名前",
+    })
+    expect(mocks.mutate).toHaveBeenCalledTimes(1)
+    expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
+  })
+
   it("型付き入力拒否はValidationとして返し、再取得しない", async () => {
     const violations = [
       { scope: "FIELD", code: "REQUIRED", inputPaths: [{ segments: ["nickname"] }] },
