@@ -46,7 +46,7 @@ export const createActionAdapter = <Input, Response, Success, Rejection>({
       }
     }
     return outcome
-  };
+  }
 
   return run
-};
+}
