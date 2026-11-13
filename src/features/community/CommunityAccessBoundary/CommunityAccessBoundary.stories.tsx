@@ -107,6 +107,40 @@ export const Unavailable: Story = {
   },
 }
 
+export const Unauthenticated: Story = {
+  name: "Interaction · 認証失効時にログインを案内",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider
+        mocks={[{
+          request,
+          result: {
+            errors: [
+              new GraphQLError("unauthenticated", {
+                extensions: { code: "UNAUTHENTICATED" },
+              }),
+            ],
+          },
+        }]}
+        addTypename={false}
+      >
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(
+      await canvas.findByText("認証状態を確認できませんでした"),
+    ).toBeVisible()
+    await expect(
+      canvas.getByRole("button", { name: "ログインへ" }),
+    ).toBeVisible()
+    await expect(canvas.queryByText("Community固有コンテンツ")).not.toBeInTheDocument()
+  },
+}
+
 export const Retry: Story = {
   name: "Interaction · 通信失敗から再試行",
   tags: ["interaction"],
