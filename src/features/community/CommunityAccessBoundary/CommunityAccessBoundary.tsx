@@ -1,7 +1,6 @@
 "use client"
 
 import { Button, Center } from "@mantine/core"
-import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import { PageStatusBoundary } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import { useCommunityDetailsQuery } from "@/infrastructure/graphql/generated"
@@ -15,11 +14,14 @@ import { getCommunityAccessStatus } from "./communityAccessStatus"
 export function CommunityAccessBoundary({
   communityId,
   children,
+  onReturnToDashboard,
+  onLogin,
 }: {
   communityId: string
   children: ReactNode
+  onReturnToDashboard: () => void
+  onLogin: () => void
 }) {
-  const router = useRouter()
   const { data, loading, error, refetch } = useCommunityDetailsQuery({
     variables: { communityId },
     fetchPolicy: "network-only",
@@ -37,7 +39,7 @@ export function CommunityAccessBoundary({
   if (status === "unavailable")
     return (
       <CommunityAccessUnavailable
-        onReturnToDashboard={() => router.push("/dashboard")}
+        onReturnToDashboard={onReturnToDashboard}
       />
     )
 
@@ -63,7 +65,7 @@ export function CommunityAccessBoundary({
       {failed && (
         <Center>
           {status === "unauthenticated" ? (
-            <Button variant="light" onClick={() => router.push("/login")}>
+            <Button variant="light" onClick={onLogin}>
               ログインへ
             </Button>
           ) : (
