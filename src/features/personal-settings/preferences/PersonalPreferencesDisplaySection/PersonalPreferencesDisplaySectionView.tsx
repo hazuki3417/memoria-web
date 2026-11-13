@@ -4,7 +4,6 @@ import { Box, ColorInput, Select, Stack } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import type { UserPreferences } from "../userPreferences"
-import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
 import type { PersonalPreferencesDisplaySectionModel } from "./usePersonalPreferencesDisplaySection"
 type PreferencesModel = PersonalPreferencesDisplaySectionModel
 
