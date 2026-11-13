@@ -3,7 +3,7 @@
 import { useUserPreferences } from "./useUserPreferences"
 import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
 import { PersonalPreferencesView } from "./PersonalPreferencesView/PersonalPreferencesView"
-import type { SavePersonalPreferencesAction } from "./preferencesSaveOutcome"
+import type { SavePersonalPreferencesAction } from "./save/preferencesSaveOutcome"
 
 /** 環境設定のForm・Actionを接続し、既存Viewの表示と操作を保持する。 */
 export function PersonalPreferences({
