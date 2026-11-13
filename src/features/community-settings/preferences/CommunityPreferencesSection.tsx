@@ -50,7 +50,7 @@ export function CommunityPreferencesSection({
             />
           ) : undefined
         }
-        aliasControl={
+        aliasSection={
           <CommunityAliasSection
             savedAlias={settings.alias}
             onInspect={alias.inspectAlias}
