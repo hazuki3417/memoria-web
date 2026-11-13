@@ -1,70 +1,47 @@
 "use client"
 
+import { useMediaQuery } from "@mantine/hooks"
+import { usePersonalSettingsPreferencesQuery } from "@/infrastructure/graphql/generated"
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
-import { usePersonalPreferencesConnection } from "./usePersonalPreferencesConnection"
-import { usePersonalPreferencesForm } from "./usePersonalPreferencesForm"
-import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
+import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
+import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 import { PersonalPreferencesView } from "./PersonalPreferencesView"
-import type { SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
+import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
+import { fromGraphqlUserPreferences } from "./userPreferencesGraphqlAdapter"
 
-type PreferencesProps = {
-  /** SettingsSectionHostを使う実運用の入口。Storyでは指定しない。 */
-  render?: SettingsSectionRender
-  compact?: boolean
-  initialPreferences?: UserPreferences
-  onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
-  onSaveAction?: SavePersonalPreferencesAction
-  onInspect?: () => Promise<UserPreferences>
-}
+/** Profileと同じQuery・Action・Host接続の入口。Ready ViewがFormのLifetimeを所有する。 */
+export function PersonalPreferences({ render }: { render: SettingsSectionRender }) {
+  const query = usePersonalSettingsPreferencesQuery({
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+  })
+  const { inspectPreferences } = usePersonalSettingsInspection()
+  const { savePreferencesAction } = usePersonalPreferencesSave()
+  const compact = useMediaQuery("(max-width: 48em)")
+  const values = query.data?.me?.preferences
 
-/**
- * Preferencesの唯一の公開入口。実運用のQuery/Mutation接続と、
- * Storybookの注入Fixtureを明確に分離する。
- */
-export function PersonalPreferences(props: PreferencesProps) {
-  if (props.render) return <ConnectedPreferences render={props.render} />
-  return <PreferencesReady {...props} />
-}
+  usePersonalSettingsRefreshError(Boolean(values && query.error))
 
-/** 実運用だけがApollo依存Hookを使用し、Loading/ErrorではFormを起動しない。 */
-function ConnectedPreferences({ render }: { render: SettingsSectionRender }) {
-  const connection = usePersonalPreferencesConnection()
-
-  if (!connection.initialPreferences) {
+  if (!values) {
     return render(
-      connection.loading
+      query.loading
         ? { status: "loading" }
-        : { status: "error", retry: connection.retry },
+        : {
+            status: "error",
+            retry: () => { void query.refetch().catch(() => undefined) },
+          },
     )
   }
 
   return render({
     status: "ready",
     content: (
-      <PreferencesReady
-        compact={connection.compact}
-        initialPreferences={connection.initialPreferences}
-        onSaveAction={connection.savePreferencesAction}
-        onInspect={connection.inspectPreferences}
+      <PersonalPreferencesView
+        compact={compact}
+        initialPreferences={fromGraphqlUserPreferences(values)}
+        onSaveAction={savePreferencesAction}
+        onInspect={inspectPreferences}
       />
     ),
   })
-}
-
-/** 共有FormとQueueはReady画面のLifetimeだけに存在する。 */
-function PreferencesReady({
-  compact = false,
-  initialPreferences = defaultUserPreferences,
-  onSave,
-  onSaveAction,
-  onInspect,
-}: Omit<PreferencesProps, "render">) {
-  const model = usePersonalPreferencesForm(initialPreferences, onSave, onInspect, onSaveAction)
-  return (
-    <PersonalPreferencesView
-      compact={compact}
-      model={model}
-      canSave={Boolean(onSave || onSaveAction)}
-    />
-  )
 }
