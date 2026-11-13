@@ -5,7 +5,7 @@ import { CommunityPreferencesSection } from "../CommunityPreferencesSection"
 import { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
 import { useCommunityAliasSave } from "../CommunityAliasSection/useCommunityAliasSave"
 
-/** Query/Mutation/session stays mounted while the Host renders Loading/Error. */
+/** Query remains mounted through Host states; Ready view owns save lifetime. */
 export function ConnectedCommunityPreferences({
   communityId,
   render,
@@ -32,11 +32,9 @@ export function ConnectedCommunityPreferences({
     status: "ready",
     content: (
       <CommunityPreferencesSection
+        key={communityId}
         communityId={communityId}
         settings={settings}
-        snapshot={model.snapshot}
-        controller={model.controller}
-        canResave={model.canResave}
         alias={alias}
       />
     ),
