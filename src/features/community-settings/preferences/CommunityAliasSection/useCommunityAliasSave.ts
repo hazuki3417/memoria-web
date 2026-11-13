@@ -17,7 +17,7 @@ import type {
   CommunityAliasSaveRejection,
   SaveCommunityAlias,
 } from "./communityAliasSaveOutcome"
-import { commitCommunitySettingsPatch } from "../ConnectedCommunityPreferences/communitySettingsCache"
+import { commitCommunitySettingsPatch } from "../communitySettingsCache"
 
 /** Community ID固定のAlias保存と、Cacheに影響しない結果不明時の照会を提供する。 */
 export const useCommunityAliasSave = (communityId: string) => {
