@@ -4,7 +4,6 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { PersonalPreferences } from "./PersonalPreferences"
 import { defaultUserPreferences, type UserPreferencesPatch } from "./userPreferences"
-import { PersonalPreferencesSessionProvider } from "./PersonalPreferencesSessionContext"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
@@ -135,12 +134,16 @@ export const PreferenceSaveStatus: Story = {
   },
 }
 
+const navigationSave = fn(async (_patch: UserPreferencesPatch) => {
+  throw new Error("response lost")
+})
+
 function PreferencesSessionRoundTripFixture(
   args: ComponentProps<typeof PersonalPreferences>,
 ) {
   const [show, setShow] = useState(true)
   return (
-    <PersonalPreferencesSessionProvider>
+    <>
       <Button onClick={() => setShow((previous) => !previous)}>
         {show ? "設定画面から移動" : "設定画面へ戻る"}
       </Button>
@@ -149,32 +152,29 @@ function PreferencesSessionRoundTripFixture(
           {...args}
           compact={false}
           initialPreferences={defaultUserPreferences}
-          onSave={async (patch) => ({
-            ...defaultUserPreferences,
-            ...patch,
-          })}
+          onSave={navigationSave}
         />
       )}
-    </PersonalPreferencesSessionProvider>
+    </>
   )
 }
 
 export const PreferencesSessionRoundTrip: Story = {
-  name: "Interaction · SPA画面再訪で未保存DraftとBadgeを保持",
+  name: "Interaction · SPA離脱でQueueを閉じ再訪時にDraftとFailureを復元しない",
   tags: ["interaction"],
   render: (args) => <PreferencesSessionRoundTripFixture {...args} />,
   play: async ({ canvasElement }) => {
+    navigationSave.mockClear()
     const canvas = within(canvasElement)
     const input = canvas.getAllByRole("switch")[0]
     await userEvent.click(input)
     await expect(input).toBeChecked()
     await userEvent.click(canvas.getByRole("button", { name: "設定画面から移動" }))
+    await waitFor(() => expect(navigationSave).toHaveBeenCalledTimes(1))
     await userEvent.click(canvas.getByRole("button", { name: "設定画面へ戻る" }))
-    const restored = canvas.getAllByRole("switch")[0]
-    await expect(restored).toBeChecked()
-    await waitFor(() => {
-      expect(canvas.getByText("保存済み")).toBeVisible()
-    })
+    const fresh = canvas.getAllByRole("switch")[0]
+    await expect(fresh).not.toBeChecked()
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
 
@@ -278,16 +278,6 @@ export const PreferencesRefreshWhileEditing: Story = {
 }
 
 
-function PreferencesFeedbackSessionFixture(
-  args: ComponentProps<typeof PersonalPreferences>,
-) {
-  return (
-    <PersonalPreferencesSessionProvider>
-      <PersonalPreferences {...args} />
-    </PersonalPreferencesSessionProvider>
-  )
-}
-
 export const PreferencesFormErrorVisual: Story = {
   name: "Visual · Personal PreferencesのForm Error",
   tags: ["visual"],
@@ -343,7 +333,6 @@ export const PreferencesBlockedVisual: Story = {
 export const PreferencesUnknownMatchesVisual: Story = {
   name: "Visual · Personal PreferencesのUnknown照会一致",
   tags: ["visual"],
-  render: (args) => <PreferencesFeedbackSessionFixture {...args} />,
   args: {
     onSave: fn(async () => { throw new Error("unknown") }),
     onInspect: fn(async () => ({
@@ -366,7 +355,6 @@ export const PreferencesUnknownMatchesVisual: Story = {
 export const PreferencesUnknownDiffersVisual: Story = {
   name: "Visual · Personal PreferencesのUnknown照会不一致",
   tags: ["visual"],
-  render: (args) => <PreferencesFeedbackSessionFixture {...args} />,
   args: {
     onSave: fn(async () => { throw new Error("unknown") }),
     onInspect: fn(async () => defaultUserPreferences),
