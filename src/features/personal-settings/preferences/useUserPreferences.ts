@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { preferencesSchema } from "./preferencesSchema"
 import { usePreferencesSave } from "./save/usePreferencesSave"
-import { usePersonalAccentPreview } from "./PersonalAccentPreviewContext"
+import { usePersonalAccentPreview } from "./PersonalAccentPreview/PersonalAccentPreviewContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 import type { SavePersonalPreferencesAction } from "./preferencesSaveOutcome"
 
