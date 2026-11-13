@@ -3,14 +3,14 @@
 import { Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
-import type { useUserPreferences } from "../useUserPreferences"
+import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
 import { PersonalPreferencesSaveFeedback } from "./PersonalPreferencesSaveFeedback"
 import { PersonalPreferencesDisplaySection } from "./PersonalPreferencesDisplaySection"
 import { PersonalPreferencesPreviewSection } from "./PersonalPreferencesPreviewSection"
 
 export type PersonalPreferencesViewProps = {
   compact: boolean
-  model: ReturnType<typeof useUserPreferences>
+  model: ReturnType<typeof usePersonalPreferencesForm>
   canSave: boolean
 }
 
