@@ -8,26 +8,29 @@ import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch
 import { PersonalPreferencesSaveFeedback } from "./PersonalPreferencesSaveFeedback"
 import { PersonalPreferencesDisplaySection } from "./PersonalPreferencesDisplaySection"
 import { PersonalPreferencesPreviewSection } from "./PersonalPreferencesPreviewSection"
+import type { SavePersonalPreferencesAction } from "./preferencesSaveOutcome"
 
 export function PersonalPreferences({
   compact,
   initialPreferences = defaultUserPreferences,
   onSave,
+  onSaveAction,
   onInspect,
 }: {
   compact: boolean
   initialPreferences?: UserPreferences
   onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+  onSaveAction?: SavePersonalPreferencesAction
   onInspect?: () => Promise<UserPreferences>
 }) {
-  const model = useUserPreferences(initialPreferences, onSave, onInspect)
+  const model = useUserPreferences(initialPreferences, onSave, onInspect, onSaveAction)
   return (
     <Stack gap="xl">
       <PageHeader
         title="環境設定"
         description="表示とプレビューの動作を設定します。"
         titleAccessory={
-          onSave ? (
+          onSave || onSaveAction ? (
             <SaveStatus
               state={model.saveError ? "attention" : model.saveStatus}
               announce
