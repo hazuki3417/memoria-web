@@ -14,6 +14,7 @@ type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type Rejection = PreferencesSaveRejection
 type State = {
   confirmed: UserPreferences
+  draftPatch: UserPreferencesPatch
   saveStatus: SaveStatusState
   failure: Failure
   blockedFeedback: PreferencesBlockedFeedback | null
@@ -32,6 +33,7 @@ export function usePreferencesSave(
 ) {
   const [state, setState] = useState<State>(() => ({
     confirmed: initialPreferences!,
+    draftPatch: {},
     saveStatus: "idle",
     failure: null,
     blockedFeedback: null,
@@ -94,6 +96,7 @@ export function usePreferencesSave(
           pending.current = nextPending
           emit({
             confirmed,
+            draftPatch: nextPending,
             saveStatus: Object.keys(nextPending).length ? "saving" : "saved",
             failure: null, validation: null, blockedFeedback: null,
           })
@@ -122,6 +125,7 @@ export function usePreferencesSave(
     observed.current = null
     inspectionGeneration.current += 1
     emit({
+      draftPatch: pending.current,
       inspected: false, observedMatches: false,
       validation: stateRef.current.validation
         ? { fieldErrors: Object.fromEntries(Object.entries(stateRef.current.validation.fieldErrors).filter(([key]) => !(key in patch))), formError: false }
@@ -201,7 +205,7 @@ export function usePreferencesSave(
     observed.current = null
     void queueRef.current?.close()
     queueRef.current = null
-    emit({ confirmed, failure: null, saveStatus: "idle", validation: null, blockedFeedback: null, inspected: false, observedMatches: false })
+    emit({ confirmed, draftPatch: {}, failure: null, saveStatus: "idle", validation: null, blockedFeedback: null, inspected: false, observedMatches: false })
   }
 
   const retry = () => {
@@ -227,7 +231,7 @@ export function usePreferencesSave(
     void queueRef.current?.close()
     queueRef.current = null
     emit({
-      failure: null, saveStatus: "idle", blockedFeedback: null, validation: null,
+      failure: null, saveStatus: "idle", draftPatch: {}, blockedFeedback: null, validation: null,
       inspected: false, observedMatches: false,
       discardRevision: stateRef.current.discardRevision + 1,
     })
@@ -239,6 +243,7 @@ export function usePreferencesSave(
     validation: state.validation,
     saveStatus: state.saveStatus,
     confirmed: state.confirmed,
+    draftPatch: state.draftPatch,
     discardRevision: state.discardRevision,
     enqueue,
     setAccentDraft: (value: string) => {
