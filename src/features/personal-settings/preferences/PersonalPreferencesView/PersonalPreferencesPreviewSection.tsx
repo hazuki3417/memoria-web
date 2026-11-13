@@ -3,8 +3,8 @@
 import { Box, Stack, Switch } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import type { useUserPreferences } from "../useUserPreferences"
-type PreferencesModel = ReturnType<typeof useUserPreferences>
+import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
+type PreferencesModel = ReturnType<typeof usePersonalPreferencesForm>
 
 /** Shows Media Detail behavior options without owning the preference session. */
 export function PersonalPreferencesPreviewSection({ compact, model }: { compact: boolean; model: PreferencesModel }) {
