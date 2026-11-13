@@ -28,7 +28,7 @@ type Operations = {
 }
 type Patch = { accentColor: string; revision: number }
 type SaveRejection = { kind: "blocked" | "rejected"; error: unknown }
-type SaveSuccess = { color: string | null }
+type SaveSuccess = { color: string }
 const hex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 const normalized = (value: string) => value.toUpperCase()
 
@@ -73,12 +73,10 @@ export function createCommunityAccentSaveController() {
   const makeQueue = (delayMs = 400): AutoSaveQueue<Patch> =>
     createAutoSaveQueue<Patch, SaveSuccess, SaveRejection>({
       delayMs,
+      shouldExecute: (attempt) =>
+        attempt.revision === revision && snapshot.draft !== null &&
+        hex(snapshot.draft) && normalized(snapshot.draft) === attempt.accentColor,
       execute: async (attempt): Promise<ActionOutcome<SaveSuccess, SaveRejection>> => {
-        // A newer incomplete draft or an explicit discard invalidates a queued color.
-        // The generic Queue still sees a successful no-op, without sending a stale Mutation.
-        if (attempt.revision !== revision || snapshot.draft === null ||
-            !hex(snapshot.draft) || normalized(snapshot.draft) !== attempt.accentColor)
-          return { kind: "success", value: { color: null } }
         running = true
         update({ status: "saving" })
         try {
@@ -98,7 +96,6 @@ export function createCommunityAccentSaveController() {
       },
       onResult: ({ attempted, outcome, unsent }) => {
         if (outcome.kind === "success") {
-          if (!outcome.value.color) return
           const color = outcome.value.color
           // Mutation success is authoritative, even if its view has unmounted.
           // Apollo/cache commit occurs inside operations.save, never in UI state.
