@@ -3,9 +3,9 @@
 import { Button } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
 import { resolveCommunityNameSaveFeedback } from "./resolveCommunityNameSaveFeedback"
-import type { useCommunityNameSettings, InspectCommunityName } from "./useCommunityNameSettings"
+import type { useCommunityNameForm, InspectCommunityName } from "./useCommunityNameForm"
 
-type NameForm = ReturnType<typeof useCommunityNameSettings>
+type NameForm = ReturnType<typeof useCommunityNameForm>
 
 /** Community名保存の案内を1件表示し、結果不明時の照会・確認・再保存・破棄を提供する。 */
 export const CommunityNameSaveFeedback = ({
