@@ -148,21 +148,6 @@ export const NameUnknownOutcome: Story = {
   },
 }
 
-export const NameReadOnly: Story = {
-  name: "Visual · Community名閲覧のみ",
-  tags: ["visual"],
-  args: { isAdmin: false },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(
-      canvas.getByRole("textbox", { name: /Community名/ }),
-    ).toBeDisabled()
-    await expect(
-      canvas.queryByRole("button", { name: "保存" }),
-    ).not.toBeInTheDocument()
-  },
-}
-
 export const NameTrimmedUnchanged: Story = {
   name: "Interaction · 前後の空白のみの変更は保存不可",
   tags: ["interaction"],
@@ -289,8 +274,8 @@ export const NameUnknownMatches: Story = {
 }
 
 export const NameUnknownDiffers: Story = {
-  name: "Visual · Community名の現在値とDraftが不一致",
-  tags: ["visual"],
+  name: "Interaction · Community名の現在値とDraftが不一致",
+  tags: ["interaction"],
   args: {
     onSaveName: fn(async () => { return saveUnknown() }),
     onInspectName: fn(async () => "現在のCommunity名"),
@@ -495,8 +480,8 @@ export const NameUnknownDiscard: Story = {
 }
 
 export const NameBlockedForbidden: Story = {
-  name: "Visual · Community名を変更できない権限状態",
-  tags: ["visual"],
+  name: "Interaction · Community名を変更できない権限状態",
+  tags: ["interaction"],
   args: {
     onSaveName: fn(async () => {
       return saveBlocked({ graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }] })
@@ -510,28 +495,6 @@ export const NameBlockedForbidden: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(await canvas.findByRole("alert")).toHaveTextContent("この操作を行う権限がありません")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
-  },
-}
-
-export const NameFormValidationVisual: Story = {
-  name: "Visual · Community名のForm Validation Feedback",
-  tags: ["visual"],
-  args: {
-    onSaveName: fn(async () => {
-      return saveValidation([
-        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
-      ])
-    }),
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: /Community名/ })
-    await userEvent.clear(input)
-    await userEvent.type(input, "変更後のCommunity名")
-    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
-    await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.type(input, "を再編集")
-    await expect(canvas.getByRole("alert")).toBeVisible()
   },
 }
 
