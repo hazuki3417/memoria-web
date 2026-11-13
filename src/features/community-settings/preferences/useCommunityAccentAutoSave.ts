@@ -70,6 +70,11 @@ export function useCommunityAccentAutoSave(communityId: string, initialAccent: s
   }, [controller, communityId, initialAccent, client, setPreview, clearPreview])
 
   useEffect(() => {
+    // React Strict Mode replays mount cleanup; a closed Queue cannot be reopened.
+    if (controller.isClosed()) {
+      setController(createCommunityAccentSaveController())
+      return
+    }
     return () => { void controller.close() }
   }, [controller])
 
