@@ -1,100 +1,96 @@
 import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import type { SettingsSectionResult } from "@/ui/SettingsSectionHost"
 import { defaultUserPreferences } from "./userPreferences"
 import { PersonalPreferences } from "./PersonalPreferences"
-import type { SettingsSectionResult } from "@/ui/SettingsSectionHost"
 
 const mocks = vi.hoisted(() => ({
-  connection: vi.fn(),
-  form: vi.fn(),
+  query: vi.fn(),
+  save: vi.fn(),
+  inspect: vi.fn(),
+  view: vi.fn(),
+  refreshError: vi.fn(),
+  compact: vi.fn(),
 }))
 
-vi.mock("./usePersonalPreferencesConnection", () => ({
-  usePersonalPreferencesConnection: () => mocks.connection(),
+vi.mock("@/infrastructure/graphql/generated", () => ({
+  usePersonalSettingsPreferencesQuery: (...args: unknown[]) => mocks.query(...args),
 }))
-vi.mock("./usePersonalPreferencesForm", () => ({
-  usePersonalPreferencesForm: (...args: unknown[]) => mocks.form(...args),
+vi.mock("@mantine/hooks", () => ({
+  useMediaQuery: (...args: unknown[]) => mocks.compact(...args),
+}))
+vi.mock("../usePersonalSettingsInspection", () => ({
+  usePersonalSettingsInspection: () => ({ inspectPreferences: mocks.inspect }),
+}))
+vi.mock("../usePersonalSettingsRefreshError", () => ({
+  usePersonalSettingsRefreshError: (...args: unknown[]) => mocks.refreshError(...args),
+}))
+vi.mock("./usePersonalPreferencesSave", () => ({
+  usePersonalPreferencesSave: () => ({ savePreferencesAction: mocks.save }),
+}))
+vi.mock("./userPreferencesGraphqlAdapter", () => ({
+  fromGraphqlUserPreferences: () => defaultUserPreferences,
 }))
 vi.mock("./PersonalPreferencesView", () => ({
-  PersonalPreferencesView: () => null,
+  PersonalPreferencesView: (props: unknown) => { mocks.view(props); return null },
 }))
 
 let root: Root
 let host: HTMLDivElement
+const refetch = vi.fn()
 
 beforeEach(() => {
   vi.clearAllMocks()
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
-  mocks.connection.mockReturnValue({
-    initialPreferences: null,
+  mocks.compact.mockReturnValue(false)
+  mocks.query.mockReturnValue({
+    data: undefined,
     loading: true,
-    retry: vi.fn(),
-    compact: false,
-    savePreferencesAction: vi.fn(),
-    inspectPreferences: vi.fn(),
+    error: undefined,
+    refetch,
   })
 })
+
 afterEach(async () => {
   await act(async () => root.unmount())
   host.remove()
 })
 
-describe("PersonalPreferencesの単一公開入口", () => {
-  it("QueryのLoading中はHostへ状態だけを返しFormを作らない", async () => {
-    const render = vi.fn(() => null)
-    await act(async () => root.render(createElement(PersonalPreferences, { render })))
-    expect(render).toHaveBeenCalledWith({ status: "loading" })
-    expect(mocks.form).not.toHaveBeenCalled()
+const renderHost = vi.fn((result: SettingsSectionResult) =>
+  result.status === "ready" ? result.content : null)
+
+describe("PersonalPreferencesはProfileと同じQuery/Action/Hostの入口", () => {
+  it("Loading時はReady ViewをMountしない", async () => {
+    await act(async () => root.render(createElement(PersonalPreferences, { render: renderHost })))
+    expect(renderHost).toHaveBeenCalledWith({ status: "loading" })
+    expect(mocks.view).not.toHaveBeenCalled()
   })
 
-  it("Query失敗時はRetryをHostへ渡しFormを作らない", async () => {
-    const retry = vi.fn()
-    mocks.connection.mockReturnValue({ initialPreferences: null, loading: false, retry })
-    const render = vi.fn(() => null)
-    await act(async () => root.render(createElement(PersonalPreferences, { render })))
-    expect(render).toHaveBeenCalledWith({ status: "error", retry })
-    expect(mocks.form).not.toHaveBeenCalled()
+  it("Error時はRetryをHostへ提供する", async () => {
+    mocks.query.mockReturnValue({ data: undefined, loading: false, refetch })
+    await act(async () => root.render(createElement(PersonalPreferences, { render: renderHost })))
+    expect(renderHost).toHaveBeenCalledWith(expect.objectContaining({
+      status: "error", retry: expect.any(Function),
+    }))
+    expect(mocks.view).not.toHaveBeenCalled()
   })
 
-  it("Query成功時だけReadyの共有FormにActionとInspectionを結合する", async () => {
-    const savePreferencesAction = vi.fn()
-    const inspectPreferences = vi.fn()
-    mocks.connection.mockReturnValue({
-      initialPreferences: defaultUserPreferences,
-      loading: false,
-      compact: true,
-      savePreferencesAction,
-      inspectPreferences,
+  it("Ready時だけViewへ初期値・Action・Inspectionを接続する", async () => {
+    mocks.compact.mockReturnValue(true)
+    mocks.query.mockReturnValue({
+      data: { me: { preferences: {} } }, loading: false, error: undefined, refetch,
     })
-    const render = vi.fn((state: SettingsSectionResult) =>
-      state.status === "ready" ? state.content : null)
-    // Hostがcontentを描画して初めてReadyのFormが生成される。
-    await act(async () => root.render(createElement(PersonalPreferences, { render })))
-    expect(render).toHaveBeenCalledWith(expect.objectContaining({ status: "ready" }))
-    expect(mocks.form).toHaveBeenCalledWith(
-      defaultUserPreferences,
-      undefined,
-      inspectPreferences,
-      savePreferencesAction,
-    )
-  })
-
-  it("Storyの注入Propsでは通信Connectionを使わない", async () => {
-    const onSave = vi.fn()
-    await act(async () => root.render(createElement(PersonalPreferences, {
-      compact: false,
+    await act(async () => root.render(createElement(PersonalPreferences, { render: renderHost })))
+    expect(renderHost).toHaveBeenCalledWith(expect.objectContaining({ status: "ready" }))
+    expect(mocks.view).toHaveBeenCalledWith(expect.objectContaining({
+      compact: true,
       initialPreferences: defaultUserPreferences,
-      onSave,
-    })))
-    expect(mocks.connection).not.toHaveBeenCalled()
-    expect(mocks.form).toHaveBeenCalledWith(
-      defaultUserPreferences,
-      onSave,
-      undefined,
-      undefined,
-    )
+      onSaveAction: mocks.save,
+      onInspect: mocks.inspect,
+    }))
+    expect(mocks.refreshError).toHaveBeenCalledWith(false)
   })
 })
