@@ -73,5 +73,6 @@ export const useCommunityAliasSave = (communityId: string) => {
     return current.data.community.mySettings.alias
   }
 
+  /** Alias保存の確定Outcomeと、Unknown時だけ利用する現在値照会を提供する。 */
   return { inspectAlias, saveAlias }
 }
