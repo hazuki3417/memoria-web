@@ -3,7 +3,7 @@
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { CommunityPreferencesSection } from "../CommunityPreferencesSection"
 import { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
-import { useCommunityAliasConnection } from "./useCommunityAliasConnection"
+import { useCommunityAliasSave } from "../CommunityAliasSection/useCommunityAliasSave"
 
 /** Query/Mutation/session stays mounted while the Host renders Loading/Error. */
 export function ConnectedCommunityPreferences({
@@ -14,7 +14,7 @@ export function ConnectedCommunityPreferences({
   render: SettingsSectionRender
 }) {
   const model = useCommunityPreferencesConnection(communityId)
-  const alias = useCommunityAliasConnection(communityId)
+  const alias = useCommunityAliasSave(communityId)
   const settings = model.data?.community?.mySettings
 
   if (!settings) {
