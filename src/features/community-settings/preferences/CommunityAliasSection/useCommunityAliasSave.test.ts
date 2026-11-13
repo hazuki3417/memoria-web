@@ -62,6 +62,33 @@ describe("Community別名の保存ActionとApollo境界", () => {
     expect(mocks.patch).toHaveBeenCalledWith(mocks.cache, "community-1", { alias: "確定した別名" })
     expect(mocks.query).not.toHaveBeenCalled()
   })
+  it("Mutation成功後のCache同期に失敗しても確定済みSuccessをUnknownへ変更しない", async () => {
+    mocks.mutation.mockResolvedValue({
+      data: { updateCommunitySettings: {
+        __typename: "UpdateCommunitySettingsSuccess",
+        settings: { alias: "確定した別名", accentColor: "#112233" },
+      } },
+    })
+    mocks.patch.mockImplementationOnce(() => { throw new Error("cache unavailable") })
+    await expect(actions.saveAlias("確定した別名")).resolves.toEqual({
+      kind: "success", value: "確定した別名",
+    })
+    expect(mocks.patch).toHaveBeenCalledTimes(1)
+  })
+
+  it("Typed Successに別のGraphQL Errorが併存してもMutationの確定結果を優先する", async () => {
+    mocks.mutation.mockResolvedValue({
+      data: { updateCommunitySettings: {
+        __typename: "UpdateCommunitySettingsSuccess",
+        settings: { alias: "確定した別名", accentColor: "#112233" },
+      } },
+      errors: [{ extensions: { code: "INTERNAL" } }],
+    })
+    await expect(actions.saveAlias("確定した別名")).resolves.toEqual({
+      kind: "success", value: "確定した別名",
+    })
+  })
+
   it("nullによる別名解除を確定成功としてCacheへPatchする", async () => {
     mocks.mutation.mockResolvedValue({
       data: { updateCommunitySettings: {
