@@ -140,6 +140,7 @@ export function createCommunityAccentSaveController() {
 
   return {
     getSnapshot: () => snapshot,
+    isClosed: () => closed,
     subscribe(listener: () => void) {
       listeners.add(listener)
       return () => { listeners.delete(listener) }
