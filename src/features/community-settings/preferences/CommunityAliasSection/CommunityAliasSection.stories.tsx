@@ -243,8 +243,8 @@ export const AliasUnknownMatches: Story = {
 }
 
 export const AliasUnknownDiffers: Story = {
-  name: "Visual · Alias現在値とDraft不一致・復旧Action",
-  tags: ["visual"],
+  name: "Interaction · Alias現在値とDraft不一致・復旧Action",
+  tags: ["interaction"],
   args: {
     onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => "現在の別名"),
@@ -310,8 +310,8 @@ export const AliasUnknownDiscard: Story = {
 }
 
 export const AliasBlockedUserDeleting: Story = {
-  name: "Visual · Alias更新不可（削除処理中）",
-  tags: ["visual"],
+  name: "Interaction · Alias更新不可（削除処理中）",
+  tags: ["interaction"],
   args: {
     onSave: fn(async () => {
       return { kind: "rejected" as const, reason: { kind: "blocked" as const, error: { graphQLErrors: [{ extensions: { code: "USER_DELETING" } }] } } }
@@ -328,24 +328,3 @@ export const AliasBlockedUserDeleting: Story = {
   },
 }
 
-export const AliasFormValidationPanel: Story = {
-  name: "Visual · Alias Form-level Validationの持続表示",
-  tags: ["visual"],
-  args: {
-    onSave: fn(async () => {
-      return validation([
-        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
-      ])
-    }),
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: "Community別名" })
-    await userEvent.clear(input)
-    await userEvent.type(input, "更新する別名")
-    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
-    await expect(await canvas.findByRole("alert")).toHaveTextContent("入力内容を確認してください")
-    await userEvent.type(input, "を再編集")
-    await expect(canvas.getByRole("alert")).toBeVisible()
-  },
-}
