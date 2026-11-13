@@ -1,687 +1,242 @@
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 import { createCommunityAccentSaveController } from "./communityAccentSaveController"
 
-const id = "community-1"
-const tick = async () => {
-  await Promise.resolve()
-  await Promise.resolve()
-  await Promise.resolve()
+const makeOperations = (save = vi.fn().mockResolvedValue("#ABCDEF")) => ({
+  save,
+  observe: vi.fn().mockResolvedValue("#112233"),
+  confirm: vi.fn(),
+  preview: vi.fn().mockReturnValue(1),
+  release: vi.fn(),
+})
+
+const setup = (save?: ReturnType<typeof vi.fn>) => {
+  const controller = createCommunityAccentSaveController()
+  const operations = makeOperations(save)
+  controller.configure(operations)
+  controller.initialize("#112233")
+  return { controller, operations }
 }
 
-describe("session Community Accent save controller", () => {
-  it("preserves the draft and status after view listeners unmount", async () => {
-    const controller = createCommunityAccentSaveController()
-    const save = vi.fn().mockResolvedValue("#ABCDEF")
-    const subscriber = vi.fn()
-    const confirm = vi.fn()
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe: vi.fn().mockResolvedValue("#ABCDEF"),
-      confirm,
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    const unsubscribe = controller.subscribe(id, subscriber)
-    controller.edit(id, "#ABCDEF")
-    unsubscribe()
-    await tick()
-    expect(save).toHaveBeenCalledWith("#ABCDEF")
-    expect(controller.getSnapshot(id)).toMatchObject({
-      confirmed: "#ABCDEF",
-      draft: "#ABCDEF",
-      status: "saved",
+describe("Ready画面単位のCommunity Accent AutoSave", () => {
+  beforeEach(() => { vi.useFakeTimers() })
+  afterEach(() => { vi.useRealTimers() })
+
+  it("有効な色を即時Previewし、400ms待機後に一度だけ保存する", async () => {
+    const { controller, operations } = setup()
+    controller.edit("#AABBCC")
+    expect(operations.preview).toHaveBeenCalledWith("#AABBCC")
+    expect(operations.save).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(399)
+    expect(operations.save).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(1)
+    expect(operations.save).toHaveBeenCalledTimes(1)
+    expect(operations.save).toHaveBeenCalledWith("#AABBCC")
+    expect(controller.getSnapshot()).toMatchObject({
+      confirmed: "#ABCDEF", draft: "#AABBCC", status: "pending",
     })
   })
 
-  it("preserves an incomplete draft and does not send it", async () => {
-    const controller = createCommunityAccentSaveController()
+  it("完成前HEXは保存しない。直前の有効色も後続の未完成Draftにより無効化する", async () => {
+    const { controller, operations } = setup()
+    controller.edit("#AABBCC")
+    controller.edit("#AAB")
+    await vi.advanceTimersByTimeAsync(500)
+    expect(operations.save).not.toHaveBeenCalled()
+    expect(controller.getSnapshot()).toMatchObject({
+      confirmed: "#112233", draft: "#AAB", status: "pending",
+    })
+  })
+
+  it("同一Debounce内の連続変更は最新色だけを送信する", async () => {
+    const { controller, operations } = setup(vi.fn().mockResolvedValue("#445566"))
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(200)
+    controller.edit("#445566")
+    await vi.advanceTimersByTimeAsync(400)
+    expect(operations.save).toHaveBeenCalledTimes(1)
+    expect(operations.save).toHaveBeenCalledWith("#445566")
+    expect(controller.getSnapshot()).toMatchObject({ confirmed: "#445566", status: "saved" })
+  })
+
+  it("離脱で有効Pendingを直ちに送信し、Previewと購読を解放する", async () => {
+    const { controller, operations } = setup()
+    const observer = vi.fn()
+    controller.subscribe(observer)
+    controller.edit("#AABBCC")
+    const notifications = observer.mock.calls.length
+    const close = controller.close()
+    await close
+    expect(operations.save).toHaveBeenCalledTimes(1)
+    expect(operations.release).toHaveBeenCalledWith(1)
+    expect(controller.isClosed()).toBe(true)
+    expect(observer).toHaveBeenCalledTimes(notifications)
+  })
+
+  it("離脱後はDraft・Failureを新しい画面に復元しない", async () => {
+    const previous = setup()
+    previous.controller.edit("#123")
+    await previous.controller.close()
+    const next = setup()
+    expect(next.controller.getSnapshot()).toMatchObject({
+      confirmed: "#112233", draft: "#112233", failure: null, status: "idle",
+    })
+    expect(previous.operations.save).not.toHaveBeenCalled()
+  })
+
+  it("通信結果不明では自動再送せず、現在値照会後の明示Retryのみ許可する", async () => {
     const save = vi.fn()
-    controller.initialize(id, "#112233")
-    controller.edit(id, "#123")
-    await tick()
-    expect(save).not.toHaveBeenCalled()
-    expect(controller.getSnapshot(id)).toMatchObject({
-      confirmed: "#112233",
-      draft: "#123",
-      status: "pending",
+      .mockRejectedValueOnce(Object.assign(new Error("offline"), { networkError: new Error("offline") }))
+      .mockResolvedValueOnce("#AABBCC")
+    const { controller, operations } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    expect(controller.getSnapshot()).toMatchObject({
+      failure: "unknown", status: "attention", inspected: false,
     })
+    expect(operations.release).not.toHaveBeenCalled()
+    controller.edit("#445566")
+    await vi.advanceTimersByTimeAsync(500)
+    expect(save).toHaveBeenCalledTimes(1)
+    controller.retry()
+    await vi.advanceTimersByTimeAsync(10)
+    expect(save).toHaveBeenCalledTimes(1)
+    await controller.inspect()
+    expect(controller.getSnapshot()).toMatchObject({ inspected: true, observedMatches: false })
+    controller.retry()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(save).toHaveBeenCalledTimes(2)
   })
 
-  it("does not save a superseded queued color after a newer HEX draft becomes incomplete", async () => {
-    const controller = createCommunityAccentSaveController()
-    let resolveFirst: ((value: string) => void) | undefined
-    const save = vi.fn().mockImplementationOnce(
-      () =>
-        new Promise<string>((resolve) => {
-          resolveFirst = resolve
-        }),
+  it("現在値一致は元のMutation成功と断定せず、確認完了時だけ採用する", async () => {
+    const { controller, operations } = setup(
+      vi.fn().mockRejectedValue(new Error("unconfirmed")),
     )
-    const release = vi.fn()
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(1),
-      release,
-    })
-    controller.edit(id, "#AABBCC")
-    controller.edit(id, "#445566")
-    controller.edit(id, "#445")
-    expect(controller.getSnapshot(id).draft).toBe("#445")
-    resolveFirst?.("#AABBCC")
-    await tick()
-    expect(save).toHaveBeenCalledTimes(1)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      confirmed: "#AABBCC",
-      draft: "#445",
-      status: "pending",
-    })
-    expect(release).toHaveBeenCalled()
+    operations.observe.mockResolvedValue("#AABBCC")
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    await controller.inspect()
+    expect(controller.getSnapshot()).toMatchObject({ observedMatches: true, failure: "unknown" })
+    controller.confirmObservation()
+    expect(operations.confirm).toHaveBeenCalledWith("#AABBCC")
+    expect(controller.getSnapshot()).toMatchObject({ confirmed: "#AABBCC", failure: null })
   })
 
-  it("never automatically resends an unknown write and requires observation", async () => {
-    const controller = createCommunityAccentSaveController()
-    const save = vi
-      .fn()
-      .mockRejectedValueOnce(
-        Object.assign(new Error("transport"), {
-          networkError: new Error("offline"),
-        }),
-      )
-      .mockResolvedValue("#ABCDEF")
-    const observe = vi.fn().mockResolvedValue("#112233")
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe,
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
+  it("ValidationはField ErrorとDraftを維持し、離脱時に自動Retryしない", async () => {
+    const save = vi.fn().mockRejectedValue(
+      new SettingsInputValidationError([
+        { scope: "FIELD", code: "INVALID_FORMAT", inputPaths: [{ segments: ["accentColor"] }] },
+      ]),
+    )
+    const { controller } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    expect(controller.getSnapshot()).toMatchObject({
+      failure: "rejected", draft: "#AABBCC",
+      validation: { fieldErrors: { accentColor: "入力形式を確認してください。" } },
     })
-    controller.edit(id, "#ABCDEF")
-    await tick()
-    expect(controller.getSnapshot(id)).toMatchObject({
-      status: "attention",
-      failure: "unknown",
-      inspected: false,
-    })
-    controller.edit(id, "#ABCDEF")
-    controller.retry(id)
-    await tick()
-    expect(save).toHaveBeenCalledTimes(1)
-    await controller.inspect(id)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: true,
-      observedMatches: false,
-    })
-    controller.retry(id)
-    await tick()
-    expect(save).toHaveBeenCalledTimes(2)
-    expect(controller.getSnapshot(id).failure).toBeNull()
-  })
-
-  it("requires a fresh inspection if an unknown Accent draft changes", async () => {
-    const controller = createCommunityAccentSaveController()
-    const save = vi
-      .fn()
-      .mockRejectedValue(
-        Object.assign(new Error("offline"), {
-          networkError: new Error("offline"),
-        }),
-      )
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe: vi.fn().mockResolvedValue("#112233"),
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#AABBCC")
-    await tick()
-    await controller.inspect(id)
-    expect(controller.getSnapshot(id).inspected).toBe(true)
-
-    controller.edit(id, "#445566")
-    expect(controller.getSnapshot(id)).toMatchObject({
-      failure: "unknown",
-      inspected: false,
-      observedMatches: false,
-      draft: "#445566",
-    })
-    controller.retry(id)
-    await tick()
-    expect(save).toHaveBeenCalledTimes(1)
-    await controller.inspect(id)
-    controller.retry(id)
-    await tick()
-    expect(save).toHaveBeenCalledTimes(2)
-  })
-
-  it("does not send a newer valid draft automatically while Unknown recovery is required", async () => {
-    const controller = createCommunityAccentSaveController()
-    const save = vi
-      .fn()
-      .mockRejectedValue(
-        Object.assign(new Error("offline"), {
-          networkError: new Error("offline"),
-        }),
-      )
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe: vi.fn().mockResolvedValue("#112233"),
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#AABBCC")
-    await tick()
-    controller.edit(id, "#445566")
-    await tick()
-    expect(controller.getSnapshot(id)).toMatchObject({
-      draft: "#445566",
-      failure: "unknown",
-      status: "attention",
-    })
-    expect(save).toHaveBeenCalledTimes(1)
-    await controller.inspect(id)
-    expect(save).toHaveBeenCalledTimes(1)
-    controller.retry(id)
-    await tick()
-    expect(save).toHaveBeenCalledTimes(2)
-  })
-
-  it("allows explicit completion on an observed match without a second mutation", async () => {
-    const controller = createCommunityAccentSaveController()
-    const save = vi
-      .fn()
-      .mockRejectedValueOnce(
-        Object.assign(new Error("connection"), {
-          networkError: new Error("offline"),
-        }),
-      )
-    const confirm = vi.fn()
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe: vi.fn().mockResolvedValue("#ABCDEF"),
-      confirm,
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#ABCDEF")
-    await tick()
-    await controller.inspect(id)
-    expect(controller.getSnapshot(id).observedMatches).toBe(true)
-    controller.confirmObservation(id)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      status: "idle",
-      confirmed: "#ABCDEF",
-      failure: null,
-    })
-    expect(confirm).toHaveBeenCalledTimes(1)
-    expect(confirm).toHaveBeenCalledWith("#ABCDEF")
+    await controller.close()
     expect(save).toHaveBeenCalledTimes(1)
   })
 
-  it("ignores a stale inspection failure after a newer draft was inspected", async () => {
-    const controller = createCommunityAccentSaveController()
-    let rejectFirst: ((error: Error) => void) | undefined
-    const observe = vi
-      .fn()
-      .mockImplementationOnce(
-        () =>
-          new Promise<string>((_resolve, reject) => {
-            rejectFirst = reject
-          }),
-      )
-      .mockResolvedValue("#445566")
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save: vi
-        .fn()
-        .mockRejectedValue(
-          Object.assign(new Error("offline"), {
-            networkError: new Error("offline"),
-          }),
-        ),
-      observe,
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
+  it("認可拒否では保存を停止し、再送ボタンからも保存しない", async () => {
+    const save = vi.fn().mockRejectedValue({
+      graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }],
     })
-    controller.edit(id, "#ABCDEF")
-    await tick()
-    const oldInspection = controller.inspect(id)
-    controller.edit(id, "#445566")
-    await controller.inspect(id)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: true,
-      observedMatches: true,
-    })
-    rejectFirst?.(new Error("stale request failed"))
-    await oldInspection
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: true,
-      observedMatches: true,
-      draft: "#445566",
-    })
-  })
-
-  it("ignores an older inspection result when a newer inspection of the same draft finishes", async () => {
-    const controller = createCommunityAccentSaveController()
-    let resolveFirst: ((value: string) => void) | undefined
-    const observe = vi
-      .fn()
-      .mockImplementationOnce(
-        () =>
-          new Promise<string>((resolve) => {
-            resolveFirst = resolve
-          }),
-      )
-      .mockResolvedValue("#112233")
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save: vi
-        .fn()
-        .mockRejectedValue(
-          Object.assign(new Error("offline"), {
-            networkError: new Error("offline"),
-          }),
-        ),
-      observe,
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#AABBCC")
-    await tick()
-    const older = controller.inspect(id)
-    await controller.inspect(id)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: true,
-      observedMatches: false,
-    })
-    resolveFirst?.("#AABBCC")
-    await older
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: true,
-      observedMatches: false,
-    })
-  })
-
-  it("ignores older inspection failures when a newer inspection of the same draft succeeds", async () => {
-    const controller = createCommunityAccentSaveController()
-    let rejectFirst: ((error: Error) => void) | undefined
-    const observe = vi
-      .fn()
-      .mockImplementationOnce(
-        () =>
-          new Promise<string>((_resolve, reject) => {
-            rejectFirst = reject
-          }),
-      )
-      .mockResolvedValue("#AABBCC")
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save: vi
-        .fn()
-        .mockRejectedValue(
-          Object.assign(new Error("offline"), {
-            networkError: new Error("offline"),
-          }),
-        ),
-      observe,
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#AABBCC")
-    await tick()
-    const older = controller.inspect(id)
-    await controller.inspect(id)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: true,
-      observedMatches: true,
-    })
-    rejectFirst?.(new Error("superseded failure"))
-    await older
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: true,
-      observedMatches: true,
-    })
-  })
-
-  it("invalidates a matching observation while a fresh inspection is pending", async () => {
-    const controller = createCommunityAccentSaveController()
-    let resolveRefresh: ((value: string) => void) | undefined
-    const observe = vi
-      .fn()
-      .mockResolvedValueOnce("#AABBCC")
-      .mockImplementationOnce(
-        () =>
-          new Promise<string>((resolve) => {
-            resolveRefresh = resolve
-          }),
-      )
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save: vi
-        .fn()
-        .mockRejectedValue(
-          Object.assign(new Error("offline"), {
-            networkError: new Error("offline"),
-          }),
-        ),
-      observe,
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#AABBCC")
-    await tick()
-    await controller.inspect(id)
-    expect(controller.getSnapshot(id).observedMatches).toBe(true)
-    const pending = controller.inspect(id)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: false,
-      observedMatches: false,
-    })
-    controller.confirmObservation(id)
-    expect(controller.getSnapshot(id).failure).toBe("unknown")
-    resolveRefresh?.("#112233")
-    await pending
-    expect(controller.getSnapshot(id)).toMatchObject({
-      inspected: true,
-      observedMatches: false,
-    })
-  })
-
-  it("does not roll back a confirmed mutation when an older query result arrives", async () => {
-    const controller = createCommunityAccentSaveController()
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save: vi.fn().mockResolvedValue("#ABCDEF"),
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#ABCDEF")
-    await tick()
-    controller.initialize(id, "#112233")
-    expect(controller.getSnapshot(id)).toMatchObject({
-      confirmed: "#ABCDEF",
-      draft: "#ABCDEF",
-    })
-  })
-
-  it("requires manual retry after a rejected mutation and keeps Draft on error", async () => {
-    const controller = createCommunityAccentSaveController()
-    // An explicitly retryable result is distinguishable from an unclassified
-    // GraphQL execution error, which must remain Unknown Outcome.
-    const rejected = { kind: "retryable" }
-    const save = vi
-      .fn()
-      .mockRejectedValueOnce(rejected)
-      .mockResolvedValueOnce("#AABBCC")
-    const release = vi.fn()
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(1),
-      release,
-    })
-    controller.edit(id, "#AABBCC")
-    await tick()
-    expect(controller.getSnapshot(id)).toMatchObject({
-      confirmed: "#112233",
-      draft: "#AABBCC",
-      failure: "rejected",
-      status: "attention",
-    })
-    expect(release).toHaveBeenCalled()
-    await tick()
+    const { controller } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    expect(controller.getSnapshot().failure).toBe("blocked")
+    controller.retry()
+    await vi.advanceTimersByTimeAsync(1000)
     expect(save).toHaveBeenCalledTimes(1)
-    controller.retry(id)
-    await tick()
-    expect(save).toHaveBeenCalledTimes(2)
-    expect(controller.getSnapshot(id).confirmed).toBe("#AABBCC")
   })
 
-  it("treats unclassified and internal GraphQL execution errors as unknown, never immediate retry", async () => {
-    for (const graphQLErrors of [
-      [{ extensions: { code: "INTERNAL_SERVER_ERROR" } }],
-      [{ message: "Rejected" }],
-      [
-        { extensions: { code: "VALIDATION" } },
-        { extensions: { code: "INTERNAL_SERVER_ERROR" } },
-      ],
-    ]) {
-      const controller = createCommunityAccentSaveController()
-      const save = vi.fn().mockRejectedValue({ graphQLErrors })
-      controller.initialize(id, "#112233")
-      controller.configure(id, {
-        save,
-        observe: vi.fn().mockResolvedValue("#112233"),
-        preview: vi.fn().mockReturnValue(1),
-        release: vi.fn(),
-      })
-      controller.edit(id, "#AABBCC")
-      await tick()
-      expect(controller.getSnapshot(id)).toMatchObject({
-        confirmed: "#112233",
-        draft: "#AABBCC",
-        failure: "unknown",
-        inspected: false,
-      })
-      controller.retry(id)
-      await tick()
-      expect(save).toHaveBeenCalledTimes(1)
-    }
-  })
-
-  it("blocks retry on an authenticated/authorized execution rejection", async () => {
-    for (const code of ["UNAUTHENTICATED", "FORBIDDEN", "USER_DELETING"]) {
-      const controller = createCommunityAccentSaveController()
-      const save = vi.fn().mockRejectedValue({
-        graphQLErrors: [{ extensions: { code } }],
-      })
-      controller.initialize(id, "#112233")
-      controller.configure(id, {
-        save,
-        observe: vi.fn(),
-        preview: vi.fn().mockReturnValue(1),
-        release: vi.fn(),
-      })
-      controller.edit(id, "#AABBCC")
-      await tick()
-      expect(controller.getSnapshot(id)).toMatchObject({
-        confirmed: "#112233",
-        draft: "#AABBCC",
-        failure: "blocked",
-        status: "attention",
-        blockedFeedback: {
-          title: code === "UNAUTHENTICATED"
-            ? "ログインが必要です"
-            : code === "USER_DELETING"
-              ? "アカウントの削除処理中です"
-              : "Community設定を変更できません",
-        },
-      })
-      controller.edit(id, "#445566")
-      controller.retry(id)
-      await tick()
-      expect(save).toHaveBeenCalledTimes(1)
-      controller.discard(id)
-      expect(controller.getSnapshot(id).blockedFeedback).toBeNull()
-    }
-  })
-
-  it("discards an errored draft without pretending to cancel an unknown mutation", async () => {
-    const controller = createCommunityAccentSaveController()
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save: vi.fn().mockRejectedValue(new Error("unconfirmed")),
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#AABBCC")
-    await tick()
-    controller.discard(id)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      draft: "#112233",
-      confirmed: "#112233",
-      failure: null,
-      status: "idle",
-    })
-  })
-
-  it("does not leak Draft or failure state between communities", async () => {
-    const controller = createCommunityAccentSaveController()
-    controller.initialize("community-a", "#112233")
-    controller.initialize("community-b", "#445566")
-    controller.edit("community-a", "#1")
-    expect(controller.getSnapshot("community-a").draft).toBe("#1")
-    expect(controller.getSnapshot("community-b")).toMatchObject({
-      confirmed: "#445566",
-      draft: "#445566",
-      status: "idle",
-    })
-  })
-
-  it("preserves newer Draft when an old in-flight mutation completes", async () => {
-    const controller = createCommunityAccentSaveController()
-    let resolveFirst: ((value: string) => void) | undefined
-    const save = vi
-      .fn()
-      .mockImplementationOnce(
-        () =>
-          new Promise<string>((resolve) => {
-            resolveFirst = resolve
-          }),
-      )
-      .mockResolvedValue("#445566")
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#ABCDEF")
-    controller.edit(id, "#445566")
-    resolveFirst?.("#ABCDEF")
-    await tick()
-    expect(save).toHaveBeenCalledTimes(2)
-    expect(controller.getSnapshot(id)).toMatchObject({
-      confirmed: "#445566",
-      draft: "#445566",
-      status: "saved",
-    })
-  })
-
-  it("retains Typed accent Field Validation with its Draft after rejection", async () => {
-    const controller = createCommunityAccentSaveController()
-    const save = vi.fn().mockRejectedValue(new SettingsInputValidationError([
-      { scope: "FIELD", code: "INVALID_FORMAT", inputPaths: [{ segments: ["accentColor"] }] },
-    ]))
-    controller.initialize(id, "#112233")
-    controller.configure(id, {
-      save,
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.edit(id, "#ABCDEF")
-    await tick()
-    expect(controller.getSnapshot(id)).toMatchObject({
-      failure: "rejected",
-      draft: "#ABCDEF",
-      validation: {
-        fieldErrors: { accentColor: "入力形式を確認してください。" },
-        formError: false,
-      },
-    })
-    controller.discard(id)
-    expect(controller.getSnapshot(id)).toMatchObject({ failure: null, validation: null })
-  })
-
-  it("isolates a late unknown failure from another Community's successful save", async () => {
-    const controller = createCommunityAccentSaveController()
-    let rejectOld: ((reason: unknown) => void) | undefined
-    const newRelease = vi.fn()
-    controller.initialize("community-a", "#112233")
-    controller.initialize("community-b", "#445566")
-    controller.configure("community-a", {
-      save: () =>
-        new Promise<string>((_resolve, reject) => {
-          rejectOld = reject
-        }),
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(1),
-      release: vi.fn(),
-    })
-    controller.configure("community-b", {
-      save: vi.fn().mockResolvedValue("#CCDDEE"),
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(2),
-      release: newRelease,
-    })
-    controller.edit("community-a", "#AABBCC")
-    controller.edit("community-b", "#CCDDEE")
-    await tick()
-    expect(controller.getSnapshot("community-b")).toMatchObject({
-      confirmed: "#CCDDEE", failure: null, status: "saved",
-    })
-    const released = newRelease.mock.calls.length
-    rejectOld?.({ graphQLErrors: [{ extensions: { code: "INTERNAL_SERVER_ERROR" } }] })
-    await tick()
-    expect(controller.getSnapshot("community-a")).toMatchObject({
-      confirmed: "#112233", draft: "#AABBCC", failure: "unknown",
-    })
-    expect(controller.getSnapshot("community-b")).toMatchObject({
-      confirmed: "#CCDDEE", draft: "#CCDDEE", failure: null, status: "saved",
-    })
-    expect(newRelease).toHaveBeenCalledTimes(released)
-  })
-
-  it("keeps the new Community independent when an old Community mutation settles late", async () => {
-    const controller = createCommunityAccentSaveController()
+  it("異なるCommunityへの新しい画面は別Ownerを使い、遅延結果がDraftへ流入しない", async () => {
     let resolveOld: ((value: string) => void) | undefined
-    const oldRelease = vi.fn()
-    const newRelease = vi.fn()
-    const newPreview = vi.fn().mockReturnValue(2)
-    controller.initialize("community-a", "#112233")
-    controller.initialize("community-b", "#445566")
-    controller.configure("community-a", {
-      save: () => new Promise<string>((resolve) => { resolveOld = resolve }),
-      observe: vi.fn(),
-      preview: vi.fn().mockReturnValue(1),
-      release: oldRelease,
+    const oldSave = vi.fn().mockImplementation(
+      () => new Promise<string>((resolve) => { resolveOld = resolve }),
+    )
+    const older = setup(oldSave)
+    older.controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    const close = older.controller.close()
+    const newer = setup(vi.fn().mockResolvedValue("#445566"))
+    newer.controller.edit("#445566")
+    await vi.advanceTimersByTimeAsync(400)
+    resolveOld?.("#AABBCC")
+    await close
+    expect(newer.controller.getSnapshot()).toMatchObject({
+      confirmed: "#445566", draft: "#445566", failure: null,
     })
-    controller.configure("community-b", {
-      save: vi.fn().mockResolvedValue("#CCDDEE"),
-      observe: vi.fn(),
-      preview: newPreview,
-      release: newRelease,
+  })
+  it("遅延中の先行保存が終わってから後続の最新値を直列送信する", async () => {
+    let resolveFirst: ((value: string) => void) | undefined
+    const save = vi.fn()
+      .mockImplementationOnce(() => new Promise<string>((resolve) => { resolveFirst = resolve }))
+      .mockResolvedValueOnce("#445566")
+    const { controller } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    controller.edit("#445566")
+    expect(save).toHaveBeenCalledTimes(1)
+    resolveFirst?.("#AABBCC")
+    await vi.advanceTimersByTimeAsync(0)
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(save).toHaveBeenNthCalledWith(2, "#445566")
+    expect(controller.getSnapshot()).toMatchObject({
+      confirmed: "#445566", draft: "#445566", failure: null, status: "saved",
     })
-    // Route/Community switches while the first mutation is still in-flight.
-    controller.edit("community-a", "#ABCDEF")
-    controller.edit("community-b", "#CCDDEE")
-    await tick()
-    expect(controller.getSnapshot("community-b")).toMatchObject({
-      confirmed: "#CCDDEE", draft: "#CCDDEE", status: "saved",
-    })
-    const newReleaseCount = newRelease.mock.calls.length
-    resolveOld?.("#ABCDEF")
-    await tick()
-    expect(controller.getSnapshot("community-a")).toMatchObject({
-      confirmed: "#ABCDEF", draft: "#ABCDEF", status: "saved",
-    })
-    expect(controller.getSnapshot("community-b")).toMatchObject({
-      confirmed: "#CCDDEE", draft: "#CCDDEE", status: "saved",
-    })
-    expect(newRelease).toHaveBeenCalledTimes(newReleaseCount)
-    expect(newPreview).toHaveBeenCalledWith("#CCDDEE")
-    expect(oldRelease).toHaveBeenCalled()
   })
 
+  it("先行Mutation処理中の未完成Draftが後続予約を無効化する", async () => {
+    let resolveFirst: ((value: string) => void) | undefined
+    const save = vi.fn().mockImplementation(
+      () => new Promise<string>((resolve) => { resolveFirst = resolve }),
+    )
+    const { controller } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    controller.edit("#445566")
+    controller.edit("#445")
+    resolveFirst?.("#AABBCC")
+    await vi.advanceTimersByTimeAsync(0)
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(controller.getSnapshot()).toMatchObject({
+      confirmed: "#AABBCC", draft: "#445", status: "pending",
+    })
+  })
+
+  it("保存結果不明時の古い照会は新しいDraftの確認結果を上書きしない", async () => {
+    const { controller, operations } = setup(
+      vi.fn().mockRejectedValue(new Error("unconfirmed")),
+    )
+    let resolveOld: ((value: string) => void) | undefined
+    operations.observe
+      .mockImplementationOnce(() => new Promise<string>((resolve) => { resolveOld = resolve }))
+      .mockResolvedValueOnce("#445566")
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    const old = controller.inspect()
+    controller.edit("#445566")
+    await controller.inspect()
+    expect(controller.getSnapshot()).toMatchObject({
+      inspected: true, observedMatches: true, draft: "#445566",
+    })
+    resolveOld?.("#112233")
+    await old
+    expect(controller.getSnapshot()).toMatchObject({
+      inspected: true, observedMatches: true, draft: "#445566",
+    })
+  })
+
+  it("結果不明のまま画面離脱しても後続変更を自動送信しない", async () => {
+    const save = vi.fn().mockRejectedValue(new Error("unconfirmed"))
+    const { controller } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    controller.edit("#445566")
+    await controller.close()
+    expect(save).toHaveBeenCalledTimes(1)
+  })
 })

@@ -1,3 +1,4 @@
+import { createAutoSaveQueue, type AutoSaveQueue, type ActionOutcome } from "@/ui/Action"
 import { resolveFormFailureValidation } from "@/ui/formValidation"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
@@ -18,25 +19,20 @@ export type AccentSnapshot = Readonly<{
   inspected: boolean
 }>
 
-type SaveAccent = (color: string) => Promise<string>
-type ObserveAccent = () => Promise<string>
-type PreviewAccent = (color: string) => number
-type ReleasePreview = (owner: number) => void
-
-type Entry = {
-  snapshot: AccentSnapshot
-  desired: string | null
-  running: boolean
-  inspectionGeneration: number
-  previewOwner: number | null
-  save?: SaveAccent
-  observe?: ObserveAccent
-  confirm?: (color: string) => void
-  preview?: PreviewAccent
-  release?: ReleasePreview
+type Operations = {
+  save: (color: string) => Promise<string>
+  observe: () => Promise<string>
+  confirm: (color: string) => void
+  preview: (color: string) => number
+  release: (owner: number) => void
 }
+type Patch = { accentColor: string; revision: number }
+type SaveRejection = { kind: "blocked" | "rejected"; error: unknown }
+type SaveSuccess = { color: string }
+const hex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
+const normalized = (value: string) => value.toUpperCase()
 
-const emptySnapshot: AccentSnapshot = {
+const initialSnapshot: AccentSnapshot = {
   confirmed: null,
   draft: null,
   status: "idle",
@@ -47,286 +43,202 @@ const emptySnapshot: AccentSnapshot = {
   inspected: false,
 }
 
-const hex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
-const normalized = (value: string) => value.toUpperCase()
-
 /**
- * Owns Community Accent writes for one authenticated Application Shell lifetime.
- * All entries are scoped by Community ID and all listeners are detachable.
- * A failed/unknown write never triggers an automatic retry.
+ * One Ready Community Preferences view owns this controller and its short-lived Queue.
+ * Only the in-flight action and its fixed Apollo/Community closure may outlive the view.
+ * Neither draft nor failure is restored on a later visit.
  */
 export function createCommunityAccentSaveController() {
-  const entries = new Map<string, Entry>()
-  const listeners = new Map<string, Set<() => void>>()
+  let snapshot: AccentSnapshot = initialSnapshot
+  let operations: Operations | null = null
+  let queue: AutoSaveQueue<Patch> | null = null
+  let previewOwner: number | null = null
+  let revision = 0
+  let inspectionGeneration = 0
+  let closed = false
+  let running = false
+  const listeners = new Set<() => void>()
 
-  const entryFor = (id: string): Entry => {
-    let entry = entries.get(id)
-    if (!entry) {
-      entry = {
-        snapshot: emptySnapshot,
-        desired: null,
-        running: false,
-        inspectionGeneration: 0,
-        previewOwner: null,
-      }
-      entries.set(id, entry)
-    }
-    return entry
+  const update = (patch: Partial<AccentSnapshot>) => {
+    snapshot = { ...snapshot, ...patch }
+    if (!closed) for (const listener of listeners) listener()
   }
-
-  const notify = (id: string) => {
-    for (const listener of listeners.get(id) ?? []) listener()
-  }
-
-  const update = (id: string, change: Partial<AccentSnapshot>) => {
-    const entry = entryFor(id)
-    entry.snapshot = { ...entry.snapshot, ...change }
-    notify(id)
-  }
-
-  const clearPreview = (entry: Entry) => {
-    if (entry.previewOwner !== null) {
-      entry.release?.(entry.previewOwner)
-      entry.previewOwner = null
+  const releasePreview = () => {
+    if (previewOwner !== null) {
+      operations?.release(previewOwner)
+      previewOwner = null
     }
   }
 
-  async function drain(id: string) {
-    const entry = entryFor(id)
-    if (entry.running || entry.desired === null || entry.snapshot.failure)
-      return
-    entry.running = true
-    update(id, { status: "saving" })
-    try {
-      while (entry.desired !== null && !entry.snapshot.failure) {
-        const selected = entry.desired
-        entry.desired = null
+  const makeQueue = (delayMs = 400): AutoSaveQueue<Patch> =>
+    createAutoSaveQueue<Patch, SaveSuccess, SaveRejection>({
+      delayMs,
+      shouldExecute: (attempt) =>
+        attempt.revision === revision && snapshot.draft !== null &&
+        hex(snapshot.draft) && normalized(snapshot.draft) === attempt.accentColor,
+      execute: async (attempt): Promise<ActionOutcome<SaveSuccess, SaveRejection>> => {
+        running = true
+        update({ status: "saving" })
         try {
-          if (!entry.save) throw new Error("Accent save function unavailable")
-          const confirmed = normalized(await entry.save(selected))
-          if (!hex(confirmed)) throw new Error("Accent save response invalid")
-          // The caller updates the Apollo confirmed cache only for successful results.
-          // Newer pending edits always retain their own preview and Draft.
-          update(id, {
-            confirmed,
-            status: entry.desired === null ? "saved" : "saving",
-            validation: null,
-          })
+          if (!operations) return { kind: "unknown" }
+          const confirmed = normalized(await operations.save(attempt.accentColor))
+          if (!hex(confirmed)) return { kind: "unknown" }
+          return { kind: "success", value: { color: confirmed } }
         } catch (error) {
-          const kind = classifySettingsSaveFailure(error)
-          const failure: AccentFailure =
-            kind === "unknown"
-              ? "unknown"
-              : kind === "blocked"
-                ? "blocked"
-                : "rejected"
-          entry.desired = null
-          clearPreview(entry)
-          const validation =
-            kind === "validation"
-              ? resolveFormFailureValidation(getSettingsInputViolations(error), ["accentColor"])
-              : null
-          update(id, {
-            status: "attention",
-            failure,
-            blockedFeedback: failure === "blocked" ? getCommunityBlockedFeedback(error, "Community設定") : null,
-            validation,
-            observedMatches: false,
-            inspected: false,
+          const failure = classifySettingsSaveFailure(error)
+          if (failure === "unknown") return { kind: "unknown" }
+          return { kind: "rejected", reason: {
+            kind: failure === "blocked" ? "blocked" : "rejected", error,
+          } }
+        } finally {
+          running = false
+        }
+      },
+      onResult: ({ attempted, outcome, unsent }) => {
+        if (outcome.kind === "success") {
+          const color = outcome.value.color
+          // Mutation success is authoritative, even if its view has unmounted.
+          // Apollo/cache commit occurs inside operations.save, never in UI state.
+          if (closed) return
+          const pendingDraft = snapshot.draft
+          const latest = attempted.revision === revision
+          if (latest) releasePreview()
+          update({
+            confirmed: color,
+            status: !latest || unsent || (pendingDraft && normalized(pendingDraft) !== color)
+              ? "pending" : "saved",
+            validation: null,
           })
           return
         }
-      }
-      clearPreview(entry)
-      update(id, {
-        status:
-          entry.snapshot.draft !== null &&
-          entry.snapshot.confirmed !== null &&
-          normalized(entry.snapshot.draft) !==
-            normalized(entry.snapshot.confirmed)
-            ? "pending"
-            : "saved",
-      })
-    } finally {
-      entry.running = false
-    }
+        if (closed) return
+        const failure: AccentFailure =
+          outcome.kind === "unknown" ? "unknown" : outcome.reason.kind
+        const error = outcome.kind === "rejected" ? outcome.reason.error : null
+        const kind = outcome.kind === "rejected" ? classifySettingsSaveFailure(error) : "unknown"
+        // Failed selections remain visible as Preview; no implicit rollback.
+        update({
+          status: "attention",
+          failure,
+          blockedFeedback: failure === "blocked" ? getCommunityBlockedFeedback(error, "Community設定") : null,
+          validation: kind === "validation"
+            ? resolveFormFailureValidation(getSettingsInputViolations(error), ["accentColor"])
+            : null,
+          observedMatches: false,
+          inspected: false,
+        })
+      },
+    })
+
+  const enqueue = (color: string, delayMs = 400) => {
+    if (!queue) queue = makeQueue(delayMs)
+    queue.enqueue({ accentColor: color, revision })
   }
 
   return {
-    getSnapshot(id: string): AccentSnapshot {
-      return entryFor(id).snapshot
+    getSnapshot: () => snapshot,
+    isClosed: () => closed,
+    subscribe(listener: () => void) {
+      listeners.add(listener)
+      return () => { listeners.delete(listener) }
     },
-    subscribe(id: string, listener: () => void) {
-      let group = listeners.get(id)
-      if (!group) {
-        group = new Set()
-        listeners.set(id, group)
-      }
-      group.add(listener)
-      return () => {
-        group?.delete(listener)
-        if (group?.size === 0) listeners.delete(id)
-      }
-    },
-    initialize(id: string, serverColor: string) {
+    configure(next: Operations) { operations = next },
+    initialize(serverColor: string) {
       if (!hex(serverColor)) return
-      const entry = entryFor(id)
-      // Initial hydration only: a stale cached/refetched value must never roll
-      // back a later confirmed mutation or overwrite a restored Draft.
-      if (entry.snapshot.confirmed !== null || entry.snapshot.draft !== null)
-        return
-      update(id, {
-        confirmed: normalized(serverColor),
-        draft: normalized(serverColor),
-      })
+      if (snapshot.confirmed !== null || snapshot.draft !== null) return
+      update({ confirmed: normalized(serverColor), draft: normalized(serverColor) })
     },
-    configure(
-      id: string,
-      operations: {
-        save: SaveAccent
-        observe: ObserveAccent
-        confirm?: (color: string) => void
-        preview: PreviewAccent
-        release: ReleasePreview
-      },
-    ) {
-      const entry = entryFor(id)
-      Object.assign(entry, operations)
-    },
-    edit(id: string, value: string) {
-      const entry = entryFor(id)
-      update(id, { draft: value, validation: null, observedMatches: false, inspected: false })
+    edit(value: string) {
+      if (closed) return
+      revision += 1
+      inspectionGeneration += 1
+      update({ draft: value, validation: null, observedMatches: false, inspected: false })
       if (!hex(value)) {
-        // A newer incomplete draft supersedes any queued valid color.
-        // The in-flight request cannot be cancelled, but no stale queued
-        // mutation should start after it settles.
-        entry.desired = null
-        clearPreview(entry)
-        update(id, {
-          status: entry.snapshot.failure
-            ? "attention"
-            : entry.running
-              ? "saving"
-              : "pending",
-        })
+        releasePreview()
+        update({ status: snapshot.failure ? "attention" : running ? "saving" : "pending" })
         return
       }
-      if (entry.snapshot.failure) {
-        // Explicit user recovery is required, especially for unknown outcomes.
-        // A new valid edit must not re-enable an older queued mutation.
-        entry.desired = null
-        update(id, { status: "attention" })
+      if (snapshot.failure) {
+        // Unknown / rejected require explicit recovery: never resume a stopped Queue.
+        update({ status: "attention" })
         return
       }
       const color = normalized(value)
-      if (color === entry.snapshot.confirmed && !entry.running) {
-        entry.desired = null
-        clearPreview(entry)
-        update(id, { status: "idle" })
+      if (color === snapshot.confirmed && !running) {
+        releasePreview()
+        update({ status: "idle" })
         return
       }
-      entry.desired = color
-      if (entry.preview) entry.previewOwner = entry.preview(color)
-      update(id, { status: entry.running ? "saving" : "pending" })
-      void drain(id)
+      if (operations) previewOwner = operations.preview(color)
+      update({ status: running ? "saving" : "pending" })
+      enqueue(color)
     },
-    async inspect(id: string) {
-      const entry = entryFor(id)
-      if (entry.snapshot.failure !== "unknown" || !entry.observe) return
-      const draftAtStart = entry.snapshot.draft
-      const generation = ++entry.inspectionGeneration
-      // A new inspection supersedes the previous observation immediately.
-      update(id, { inspected: false, observedMatches: false })
+    async inspect() {
+      if (closed || snapshot.failure !== "unknown" || !operations) return
+      const generation = ++inspectionGeneration
+      const draftAtStart = snapshot.draft
+      update({ inspected: false, observedMatches: false })
       try {
-        const server = normalized(await entry.observe())
-        if (
-          generation !== entry.inspectionGeneration ||
-          entry.snapshot.draft !== draftAtStart ||
-          entry.snapshot.failure !== "unknown"
-        )
-          return
-        const draft = entry.snapshot.draft
-        update(id, {
-          // This is a current observation, not proof of the old mutation.
-          observedMatches: Boolean(
-            draft && hex(draft) && normalized(draft) === server,
-          ),
+        const server = normalized(await operations.observe())
+        if (closed || generation !== inspectionGeneration || snapshot.draft !== draftAtStart ||
+            snapshot.failure !== "unknown") return
+        update({
           inspected: true,
+          observedMatches: Boolean(draftAtStart && hex(draftAtStart) &&
+            normalized(draftAtStart) === server),
         })
       } catch {
-        // An old inspection failure must not reset a newer draft's recovery.
-        if (
-          generation !== entry.inspectionGeneration ||
-          entry.snapshot.draft !== draftAtStart ||
-          entry.snapshot.failure !== "unknown"
-        )
-          return
-        update(id, { observedMatches: false, inspected: false })
+        if (!closed && generation === inspectionGeneration &&
+            snapshot.draft === draftAtStart && snapshot.failure === "unknown")
+          update({ inspected: false, observedMatches: false })
       }
     },
-    confirmObservation(id: string) {
-      const entry = entryFor(id)
-      if (
-        entry.snapshot.failure !== "unknown" ||
-        !entry.snapshot.observedMatches
-      )
-        return
-      const confirmed = entry.snapshot.draft
-        ? normalized(entry.snapshot.draft)
-        : entry.snapshot.confirmed
-      if (!confirmed) return
-      entry.confirm?.(confirmed)
-      clearPreview(entry)
-      update(id, {
-        failure: null,
-        blockedFeedback: null,
-        validation: null,
-        status: "idle",
-        observedMatches: false,
-        inspected: false,
-        confirmed,
+    confirmObservation() {
+      if (closed || snapshot.failure !== "unknown" || !snapshot.observedMatches ||
+          !snapshot.draft || !hex(snapshot.draft)) return
+      const color = normalized(snapshot.draft)
+      operations?.confirm(color)
+      releasePreview()
+      update({
+        confirmed: color, status: "idle", failure: null,
+        blockedFeedback: null, validation: null, inspected: false, observedMatches: false,
       })
+      queue = null
     },
-    retry(id: string) {
-      const entry = entryFor(id)
-      if (
-        !entry.snapshot.failure ||
-        entry.snapshot.failure === "blocked" ||
-        !entry.snapshot.draft ||
-        !hex(entry.snapshot.draft)
-      )
-        return
-      if (entry.snapshot.failure === "unknown" && !entry.snapshot.inspected)
-        return
-      // Unknown is never retried without a separate explicit user click.
-      entry.desired = normalized(entry.snapshot.draft)
-      update(id, {
-        failure: null,
-        blockedFeedback: null,
-        validation: null,
-        observedMatches: false,
-        inspected: false,
-        status: "pending",
+    retry() {
+      if (closed || !snapshot.failure || snapshot.failure === "blocked" ||
+          !snapshot.draft || !hex(snapshot.draft) ||
+          (snapshot.failure === "unknown" && !snapshot.inspected)) return
+      const color = normalized(snapshot.draft)
+      revision += 1
+      queue = null
+      update({
+        failure: null, blockedFeedback: null, validation: null,
+        inspected: false, observedMatches: false, status: "pending",
       })
-      if (entry.preview) entry.previewOwner = entry.preview(entry.desired)
-      void drain(id)
+      if (operations) previewOwner = operations.preview(color)
+      enqueue(color, 0)
     },
-    discard(id: string) {
-      const entry = entryFor(id)
-      // Never allow an in-flight write to be dismissed as definitively cancelled.
-      if (entry.running) return
-      entry.desired = null
-      clearPreview(entry)
-      update(id, {
-        draft: entry.snapshot.confirmed,
-        failure: null,
-        blockedFeedback: null,
-        validation: null,
-        observedMatches: false,
-        inspected: false,
-        status: "idle",
+    discard() {
+      if (closed || running) return
+      revision += 1
+      inspectionGeneration += 1
+      releasePreview()
+      // A halted Queue cannot resume. A queued old color is invalidated by revision.
+      update({
+        draft: snapshot.confirmed, status: "idle", failure: null,
+        blockedFeedback: null, validation: null, inspected: false, observedMatches: false,
       })
+      queue = null
+    },
+    close() {
+      if (closed) return Promise.resolve()
+      closed = true
+      inspectionGeneration += 1
+      releasePreview()
+      listeners.clear()
+      // close() initiates queued valid sends now; no React state is updated on settle.
+      return queue?.close() ?? Promise.resolve()
     },
   }
 }
-

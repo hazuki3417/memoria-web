@@ -168,7 +168,7 @@ export const AccentErrorWithDetails: Story = {
     saveStatus: "attention",
     saveFeedback: (
       <FeedbackPanel kind="error" title="保存できませんでした" role="alert">
-        Shellは確定色に戻しました。ColorInputの変更内容は保持しています。
+        選択した色は保存結果が未確定でも表示を維持しています。ColorInputの変更内容は保持しています。
       </FeedbackPanel>
     ),
   },
@@ -193,7 +193,7 @@ export const AccentUnknownBeforeInspection: Story = {
           </>
         }
       >
-        最後に確認できた色を表示しています。入力内容は保持しています。
+        選択した色を表示しています。入力内容は保持しています。
         現在値を確認してから必要な操作を選んでください。
       </FeedbackPanel>
     ),
