@@ -17,7 +17,7 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   CommunityMySettingsDocument: { kind: "Document", name: "communityMySettings" },
   useUpdateCommunitySettingsMutation: () => [mocks.mutation],
 }))
-vi.mock("../ConnectedCommunityPreferences/communitySettingsCache", () => ({
+vi.mock("../communitySettingsCache", () => ({
   commitCommunitySettingsPatch: mocks.patch,
 }))
 
