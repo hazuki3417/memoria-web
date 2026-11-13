@@ -2,15 +2,13 @@
 
 import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
-import { SettingsContentStatus } from "@/components/SettingsContentStatus/SettingsContentStatus"
-import { CommunityMembershipUnavailable } from "./CommunityMembershipUnavailable"
 import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { ConnectedCommunityGeneral } from "../general/ConnectedCommunityGeneral"
 import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
 import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
-import { useCommunitySettingsAccessState } from "./useCommunitySettingsAccessState"
+import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
@@ -46,27 +44,13 @@ export function CommunitySettingsRoute({
   section = "general",
 }: CommunitySettingsRouteProps) {
   const router = useRouter()
-  const { communityAccentColor, status: membershipStatus, retry: retryMembership } =
-    useCommunitySettingsAccessState(communityId)
-
-  if (membershipStatus === "not-member")
-    return (
-      <CommunityMembershipUnavailable
-        onReturnToDashboard={() => router.push("/dashboard")}
-      />
-    )
-
-  if (membershipStatus !== "ready")
-    return (
-      <SettingsContentStatus
-        state={membershipStatus}
-        label="Communityの所属状況を確認中"
-        errorTitle="Communityの所属状況を確認できませんでした"
-        onRetry={retryMembership}
-      >
-        {null}
-      </SettingsContentStatus>
-    )
+  // The enclosing CommunityAccessBoundary owns access verification.
+  // Settings reads its own accent; myCommunities remains Switcher-only.
+  const { data: settingsData } = useCommunityMySettingsQuery({
+    variables: { communityId },
+    fetchPolicy: "cache-first",
+  })
+  const communityAccentColor = settingsData?.community?.mySettings.accentColor
 
   let controller: (render: SettingsSectionRender) => ReactNode
 
