@@ -2,7 +2,7 @@ import { MockedProvider } from "@apollo/client/testing"
 import type { Meta, StoryObj } from "@storybook/react"
 import { GraphQLError } from "graphql"
 import { Text } from "@mantine/core"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunityDetailsDocument } from "@/infrastructure/graphql/generated"
 import { CommunityAccessBoundary } from "./CommunityAccessBoundary"
 
@@ -34,9 +34,19 @@ const notFound = {
 }
 const networkFailure = { request, error: new Error("network unavailable") }
 
-function ProtectedCommunityStory() {
+function ProtectedCommunityStory({
+  onReturnToDashboard,
+  onLogin,
+}: {
+  onReturnToDashboard: () => void
+  onLogin: () => void
+}) {
   return (
-    <CommunityAccessBoundary communityId={communityId}>
+    <CommunityAccessBoundary
+      communityId={communityId}
+      onReturnToDashboard={onReturnToDashboard}
+      onLogin={onLogin}
+    >
       <Text>Community固有コンテンツ</Text>
     </CommunityAccessBoundary>
   )
@@ -45,6 +55,10 @@ function ProtectedCommunityStory() {
 const meta = {
   title: "Features/Community/Access Boundary",
   component: ProtectedCommunityStory,
+  args: {
+    onReturnToDashboard: fn(),
+    onLogin: fn(),
+  },
 } satisfies Meta<typeof ProtectedCommunityStory>
 
 export default meta
@@ -97,13 +111,12 @@ export const Unavailable: Story = {
       </MockedProvider>
     ),
   ],
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText("このCommunityを表示できません")).toBeVisible()
     await expect(canvas.queryByText("Community固有コンテンツ")).not.toBeInTheDocument()
-    await expect(
-      canvas.getByRole("button", { name: "ダッシュボードへ戻る" }),
-    ).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "ダッシュボードへ戻る" }))
+    await expect(args.onReturnToDashboard).toHaveBeenCalledTimes(1)
   },
 }
 
@@ -129,15 +142,14 @@ export const Unauthenticated: Story = {
       </MockedProvider>
     ),
   ],
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await expect(
       await canvas.findByText("認証状態を確認できませんでした"),
     ).toBeVisible()
-    await expect(
-      canvas.getByRole("button", { name: "ログインへ" }),
-    ).toBeVisible()
     await expect(canvas.queryByText("Community固有コンテンツ")).not.toBeInTheDocument()
+    await userEvent.click(canvas.getByRole("button", { name: "ログインへ" }))
+    await expect(args.onLogin).toHaveBeenCalledTimes(1)
   },
 }
 
