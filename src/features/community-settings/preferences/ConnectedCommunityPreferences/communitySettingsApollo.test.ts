@@ -11,7 +11,7 @@ import {
   UpdateCommunitySettingsDocument,
   type OperationCommunityMySettingsQuery,
 } from "@/infrastructure/graphql/generated"
-import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { commitCommunitySettingsPatch } from "../communitySettingsCache"
 import { requireSettingsMutationOutcome, classifySettingsSaveFailure } from "@/infrastructure/graphql/settingsMutationResult"
 
 function settings(accentColor: string, alias: string | null) {
