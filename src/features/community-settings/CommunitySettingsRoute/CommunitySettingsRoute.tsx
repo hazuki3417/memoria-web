@@ -38,7 +38,7 @@ export type CommunitySettingsRouteProps = {
   section?: CommunitySettingsSection
 }
 
-/** Selects one Controller; only membership and navigation remain in Route. */
+/** Selects one Section controller and keeps Settings navigation/accent wiring. */
 export function CommunitySettingsRoute({
   communityId,
   section = "general",
