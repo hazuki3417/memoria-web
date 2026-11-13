@@ -6,17 +6,64 @@ import {
   useUpdateCommunitySettingsMutation,
 } from "@/infrastructure/graphql/generated"
 import {
-  SettingsInputValidationError,
-  requireSettingsMutationOutcome,
+  SettingsGraphQLExecutionError,
+  classifySettingsSaveFailure,
 } from "@/infrastructure/graphql/settingsMutationResult"
+import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
+import {
+  classifyCommunityAliasMutationResult,
+} from "../CommunityAliasSection/classifyCommunityAliasMutationResult"
+import type {
+  CommunityAliasSaveRejection,
+  SaveCommunityAlias,
+} from "../CommunityAliasSection/communityAliasSaveOutcome"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
 
-/** Owns Community Alias observation and mutation without stale refetch side effects. */
-export function useCommunityAliasConnection(communityId: string) {
+/** Community ID固定のAlias保存と、Cacheに影響しない結果不明時の照会を提供する。 */
+export const useCommunityAliasConnection = (communityId: string) => {
   const client = useApolloClient()
-  const [save] = useUpdateCommunitySettingsMutation()
+  const [mutation] = useUpdateCommunitySettingsMutation()
 
-  const inspectAlias = async () => {
+  const classifyError = (error: unknown): ActionOutcome<string | null, CommunityAliasSaveRejection> => {
+    const kind = classifySettingsSaveFailure(error)
+    if (kind === "blocked") return { kind: "rejected", reason: { kind, error } }
+    if (kind === "retryable") return { kind: "rejected", reason: { kind } }
+    return { kind: "unknown" }
+  }
+
+  const execute = async (alias: string | null) => {
+    const response = await mutation({
+      fetchPolicy: "no-cache",
+      errorPolicy: "all",
+      variables: { input: { communityId, alias } },
+    })
+    return { response, alias }
+  }
+
+  const classify = (
+    { response, alias }: Awaited<ReturnType<typeof execute>>,
+  ): ActionOutcome<string | null, CommunityAliasSaveRejection> => {
+    const result = response.data?.updateCommunitySettings
+    if (result) return classifyCommunityAliasMutationResult(result, alias)
+    if (response.errors?.length) {
+      return classifyError(new SettingsGraphQLExecutionError(response.errors))
+    }
+    return { kind: "unknown" }
+  }
+
+  const afterSuccess = (alias: string | null) => {
+    // 確定したAliasフィールドのみを更新し、並行保存のAccentを上書きしない。
+    commitCommunitySettingsPatch(client.cache, communityId, { alias })
+  }
+
+  const saveAlias: SaveCommunityAlias = createActionAdapter({
+    execute,
+    classify,
+    classifyError,
+    afterSuccess,
+  })
+
+  const inspectAlias = async (): Promise<string | null> => {
     const current = await client.query({
       query: CommunityMySettingsDocument,
       variables: { communityId },
@@ -24,30 +71,6 @@ export function useCommunityAliasConnection(communityId: string) {
     })
     if (!current.data?.community) throw new Error("Community unavailable")
     return current.data.community.mySettings.alias
-  }
-
-  const saveAlias = async (alias: string | null) => {
-    const result = await save({
-      fetchPolicy: "no-cache",
-      errorPolicy: "all",
-      variables: { input: { communityId, alias } },
-    })
-    const outcome = requireSettingsMutationOutcome(result.data?.updateCommunitySettings, result)
-    if (outcome?.__typename === "InputValidationFailure")
-      throw new SettingsInputValidationError(outcome.violations)
-    const settings =
-      outcome?.__typename === "UpdateCommunitySettingsSuccess"
-        ? outcome.settings
-        : undefined
-    if (!settings || settings.alias !== alias) {
-      throw new Error("Community alias save unconfirmed")
-    }
-    commitCommunitySettingsPatch(client.cache, communityId, {
-      alias: settings.alias,
-    })
-    // Both subscribed views share the normalized Community fragment.
-    // Refetching either after this write may reintroduce an older
-    // Accent/Alias snapshot while the other field is in flight.
   }
 
   return { inspectAlias, saveAlias }
