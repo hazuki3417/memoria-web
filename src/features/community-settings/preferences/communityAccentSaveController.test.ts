@@ -30,7 +30,8 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
     await vi.advanceTimersByTimeAsync(399)
     expect(operations.save).not.toHaveBeenCalled()
     await vi.advanceTimersByTimeAsync(1)
-    expect(operations.save).toHaveBeenCalledExactlyOnceWith("#AABBCC")
+    expect(operations.save).toHaveBeenCalledTimes(1)
+    expect(operations.save).toHaveBeenCalledWith("#AABBCC")
     expect(controller.getSnapshot()).toMatchObject({
       confirmed: "#ABCDEF", draft: "#AABBCC", status: "pending",
     })
@@ -168,5 +169,74 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
     expect(newer.controller.getSnapshot()).toMatchObject({
       confirmed: "#445566", draft: "#445566", failure: null,
     })
+  })
+  it("遅延中の先行保存が終わってから後続の最新値を直列送信する", async () => {
+    let resolveFirst: ((value: string) => void) | undefined
+    const save = vi.fn()
+      .mockImplementationOnce(() => new Promise<string>((resolve) => { resolveFirst = resolve }))
+      .mockResolvedValueOnce("#445566")
+    const { controller } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    controller.edit("#445566")
+    expect(save).toHaveBeenCalledTimes(1)
+    resolveFirst?.("#AABBCC")
+    await vi.advanceTimersByTimeAsync(0)
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(save).toHaveBeenNthCalledWith(2, "#445566")
+    expect(controller.getSnapshot()).toMatchObject({
+      confirmed: "#445566", draft: "#445566", failure: null, status: "saved",
+    })
+  })
+
+  it("先行Mutation処理中の未完成Draftが後続予約を無効化する", async () => {
+    let resolveFirst: ((value: string) => void) | undefined
+    const save = vi.fn().mockImplementation(
+      () => new Promise<string>((resolve) => { resolveFirst = resolve }),
+    )
+    const { controller } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    controller.edit("#445566")
+    controller.edit("#445")
+    resolveFirst?.("#AABBCC")
+    await vi.advanceTimersByTimeAsync(0)
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(controller.getSnapshot()).toMatchObject({
+      confirmed: "#AABBCC", draft: "#445", status: "pending",
+    })
+  })
+
+  it("保存結果不明時の古い照会は新しいDraftの確認結果を上書きしない", async () => {
+    const { controller, operations } = setup(
+      vi.fn().mockRejectedValue(new Error("unconfirmed")),
+    )
+    let resolveOld: ((value: string) => void) | undefined
+    operations.observe
+      .mockImplementationOnce(() => new Promise<string>((resolve) => { resolveOld = resolve }))
+      .mockResolvedValueOnce("#445566")
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    const old = controller.inspect()
+    controller.edit("#445566")
+    await controller.inspect()
+    expect(controller.getSnapshot()).toMatchObject({
+      inspected: true, observedMatches: true, draft: "#445566",
+    })
+    resolveOld?.("#112233")
+    await old
+    expect(controller.getSnapshot()).toMatchObject({
+      inspected: true, observedMatches: true, draft: "#445566",
+    })
+  })
+
+  it("結果不明のまま画面離脱しても後続変更を自動送信しない", async () => {
+    const save = vi.fn().mockRejectedValue(new Error("unconfirmed"))
+    const { controller } = setup(save)
+    controller.edit("#AABBCC")
+    await vi.advanceTimersByTimeAsync(400)
+    controller.edit("#445566")
+    await controller.close()
+    expect(save).toHaveBeenCalledTimes(1)
   })
 })
