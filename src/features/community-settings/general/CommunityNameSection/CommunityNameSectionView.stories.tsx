@@ -137,5 +137,8 @@ export const FormValidation: Story = {
     await userEvent.type(input, "変更したCommunity名")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(await canvas.findByRole("alert")).toHaveTextContent("入力内容を確認してください")
+    await userEvent.type(input, "を再編集")
+    await expect(input).toHaveValue("変更したCommunity名を再編集")
+    await expect(canvas.getByRole("alert")).toBeVisible()
   },
 }
