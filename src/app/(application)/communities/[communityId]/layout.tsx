@@ -1,5 +1,5 @@
 import { CommunityProvider } from "@/features/community/CommunityProvider"
-import { CommunityAccessBoundary } from "@/features/community/CommunityAccessBoundary"
+import { ConnectedCommunityAccessBoundary } from "@/features/community/CommunityAccessBoundary"
 
 export default async function CommunityLayout({
   children,
@@ -11,9 +11,9 @@ export default async function CommunityLayout({
   const { communityId } = await params
   return (
     <CommunityProvider key={communityId} communityId={communityId}>
-      <CommunityAccessBoundary communityId={communityId}>
+      <ConnectedCommunityAccessBoundary communityId={communityId}>
         {children}
-      </CommunityAccessBoundary>
+      </ConnectedCommunityAccessBoundary>
     </CommunityProvider>
   )
 }
