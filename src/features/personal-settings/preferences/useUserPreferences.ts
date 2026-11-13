@@ -8,7 +8,7 @@ import { preferencesSchema } from "./preferencesSchema"
 import { usePreferencesSave } from "./save/usePreferencesSave"
 import { usePersonalAccentPreview } from "./PersonalAccentPreview/PersonalAccentPreviewContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
-import type { SavePersonalPreferencesAction } from "./preferencesSaveOutcome"
+import type { SavePersonalPreferencesAction } from "./save/preferencesSaveOutcome"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type PreferencesFormValues = z.input<typeof preferencesSchema>
