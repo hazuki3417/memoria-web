@@ -41,7 +41,7 @@ afterEach(async () => {
 })
 
 describe("Community名のMutation契約", () => {
-  it("Community名変更の成功は確定名を返し、MyCommunitiesの再取得を要求する", async () => {
+  it("Community名の保存成功は確定名を返し、MyCommunitiesを更新する", async () => {
     mocks.rename.mockResolvedValue({
       data: {
         updateCommunity: {
@@ -50,7 +50,7 @@ describe("Community名のMutation契約", () => {
         },
       },
     })
-    expect(await actions.onSaveName("新しい名前")).toBe("新しい名前")
+    expect(await actions.onSaveName("新しい名前")).toEqual({ kind: "success", value: "新しい名前" })
     expect(mocks.rename).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
@@ -63,16 +63,16 @@ describe("Community名のMutation契約", () => {
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
-  it("Community名変更の応答欠落と通信失敗をFormに伝搬し、接続層から重複通知しない", async () => {
+  it("Community名変更の応答欠落と通信失敗は結果不明として返し、自動再送しない", async () => {
     mocks.rename
       .mockResolvedValueOnce({ data: null })
       .mockRejectedValueOnce(new Error("network"))
-    await expect(actions.onSaveName("変更")).rejects.toThrow("Settings mutation outcome unavailable")
-    await expect(actions.onSaveName("変更")).rejects.toThrow("network")
+    await expect(actions.onSaveName("変更")).resolves.toEqual({ kind: "unknown" })
+    await expect(actions.onSaveName("変更")).resolves.toEqual({ kind: "unknown" })
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
-  it("Community名のTyped ValidationをField Path付きでFormへ伝達する", async () => {
+  it("Community名のTyped Validationを拒否理由とField Path付きで伝える", async () => {
     mocks.rename.mockResolvedValue({
       data: {
         updateCommunity: {
@@ -83,9 +83,9 @@ describe("Community名のMutation契約", () => {
         },
       },
     })
-    await expect(actions.onSaveName("変更")).rejects.toMatchObject({
-      kind: "validation",
-      violations: [{ code: "REQUIRED" }],
+    await expect(actions.onSaveName("変更")).resolves.toMatchObject({
+      kind: "rejected",
+      reason: { kind: "validation", violations: [{ code: "REQUIRED" }] },
     })
     expect(mocks.notify).not.toHaveBeenCalled()
   })
