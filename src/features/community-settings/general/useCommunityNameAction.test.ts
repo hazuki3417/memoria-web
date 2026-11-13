@@ -89,5 +89,23 @@ describe("Community名のMutation契約", () => {
     })
     expect(mocks.notify).not.toHaveBeenCalled()
   })
+  it("GraphQLの権限エラーは自動再送できないBlockedとして返す", async () => {
+    const error = { extensions: { code: "FORBIDDEN" }, message: "Not authorized" }
+    mocks.rename.mockResolvedValue({ errors: [error] })
+    await expect(actions.onSaveName("変更")).resolves.toMatchObject({
+      kind: "rejected",
+      reason: { kind: "blocked" },
+    })
+    expect(mocks.rename).toHaveBeenCalledTimes(1)
+  })
+
+  it("未認識のGraphQLエラーは結果不明として扱う", async () => {
+    mocks.rename.mockResolvedValue({
+      errors: [{ extensions: { code: "INTERNAL" } }],
+    })
+    await expect(actions.onSaveName("変更")).resolves.toEqual({ kind: "unknown" })
+    expect(mocks.rename).toHaveBeenCalledTimes(1)
+  })
+
 
 })
