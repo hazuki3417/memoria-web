@@ -1,44 +1,47 @@
 "use client"
 
-import { Stack } from "@mantine/core"
-import { PageHeader } from "@/components/PageHeader"
-import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
-import { useUserPreferences } from "./useUserPreferences"
-import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
-import { PersonalPreferencesSaveFeedback } from "./PersonalPreferencesSaveFeedback"
-import { PersonalPreferencesDisplaySection } from "./PersonalPreferencesDisplaySection"
-import { PersonalPreferencesPreviewSection } from "./PersonalPreferencesPreviewSection"
+import { useMediaQuery } from "@mantine/hooks"
+import { usePersonalSettingsPreferencesQuery } from "@/infrastructure/graphql/generated"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
+import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
+import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
+import { PersonalPreferencesView } from "./PersonalPreferencesView"
+import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
+import { fromGraphqlUserPreferences } from "./userPreferencesGraphqlAdapter"
 
-export function PersonalPreferences({
-  compact,
-  initialPreferences = defaultUserPreferences,
-  onSave,
-  onInspect,
-}: {
-  compact: boolean
-  initialPreferences?: UserPreferences
-  onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
-  onInspect?: () => Promise<UserPreferences>
-}) {
-  const model = useUserPreferences(initialPreferences, onSave, onInspect)
-  return (
-    <Stack gap="xl">
-      <PageHeader
-        title="環境設定"
-        description="表示とプレビューの動作を設定します。"
-        titleAccessory={
-          onSave ? (
-            <SaveStatus
-              state={model.saveError ? "attention" : model.saveStatus}
-              announce
-              timing={SETTINGS_SAVE_STATUS_TIMING}
-            />
-          ) : undefined
-        }
+/** Profileと同じQuery・Action・Host接続の入口。Ready ViewがFormのLifetimeを所有する。 */
+export function PersonalPreferences({ render }: { render: SettingsSectionRender }) {
+  const query = usePersonalSettingsPreferencesQuery({
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+  })
+  const { inspectPreferences } = usePersonalSettingsInspection()
+  const { savePreferencesAction } = usePersonalPreferencesSave()
+  const compact = useMediaQuery("(max-width: 48em)")
+  const values = query.data?.me?.preferences
+
+  usePersonalSettingsRefreshError(Boolean(values && query.error))
+
+  if (!values) {
+    return render(
+      query.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void query.refetch().catch(() => undefined) },
+          },
+    )
+  }
+
+  return render({
+    status: "ready",
+    content: (
+      <PersonalPreferencesView
+        compact={compact}
+        initialPreferences={fromGraphqlUserPreferences(values)}
+        onSaveAction={savePreferencesAction}
+        onInspect={inspectPreferences}
       />
-      <PersonalPreferencesSaveFeedback model={model} />
-      <PersonalPreferencesDisplaySection compact={compact} model={model} />
-      <PersonalPreferencesPreviewSection compact={compact} model={model} />
-    </Stack>
-  )
+    ),
+  })
 }

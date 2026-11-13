@@ -6,7 +6,7 @@ import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSe
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { Profile } from "../profile"
-import { ConnectedPersonalPreferences } from "../preferences/ConnectedPersonalPreferences"
+import { PersonalPreferences } from "../preferences/PersonalPreferences"
 import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
 import { Account } from "../account/Account"
 import { usePersonalSettingsAccentColor } from "./usePersonalSettingsAccentColor"
@@ -49,7 +49,7 @@ export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
       controller = (render) => <Profile render={render} />
       break
     case "preferences":
-      controller = (render) => <ConnectedPersonalPreferences render={render} />
+      controller = (render) => <PersonalPreferences render={render} />
       break
     case "account":
       // The deletion entry UI requires no Section data Query.

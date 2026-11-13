@@ -3,12 +3,12 @@
 import { Box, Stack, Switch } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import type { useUserPreferences } from "./useUserPreferences"
-type PreferencesModel = ReturnType<typeof useUserPreferences>
+import type { PersonalPreferencesPreviewSectionModel } from "./usePersonalPreferencesPreviewSection"
+type PreferencesModel = PersonalPreferencesPreviewSectionModel
 
 /** Shows Media Detail behavior options without owning the preference session. */
-export function PersonalPreferencesPreviewSection({ compact, model }: { compact: boolean; model: PreferencesModel }) {
-  const { preferences, change, fieldErrors } = model
+export function PersonalPreferencesPreviewSectionView({ compact, model }: { compact: boolean; model: PreferencesModel }) {
+  const { preferences, fieldErrors, changeNavigationWrap, changeInitialInfoWide, changeInitialInfoMedium } = model
   const loop = preferences.mediaDetailNavigationWrap
   const wideDetails = preferences.mediaDetailInitialInfoWide
   const mediumDetails = preferences.mediaDetailInitialInfoMedium
@@ -25,9 +25,7 @@ export function PersonalPreferencesPreviewSection({ compact, model }: { compact:
             <Switch
               checked={loop}
               error={fieldErrors.mediaDetailNavigationWrap?.message}
-              onChange={(event) =>
-                change("mediaDetailNavigationWrap", event.currentTarget.checked)
-              }
+              onChange={(event) => changeNavigationWrap(event.currentTarget.checked)}
               label={loop ? "オン" : "オフ"}
             />
           </SettingRow>
@@ -39,12 +37,7 @@ export function PersonalPreferencesPreviewSection({ compact, model }: { compact:
             <Switch
               checked={wideDetails}
               error={fieldErrors.mediaDetailInitialInfoWide?.message}
-              onChange={(event) =>
-                change(
-                  "mediaDetailInitialInfoWide",
-                  event.currentTarget.checked,
-                )
-              }
+              onChange={(event) => changeInitialInfoWide(event.currentTarget.checked)}
               label={wideDetails ? "オン" : "オフ"}
             />
           </SettingRow>
@@ -56,12 +49,7 @@ export function PersonalPreferencesPreviewSection({ compact, model }: { compact:
             <Switch
               checked={mediumDetails}
               error={fieldErrors.mediaDetailInitialInfoMedium?.message}
-              onChange={(event) =>
-                change(
-                  "mediaDetailInitialInfoMedium",
-                  event.currentTarget.checked,
-                )
-              }
+              onChange={(event) => changeInitialInfoMedium(event.currentTarget.checked)}
               label={mediumDetails ? "オン" : "オフ"}
             />
           </SettingRow>

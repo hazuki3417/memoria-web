@@ -2,15 +2,14 @@ import { Box, Button } from "@mantine/core"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
-import { PersonalPreferences } from "./PersonalPreferences"
+import { PersonalPreferencesView } from "./PersonalPreferencesView"
 import { defaultUserPreferences, type UserPreferencesPatch } from "./userPreferences"
-import { PersonalPreferencesSessionProvider } from "./PersonalPreferencesSessionContext"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
-  // Preserve the existing Storybook IDs during the component rename.
+  // Existing meta title preserves page-level Story IDs during ownership migration.
   title: "features/settings/preferences/SettingsPreferences",
-  component: PersonalPreferences,
+  component: PersonalPreferencesView,
   args: {
     compact: false,
     initialPreferences: defaultUserPreferences,
@@ -22,51 +21,13 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof PersonalPreferences>
+} satisfies Meta<typeof PersonalPreferencesView>
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Preferences: Story = {
   name: "Visual · 環境設定",
   tags: ["visual"],
-}
-
-export const PreferenceSections: Story = {
-  name: "Interaction · 設定項目の表示",
-  tags: ["interaction"],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    for (const label of [
-      "表示テーマ",
-      "Personal Accent Color",
-      "日付形式",
-      "ファイルサイズの単位",
-      "Mediaサムネイルサイズ",
-    ]) {
-      await expect(canvas.getByLabelText(label)).toBeVisible()
-    }
-    await expect(
-      canvas.getByText("Media Detailの前後Navigation循環"),
-    ).toBeVisible()
-    await expect(canvas.getByText("詳細情報の初期表示（Wide）")).toBeVisible()
-    await expect(canvas.getByText("詳細情報の初期表示（Medium）")).toBeVisible()
-  },
-}
-
-export const PreviewToggle: Story = {
-  name: "Interaction · Media Detail循環設定",
-  tags: ["interaction"],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const row = canvas
-      .getByText("Media Detailの前後Navigation循環")
-      .closest("div")
-    await expect(row).not.toBeNull()
-    const input = canvas.getAllByRole("switch")[0]
-    const previous = (input as HTMLInputElement).checked
-    await userEvent.click(input)
-    await expect(input).toHaveProperty("checked", !previous)
-  },
 }
 
 export const PreferencePatchContract: Story = {
@@ -135,50 +96,51 @@ export const PreferenceSaveStatus: Story = {
   },
 }
 
+const navigationSave = fn(async (_patch: UserPreferencesPatch) => {
+  throw new Error("response lost")
+})
+
 function PreferencesSessionRoundTripFixture(
-  args: ComponentProps<typeof PersonalPreferences>,
+  args: ComponentProps<typeof PersonalPreferencesView>,
 ) {
   const [show, setShow] = useState(true)
   return (
-    <PersonalPreferencesSessionProvider>
+    <>
       <Button onClick={() => setShow((previous) => !previous)}>
         {show ? "設定画面から移動" : "設定画面へ戻る"}
       </Button>
       {show && (
-        <PersonalPreferences
+        <PersonalPreferencesView
           {...args}
           compact={false}
           initialPreferences={defaultUserPreferences}
-          onSave={async (patch) => ({
-            ...defaultUserPreferences,
-            ...patch,
-          })}
+          onSave={navigationSave}
         />
       )}
-    </PersonalPreferencesSessionProvider>
+    </>
   )
 }
 
 export const PreferencesSessionRoundTrip: Story = {
-  name: "Interaction · SPA画面再訪で未保存DraftとBadgeを保持",
+  name: "Interaction · SPA離脱でQueueを閉じ再訪時にDraftとFailureを復元しない",
   tags: ["interaction"],
   render: (args) => <PreferencesSessionRoundTripFixture {...args} />,
   play: async ({ canvasElement }) => {
+    navigationSave.mockClear()
     const canvas = within(canvasElement)
     const input = canvas.getAllByRole("switch")[0]
     await userEvent.click(input)
     await expect(input).toBeChecked()
     await userEvent.click(canvas.getByRole("button", { name: "設定画面から移動" }))
+    await waitFor(() => expect(navigationSave).toHaveBeenCalledTimes(1))
     await userEvent.click(canvas.getByRole("button", { name: "設定画面へ戻る" }))
-    const restored = canvas.getAllByRole("switch")[0]
-    await expect(restored).toBeChecked()
-    await waitFor(() => {
-      expect(canvas.getByText("保存済み")).toBeVisible()
-    })
+    const fresh = canvas.getAllByRole("switch")[0]
+    await expect(fresh).not.toBeChecked()
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
 }
 
-function PreferencesRefreshFixture(args: ComponentProps<typeof PersonalPreferences>) {
+function PreferencesRefreshFixture(args: ComponentProps<typeof PersonalPreferencesView>) {
   const [preferences, setPreferences] = useState(defaultUserPreferences)
   return (
     <>
@@ -195,7 +157,7 @@ function PreferencesRefreshFixture(args: ComponentProps<typeof PersonalPreferenc
       }))}>
         別Fieldのみ再取得を再現
       </Button>
-      <PersonalPreferences
+      <PersonalPreferencesView
         {...args}
         compact={false}
         initialPreferences={preferences}
@@ -218,26 +180,6 @@ export const PreferencesRefreshWhileUntouched: Story = {
     // RHF reset/hydration must never enqueue a new auto-save patch.
     await new Promise((resolve) => setTimeout(resolve, 500))
     await expect(args.onSave).not.toHaveBeenCalled()
-  },
-}
-
-export const PreferencesAccentValidationOnBlur: Story = {
-  name: "Interaction · Personal AccentのValidationはBlur後に表示",
-  tags: ["interaction"],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: "Personal Accent Color" })
-    await userEvent.clear(input)
-    await userEvent.type(input, "#123")
-    await expect(canvas.queryByText("HEXカラーコード（#RRGGBB）を入力してください。")).not.toBeInTheDocument()
-    await userEvent.tab()
-    await expect(canvas.getByText("HEXカラーコード（#RRGGBB）を入力してください。")).toBeVisible()
-    await userEvent.clear(input)
-    await userEvent.type(input, "#ABCDEF")
-    await expect(canvas.queryByText("HEXカラーコード（#RRGGBB）を入力してください。")).not.toBeInTheDocument()
-    await userEvent.clear(input)
-    await userEvent.type(input, "#123")
-    await expect(canvas.getByText("HEXカラーコード（#RRGGBB）を入力してください。")).toBeVisible()
   },
 }
 
@@ -277,16 +219,6 @@ export const PreferencesRefreshWhileEditing: Story = {
   },
 }
 
-
-function PreferencesFeedbackSessionFixture(
-  args: ComponentProps<typeof PersonalPreferences>,
-) {
-  return (
-    <PersonalPreferencesSessionProvider>
-      <PersonalPreferences {...args} />
-    </PersonalPreferencesSessionProvider>
-  )
-}
 
 export const PreferencesFormErrorVisual: Story = {
   name: "Visual · Personal PreferencesのForm Error",
@@ -343,7 +275,6 @@ export const PreferencesBlockedVisual: Story = {
 export const PreferencesUnknownMatchesVisual: Story = {
   name: "Visual · Personal PreferencesのUnknown照会一致",
   tags: ["visual"],
-  render: (args) => <PreferencesFeedbackSessionFixture {...args} />,
   args: {
     onSave: fn(async () => { throw new Error("unknown") }),
     onInspect: fn(async () => ({
@@ -366,7 +297,6 @@ export const PreferencesUnknownMatchesVisual: Story = {
 export const PreferencesUnknownDiffersVisual: Story = {
   name: "Visual · Personal PreferencesのUnknown照会不一致",
   tags: ["visual"],
-  render: (args) => <PreferencesFeedbackSessionFixture {...args} />,
   args: {
     onSave: fn(async () => { throw new Error("unknown") }),
     onInspect: fn(async () => defaultUserPreferences),

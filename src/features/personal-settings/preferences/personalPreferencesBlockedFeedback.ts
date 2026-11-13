@@ -1,12 +1,12 @@
 /** UI copy based on public GraphQL error codes, never raw server messages. */
-export type PreferencesBlockedFeedback = { title: string; description: string }
+export type PersonalPreferencesBlockedFeedback = { title: string; description: string }
 
-const GENERIC: PreferencesBlockedFeedback = {
+const GENERIC: PersonalPreferencesBlockedFeedback = {
   title: "設定を変更できません",
   description: "現在の状態では設定を更新できません。ログイン状態や権限を確認してください。",
 }
 
-export function getPreferencesBlockedFeedback(error: unknown): PreferencesBlockedFeedback {
+export function getPersonalPreferencesBlockedFeedback(error: unknown): PersonalPreferencesBlockedFeedback {
   if (typeof error !== "object" || error === null) return GENERIC
   const list = "graphQLErrors" in error && Array.isArray(error.graphQLErrors)
     ? error.graphQLErrors

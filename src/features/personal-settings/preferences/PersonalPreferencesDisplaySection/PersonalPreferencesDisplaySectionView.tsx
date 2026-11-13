@@ -1,16 +1,14 @@
 "use client"
 
-import { Box, ColorInput, Select, Stack, useMantineColorScheme } from "@mantine/core"
+import { Box, ColorInput, Select, Stack } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import type { UserPreferences } from "./userPreferences"
-import type { useUserPreferences } from "./useUserPreferences"
-type PreferencesModel = ReturnType<typeof useUserPreferences>
+import type { PersonalPreferencesDisplaySectionModel } from "./usePersonalPreferencesDisplaySection"
+type PreferencesModel = PersonalPreferencesDisplaySectionModel
 
 /** Shows personal appearance and formatting preferences without owning saves. */
-export function PersonalPreferencesDisplaySection({ compact, model }: { compact: boolean; model: PreferencesModel }) {
-  const { colorScheme, setColorScheme } = useMantineColorScheme()
-  const { preferences, accentDraft, accentOnBlur, accentDraftError, change, changeAccentDraft, fieldErrors } = model
+export function PersonalPreferencesDisplaySectionView({ compact, model }: { compact: boolean; model: PreferencesModel }) {
+  const { colorScheme, changeTheme, changeDateFormat, changeFileSizeUnit, changeThumbnailSize, preferences, accentDraft, accentOnBlur, accentDraftError, changeAccentDraft, fieldErrors } = model
   const dateFormat = preferences.dateFormat
   const fileSizeUnit = preferences.fileSizeUnit
   const thumbnailSize = preferences.mediaThumbnailSize
@@ -26,9 +24,7 @@ export function PersonalPreferencesDisplaySection({ compact, model }: { compact:
             <Select
               aria-label="表示テーマ"
               value={colorScheme}
-              onChange={(value) =>
-                value && setColorScheme(value as "auto" | "light" | "dark")
-              }
+              onChange={changeTheme}
               data={[
                 { value: "auto", label: "システム" },
                 { value: "light", label: "ライト" },
@@ -60,10 +56,7 @@ export function PersonalPreferencesDisplaySection({ compact, model }: { compact:
               aria-label="日付形式"
               error={fieldErrors.dateFormat?.message}
               value={dateFormat}
-              onChange={(value) =>
-                value &&
-                change("dateFormat", value as UserPreferences["dateFormat"])
-              }
+              onChange={changeDateFormat}
               data={[
                 { value: "YYYY_MM_DD", label: "YYYY/MM/DD" },
                 { value: "MM_DD_YYYY", label: "MM/DD/YYYY" },
@@ -81,10 +74,7 @@ export function PersonalPreferencesDisplaySection({ compact, model }: { compact:
               aria-label="ファイルサイズの単位"
               error={fieldErrors.fileSizeUnit?.message}
               value={fileSizeUnit}
-              onChange={(value) =>
-                value &&
-                change("fileSizeUnit", value as UserPreferences["fileSizeUnit"])
-              }
+              onChange={changeFileSizeUnit}
               data={[
                 { value: "DECIMAL", label: "SI（KB, MB, GB）" },
                 { value: "BINARY", label: "2進（KiB, MiB, GiB）" },
@@ -101,13 +91,7 @@ export function PersonalPreferencesDisplaySection({ compact, model }: { compact:
               aria-label="Mediaサムネイルサイズ"
               error={fieldErrors.mediaThumbnailSize?.message}
               value={thumbnailSize}
-              onChange={(value) =>
-                value &&
-                change(
-                  "mediaThumbnailSize",
-                  value as UserPreferences["mediaThumbnailSize"],
-                )
-              }
+              onChange={changeThumbnailSize}
               data={[
                 { value: "SMALL", label: "小" },
                 { value: "MEDIUM", label: "中" },
