@@ -14,6 +14,9 @@ const saveValidation = (
 const saveBlocked = (error: unknown): CommunityNameOutcome => ({
   kind: "rejected", reason: { kind: "blocked", error },
 })
+const saveRetryable = (): CommunityNameOutcome => ({
+  kind: "rejected", reason: { kind: "retryable" },
+})
 
 
 const meta = {
@@ -343,6 +346,82 @@ export const NameUnknownInspectFailure: Story = {
     await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
     await expect(input).toHaveValue("未確定のCommunity名")
     await expect(args.onSaveName).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const NameUnknownExplicitRetry: Story = {
+  name: "Interaction · 状態照会後の明示再保存は1回だけ実行",
+  tags: ["interaction"],
+  args: {
+    onSaveName: fn()
+      .mockResolvedValueOnce(saveUnknown())
+      .mockImplementation((name: string) => Promise.resolve(saveSuccess(name))),
+    onInspectName: fn(async () => "以前のCommunity名"),
+  },
+  play: async ({ canvasElement, args }) => {
+    args.onSaveName?.mockReset()
+    args.onSaveName?.mockResolvedValueOnce(saveUnknown())
+    args.onSaveName?.mockImplementation((name: string) => Promise.resolve(saveSuccess(name)))
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "明示的に再保存する名前")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await expect(args.onSaveName).toHaveBeenCalledTimes(1)
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
+    await userEvent.click(canvas.getByRole("button", { name: "もう一度保存" }))
+    await expect(args.onSaveName).toHaveBeenCalledTimes(2)
+    await expect(args.onSaveName).toHaveBeenLastCalledWith("明示的に再保存する名前")
+    await waitFor(() => expect(canvas.queryByRole("alert")).not.toBeInTheDocument())
+    await expect(input).toHaveValue("明示的に再保存する名前")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+export const NameSaveStaleQuery: Story = {
+  name: "Interaction · 保存確定後に古いQueryが返っても確定値を維持",
+  tags: ["interaction"],
+  render: (args) => <CommunityNameRefreshFixture {...args} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "確定したCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(args.onSaveName).toHaveBeenCalledWith("確定したCommunity名")
+    await expect(input).toHaveValue("確定したCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "サーバー再取得を再現" }))
+    await expect(input).toHaveValue("確定したCommunity名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+export const NameRetryable: Story = {
+  name: "Interaction · 再試行可能な失敗ではDraftを保持して明示再保存",
+  tags: ["interaction"],
+  args: {
+    onSaveName: fn()
+      .mockResolvedValueOnce(saveRetryable())
+      .mockImplementation((name: string) => Promise.resolve(saveSuccess(name))),
+  },
+  play: async ({ canvasElement, args }) => {
+    args.onSaveName?.mockReset()
+    args.onSaveName?.mockResolvedValueOnce(saveRetryable())
+    args.onSaveName?.mockImplementation((name: string) => Promise.resolve(saveSuccess(name)))
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "再試行する名前")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("再試行してください")
+    await expect(input).toHaveValue("再試行する名前")
+    await expect(args.onSaveName).toHaveBeenCalledTimes(1)
+    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await expect(args.onSaveName).toHaveBeenCalledTimes(2)
+    await waitFor(() => expect(canvas.queryByRole("alert")).not.toBeInTheDocument())
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
 
