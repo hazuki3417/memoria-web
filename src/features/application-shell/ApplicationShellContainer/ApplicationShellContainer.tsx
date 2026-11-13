@@ -22,8 +22,8 @@ import {
   useCommunityAccentPreview,
 } from "../CommunityAccentPreviewContext"
 import { resolveCommunityAccent } from "../communityAccentPreview"
-import { PersonalPreferencesSessionProvider } from "@/features/personal-settings/preferences/PersonalPreferencesSessionContext"
-import { usePersonalPreferencesSession } from "@/features/personal-settings/preferences/PersonalPreferencesSessionContext"
+import { PersonalAccentPreviewProvider } from "@/features/personal-settings/preferences/PersonalAccentPreviewContext"
+import { usePersonalAccentPreview } from "@/features/personal-settings/preferences/PersonalAccentPreviewContext"
 import { resolvePersonalAccent } from "@/features/personal-settings/preferences/personalAccentPreview"
 import {
   ApplicationAccountMenu,
@@ -59,17 +59,17 @@ export function ApplicationShellContainer({
   children: ReactNode
 }) {
   return (
-    <PersonalPreferencesSessionProvider>
+    <PersonalAccentPreviewProvider>
       <CommunityAccentPreviewProvider>
         <ApplicationShellWithPreview>{children}</ApplicationShellWithPreview>
       </CommunityAccentPreviewProvider>
-    </PersonalPreferencesSessionProvider>
+    </PersonalAccentPreviewProvider>
   )
 }
 
 function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
   const { previews: accentPreviews } = useCommunityAccentPreview()
-  const { snapshot: personalSession } = usePersonalPreferencesSession()
+  const personalPreview = usePersonalAccentPreview()
   const router = useRouter()
   const pathname = usePathname()
   const navigation = useApplicationNavigation()
@@ -126,7 +126,7 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
     accentColor:
       resolvePersonalAccent(
         currentUserData?.me?.preferences.personalAccentColor,
-        personalSession,
+        personalPreview?.color ?? null,
       ) ?? personalContext.accentColor,
   }
   const currentContext =
