@@ -1,7 +1,7 @@
 import { Box, Button } from "@mantine/core"
 import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 import type { SaveCommunityName, CommunityNameSaveRejection } from "./communityNameSaveOutcome"
 
@@ -93,6 +93,7 @@ export const NameSaving: Story = {
     await userEvent.type(input, "新しいCommunity名")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(args.onSaveName).toHaveBeenCalledWith("新しいCommunity名")
+    await expect(input).toBeDisabled()
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
@@ -269,7 +270,7 @@ export const NameEditedDuringSave: Story = {
     await expect(input).toBeDisabled()
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
     await userEvent.click(canvas.getByRole("button", { name: "保存応答を再現" }))
-    await expect(input).toBeEnabled()
+    await waitFor(() => expect(input).toBeEnabled())
     await expect(input).toHaveValue("最初の変更")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
