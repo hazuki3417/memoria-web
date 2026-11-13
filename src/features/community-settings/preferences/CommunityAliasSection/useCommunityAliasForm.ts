@@ -42,7 +42,7 @@ export const useCommunityAliasForm = ({
     mode: "onChange",
     defaultValues: { alias: savedAlias ?? "" },
   })
-  const { control, reset, getValues, handleSubmit, setError, clearErrors } = form
+  const { control, reset, handleSubmit, setError, clearErrors } = form
   const { field, fieldState } = useController({ control, name: "alias" })
   const text = useWatch({ control, name: "alias" }) ?? ""
   const normalized = text.trim()
