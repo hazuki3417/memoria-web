@@ -2,8 +2,8 @@
 
 import { Button, Stack } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
-import type { useUserPreferences } from "../useUserPreferences"
-type PreferencesModel = ReturnType<typeof useUserPreferences>
+import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
+type PreferencesModel = ReturnType<typeof usePersonalPreferencesForm>
 
 /** Owns the existing Preferences save error and explicit recovery presentation. */
 export function PersonalPreferencesSaveFeedback({ model }: { model: PreferencesModel }) {
