@@ -42,7 +42,14 @@ export const AccentDraft: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, "#123")
     await expect(input).toHaveValue("#123")
+    await expect(canvas.queryByText("HEXカラーコード（#RRGGBB）を入力してください。")).not.toBeInTheDocument()
     await userEvent.tab()
+    await expect(canvas.getByText("HEXカラーコード（#RRGGBB）を入力してください。")).toBeVisible()
+    await userEvent.clear(input)
+    await userEvent.type(input, "#ABCDEF")
+    await expect(canvas.queryByText("HEXカラーコード（#RRGGBB）を入力してください。")).not.toBeInTheDocument()
+    await userEvent.clear(input)
+    await userEvent.type(input, "#123")
     await expect(canvas.getByText("HEXカラーコード（#RRGGBB）を入力してください。")).toBeVisible()
   },
 }
