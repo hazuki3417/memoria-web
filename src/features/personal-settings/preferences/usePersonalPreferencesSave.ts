@@ -11,7 +11,6 @@ import {
 } from "@/infrastructure/graphql/generated"
 import {
   SettingsGraphQLExecutionError,
-  SettingsInputValidationError,
   classifySettingsSaveFailure,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
@@ -23,10 +22,7 @@ import type {
   SavePersonalPreferencesAction,
 } from "./personalPreferencesSaveOutcome"
 
-/**
- * PreferencesのMutationをActionOutcomeに分類する。
- * 既存SessionのException I/Fは移行期間中の互換境界として残す。
- */
+/** PreferencesのMutationをTyped ActionOutcomeに分類する。 */
 export function usePersonalPreferencesSave() {
   const client = useApolloClient()
 
@@ -79,19 +75,5 @@ export function usePersonalPreferencesSave() {
     afterSuccess,
   })
 
-  const savePreferences = async (patch: UserPreferencesPatch): Promise<UserPreferences> => {
-    const outcome = await savePreferencesAction(patch)
-    if (outcome.kind === "success") return outcome.value
-    if (outcome.kind === "unknown") throw new Error("Preferences update unconfirmed")
-    switch (outcome.reason.kind) {
-      case "validation":
-        throw new SettingsInputValidationError(outcome.reason.violations)
-      case "blocked":
-        throw outcome.reason.error
-      case "retryable":
-        throw { kind: "retryable" }
-    }
-  }
-
-  return { savePreferences, savePreferencesAction }
+  return { savePreferencesAction }
 }
