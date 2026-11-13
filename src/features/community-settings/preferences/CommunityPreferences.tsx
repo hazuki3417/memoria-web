@@ -21,7 +21,7 @@ export function CommunityPreferences({
   saveFeedback,
   accentError,
   onDraftValidityChange,
-  aliasControl,
+  aliasSection,
 }: {
   accent: string
   initialDraft?: string
@@ -34,7 +34,7 @@ export function CommunityPreferences({
   saveFeedback?: ReactNode
   accentError?: string
   onDraftValidityChange?: (valid: boolean) => void
-  aliasControl?: ReactNode
+  aliasSection?: ReactNode
 }) {
   const compact = useMediaQuery("(max-width: 48em)")
   const { field, fieldState, draftInvalid, onDraftChange } = useCommunityAccentForm({
@@ -58,10 +58,10 @@ export function CommunityPreferences({
         }
       />
       {saveFeedback}
-      {aliasControl && (
+      {aliasSection && (
         <Box>
           <SectionHeader>表示名</SectionHeader>
-          {aliasControl}
+          {aliasSection}
         </Box>
       )}
       <Box>
