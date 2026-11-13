@@ -1,14 +1,13 @@
 "use client"
 
 import type { Dispatch, ReactNode, SetStateAction } from "react"
-import { Box, ColorInput, Stack, Text } from "@mantine/core"
-import { useMediaQuery } from "@mantine/hooks"
+import { Box, Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING, type SaveStatusState } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
-import { SettingRow } from "@/components/SettingRow"
-import { useCommunityAccentForm } from "./useCommunityAccentForm"
+import { CommunityAccentSection } from "./CommunityAccentSection"
 
+/** Preferences全体のHeader・Feedback・Alias/AccentをCompositionする。 */
 export function CommunityPreferences({
   accent,
   initialDraft,
@@ -36,12 +35,6 @@ export function CommunityPreferences({
   onDraftValidityChange?: (valid: boolean) => void
   aliasSection?: ReactNode
 }) {
-  const compact = useMediaQuery("(max-width: 48em)")
-  const { field, fieldState, draftInvalid, onDraftChange } = useCommunityAccentForm({
-    accent, initialDraft, restoreOnAccentChange, preserveDraftOnAccentChange,
-    saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
-  })
-
   return (
     <Stack gap="xl">
       <PageHeader
@@ -64,38 +57,18 @@ export function CommunityPreferences({
           {aliasSection}
         </Box>
       )}
-      <Box>
-        <SectionHeader>表示</SectionHeader>
-        <Stack gap="xl">
-          <SettingRow
-            compact={compact}
-            label="Community Accent Color"
-            description="このCommunityで使用するアクセントカラーを選びます。"
-          >
-            <ColorInput
-              aria-label="Communityアクセントカラー"
-              error={
-                accentError ??
-                (fieldState.isTouched &&
-                draftInvalid
-                  ? "HEXカラーコード（#RRGGBB）を入力してください。"
-                  : undefined)
-              }
-              format="hex"
-              name={field.name}
-              ref={field.ref}
-              onBlur={field.onBlur}
-              value={field.value}
-              onChange={onDraftChange}
-            />
-          </SettingRow>
-          {isPreview && (
-            <Text size="sm" c="dimmed">
-              色の選択はプレビューです。保存・Contextへの反映はまだ行われません。
-            </Text>
-          )}
-        </Stack>
-      </Box>
+      <CommunityAccentSection
+        accent={accent}
+        initialDraft={initialDraft}
+        onAccentDraftChange={onAccentDraftChange}
+        setAccent={setAccent}
+        isPreview={isPreview}
+        restoreOnAccentChange={restoreOnAccentChange}
+        preserveDraftOnAccentChange={preserveDraftOnAccentChange}
+        saveStatus={saveStatus}
+        accentError={accentError}
+        onDraftValidityChange={onDraftValidityChange}
+      />
     </Stack>
   )
 }
