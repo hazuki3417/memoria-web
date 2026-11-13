@@ -49,7 +49,12 @@ export function useCommunityAccentAutoSave(communityId: string, initialAccent: s
           ? outcome.settings.accentColor : undefined
         if (!confirmed || !isHex(confirmed)) throw new Error("Accent save response invalid")
         // A confirmed write remains authoritative even after this view unmounts.
-        commitCommunitySettingsPatch(client.cache, communityId, { accentColor: confirmed.toUpperCase() })
+        try {
+          commitCommunitySettingsPatch(client.cache, communityId, { accentColor: confirmed.toUpperCase() })
+        } catch {
+          // Cache synchronization failure does not undo a confirmed Mutation.
+          void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
+        }
         return confirmed
       },
       observe: async () => {
@@ -62,7 +67,13 @@ export function useCommunityAccentAutoSave(communityId: string, initialAccent: s
         if (!current || !isHex(current)) throw new Error("Community accent unavailable")
         return current
       },
-      confirm: (color) => commitCommunitySettingsPatch(client.cache, communityId, { accentColor: color }),
+      confirm: (color) => {
+        try {
+          commitCommunitySettingsPatch(client.cache, communityId, { accentColor: color })
+        } catch {
+          void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
+        }
+      },
       preview: (value) => setPreview(communityId, value),
       release: (owner) => clearPreview(communityId, owner),
     })
