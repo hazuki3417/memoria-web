@@ -5,10 +5,10 @@ import { useController, useForm, type FieldPathValue } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { personalPreferencesSchema } from "./personalPreferencesSchema"
-import { usePersonalPreferencesAutoSave } from "./PersonalPreferencesSave/usePersonalPreferencesAutoSave"
+import { usePersonalPreferencesAutoSave } from "./usePersonalPreferencesAutoSave"
 import { usePersonalAccentPreview } from "./PersonalAccentPreview/PersonalAccentPreviewContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
-import type { SavePersonalPreferencesAction } from "./PersonalPreferencesSave/personalPreferencesSaveOutcome"
+import type { SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type PreferencesFormValues = z.input<typeof personalPreferencesSchema>
