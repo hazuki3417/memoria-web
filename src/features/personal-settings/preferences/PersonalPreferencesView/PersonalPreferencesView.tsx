@@ -4,7 +4,7 @@ import { Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
 import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
-import { PersonalPreferencesSaveFeedback } from "./PersonalPreferencesSaveFeedback"
+import { PersonalPreferencesSaveFeedback } from "../PersonalPreferencesSaveFeedback"
 import { PersonalPreferencesDisplaySection } from "../PersonalPreferencesDisplaySection/PersonalPreferencesDisplaySection"
 import { PersonalPreferencesPreviewSection } from "../PersonalPreferencesPreviewSection/PersonalPreferencesPreviewSection"
 
