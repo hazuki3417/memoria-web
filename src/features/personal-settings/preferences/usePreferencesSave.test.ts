@@ -19,7 +19,7 @@ const renderHook = (onInspect?: () => Promise<UserPreferences>) => {
 
 beforeEach(async () => {
   vi.useFakeTimers()
-  save = vi.fn(async (patch) => ({ ...defaultUserPreferences, ...patch }))
+  save = vi.fn(async (patch: UserPreferencesPatch) => ({ ...defaultUserPreferences, ...patch }))
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
