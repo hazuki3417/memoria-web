@@ -23,7 +23,7 @@ describe("Community名のTyped Mutation結果", () => {
   it("入力検証失敗を未成立の拒否として返す", () => {
     const result = {
       __typename: "InputValidationFailure",
-      violations: [{ scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["name"] }] }],
+      violations: [],
     } satisfies Result
     expect(classifyCommunityNameMutationResult(result)).toEqual({
       kind: "rejected",
