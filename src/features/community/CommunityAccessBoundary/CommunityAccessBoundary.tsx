@@ -54,7 +54,7 @@ export function CommunityAccessBoundary({
         }
         errorDescription={
           status === "unauthenticated"
-            ? "認証状態を確認してから再試行してください。"
+            ? "再度ログインしてからアクセスしてください。"
             : "通信状況を確認して再試行してください。"
         }
       >
@@ -62,9 +62,15 @@ export function CommunityAccessBoundary({
       </PageStatusBoundary>
       {failed && (
         <Center>
-          <Button variant="light" onClick={() => void refetch().catch(() => undefined)}>
-            再試行
-          </Button>
+          {status === "unauthenticated" ? (
+            <Button variant="light" onClick={() => router.push("/login")}>
+              ログインへ
+            </Button>
+          ) : (
+            <Button variant="light" onClick={() => void refetch().catch(() => undefined)}>
+              再試行
+            </Button>
+          )}
         </Center>
       )}
     </>
