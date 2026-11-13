@@ -5,13 +5,18 @@ import { useCommunityNameSave } from "./useCommunityNameSave"
 
 const mocks = vi.hoisted(() => ({
   rename: vi.fn(),
+  inspect: vi.fn(),
   notify: vi.fn(),
 }))
 
 vi.mock("@/components/Feedback", () => ({
   showNotification: mocks.notify,
 }))
+vi.mock("@apollo/client", () => ({
+  useApolloClient: () => ({ query: mocks.inspect }),
+}))
 vi.mock("@/infrastructure/graphql/generated", () => ({
+  CommunitySettingsNameInspectionDocument: { kind: "Document", name: "communityNameInspection" },
   MyCommunitiesDocument: { kind: "Document", name: "myCommunities" },
   useUpdateCommunityMutation: () => [mocks.rename],
 }))
@@ -107,4 +112,29 @@ describe("Community名のMutation契約", () => {
     await expect(actions.onSaveName("変更")).resolves.toEqual({ kind: "unknown" })
     expect(mocks.rename).toHaveBeenCalledTimes(1)
   })
+  it("現在値照会は固定したCommunity IDでno-cacheのQueryを実行する", async () => {
+    mocks.inspect.mockResolvedValue({
+      data: { community: { name: "現在のCommunity名" } },
+    })
+    await expect(actions.onInspectName()).resolves.toBe("現在のCommunity名")
+    expect(mocks.inspect).toHaveBeenCalledWith({
+      query: { kind: "Document", name: "communityNameInspection" },
+      variables: { communityId: "community-1" },
+      fetchPolicy: "no-cache",
+    })
+    expect(mocks.rename).not.toHaveBeenCalled()
+  })
+
+  it("現在値が取得できない場合はエラーを通知し、保存Actionは呼ばない", async () => {
+    mocks.inspect.mockResolvedValue({ data: { community: null } })
+    await expect(actions.onInspectName()).rejects.toThrow("Community not available")
+    expect(mocks.rename).not.toHaveBeenCalled()
+  })
+
+  it("照会の通信失敗は呼出元のRecoveryに伝搬する", async () => {
+    mocks.inspect.mockRejectedValue(new Error("read unavailable"))
+    await expect(actions.onInspectName()).rejects.toThrow("read unavailable")
+    expect(mocks.rename).not.toHaveBeenCalled()
+  })
+
 })
