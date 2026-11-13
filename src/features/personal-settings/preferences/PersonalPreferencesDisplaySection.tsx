@@ -15,7 +15,6 @@ export function PersonalPreferencesDisplaySection({ compact, model }: { compact:
   const fileSizeUnit = preferences.fileSizeUnit
   const thumbnailSize = preferences.mediaThumbnailSize
   return (
-    <>
       <Box>
         <SectionHeader>表示</SectionHeader>
         <Stack gap="xl">
@@ -119,6 +118,5 @@ export function PersonalPreferencesDisplaySection({ compact, model }: { compact:
           </SettingRow>
         </Stack>
       </Box>
-    </>
   )
 }

@@ -1,247 +1,202 @@
 "use client"
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react"
-import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
-import { resolveFormFailureValidation } from "@/ui/formValidation"
-import { profileSchema } from "./profileSchema"
-import { getProfileBlockedFeedback, type ProfileBlockedFeedback } from "./profileBlockedFeedback"
 import { showNotification } from "@/components/Feedback"
-import { classifySettingsSaveFailure, getSettingsInputViolations } from "@/infrastructure/graphql/settingsMutationResult"
+import { useExplicitSaveProcess } from "@/ui/Action"
+import { resolveFormInputValidation } from "@/ui/formValidation"
+import { profileSchema } from "./profileSchema"
+import type { SaveProfile } from "./profileSaveOutcome"
 
-export type SaveProfile = (nickname: string) => Promise<void>
 export type InspectProfile = () => Promise<string>
 
-type Inspection =
-  | { status: "idle" | "checking" | "failed" }
-  | { status: "matches" | "differs"; nickname: string }
+type SaveStatus =
+  | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
+  | { kind: "blocked"; error: unknown }
 
-/** Owns Profile form draft, save/inspection state and stale-query protection. */
-export function useProfileForm({
+/** ProfileのNickname編集・入力検証・明示保存・結果不明時の復旧操作を画面から利用できるようにする。 */
+export const useProfileForm = ({
   onSave,
   onInspect,
   initialNickname,
-  initialSaveState,
-  blockedMessage,
+  initialSaveState = "idle",
 }: {
   onSave: SaveProfile
   onInspect?: InspectProfile
   initialNickname: string
-  initialSaveState: "idle" | "saving" | "retryable-error" | "blocked"
-  blockedMessage: string
-}) {
-  const {
-    control,
-    reset,
-    getValues,
-    handleSubmit,
-    setError,
-    clearErrors,
-    formState: { isSubmitted },
-  } = useForm<
-    z.input<typeof profileSchema>,
-    unknown,
-    z.output<typeof profileSchema>
-  >({
+  initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
+}) => {
+  const form = useForm<z.input<typeof profileSchema>, unknown, z.output<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     mode: "onChange",
     defaultValues: { nickname: initialNickname },
   })
+  const { control, reset, getValues, handleSubmit, setError, clearErrors } = form
   const { field, fieldState } = useController({ control, name: "nickname" })
-  const saved = useRef(initialNickname)
-  const previousSourceNickname = useRef(initialNickname)
-  // Keep a newly confirmed name authoritative until the shared Query echoes it.
-  const awaitingSourceEcho = useRef<string | null>(null)
-  const inspectionGeneration = useRef(0)
+  const nickname = useWatch({ control, name: "nickname" }) ?? initialNickname
+  const normalized = nickname.trim()
+  const baseline = form.formState.defaultValues?.nickname ?? initialNickname
+  const dirty = normalized !== baseline.trim()
+  const validation = profileSchema.safeParse({ nickname })
+  const invalid = !validation.success
 
-  const [saveState, setSaveState] = useState<
-    "idle" | "saving" | "retryable-error" | "blocked" | "unknown"
-  >(initialSaveState)
+  const matchesNickname = (observed: string, submitted: string) => {
+    return observed === submitted
+  }
+
+  const { process, snapshot: processState } = useExplicitSaveProcess({
+    execute: onSave,
+    recovery: onInspect
+      ? { inspect: onInspect, matches: matchesNickname }
+      : undefined,
+  })
+
+  const [status, setStatus] = useState<SaveStatus>(
+    initialSaveState === "blocked"
+      ? { kind: "blocked", error: null }
+      : { kind: initialSaveState },
+  )
   const [formInvalid, setFormInvalid] = useState(false)
-  const [blockedFeedback, setBlockedFeedback] =
-    useState<ProfileBlockedFeedback | null>(null)
-  const [inspection, setInspection] = useState<Inspection>({ status: "idle" })
+  const alive = useRef(true)
+  const queryEcho = useRef({ observed: initialNickname, confirmed: null as string | null })
 
-  useEffect(() => () => {
-    inspectionGeneration.current += 1
+  useEffect(() => {
+    alive.current = true
+    return () => {
+      alive.current = false
+    }
   }, [])
 
-  // Untouched Draft follows fresh data. In-flight / failed / unknown Drafts do
-  // not get replaced by a background Query. A stale cache echo cannot undo a
-  // successful save or an explicitly confirmed server observation.
   useEffect(() => {
-    if (previousSourceNickname.current === initialNickname) return
-    previousSourceNickname.current = initialNickname
-    if (saveState === "unknown") return
-    if (awaitingSourceEcho.current !== null) {
-      if (initialNickname !== awaitingSourceEcho.current) return
-      awaitingSourceEcho.current = null
+    if (queryEcho.current.observed === initialNickname) return
+    queryEcho.current.observed = initialNickname
+    if (queryEcho.current.confirmed !== null) {
+      if (initialNickname !== queryEcho.current.confirmed) return
+      queryEcho.current.confirmed = null
     }
-    const draftIsEdited = getValues("nickname").trim() !== saved.current
-    saved.current = initialNickname
-    if (
-      !draftIsEdited &&
-      saveState !== "saving" &&
-      saveState !== "retryable-error"
-    ) {
+    if (!form.formState.isDirty && !processState.busy && status.kind === "idle") {
       reset({ nickname: initialNickname })
     }
-  }, [initialNickname, getValues, reset, saveState])
+  }, [initialNickname, form.formState.isDirty, reset, processState.busy, status.kind])
 
-  const validation = profileSchema.safeParse({ nickname: field.value })
-  const normalized = field.value.trim()
-  const dirty = normalized !== saved.current
-  const invalid = !validation.success
-  const showClientError = fieldState.isTouched || isSubmitted
-  const isSaving = saveState === "saving"
-  const isBlocked = saveState === "blocked"
-  const isUnknown = saveState === "unknown"
+  const saving = processState.busy || status.kind === "saving" || form.formState.isSubmitting
+  const blocked = status.kind === "blocked"
+  const unknown = status.kind === "unknown"
+  const inspection = processState.inspection
   const canRetryInspected =
-    isUnknown &&
-    inspection.status === "differs" &&
+    unknown &&
+    inspection.kind === "differs" &&
     !invalid &&
-    normalized !== inspection.nickname
+    normalized !== inspection.value
 
-  let saveLabel = "更新"
-  if (saveState === "retryable-error") {
-    saveLabel = "再試行"
-  } else if (isSaving) {
-    saveLabel = "更新中"
-  }
-
-  function adoptCurrentNickname(nickname: string) {
-    inspectionGeneration.current += 1
-    saved.current = nickname
-    awaitingSourceEcho.current = initialNickname === nickname ? null : nickname
-    reset({ nickname })
-    setInspection({ status: "idle" })
-    setSaveState("idle")
+  const adopt = (value: string) => {
+    process.invalidateInspection()
+    queryEcho.current.confirmed = value === initialNickname ? null : value
+    reset({ nickname: value })
+    clearErrors()
     setFormInvalid(false)
-    clearErrors("nickname")
+    setStatus({ kind: "idle" })
   }
 
-  const save = handleSubmit(async ({ nickname }) => {
+  const submitNickname = async ({ nickname: input }: z.output<typeof profileSchema>) => {
     if (
-      isSaving ||
-      isBlocked ||
-      (isUnknown && !canRetryInspected) ||
+      process.getSnapshot().busy ||
+      blocked ||
+      status.kind === "saving" ||
+      (unknown && !canRetryInspected) ||
       (!dirty && !canRetryInspected)
-    )
-      return
+    ) return
 
-    inspectionGeneration.current += 1
-    setInspection({ status: "idle" })
-    setSaveState("saving")
-    setBlockedFeedback(null)
     setFormInvalid(false)
     clearErrors("nickname")
-    try {
-      await onSave(nickname)
-      adoptCurrentNickname(nickname)
+    const outcome = await process.submit(input)
+    if (!alive.current || outcome === null) return
+
+    if (outcome.kind === "success") {
+      adopt(outcome.value)
       showNotification({
         kind: "success",
         title: "プロフィールを保存",
         description: "プロフィールを更新しました。",
       })
-    } catch (error) {
-      const kind = classifySettingsSaveFailure(error)
-      if (kind === "validation") {
-        const result = resolveFormFailureValidation(getSettingsInputViolations(error), ["nickname"])
-        if (result.fieldErrors.nickname) {
-          setError("nickname", {
-            type: "server",
-            message: result.fieldErrors.nickname,
-          })
+    } else if (outcome.kind === "unknown") {
+      setStatus({ kind: "unknown" })
+    } else {
+      const reason = outcome.reason
+      switch (reason.kind) {
+        case "validation": {
+          const errors = resolveFormInputValidation({ violations: reason.violations }, ["nickname"])
+          if (errors.fieldErrors.nickname) {
+            setError("nickname", { type: "server", message: errors.fieldErrors.nickname })
+          }
+          setFormInvalid(errors.formError)
+          setStatus({ kind: "idle" })
+          break
         }
-        setFormInvalid(result.formError)
-        setSaveState("idle")
-      } else if (kind === "blocked") {
-        setBlockedFeedback(getProfileBlockedFeedback(error, blockedMessage))
-        setSaveState("blocked")
-      } else {
-        setSaveState(kind === "retryable" ? "retryable-error" : "unknown")
+        case "blocked":
+          setStatus({
+            kind: "blocked",
+            error: reason.error,
+          })
+          break
+        case "retryable":
+          setStatus({ kind: "retryable-error" })
+          break
       }
     }
-  })
+  }
 
-  async function inspectCurrentProfile() {
-    if (!isUnknown || !onInspect || inspection.status === "checking") return
-    const generation = ++inspectionGeneration.current
-    const draftAtStart = getValues("nickname").trim()
-    setInspection({ status: "checking" })
-    try {
-      const currentNickname = await onInspect()
-      if (
-        generation !== inspectionGeneration.current ||
-        getValues("nickname").trim() !== draftAtStart
-      )
-        return
-      setInspection({
-        status: currentNickname === draftAtStart ? "matches" : "differs",
-        nickname: currentNickname,
-      })
-    } catch {
-      if (
-        generation !== inspectionGeneration.current ||
-        getValues("nickname").trim() !== draftAtStart
-      )
-        return
-      setInspection({ status: "failed" })
+  const save = handleSubmit(submitNickname)
+
+  const inspectCurrentProfile = async () => {
+    if (!unknown || !onInspect || inspection.kind === "checking") return
+    await process.inspect(getValues("nickname").trim())
+  }
+
+  const confirmObservedProfile = () => {
+    if (
+      unknown &&
+      inspection.kind === "matches" &&
+      getValues("nickname").trim() === inspection.value
+    ) {
+      // 現在値が一致しても以前のMutationが成功した証拠にはならない。
+      adopt(inspection.value)
     }
   }
 
-  function confirmObservedProfile() {
-    if (
-      !isUnknown ||
-      inspection.status !== "matches" ||
-      inspection.nickname !== getValues("nickname").trim()
-    )
-      return
-    // A matching read is an observation, NOT evidence that the old write
-    // succeeded. Intentionally do not emit a success Notification here.
-    adoptCurrentNickname(inspection.nickname)
+  const discardUnconfirmedDraft = () => {
+    if (unknown && inspection.kind === "differs") adopt(inspection.value)
   }
-
-  function discardUnconfirmedDraft() {
-    if (!isUnknown || inspection.status !== "differs") return
-    // Discard is an explicit decision to adopt the inspected server value.
-    adoptCurrentNickname(inspection.nickname)
-  }
-
 
   const onDraftChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.onChange(event)
     clearErrors("nickname")
-    if (isUnknown) {
-      inspectionGeneration.current += 1
-      setInspection({ status: "idle" })
-    }
-    // A form-level server rejection remains visible until another
-    // confirmed submit. Editing alone cannot prove it is resolved.
+    if (status.kind === "unknown") process.invalidateInspection()
   }
 
+  /** 入力状態と検証結果、保存可否・Feedback状態、保存・復旧に必要な画面操作を提供する。 */
   return {
     field,
     fieldState,
     validation,
-    normalized,
     dirty,
     invalid,
-    showClientError,
-    isSaving,
-    isBlocked,
-    isUnknown,
-    canRetryInspected,
-    saveLabel,
-    saveState,
-    formInvalid,
-    blockedFeedback,
+    showClientError: fieldState.isTouched || form.formState.isSubmitted,
+    saving,
+    blocked,
+    unknown,
+    status,
     inspection,
+    formInvalid,
+    normalized,
+    canRetryInspected,
+    saveLabel: saving ? "更新中" : status.kind === "retryable-error" ? "再試行" : "更新",
     save,
+    onDraftChange,
     inspectCurrentProfile,
     confirmObservedProfile,
     discardUnconfirmedDraft,
-    onDraftChange,
   }
 }

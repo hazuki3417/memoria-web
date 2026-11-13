@@ -1,13 +1,5 @@
-/**
- * The outcome describes one operation, not follow-up refetch or UI feedback.
- * A transport failure alone is not evidence that a remote write was rejected.
- */
+/** 一回の遠隔操作の成立確実性を表す。後続の同期や通知の成否は含めない。 */
 export type ActionOutcome<Success, Rejection> =
   | { kind: "success"; value: Success }
   | { kind: "rejected"; reason: Rejection }
   | { kind: "unknown" }
-
-/** An action is an ordinary asynchronous function; no wrapper is required. */
-export type Action<Input, Success, Rejection> = (
-  input: Input,
-) => Promise<ActionOutcome<Success, Rejection>>

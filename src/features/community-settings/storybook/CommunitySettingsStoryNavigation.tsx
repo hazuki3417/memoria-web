@@ -88,10 +88,10 @@ export function CommunitySettingsStoryNavigation({
       )
       break
     case "usage":
-      content = <>{props.usageContent}</>
+      content = props.usageContent
       break
     case "preferences":
-      content = <>{preferencesContent ?? <CommunityPreferences accent={accent} setAccent={setAccent} />}</>
+      content = preferencesContent ?? <CommunityPreferences accent={accent} setAccent={setAccent} />
       break
   }
 

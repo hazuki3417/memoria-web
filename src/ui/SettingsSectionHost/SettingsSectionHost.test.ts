@@ -18,10 +18,29 @@ vi.mock("@/components/SettingsContentStatus/SettingsContentStatus", () => ({
       { "data-state": state },
       state === "ready" ? children : null,
       state === "error" && onRetry
-        ? createElement("button", { onClick: onRetry }, "再試行")
+        ? createElement("button", { type: "button", onClick: onRetry }, "再試行")
         : null,
     ),
 }))
+
+function Controller({
+  render,
+  status,
+  onMounted,
+}: {
+  render: SettingsSectionRender
+  status: "loading" | "ready"
+  onMounted: () => void
+}) {
+  useEffect(() => {
+    onMounted()
+  }, [onMounted])
+  return render(
+    status === "ready"
+      ? { status: "ready", content: createElement("span", null, "Profile UI") }
+      : { status: "loading" },
+  )
+}
 
 describe("SettingsSectionHost", () => {
   let root: Root
@@ -38,30 +57,18 @@ describe("SettingsSectionHost", () => {
 
   it("keeps the controller mounted while its ready-only content is hidden", () => {
     let mounted = 0
-    function Controller({
-      render,
-      status,
-    }: {
-      render: SettingsSectionRender
-      status: "loading" | "ready"
-    }) {
-      useEffect(() => {
-        mounted += 1
-      }, [])
-      return render(
-        status === "ready"
-          ? { status: "ready", content: createElement("span", null, "Profile UI") }
-          : { status: "loading" },
-      )
-    }
 
+    const onMounted = () => {
+      mounted += 1
+    }
     const show = (status: "loading" | "ready") => {
       act(() =>
         root.render(
           createElement(SettingsSectionHost, {
             label: "読み込み中",
+            // biome-ignore lint/correctness/noChildrenProp: createElement needs this required prop for TypeScript overload resolution.
             children: (render: SettingsSectionRender) =>
-              createElement(Controller, { render, status }),
+              createElement(Controller, { render, status, onMounted }),
           }),
         ),
       )
@@ -82,6 +89,7 @@ describe("SettingsSectionHost", () => {
       root.render(
         createElement(SettingsSectionHost, {
           label: "読み込み中",
+          // biome-ignore lint/correctness/noChildrenProp: createElement needs this required prop for TypeScript overload resolution.
           children: (render: SettingsSectionRender) =>
             render({ status: "error", retry }),
         }),

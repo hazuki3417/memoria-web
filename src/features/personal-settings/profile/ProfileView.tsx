@@ -3,49 +3,41 @@
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
-import { useProfileForm } from "./useProfileForm"
 import { ProfileSaveFeedback } from "./ProfileSaveFeedback"
-import type { SaveProfile, InspectProfile } from "./useProfileForm"
+import { useProfileForm, type InspectProfile } from "./useProfileForm"
+import type { SaveProfile } from "./profileSaveOutcome"
 
-
-const MOCK_PROFILE = { nickname: "ユーザー" }
-const DEFAULT_BLOCKED_MESSAGE =
+const blockedDescription =
   "現在の状態では保存を続けられません。ページを再読み込みして、プロフィールの状態を確認してください。"
 
-export function PersonalProfile({
+/** 利用者がNicknameを編集・保存し、保存失敗や結果不明時の案内と復旧操作を利用できる画面を提供する。 */
+export const ProfileView = ({
   onSave,
   onInspect,
-  initialNickname = MOCK_PROFILE.nickname,
+  initialNickname = "ユーザー",
   initialSaveState = "idle",
-  blockedMessage = DEFAULT_BLOCKED_MESSAGE,
+  blockedMessage = blockedDescription,
 }: {
   onSave: SaveProfile
   onInspect?: InspectProfile
   initialNickname?: string
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
   blockedMessage?: string
-}) {
+}) => {
   const form = useProfileForm({
     onSave,
     onInspect,
     initialNickname,
     initialSaveState,
-    blockedMessage,
   })
-  const {
-    field,
-    fieldState,
-    validation,
-    dirty,
-    invalid,
-    showClientError,
-    isSaving,
-    isBlocked,
-    isUnknown,
-    saveLabel,
-    save,
-    onDraftChange,
-  } = form
+
+  const { field, fieldState, validation } = form
+  const error =
+    fieldState.error?.type === "server"
+      ? fieldState.error.message
+      : form.showClientError && !validation.success
+        ? validation.error.issues[0]?.message
+        : undefined
 
   return (
     <Stack gap="xl">
@@ -64,29 +56,23 @@ export function PersonalProfile({
           <TextInput
             label="ニックネーム"
             description="Memoriaで表示する名前です。"
+            required
             name={field.name}
             ref={field.ref}
             onBlur={field.onBlur}
             value={field.value}
-            onChange={onDraftChange}
-            error={
-              fieldState.error?.type === "server"
-                ? fieldState.error.message
-                : showClientError && !validation.success
-                  ? validation.error.issues[0]?.message
-                  : undefined
-            }
-            required
-            disabled={isSaving || isBlocked}
+            onChange={form.onDraftChange}
+            error={error}
+            disabled={form.saving || form.blocked}
           />
           <Button
             size="sm"
             style={{ alignSelf: "flex-start" }}
-            disabled={!dirty || invalid || isSaving || isBlocked || isUnknown}
-            loading={isSaving}
-            onClick={() => void save()}
+            disabled={!form.dirty || form.invalid || form.saving || form.blocked || form.unknown}
+            loading={form.saving}
+            onClick={() => void form.save()}
           >
-            {saveLabel}
+            {form.saveLabel}
           </Button>
         </Stack>
       </Box>

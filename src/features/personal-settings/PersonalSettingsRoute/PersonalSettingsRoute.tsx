@@ -5,7 +5,7 @@ import type { ReactNode } from "react"
 import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
-import { ConnectedPersonalProfile } from "../profile/ConnectedPersonalProfile"
+import { Profile } from "../profile"
 import { ConnectedPersonalPreferences } from "../preferences/ConnectedPersonalPreferences"
 import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
 import { Account } from "../account/Account"
@@ -46,7 +46,7 @@ export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
 
   switch (section) {
     case "profile":
-      controller = (render) => <ConnectedPersonalProfile render={render} />
+      controller = (render) => <Profile render={render} />
       break
     case "preferences":
       controller = (render) => <ConnectedPersonalPreferences render={render} />

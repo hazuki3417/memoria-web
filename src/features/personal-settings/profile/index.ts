@@ -1,2 +1,4 @@
-export { PersonalProfile } from "./PersonalProfile"
-export type { SaveProfile, InspectProfile } from "./useProfileForm"
+export { Profile } from "./Profile"
+export { ProfileView } from "./ProfileView"
+export type { InspectProfile } from "./useProfileForm"
+export type { SaveProfile, ProfileSaveRejection } from "./profileSaveOutcome"
