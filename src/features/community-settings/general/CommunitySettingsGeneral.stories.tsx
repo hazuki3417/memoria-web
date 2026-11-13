@@ -4,7 +4,6 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
 import type { SaveCommunityName, CommunityNameSaveRejection } from "./communityNameSaveOutcome"
-import type { ActionOutcome } from "@/ui/Action"
 
 type CommunityNameOutcome = Awaited<ReturnType<SaveCommunityName>>
 const saveSuccess = (name: string): CommunityNameOutcome => ({ kind: "success", value: name })
