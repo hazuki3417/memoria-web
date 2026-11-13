@@ -27,7 +27,7 @@ export const CommunityAliasSectionView = ({ model, onInspect }: CommunityAliasSe
         ref={field.ref}
         onBlur={field.onBlur}
         value={text}
-        disabled={saving || blocked}
+        disabled={saving}
         onChange={onAliasChange}
         error={
           fieldState.error?.type === "server"
