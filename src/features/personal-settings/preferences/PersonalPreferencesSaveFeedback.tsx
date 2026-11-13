@@ -7,7 +7,7 @@ type PreferencesModel = ReturnType<typeof useUserPreferences>
 
 /** Owns the existing Preferences save error and explicit recovery presentation. */
 export function PersonalPreferencesSaveFeedback({ model }: { model: PreferencesModel }) {
-  const { saveError, blockedFeedback, validation, inspect, confirmObservation, retry, discard, inspected, observedMatches, hasSession, canRetry } = model
+  const { saveError, blockedFeedback, validation, inspect, confirmObservation, retry, discard, inspected, observedMatches, canDiscard, canRetry } = model
   return (
     <>
       {saveError && (
@@ -42,7 +42,7 @@ export function PersonalPreferencesSaveFeedback({ model }: { model: PreferencesM
                   もう一度保存
                 </Button>
               )}
-              {hasSession && (
+              {canDiscard && (
                 <Button size="xs" variant="subtle" color="gray" onClick={discard}>
                   変更を破棄
                 </Button>
