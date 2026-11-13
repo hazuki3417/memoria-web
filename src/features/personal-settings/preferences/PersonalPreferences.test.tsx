@@ -3,6 +3,7 @@ import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { defaultUserPreferences } from "./userPreferences"
 import { PersonalPreferences } from "./PersonalPreferences"
+import type { SettingsSectionResult } from "@/ui/SettingsSectionHost"
 
 const mocks = vi.hoisted(() => ({
   connection: vi.fn(),
@@ -68,8 +69,8 @@ describe("PersonalPreferencesの単一公開入口", () => {
       savePreferencesAction,
       inspectPreferences,
     })
-    const render = vi.fn((state: { status: string; content?: unknown }) =>
-      state.content ?? null)
+    const render = vi.fn((state: SettingsSectionResult) =>
+      state.status === "ready" ? state.content : null)
     // Hostがcontentを描画して初めてReadyのFormが生成される。
     await act(async () => root.render(createElement(PersonalPreferences, { render })))
     expect(render).toHaveBeenCalledWith(expect.objectContaining({ status: "ready" }))
