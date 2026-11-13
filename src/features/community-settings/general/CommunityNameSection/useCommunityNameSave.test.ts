@@ -65,6 +65,7 @@ describe("Community名のMutation契約", () => {
       }),
     )
     expect(mocks.rename.mock.calls[0][0].refetchQueries).toHaveLength(1)
+    expect(mocks.inspect).not.toHaveBeenCalled()
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
