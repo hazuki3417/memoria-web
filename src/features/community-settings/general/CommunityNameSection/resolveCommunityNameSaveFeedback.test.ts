@@ -1,59 +1,63 @@
 import { describe, expect, it } from "vitest"
-import { resolveCommunityNameSaveFeedback, type CommunityNameInspection } from "./resolveCommunityNameSaveFeedback"
-import type { SettingsSaveFailureKind } from "@/infrastructure/graphql/settingsMutationResult"
+import { resolveCommunityNameSaveFeedback } from "./resolveCommunityNameSaveFeedback"
 
-function feedback({
-  failure = null,
-  formInvalid = false,
-  inspection = { status: "idle" },
-  hasInspector = true,
-  draft = "新しい名前",
-  blockedFeedback = null,
-}: {
-  failure?: SettingsSaveFailureKind | null
-  formInvalid?: boolean
-  inspection?: CommunityNameInspection
-  hasInspector?: boolean
-  draft?: string
-  blockedFeedback?: { title: string; description: string } | null
-} = {}) {
-  return resolveCommunityNameSaveFeedback({
-    failure, formInvalid, inspection, hasInspector, draft, blockedFeedback,
-  })
+const base = {
+  status: { kind: "idle" as const },
+  formInvalid: false,
 }
 
-describe("Community名の保存・復旧Feedback", () => {
-  it("正常状態ではFeedbackを表示しない", () => {
-    expect(feedback()).toBeNull()
+describe("Community名の保存Feedback", () => {
+  it("通常状態と保存中にはFeedbackを表示しない", () => {
+    expect(resolveCommunityNameSaveFeedback(base)).toBeNull()
+    expect(resolveCommunityNameSaveFeedback({
+      ...base, status: { kind: "saving" },
+    })).toBeNull()
   })
 
-  it("Form validationが他の保存失敗より優先される", () => {
-    const result = feedback({ formInvalid: true, failure: "unknown" })
-    expect(result?.title).toBe("入力内容を確認してください")
+  it("検証エラーは再試行可能エラーより優先する", () => {
+    const result = resolveCommunityNameSaveFeedback({
+      status: { kind: "retryable-error" },
+      formInvalid: true,
+    })
+    expect(result?.type).toBe("validation")
     expect(result?.kind).toBe("error")
   })
 
-  it("Blockedでは既存の理由を保持し、未指定時は既定文言を使う", () => {
-    expect(feedback({ failure: "blocked", blockedFeedback: {
-      title: "変更できません", description: "利用権限がありません",
-    } })).toMatchObject({ title: "変更できません", description: "利用権限がありません" })
-    expect(feedback({ failure: "blocked" })?.title).toBe("Community名を変更できません")
+  it("再試行可能な失敗を案内する", () => {
+    const result = resolveCommunityNameSaveFeedback({
+      ...base, status: { kind: "retryable-error" },
+    })
+    expect(result?.type).toBe("retryable")
+    expect(result?.description).toBe("再試行してください。")
   })
 
-  it("結果不明の現在値確認・再保存判断を状態別に説明する", () => {
-    expect(feedback({ failure: "unknown", inspection: { status: "matches", name: "新しい名前" } })?.description)
-      .toContain("成功した証明ではありません")
-    expect(feedback({ failure: "unknown", inspection: { status: "differs", name: "サーバー名" }, draft: "  新しい名前  " })?.description)
-      .toContain("「サーバー名」")
-    expect(feedback({ failure: "unknown", inspection: { status: "failed" } })?.description)
-      .toContain("取得できませんでした")
-    expect(feedback({ failure: "unknown" })?.description)
-      .toContain("現在の状態を確認")
-    expect(feedback({ failure: "unknown", hasInspector: false })?.description)
-      .toContain("入力内容を控えて")
+  it("Unknownは入力エラーより優先し、自動再送を要求しない", () => {
+    const result = resolveCommunityNameSaveFeedback({
+      status: { kind: "unknown" },
+      formInvalid: true,
+    })
+    expect(result?.type).toBe("unknown")
+    expect(result?.description).toContain("自動で再送せず")
   })
 
-  it("再試行可能な失敗では入力保持を案内する", () => {
-    expect(feedback({ failure: "retryable" })?.description).toContain("入力内容は保持")
+  it("BlockedはCommunity固有の公開エラー理由を表示する", () => {
+    const result = resolveCommunityNameSaveFeedback({
+      status: {
+        kind: "blocked",
+        error: { graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }] },
+      },
+      formInvalid: true,
+    })
+    expect(result?.type).toBe("blocked")
+    expect(result?.title).toBe("Community名を変更できません")
+    expect(result?.description).toContain("権限")
+  })
+
+  it("未知のBlocked原因は安全な案内へフォールバックする", () => {
+    const result = resolveCommunityNameSaveFeedback({
+      ...base, status: { kind: "blocked", error: null },
+    })
+    expect(result?.type).toBe("blocked")
+    expect(result?.description).not.toContain("undefined")
   })
 })
