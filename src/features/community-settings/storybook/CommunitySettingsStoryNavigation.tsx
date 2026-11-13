@@ -11,7 +11,7 @@ import type { CommunityInvitationSectionProps } from "../general/CommunityInvita
 import { CommunityPreferences } from "../preferences/CommunityPreferences"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
-import type { SaveCommunityName } from "../general/communityNameSaveOutcome"
+import type { SaveCommunityName } from "../general/CommunityNameSection/communityNameSaveOutcome"
 import { useCommunityStoryInvitation } from "./useCommunityStoryInvitation"
 
 
