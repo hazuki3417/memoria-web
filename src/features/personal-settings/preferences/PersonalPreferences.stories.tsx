@@ -2,14 +2,14 @@ import { Box, Button } from "@mantine/core"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
-import { PersonalPreferences } from "./PersonalPreferences"
+import { PersonalPreferencesView } from "./PersonalPreferencesView"
 import { defaultUserPreferences, type UserPreferencesPatch } from "./userPreferences"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
   // Preserve the existing Storybook IDs during the component rename.
   title: "features/settings/preferences/SettingsPreferences",
-  component: PersonalPreferences,
+  component: PersonalPreferencesView,
   args: {
     compact: false,
     initialPreferences: defaultUserPreferences,
@@ -21,7 +21,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof PersonalPreferences>
+} satisfies Meta<typeof PersonalPreferencesView>
 export default meta
 type Story = StoryObj<typeof meta>
 
@@ -139,7 +139,7 @@ const navigationSave = fn(async (_patch: UserPreferencesPatch) => {
 })
 
 function PreferencesSessionRoundTripFixture(
-  args: ComponentProps<typeof PersonalPreferences>,
+  args: ComponentProps<typeof PersonalPreferencesView>,
 ) {
   const [show, setShow] = useState(true)
   return (
@@ -148,7 +148,7 @@ function PreferencesSessionRoundTripFixture(
         {show ? "設定画面から移動" : "設定画面へ戻る"}
       </Button>
       {show && (
-        <PersonalPreferences
+        <PersonalPreferencesView
           {...args}
           compact={false}
           initialPreferences={defaultUserPreferences}
@@ -178,7 +178,7 @@ export const PreferencesSessionRoundTrip: Story = {
   },
 }
 
-function PreferencesRefreshFixture(args: ComponentProps<typeof PersonalPreferences>) {
+function PreferencesRefreshFixture(args: ComponentProps<typeof PersonalPreferencesView>) {
   const [preferences, setPreferences] = useState(defaultUserPreferences)
   return (
     <>
@@ -195,7 +195,7 @@ function PreferencesRefreshFixture(args: ComponentProps<typeof PersonalPreferenc
       }))}>
         別Fieldのみ再取得を再現
       </Button>
-      <PersonalPreferences
+      <PersonalPreferencesView
         {...args}
         compact={false}
         initialPreferences={preferences}
