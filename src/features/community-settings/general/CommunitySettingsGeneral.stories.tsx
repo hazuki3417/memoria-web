@@ -3,7 +3,19 @@ import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
-import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
+import type { SaveCommunityName, CommunityNameSaveRejection } from "./communityNameSaveOutcome"
+import type { ActionOutcome } from "@/ui/Action"
+
+type CommunityNameOutcome = Awaited<ReturnType<SaveCommunityName>>
+const saveSuccess = (name: string): CommunityNameOutcome => ({ kind: "success", value: name })
+const saveUnknown = (): CommunityNameOutcome => ({ kind: "unknown" })
+const saveValidation = (
+  violations: Extract<CommunityNameSaveRejection, { kind: "validation" }>["violations"],
+): CommunityNameOutcome => ({ kind: "rejected", reason: { kind: "validation", violations } })
+const saveBlocked = (error: unknown): CommunityNameOutcome => ({
+  kind: "rejected", reason: { kind: "blocked", error },
+})
+
 
 const meta = {
   title: "Features/Community Settings/Settings",
@@ -74,7 +86,7 @@ export const NameInvalid: Story = {
 export const NameSaving: Story = {
   name: "Interaction · Community名保存中",
   tags: ["interaction"],
-  args: { onSaveName: fn(() => new Promise<string>(() => undefined)) },
+  args: { onSaveName: fn(() => new Promise<CommunityNameOutcome>(() => undefined)) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /Community名/ })
@@ -91,7 +103,7 @@ export const NameServerFieldValidation: Story = {
   tags: ["interaction"],
   args: {
     onSaveName: fn(async () => {
-      throw new SettingsInputValidationError([
+      return saveValidation([
         { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["name"] }] },
       ])
     }),
@@ -113,7 +125,7 @@ export const NameServerFormValidation: Story = {
   tags: ["interaction"],
   args: {
     onSaveName: fn(async () => {
-      throw new SettingsInputValidationError([
+      return saveValidation([
         { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
       ])
     }),
@@ -133,7 +145,7 @@ export const NameUnknownOutcome: Story = {
   name: "Interaction · Community名の保存結果不明は再送しない",
   tags: ["interaction"],
   args: {
-    onSaveName: fn(async () => { throw new Error("timeout") }),
+    onSaveName: fn(async () => { return saveUnknown() }),
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
@@ -141,7 +153,7 @@ export const NameUnknownOutcome: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, "変更後のCommunity名")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
-    await expect(await canvas.findByText("保存結果を確認できませんでした")).toBeVisible()
+    await expect(await canvas.findByText("Community名の保存結果を確認できませんでした")).toBeVisible()
     await expect(input).toHaveValue("変更後のCommunity名")
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
     await expect(args.onSaveName).toHaveBeenCalledTimes(1)
@@ -227,16 +239,16 @@ export const NameRefreshWhileEditing: Story = {
 function CommunityNamePendingSaveFixture(
   args: ComponentProps<typeof CommunitySettingsStoryNavigation>,
 ) {
-  const resolveSave = useRef<((saved: string) => void) | null>(null)
+  const resolveSave = useRef<((outcome: CommunityNameOutcome) => void) | null>(null)
   return (
     <>
-      <Button onClick={() => resolveSave.current?.("最初の変更")}>
+      <Button onClick={() => resolveSave.current?.(saveSuccess("最初の変更"))}>
         保存応答を再現
       </Button>
       <CommunitySettingsStoryNavigation
         {...args}
         onSaveName={() =>
-          new Promise<string>((resolve) => {
+          new Promise<CommunityNameOutcome>((resolve) => {
             resolveSave.current = resolve
           })
         }
@@ -246,7 +258,7 @@ function CommunityNamePendingSaveFixture(
 }
 
 export const NameEditedDuringSave: Story = {
-  name: "Interaction · 保存中の新しい入力を保存応答から保護",
+  name: "Interaction · 保存中は入力を停止し、確定後もDraftを維持",
   tags: ["interaction"],
   render: (args) => <CommunityNamePendingSaveFixture {...args} />,
   play: async ({ canvasElement }) => {
@@ -255,22 +267,20 @@ export const NameEditedDuringSave: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, "最初の変更")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
-    await userEvent.clear(input)
-    await userEvent.type(input, "保存中の追加変更")
-    await userEvent.click(
-      canvas.getByRole("button", { name: "保存応答を再現" }),
-    )
-    await expect(input).toHaveValue("保存中の追加変更")
-    await expect(canvas.getByRole("button", { name: "保存" })).toBeEnabled()
+    await expect(input).toBeDisabled()
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await userEvent.click(canvas.getByRole("button", { name: "保存応答を再現" }))
+    await expect(input).toBeEnabled()
+    await expect(input).toHaveValue("最初の変更")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
-
 
 export const NameUnknownMatches: Story = {
   name: "Interaction · Community名は現在値一致を明示確認する",
   tags: ["interaction"],
   args: {
-    onSaveName: fn(async () => { throw new Error("unknown") }),
+    onSaveName: fn(async () => { return saveUnknown() }),
     onInspectName: fn(async () => "変更するCommunity名"),
   },
   play: async ({ canvasElement, args }) => {
@@ -282,7 +292,7 @@ export const NameUnknownMatches: Story = {
     await expect(await canvas.findByRole("alert")).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
     await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
-    await expect(canvas.getByRole("alert")).toHaveTextContent("成功した証明ではありません")
+    await expect(canvas.getByRole("alert")).toHaveTextContent("保存結果は不明です")
     await userEvent.click(canvas.getByRole("button", { name: "確認完了" }))
     await expect(input).toHaveValue("変更するCommunity名")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
@@ -294,7 +304,7 @@ export const NameUnknownDiffers: Story = {
   name: "Visual · Community名の現在値とDraftが不一致",
   tags: ["visual"],
   args: {
-    onSaveName: fn(async () => { throw new Error("unknown") }),
+    onSaveName: fn(async () => { return saveUnknown() }),
     onInspectName: fn(async () => "現在のCommunity名"),
   },
   play: async ({ canvasElement, args }) => {
@@ -307,7 +317,7 @@ export const NameUnknownDiffers: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
     await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
     await expect(canvas.getByRole("button", { name: "変更を破棄" })).toBeVisible()
-    await expect(canvas.getByRole("alert")).toHaveTextContent("現在のCommunity名")
+    await expect(canvas.getByRole("alert")).toHaveTextContent("保存結果は不明です")
     await expect(args.onSaveName).toHaveBeenCalledTimes(1)
   },
 }
@@ -316,7 +326,7 @@ export const NameUnknownInspectFailure: Story = {
   name: "Interaction · Community名照会失敗時は再送しない",
   tags: ["interaction"],
   args: {
-    onSaveName: fn(async () => { throw new Error("unknown") }),
+    onSaveName: fn(async () => { return saveUnknown() }),
     onInspectName: fn(async () => { throw new Error("read failed") }),
   },
   play: async ({ canvasElement, args }) => {
@@ -328,7 +338,7 @@ export const NameUnknownInspectFailure: Story = {
     await expect(await canvas.findByRole("alert")).toBeVisible()
     await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      "現在のCommunity名を取得できませんでした",
+      "保存結果は不明です",
     )
     await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
     await expect(input).toHaveValue("未確定のCommunity名")
@@ -340,7 +350,7 @@ export const NameUnknownDiscard: Story = {
   name: "Interaction · Community名の現在値へ明示破棄",
   tags: ["interaction"],
   args: {
-    onSaveName: fn(async () => { throw new Error("unknown") }),
+    onSaveName: fn(async () => { return saveUnknown() }),
     onInspectName: fn(async () => "確認した現在値"),
   },
   play: async ({ canvasElement, args }) => {
@@ -364,7 +374,7 @@ export const NameBlockedForbidden: Story = {
   tags: ["visual"],
   args: {
     onSaveName: fn(async () => {
-      throw { graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }] }
+      return saveBlocked({ graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }] })
     }),
   },
   play: async ({ canvasElement }) => {
@@ -383,7 +393,7 @@ export const NameFormValidationVisual: Story = {
   tags: ["visual"],
   args: {
     onSaveName: fn(async () => {
-      throw new SettingsInputValidationError([
+      return saveValidation([
         { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
       ])
     }),
@@ -565,20 +575,20 @@ export const NameDraftSurvivesNavigation: Story = {
 export const NameUnknownSurvivesNavigation: Story = {
   name: "Interaction · Section切替でCommunity名の未確定状態を破棄",
   tags: ["interaction"],
-  args: { onSaveName: fn(async () => { throw new Error("timeout") }) },
+  args: { onSaveName: fn(async () => { return saveUnknown() }) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /Community名/ })
     await userEvent.clear(input)
     await userEvent.type(input, "未確定のCommunity名")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
-    await expect(await canvas.findByText("保存結果を確認できませんでした")).toBeVisible()
+    await expect(await canvas.findByText("Community名の保存結果を確認できませんでした")).toBeVisible()
 
     const navigation = within(canvas.getByRole("navigation", { name: "Community設定" }))
     await userEvent.click(navigation.getByText("メンバー"))
     await userEvent.click(navigation.getByText("一般"))
     await expect(canvas.getByRole("textbox", { name: /Community名/ })).toHaveValue("家族のアルバム")
-    await expect(canvas.queryByText("保存結果を確認できませんでした")).not.toBeInTheDocument()
+    await expect(canvas.queryByText("Community名の保存結果を確認できませんでした")).not.toBeInTheDocument()
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
     await expect(args.onSaveName).toHaveBeenCalledTimes(1)
   },
