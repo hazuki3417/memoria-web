@@ -59,9 +59,9 @@ export function usePreferencesSave(
     setState(next)
   }
 
-  const makeQueue = (): AutoSaveQueue<UserPreferencesPatch> =>
+  const makeQueue = (delayMs = 400): AutoSaveQueue<UserPreferencesPatch> =>
     createAutoSaveQueue<UserPreferencesPatch, UserPreferences, Rejection>({
-      delayMs: 400,
+      delayMs,
       execute: async (patch): Promise<ActionOutcome<UserPreferences, Rejection>> => {
         emit({ saveStatus: "saving" })
         try {
@@ -206,11 +206,10 @@ export function usePreferencesSave(
     observed.current = null
     // 停止した旧Queueは再開せず、新しい明示Attemptとして再構築する。
     void queueRef.current?.close()
-    queueRef.current = makeQueue()
+    queueRef.current = makeQueue(0)
     emit({ failure: null, saveStatus: "pending", validation: null, blockedFeedback: null, inspected: false, observedMatches: false })
     queueRef.current.enqueue(patch)
-    // 明示RetryではDebounceを待たない。新Queueにcloseすると送信中の後続編集を失うため
-    // 画面表示中は通常のDebounceを使用する。
+    // 明示Retryは新しいAttemptとして最短の次Tickに送信し、後続編集も受け付ける。
   }
 
   const discard = () => {
