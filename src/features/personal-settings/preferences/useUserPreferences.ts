@@ -8,6 +8,7 @@ import { preferencesSchema } from "./preferencesSchema"
 import { usePreferencesSave } from "./usePreferencesSave"
 import { usePersonalAccentPreview } from "./PersonalAccentPreviewContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import type { SavePersonalPreferencesAction } from "./preferencesSaveOutcome"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
 type PreferencesFormValues = z.input<typeof preferencesSchema>
@@ -20,6 +21,7 @@ export function useUserPreferences(
   initialPreferences: UserPreferences,
   onSave?: SavePreferences,
   onInspect?: () => Promise<UserPreferences>,
+  onSaveAction?: SavePersonalPreferencesAction,
 ) {
   const {
     saveError,
@@ -36,7 +38,7 @@ export function useUserPreferences(
     inspect,
     confirmObservation,
     discard,
-  } = usePreferencesSave(onSave, initialPreferences, onInspect)
+  } = usePreferencesSave(onSave, initialPreferences, onInspect, onSaveAction)
   const preview = usePersonalAccentPreview()
   const initial = confirmed ?? initialPreferences
   const {
