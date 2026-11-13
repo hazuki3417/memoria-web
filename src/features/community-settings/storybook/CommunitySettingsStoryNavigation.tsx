@@ -11,6 +11,7 @@ import type { CommunityInvitationSectionProps } from "../general/CommunityInvita
 import { CommunityPreferences } from "../preferences/CommunityPreferences"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
+import type { SaveCommunityName } from "../general/communityNameSaveOutcome"
 import { useCommunityStoryInvitation } from "./useCommunityStoryInvitation"
 
 
@@ -22,7 +23,7 @@ export type CommunitySettingsStoryProps = {
   communityId?: string
   section?: CommunitySettingsSection
   communityName?: string
-  onSaveName?: (name: string) => Promise<string>
+  onSaveName?: SaveCommunityName
   onInspectName?: () => Promise<string>
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
