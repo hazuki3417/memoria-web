@@ -349,6 +349,66 @@ export const NameUnknownInspectFailure: Story = {
   },
 }
 
+/** Inspectionの応答より後に入力されたDraftを、古い観測値から保護する。 */
+const CommunityNamePendingInspectionFixture = (
+  args: ComponentProps<typeof CommunitySettingsStoryNavigation>,
+) => {
+  const resolveInspection = useRef<((name: string) => void) | null>(null)
+  return (
+    <>
+      <Button onClick={() => resolveInspection.current?.("古い観測値")}>
+        遅延照会を返す
+      </Button>
+      <CommunitySettingsStoryNavigation
+        {...args}
+        onSaveName={async () => saveUnknown()}
+        onInspectName={() =>
+          new Promise<string>((resolve) => {
+            resolveInspection.current = resolve
+          })
+        }
+      />
+    </>
+  )
+}
+
+export const NameUnknownStaleInspection: Story = {
+  name: "Interaction · 照会中の追加編集は古い観測値から保護",
+  tags: ["interaction"],
+  render: (args) => <CommunityNamePendingInspectionFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "初回Draft")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await userEvent.type(input, "と追加編集")
+    await userEvent.click(canvas.getByRole("button", { name: "遅延照会を返す" }))
+    await expect(input).toHaveValue("初回Draftと追加編集")
+    await expect(canvas.queryByRole("button", { name: "確認完了" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
+    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
+  },
+}
+
+export const NameNormalizedSave: Story = {
+  name: "Interaction · Community名の空白を正規化して保存",
+  tags: ["interaction"],
+  args: { onSaveName: fn(async (name: string) => saveSuccess(name)) },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "  正規化したCommunity名  ")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(args.onSaveName).toHaveBeenCalledWith("正規化したCommunity名")
+    await expect(input).toHaveValue("正規化したCommunity名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
 export const NameUnknownExplicitRetry: Story = {
   name: "Interaction · 状態照会後の明示再保存は1回だけ実行",
   tags: ["interaction"],
