@@ -16,7 +16,7 @@ export function ConnectedPersonalPreferences({ render }: { render: SettingsSecti
     notifyOnNetworkStatusChange: true,
   })
   const { inspectPreferences } = usePersonalSettingsInspection()
-  const { savePreferences } = usePersonalPreferencesSave()
+  const { savePreferencesAction } = usePersonalPreferencesSave()
   const compact = useMediaQuery("(max-width: 48em)")
   const values = preferences.data?.me?.preferences
 
@@ -38,7 +38,7 @@ export function ConnectedPersonalPreferences({ render }: { render: SettingsSecti
       <PersonalPreferences
         compact={compact}
         initialPreferences={fromGraphqlUserPreferences(values)}
-        onSave={savePreferences}
+        onSaveAction={savePreferencesAction}
         onInspect={inspectPreferences}
       />
     ),
