@@ -5,7 +5,7 @@ import { createAutoSaveQueue, type AutoSaveQueue, type ActionOutcome } from "@/u
 import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { SettingsInputValidationError, classifySettingsSaveFailure } from "@/infrastructure/graphql/settingsMutationResult"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import { getPersonalPreferencesBlockedFeedback, type PersonalPreferencesBlockedFeedback } from "./personalPersonalPreferencesBlockedFeedback"
+import { getPersonalPreferencesBlockedFeedback, type PersonalPreferencesBlockedFeedback } from "./personalPreferencesBlockedFeedback"
 import type { UserPreferences, UserPreferencesPatch } from "../userPreferences"
 import type { PersonalPreferencesSaveRejection, SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
 
