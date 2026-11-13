@@ -17,6 +17,8 @@ export type AutoSaveQueue<Patch> = Readonly<{
 type AutoSaveQueueConfig<Patch, Success, Rejection> = {
   execute: Action<Patch, Success, Rejection>
   onResult?: (result: AutoSaveAttempt<Patch, Success, Rejection>) => void
+  /** 送信直前に無効化済みのPatchを除外する。除外は遠隔操作のSuccessではない。 */
+  shouldExecute?: (patch: Patch) => boolean
   delayMs?: number
 }
 
@@ -28,6 +30,7 @@ export const createAutoSaveQueue = <
 >({
   execute,
   onResult,
+  shouldExecute,
   delayMs = 400,
 }: AutoSaveQueueConfig<Patch, Success, Rejection>): AutoSaveQueue<Patch> => {
   let pending: Patch | null = null
@@ -51,6 +54,10 @@ export const createAutoSaveQueue = <
       while (pending && !halted) {
         const attempted = pending
         pending = null
+
+        // Superseded input is discarded without pretending a remote action succeeded.
+        // The queue may still process a newer pending change.
+        if (shouldExecute && !shouldExecute(attempted)) continue
 
         let outcome: ActionOutcome<Success, Rejection>
         try {
