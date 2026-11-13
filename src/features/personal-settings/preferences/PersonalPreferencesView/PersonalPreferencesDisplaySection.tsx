@@ -4,8 +4,8 @@ import { Box, ColorInput, Select, Stack, useMantineColorScheme } from "@mantine/
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
 import type { UserPreferences } from "../userPreferences"
-import type { useUserPreferences } from "../useUserPreferences"
-type PreferencesModel = ReturnType<typeof useUserPreferences>
+import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
+type PreferencesModel = ReturnType<typeof usePersonalPreferencesForm>
 
 /** Shows personal appearance and formatting preferences without owning saves. */
 export function PersonalPreferencesDisplaySection({ compact, model }: { compact: boolean; model: PreferencesModel }) {
