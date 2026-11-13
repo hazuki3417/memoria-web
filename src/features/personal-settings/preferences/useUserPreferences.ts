@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { preferencesSchema } from "./preferencesSchema"
 import { usePreferencesSave } from "./usePreferencesSave"
+import { usePersonalAccentPreview } from "./PersonalAccentPreviewContext"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 
 type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
@@ -13,7 +14,7 @@ type PreferencesFormValues = z.input<typeof preferencesSchema>
 
 /**
  * RHF owns editable Preference fields and the incomplete ColorInput draft.
- * The existing queue remains the only owner of save ordering and retries.
+ * 画面内AutoSaveQueueが送信順序を保持し、明示RetryをFeatureが判断する。
  */
 export function useUserPreferences(
   initialPreferences: UserPreferences,
@@ -25,7 +26,10 @@ export function useUserPreferences(
     blockedFeedback,
     saveStatus,
     validation,
-    sessionSnapshot,
+    confirmed,
+    discardRevision,
+    inspected,
+    observedMatches,
     enqueue,
     setAccentDraft,
     retry,
@@ -33,10 +37,8 @@ export function useUserPreferences(
     confirmObservation,
     discard,
   } = usePreferencesSave(onSave, initialPreferences, onInspect)
-  const initial = {
-    ...(sessionSnapshot?.confirmed ?? initialPreferences),
-    ...(sessionSnapshot?.draftPatch ?? {}),
-  }
+  const preview = usePersonalAccentPreview()
+  const initial = confirmed ?? initialPreferences
   const {
     control,
     watch,
@@ -51,15 +53,14 @@ export function useUserPreferences(
     mode: "onChange",
     defaultValues: {
       ...initial,
-      accentDraft: sessionSnapshot?.accentDraft ?? initial.personalAccentColor,
+      accentDraft: initial.personalAccentColor,
     },
   })
   const { field: accentField, fieldState: accentState } = useController({
     control,
     name: "accentDraft",
   })
-  // The controller survives route changes; reapply persisted Server Field
-  // validation on mount without converting transport failures to input errors.
+  // 表示中のServer Field ValidationをFieldへ適用する。
   useEffect(() => {
     if (!validation) return
     for (const [field, message] of Object.entries(validation.fieldErrors)) {
@@ -70,40 +71,28 @@ export function useUserPreferences(
     }
   }, [validation, setError])
 
-  // Apply new source values only to fields the user has not edited.
-  // Dirty field subscriptions are required by RHF's keepDirtyValues option.
-  const previousSource = useRef(initialPreferences)
+  // Queryや保存確定値が変わっても編集中のFieldはRHFが保持する。
+  const previousSource = useRef(initial)
   useEffect(() => {
     const previous = previousSource.current
-    if (
-      (Object.keys(previous) as Array<keyof UserPreferences>).every(
-        (key) => previous[key] === initialPreferences[key],
-      )
-    )
-      return
-    previousSource.current = initialPreferences
-    reset(
-      {
-        ...initialPreferences,
-        ...(sessionSnapshot?.draftPatch ?? {}),
-        accentDraft:
-          sessionSnapshot?.accentDraft ??
-          initialPreferences.personalAccentColor,
-      },
-      { keepDirtyValues: Object.keys(dirtyFields).length > 0 },
-    )
-  }, [initialPreferences, reset, dirtyFields, sessionSnapshot])
-  const previousDiscardRevision = useRef(sessionSnapshot?.discardRevision)
+    if ((Object.keys(previous) as Array<keyof UserPreferences>).every(
+      (key) => previous[key] === initial[key],
+    )) return
+    previousSource.current = initial
+    reset({ ...initial, accentDraft: initial.personalAccentColor }, {
+      keepDirtyValues: Object.keys(dirtyFields).length > 0,
+    })
+  }, [initial, reset, dirtyFields])
+
+  const previousDiscardRevision = useRef(discardRevision)
   useEffect(() => {
-    if (
-      !sessionSnapshot ||
-      previousDiscardRevision.current === sessionSnapshot.discardRevision
-    )
-      return
-    previousDiscardRevision.current = sessionSnapshot.discardRevision
-    const baseline = sessionSnapshot.confirmed ?? initialPreferences
-    reset({ ...baseline, accentDraft: baseline.personalAccentColor })
-  }, [sessionSnapshot, initialPreferences, reset])
+    if (previousDiscardRevision.current === discardRevision) return
+    previousDiscardRevision.current = discardRevision
+    reset({ ...confirmed, accentDraft: confirmed.personalAccentColor })
+    preview?.setColor(null)
+  }, [discardRevision, confirmed, reset, preview])
+
+  useEffect(() => () => { preview?.setColor(null) }, [preview?.setColor])
 
   const values = watch()
   const preferences: UserPreferences = {
@@ -136,7 +125,11 @@ export function useUserPreferences(
     setAccentDraft(value)
     setValue("accentDraft", value, { shouldDirty: true })
     const parsed = preferencesSchema.shape.personalAccentColor.safeParse(value)
-    if (parsed.success) change("personalAccentColor", parsed.data.toUpperCase())
+    if (parsed.success) {
+      const normalized = parsed.data.toUpperCase()
+      change("personalAccentColor", normalized)
+      preview?.setColor(normalized)
+    }
   }
 
   return {
@@ -159,11 +152,9 @@ export function useUserPreferences(
     inspect,
     confirmObservation,
     discard,
-    inspected: sessionSnapshot?.inspected ?? false,
-    observedMatches: sessionSnapshot?.observedMatches ?? false,
-    hasSession: Boolean(sessionSnapshot),
-    canRetry:
-      !sessionSnapshot?.accentDraft ||
-      /^#[0-9a-fA-F]{6}$/.test(sessionSnapshot.accentDraft),
+    inspected,
+    observedMatches,
+    hasSession: true,
+    canRetry: !values.accentDraft || /^#[0-9a-fA-F]{6}$/.test(values.accentDraft),
   }
 }
