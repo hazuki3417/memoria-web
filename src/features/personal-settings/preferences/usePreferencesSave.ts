@@ -1,130 +1,247 @@
 "use client"
 
-import { resolveFormFailureValidation } from "@/ui/formValidation"
-
 import { useEffect, useRef, useState } from "react"
-import { createPreferencesSaveQueue } from "./preferencesSaveQueue"
-import { usePersonalPreferencesSession } from "./PersonalPreferencesSessionContext"
-import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import { createAutoSaveQueue, type AutoSaveQueue, type ActionOutcome } from "@/ui/Action"
+import { resolveFormFailureValidation } from "@/ui/formValidation"
+import { SettingsInputValidationError, classifySettingsSaveFailure } from "@/infrastructure/graphql/settingsMutationResult"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import {
-  classifySettingsSaveFailure,
-  getSettingsInputViolations,
-} from "@/infrastructure/graphql/settingsMutationResult"
-import type { PreferencesFailure } from "./personalPreferencesSession"
 import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
+import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
 
+type Failure = "unknown" | "retryable" | "blocked" | "validation" | null
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
-type SaveError = PreferencesFailure
+type Rejection = { kind: "validation"; error: SettingsInputValidationError } | { kind: "blocked"; error: unknown } | { kind: "retryable" }
+type State = {
+  confirmed: UserPreferences
+  saveStatus: SaveStatusState
+  failure: Failure
+  blockedFeedback: PreferencesBlockedFeedback | null
+  validation: { fieldErrors: Record<string, string>; formError: boolean } | null
+  inspected: boolean
+  observedMatches: boolean
+  discardRevision: number
+}
 
-/** Session controller in Application Shell, legacy local queue for isolated Storybook. */
+/** 画面のLifetimeだけに属する保存Queue・Draft/Feedback・明示Recoveryを結合する。 */
 export function usePreferencesSave(
   onSave?: Save,
   initialPreferences?: UserPreferences,
   onInspect?: () => Promise<UserPreferences>,
 ) {
-  const { controller: session, snapshot } = usePersonalPreferencesSession()
-  const [localError, setLocalError] = useState<SaveError>(null)
-  const [localBlockedFeedback, setLocalBlockedFeedback] = useState<PreferencesBlockedFeedback | null>(null)
-  const [localValidation, setLocalValidation] = useState<{
-    fieldErrors: Record<string, string>
-    formError: boolean
-  } | null>(null)
-  const [localStatus, setLocalStatus] = useState<SaveStatusState>("idle")
+  const [state, setState] = useState<State>(() => ({
+    confirmed: initialPreferences!,
+    saveStatus: "idle",
+    failure: null,
+    blockedFeedback: null,
+    validation: null,
+    inspected: false,
+    observedMatches: false,
+    discardRevision: 0,
+  }))
+  const stateRef = useRef(state)
+  stateRef.current = state
+  const mounted = useRef(true)
   const saveRef = useRef(onSave)
-  const inspectRef = useRef(onInspect)
   saveRef.current = onSave
+  const inspectRef = useRef(onInspect)
   inspectRef.current = onInspect
-  const localRef = useRef<ReturnType<typeof createPreferencesSaveQueue> | null>(
-    null,
-  )
+  const pending = useRef<UserPreferencesPatch>({})
+  const queueRef = useRef<AutoSaveQueue<UserPreferencesPatch> | null>(null)
+  const confirmedLocally = useRef(new Set<keyof UserPreferences>())
+  const observed = useRef<UserPreferences | null>(null)
+  const inspectionGeneration = useRef(0)
+  const accentDraft = useRef<string | null>(null)
 
-  useEffect(() => {
-    if (!session || !saveRef.current) return
-    session.configure(
-      (patch) => {
-        const save = saveRef.current
-        if (!save) throw new Error("Preferences save unavailable")
-        return save(patch)
-      },
-      async () => {
-        const inspect = inspectRef.current
-        if (!inspect) throw new Error("Preferences Query unavailable")
-        return inspect()
-      },
-    )
-  }, [session])
+  const emit = (patch: Partial<State>) => {
+    if (!mounted.current) return
+    const next = { ...stateRef.current, ...patch }
+    stateRef.current = next
+    setState(next)
+  }
 
-  useEffect(() => {
-    if (!session || !initialPreferences) return
-    session.hydrate(initialPreferences)
-  }, [session, initialPreferences])
-
-  useEffect(() => {
-    if (session || !saveRef.current) return
-    let mounted = true
-    const queue = createPreferencesSaveQueue(
-      (patch) => {
-        const save = saveRef.current
-        if (!save) throw new Error("Preferences save unavailable")
-        return save(patch)
-      },
-      () => {
-        if (mounted) {
-          setLocalError(null)
-          setLocalBlockedFeedback(null)
-          setLocalValidation(null)
+  const makeQueue = (): AutoSaveQueue<UserPreferencesPatch> =>
+    createAutoSaveQueue<UserPreferencesPatch, UserPreferences, Rejection>({
+      delayMs: 400,
+      execute: async (patch): Promise<ActionOutcome<UserPreferences, Rejection>> => {
+        try {
+          if (!saveRef.current) return { kind: "unknown" }
+          return { kind: "success", value: await saveRef.current(patch) }
+        } catch (error) {
+          if (error instanceof SettingsInputValidationError)
+            return { kind: "rejected", reason: { kind: "validation", error } }
+          const failure = classifySettingsSaveFailure(error)
+          if (failure === "blocked") return { kind: "rejected", reason: { kind: "blocked", error } }
+          if (failure === "retryable") return { kind: "rejected", reason: { kind: "retryable" } }
+          return { kind: "unknown" }
         }
       },
-      (error, attempted) => {
-        if (!mounted) return
-        const kind = classifySettingsSaveFailure(error)
-        setLocalError(kind)
-        setLocalBlockedFeedback(kind === "blocked" ? getPreferencesBlockedFeedback(error) : null)
-        setLocalValidation(
-          kind === "validation"
-            ? resolveFormFailureValidation(getSettingsInputViolations(error), Object.keys(attempted))
-            : null,
-        )
+      onResult: ({ attempted, outcome }) => {
+        if (!mounted.current) return
+        if (outcome.kind === "success") {
+          const confirmed = { ...stateRef.current.confirmed }
+          const nextPending = { ...pending.current }
+          for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
+            Object.assign(confirmed, { [key]: outcome.value[key] })
+            confirmedLocally.current.add(key)
+            if (nextPending[key] === attempted[key]) delete nextPending[key]
+          }
+          pending.current = nextPending
+          emit({
+            confirmed,
+            saveStatus: Object.keys(nextPending).length ? "saving" : "saved",
+            failure: null, validation: null, blockedFeedback: null,
+          })
+        } else {
+          const failure: Failure = outcome.kind === "unknown" ? "unknown" : outcome.reason.kind
+          const error = outcome.kind === "rejected" && "error" in outcome.reason ? outcome.reason.error : null
+          emit({
+            failure,
+            saveStatus: "attention",
+            blockedFeedback: failure === "blocked" ? getPreferencesBlockedFeedback(error) : null,
+            validation: error instanceof SettingsInputValidationError
+              ? resolveFormFailureValidation(error.violations, Object.keys(attempted))
+              : null,
+            inspected: false,
+            observedMatches: false,
+          })
+        }
       },
-      400,
-      (state) => {
-        if (mounted) setLocalStatus(state)
-      },
-    )
-    localRef.current = queue
+    })
+
+  const enqueue = (patch: UserPreferencesPatch) => {
+    if (!onSave || stateRef.current.failure === "blocked") return
+    pending.current = { ...pending.current, ...patch }
+    observed.current = null
+    inspectionGeneration.current += 1
+    emit({
+      inspected: false, observedMatches: false,
+      validation: stateRef.current.validation
+        ? { fieldErrors: Object.fromEntries(Object.entries(stateRef.current.validation.fieldErrors).filter(([key]) => !(key in patch))), formError: false }
+        : null,
+      saveStatus: stateRef.current.failure ? "attention" : "pending",
+    })
+    if (stateRef.current.failure) return
+    if (!queueRef.current) queueRef.current = makeQueue()
+    queueRef.current.enqueue(patch)
+  }
+
+  useEffect(() => {
+    mounted.current = true
     return () => {
-      mounted = false
-      // A paused failure is never retried by navigation.
-      void queue.flush({ manual: false })
-      localRef.current = null
+      mounted.current = false
+      inspectionGeneration.current += 1
+      // Queueはclose後も必要な通信試行を保持するが、画面Stateは更新しない。
+      void queueRef.current?.close()
+      queueRef.current = null
+      pending.current = {}
+      observed.current = null
     }
-  }, [session])
+  }, [])
+
+  useEffect(() => {
+    if (!initialPreferences || stateRef.current.failure) return
+    const confirmed = { ...stateRef.current.confirmed }
+    let changed = false
+    for (const key of Object.keys(initialPreferences) as Array<keyof UserPreferences>) {
+      if (confirmedLocally.current.has(key)) {
+        if (initialPreferences[key] === confirmed[key]) confirmedLocally.current.delete(key)
+        else continue
+      }
+      if (key in pending.current) continue
+      if (confirmed[key] !== initialPreferences[key]) {
+        Object.assign(confirmed, { [key]: initialPreferences[key] })
+        changed = true
+      }
+    }
+    if (changed) emit({ confirmed })
+  }, [initialPreferences])
+
+  const inspect = async () => {
+    if (stateRef.current.failure !== "unknown" || !inspectRef.current) return
+    const generation = ++inspectionGeneration.current
+    const patchAtStart = pending.current
+    const rawAtStart = accentDraft.current
+    observed.current = null
+    emit({ inspected: false, observedMatches: false })
+    try {
+      const current = await inspectRef.current()
+      if (!mounted.current || generation !== inspectionGeneration.current ||
+        stateRef.current.failure !== "unknown" || pending.current !== patchAtStart ||
+        accentDraft.current !== rawAtStart) return
+      observed.current = current
+      const keys = Object.keys(pending.current) as Array<keyof UserPreferences>
+      emit({
+        inspected: true,
+        observedMatches: keys.length > 0 && keys.every(key => current[key] === pending.current[key]) &&
+          (accentDraft.current === null || /^#[0-9A-Fa-f]{6}$/.test(accentDraft.current)),
+      })
+    } catch {
+      if (mounted.current && generation === inspectionGeneration.current)
+        emit({ inspected: false, observedMatches: false })
+    }
+  }
+
+  const confirmObservation = () => {
+    const current = observed.current
+    if (!current || stateRef.current.failure !== "unknown" || !stateRef.current.observedMatches) return
+    const confirmed = { ...stateRef.current.confirmed }
+    for (const key of Object.keys(pending.current) as Array<keyof UserPreferences>) {
+      Object.assign(confirmed, { [key]: current[key] })
+      confirmedLocally.current.add(key)
+    }
+    pending.current = {}
+    observed.current = null
+    void queueRef.current?.close()
+    queueRef.current = null
+    emit({ confirmed, failure: null, saveStatus: "idle", validation: null, blockedFeedback: null, inspected: false, observedMatches: false })
+  }
+
+  const retry = () => {
+    const { failure, inspected } = stateRef.current
+    if (!failure || failure === "blocked" || (failure === "unknown" && !inspected)) return
+    if (accentDraft.current !== null && !/^#[0-9A-Fa-f]{6}$/.test(accentDraft.current)) return
+    const patch = pending.current
+    if (!Object.keys(patch).length) return
+    observed.current = null
+    // 停止した旧Queueは再開せず、新しい明示Attemptとして再構築する。
+    void queueRef.current?.close()
+    queueRef.current = makeQueue()
+    emit({ failure: null, saveStatus: "pending", validation: null, blockedFeedback: null, inspected: false, observedMatches: false })
+    queueRef.current.enqueue(patch)
+    // 明示RetryではDebounceを待たない。新Queueにcloseすると送信中の後続編集を失うため
+    // 画面表示中は通常のDebounceを使用する。
+  }
+
+  const discard = () => {
+    if (stateRef.current.saveStatus === "saving") return
+    pending.current = {}
+    observed.current = null
+    inspectionGeneration.current += 1
+    void queueRef.current?.close()
+    queueRef.current = null
+    emit({
+      failure: null, saveStatus: "idle", blockedFeedback: null, validation: null,
+      inspected: false, observedMatches: false,
+      discardRevision: stateRef.current.discardRevision + 1,
+    })
+  }
 
   return {
-    saveError: session ? snapshot.failure : localError,
-    blockedFeedback: session ? snapshot.blockedFeedback : localBlockedFeedback,
-    validation: session ? snapshot.validation : localValidation,
-    saveStatus: session ? snapshot.saveStatus : localStatus,
-    sessionSnapshot: session ? snapshot : null,
-    enqueue: (patch: UserPreferencesPatch) => {
-      if (session) session.edit(patch)
-      else localRef.current?.enqueue(patch)
-    },
+    saveError: state.failure,
+    blockedFeedback: state.blockedFeedback,
+    validation: state.validation,
+    saveStatus: state.saveStatus,
+    confirmed: state.confirmed,
+    discardRevision: state.discardRevision,
+    enqueue,
     setAccentDraft: (value: string) => {
-      session?.editAccentDraft(value)
+      accentDraft.current = value
+      inspectionGeneration.current += 1
+      observed.current = null
+      emit({ inspected: false, observedMatches: false })
     },
-    retry: () => {
-      if (session) session.retry()
-      else {
-        setLocalError(null)
-        setLocalBlockedFeedback(null)
-        setLocalValidation(null)
-        void localRef.current?.flush()
-      }
-    },
-    inspect: () => session?.inspect(),
-    confirmObservation: () => session?.confirmObservation(),
-    discard: () => session?.discard(),
+    retry, inspect, confirmObservation, discard,
+    inspected: state.inspected,
+    observedMatches: state.observedMatches,
   }
 }
