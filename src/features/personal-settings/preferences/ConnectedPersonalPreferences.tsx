@@ -5,7 +5,7 @@ import { usePersonalSettingsPreferencesQuery } from "@/infrastructure/graphql/ge
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { PersonalPreferences } from "./PersonalPreferences"
 import { fromGraphqlUserPreferences } from "./userPreferencesGraphqlAdapter"
-import { usePersonalPreferencesSave } from "./PersonalPreferencesSave/usePersonalPreferencesSave"
+import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
 import { usePersonalSettingsInspection } from "../usePersonalSettingsInspection"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
