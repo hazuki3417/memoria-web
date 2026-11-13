@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { getPersonalPreferencesBlockedFeedback } from "./personalPersonalPreferencesBlockedFeedback"
+import { getPersonalPreferencesBlockedFeedback } from "./personalPreferencesBlockedFeedback"
 
 describe("getPersonalPreferencesBlockedFeedback", () => {
   it.each([
