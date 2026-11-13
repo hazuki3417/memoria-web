@@ -7,10 +7,11 @@ import { SettingsInputValidationError, classifySettingsSaveFailure } from "@/inf
 import type { SaveStatusState } from "@/components/SaveStatus"
 import { getPreferencesBlockedFeedback, type PreferencesBlockedFeedback } from "./preferencesBlockedFeedback"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import type { PreferencesSaveRejection, SavePersonalPreferencesAction } from "./preferencesSaveOutcome"
 
 type Failure = "unknown" | "retryable" | "blocked" | "validation" | null
 type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
-type Rejection = { kind: "validation"; error: SettingsInputValidationError } | { kind: "blocked"; error: unknown } | { kind: "retryable" }
+type Rejection = PreferencesSaveRejection
 type State = {
   confirmed: UserPreferences
   saveStatus: SaveStatusState
@@ -27,6 +28,7 @@ export function usePreferencesSave(
   onSave?: Save,
   initialPreferences?: UserPreferences,
   onInspect?: () => Promise<UserPreferences>,
+  onSaveAction?: SavePersonalPreferencesAction,
 ) {
   const [state, setState] = useState<State>(() => ({
     confirmed: initialPreferences!,
@@ -43,6 +45,8 @@ export function usePreferencesSave(
   const mounted = useRef(true)
   const saveRef = useRef(onSave)
   saveRef.current = onSave
+  const actionRef = useRef(onSaveAction)
+  actionRef.current = onSaveAction
   const inspectRef = useRef(onInspect)
   inspectRef.current = onInspect
   const pending = useRef<UserPreferencesPatch>({})
@@ -65,11 +69,12 @@ export function usePreferencesSave(
       execute: async (patch): Promise<ActionOutcome<UserPreferences, Rejection>> => {
         emit({ saveStatus: "saving" })
         try {
+          if (actionRef.current) return await actionRef.current(patch)
           if (!saveRef.current) return { kind: "unknown" }
           return { kind: "success", value: await saveRef.current(patch) }
         } catch (error) {
           if (error instanceof SettingsInputValidationError)
-            return { kind: "rejected", reason: { kind: "validation", error } }
+            return { kind: "rejected", reason: { kind: "validation", violations: error.violations } }
           const failure = classifySettingsSaveFailure(error)
           if (failure === "blocked") return { kind: "rejected", reason: { kind: "blocked", error } }
           if (failure === "retryable") return { kind: "rejected", reason: { kind: "retryable" } }
@@ -94,13 +99,15 @@ export function usePreferencesSave(
           })
         } else {
           const failure: Failure = outcome.kind === "unknown" ? "unknown" : outcome.reason.kind
-          const error = outcome.kind === "rejected" && "error" in outcome.reason ? outcome.reason.error : null
+          const error = outcome.kind === "rejected" && outcome.reason.kind === "blocked" ? outcome.reason.error : null
+          const violations = outcome.kind === "rejected" && outcome.reason.kind === "validation"
+            ? outcome.reason.violations : null
           emit({
             failure,
             saveStatus: "attention",
             blockedFeedback: failure === "blocked" ? getPreferencesBlockedFeedback(error) : null,
-            validation: error instanceof SettingsInputValidationError
-              ? resolveFormFailureValidation(error.violations, Object.keys(attempted))
+            validation: violations
+              ? resolveFormFailureValidation(violations, Object.keys(attempted))
               : null,
             inspected: false,
             observedMatches: false,
@@ -110,7 +117,7 @@ export function usePreferencesSave(
     })
 
   const enqueue = (patch: UserPreferencesPatch) => {
-    if (!saveRef.current || stateRef.current.failure === "blocked") return
+    if ((!saveRef.current && !actionRef.current) || stateRef.current.failure === "blocked") return
     pending.current = { ...pending.current, ...patch }
     observed.current = null
     inspectionGeneration.current += 1
