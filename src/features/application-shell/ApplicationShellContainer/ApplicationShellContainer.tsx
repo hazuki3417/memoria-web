@@ -23,7 +23,7 @@ import {
 } from "../CommunityAccentPreviewContext"
 import { resolveCommunityAccent } from "../communityAccentPreview"
 import { PersonalAccentPreviewProvider } from "@/features/personal-settings/preferences/PersonalAccentPreview/PersonalAccentPreviewContext"
-import { usePersonalAccentPreview } from "@/features/personal-settings/preferences/PersonalAccentPreviewContext"
+import { usePersonalAccentPreview } from "@/features/personal-settings/preferences/PersonalAccentPreview/PersonalAccentPreviewContext"
 import { resolvePersonalAccent } from "@/features/personal-settings/preferences/PersonalAccentPreview/personalAccentPreview"
 import {
   ApplicationAccountMenu,
