@@ -40,6 +40,9 @@ export function getCommunityAccessStatus({
   // Old Apollo data must not make pages visible during a new verification.
   if (loading) return "loading"
   if (error) {
+    // A mixed transport/GraphQL failure cannot confirm resource absence.
+    if (typeof error === "object" && "networkError" in error && error.networkError != null)
+      return "error"
     const codes = graphqlCodes(error)
     // An unknown or mixed failure cannot safely establish non-membership.
     if (codes.length !== 1) return "error"
