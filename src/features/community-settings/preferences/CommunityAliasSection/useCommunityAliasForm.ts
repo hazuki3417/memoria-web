@@ -93,7 +93,7 @@ export const useCommunityAliasForm = ({
   const blocked = status.kind === "blocked"
   const unknown = status.kind === "unknown"
   const inspection = processState.inspection
-  const failure = status.kind === "retryable-error" ? "retryable"
+  const failure: "retryable" | "blocked" | "unknown" | null = status.kind === "retryable-error" ? "retryable"
     : status.kind === "blocked" ? "blocked"
     : status.kind === "unknown" ? "unknown" : null
   const blockedFeedback = status.kind === "blocked"
