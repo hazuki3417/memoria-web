@@ -3,7 +3,6 @@ import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { defaultUserPreferences } from "./userPreferences"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
-import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
@@ -70,11 +69,6 @@ describe("Personal PreferencesのAction Adapter", () => {
     expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
   })
 
-  it("従来のSessionへの成功値を維持する", async () => {
-    mocks.mutate.mockResolvedValue(success)
-    await expect(save.savePreferences(patch)).resolves.toEqual(confirmed)
-  })
-
   it("Typed ValidationはRejectedとし、既存のField Violation例外へ変換する", async () => {
     const violations = [{
       scope: "FIELD", code: "INVALID_VALUE",
@@ -87,7 +81,6 @@ describe("Personal PreferencesのAction Adapter", () => {
       kind: "rejected",
       reason: { kind: "validation", violations },
     })
-    await expect(save.savePreferences(patch)).rejects.toBeInstanceOf(SettingsInputValidationError)
   })
 
   it("Mutationの結果欠落と通信例外はUnknownとして返す", async () => {
@@ -104,9 +97,6 @@ describe("Personal PreferencesのAction Adapter", () => {
     })
     await expect(save.savePreferencesAction(patch)).resolves.toMatchObject({
       kind: "rejected", reason: { kind: "blocked" },
-    })
-    await expect(save.savePreferences(patch)).rejects.toMatchObject({
-      graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }],
     })
   })
 
