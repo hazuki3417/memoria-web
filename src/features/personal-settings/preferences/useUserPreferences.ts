@@ -170,7 +170,7 @@ export function useUserPreferences(
     discard,
     inspected,
     observedMatches,
-    hasSession: true,
+    canDiscard: Boolean(onSaveAction || onInspect),
     canRetry: !values.accentDraft || /^#[0-9a-fA-F]{6}$/.test(values.accentDraft),
   }
 }
