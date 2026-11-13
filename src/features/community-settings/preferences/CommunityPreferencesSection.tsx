@@ -2,7 +2,7 @@
 
 import { Stack } from "@mantine/core"
 import { CommunityPreferences } from "./CommunityPreferences"
-import { CommunityAliasControl } from "./CommunityAliasControl"
+import { CommunityAliasSection } from "./CommunityAliasSection"
 import { CommunityAccentSaveFeedback } from "./ConnectedCommunityPreferences/CommunityAccentSaveFeedback"
 import type { useCommunityPreferencesConnection } from "./ConnectedCommunityPreferences/useCommunityPreferencesConnection"
 import type { useCommunityAliasConnection } from "./ConnectedCommunityPreferences/useCommunityAliasConnection"
@@ -51,7 +51,7 @@ export function CommunityPreferencesSection({
           ) : undefined
         }
         aliasControl={
-          <CommunityAliasControl
+          <CommunityAliasSection
             savedAlias={settings.alias}
             onInspect={alias.inspectAlias}
             onSave={alias.saveAlias}
