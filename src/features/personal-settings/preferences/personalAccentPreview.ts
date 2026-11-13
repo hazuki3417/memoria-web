@@ -1,18 +1,9 @@
-import type { PreferencesSessionSnapshot } from "./personalPreferencesSession"
-
-const validAccent = (value: string): boolean => /^#[0-9A-Fa-f]{6}$/.test(value)
-
-/**
- * Preview only a valid, pending Personal Accent edit.
- * Failed/unknown writes must fall back to the last confirmed value, while
- * keeping the draft in the session for explicit retry or discard.
- */
+/** 画面の有効Accent選択だけを即時表示する。離脱後はQueryの値へ戻す。 */
 export function resolvePersonalAccent(
   persisted: string | undefined,
-  session: PreferencesSessionSnapshot,
+  preview: string | null,
 ): string | undefined {
-  const confirmed = session.confirmed?.personalAccentColor ?? persisted
-  if (session.failure) return confirmed
-  const draft = session.draftPatch.personalAccentColor
-  return draft && validAccent(draft) ? draft.toUpperCase() : confirmed
+  return preview && /^#[0-9A-Fa-f]{6}$/.test(preview)
+    ? preview.toUpperCase()
+    : persisted
 }
