@@ -3,19 +3,31 @@
 import { Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
-import type { usePersonalPreferencesForm } from "./usePersonalPreferencesForm"
+import { usePersonalPreferencesForm } from "./usePersonalPreferencesForm"
+import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
+import type { SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
 import { PersonalPreferencesSaveFeedback } from "./PersonalPreferencesSaveFeedback"
 import { PersonalPreferencesDisplaySection } from "./PersonalPreferencesDisplaySection/PersonalPreferencesDisplaySection"
 import { PersonalPreferencesPreviewSection } from "./PersonalPreferencesPreviewSection/PersonalPreferencesPreviewSection"
 
 export type PersonalPreferencesViewProps = {
-  compact: boolean
-  model: ReturnType<typeof usePersonalPreferencesForm>
-  canSave: boolean
+  compact?: boolean
+  initialPreferences?: UserPreferences
+  onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+  onSaveAction?: SavePersonalPreferencesAction
+  onInspect?: () => Promise<UserPreferences>
 }
 
 /** 環境設定のHeader・Feedback・各Sectionを、保存処理から独立して描画する。 */
-export function PersonalPreferencesView({ compact, model, canSave }: PersonalPreferencesViewProps) {
+export function PersonalPreferencesView({
+  compact = false,
+  initialPreferences = defaultUserPreferences,
+  onSave,
+  onSaveAction,
+  onInspect,
+}: PersonalPreferencesViewProps) {
+  const model = usePersonalPreferencesForm(initialPreferences, onSave, onInspect, onSaveAction)
+  const canSave = Boolean(onSave || onSaveAction)
   return (
     <Stack gap="xl">
       <PageHeader
