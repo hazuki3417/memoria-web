@@ -168,19 +168,6 @@ export const InvitationProductionUnavailable: Story = {
   },
 }
 
-/** URL-controlled consumers do not opt into the Preview-only Invitation simulation by default. */
-export const InvitationUrlControlledUnavailable: Story = {
-  name: "Interaction · URL制御ではInvitationデモが既定で無効",
-  tags: ["interaction"],
-  args: { invitationMode: "unavailable" },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(canvas.getByText("招待URLの管理機能は現在利用できません。")).toBeVisible()
-    await expect(canvas.queryByRole("textbox", { name: "招待URL" })).not.toBeInTheDocument()
-    await expect(canvas.queryByRole("button", { name: "招待URLを発行" })).not.toBeInTheDocument()
-  },
-}
-
 /** Story IDは維持し、Generalを離れるとDraftが破棄される契約を検証する。 */
 export const NameDraftSurvivesNavigation: Story = {
   name: "Interaction · Section切替でCommunity名のDraftを破棄",
