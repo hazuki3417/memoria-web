@@ -63,6 +63,7 @@ export function usePreferencesSave(
     createAutoSaveQueue<UserPreferencesPatch, UserPreferences, Rejection>({
       delayMs: 400,
       execute: async (patch): Promise<ActionOutcome<UserPreferences, Rejection>> => {
+        emit({ saveStatus: "saving" })
         try {
           if (!saveRef.current) return { kind: "unknown" }
           return { kind: "success", value: await saveRef.current(patch) }
@@ -109,7 +110,7 @@ export function usePreferencesSave(
     })
 
   const enqueue = (patch: UserPreferencesPatch) => {
-    if (!onSave || stateRef.current.failure === "blocked") return
+    if (!saveRef.current || stateRef.current.failure === "blocked") return
     pending.current = { ...pending.current, ...patch }
     observed.current = null
     inspectionGeneration.current += 1
