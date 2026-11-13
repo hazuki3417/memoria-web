@@ -383,6 +383,7 @@ export const NameUnknownExplicitRetry: Story = {
 export const NameSaveStaleQuery: Story = {
   name: "Interaction · 保存確定後に古いQueryが返っても確定値を維持",
   tags: ["interaction"],
+  args: { onSaveName: fn(async (name: string) => saveSuccess(name)) },
   render: (args) => <CommunityNameRefreshFixture {...args} />,
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
