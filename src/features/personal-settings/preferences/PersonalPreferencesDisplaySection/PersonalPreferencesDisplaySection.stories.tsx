@@ -33,6 +33,29 @@ export const Display: Story = {
   },
 }
 
+export const Compact: Story = {
+  name: "Visual · Display Section（Compact）",
+  tags: ["visual"],
+  args: { compact: true },
+}
+
+export const FormatSelections: Story = {
+  name: "Interaction · 日付・ファイルサイズ・サムネイルの設定変更",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const documentCanvas = within(canvasElement.ownerDocument.body)
+    const choose = async (field: string, option: string) => {
+      await userEvent.click(canvas.getByLabelText(field))
+      await userEvent.click(await documentCanvas.findByRole("option", { name: option }))
+      await expect(canvas.getByLabelText(field)).toHaveValue(option)
+    }
+    await choose("日付形式", "MM/DD/YYYY")
+    await choose("ファイルサイズの単位", "2進（KiB, MiB, GiB）")
+    await choose("Mediaサムネイルサイズ", "大")
+  },
+}
+
 export const AccentDraft: Story = {
   name: "Interaction · Sectionの未完成Accent Draft",
   tags: ["interaction"],
