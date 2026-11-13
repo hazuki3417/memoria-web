@@ -33,6 +33,12 @@ export const Preview: Story = {
   },
 }
 
+export const Compact: Story = {
+  name: "Visual · Preview Section（Compact）",
+  tags: ["visual"],
+  args: { compact: true },
+}
+
 export const NavigationWrap: Story = {
   name: "Interaction · SectionのNavigation循環を変更",
   tags: ["interaction"],
@@ -42,5 +48,20 @@ export const NavigationWrap: Story = {
     await expect(control).not.toBeChecked()
     await userEvent.click(control)
     await expect(control).toBeChecked()
+  },
+}
+
+export const InitialInfo: Story = {
+  name: "Interaction · Wide/Mediumの詳細情報初期表示を変更",
+  tags: ["interaction"],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const switches = canvas.getAllByRole("switch")
+    await expect(switches).toHaveLength(3)
+    for (const control of [switches[1], switches[2]]) {
+      const wasChecked = (control as HTMLInputElement).checked
+      await userEvent.click(control)
+      await expect(control).toHaveProperty("checked", !wasChecked)
+    }
   },
 }
