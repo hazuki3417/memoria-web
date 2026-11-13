@@ -1,9 +1,11 @@
 import { resolveSaveFeedback, type SaveFeedback, type SaveFeedbackMessages, type SaveFeedbackType } from "@/ui/save-feedback"
 import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
-import type { useCommunityNameSettings } from "./useCommunityNameSettings"
-
-type NameForm = ReturnType<typeof useCommunityNameSettings>
-type FeedbackInput = Pick<NameForm, "status" | "formInvalid">
+type FeedbackInput = {
+  status:
+    | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
+    | { kind: "blocked"; error: unknown }
+  formInvalid: boolean
+}
 
 const messages = {
   validation: {
