@@ -7,7 +7,7 @@ import { useMediaQuery } from "@mantine/hooks"
 import {
   PersonalSettingsLayout,
   ProfileView,
-  PersonalPreferences,
+  PersonalPreferencesView,
   Account,
   type PersonalSettingsSection,
 } from "@/features/personal-settings"
@@ -57,7 +57,7 @@ export function SettingsPrototype({
       )
       break
     case "preferences":
-      content = <PersonalPreferences compact={compact} />
+      content = <PersonalPreferencesView compact={compact} />
       break
     case "usage":
       content = (
