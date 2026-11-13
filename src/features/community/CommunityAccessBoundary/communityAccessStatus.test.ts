@@ -51,6 +51,17 @@ describe("getCommunityAccessStatus", () => {
       getCommunityAccessStatus(
         input({
           error: {
+            graphQLErrors: [{ extensions: { code: "NOT_FOUND" } }],
+            networkError: new Error("offline"),
+          },
+        }),
+      ),
+    ).toBe("error")
+
+    expect(
+      getCommunityAccessStatus(
+        input({
+          error: {
             graphQLErrors: [
               { extensions: { code: "NOT_FOUND" } },
               { extensions: { code: "INTERNAL" } },
