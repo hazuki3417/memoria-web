@@ -130,7 +130,7 @@ export function useUserPreferences(
     if (parsed.success) {
       const normalized = parsed.data.toUpperCase()
       change("personalAccentColor", normalized)
-      preview?.setColor(normalized)
+      if (saveError !== "blocked") preview?.setColor(normalized)
     }
   }
 
