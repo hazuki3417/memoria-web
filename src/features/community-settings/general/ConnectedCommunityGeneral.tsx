@@ -4,7 +4,6 @@ import { useCommunitySettingsGeneralQuery } from "@/infrastructure/graphql/gener
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { CommunityGeneral } from "./CommunityGeneral"
 import { useCommunityNameSave } from "./CommunityNameSection/useCommunityNameSave"
-import { useCommunityNameInspection } from "./CommunityNameSection/useCommunityNameInspection"
 import type { CommunityInvitationSectionProps } from "./CommunityInvitationSection"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
@@ -35,8 +34,7 @@ export function ConnectedCommunityGeneral({
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
-  const { onSaveName } = useCommunityNameSave(communityId)
-  const onInspectName = useCommunityNameInspection(communityId)
+  const { onSaveName, onInspectName } = useCommunityNameSave(communityId)
   const name = query.data?.community?.name
   const members = query.data?.communityMembers
   const selfId = query.data?.me?.id
