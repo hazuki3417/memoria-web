@@ -172,4 +172,40 @@ describe("自動保存Queue（createAutoSaveQueue）", () => {
     await queue.close()
     expect(seen).toEqual([{ color: "red" }, { color: "blue" }])
   })
+  it("送信前に無効化したPatchはMutation成功扱いせず破棄する", async () => {
+    vi.useFakeTimers()
+    const execute = vi.fn(async (_patch: Patch) => success())
+    const onResult = vi.fn()
+    let permitted = "blue"
+    const queue = createAutoSaveQueue<Patch, void, string>({
+      execute,
+      onResult,
+      shouldExecute: (patch) => patch.color === permitted,
+    })
+
+    queue.enqueue({ color: "red" })
+    await vi.advanceTimersByTimeAsync(400)
+    expect(execute).not.toHaveBeenCalled()
+    expect(onResult).not.toHaveBeenCalled()
+
+    queue.enqueue({ color: "blue" })
+    await queue.close()
+    expect(execute).toHaveBeenCalledTimes(1)
+    expect(execute).toHaveBeenCalledWith({ color: "blue" })
+    expect(onResult).toHaveBeenCalledTimes(1)
+  })
+
+  it("離脱時にも無効化された古いPendingを送信しない", async () => {
+    const execute = vi.fn(async (_patch: Patch) => success())
+    const onResult = vi.fn()
+    const queue = createAutoSaveQueue<Patch, void, string>({
+      execute,
+      onResult,
+      shouldExecute: () => false,
+    })
+    queue.enqueue({ color: "red" })
+    await queue.close()
+    expect(execute).not.toHaveBeenCalled()
+    expect(onResult).not.toHaveBeenCalled()
+  })
 })
