@@ -2,82 +2,75 @@
 
 import { Button } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
-import type { useCommunityNameSettings } from "./useCommunityNameSettings"
+import { resolveCommunityNameSaveFeedback } from "./resolveCommunityNameSaveFeedback"
+import type { useCommunityNameForm, InspectCommunityName } from "./useCommunityNameForm"
 
-type Props = Pick<
-  ReturnType<typeof useCommunityNameSettings>,
-  | "saveFeedback"
-  | "unknown"
-  | "inspection"
-  | "inspectName"
-  | "confirmObservation"
-  | "discardUnconfirmed"
-  | "canResaveInspected"
-  | "saveName"
->
+type NameForm = ReturnType<typeof useCommunityNameForm>
 
-/** Owns the confirmation/retry/discard feedback UI, not the form's recovery state. */
-export function CommunityNameSaveFeedback({
-  saveFeedback,
-  unknown = false,
-  inspection,
-  inspectName,
-  confirmObservation,
-  discardUnconfirmed,
-  canResaveInspected = false,
-  saveName,
-}: Props) {
-  if (!saveFeedback) return null
+/** Community名保存の案内を1件表示し、結果不明時の照会・確認・再保存・破棄を提供する。 */
+export const CommunityNameSaveFeedback = ({
+  model,
+  onInspect,
+}: {
+  model: NameForm
+  onInspect?: InspectCommunityName
+}) => {
+  const {
+    status,
+    inspection,
+    formInvalid,
+    canRetryInspected,
+    inspectCurrentCommunityName,
+    confirmObservedCommunityName,
+    discardUnconfirmedDraft,
+    save,
+  } = model
+
+  const feedback = resolveCommunityNameSaveFeedback({ status, formInvalid })
+  if (!feedback) return null
+
+  const actions = feedback.type === "unknown" && onInspect ? (
+    <>
+      <Button
+        size="xs"
+        variant="light"
+        loading={inspection.kind === "checking"}
+        onClick={() => void inspectCurrentCommunityName()}
+      >
+        {inspection.kind === "idle" || inspection.kind === "failed" || inspection.kind === "checking"
+          ? "現在の状態を確認"
+          : "もう一度確認"}
+      </Button>
+      {inspection.kind === "matches" && (
+        <Button size="xs" onClick={confirmObservedCommunityName}>
+          確認完了
+        </Button>
+      )}
+      {inspection.kind === "differs" && (
+        <>
+          <Button
+            size="xs"
+            disabled={!canRetryInspected}
+            onClick={() => void save()}
+          >
+            もう一度保存
+          </Button>
+          <Button size="xs" variant="subtle" color="gray" onClick={discardUnconfirmedDraft}>
+            変更を破棄
+          </Button>
+        </>
+      )}
+    </>
+  ) : undefined
 
   return (
     <FeedbackPanel
-      kind={saveFeedback.kind ?? "error"}
-      title={saveFeedback.title}
+      kind={feedback.kind}
+      title={feedback.title}
       role="alert"
-      actions={
-        unknown && inspectName ? (
-          <>
-            <Button
-              size="xs"
-              variant="light"
-              loading={inspection?.status === "checking"}
-              onClick={() => void inspectName()}
-            >
-              {inspection?.status === "matches" || inspection?.status === "differs"
-                ? "もう一度確認"
-                : "現在の状態を確認"}
-            </Button>
-            {inspection?.status === "matches" && confirmObservation && (
-              <Button size="xs" onClick={confirmObservation}>
-                確認完了
-              </Button>
-            )}
-            {inspection?.status === "differs" && (
-              <>
-                <Button
-                  size="xs"
-                  disabled={!canResaveInspected}
-                  onClick={saveName}
-                >
-                  もう一度保存
-                </Button>
-                {discardUnconfirmed && (
-                  <Button
-                    size="xs"
-                    variant="subtle"
-                    color="gray"
-                    onClick={discardUnconfirmed}
-                  >
-                    変更を破棄
-                  </Button>
-                )}
-              </>
-            )}
-          </>
-        ) : undefined
-      }
+      actions={actions}
     >
-      {saveFeedback.description}
+      {feedback.description}
     </FeedbackPanel>
   )
 }

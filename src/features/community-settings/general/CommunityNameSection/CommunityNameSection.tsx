@@ -1,78 +1,29 @@
 "use client"
 
-import { Box, Button, Stack, TextInput } from "@mantine/core"
-import { SectionHeader } from "@/components/SectionHeader"
-import { CommunityNameSaveFeedback } from "./CommunityNameSaveFeedback"
-import { useCommunityNameSettings } from "./useCommunityNameSettings"
+import { CommunityNameSectionView } from "./CommunityNameSectionView"
+import { useCommunityNameForm } from "./useCommunityNameForm"
+import type { SaveCommunityName } from "./communityNameSaveOutcome"
 
 export type CommunityNameSectionProps = {
   isAdmin: boolean
   communityName?: string
-  onSaveName?: (name: string) => Promise<string>
+  onSaveName?: SaveCommunityName
   onInspectName?: () => Promise<string>
 }
 
-export function CommunityNameSection({
-  isAdmin,
-  communityName,
-  onSaveName,
-  onInspectName,
-}: CommunityNameSectionProps) {
-  const {
-    draft,
-    setDraft,
-    invalid,
-    dirty,
-    savingName,
-    saveName,
-    fieldError,
-    onNameBlur,
-    saveFeedback,
-    saveBlocked,
-    unknown,
-    inspection,
-    inspectName,
-    confirmObservation,
-    discardUnconfirmed,
-    canResaveInspected,
-  } = useCommunityNameSettings({ communityName, onSaveName, onInspectName })
+const localSave: SaveCommunityName = async (name) => ({ kind: "success", value: name })
 
-  return (
-    <Box>
-      <SectionHeader>基本情報</SectionHeader>
-      <Stack gap="md" maw={540}>
-        <CommunityNameSaveFeedback
-          saveFeedback={saveFeedback}
-          unknown={unknown}
-          inspection={inspection}
-          inspectName={inspectName}
-          confirmObservation={confirmObservation}
-          discardUnconfirmed={discardUnconfirmed}
-          canResaveInspected={canResaveInspected}
-          saveName={saveName}
-        />
-        <TextInput
-          label="Community名"
-          value={draft}
-          onChange={(event) => setDraft(event.currentTarget.value)}
-          onBlur={onNameBlur}
-          error={fieldError}
-          disabled={!isAdmin}
-          required
-        />
-        {isAdmin && (
-          <Box>
-            <Button
-              size="sm"
-              disabled={!dirty || invalid || savingName || saveBlocked}
-              loading={savingName}
-              onClick={saveName}
-            >
-              保存
-            </Button>
-          </Box>
-        )}
-      </Stack>
-    </Box>
-  )
+/** Community名のAction・Form・Recoveryを接続し、Viewへ表示用契約を渡す。 */
+export const CommunityNameSection = ({
+  isAdmin,
+  communityName = "家族のアルバム",
+  onSaveName = localSave,
+  onInspectName,
+}: CommunityNameSectionProps) => {
+  const form = useCommunityNameForm({
+    initialName: communityName,
+    onSave: onSaveName,
+    onInspect: onInspectName,
+  })
+  return <CommunityNameSectionView isAdmin={isAdmin} form={form} onInspectName={onInspectName} />
 }

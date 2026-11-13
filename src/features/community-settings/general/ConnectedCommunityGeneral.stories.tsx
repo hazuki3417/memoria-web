@@ -1,7 +1,8 @@
 import { MockedProvider } from "@apollo/client/testing"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, userEvent, within } from "storybook/test"
-import { CommunitySettingsGeneralDocument } from "@/infrastructure/graphql/generated"
+import { GraphQLError } from "graphql"
+import { expect, userEvent, waitFor, within } from "storybook/test"
+import { CommunitySettingsGeneralDocument, CommunitySettingsNameInspectionDocument, UpdateCommunityDocument } from "@/infrastructure/graphql/generated"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import { ConnectedCommunityGeneral } from "./ConnectedCommunityGeneral"
 
@@ -154,5 +155,234 @@ export const ErrorRetry: Story = {
       await canvas.findByRole("textbox", { name: /Community名/ }),
     ).toHaveValue("家族のアルバム")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+
+const mutationRequest = {
+  query: UpdateCommunityDocument,
+  variables: { input: { communityId: "club-a", name: "変更後のCommunity名" } },
+}
+const renameSuccess = {
+  request: mutationRequest,
+  result: {
+    data: {
+      updateCommunity: {
+        __typename: "UpdateCommunitySuccess",
+        community: {
+          id: "club-a",
+          name: "変更後のCommunity名",
+          createdAt: "2026-01-01T00:00:00Z",
+          updatedAt: "2026-01-01T00:00:00Z",
+        },
+      },
+    },
+  },
+}
+const renameValidation = {
+  request: mutationRequest,
+  result: {
+    data: {
+      updateCommunity: {
+        __typename: "InputValidationFailure",
+        violations: [
+          { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["name"] }] },
+        ],
+      },
+    },
+  },
+}
+const renameUnknown = {
+  request: mutationRequest,
+  error: new Error("Transport result unavailable"),
+}
+const renameBlocked = {
+  request: mutationRequest,
+  result: {
+    errors: [new GraphQLError("Forbidden", { extensions: { code: "FORBIDDEN" } })],
+  },
+}
+
+export const MutationSuccess: Story = {
+  name: "Interaction · Community名のTyped Successを確定値に反映",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[generalSuccess, renameSuccess]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await waitFor(() => expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled())
+    await expect(input).toHaveValue("変更後のCommunity名")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const MutationValidation: Story = {
+  name: "Interaction · Community名のTyped ValidationをFieldへ反映",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[generalSuccess, renameValidation]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByText("文字数が上限を超えています。")).toBeVisible()
+    await expect(input).toHaveValue("変更後のCommunity名")
+  },
+}
+
+export const MutationTransportUnknown: Story = {
+  name: "Interaction · Community名の通信結果不明で再送を停止",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[generalSuccess, renameUnknown]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "Community名の保存結果を確認できませんでした",
+    )
+    await expect(input).toHaveValue("変更後のCommunity名")
+    await expect(input).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeEnabled()
+  },
+}
+
+/** Unknownの実際のInspection Query経路をApollo Mockで確認する。 */
+const inspectRequest = {
+  query: CommunitySettingsNameInspectionDocument,
+  variables: { communityId: "club-a" },
+}
+const inspectCurrentName = {
+  request: inspectRequest,
+  result: {
+    data: { community: { id: "club-a", name: "サーバーに残るCommunity名" } },
+  },
+}
+const renameMissingTypedResult = {
+  request: mutationRequest,
+  result: { data: { updateCommunity: null } },
+}
+const renameExecutionUnknown = {
+  request: mutationRequest,
+  result: {
+    errors: [new GraphQLError("Execution failure", { extensions: { code: "INTERNAL" } })],
+  },
+}
+
+export const MutationMissingTypedResult: Story = {
+  name: "Interaction · Typed Result欠落はUnknownとして再送しない",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[generalSuccess, renameMissingTypedResult]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("保存結果を確認できませんでした")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await expect(input).toHaveValue("変更後のCommunity名")
+  },
+}
+
+export const MutationExecutionUnknown: Story = {
+  name: "Interaction · GraphQL INTERNALはUnknownとして再送しない",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[generalSuccess, renameExecutionUnknown]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("保存結果を確認できませんでした")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+    await expect(input).toBeEnabled()
+  },
+}
+
+export const MutationUnknownInspection: Story = {
+  name: "Interaction · Unknown後はno-cacheの実Queryで現状を確認する",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[generalSuccess, renameUnknown, inspectCurrentName]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
+    await expect(canvas.getByRole("button", { name: "変更を破棄" })).toBeVisible()
+    await expect(input).toHaveValue("変更後のCommunity名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+export const MutationBlocked: Story = {
+  name: "Interaction · Community名の権限失効で編集と保存を停止",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[generalSuccess, renameBlocked]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = await canvas.findByRole("textbox", { name: /Community名/ })
+    await userEvent.clear(input)
+    await userEvent.type(input, "変更後のCommunity名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "この操作を行う権限がありません",
+    )
+    await expect(input).toBeDisabled()
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
