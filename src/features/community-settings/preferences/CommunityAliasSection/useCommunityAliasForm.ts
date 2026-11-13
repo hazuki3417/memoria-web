@@ -84,10 +84,10 @@ export const useCommunityAliasForm = ({
       if (savedAlias !== queryEcho.current.confirmed) return
       queryEcho.current.awaiting = false
     }
-    if (!form.formState.isDirty && !processState.busy && status.kind === "idle") {
+    if (!changed && !processState.busy && status.kind === "idle") {
       reset({ alias: savedAlias ?? "" })
     }
-  }, [savedAlias, form.formState.isDirty, reset, processState.busy, status.kind])
+  }, [savedAlias, changed, reset, processState.busy, status.kind])
 
   const saving = processState.busy || status.kind === "saving" || form.formState.isSubmitting
   const blocked = status.kind === "blocked"
