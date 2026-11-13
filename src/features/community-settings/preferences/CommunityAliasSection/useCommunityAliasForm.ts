@@ -13,6 +13,10 @@ import type { SaveCommunityAlias } from "./communityAliasSaveOutcome"
 
 export type InspectCommunityAlias = () => Promise<string | null>
 
+type Inspection =
+  | { status: "idle" | "checking" | "failed" }
+  | { status: "matches" | "differs"; alias: string | null }
+
 type SaveStatus =
   | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
   | { kind: "blocked"; error: unknown }
@@ -175,12 +179,14 @@ export const useCommunityAliasForm = ({
     // Form Level Validationは次の保存まで維持する。
   }
 
+  const displayedInspection: Inspection = inspection.kind === "matches" || inspection.kind === "differs"
+    ? { status: inspection.kind, alias: inspection.value }
+    : { status: inspection.kind }
+
   /** Formの値・保存状態・復旧操作をUIに渡す。 */
   return {
     field, fieldState, text, saving, failure, formInvalid, blockedFeedback,
-    inspection: inspection.kind === "matches" || inspection.kind === "differs"
-      ? { status: inspection.kind, alias: inspection.value }
-      : { status: inspection.kind },
+    inspection: displayedInspection,
     inspect, canResaveInspected, confirmObservation, discardUnconfirmed,
     normalized, validation, showClientError: fieldState.isTouched || form.formState.isSubmitted,
     changed, invalid, save, onAliasChange, blocked, unknown,
