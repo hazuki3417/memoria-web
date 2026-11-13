@@ -29,6 +29,7 @@ export function useUserPreferences(
     saveStatus,
     validation,
     confirmed,
+    draftPatch,
     discardRevision,
     inspected,
     observedMatches,
@@ -81,10 +82,23 @@ export function useUserPreferences(
       (key) => previous[key] === initial[key],
     )) return
     previousSource.current = initial
-    reset({ ...initial, accentDraft: initial.personalAccentColor }, {
-      keepDirtyValues: Object.keys(dirtyFields).length > 0,
+    const noPersistence = !onSave && !onSaveAction
+    const incompleteAccent = !preferencesSchema.shape.personalAccentColor.safeParse(
+      getValues("accentDraft"),
+    ).success
+    reset({
+      ...initial,
+      ...draftPatch,
+      accentDraft: incompleteAccent
+        ? getValues("accentDraft")
+        : draftPatch.personalAccentColor ?? initial.personalAccentColor,
+    }, {
+      // Pendingの後続編集と未完成ColorInputだけを保持する。
+      keepDirtyValues: noPersistence
+        ? Object.keys(dirtyFields).length > 0
+        : Object.keys(draftPatch).length > 0 || incompleteAccent,
     })
-  }, [initial, reset, dirtyFields])
+  }, [initial, reset, dirtyFields, draftPatch, getValues, onSave, onSaveAction])
 
   const previousDiscardRevision = useRef(discardRevision)
   useEffect(() => {
