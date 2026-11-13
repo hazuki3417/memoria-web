@@ -1,16 +1,22 @@
 import { Box, Button } from "@mantine/core"
-import { useState, type ComponentProps } from "react"
+import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
-import { CommunityAliasControl } from "./CommunityAliasControl"
-import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
+import { CommunityAliasSection } from "./CommunityAliasSection"
+import type { CommunityAliasSaveRejection } from "./communityAliasSaveOutcome"
+
+const success = (alias: string | null) => ({ kind: "success" as const, value: alias })
+const unknown = () => ({ kind: "unknown" as const })
+const validation = (violations: Extract<CommunityAliasSaveRejection, { kind: "validation" }>["violations"]) => ({
+  kind: "rejected" as const, reason: { kind: "validation" as const, violations },
+})
 
 const meta = {
-  title: "Features/Community Settings/Community Alias",
-  component: CommunityAliasControl,
+  title: "features/community-settings/preferences/CommunityAliasSection",
+  component: CommunityAliasSection,
   args: {
     savedAlias: "元の別名",
-    onSave: fn(async () => undefined),
+    onSave: fn(async (alias: string | null) => success(alias)),
   },
   decorators: [
     (Story) => (
@@ -19,7 +25,7 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof CommunityAliasControl>
+} satisfies Meta<typeof CommunityAliasSection>
 export default meta
 type Story = StoryObj<typeof meta>
 
@@ -82,7 +88,7 @@ export const AliasRetry: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw { kind: "retryable" }
+      return { kind: "rejected" as const, reason: { kind: "retryable" as const } }
     }),
   },
   play: async ({ canvasElement }) => {
@@ -106,7 +112,7 @@ export const AliasServerFieldValidation: Story = {
   tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw new SettingsInputValidationError([
+      return validation([
         { scope: "FIELD", code: "TOO_LONG", inputPaths: [{ segments: ["alias"] }] },
       ])
     }),
@@ -126,7 +132,7 @@ export const AliasServerFieldValidation: Story = {
 export const AliasUnknownOutcome: Story = {
   name: "Interaction · Alias結果不明時の二重送信防止",
   tags: ["interaction"],
-  args: { onSave: fn(async () => { throw new Error("timeout") }) },
+  args: { onSave: fn(async () => { return unknown() }) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: "Community別名" })
@@ -141,7 +147,7 @@ export const AliasUnknownOutcome: Story = {
 }
 
 function AliasRefreshFixture(
-  args: ComponentProps<typeof CommunityAliasControl>,
+  args: ComponentProps<typeof CommunityAliasSection>,
 ) {
   const [alias, setAlias] = useState(args.savedAlias)
   return (
@@ -149,7 +155,7 @@ function AliasRefreshFixture(
       <Button onClick={() => setAlias("取得した新しい別名")}>
         Alias再取得を再現
       </Button>
-      <CommunityAliasControl {...args} savedAlias={alias} />
+      <CommunityAliasSection {...args} savedAlias={alias} />
     </>
   )
 }
@@ -215,7 +221,7 @@ export const AliasUnknownMatches: Story = {
   name: "Interaction · 現在のAliasが一致したら明示確認",
   tags: ["interaction"],
   args: {
-    onSave: fn(async () => { throw new Error("response lost") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => "変更した別名"),
   },
   play: async ({ canvasElement, args }) => {
@@ -237,10 +243,10 @@ export const AliasUnknownMatches: Story = {
 }
 
 export const AliasUnknownDiffers: Story = {
-  name: "Visual · Alias現在値とDraft不一致・復旧Action",
-  tags: ["visual"],
+  name: "Interaction · Alias現在値とDraft不一致・復旧Action",
+  tags: ["interaction"],
   args: {
-    onSave: fn(async () => { throw new Error("unknown") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => "現在の別名"),
   },
   play: async ({ canvasElement, args }) => {
@@ -262,7 +268,7 @@ export const AliasUnknownInspectFailure: Story = {
   name: "Interaction · Alias現在値照会失敗では再送しない",
   tags: ["interaction"],
   args: {
-    onSave: fn(async () => { throw new Error("uncertain") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => { throw new Error("read failed") }),
   },
   play: async ({ canvasElement, args }) => {
@@ -284,7 +290,7 @@ export const AliasUnknownDiscard: Story = {
   name: "Interaction · Alias不一致時に現在値を採用してDraft破棄",
   tags: ["interaction"],
   args: {
-    onSave: fn(async () => { throw new Error("unknown") }),
+    onSave: fn(async () => { return unknown() }),
     onInspect: fn(async () => null),
   },
   play: async ({ canvasElement, args }) => {
@@ -303,12 +309,137 @@ export const AliasUnknownDiscard: Story = {
   },
 }
 
+export const AliasUnknownNullMatches: Story = {
+  name: "Interaction · null解除が照会値と一致した場合は明示確認できる",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => unknown()),
+    onInspect: fn(async () => null),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeEnabled()
+    await userEvent.click(canvas.getByRole("button", { name: "確認完了" }))
+    await expect(input).toHaveValue("")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const AliasUnknownExplicitRetry: Story = {
+  name: "Interaction · Alias照会不一致の後に明示再保存する",
+  tags: ["interaction"],
+  args: {
+    onSave: fn()
+      .mockResolvedValueOnce(unknown())
+      .mockImplementation((alias: string | null) => Promise.resolve(success(alias))),
+    onInspect: fn(async () => "元の別名"),
+  },
+  play: async ({ canvasElement, args }) => {
+    args.onSave?.mockReset()
+    args.onSave?.mockResolvedValueOnce(unknown())
+    args.onSave?.mockImplementation((alias: string | null) => Promise.resolve(success(alias)))
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "明示再保存する別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
+    await userEvent.click(canvas.getByRole("button", { name: "もう一度保存" }))
+    await expect(args.onSave).toHaveBeenCalledTimes(2)
+    await expect(args.onSave).toHaveBeenLastCalledWith("明示再保存する別名")
+    await waitFor(() => expect(canvas.queryByRole("alert")).not.toBeInTheDocument())
+    await expect(input).toHaveValue("明示再保存する別名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+function PendingAliasInspectionFixture(args: ComponentProps<typeof CommunityAliasSection>) {
+  const resolveInspection = useRef<((alias: string | null) => void) | null>(null)
+  return (
+    <>
+      <Button onClick={() => resolveInspection.current?.("古い照会結果")}>
+        遅延照会を返す
+      </Button>
+      <CommunityAliasSection
+        {...args}
+        onSave={async () => unknown()}
+        onInspect={() => new Promise<string | null>((resolve) => {
+          resolveInspection.current = resolve
+        })}
+      />
+    </>
+  )
+}
+
+export const AliasUnknownStaleInspection: Story = {
+  name: "Interaction · 照会中にDraftを変更した場合は古い照会結果を無効化",
+  tags: ["interaction"],
+  render: (args) => <PendingAliasInspectionFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "最初のDraft")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await userEvent.type(input, "と追加編集")
+    await userEvent.click(canvas.getByRole("button", { name: "遅延照会を返す" }))
+    await expect(input).toHaveValue("最初のDraftと追加編集")
+    await expect(canvas.queryByRole("button", { name: "確認完了" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
+    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
+  },
+}
+
+export const AliasSaveStaleQuery: Story = {
+  name: "Interaction · 保存成功後は古い再取得値で確定Aliasを巻き戻さない",
+  tags: ["interaction"],
+  render: (args) => <AliasRefreshFixture {...args} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "確定した別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(args.onSave).toHaveBeenCalledWith("確定した別名")
+    await expect(input).toHaveValue("確定した別名")
+    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
+    await expect(input).toHaveValue("確定した別名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+export const AliasNormalizedSave: Story = {
+  name: "Interaction · Aliasの前後空白をTrimして保存",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "  正規化した別名  ")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(args.onSave).toHaveBeenCalledWith("正規化した別名")
+    await expect(input).toHaveValue("正規化した別名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
 export const AliasBlockedUserDeleting: Story = {
-  name: "Visual · Alias更新不可（削除処理中）",
-  tags: ["visual"],
+  name: "Interaction · Alias更新不可（削除処理中）",
+  tags: ["interaction"],
   args: {
     onSave: fn(async () => {
-      throw { graphQLErrors: [{ extensions: { code: "USER_DELETING" } }] }
+      return { kind: "rejected" as const, reason: { kind: "blocked" as const, error: { graphQLErrors: [{ extensions: { code: "USER_DELETING" } }] } } }
     }),
   },
   play: async ({ canvasElement }) => {
@@ -322,24 +453,3 @@ export const AliasBlockedUserDeleting: Story = {
   },
 }
 
-export const AliasFormValidationPanel: Story = {
-  name: "Visual · Alias Form-level Validationの持続表示",
-  tags: ["visual"],
-  args: {
-    onSave: fn(async () => {
-      throw new SettingsInputValidationError([
-        { scope: "FORM", code: "INVALID_COMBINATION", inputPaths: [] },
-      ])
-    }),
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: "Community別名" })
-    await userEvent.clear(input)
-    await userEvent.type(input, "更新する別名")
-    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
-    await expect(await canvas.findByRole("alert")).toHaveTextContent("入力内容を確認してください")
-    await userEvent.type(input, "を再編集")
-    await expect(canvas.getByRole("alert")).toBeVisible()
-  },
-}

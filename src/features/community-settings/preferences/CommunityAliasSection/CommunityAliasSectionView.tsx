@@ -1,22 +1,19 @@
 "use client"
 
 import { Box, Button, Stack, TextInput } from "@mantine/core"
-import { useCommunityAliasForm } from "./useCommunityAliasForm"
 import { CommunityAliasSaveFeedback } from "./CommunityAliasSaveFeedback"
+import type { useCommunityAliasForm, InspectCommunityAlias } from "./useCommunityAliasForm"
 
-export function CommunityAliasControl({
-  savedAlias,
-  onSave,
-  onInspect,
-}: {
-  savedAlias: string | null
-  onSave: (alias: string | null) => Promise<void>
-  onInspect?: () => Promise<string | null>
-}) {
-  const model = useCommunityAliasForm({ savedAlias, onSave, onInspect })
+export type CommunityAliasSectionViewProps = {
+  model: ReturnType<typeof useCommunityAliasForm>
+  onInspect?: InspectCommunityAlias
+}
+
+/** Community別名の表示・編集・保存・Recovery操作を提供する。 */
+export const CommunityAliasSectionView = ({ model, onInspect }: CommunityAliasSectionViewProps) => {
   const {
-    field, fieldState, text, saving, failure, validation,
-    showClientError, changed, invalid, save, onAliasChange,
+    field, fieldState, text, saving, blocked, unknown, validation,
+    showClientError, changed, invalid, save, onAliasChange, saveLabel,
   } = model
 
   return (
@@ -45,10 +42,10 @@ export function CommunityAliasControl({
         <Button
           size="sm"
           loading={saving}
-          disabled={!changed || invalid || saving || failure === "unknown" || failure === "blocked"}
+          disabled={!changed || invalid || saving || unknown || blocked}
           onClick={() => void save()}
         >
-          保存
+          {saveLabel}
         </Button>
       </Box>
     </Stack>

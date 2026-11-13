@@ -7,7 +7,7 @@ import {
   useCommunityAccentSave,
 } from "@/features/application-shell/CommunityAccentPreviewContext"
 import { useCommunitySettingsRefreshError } from "../../useCommunitySettingsRefreshError"
-import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { commitCommunitySettingsPatch } from "../communitySettingsCache"
 import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
 import {
   CommunityMySettingsDocument,

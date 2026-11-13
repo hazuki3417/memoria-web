@@ -2,10 +2,10 @@
 
 import { Stack } from "@mantine/core"
 import { CommunityPreferences } from "./CommunityPreferences"
-import { CommunityAliasControl } from "./CommunityAliasControl"
+import { CommunityAliasSection } from "./CommunityAliasSection"
 import { CommunityAccentSaveFeedback } from "./ConnectedCommunityPreferences/CommunityAccentSaveFeedback"
 import type { useCommunityPreferencesConnection } from "./ConnectedCommunityPreferences/useCommunityPreferencesConnection"
-import type { useCommunityAliasConnection } from "./ConnectedCommunityPreferences/useCommunityAliasConnection"
+import type { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
 type Connection = ReturnType<typeof useCommunityPreferencesConnection>
 
@@ -23,7 +23,7 @@ export function CommunityPreferencesSection({
   snapshot: Connection["snapshot"]
   controller: Connection["controller"]
   canResave: boolean
-  alias: ReturnType<typeof useCommunityAliasConnection>
+  alias: ReturnType<typeof useCommunityAliasSave>
 }) {
   const failure = snapshot.failure
   const accent = snapshot.confirmed ?? settings.accentColor
@@ -50,8 +50,8 @@ export function CommunityPreferencesSection({
             />
           ) : undefined
         }
-        aliasControl={
-          <CommunityAliasControl
+        aliasSection={
+          <CommunityAliasSection
             savedAlias={settings.alias}
             onInspect={alias.inspectAlias}
             onSave={alias.saveAlias}

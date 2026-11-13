@@ -12,8 +12,8 @@ const mocks = vi.hoisted(() => ({
 vi.mock("./useCommunityPreferencesConnection", () => ({
   useCommunityPreferencesConnection: mocks.connection,
 }))
-vi.mock("./useCommunityAliasConnection", () => ({
-  useCommunityAliasConnection: mocks.alias,
+vi.mock("../CommunityAliasSection/useCommunityAliasSave", () => ({
+  useCommunityAliasSave: mocks.alias,
 }))
 vi.mock("../CommunityPreferencesSection", () => ({
   CommunityPreferencesSection: () => createElement("div", null, "Community Preferences"),
