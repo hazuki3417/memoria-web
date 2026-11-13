@@ -3,7 +3,6 @@
 import { Box, Stack, Switch } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
 import type { PersonalPreferencesPreviewSectionModel } from "./usePersonalPreferencesPreviewSection"
 type PreferencesModel = PersonalPreferencesPreviewSectionModel
 
