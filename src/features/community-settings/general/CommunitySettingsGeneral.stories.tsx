@@ -3,7 +3,7 @@ import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { CommunitySettingsStoryNavigation } from "../storybook/CommunitySettingsStoryNavigation"
-import type { SaveCommunityName, CommunityNameSaveRejection } from "./communityNameSaveOutcome"
+import type { SaveCommunityName, CommunityNameSaveRejection } from "./CommunityNameSection/communityNameSaveOutcome"
 
 type CommunityNameOutcome = Awaited<ReturnType<SaveCommunityName>>
 const saveSuccess = (name: string): CommunityNameOutcome => ({ kind: "success", value: name })
