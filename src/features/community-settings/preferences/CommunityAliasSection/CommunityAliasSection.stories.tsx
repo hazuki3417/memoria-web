@@ -1,7 +1,7 @@
 import { Box, Button } from "@mantine/core"
-import { useState, type ComponentProps } from "react"
+import { useRef, useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
-import { expect, fn, userEvent, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { CommunityAliasSection } from "./CommunityAliasSection"
 import type { CommunityAliasSaveRejection } from "./communityAliasSaveOutcome"
 
@@ -306,6 +306,131 @@ export const AliasUnknownDiscard: Story = {
     await expect(input).toHaveValue("")
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
     await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const AliasUnknownNullMatches: Story = {
+  name: "Interaction · null解除が照会値と一致した場合は明示確認できる",
+  tags: ["interaction"],
+  args: {
+    onSave: fn(async () => unknown()),
+    onInspect: fn(async () => null),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeEnabled()
+    await userEvent.click(canvas.getByRole("button", { name: "確認完了" }))
+    await expect(input).toHaveValue("")
+    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+  },
+}
+
+export const AliasUnknownExplicitRetry: Story = {
+  name: "Interaction · Alias照会不一致の後に明示再保存する",
+  tags: ["interaction"],
+  args: {
+    onSave: fn()
+      .mockResolvedValueOnce(unknown())
+      .mockImplementation((alias: string | null) => Promise.resolve(success(alias))),
+    onInspect: fn(async () => "元の別名"),
+  },
+  play: async ({ canvasElement, args }) => {
+    args.onSave?.mockReset()
+    args.onSave?.mockResolvedValueOnce(unknown())
+    args.onSave?.mockImplementation((alias: string | null) => Promise.resolve(success(alias)))
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "明示再保存する別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await expect(args.onSave).toHaveBeenCalledTimes(1)
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
+    await userEvent.click(canvas.getByRole("button", { name: "もう一度保存" }))
+    await expect(args.onSave).toHaveBeenCalledTimes(2)
+    await expect(args.onSave).toHaveBeenLastCalledWith("明示再保存する別名")
+    await waitFor(() => expect(canvas.queryByRole("alert")).not.toBeInTheDocument())
+    await expect(input).toHaveValue("明示再保存する別名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+function PendingAliasInspectionFixture(args: ComponentProps<typeof CommunityAliasSection>) {
+  const resolveInspection = useRef<((alias: string | null) => void) | null>(null)
+  return (
+    <>
+      <Button onClick={() => resolveInspection.current?.("古い照会結果")}>
+        遅延照会を返す
+      </Button>
+      <CommunityAliasSection
+        {...args}
+        onSave={async () => unknown()}
+        onInspect={() => new Promise<string | null>((resolve) => {
+          resolveInspection.current = resolve
+        })}
+      />
+    </>
+  )
+}
+
+export const AliasUnknownStaleInspection: Story = {
+  name: "Interaction · 照会中にDraftを変更した場合は古い照会結果を無効化",
+  tags: ["interaction"],
+  render: (args) => <PendingAliasInspectionFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "最初のDraft")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(await canvas.findByRole("alert")).toBeVisible()
+    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
+    await userEvent.type(input, "と追加編集")
+    await userEvent.click(canvas.getByRole("button", { name: "遅延照会を返す" }))
+    await expect(input).toHaveValue("最初のDraftと追加編集")
+    await expect(canvas.queryByRole("button", { name: "確認完了" })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
+    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
+  },
+}
+
+export const AliasSaveStaleQuery: Story = {
+  name: "Interaction · 保存成功後は古い再取得値で確定Aliasを巻き戻さない",
+  tags: ["interaction"],
+  render: (args) => <AliasRefreshFixture {...args} />,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "確定した別名")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(args.onSave).toHaveBeenCalledWith("確定した別名")
+    await expect(input).toHaveValue("確定した別名")
+    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
+    await expect(input).toHaveValue("確定した別名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
+  },
+}
+
+export const AliasNormalizedSave: Story = {
+  name: "Interaction · Aliasの前後空白をTrimして保存",
+  tags: ["interaction"],
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "  正規化した別名  ")
+    await userEvent.click(canvas.getByRole("button", { name: "保存" }))
+    await expect(args.onSave).toHaveBeenCalledWith("正規化した別名")
+    await expect(input).toHaveValue("正規化した別名")
+    await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
 
