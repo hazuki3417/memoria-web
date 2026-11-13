@@ -3,8 +3,8 @@
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { CommunityNameSaveFeedback } from "./CommunityNameSaveFeedback"
-import { useCommunityNameSettings } from "./useCommunityNameSettings"
-import type { SaveCommunityName } from "../communityNameSaveOutcome"
+import { useCommunityNameForm } from "./useCommunityNameForm"
+import type { SaveCommunityName } from "./communityNameSaveOutcome"
 
 export type CommunityNameSectionProps = {
   isAdmin: boolean
@@ -22,7 +22,7 @@ export const CommunityNameSection = ({
   onSaveName = localSave,
   onInspectName,
 }: CommunityNameSectionProps) => {
-  const form = useCommunityNameSettings({
+  const form = useCommunityNameForm({
     initialName: communityName,
     onSave: onSaveName,
     onInspect: onInspectName,
