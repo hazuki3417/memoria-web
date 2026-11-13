@@ -4,27 +4,21 @@ import { Stack } from "@mantine/core"
 import { CommunityPreferences } from "./CommunityPreferences"
 import { CommunityAliasSection } from "./CommunityAliasSection"
 import { CommunityAccentSaveFeedback } from "./ConnectedCommunityPreferences/CommunityAccentSaveFeedback"
-import type { useCommunityPreferencesConnection } from "./ConnectedCommunityPreferences/useCommunityPreferencesConnection"
+import { useCommunityAccentAutoSave } from "./useCommunityAccentAutoSave"
 import type { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
-type Connection = ReturnType<typeof useCommunityPreferencesConnection>
-
-/** Ready-only UI composition; status is exclusively the shared Host's concern. */
+/** Ready-only UI composition; its Accent Queue closes when this view unmounts. */
 export function CommunityPreferencesSection({
   communityId,
   settings,
-  snapshot,
-  controller,
-  canResave,
   alias,
 }: {
   communityId: string
   settings: { accentColor: string; alias: string | null }
-  snapshot: Connection["snapshot"]
-  controller: Connection["controller"]
-  canResave: boolean
   alias: ReturnType<typeof useCommunityAliasSave>
 }) {
+  const { snapshot, controller, canResave } =
+    useCommunityAccentAutoSave(communityId, settings.accentColor)
   const failure = snapshot.failure
   const accent = snapshot.confirmed ?? settings.accentColor
   const lastDraft = snapshot.draft ?? accent
@@ -39,11 +33,10 @@ export function CommunityPreferencesSection({
         preserveDraftOnAccentChange={failure !== null}
         saveStatus={failure ? "attention" : snapshot.status}
         accentError={snapshot.validation?.fieldErrors.accentColor}
-        onAccentDraftChange={(value) => controller.edit(communityId, value)}
+        onAccentDraftChange={(value) => controller.edit(value)}
         saveFeedback={
           failure ? (
             <CommunityAccentSaveFeedback
-              communityId={communityId}
               snapshot={snapshot}
               controller={controller}
               canResave={canResave}
