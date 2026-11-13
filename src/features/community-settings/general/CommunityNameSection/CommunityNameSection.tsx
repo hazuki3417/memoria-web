@@ -1,6 +1,6 @@
 "use client"
 
-import { CommunityNameView } from "./CommunityNameView"
+import { CommunityNameSectionView } from "./CommunityNameSectionView"
 import { useCommunityNameForm } from "./useCommunityNameForm"
 import type { SaveCommunityName } from "./communityNameSaveOutcome"
 
@@ -25,5 +25,5 @@ export const CommunityNameSection = ({
     onSave: onSaveName,
     onInspect: onInspectName,
   })
-  return <CommunityNameView isAdmin={isAdmin} form={form} onInspectName={onInspectName} />
+  return <CommunityNameSectionView isAdmin={isAdmin} form={form} onInspectName={onInspectName} />
 }
