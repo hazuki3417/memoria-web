@@ -48,8 +48,7 @@ export const useCommunityPreferencesForm = ({
   })
   const { field, fieldState } = useController({ control, name: "accentDraft" })
 
-  // Refresh an untouched input; preserve an incomplete draft unless the
-  // AutoSaveの明示破棄が復元する its last confirmed value.
+  // 未編集なら取得値に追従し、入力途中のDraftは明示破棄まで保持する。
   const previousAccent = useRef(accent)
   const previousInitialDraft = useRef(initialDraft)
   useEffect(() => {
@@ -71,8 +70,8 @@ export const useCommunityPreferencesForm = ({
     reset,
   ])
 
-  // 明示破棄でAlias controlsを再Mountせず入力を復元する。
-  // Normal server refetch and pending input must not overwrite the live RHF Draft.
+  // 明示破棄でAliasを再Mountせず入力を復元する。
+  // 通常の再取得やPendingは入力中のRHF Draftを上書きしない。
   useEffect(() => {
     if (
       initialDraft === undefined ||
@@ -87,7 +86,6 @@ export const useCommunityPreferencesForm = ({
       reset({ accentDraft: initialDraft })
     }
   }, [initialDraft, saveStatus, accent, reset])
-
 
   const onDraftChange = (next: string) => {
     field.onChange(next)

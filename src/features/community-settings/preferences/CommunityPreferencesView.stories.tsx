@@ -267,3 +267,40 @@ export const AccentValidationPanel: Story = {
     ),
   },
 }
+
+/** Productionと同じView/Form/AutoSaveの経路で、Aliasの編集中Draftを保護する。 */
+export const AccentRecoveryPreservesAliasDraft: Story = {
+  name: "Interaction · Accentの明示破棄でAlias Draftを保持",
+  tags: ["interaction"],
+  args: {
+    accent: "#123456",
+    isPreview: false,
+    operations: {
+      save: fn(async () => ({ kind: "unknown" as const })),
+      observe: fn(async () => ({ accentColor: "#123456" })),
+      confirm: fn(),
+    },
+    preview: { preview: fn(() => 1), release: fn() },
+    alias: {
+      savedAlias: "保存済み別名",
+      onSave: fn(async (value: string | null) => ({ kind: "success" as const, value })),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const aliasInput = canvas.getByRole("textbox", { name: "Community別名" })
+    const accentInput = canvas.getByRole("textbox", { name: "Communityアクセントカラー" })
+    await userEvent.clear(aliasInput)
+    await userEvent.type(aliasInput, "未保存の別名")
+    await userEvent.clear(accentInput)
+    await userEvent.type(accentInput, "#AABBCC")
+    await expect(await canvas.findByText("保存結果を確認できませんでした")).toBeVisible()
+    await expect(args.operations?.save).toHaveBeenCalledWith({ accentColor: "#AABBCC" })
+    await expect(args.preview?.preview).toHaveBeenCalledWith("#AABBCC")
+    await userEvent.click(canvas.getByRole("button", { name: "変更を破棄" }))
+    await expect(accentInput).toHaveValue("#123456")
+    await expect(aliasInput).toHaveValue("未保存の別名")
+    await expect(args.alias?.onSave).not.toHaveBeenCalled()
+    await expect(args.preview?.release).toHaveBeenCalledWith(1)
+  },
+}
