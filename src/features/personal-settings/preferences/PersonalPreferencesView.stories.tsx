@@ -7,7 +7,6 @@ import { defaultUserPreferences, type UserPreferencesPatch } from "./userPrefere
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
-  // Existing meta title preserves page-level Story IDs during ownership migration.
   title: "features/personal-settings/preferences/PersonalPreferencesView",
   component: PersonalPreferencesView,
   args: {

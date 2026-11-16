@@ -177,7 +177,7 @@ export const InvitationProductionUnavailable: Story = {
   },
 }
 
-/** Story IDは維持し、Generalを離れるとDraftが破棄される契約を検証する。 */
+/** Generalを離れるとDraftが破棄される契約を検証する。 */
 export const NameDraftSurvivesNavigation: Story = {
   name: "Interaction · Section切替でCommunity名のDraftを破棄",
   tags: ["interaction"],
