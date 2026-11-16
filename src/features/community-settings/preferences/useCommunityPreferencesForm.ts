@@ -4,7 +4,7 @@ import { useEffect, useRef, type Dispatch, type SetStateAction } from "react"
 import { useController, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
-import { communityAccentSchema } from "./communityAccentSchema"
+import { communityPreferencesSchema } from "./communityPreferencesSchema"
 import type { SaveStatusState } from "@/components/SaveStatus"
 
 /** Owns Community Accent form draft, source reconciliation and validation. */
@@ -28,9 +28,9 @@ export const useCommunityPreferencesForm = ({
   setAccent: Dispatch<SetStateAction<string>>
 }) => {
   const { control, getValues, reset } = useForm<
-    z.input<typeof communityAccentSchema>
+    z.input<typeof communityPreferencesSchema>
   >({
-    resolver: zodResolver(communityAccentSchema),
+    resolver: zodResolver(communityPreferencesSchema),
     mode: "onChange",
     defaultValues: { accentDraft: initialDraft ?? accent },
   })
@@ -80,7 +80,7 @@ export const useCommunityPreferencesForm = ({
   const onDraftChange = (next: string) => {
     field.onChange(next)
     onAccentDraftChange?.(next)
-    const parsed = communityAccentSchema.safeParse({ accentDraft: next })
+    const parsed = communityPreferencesSchema.safeParse({ accentDraft: next })
     onDraftValidityChange?.(parsed.success)
     if (parsed.success) setAccent(parsed.data.accentDraft)
   }
@@ -88,7 +88,7 @@ export const useCommunityPreferencesForm = ({
   return {
     field,
     fieldState,
-    draftInvalid: !communityAccentSchema.safeParse({ accentDraft: field.value }).success,
+    draftInvalid: !communityPreferencesSchema.safeParse({ accentDraft: field.value }).success,
     onDraftChange,
   }
 }
