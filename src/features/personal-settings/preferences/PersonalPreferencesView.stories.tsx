@@ -3,7 +3,7 @@ import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { PersonalPreferencesView } from "./PersonalPreferencesView"
-import { defaultUserPreferences, type UserPreferencesPatch } from "./userPreferences"
+import { defaultPersonalPreferences, type PersonalPreferencesPatch } from "./personalPreferences"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
 const meta = {
@@ -11,7 +11,7 @@ const meta = {
   component: PersonalPreferencesView,
   args: {
     compact: false,
-    initialPreferences: defaultUserPreferences,
+    initialPreferences: defaultPersonalPreferences,
   },
   decorators: [
     (Story) => (
@@ -33,7 +33,7 @@ export const PreferencePatchContract: Story = {
   name: "Interaction · 編集したFieldだけを自動保存",
   tags: ["interaction"],
   args: {
-    onSave: fn(async () => ({ ...defaultUserPreferences, mediaDetailNavigationWrap: true })),
+    onSave: fn(async () => ({ ...defaultPersonalPreferences, mediaDetailNavigationWrap: true })),
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
@@ -77,8 +77,8 @@ export const PreferenceSaveStatus: Story = {
   name: "Interaction · 自動保存のタイトル横Status",
   tags: ["interaction"],
   args: {
-    onSave: fn(async (patch: UserPreferencesPatch) => ({
-      ...defaultUserPreferences,
+    onSave: fn(async (patch: PersonalPreferencesPatch) => ({
+      ...defaultPersonalPreferences,
       ...patch,
     })),
   },
@@ -95,7 +95,7 @@ export const PreferenceSaveStatus: Story = {
   },
 }
 
-const navigationSave = fn(async (_patch: UserPreferencesPatch) => {
+const navigationSave = fn(async (_patch: PersonalPreferencesPatch) => {
   throw new Error("response lost")
 })
 
@@ -112,7 +112,7 @@ function PreferencesSessionRoundTripFixture(
         <PersonalPreferencesView
           {...args}
           compact={false}
-          initialPreferences={defaultUserPreferences}
+          initialPreferences={defaultPersonalPreferences}
           onSave={navigationSave}
         />
       )}
@@ -140,7 +140,7 @@ export const PreferencesSessionRoundTrip: Story = {
 }
 
 function PreferencesRefreshFixture(args: ComponentProps<typeof PersonalPreferencesView>) {
-  const [preferences, setPreferences] = useState(defaultUserPreferences)
+  const [preferences, setPreferences] = useState(defaultPersonalPreferences)
   return (
     <>
       <Button onClick={() => setPreferences((current) => ({
@@ -168,7 +168,7 @@ function PreferencesRefreshFixture(args: ComponentProps<typeof PersonalPreferenc
 export const PreferencesRefreshWhileUntouched: Story = {
   name: "Interaction · Preferences未編集Fieldは再取得値へ追従",
   tags: ["interaction"],
-  args: { onSave: fn(async () => defaultUserPreferences) },
+  args: { onSave: fn(async () => defaultPersonalPreferences) },
   render: (args) => <PreferencesRefreshFixture {...args} />,
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
@@ -186,8 +186,8 @@ export const PreferencesInvalidAccentDraft: Story = {
   name: "Interaction · 未完成HEXは保存Patchに含めない",
   tags: ["interaction"],
   args: {
-    onSave: fn(async (patch: UserPreferencesPatch) => ({
-      ...defaultUserPreferences,
+    onSave: fn(async (patch: PersonalPreferencesPatch) => ({
+      ...defaultPersonalPreferences,
       ...patch,
     })),
   },
@@ -277,7 +277,7 @@ export const PreferencesUnknownMatchesVisual: Story = {
   args: {
     onSave: fn(async () => { throw new Error("unknown") }),
     onInspect: fn(async () => ({
-      ...defaultUserPreferences,
+      ...defaultPersonalPreferences,
       mediaDetailNavigationWrap: true,
     })),
   },
@@ -298,7 +298,7 @@ export const PreferencesUnknownDiffersVisual: Story = {
   tags: ["visual"],
   args: {
     onSave: fn(async () => { throw new Error("unknown") }),
-    onInspect: fn(async () => defaultUserPreferences),
+    onInspect: fn(async () => defaultPersonalPreferences),
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

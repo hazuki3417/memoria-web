@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest"
 import { personalPreferencesSchema } from "./personalPreferencesSchema"
-import { defaultUserPreferences } from "./userPreferences"
+import { defaultPersonalPreferences } from "./personalPreferences"
 
 describe("personalPreferencesSchema", () => {
   it("allows incomplete ColorInput drafts without saving them", () => {
     expect(
       personalPreferencesSchema.safeParse({
-        ...defaultUserPreferences,
+        ...defaultPersonalPreferences,
         accentDraft: "#12A",
       }).success,
     ).toBe(true)
@@ -15,14 +15,14 @@ describe("personalPreferencesSchema", () => {
   it("rejects invalid persisted colors and enum values", () => {
     expect(
       personalPreferencesSchema.safeParse({
-        ...defaultUserPreferences,
+        ...defaultPersonalPreferences,
         accentDraft: "#12A",
         personalAccentColor: "#12A",
       }).success,
     ).toBe(false)
     expect(
       personalPreferencesSchema.safeParse({
-        ...defaultUserPreferences,
+        ...defaultPersonalPreferences,
         accentDraft: "#123456",
         dateFormat: "INVALID",
       }).success,

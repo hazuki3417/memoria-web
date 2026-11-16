@@ -7,17 +7,19 @@ const mocks = vi.hoisted(() => ({
   mutation: vi.fn(),
   query: vi.fn(),
   patch: vi.fn(),
+  refetchQueries: vi.fn(),
   cache: {},
 }))
 
 vi.mock("@apollo/client", () => ({
-  useApolloClient: () => ({ query: mocks.query, cache: mocks.cache }),
+  useApolloClient: () => ({ query: mocks.query, cache: mocks.cache, refetchQueries: mocks.refetchQueries }),
 }))
 vi.mock("@/infrastructure/graphql/generated", () => ({
   CommunityMySettingsDocument: { kind: "Document", name: "communityMySettings" },
+  MyCommunitiesDocument: { kind: "Document", name: "myCommunities" },
   useUpdateCommunitySettingsMutation: () => [mocks.mutation],
 }))
-vi.mock("../communitySettingsCache", () => ({
+vi.mock("../communityPreferencesCache", () => ({
   commitCommunitySettingsPatch: mocks.patch,
 }))
 
@@ -28,6 +30,8 @@ let actions!: Actions
 
 beforeEach(async () => {
   vi.resetAllMocks()
+  mocks.patch.mockReturnValue(true)
+  mocks.refetchQueries.mockResolvedValue([])
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
@@ -74,6 +78,22 @@ describe("Community別名の保存ActionとApollo境界", () => {
       kind: "success", value: "確定した別名",
     })
     expect(mocks.patch).toHaveBeenCalledTimes(1)
+    expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: [expect.anything(), expect.anything()], onQueryUpdated: expect.any(Function) })
+  })
+
+  it("Cache欠落時は一覧と対象CommunityだけをRefetchする", () => {
+    mocks.patch.mockReturnValueOnce(false)
+    actions.confirmAlias("確定した別名")
+    expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
+    const { onQueryUpdated } = mocks.refetchQueries.mock.calls[0][0]
+    const result = Promise.resolve({})
+    const refetch = vi.fn().mockReturnValue(result)
+
+    expect(onQueryUpdated({ variables: undefined, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: {}, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: { communityId: "community-1" }, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: { communityId: "community-2" }, refetch })).toBe(false)
+    expect(refetch).toHaveBeenCalledTimes(3)
   })
 
   it("Typed Successに別のGraphQL Errorが併存してもMutationの確定結果を優先する", async () => {
@@ -142,17 +162,23 @@ describe("Community別名の保存ActionとApollo境界", () => {
   })
   it("Inspectionは固定したCommunityの現在値をno-cacheで照会する", async () => {
     mocks.query.mockResolvedValue({
-      data: { community: { mySettings: { alias: null } } },
+      data: { community: { id: "community-1", mySettings: { alias: null } } },
     })
     await expect(actions.inspectAlias()).resolves.toBeNull()
     expect(mocks.query).toHaveBeenCalledWith({
       query: { kind: "Document", name: "communityMySettings" },
       variables: { communityId: "community-1" },
-      fetchPolicy: "no-cache",
+      fetchPolicy: "no-cache", context: { settingsInspection: true, queryDeduplication: false },
     })
     expect(mocks.patch).not.toHaveBeenCalled()
     expect(mocks.mutation).not.toHaveBeenCalled()
   })
+  it("別Communityの別名は照会結果として採用しない", async () => {
+    mocks.query.mockResolvedValue({ data: { community: { id: "community-2", mySettings: { alias: "別名" } } } })
+    await expect(actions.inspectAlias()).rejects.toThrow("Community unavailable")
+    expect(mocks.patch).not.toHaveBeenCalled()
+  })
+
   it("InspectionでCommunityを取得できない場合は呼出元へ失敗を返す", async () => {
     mocks.query.mockResolvedValue({ data: { community: null } })
     await expect(actions.inspectAlias()).rejects.toThrow("Community unavailable")

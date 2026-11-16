@@ -26,11 +26,13 @@ export const useCommunityAliasForm = ({
   savedAlias,
   onSave,
   onInspect,
+  onConfirm,
   initialSaveState = "idle",
 }: {
   savedAlias: string | null
   onSave: SaveCommunityAlias
   onInspect?: InspectCommunityAlias
+  onConfirm?: (alias: string | null) => void
   initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
 }) => {
   const form = useForm<
@@ -167,10 +169,16 @@ export const useCommunityAliasForm = ({
     if (
       unknown && inspection.kind === "matches" &&
       inputAlias === inspection.value
-    ) adopt(inspection.value)
+    ) {
+      onConfirm?.(inspection.value)
+      adopt(inspection.value)
+    }
   }
   const discardUnconfirmed = () => {
-    if (unknown && inspection.kind === "differs") adopt(inspection.value)
+    if (unknown && inspection.kind === "differs") {
+      onConfirm?.(inspection.value)
+      adopt(inspection.value)
+    }
   }
   const onAliasChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.onChange(event.currentTarget.value)

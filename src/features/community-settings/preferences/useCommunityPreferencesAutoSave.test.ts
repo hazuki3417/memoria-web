@@ -24,8 +24,10 @@ const setup = (save?: ReturnType<typeof vi.fn<SaveCommunityPreferencesAction>>, 
   const render = vi.fn()
   const preview = { preview: operations.preview, release: operations.release }
 
+  let sourceAccent = "#112233"
+  let sourceReady = true
   const Harness = () => {
-    current = useCommunityPreferencesAutoSave("#112233", operations, preview)
+    current = useCommunityPreferencesAutoSave(sourceAccent, operations, preview, sourceReady)
     render(current.snapshot)
     return null
   }
@@ -40,6 +42,11 @@ const setup = (save?: ReturnType<typeof vi.fn<SaveCommunityPreferencesAction>>, 
   const autoSave = {
     edit: (draft: CommunityPreferencesDraft) => { act(() => current.edit(draft)) },
     getSnapshot: () => current.snapshot,
+    refresh: (color: string, ready = true) => {
+      sourceAccent = color
+      sourceReady = ready
+      act(() => root.render(strict ? createElement(StrictMode, null, createElement(Harness)) : createElement(Harness)))
+    },
     retry: () => { act(() => current.retry()) },
     inspect: () => current.inspect(),
     confirmObservation: () => { act(() => current.confirmObservation()) },
@@ -67,7 +74,7 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
     expect(operations.save).toHaveBeenCalledTimes(1)
     expect(operations.save).toHaveBeenCalledWith({ accentColor: "#AABBCC" })
     expect(autoSave.getSnapshot()).toMatchObject({
-      confirmed: { accentColor: "#ABCDEF" }, draft: { accentColor: "#AABBCC" }, status: "pending",
+      confirmed: { accentColor: "#ABCDEF" }, draft: { accentColor: "#ABCDEF" }, status: "saved",
     })
   })
 
@@ -78,7 +85,7 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(500) })
     expect(operations.save).not.toHaveBeenCalled()
     expect(autoSave.getSnapshot()).toMatchObject({
-      confirmed: { accentColor: "#112233" }, draft: { accentColor: "#AAB" }, status: "pending",
+      confirmed: { accentColor: "#112233" }, draft: { accentColor: "#AAB" }, status: "idle",
     })
   })
 
@@ -126,6 +133,7 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
     })
     expect(operations.release).not.toHaveBeenCalled()
     autoSave.edit({ accentColor: "#445566" })
+    expect(operations.preview).toHaveBeenLastCalledWith("#445566")
     await act(async () => { await vi.advanceTimersByTimeAsync(500) })
     expect(save).toHaveBeenCalledTimes(1)
     autoSave.retry()
@@ -238,8 +246,47 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
     })
     expect(save).toHaveBeenCalledTimes(1)
     expect(autoSave.getSnapshot()).toMatchObject({
-      confirmed: { accentColor: "#AABBCC" }, draft: { accentColor: "#445" }, status: "pending",
+      confirmed: { accentColor: "#AABBCC" }, draft: { accentColor: "#445" }, status: "saved",
     })
+  })
+
+  it("先行Attemptの失敗時には未完成HEXで送信済み色のPreviewを失わない", async () => {
+    let resolveFirst!: (outcome: CommunityPreferencesSaveOutcome) => void
+    const save = vi.fn<SaveCommunityPreferencesAction>().mockImplementation(
+      () => new Promise(resolve => { resolveFirst = resolve }),
+    )
+    const { autoSave, operations } = setup(save)
+    autoSave.edit({ accentColor: "#AABBCC" })
+    await act(async () => { await vi.advanceTimersByTimeAsync(400) })
+    autoSave.edit({ accentColor: "#445566" })
+    autoSave.edit({ accentColor: "#445" })
+    expect(operations.preview).toHaveBeenLastCalledWith("#AABBCC")
+    await act(async () => { resolveFirst({ kind: "unknown" }) })
+    expect(operations.release).not.toHaveBeenCalled()
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(autoSave.getSnapshot()).toMatchObject({ status: "attention", failure: "unknown", draft: { accentColor: "#445" } })
+  })
+
+  it("保存後に変化した取得値をEcho待ちで無期限に拒否しない", async () => {
+    const { autoSave } = setup(vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue(success({ accentColor: "#AABBCC" })))
+    autoSave.edit({ accentColor: "#AABBCC" })
+    await act(async () => { await vi.advanceTimersByTimeAsync(400) })
+    expect(autoSave.getSnapshot().confirmed?.accentColor).toBe("#AABBCC")
+    autoSave.refresh("#778899")
+    expect(autoSave.getSnapshot()).toMatchObject({
+      confirmed: { accentColor: "#778899" }, draft: { accentColor: "#778899" },
+    })
+  })
+
+  it("同値の正常再取得も取得完了として扱う", async () => {
+    const { autoSave } = setup(vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue(success({ accentColor: "#AABBCC" })))
+    autoSave.edit({ accentColor: "#AABBCC" })
+    await act(async () => { await vi.advanceTimersByTimeAsync(400) })
+    expect(autoSave.getSnapshot().confirmed?.accentColor).toBe("#AABBCC")
+    autoSave.refresh("#112233", false)
+    expect(autoSave.getSnapshot().confirmed?.accentColor).toBe("#AABBCC")
+    autoSave.refresh("#112233", true)
+    expect(autoSave.getSnapshot().confirmed?.accentColor).toBe("#112233")
   })
 
   it("保存結果不明時の古い照会は新しいDraftの確認結果を上書きしない", async () => {

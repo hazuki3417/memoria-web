@@ -29,6 +29,7 @@ export const CommunityPreferencesView = ({
   alias,
   operations,
   preview,
+  sourceReady = true,
 }: {
   accent: string
   initialDraft?: string
@@ -45,11 +46,12 @@ export const CommunityPreferencesView = ({
   alias?: ComponentProps<typeof CommunityAliasSection>
   operations?: CommunityPreferencesSaveOperations
   preview?: CommunityPreferencesAccentPreview
+  sourceReady?: boolean
 }) => {
   const model = useCommunityPreferencesForm({
     accent, initialDraft, restoreOnAccentChange, preserveDraftOnAccentChange,
     saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
-    operations, preview,
+    operations, preview, sourceReady,
   })
   const aliasContent = alias ? <CommunityAliasSection {...alias} /> : aliasSection
   const content = (

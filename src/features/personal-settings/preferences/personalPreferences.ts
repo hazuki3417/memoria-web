@@ -3,7 +3,7 @@
  * Theme is browser/device-local and deliberately excluded.
  * Values match the GraphQL contract in memoria-design.
  */
-export type UserPreferences = {
+export type PersonalPreferencesValues = {
   personalAccentColor: string
   dateFormat: "YYYY_MM_DD" | "MM_DD_YYYY" | "DD_MM_YYYY"
   fileSizeUnit: "DECIMAL" | "BINARY"
@@ -13,9 +13,9 @@ export type UserPreferences = {
   mediaDetailInitialInfoMedium: boolean
 }
 
-export type UserPreferencesPatch = Partial<UserPreferences>
+export type PersonalPreferencesPatch = Partial<PersonalPreferencesValues>
 
-export const defaultUserPreferences: Readonly<UserPreferences> = {
+export const defaultPersonalPreferences: Readonly<PersonalPreferencesValues> = {
   personalAccentColor: "#10B981",
   dateFormat: "YYYY_MM_DD",
   fileSizeUnit: "DECIMAL",

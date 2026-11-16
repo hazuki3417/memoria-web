@@ -21,6 +21,7 @@ export const useCommunityPreferencesForm = ({
   setAccent,
   operations,
   preview,
+  sourceReady = true,
 }: {
   accent: string
   initialDraft?: string
@@ -32,13 +33,15 @@ export const useCommunityPreferencesForm = ({
   setAccent?: Dispatch<SetStateAction<string>>
   operations?: CommunityPreferencesSaveOperations
   preview?: CommunityPreferencesAccentPreview
+  sourceReady?: boolean
 }) => {
-  const autoSave = useCommunityPreferencesAutoSave(sourceAccent, operations, preview)
+  const autoSave = useCommunityPreferencesAutoSave(sourceAccent, operations, preview, sourceReady)
   const { snapshot } = autoSave
   const accent = operations ? snapshot.confirmed?.accentColor ?? sourceAccent : sourceAccent
   const initialDraft = operations ? snapshot.draft?.accentColor ?? accent : sourceDraft
   const preserveDraftOnAccentChange = operations ? snapshot.failure !== null : preserveDraft
-  const saveStatus = operations ? (snapshot.failure ? "attention" : snapshot.status) : suppliedSaveStatus
+  let saveStatus = suppliedSaveStatus
+  if (operations) saveStatus = snapshot.failure ? "attention" : snapshot.status
   const { control, getValues, reset } = useForm<
     z.input<typeof communityPreferencesSchema>
   >({

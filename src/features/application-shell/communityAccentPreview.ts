@@ -5,22 +5,22 @@ export type CommunityAccentPreview = {
 } | null
 
 /** Preview changes only the active Community presentation, never the confirmed value. */
-export function resolveCommunityAccent(
+export const resolveCommunityAccent = (
   communityId: string | null | undefined,
   confirmed: string,
   preview: CommunityAccentPreview,
-): string {
+): string => {
   return preview && preview.communityId === communityId
     ? preview.color
     : confirmed
 }
 
 /** A late response or stale cleanup cannot dismiss another owner's preview. */
-export function releaseCommunityAccentPreview(
+export const releaseCommunityAccentPreview = (
   current: CommunityAccentPreview,
   communityId: string,
   owner: number,
-): CommunityAccentPreview {
+): CommunityAccentPreview => {
   return current?.communityId === communityId && current.owner === owner
     ? null
     : current

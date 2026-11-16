@@ -22,9 +22,8 @@ import {
   useCommunityAccentPreview,
 } from "../CommunityAccentPreviewContext"
 import { resolveCommunityAccent } from "../communityAccentPreview"
-import { PersonalAccentPreviewProvider } from "@/features/personal-settings/preferences/PersonalAccentPreview/PersonalAccentPreviewContext"
-import { usePersonalAccentPreview } from "@/features/personal-settings/preferences/PersonalAccentPreview/PersonalAccentPreviewContext"
-import { resolvePersonalAccent } from "@/features/personal-settings/preferences/PersonalAccentPreview/personalAccentPreview"
+import { PersonalAccentPreviewProvider, usePersonalAccentPreview } from "../PersonalAccentPreviewContext"
+import { resolvePersonalAccent } from "../personalAccentPreview"
 import {
   ApplicationAccountMenu,
   ApplicationContextSwitcher,
@@ -81,7 +80,7 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
     loading: communitiesLoading,
     error: communitiesError,
     refetch: refetchCommunities,
-  } = useMyCommunitiesQuery()
+  } = useMyCommunitiesQuery({ refetchWritePolicy: "merge" })
   const communityRefreshInFlight = useRef(false)
   const refreshCommunities = async () => {
     if (
@@ -99,7 +98,7 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
     }
   }
   const { data: currentUserData, loading: currentUserLoading } =
-    useCurrentUserQuery()
+    useCurrentUserQuery({ refetchWritePolicy: "merge" })
   const [createMutation] = useCreateCommunityMutation()
   const created = sortCommunitiesByDisplayName(
     communityData?.myCommunities.map((item) => ({

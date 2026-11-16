@@ -48,7 +48,7 @@ export function GroupBrowserContainer({
     variables: { communityId: communityId ?? "" },
     skip: contextKind !== "community" || !communityId,
   })
-  const currentUser = useCurrentUserQuery({ skip: contextKind !== "community" })
+  const currentUser = useCurrentUserQuery({ skip: contextKind !== "community", refetchWritePolicy: "merge" })
   const canManage =
     contextKind === "personal" ||
     Boolean(

@@ -5,16 +5,16 @@ import {
   MediaThumbnailSize,
 } from "@/infrastructure/graphql/generated"
 import {
-  fromGraphqlUserPreferences,
-  toGraphqlUserPreferencesPatch,
-} from "./userPreferencesGraphqlAdapter"
-import { defaultUserPreferences } from "./userPreferences"
+  fromGraphqlPersonalPreferences,
+  toGraphqlPersonalPreferencesPatch,
+} from "./personalPreferencesGraphqlAdapter"
+import { defaultPersonalPreferences } from "./personalPreferences"
 
-describe("User Preferences GraphQL adapter", () => {
+describe("Personal PreferencesのGraphQL変換", () => {
   it("converts all account-synchronized preferences from GraphQL", () => {
     expect(
-      fromGraphqlUserPreferences({
-        personalAccentColor: "#4287F5",
+      fromGraphqlPersonalPreferences({
+        personalAccentColor: "#4287f5",
         dateFormat: DateFormat.DdMmYyyy,
         fileSizeUnit: FileSizeUnit.Binary,
         mediaThumbnailSize: MediaThumbnailSize.Large,
@@ -23,7 +23,7 @@ describe("User Preferences GraphQL adapter", () => {
         mediaDetailInitialInfoMedium: true,
       }),
     ).toEqual({
-      ...defaultUserPreferences,
+      ...defaultPersonalPreferences,
       personalAccentColor: "#4287F5",
       dateFormat: "DD_MM_YYYY",
       fileSizeUnit: "BINARY",
@@ -36,7 +36,7 @@ describe("User Preferences GraphQL adapter", () => {
 
   it("converts changed enum values and preserves scalar changes", () => {
     expect(
-      toGraphqlUserPreferencesPatch({
+      toGraphqlPersonalPreferencesPatch({
         personalAccentColor: "#4287F5",
         dateFormat: "MM_DD_YYYY",
         fileSizeUnit: "BINARY",
@@ -53,7 +53,7 @@ describe("User Preferences GraphQL adapter", () => {
   })
 
   it("does not introduce unrelated edits into a partial update", () => {
-    const patch = toGraphqlUserPreferencesPatch({
+    const patch = toGraphqlPersonalPreferencesPatch({
       personalAccentColor: "#123456",
     })
     expect(patch.personalAccentColor).toBe("#123456")
@@ -66,17 +66,17 @@ describe("User Preferences GraphQL adapter", () => {
   it("supports every enum option", () => {
     for (const value of ["YYYY_MM_DD", "MM_DD_YYYY", "DD_MM_YYYY"] as const) {
       expect(
-        toGraphqlUserPreferencesPatch({ dateFormat: value }).dateFormat,
+        toGraphqlPersonalPreferencesPatch({ dateFormat: value }).dateFormat,
       ).toBe(value)
     }
     for (const value of ["DECIMAL", "BINARY"] as const) {
       expect(
-        toGraphqlUserPreferencesPatch({ fileSizeUnit: value }).fileSizeUnit,
+        toGraphqlPersonalPreferencesPatch({ fileSizeUnit: value }).fileSizeUnit,
       ).toBe(value)
     }
     for (const value of ["SMALL", "MEDIUM", "LARGE"] as const) {
       expect(
-        toGraphqlUserPreferencesPatch({ mediaThumbnailSize: value })
+        toGraphqlPersonalPreferencesPatch({ mediaThumbnailSize: value })
           .mediaThumbnailSize,
       ).toBe(value)
     }

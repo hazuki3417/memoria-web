@@ -1,8 +1,10 @@
 "use client"
 
 import { useApolloClient } from "@apollo/client"
+import { settingsInspectionContext } from "@/infrastructure/graphql/settingsCacheReadProtection"
 import {
   CommunityMySettingsDocument,
+  MyCommunitiesDocument,
   useUpdateCommunitySettingsMutation,
 } from "@/infrastructure/graphql/generated"
 import {
@@ -17,7 +19,7 @@ import type {
   CommunityAliasSaveRejection,
   SaveCommunityAlias,
 } from "./communityAliasSaveOutcome"
-import { commitCommunitySettingsPatch } from "../communitySettingsCache"
+import { commitCommunitySettingsPatch } from "../communityPreferencesCache"
 
 /** Community ID固定のAlias保存と、Cacheに影響しない結果不明時の照会を提供する。 */
 export const useCommunityAliasSave = (communityId: string) => {
@@ -51,9 +53,30 @@ export const useCommunityAliasSave = (communityId: string) => {
     return { kind: "unknown" }
   }
 
+  const confirmAlias = (alias: string | null) => {
+    try {
+      if (commitCommunitySettingsPatch(client.cache, communityId, { alias })) return
+    } catch {
+      // 保存OutcomeとCache同期失敗を区別する。
+    }
+    try {
+      void client.refetchQueries({
+        include: [CommunityMySettingsDocument, MyCommunitiesDocument],
+        onQueryUpdated: (query) => {
+          const targetId = query.variables?.communityId
+          return targetId === undefined || targetId === communityId
+            ? query.refetch()
+            : false
+        },
+      }).catch(() => undefined)
+    } catch {
+      // 保存Outcomeと取得同期は独立している。
+    }
+  }
+
   const afterSuccess = (alias: string | null) => {
     // 確定したAliasフィールドのみを更新し、並行保存のAccentを上書きしない。
-    commitCommunitySettingsPatch(client.cache, communityId, { alias })
+    confirmAlias(alias)
   }
 
   const saveAlias: SaveCommunityAlias = createActionAdapter({
@@ -68,11 +91,13 @@ export const useCommunityAliasSave = (communityId: string) => {
       query: CommunityMySettingsDocument,
       variables: { communityId },
       fetchPolicy: "no-cache",
+      context: settingsInspectionContext,
     })
-    if (!current.data?.community) throw new Error("Community unavailable")
-    return current.data.community.mySettings.alias
+    const community = current.data?.community
+    if (community?.id !== communityId) throw new Error("Community unavailable")
+    return community.mySettings.alias
   }
 
   /** Alias保存の確定Outcomeと、Unknown時だけ利用する現在値照会を提供する。 */
-  return { inspectAlias, saveAlias }
+  return { inspectAlias, saveAlias, confirmAlias }
 }

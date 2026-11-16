@@ -1,15 +1,17 @@
-import { InMemoryCache } from "@apollo/client"
+import { createApolloCache } from "@/infrastructure/graphql/createApolloCache"
 import { describe, expect, it } from "vitest"
 import {
   CommunityMySettingsDocument,
+  CommunitySettingsMembershipDocument,
+  CommunitySettingsCacheFragmentDoc,
   MyCommunitiesDocument,
   type OperationCommunityMySettingsQuery,
   type OperationMyCommunitiesQuery,
 } from "@/infrastructure/graphql/generated"
-import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { commitCommunitySettingsPatch } from "./communityPreferencesCache"
 
 function createCache() {
-  const cache = new InMemoryCache()
+  const cache = createApolloCache()
   cache.writeQuery({
     query: MyCommunitiesDocument,
     data: {
@@ -179,5 +181,28 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
       accentColor: "#112233",
       alias: "New alias",
     })
+  })
+
+  it("部分取得によるAliasの欠落を防ぎ、未取得Fieldも確定Patchで補える", () => {
+    const cache = createCache()
+    cache.writeQuery({
+      query: CommunitySettingsMembershipDocument,
+      data: { myCommunities: [{ __typename: "Community", id: "community-1",
+        mySettings: { __typename: "CommunitySettings", accentColor: "#334455" } }] },
+    })
+    expect(cache.readQuery<OperationCommunityMySettingsQuery>({ query: CommunityMySettingsDocument, variables: { communityId: "community-1" } })?.community?.mySettings)
+      .toMatchObject({ accentColor: "#334455", alias: "My community" })
+    const partial = createApolloCache()
+    partial.writeQuery({
+      query: CommunitySettingsMembershipDocument,
+      data: { myCommunities: [{ __typename: "Community", id: "community-1",
+        mySettings: { __typename: "CommunitySettings", accentColor: "#334455" } }] },
+    })
+    expect(commitCommunitySettingsPatch(partial, "community-1", { alias: null })).toBe(true)
+    expect(partial.readFragment({ id: "Community:community-1", fragment: CommunitySettingsCacheFragmentDoc }))
+      .toMatchObject({ mySettings: { accentColor: "#334455", alias: null } })
+    const before = partial.extract()
+    expect(commitCommunitySettingsPatch(partial, "missing", { accentColor: "#AABBCC" })).toBe(false)
+    expect(partial.extract()).toEqual(before)
   })
 })

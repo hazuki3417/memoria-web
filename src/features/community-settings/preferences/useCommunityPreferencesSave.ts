@@ -2,9 +2,12 @@
 
 import { useMemo } from "react"
 import { useApolloClient } from "@apollo/client"
+import { settingsInspectionContext } from "@/infrastructure/graphql/settingsCacheReadProtection"
 import {
   CommunityMySettingsDocument,
+  MyCommunitiesDocument,
   UpdateCommunitySettingsDocument,
+  type OperationCommunityMySettingsQuery,
   type OperationUpdateCommunitySettingsMutation,
   type OperationUpdateCommunitySettingsMutationVariables,
 } from "@/infrastructure/graphql/generated"
@@ -14,7 +17,7 @@ import {
   getSettingsInputViolations,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { createActionAdapter } from "@/ui/Action"
-import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { commitCommunitySettingsPatch } from "./communityPreferencesCache"
 import { fromGraphqlCommunityPreferences, toGraphqlCommunityPreferencesPatch } from "./communityPreferencesGraphqlAdapter"
 import { isCommunityAccentColor, type CommunityPreferencesPatch, type CommunityPreferencesValues } from "./communityPreferences"
 import { classifyCommunityPreferencesMutationResult } from "./classifyCommunityPreferencesMutationResult"
@@ -57,9 +60,22 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
 
     const confirm = (patch: CommunityPreferencesPatch) => {
       try {
-        commitCommunitySettingsPatch(client.cache, communityId, patch)
+        if (commitCommunitySettingsPatch(client.cache, communityId, patch)) return
       } catch {
-        void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
+        // Cache同期失敗は保存Outcomeとは別に扱う。
+      }
+      try {
+        void client.refetchQueries({
+          include: [CommunityMySettingsDocument, MyCommunitiesDocument],
+          onQueryUpdated: (query) => {
+            const targetId = query.variables?.communityId
+            return targetId === undefined || targetId === communityId
+              ? query.refetch()
+              : false
+          },
+        }).catch(() => undefined)
+      } catch {
+        // 保存Outcomeと取得同期は独立している。
       }
     }
 
@@ -80,12 +96,29 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
         query: CommunityMySettingsDocument,
         variables: { communityId },
         fetchPolicy: "no-cache",
+        context: settingsInspectionContext,
       })
-      const settings = result.data?.community?.mySettings
-      if (!settings?.accentColor || !isCommunityAccentColor(settings.accentColor)) throw new Error("Community accent unavailable")
+      const community = result.data?.community
+      const settings = community?.mySettings
+      if (community?.id !== communityId || !settings?.accentColor || !isCommunityAccentColor(settings.accentColor)) {
+        throw new Error("Community accent unavailable")
+      }
       return fromGraphqlCommunityPreferences(settings)
     }
 
-    return { save, observe, confirm }
+    const isAccentConfirmed = (color: string) => {
+      try {
+        const current = client.cache.readQuery<OperationCommunityMySettingsQuery>({
+          query: CommunityMySettingsDocument,
+          variables: { communityId },
+          returnPartialData: true,
+        })?.community
+        return current?.id === communityId && current?.mySettings?.accentColor.toUpperCase() === color.toUpperCase()
+      } catch {
+        return false
+      }
+    }
+
+    return { save, observe, confirm, isAccentConfirmed }
   }, [client, communityId])
 }

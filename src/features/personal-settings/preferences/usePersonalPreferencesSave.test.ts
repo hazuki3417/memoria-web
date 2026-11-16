@@ -1,16 +1,18 @@
 import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { defaultUserPreferences } from "./userPreferences"
+import { defaultPersonalPreferences } from "./personalPreferences"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
 
 const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
   refetchQueries: vi.fn(),
+  patch: vi.fn(),
+  query: vi.fn(),
 }))
 
 vi.mock("@apollo/client", () => ({
-  useApolloClient: () => ({ mutate: mocks.mutate, refetchQueries: mocks.refetchQueries }),
+  useApolloClient: () => ({ mutate: mocks.mutate, query: mocks.query, cache: {}, refetchQueries: mocks.refetchQueries }),
 }))
 vi.mock("@/infrastructure/graphql/generated", () => ({
   CurrentUserDocument: "currentUser",
@@ -22,6 +24,8 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   MediaThumbnailSize: { Small: "SMALL", Medium: "MEDIUM", Large: "LARGE" },
 }))
 
+vi.mock("./personalPreferencesCache", () => ({ commitPersonalPreferencesPatch: mocks.patch }))
+
 type Save = ReturnType<typeof usePersonalPreferencesSave>
 let root: Root
 let host: HTMLDivElement
@@ -30,12 +34,13 @@ let save!: Save
 beforeEach(async () => {
   vi.resetAllMocks()
   mocks.refetchQueries.mockResolvedValue([])
+  mocks.patch.mockReturnValue(true)
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
   await act(async () => {
     root.render(createElement(() => {
-      save = usePersonalPreferencesSave()
+      save = usePersonalPreferencesSave("user-1")
       return null
     }))
   })
@@ -47,7 +52,7 @@ afterEach(async () => {
 
 describe("Personal PreferencesのAction Adapter", () => {
   const patch = { fileSizeUnit: "BINARY" as const }
-  const confirmed = { ...defaultUserPreferences, fileSizeUnit: "BINARY" as const }
+  const confirmed = { ...defaultPersonalPreferences, fileSizeUnit: "BINARY" as const }
   const success = {
     data: {
       updateUserPreferences: { __typename: "UpdateUserPreferencesSuccess", preferences: confirmed },
@@ -56,16 +61,19 @@ describe("Personal PreferencesのAction Adapter", () => {
 
   it("Typed Successを返し、Refetchの失敗と区別する", async () => {
     mocks.mutate.mockResolvedValue(success)
+    mocks.patch.mockReturnValueOnce(false)
     mocks.refetchQueries.mockRejectedValue(new Error("refetch failed"))
-    await expect(save.savePreferencesAction(patch)).resolves.toEqual({
+    await expect(save.save(patch)).resolves.toEqual({
       kind: "success", value: confirmed,
     })
     expect(mocks.mutate).toHaveBeenCalledWith({
       mutation: "savePreferences",
       variables: { input: expect.objectContaining(patch) },
+      fetchPolicy: "no-cache",
       errorPolicy: "all",
     })
     // 後続処理はMutationの成立を変更しない。
+    expect(mocks.patch).toHaveBeenCalledWith(expect.anything(), "user-1", patch)
     expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
   })
 
@@ -77,7 +85,7 @@ describe("Personal PreferencesのAction Adapter", () => {
     mocks.mutate.mockResolvedValue({
       data: { updateUserPreferences: { __typename: "InputValidationFailure", violations } },
     })
-    await expect(save.savePreferencesAction(patch)).resolves.toMatchObject({
+    await expect(save.save(patch)).resolves.toMatchObject({
       kind: "rejected",
       reason: { kind: "validation", violations },
     })
@@ -86,8 +94,8 @@ describe("Personal PreferencesのAction Adapter", () => {
   it("Mutationの結果欠落と通信例外はUnknownとして返す", async () => {
     mocks.mutate.mockResolvedValueOnce({ data: null })
     mocks.mutate.mockRejectedValueOnce(new Error("network"))
-    await expect(save.savePreferencesAction(patch)).resolves.toEqual({ kind: "unknown" })
-    await expect(save.savePreferencesAction(patch)).resolves.toEqual({ kind: "unknown" })
+    await expect(save.save(patch)).resolves.toEqual({ kind: "unknown" })
+    await expect(save.save(patch)).resolves.toEqual({ kind: "unknown" })
     expect(mocks.refetchQueries).not.toHaveBeenCalled()
   })
 
@@ -95,7 +103,7 @@ describe("Personal PreferencesのAction Adapter", () => {
     mocks.mutate.mockResolvedValue({
       errors: [{ extensions: { code: "FORBIDDEN" } }],
     })
-    await expect(save.savePreferencesAction(patch)).resolves.toMatchObject({
+    await expect(save.save(patch)).resolves.toMatchObject({
       kind: "rejected", reason: { kind: "blocked" },
     })
   })
@@ -104,7 +112,7 @@ describe("Personal PreferencesのAction Adapter", () => {
     mocks.mutate.mockResolvedValue({
       ...success, errors: [{ extensions: { code: "INTERNAL" } }],
     })
-    await expect(save.savePreferencesAction(patch)).resolves.toMatchObject({
+    await expect(save.save(patch)).resolves.toMatchObject({
       kind: "success", value: confirmed,
     })
   })

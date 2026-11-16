@@ -9,6 +9,7 @@ import { CommunityPreferences } from "../preferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
 import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
+import { useOptionalCommunityAccentPreview } from "@/features/application-shell"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
@@ -39,18 +40,22 @@ export type CommunitySettingsRouteProps = {
 }
 
 /** Selects one Section controller and keeps Settings navigation/accent wiring. */
-export function CommunitySettingsRoute({
+export const CommunitySettingsRoute = ({
   communityId,
   section = "general",
-}: CommunitySettingsRouteProps) {
+}: CommunitySettingsRouteProps) => {
   const router = useRouter()
   // The enclosing CommunityAccessBoundary owns access verification.
   // Settings reads its own accent; myCommunities remains Switcher-only.
   const { data: settingsData } = useCommunityMySettingsQuery({
     variables: { communityId },
     fetchPolicy: "cache-first",
+    refetchWritePolicy: "merge",
   })
-  const communityAccentColor = settingsData?.community?.mySettings.accentColor
+  const preview = useOptionalCommunityAccentPreview()
+  const community = settingsData?.community
+  const confirmedAccent = community?.id === communityId ? community.mySettings.accentColor : undefined
+  const communityAccentColor = preview?.previews[communityId]?.color ?? confirmedAccent
 
   let controller: (render: SettingsSectionRender) => ReactNode
 

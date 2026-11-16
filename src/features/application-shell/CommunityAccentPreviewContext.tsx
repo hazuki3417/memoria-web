@@ -28,11 +28,11 @@ const CommunityAccentPreviewContext =
  * confirmed server cache. It survives route changes only while its owner
  * is mounted, and can never leak across Community IDs.
  */
-export function CommunityAccentPreviewProvider({
+export const CommunityAccentPreviewProvider = ({
   children,
 }: {
   children: ReactNode
-}) {
+}) => {
   const [previews, setCurrentPreviews] = useState<
     Record<string, NonNullable<CommunityAccentPreview>>
   >({})
@@ -73,8 +73,11 @@ export function CommunityAccentPreviewProvider({
   )
 }
 
-export function useCommunityAccentPreview() {
-  const context = useContext(CommunityAccentPreviewContext)
+/** Storyや独立したNavigationではPreview Providerが存在しない場合がある。 */
+export const useOptionalCommunityAccentPreview = () => useContext(CommunityAccentPreviewContext)
+
+export const useCommunityAccentPreview = () => {
+  const context = useOptionalCommunityAccentPreview()
   if (!context) {
     throw new Error("CommunityAccentPreviewProvider is required")
   }

@@ -2,12 +2,12 @@
 
 import { useMantineColorScheme } from "@mantine/core"
 import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
-import type { UserPreferences } from "../userPreferences"
+import type { PersonalPreferencesValues } from "../personalPreferences"
 
 type PreferencesForm = ReturnType<typeof usePersonalPreferencesForm>
 
 /** 表示Section固有のTheme操作と、共有Formから必要な設定操作を組み立てる。 */
-export function usePersonalPreferencesDisplaySection(model: PreferencesForm) {
+export const usePersonalPreferencesDisplaySection = (model: PreferencesForm) => {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
   const {
     preferences, accentDraft, accentOnBlur, accentDraftError,
@@ -17,13 +17,13 @@ export function usePersonalPreferencesDisplaySection(model: PreferencesForm) {
     if (value) setColorScheme(value as "auto" | "light" | "dark")
   }
   const changeDateFormat = (value: string | null) => {
-    if (value) change("dateFormat", value as UserPreferences["dateFormat"])
+    if (value) change("dateFormat", value as PersonalPreferencesValues["dateFormat"])
   }
   const changeFileSizeUnit = (value: string | null) => {
-    if (value) change("fileSizeUnit", value as UserPreferences["fileSizeUnit"])
+    if (value) change("fileSizeUnit", value as PersonalPreferencesValues["fileSizeUnit"])
   }
   const changeThumbnailSize = (value: string | null) => {
-    if (value) change("mediaThumbnailSize", value as UserPreferences["mediaThumbnailSize"])
+    if (value) change("mediaThumbnailSize", value as PersonalPreferencesValues["mediaThumbnailSize"])
   }
   return {
     colorScheme, changeTheme, changeDateFormat, changeFileSizeUnit, changeThumbnailSize,

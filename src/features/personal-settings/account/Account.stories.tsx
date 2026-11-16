@@ -4,8 +4,9 @@ import { expect, within } from "storybook/test"
 import { Account as AccountComponent } from "./Account"
 
 const meta = {
-  // Preserve the existing Storybook IDs during this structural refactor.
-  title: "features/settings/account/SettingsAccount",
+  // 既存Story IDを維持したままFeature分類を揃える。
+  id: "features-settings-account-settingsaccount",
+  title: "features/personal-settings/account/Account",
   component: AccountComponent,
   decorators: [
     (Story) => (

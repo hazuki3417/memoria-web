@@ -13,19 +13,23 @@ export const CommunityPreferencesSaveFeedback = ({
   const { snapshot, canResave, inspect, confirmObservation, retry, discard } = model
   const failure = snapshot.failure
   if (!failure) return null
+  let title = "保存できませんでした"
+  let description = " 内容を確認して、再保存するか変更を破棄してください。"
+  if (failure === "unknown") {
+    title = "保存結果を確認できませんでした"
+    description = " 現在の設定を確認してから、必要なら保存してください。"
+  } else if (failure === "blocked") {
+    title = snapshot.blockedFeedback?.title ?? "Community設定を変更できません"
+    description = ` ${snapshot.blockedFeedback?.description ?? "ログイン状態や権限を確認し、画面を再読み込みしてください。"}`
+  } else if (snapshot.validation) {
+    title = "入力内容を確認してください"
+    description = " 入力項目を修正したうえで再保存するか、変更を破棄してください。"
+  }
   return (
     <FeedbackPanel
       kind={failure === "unknown" ? "warning" : "error"}
       role="alert"
-      title={
-        failure === "unknown"
-          ? "保存結果を確認できませんでした"
-          : failure === "blocked"
-            ? snapshot.blockedFeedback?.title ?? "Community設定を変更できません"
-            : snapshot.validation
-              ? "入力内容を確認してください"
-              : "保存できませんでした"
-      }
+      title={title}
       actions={
         failure === "blocked" ? undefined : (
           <>
@@ -73,13 +77,7 @@ export const CommunityPreferencesSaveFeedback = ({
       <Stack gap="xs">
         <Text size="sm">
           選択した色は保存が確定していなくても表示を維持しています。入力した色は保持しています。
-          {failure === "unknown"
-            ? " 現在の設定を確認してから、必要なら保存してください。"
-            : failure === "blocked"
-              ? ` ${snapshot.blockedFeedback?.description ?? "ログイン状態や権限を確認し、画面を再読み込みしてください。"}`
-              : snapshot.validation
-                ? " 入力項目を修正したうえで再保存するか、変更を破棄してください。"
-                : " 内容を確認して、再保存するか変更を破棄してください。"}
+          {description}
         </Text>
         {failure === "unknown" && snapshot.inspected && (
           <Text size="sm">

@@ -44,7 +44,10 @@ type Lifetime = {
   revision: number
   inspectionGeneration: number
   closed: boolean
-  running: boolean
+  runningColor: string | null
+  sourceAccent: string | null
+  sourceReady: boolean
+  previewColor: string | null
 }
 
 const initialSnapshot: Snapshot = {
@@ -64,7 +67,14 @@ const releasePreview = (owner: Lifetime) => {
   if (owner.previewOwner !== null) {
     owner.preview?.release(owner.previewOwner)
     owner.previewOwner = null
+    owner.previewColor = null
   }
+}
+
+const showPreview = (owner: Lifetime, color: string) => {
+  if (!owner.preview || owner.previewColor === color) return
+  owner.previewOwner = owner.preview.preview(color)
+  owner.previewColor = color
 }
 
 /** Ready ViewのFormが利用する短命な自動保存状態・Queue・明示Recoveryを所有する。 */
@@ -72,6 +82,7 @@ export const useCommunityPreferencesAutoSave = (
   initialAccent: string,
   operations?: CommunityPreferencesSaveOperations,
   preview?: CommunityPreferencesAccentPreview,
+  sourceReady = true,
 ) => {
   const [snapshot, setSnapshot] = useState<Snapshot>(initialSnapshot)
   const ownerRef = useRef<Lifetime | null>(null)
@@ -95,7 +106,10 @@ export const useCommunityPreferencesAutoSave = (
       revision: 0,
       inspectionGeneration: 0,
       closed: false,
-      running: false,
+      runningColor: null,
+      sourceAccent: null,
+      sourceReady: false,
+      previewColor: null,
     }
     ownerRef.current = owner
     setSnapshot(initialSnapshot)
@@ -111,12 +125,25 @@ export const useCommunityPreferencesAutoSave = (
 
   useEffect(() => {
     const owner = ownerRef.current
-    if (!owner || !isCommunityAccentColor(initialAccent) ||
-        owner.snapshot.confirmed !== null || owner.snapshot.draft !== null) return
-    const values = { accentColor: normalize(initialAccent) }
-    owner.snapshot = { ...owner.snapshot, confirmed: values, draft: values }
-    setSnapshot(owner.snapshot)
-  }, [initialAccent, operations, preview])
+    if (!owner || !isCommunityAccentColor(initialAccent)) return
+    const color = normalize(initialAccent)
+    const { confirmed, draft, failure, status } = owner.snapshot
+    const sourceChanged = owner.sourceAccent !== color || (sourceReady && !owner.sourceReady)
+    owner.sourceAccent = color
+    owner.sourceReady = sourceReady
+    if (failure || owner.runningColor !== null || status === "pending" || status === "saving") return
+    // 同じ取得snapshotの再Renderでは、直前の確定値を巻き戻さない。
+    // 通常Queryの応答順序はApolloが調停する。変化した正常な取得値を拒否し続けない。
+    if (!sourceChanged) {
+      if (confirmed?.accentColor === color && owner.operations.isAccentConfirmed?.(color)) releasePreview(owner)
+      return
+    }
+    if (!owner.operations.isAccentConfirmed || owner.operations.isAccentConfirmed(color)) releasePreview(owner)
+    const values = { accentColor: color }
+    const nextDraft = draft && !isCommunityAccentColor(draft.accentColor) ? draft : values
+    if (confirmed?.accentColor === color && draft === nextDraft) return
+    emit(owner, { confirmed: values, draft: nextDraft })
+  }, [initialAccent, operations, preview, snapshot, sourceReady])
 
   const makeQueue = (owner: Lifetime, delayMs = 400): AutoSaveQueue<Attempt> => {
     const shouldExecute = (attempt: Attempt) =>
@@ -125,7 +152,7 @@ export const useCommunityPreferencesAutoSave = (
       normalize(owner.snapshot.draft.accentColor) === attempt.patch.accentColor
 
     const execute = async (attempt: Attempt): Promise<CommunityPreferencesSaveOutcome> => {
-      owner.running = true
+      owner.runningColor = attempt.patch.accentColor
       if (!owner.closed) emit(owner, { status: "saving" })
       try {
         const outcome = await owner.operations.save(attempt.patch)
@@ -136,7 +163,7 @@ export const useCommunityPreferencesAutoSave = (
       } catch {
         return { kind: "unknown" }
       } finally {
-        owner.running = false
+        owner.runningColor = null
       }
     }
 
@@ -149,18 +176,31 @@ export const useCommunityPreferencesAutoSave = (
         if (outcome.kind === "success") {
           const color = outcome.value.accentColor
           const pendingDraft = owner.snapshot.draft
-          const latest = attempted.revision === owner.revision
-          if (latest) releasePreview(owner)
+          const hasPending = Boolean(unsent && shouldExecute(unsent))
+          // 実際に送信する後続変更がある場合だけPendingを維持する。
+          // 未完成HEXはRHFのDraftとして残すが、保存予定とは区別する。
+          if (!hasPending) {
+            if (!owner.operations.isAccentConfirmed || owner.operations.isAccentConfirmed(color)) releasePreview(owner)
+            else if (owner.previewOwner !== null) showPreview(owner, color)
+          }
+          const draft = hasPending || (pendingDraft && !isCommunityAccentColor(pendingDraft.accentColor))
+            ? pendingDraft : { accentColor: color }
           emit(owner, {
             confirmed: { accentColor: color },
-            status: !latest || unsent || (pendingDraft && normalize(pendingDraft.accentColor) !== color)
-              ? "pending" : "saved",
+            draft,
+            status: hasPending ? "pending" : "saved",
             validation: null,
           })
           return
         }
         const reason = outcome.kind === "rejected" ? outcome.reason : null
-        const failure: Failure = !reason ? "unknown" : reason.kind === "blocked" ? "blocked" : "rejected"
+        let failure: Failure = "rejected"
+        if (!reason) failure = "unknown"
+        else if (reason.kind === "blocked") failure = "blocked"
+        // 後続の未完成HEXで送信済み色の即時反映を消さない。
+        if (owner.snapshot.draft && !isCommunityAccentColor(owner.snapshot.draft.accentColor)) {
+          showPreview(owner, attempted.patch.accentColor)
+        }
         emit(owner, {
           status: "attention",
           failure,
@@ -188,23 +228,30 @@ export const useCommunityPreferencesAutoSave = (
     owner.inspectionGeneration += 1
     emit(owner, { draft, validation: null, observedMatches: false, inspected: false })
     if (!isCommunityAccentColor(value)) {
-      releasePreview(owner)
-      emit(owner, { status: owner.snapshot.failure ? "attention" : owner.running ? "saving" : "pending" })
+      let status: SaveStatusState = "idle"
+      if (owner.snapshot.failure) status = "attention"
+      else if (owner.runningColor !== null) {
+        status = "saving"
+        showPreview(owner, owner.runningColor)
+      } else releasePreview(owner)
+      emit(owner, { status })
       return
     }
+    const color = normalize(value)
     if (owner.snapshot.failure) {
+      // Blockedは操作停止。それ以外の有効な新規入力は表示だけ即時反映する。
+      if (owner.snapshot.failure !== "blocked") showPreview(owner, color)
       // 停止したQueueの自動再送は行わない。
       emit(owner, { status: "attention" })
       return
     }
-    const color = normalize(value)
-    if (color === owner.snapshot.confirmed?.accentColor && !owner.running) {
+    if (color === owner.snapshot.confirmed?.accentColor && owner.runningColor === null) {
       releasePreview(owner)
       emit(owner, { status: "idle" })
       return
     }
-    if (owner.preview) owner.previewOwner = owner.preview.preview(color)
-    emit(owner, { status: owner.running ? "saving" : "pending" })
+    showPreview(owner, color)
+    emit(owner, { status: owner.runningColor !== null ? "saving" : "pending" })
     enqueue(owner, { accentColor: color })
   }
 
@@ -237,7 +284,7 @@ export const useCommunityPreferencesAutoSave = (
         !isCommunityAccentColor(owner.snapshot.draft.accentColor)) return
     const color = normalize(owner.snapshot.draft.accentColor)
     owner.operations.confirm({ accentColor: color })
-    releasePreview(owner)
+    if (!owner.operations.isAccentConfirmed || owner.operations.isAccentConfirmed(color)) releasePreview(owner)
     emit(owner, {
       confirmed: { accentColor: color }, status: "idle", failure: null,
       blockedFeedback: null, validation: null, inspected: false, observedMatches: false,
@@ -257,13 +304,13 @@ export const useCommunityPreferencesAutoSave = (
       failure: null, blockedFeedback: null, validation: null,
       inspected: false, observedMatches: false, status: "pending",
     })
-    if (owner.preview) owner.previewOwner = owner.preview.preview(color)
+    showPreview(owner, color)
     enqueue(owner, { accentColor: color }, 0)
   }
 
   const discard = () => {
     const owner = ownerRef.current
-    if (!owner || owner.closed || owner.running) return
+    if (!owner || owner.closed || owner.runningColor !== null || !owner.snapshot.failure) return
     owner.revision += 1
     owner.inspectionGeneration += 1
     releasePreview(owner)

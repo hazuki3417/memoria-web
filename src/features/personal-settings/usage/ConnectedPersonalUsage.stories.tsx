@@ -35,7 +35,8 @@ const personalEmpty = personalSuccessFor("DECIMAL", emptyGraphqlUsageFixture)
 const personalLoading = { ...personalDecimal, delay: 15_000 }
 
 const meta = {
-  title: "features/settings/usage/ConnectedPersonalUsage",
+  id: "features-settings-usage-connectedpersonalusage",
+  title: "features/personal-settings/usage/ConnectedPersonalUsage",
   component: ConnectedPersonalUsageStory,
 } satisfies Meta<typeof ConnectedPersonalUsageStory>
 export default meta

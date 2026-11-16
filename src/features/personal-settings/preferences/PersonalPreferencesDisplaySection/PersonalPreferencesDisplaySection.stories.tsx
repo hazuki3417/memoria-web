@@ -3,17 +3,18 @@
 import { Box } from "@mantine/core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
-import { defaultUserPreferences } from "../userPreferences"
+import { defaultPersonalPreferences } from "../personalPreferences"
 import { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
 import { PersonalPreferencesDisplaySection } from "./PersonalPreferencesDisplaySection"
 
 const Fixture = ({ compact = false }: { compact?: boolean }) => {
-  const model = usePersonalPreferencesForm(defaultUserPreferences)
+  const model = usePersonalPreferencesForm(defaultPersonalPreferences)
   return <PersonalPreferencesDisplaySection compact={compact} model={model} />
 }
 
 const meta = {
-  title: "features/settings/preferences/PersonalPreferencesDisplaySection",
+  id: "features-settings-preferences-personalpreferencesdisplaysection",
+  title: "features/personal-settings/preferences/PersonalPreferencesDisplaySection",
   component: Fixture,
   args: { compact: false },
   decorators: [(Story) => <Box maw={760} p="md"><Story /></Box>],

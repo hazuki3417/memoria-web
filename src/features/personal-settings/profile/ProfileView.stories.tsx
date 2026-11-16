@@ -26,8 +26,9 @@ const retryable = (): ProfileOutcome => ({
 })
 
 const meta = {
-  // Keep the existing Story IDs until a separately agreed catalog migration.
-  title: "features/settings/profile/ProfileView",
+  // 既存Story IDを維持したままFeature分類を揃える。
+  id: "features-settings-profile-profileview",
+  title: "features/personal-settings/profile/ProfileView",
   component: ProfileView,
   args: {
     initialNickname: "テストユーザー",

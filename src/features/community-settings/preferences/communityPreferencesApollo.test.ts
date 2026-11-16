@@ -1,17 +1,24 @@
 import {
   ApolloClient,
+  ApolloProvider,
   ApolloLink,
   InMemoryCache,
   Observable,
 } from "@apollo/client"
 import { GraphQLError } from "graphql"
+import { act, createElement } from "react"
+import { createRoot } from "react-dom/client"
+import { createApolloCache } from "@/infrastructure/graphql/createApolloCache"
+import { createSettingsCacheReadProtectionLink } from "@/infrastructure/graphql/settingsCacheReadProtection"
+import { useCommunityPreferencesSave } from "./useCommunityPreferencesSave"
+import { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 import { describe, expect, it } from "vitest"
 import {
   CommunityMySettingsDocument,
   UpdateCommunitySettingsDocument,
   type OperationCommunityMySettingsQuery,
 } from "@/infrastructure/graphql/generated"
-import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { commitCommunitySettingsPatch } from "./communityPreferencesCache"
 import { requireSettingsMutationOutcome, classifySettingsSaveFailure } from "@/infrastructure/graphql/settingsMutationResult"
 
 function settings(accentColor: string, alias: string | null) {
@@ -234,4 +241,75 @@ describe("Community settings Apollo operation isolation", () => {
     })
   })
 
+})
+
+describe("Community Preferencesの本番Save AdapterとApollo Cache", () => {
+  it("Accent・Aliasの並行応答と古いQueryを隔離し、明示照会の採用だけを確定反映する", async () => {
+    const cache = createApolloCache()
+    const community = (accent: string, alias: string | null) => ({
+      community: { __typename: "Community", id: "community-1", mySettings: settings(accent, alias) },
+    })
+    const mutation = (accent: string, alias: string | null) => ({
+      updateCommunitySettings: { __typename: "UpdateCommunitySettingsSuccess", settings: settings(accent, alias) },
+    })
+    const variables = { communityId: "community-1" }
+    cache.writeQuery({ query: CommunityMySettingsDocument, variables, data: community("#112233", "Old alias") })
+    cache.writeQuery({ query: CommunityMySettingsDocument, variables: { communityId: "community-2" },
+      data: { community: { __typename: "Community", id: "community-2", mySettings: settings("#778899", "Other") } } })
+    const pending: Array<{ name: string; finish: (data: Record<string, unknown>) => void }> = []
+    const link = new ApolloLink(operation => new Observable(observer => {
+      pending.push({ name: operation.operationName, finish: data => {
+        observer.next({ data })
+        observer.complete()
+      } })
+    }))
+    const client = new ApolloClient({
+      cache, link: ApolloLink.from([createSettingsCacheReadProtectionLink(cache), link]),
+    })
+    const root = createRoot(document.createElement("div"))
+    let operations!: ReturnType<typeof useCommunityPreferencesSave>
+    let alias!: ReturnType<typeof useCommunityAliasSave>
+    const Harness = () => {
+      operations = useCommunityPreferencesSave("community-1")
+      alias = useCommunityAliasSave("community-1")
+      return null
+    }
+    const read = (communityId = "community-1") => cache.readQuery<OperationCommunityMySettingsQuery>({
+      query: CommunityMySettingsDocument, variables: { communityId },
+    })?.community?.mySettings
+    try {
+      await act(async () => root.render(createElement(ApolloProvider, { client, children: createElement(Harness) })))
+      const old = client.query({ query: CommunityMySettingsDocument, variables, fetchPolicy: "network-only" })
+      const inspection = operations.observe()
+      const accent = operations.save({ accentColor: "#AABBCC" })
+      let aliasSave!: ReturnType<typeof alias.saveAlias>
+      act(() => { aliasSave = alias.saveAlias(null) })
+      expect(pending.map(entry => entry.name)).toEqual([
+        "CommunityMySettings", "CommunityMySettings", "UpdateCommunitySettings", "UpdateCommunitySettings",
+      ])
+      await act(async () => {
+        pending[3].finish(mutation("#112233", null))
+        await expect(aliasSave).resolves.toEqual({ kind: "success", value: null })
+      })
+      pending[2].finish(mutation("#AABBCC", "Old alias"))
+      await expect(accent).resolves.toMatchObject({ kind: "success" })
+      pending[0].finish(community("#112233", "Old alias"))
+      await old
+      expect(read()).toMatchObject({ accentColor: "#AABBCC", alias: null })
+      expect(read("community-2")).toMatchObject({ accentColor: "#778899", alias: "Other" })
+      pending[1].finish(community("#445566", "Observed alias"))
+      await expect(inspection).resolves.toEqual({ accentColor: "#445566" })
+      expect(read()).toMatchObject({ accentColor: "#AABBCC", alias: null })
+      operations.confirm({ accentColor: "#445566" })
+      expect(read()).toMatchObject({ accentColor: "#445566", alias: null })
+      expect(operations.isAccentConfirmed?.("#445566")).toBe(true)
+      const fresh = client.query({ query: CommunityMySettingsDocument, variables, fetchPolicy: "network-only" })
+      pending[4].finish(community("#556677", "Fresh alias"))
+      await fresh
+      expect(read()).toMatchObject({ accentColor: "#556677", alias: "Fresh alias" })
+    } finally {
+      await act(async () => root.unmount())
+      client.stop()
+    }
+  })
 })

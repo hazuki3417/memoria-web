@@ -6,15 +6,15 @@ import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { SettingsInputValidationError, classifySettingsSaveFailure } from "@/infrastructure/graphql/settingsMutationResult"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import { getPersonalPreferencesBlockedFeedback, type PersonalPreferencesBlockedFeedback } from "./personalPreferencesBlockedFeedback"
-import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import type { PersonalPreferencesValues, PersonalPreferencesPatch } from "./personalPreferences"
 import type { PersonalPreferencesSaveRejection, SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
 
 type Failure = "unknown" | "retryable" | "blocked" | "validation" | null
-type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
+type Save = (patch: PersonalPreferencesPatch) => Promise<PersonalPreferencesValues>
 type Rejection = PersonalPreferencesSaveRejection
 type State = {
-  confirmed: UserPreferences
-  draftPatch: UserPreferencesPatch
+  confirmed: PersonalPreferencesValues
+  draftPatch: PersonalPreferencesPatch
   saveStatus: SaveStatusState
   failure: Failure
   blockedFeedback: PersonalPreferencesBlockedFeedback | null
@@ -25,12 +25,14 @@ type State = {
 }
 
 /** 画面のLifetimeだけに属する保存Queue・Draft/Feedback・明示Recoveryを結合する。 */
-export function usePersonalPreferencesAutoSave(
+export const usePersonalPreferencesAutoSave = (
   onSave?: Save,
-  initialPreferences?: UserPreferences,
-  onInspect?: () => Promise<UserPreferences>,
+  initialPreferences?: PersonalPreferencesValues,
+  onInspect?: () => Promise<PersonalPreferencesValues>,
   onSaveAction?: SavePersonalPreferencesAction,
-) {
+  onConfirm?: (patch: PersonalPreferencesPatch) => void,
+  sourceReady = true,
+) => {
   const [state, setState] = useState<State>(() => ({
     confirmed: initialPreferences!,
     draftPatch: {},
@@ -45,16 +47,19 @@ export function usePersonalPreferencesAutoSave(
   const stateRef = useRef(state)
   stateRef.current = state
   const mounted = useRef(true)
+  const lifetimeGeneration = useRef(0)
   const saveRef = useRef(onSave)
   saveRef.current = onSave
   const actionRef = useRef(onSaveAction)
   actionRef.current = onSaveAction
   const inspectRef = useRef(onInspect)
   inspectRef.current = onInspect
-  const pending = useRef<UserPreferencesPatch>({})
-  const queueRef = useRef<AutoSaveQueue<UserPreferencesPatch> | null>(null)
-  const confirmedLocally = useRef(new Set<keyof UserPreferences>())
-  const observed = useRef<UserPreferences | null>(null)
+  const pending = useRef<PersonalPreferencesPatch>({})
+  const queueRef = useRef<AutoSaveQueue<PersonalPreferencesPatch> | null>(null)
+  const activeAttempt = useRef<PersonalPreferencesPatch | null>(null)
+  const previousSource = useRef(initialPreferences)
+  const previousSourceReady = useRef(sourceReady)
+  const observed = useRef<PersonalPreferencesValues | null>(null)
   const inspectionGeneration = useRef(0)
   const accentDraft = useRef<string | null>(null)
 
@@ -65,15 +70,24 @@ export function usePersonalPreferencesAutoSave(
     setState(next)
   }
 
-  const makeQueue = (delayMs = 400): AutoSaveQueue<UserPreferencesPatch> =>
-    createAutoSaveQueue<UserPreferencesPatch, UserPreferences, Rejection>({
+  const makeQueue = (delayMs = 400): AutoSaveQueue<PersonalPreferencesPatch> => {
+    const generation = lifetimeGeneration.current
+    const action = actionRef.current
+    const save = saveRef.current
+    const active = () => mounted.current && lifetimeGeneration.current === generation
+    return createAutoSaveQueue<PersonalPreferencesPatch, PersonalPreferencesValues, Rejection>({
       delayMs,
-      execute: async (patch): Promise<ActionOutcome<UserPreferences, Rejection>> => {
-        emit({ saveStatus: "saving" })
+      shouldExecute: (patch) => Object.values(patch).some(value => value !== undefined),
+      execute: async (queued): Promise<ActionOutcome<PersonalPreferencesValues, Rejection>> => {
+        const patch = Object.fromEntries(Object.entries(queued).filter(([, value]) => value !== undefined)) as PersonalPreferencesPatch
+        if (active()) {
+          activeAttempt.current = patch
+          emit({ saveStatus: "saving" })
+        }
         try {
-          if (actionRef.current) return await actionRef.current(patch)
-          if (!saveRef.current) return { kind: "unknown" }
-          return { kind: "success", value: await saveRef.current(patch) }
+          if (action) return await action(patch)
+          if (!save) return { kind: "unknown" }
+          return { kind: "success", value: await save(patch) }
         } catch (error) {
           if (error instanceof SettingsInputValidationError)
             return { kind: "rejected", reason: { kind: "validation", violations: error.violations } }
@@ -83,30 +97,39 @@ export function usePersonalPreferencesAutoSave(
           return { kind: "unknown" }
         }
       },
-      onResult: ({ attempted, outcome }) => {
-        if (!mounted.current) return
+      onResult: ({ attempted, outcome, unsent }) => {
+        if (!active()) return
+        activeAttempt.current = null
+        // Queueの未送信Patchと送信済みAttemptを分ける。取消用undefinedは保存対象にしない。
+        const nextPending = Object.fromEntries(
+          Object.entries(unsent ?? {}).filter(([, value]) => value !== undefined),
+        ) as PersonalPreferencesPatch
         if (outcome.kind === "success") {
           const confirmed = { ...stateRef.current.confirmed }
-          const nextPending = { ...pending.current }
-          for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
+          for (const key of Object.keys(attempted) as Array<keyof PersonalPreferencesValues>) {
+            if (attempted[key] === undefined) continue
             Object.assign(confirmed, { [key]: outcome.value[key] })
-            confirmedLocally.current.add(key)
-            if (nextPending[key] === attempted[key]) delete nextPending[key]
           }
           pending.current = nextPending
           emit({
             confirmed,
             draftPatch: nextPending,
-            saveStatus: Object.keys(nextPending).length ? "saving" : "saved",
+            saveStatus: Object.keys(nextPending).length ? "pending" : "saved",
             failure: null, validation: null, blockedFeedback: null,
           })
         } else {
+          // 失敗Attemptは後続の有効な変更でのみ上書きする。
+          const failed = Object.fromEntries(
+            Object.entries(attempted).filter(([, value]) => value !== undefined),
+          ) as PersonalPreferencesPatch
+          pending.current = { ...failed, ...nextPending }
           const failure: Failure = outcome.kind === "unknown" ? "unknown" : outcome.reason.kind
           const error = outcome.kind === "rejected" && outcome.reason.kind === "blocked" ? outcome.reason.error : null
           const violations = outcome.kind === "rejected" && outcome.reason.kind === "validation"
             ? outcome.reason.violations : null
           emit({
             failure,
+            draftPatch: pending.current,
             saveStatus: "attention",
             blockedFeedback: failure === "blocked" ? getPersonalPreferencesBlockedFeedback(error) : null,
             validation: violations
@@ -118,8 +141,9 @@ export function usePersonalPreferencesAutoSave(
         }
       },
     })
+  }
 
-  const enqueue = (patch: UserPreferencesPatch) => {
+  const enqueue = (patch: PersonalPreferencesPatch) => {
     if ((!saveRef.current && !actionRef.current) || stateRef.current.failure === "blocked") return
     pending.current = { ...pending.current, ...patch }
     observed.current = null
@@ -141,32 +165,37 @@ export function usePersonalPreferencesAutoSave(
     mounted.current = true
     return () => {
       mounted.current = false
+      lifetimeGeneration.current += 1
       inspectionGeneration.current += 1
       // Queueはclose後も必要な通信試行を保持するが、画面Stateは更新しない。
       void queueRef.current?.close()
       queueRef.current = null
       pending.current = {}
+      activeAttempt.current = null
       observed.current = null
     }
   }, [])
 
   useEffect(() => {
-    if (!initialPreferences || stateRef.current.failure) return
+    if (!initialPreferences) return
+    const previous = previousSource.current
+    const refreshed = sourceReady && !previousSourceReady.current
+    previousSource.current = initialPreferences
+    previousSourceReady.current = sourceReady
+    if (stateRef.current.failure) return
     const confirmed = { ...stateRef.current.confirmed }
     let changed = false
-    for (const key of Object.keys(initialPreferences) as Array<keyof UserPreferences>) {
-      if (confirmedLocally.current.has(key)) {
-        if (initialPreferences[key] === confirmed[key]) confirmedLocally.current.delete(key)
-        else continue
-      }
-      if (key in pending.current) continue
+    for (const key of Object.keys(initialPreferences) as Array<keyof PersonalPreferencesValues>) {
+      // 同じQuery snapshotの再Renderは再取得ではない。
+      // 通常取得の順序調停はApollo側が所有し、変化した取得値を無期限に拒否しない。
+      if ((!refreshed && previous?.[key] === initialPreferences[key]) || key in pending.current) continue
       if (confirmed[key] !== initialPreferences[key]) {
         Object.assign(confirmed, { [key]: initialPreferences[key] })
         changed = true
       }
     }
     if (changed) emit({ confirmed })
-  }, [initialPreferences])
+  }, [initialPreferences, sourceReady])
 
   const inspect = async () => {
     if (stateRef.current.failure !== "unknown" || !inspectRef.current) return
@@ -181,7 +210,7 @@ export function usePersonalPreferencesAutoSave(
         stateRef.current.failure !== "unknown" || pending.current !== patchAtStart ||
         accentDraft.current !== rawAtStart) return
       observed.current = current
-      const keys = Object.keys(pending.current) as Array<keyof UserPreferences>
+      const keys = Object.keys(pending.current) as Array<keyof PersonalPreferencesValues>
       emit({
         inspected: true,
         observedMatches: keys.length > 0 && keys.every(key => current[key] === pending.current[key]) &&
@@ -197,10 +226,12 @@ export function usePersonalPreferencesAutoSave(
     const current = observed.current
     if (!current || stateRef.current.failure !== "unknown" || !stateRef.current.observedMatches) return
     const confirmed = { ...stateRef.current.confirmed }
-    for (const key of Object.keys(pending.current) as Array<keyof UserPreferences>) {
+    const adopted: PersonalPreferencesPatch = {}
+    for (const key of Object.keys(pending.current) as Array<keyof PersonalPreferencesValues>) {
       Object.assign(confirmed, { [key]: current[key] })
-      confirmedLocally.current.add(key)
+      Object.assign(adopted, { [key]: current[key] })
     }
+    onConfirm?.(adopted)
     pending.current = {}
     observed.current = null
     void queueRef.current?.close()
@@ -224,7 +255,8 @@ export function usePersonalPreferencesAutoSave(
   }
 
   const discard = () => {
-    if (stateRef.current.saveStatus === "saving") return
+    if (activeAttempt.current || !stateRef.current.failure) return
+    accentDraft.current = null
     pending.current = {}
     observed.current = null
     inspectionGeneration.current += 1
@@ -250,7 +282,22 @@ export function usePersonalPreferencesAutoSave(
       accentDraft.current = value
       inspectionGeneration.current += 1
       observed.current = null
+      const inFlightColor = activeAttempt.current?.personalAccentColor
+      if (!/^#[0-9A-Fa-f]{6}$/.test(value) && !stateRef.current.failure &&
+          pending.current.personalAccentColor !== undefined) {
+        const next = { ...pending.current }
+        delete next.personalAccentColor
+        if (inFlightColor !== undefined) next.personalAccentColor = inFlightColor
+        pending.current = next
+        // 送信済みAttemptを残し、未送信Accentだけを無効化する。
+        queueRef.current?.enqueue({ personalAccentColor: undefined })
+        let saveStatus: SaveStatusState = "idle"
+        if (activeAttempt.current) saveStatus = "saving"
+        else if (Object.keys(next).length > 0) saveStatus = "pending"
+        emit({ draftPatch: next, saveStatus })
+      }
       emit({ inspected: false, observedMatches: false })
+      return inFlightColor
     },
     retry, inspect, confirmObservation, discard,
     inspected: state.inspected,
