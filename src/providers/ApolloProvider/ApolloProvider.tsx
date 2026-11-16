@@ -10,7 +10,7 @@ import { useState, type ReactNode } from "react"
 import { createApolloCache } from "@/infrastructure/graphql/createApolloCache"
 import { createSettingsCacheReadProtectionLink } from "@/infrastructure/graphql/settingsCacheReadProtection"
 
-export function ApolloProvider({ children }: { children: ReactNode }) {
+export const ApolloProvider = ({ children }: { children: ReactNode }) => {
   const [client] = useState(() => {
     const cache = createApolloCache()
     return new ApolloClient({

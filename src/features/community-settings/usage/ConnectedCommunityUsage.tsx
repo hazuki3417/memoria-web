@@ -6,13 +6,13 @@ import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
 /** One scoped read obtains the Usage and unit required by the active Section. */
-export function ConnectedCommunityUsage({
+export const ConnectedCommunityUsage = ({
   communityId,
   render,
 }: {
   communityId: string
   render: SettingsSectionRender
-}) {
+}) => {
   const query = useCommunitySettingsUsageQuery({
     variables: { communityId },
     fetchPolicy: "network-only",

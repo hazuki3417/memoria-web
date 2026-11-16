@@ -33,7 +33,8 @@ const profileFailure = {
 const profileLoading = { ...profileSuccess, delay: 15_000 }
 
 const meta = {
-  title: "features/settings/profile/Profile",
+  id: "features-settings-profile-profile",
+  title: "features/personal-settings/profile/Profile",
   component: ProfileStory,
 } satisfies Meta<typeof ProfileStory>
 export default meta

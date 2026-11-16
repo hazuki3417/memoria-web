@@ -13,7 +13,8 @@ const Fixture = ({ compact = false }: { compact?: boolean }) => {
 }
 
 const meta = {
-  title: "features/settings/preferences/PersonalPreferencesDisplaySection",
+  id: "features-settings-preferences-personalpreferencesdisplaysection",
+  title: "features/personal-settings/preferences/PersonalPreferencesDisplaySection",
   component: Fixture,
   args: { compact: false },
   decorators: [(Story) => <Box maw={760} p="md"><Story /></Box>],

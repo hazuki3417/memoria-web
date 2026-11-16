@@ -38,7 +38,8 @@ export const useCommunityPreferencesForm = ({
   const accent = operations ? snapshot.confirmed?.accentColor ?? sourceAccent : sourceAccent
   const initialDraft = operations ? snapshot.draft?.accentColor ?? accent : sourceDraft
   const preserveDraftOnAccentChange = operations ? snapshot.failure !== null : preserveDraft
-  const saveStatus = operations ? (snapshot.failure ? "attention" : snapshot.status) : suppliedSaveStatus
+  let saveStatus = suppliedSaveStatus
+  if (operations) saveStatus = snapshot.failure ? "attention" : snapshot.status
   const { control, getValues, reset } = useForm<
     z.input<typeof communityPreferencesSchema>
   >({

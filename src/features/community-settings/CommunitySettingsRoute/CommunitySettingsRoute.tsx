@@ -40,10 +40,10 @@ export type CommunitySettingsRouteProps = {
 }
 
 /** Selects one Section controller and keeps Settings navigation/accent wiring. */
-export function CommunitySettingsRoute({
+export const CommunitySettingsRoute = ({
   communityId,
   section = "general",
-}: CommunitySettingsRouteProps) {
+}: CommunitySettingsRouteProps) => {
   const router = useRouter()
   // The enclosing CommunityAccessBoundary owns access verification.
   // Settings reads its own accent; myCommunities remains Switcher-only.
