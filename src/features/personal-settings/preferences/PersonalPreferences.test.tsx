@@ -27,7 +27,7 @@ vi.mock("../usePersonalSettingsRefreshError", () => ({
   usePersonalSettingsRefreshError: (...args: unknown[]) => mocks.refreshError(...args),
 }))
 vi.mock("./usePersonalPreferencesSave", () => ({
-  usePersonalPreferencesSave: () => ({ savePreferencesAction: mocks.save }),
+  usePersonalPreferencesSave: () => ({ savePreferencesAction: mocks.save, inspectPreferences: mocks.inspect }),
 }))
 vi.mock("./userPreferencesGraphqlAdapter", () => ({
   fromGraphqlUserPreferences: () => defaultUserPreferences,
@@ -81,7 +81,7 @@ describe("PersonalPreferencesはProfileと同じQuery/Action/Hostの入口", () 
   it("Ready時だけViewへ初期値・Action・Inspectionを接続する", async () => {
     mocks.compact.mockReturnValue(true)
     mocks.query.mockReturnValue({
-      data: { me: { preferences: {} } }, loading: false, error: undefined, refetch,
+      data: { me: { id: "user-1", preferences: {} } }, loading: false, error: undefined, refetch,
     })
     await act(async () => root.render(createElement(PersonalPreferences, { render: renderHost })))
     expect(renderHost).toHaveBeenCalledWith(expect.objectContaining({ status: "ready" }))

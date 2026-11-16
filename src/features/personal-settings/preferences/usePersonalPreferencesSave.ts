@@ -1,11 +1,14 @@
 "use client"
 
 import { useApolloClient } from "@apollo/client"
+import { useMemo } from "react"
 import {
   CurrentUserDocument,
   PersonalSettingsAccentDocument,
   PersonalSettingsPreferencesDocument,
   SaveUserPreferencesDocument,
+  type OperationPersonalSettingsPreferencesQuery,
+  type OperationPersonalSettingsAccentQuery,
   type OperationSaveUserPreferencesMutation,
   type OperationSaveUserPreferencesMutationVariables,
 } from "@/infrastructure/graphql/generated"
@@ -15,7 +18,8 @@ import {
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
 import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
-import { toGraphqlUserPreferencesPatch } from "./userPreferencesGraphqlAdapter"
+import { fromGraphqlUserPreferences, toGraphqlUserPreferencesPatch } from "./userPreferencesGraphqlAdapter"
+import { commitPersonalPreferencesPatch } from "./personalPreferencesCache"
 import { classifyPersonalPreferencesMutationResult } from "./classifyPersonalPreferencesMutationResult"
 import type {
   PersonalPreferencesSaveRejection,
@@ -23,18 +27,22 @@ import type {
 } from "./personalPreferencesSaveOutcome"
 
 /** PreferencesのMutationをTyped ActionOutcomeに分類する。 */
-export function usePersonalPreferencesSave() {
+export const usePersonalPreferencesSave = (userId?: string) => {
   const client = useApolloClient()
+  return useMemo(() => {
 
-  const execute = (patch: UserPreferencesPatch) =>
-    client.mutate<
+  const execute = (patch: UserPreferencesPatch) => {
+    if (!userId) throw new Error("Current User unavailable")
+    return client.mutate<
       OperationSaveUserPreferencesMutation,
       OperationSaveUserPreferencesMutationVariables
     >({
       mutation: SaveUserPreferencesDocument,
       variables: { input: toGraphqlUserPreferencesPatch(patch) },
+      fetchPolicy: "no-cache",
       errorPolicy: "all",
     })
+  }
 
   const classifyError = (
     error: unknown,
@@ -57,15 +65,41 @@ export function usePersonalPreferencesSave() {
     return { kind: "unknown" }
   }
 
-  const afterSuccess = () => {
-    // Mutationの確定Successと後続Queryの成否を混同しない。
-    return client.refetchQueries({
-      include: [
-        CurrentUserDocument,
-        PersonalSettingsAccentDocument,
-        PersonalSettingsPreferencesDocument,
-      ],
-    }).then(() => undefined)
+  const confirmPreferences = (patch: UserPreferencesPatch) => {
+    if (!userId) return
+    try {
+      if (commitPersonalPreferencesPatch(client.cache, userId, patch)) return
+    } catch {
+      // Cache同期失敗はMutation Outcomeから独立して扱う。
+    }
+    void client.refetchQueries({
+      include: [CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument],
+    }).catch(() => undefined)
+  }
+
+  const afterSuccess = (values: UserPreferences, attempted: UserPreferencesPatch) => {
+    const patch: UserPreferencesPatch = {}
+    for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
+      if (attempted[key] !== undefined) Object.assign(patch, { [key]: values[key] })
+    }
+    confirmPreferences(patch)
+  }
+
+  const inspectPreferences = async (): Promise<UserPreferences> => {
+    const result = await client.query<OperationPersonalSettingsPreferencesQuery>({
+      query: PersonalSettingsPreferencesDocument,
+      fetchPolicy: "no-cache",
+    })
+    if (!userId || result.data?.me?.id !== userId) throw new Error("Current User unavailable")
+    return fromGraphqlUserPreferences(result.data.me.preferences)
+  }
+
+  const isAccentConfirmed = (color: string) => {
+    const current = client.cache.readQuery<OperationPersonalSettingsAccentQuery>({
+      query: PersonalSettingsAccentDocument,
+      returnPartialData: true,
+    })?.me
+    return current?.id === userId && current?.preferences?.personalAccentColor === color
   }
 
   const savePreferencesAction: SavePersonalPreferencesAction = createActionAdapter({
@@ -75,5 +109,6 @@ export function usePersonalPreferencesSave() {
     afterSuccess,
   })
 
-  return { savePreferencesAction }
+  return { savePreferencesAction, inspectPreferences, confirmPreferences, isAccentConfirmed }
+  }, [client, userId])
 }

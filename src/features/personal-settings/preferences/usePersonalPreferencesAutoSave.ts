@@ -30,6 +30,7 @@ export function usePersonalPreferencesAutoSave(
   initialPreferences?: UserPreferences,
   onInspect?: () => Promise<UserPreferences>,
   onSaveAction?: SavePersonalPreferencesAction,
+  onConfirm?: (patch: UserPreferencesPatch) => void,
 ) {
   const [state, setState] = useState<State>(() => ({
     confirmed: initialPreferences!,
@@ -197,10 +198,13 @@ export function usePersonalPreferencesAutoSave(
     const current = observed.current
     if (!current || stateRef.current.failure !== "unknown" || !stateRef.current.observedMatches) return
     const confirmed = { ...stateRef.current.confirmed }
+    const adopted: UserPreferencesPatch = {}
     for (const key of Object.keys(pending.current) as Array<keyof UserPreferences>) {
       Object.assign(confirmed, { [key]: current[key] })
+      Object.assign(adopted, { [key]: current[key] })
       confirmedLocally.current.add(key)
     }
+    onConfirm?.(adopted)
     pending.current = {}
     observed.current = null
     void queueRef.current?.close()

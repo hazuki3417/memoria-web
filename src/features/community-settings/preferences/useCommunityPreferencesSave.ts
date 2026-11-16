@@ -57,10 +57,14 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
 
     const confirm = (patch: CommunityPreferencesPatch) => {
       try {
-        commitCommunitySettingsPatch(client.cache, communityId, patch)
+        if (commitCommunitySettingsPatch(client.cache, communityId, patch)) return
       } catch {
-        void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
+        // Cache同期失敗は保存Outcomeとは別に扱う。
       }
+      void client.refetchQueries({
+        include: [CommunityMySettingsDocument],
+        onQueryUpdated: (query) => query.variables.communityId === communityId ? query.refetch() : false,
+      }).catch(() => undefined)
     }
 
     const afterSuccess = (values: CommunityPreferencesValues) => {

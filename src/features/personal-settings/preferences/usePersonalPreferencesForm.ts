@@ -22,6 +22,8 @@ export function usePersonalPreferencesForm(
   onSave?: SavePreferences,
   onInspect?: () => Promise<UserPreferences>,
   onSaveAction?: SavePersonalPreferencesAction,
+  onConfirm?: (patch: UserPreferencesPatch) => void,
+  isAccentConfirmed?: (color: string) => boolean,
 ) {
   const {
     saveError,
@@ -39,7 +41,7 @@ export function usePersonalPreferencesForm(
     inspect,
     confirmObservation,
     discard,
-  } = usePersonalPreferencesAutoSave(onSave, initialPreferences, onInspect, onSaveAction)
+  } = usePersonalPreferencesAutoSave(onSave, initialPreferences, onInspect, onSaveAction, onConfirm)
   const preview = usePersonalAccentPreview()
   const initial = confirmed ?? initialPreferences
   const {
@@ -109,6 +111,12 @@ export function usePersonalPreferencesForm(
   }, [discardRevision, confirmed, reset, preview])
 
   useEffect(() => () => { preview?.setColor(null) }, [preview?.setColor])
+
+  useEffect(() => {
+    if (isAccentConfirmed && !saveError && !draftPatch.personalAccentColor &&
+        preview?.color && preview.color === confirmed.personalAccentColor &&
+        isAccentConfirmed(preview.color)) preview.setColor(null)
+  }, [confirmed, draftPatch, saveError, preview, isAccentConfirmed, initialPreferences])
 
   const values = watch()
   const preferences: UserPreferences = {

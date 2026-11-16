@@ -16,6 +16,8 @@ export type PersonalPreferencesViewProps = {
   onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
   onSaveAction?: SavePersonalPreferencesAction
   onInspect?: () => Promise<UserPreferences>
+  onConfirm?: (patch: UserPreferencesPatch) => void
+  isAccentConfirmed?: (color: string) => boolean
 }
 
 /** 環境設定のHeader・Feedback・各Sectionを、保存処理から独立して描画する。 */
@@ -25,8 +27,10 @@ export function PersonalPreferencesView({
   onSave,
   onSaveAction,
   onInspect,
+  onConfirm,
+  isAccentConfirmed,
 }: PersonalPreferencesViewProps) {
-  const model = usePersonalPreferencesForm(initialPreferences, onSave, onInspect, onSaveAction)
+  const model = usePersonalPreferencesForm(initialPreferences, onSave, onInspect, onSaveAction, onConfirm, isAccentConfirmed)
   const canSave = Boolean(onSave || onSaveAction)
   return (
     <Stack gap="xl">

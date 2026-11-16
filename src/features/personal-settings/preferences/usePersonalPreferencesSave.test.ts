@@ -7,10 +7,12 @@ import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
 const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
   refetchQueries: vi.fn(),
+  patch: vi.fn(),
+  query: vi.fn(),
 }))
 
 vi.mock("@apollo/client", () => ({
-  useApolloClient: () => ({ mutate: mocks.mutate, refetchQueries: mocks.refetchQueries }),
+  useApolloClient: () => ({ mutate: mocks.mutate, query: mocks.query, cache: {}, refetchQueries: mocks.refetchQueries }),
 }))
 vi.mock("@/infrastructure/graphql/generated", () => ({
   CurrentUserDocument: "currentUser",
@@ -22,6 +24,8 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   MediaThumbnailSize: { Small: "SMALL", Medium: "MEDIUM", Large: "LARGE" },
 }))
 
+vi.mock("./personalPreferencesCache", () => ({ commitPersonalPreferencesPatch: mocks.patch }))
+
 type Save = ReturnType<typeof usePersonalPreferencesSave>
 let root: Root
 let host: HTMLDivElement
@@ -30,12 +34,13 @@ let save!: Save
 beforeEach(async () => {
   vi.resetAllMocks()
   mocks.refetchQueries.mockResolvedValue([])
+  mocks.patch.mockReturnValue(true)
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
   await act(async () => {
     root.render(createElement(() => {
-      save = usePersonalPreferencesSave()
+      save = usePersonalPreferencesSave("user-1")
       return null
     }))
   })
@@ -56,6 +61,7 @@ describe("Personal PreferencesのAction Adapter", () => {
 
   it("Typed Successを返し、Refetchの失敗と区別する", async () => {
     mocks.mutate.mockResolvedValue(success)
+    mocks.patch.mockReturnValueOnce(false)
     mocks.refetchQueries.mockRejectedValue(new Error("refetch failed"))
     await expect(save.savePreferencesAction(patch)).resolves.toEqual({
       kind: "success", value: confirmed,
@@ -63,9 +69,11 @@ describe("Personal PreferencesのAction Adapter", () => {
     expect(mocks.mutate).toHaveBeenCalledWith({
       mutation: "savePreferences",
       variables: { input: expect.objectContaining(patch) },
+      fetchPolicy: "no-cache",
       errorPolicy: "all",
     })
     // 後続処理はMutationの成立を変更しない。
+    expect(mocks.patch).toHaveBeenCalledWith(expect.anything(), "user-1", patch)
     expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
   })
 

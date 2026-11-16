@@ -33,6 +33,7 @@ let operations: Operations
 beforeEach(async () => {
   vi.resetAllMocks()
   mocks.refetchQueries.mockResolvedValue([])
+  mocks.patch.mockReturnValue(true)
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
@@ -74,7 +75,7 @@ describe("Community Preferencesの保存Adapter", () => {
     mocks.patch.mockImplementationOnce(() => { throw new Error("cache failure") })
     mocks.refetchQueries.mockRejectedValueOnce(new Error("refetch failure"))
     await expect(operations.save(patch)).resolves.toEqual({ kind: "success", value: patch })
-    expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: ["communityMySettings"] })
+    expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: ["communityMySettings"], onQueryUpdated: expect.any(Function) })
   })
 
   it("Typed Successが併存するGraphQL Errorより優先される", async () => {
