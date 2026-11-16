@@ -16,8 +16,8 @@ const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
 /** Community ID固定の保存・現在値照会・確定Cache反映を提供する。 */
 export const useCommunityPreferencesSave = (communityId: string) => {
   const client = useApolloClient()
-  return useMemo(() => ({
-      save: async (next) => {
+  return useMemo(() => {
+    const save = async (next: string) => {
         // ApolloClient.mutate is independent of a view-mounted useMutation hook.
         const result = await client.mutate<
           OperationUpdateCommunitySettingsMutation,
@@ -42,8 +42,8 @@ export const useCommunityPreferencesSave = (communityId: string) => {
           void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
         }
         return confirmed
-      },
-      observe: async () => {
+    }
+    const observe = async () => {
         const result = await client.query({
           query: CommunityMySettingsDocument,
           variables: { communityId },
@@ -52,13 +52,14 @@ export const useCommunityPreferencesSave = (communityId: string) => {
         const current = result.data?.community?.mySettings.accentColor
         if (!current || !isHex(current)) throw new Error("Community accent unavailable")
         return current
-      },
-      confirm: (color) => {
+    }
+    const confirm = (color: string) => {
         try {
           commitCommunitySettingsPatch(client.cache, communityId, { accentColor: color })
         } catch {
           void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
         }
-      },
-  }), [client, communityId])
+    }
+    return { save, observe, confirm }
+  }, [client, communityId])
 }
