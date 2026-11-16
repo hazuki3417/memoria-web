@@ -17,7 +17,7 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   CommunityMySettingsDocument: { kind: "Document", name: "communityMySettings" },
   useUpdateCommunitySettingsMutation: () => [mocks.mutation],
 }))
-vi.mock("../communitySettingsCache", () => ({
+vi.mock("../communityPreferencesCache", () => ({
   commitCommunitySettingsPatch: mocks.patch,
 }))
 
@@ -148,7 +148,7 @@ describe("Community別名の保存ActionとApollo境界", () => {
     expect(mocks.query).toHaveBeenCalledWith({
       query: { kind: "Document", name: "communityMySettings" },
       variables: { communityId: "community-1" },
-      fetchPolicy: "no-cache",
+      fetchPolicy: "no-cache", context: { settingsInspection: true, queryDeduplication: false },
     })
     expect(mocks.patch).not.toHaveBeenCalled()
     expect(mocks.mutation).not.toHaveBeenCalled()

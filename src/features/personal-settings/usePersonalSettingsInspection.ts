@@ -1,6 +1,7 @@
 "use client"
 
 import { useApolloClient } from "@apollo/client"
+import { settingsInspectionContext } from "@/infrastructure/graphql/settingsCacheReadProtection"
 import {
   PersonalSettingsProfileDocument,
   PersonalSettingsPreferencesDocument,
@@ -25,6 +26,7 @@ export function usePersonalSettingsInspection() {
       const result = await client.query<OperationPersonalSettingsPreferencesQuery>({
         query: PersonalSettingsPreferencesDocument,
         fetchPolicy: "no-cache",
+        context: settingsInspectionContext,
       })
       if (!result.data?.me) throw new Error("Current User unavailable")
       return fromGraphqlUserPreferences(result.data.me.preferences)

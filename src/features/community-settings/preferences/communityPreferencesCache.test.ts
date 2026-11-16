@@ -6,7 +6,7 @@ import {
   type OperationCommunityMySettingsQuery,
   type OperationMyCommunitiesQuery,
 } from "@/infrastructure/graphql/generated"
-import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { commitCommunitySettingsPatch } from "./communityPreferencesCache"
 
 function createCache() {
   const cache = new InMemoryCache()

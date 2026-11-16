@@ -2,6 +2,7 @@
 
 import { useMemo } from "react"
 import { useApolloClient } from "@apollo/client"
+import { settingsInspectionContext } from "@/infrastructure/graphql/settingsCacheReadProtection"
 import {
   CommunityMySettingsDocument,
   UpdateCommunitySettingsDocument,
@@ -15,7 +16,7 @@ import {
   getSettingsInputViolations,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { createActionAdapter } from "@/ui/Action"
-import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { commitCommunitySettingsPatch } from "./communityPreferencesCache"
 import { fromGraphqlCommunityPreferences, toGraphqlCommunityPreferencesPatch } from "./communityPreferencesGraphqlAdapter"
 import { isCommunityAccentColor, type CommunityPreferencesPatch, type CommunityPreferencesValues } from "./communityPreferences"
 import { classifyCommunityPreferencesMutationResult } from "./classifyCommunityPreferencesMutationResult"
@@ -85,6 +86,7 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
         query: CommunityMySettingsDocument,
         variables: { communityId },
         fetchPolicy: "no-cache",
+        context: settingsInspectionContext,
       })
       const settings = result.data?.community?.mySettings
       if (!settings?.accentColor || !isCommunityAccentColor(settings.accentColor)) throw new Error("Community accent unavailable")

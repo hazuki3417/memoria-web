@@ -21,7 +21,7 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
   CommunityMySettingsDocument: "communityMySettings",
   UpdateCommunitySettingsDocument: "updateCommunitySettings",
 }))
-vi.mock("./communitySettingsCache", () => ({
+vi.mock("./communityPreferencesCache", () => ({
   commitCommunitySettingsPatch: mocks.patch,
 }))
 
@@ -113,7 +113,7 @@ describe("Community Preferencesの保存Adapter", () => {
     mocks.query.mockResolvedValue({ data: { community: { mySettings: { ...patch, alias: "別名" } } } })
     await expect(operations.observe()).resolves.toEqual(patch)
     expect(mocks.query).toHaveBeenCalledWith({
-      query: "communityMySettings", variables: { communityId: "community-1" }, fetchPolicy: "no-cache",
+      query: "communityMySettings", variables: { communityId: "community-1" }, fetchPolicy: "no-cache", context: { settingsInspection: true, queryDeduplication: false },
     })
     expect(mocks.patch).not.toHaveBeenCalled()
     operations.confirm(patch)
