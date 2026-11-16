@@ -8,46 +8,72 @@ import {
   type OperationUpdateCommunitySettingsMutation,
   type OperationUpdateCommunitySettingsMutationVariables,
 } from "@/infrastructure/graphql/generated"
-import { SettingsInputValidationError, requireSettingsMutationOutcome } from "@/infrastructure/graphql/settingsMutationResult"
+import {
+  SettingsGraphQLExecutionError,
+  classifySettingsSaveFailure,
+  getSettingsInputViolations,
+} from "@/infrastructure/graphql/settingsMutationResult"
+import { createActionAdapter } from "@/ui/Action"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
 import { isCommunityAccentColor, type CommunityPreferencesPatch, type CommunityPreferencesValues } from "./communityPreferences"
-import { classifyCommunityPreferencesSaveFailure } from "./classifyCommunityPreferencesSaveFailure"
-import type { CommunityPreferencesSaveOperations, SaveCommunityPreferencesAction } from "./communityPreferencesSaveOutcome"
+import { classifyCommunityPreferencesMutationResult } from "./classifyCommunityPreferencesMutationResult"
+import type { CommunityPreferencesSaveOperations, CommunityPreferencesSaveOutcome, SaveCommunityPreferencesAction } from "./communityPreferencesSaveOutcome"
 
 /** Community ID固定の保存・現在値照会・確定Cache反映を提供する。 */
 export const useCommunityPreferencesSave = (communityId: string): CommunityPreferencesSaveOperations => {
   const client = useApolloClient()
   return useMemo(() => {
-    const save: SaveCommunityPreferencesAction = async (patch) => {
+    const execute = (patch: CommunityPreferencesPatch) =>
+      client.mutate<
+        OperationUpdateCommunitySettingsMutation,
+        OperationUpdateCommunitySettingsMutationVariables
+      >({
+        mutation: UpdateCommunitySettingsDocument,
+        fetchPolicy: "no-cache",
+        errorPolicy: "all",
+        variables: { input: { communityId, ...patch } },
+      })
+
+    const classifyError = (error: unknown): CommunityPreferencesSaveOutcome => {
+      const kind = classifySettingsSaveFailure(error)
+      if (kind === "unknown") return { kind: "unknown" }
+      if (kind === "blocked") return { kind: "rejected", reason: { kind, error } }
+      // 従来のCommunity契約を維持する。Typed Violationのない拒否はForm Errorにする。
+      if (kind === "validation")
+        return { kind: "rejected", reason: { kind, violations: getSettingsInputViolations(error) } }
+      return { kind: "rejected", reason: { kind: "rejected" } }
+    }
+
+    const classify = (
+      response: Awaited<ReturnType<typeof execute>>,
+    ): CommunityPreferencesSaveOutcome => {
+      const result = response.data?.updateCommunitySettings
+      if (result) return classifyCommunityPreferencesMutationResult(result)
+      if (response.errors?.length)
+        return classifyError(new SettingsGraphQLExecutionError(response.errors))
+      return { kind: "unknown" }
+    }
+
+    const confirm = (patch: CommunityPreferencesPatch) => {
       try {
-        // ApolloClient.mutate is independent of a view-mounted useMutation hook.
-        const result = await client.mutate<
-          OperationUpdateCommunitySettingsMutation,
-          OperationUpdateCommunitySettingsMutationVariables
-        >({
-          mutation: UpdateCommunitySettingsDocument,
-          fetchPolicy: "no-cache",
-          errorPolicy: "all",
-          variables: { input: { communityId, ...patch } },
-        })
-        const outcome = requireSettingsMutationOutcome(result.data?.updateCommunitySettings, result)
-        if (outcome?.__typename === "InputValidationFailure")
-          throw new SettingsInputValidationError(outcome.violations)
-        const confirmed = outcome?.__typename === "UpdateCommunitySettingsSuccess"
-          ? outcome.settings.accentColor : undefined
-        if (!confirmed || !isCommunityAccentColor(confirmed)) throw new Error("Accent save response invalid")
-        // A confirmed write remains authoritative even after this view unmounts.
-        try {
-          commitCommunitySettingsPatch(client.cache, communityId, { accentColor: confirmed.toUpperCase() })
-        } catch {
-          // Cache synchronization failure does not undo a confirmed Mutation.
-          void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
-        }
-        return { kind: "success", value: { accentColor: confirmed.toUpperCase() } }
-      } catch (error) {
-        return classifyCommunityPreferencesSaveFailure(error)
+        commitCommunitySettingsPatch(client.cache, communityId, patch)
+      } catch {
+        void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
       }
     }
+
+    const afterSuccess = (values: CommunityPreferencesValues) => {
+      // 確定したAccentだけを更新し、並行するAlias保存を上書きしない。
+      confirm({ accentColor: values.accentColor })
+    }
+
+    const save: SaveCommunityPreferencesAction = createActionAdapter({
+      execute,
+      classify,
+      classifyError,
+      afterSuccess,
+    })
+
     const observe = async (): Promise<CommunityPreferencesValues> => {
       const result = await client.query({
         query: CommunityMySettingsDocument,
@@ -58,14 +84,7 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
       if (!current || !isCommunityAccentColor(current)) throw new Error("Community accent unavailable")
       return { accentColor: current }
     }
-    const confirm = (patch: CommunityPreferencesPatch) => {
-        try {
-          commitCommunitySettingsPatch(client.cache, communityId, patch)
-        } catch {
-          void client.refetchQueries({ include: [CommunityMySettingsDocument] }).catch(() => undefined)
-        }
-    }
-    // 保存結果・現在値照会・明示確認に必要な操作を固定Community IDで提供する。
+
     return { save, observe, confirm }
   }, [client, communityId])
 }

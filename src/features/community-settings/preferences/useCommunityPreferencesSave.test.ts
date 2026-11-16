@@ -125,4 +125,12 @@ describe("Community Preferencesの保存Adapter", () => {
     await expect(operations.observe()).rejects.toThrow("Community accent unavailable")
     expect(mocks.patch).not.toHaveBeenCalled()
   })
+  it("Typed Violationのない明示Validation拒否はField Errorを推測しない", async () => {
+    mocks.mutate.mockResolvedValue({ errors: [{ extensions: { code: "VALIDATION" } }] })
+    await expect(operations.save(patch)).resolves.toEqual({
+      kind: "rejected", reason: { kind: "validation", violations: null },
+    })
+    expect(mocks.patch).not.toHaveBeenCalled()
+  })
+
 })

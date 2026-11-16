@@ -1,12 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 import { createCommunityPreferencesSaveController } from "./communityPreferencesSaveController"
-import { classifyCommunityPreferencesSaveFailure } from "./classifyCommunityPreferencesSaveFailure"
-import type { CommunityPreferencesPatch, CommunityPreferencesValues } from "./communityPreferences"
+import type { CommunityPreferencesValues } from "./communityPreferences"
+import type { CommunityPreferencesSaveOutcome, SaveCommunityPreferencesAction } from "./communityPreferencesSaveOutcome"
 
-type SavePreferences = (patch: CommunityPreferencesPatch) => Promise<CommunityPreferencesValues>
+const success = (value: CommunityPreferencesValues): CommunityPreferencesSaveOutcome => ({ kind: "success", value })
 
-const makeOperations = (save = vi.fn<SavePreferences>().mockResolvedValue({ accentColor: "#ABCDEF" })) => ({
+const makeOperations = (save = vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue(success({ accentColor: "#ABCDEF" }))) => ({
   save,
   observe: vi.fn().mockResolvedValue({ accentColor: "#112233" }),
   confirm: vi.fn(),
@@ -14,19 +13,10 @@ const makeOperations = (save = vi.fn<SavePreferences>().mockResolvedValue({ acce
   release: vi.fn(),
 })
 
-const setup = (save?: ReturnType<typeof vi.fn<SavePreferences>>) => {
+const setup = (save?: ReturnType<typeof vi.fn<SaveCommunityPreferencesAction>>) => {
   const controller = createCommunityPreferencesSaveController()
   const operations = makeOperations(save)
-  controller.configure({
-    ...operations,
-    save: async (patch) => {
-      try {
-        return { kind: "success", value: await operations.save(patch) }
-      } catch (error) {
-        return classifyCommunityPreferencesSaveFailure(error)
-      }
-    },
-  })
+  controller.configure(operations)
   controller.initialize({ accentColor: "#112233" })
   return { controller, operations }
 }
@@ -62,7 +52,7 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
   })
 
   it("同一Debounce内の連続変更は最新色だけを送信する", async () => {
-    const { controller, operations } = setup(vi.fn<SavePreferences>().mockResolvedValue({ accentColor: "#445566" }))
+    const { controller, operations } = setup(vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue(success({ accentColor: "#445566" })))
     controller.edit({ accentColor: "#AABBCC" })
     await vi.advanceTimersByTimeAsync(200)
     controller.edit({ accentColor: "#445566" })
@@ -98,9 +88,9 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
   })
 
   it("通信結果不明では自動再送せず、現在値照会後の明示Retryのみ許可する", async () => {
-    const save = vi.fn<SavePreferences>()
-      .mockRejectedValueOnce(Object.assign(new Error("offline"), { networkError: new Error("offline") }))
-      .mockResolvedValueOnce({ accentColor: "#AABBCC" })
+    const save = vi.fn<SaveCommunityPreferencesAction>()
+      .mockResolvedValueOnce({ kind: "unknown" })
+      .mockResolvedValueOnce(success({ accentColor: "#AABBCC" }))
     const { controller, operations } = setup(save)
     controller.edit({ accentColor: "#AABBCC" })
     await vi.advanceTimersByTimeAsync(400)
@@ -123,7 +113,7 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
 
   it("現在値一致は元のMutation成功と断定せず、確認完了時だけ採用する", async () => {
     const { controller, operations } = setup(
-      vi.fn<SavePreferences>().mockRejectedValue(new Error("unconfirmed")),
+      vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue({ kind: "unknown" }),
     )
     operations.observe.mockResolvedValue({ accentColor: "#AABBCC" })
     controller.edit({ accentColor: "#AABBCC" })
@@ -136,11 +126,12 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
   })
 
   it("ValidationはField ErrorとDraftを維持し、離脱時に自動Retryしない", async () => {
-    const save = vi.fn<SavePreferences>().mockRejectedValue(
-      new SettingsInputValidationError([
+    const save = vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue({
+      kind: "rejected",
+      reason: { kind: "validation", violations: [
         { scope: "FIELD", code: "INVALID_FORMAT", inputPaths: [{ segments: ["accentColor"] }] },
-      ]),
-    )
+      ] },
+    })
     const { controller } = setup(save)
     controller.edit({ accentColor: "#AABBCC" })
     await vi.advanceTimersByTimeAsync(400)
@@ -153,8 +144,9 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
   })
 
   it("認可拒否では保存を停止し、再送ボタンからも保存しない", async () => {
-    const save = vi.fn<SavePreferences>().mockRejectedValue({
-      graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }],
+    const save = vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue({
+      kind: "rejected",
+      reason: { kind: "blocked", error: { graphQLErrors: [{ extensions: { code: "FORBIDDEN" } }] } },
     })
     const { controller } = setup(save)
     controller.edit({ accentColor: "#AABBCC" })
@@ -166,34 +158,34 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
   })
 
   it("異なるCommunityへの新しい画面は別Ownerを使い、遅延結果がDraftへ流入しない", async () => {
-    let resolveOld: ((value: CommunityPreferencesValues) => void) | undefined
-    const oldSave = vi.fn<SavePreferences>().mockImplementation(
-      () => new Promise<CommunityPreferencesValues>((resolve) => { resolveOld = resolve }),
+    let resolveOld: ((value: CommunityPreferencesSaveOutcome) => void) | undefined
+    const oldSave = vi.fn<SaveCommunityPreferencesAction>().mockImplementation(
+      () => new Promise<CommunityPreferencesSaveOutcome>((resolve) => { resolveOld = resolve }),
     )
     const older = setup(oldSave)
     older.controller.edit({ accentColor: "#AABBCC" })
     await vi.advanceTimersByTimeAsync(400)
     const close = older.controller.close()
-    const newer = setup(vi.fn<SavePreferences>().mockResolvedValue({ accentColor: "#445566" }))
+    const newer = setup(vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue(success({ accentColor: "#445566" })))
     newer.controller.edit({ accentColor: "#445566" })
     await vi.advanceTimersByTimeAsync(400)
-    resolveOld?.({ accentColor: "#AABBCC" })
+    resolveOld?.(success({ accentColor: "#AABBCC" }))
     await close
     expect(newer.controller.getSnapshot()).toMatchObject({
       confirmed: { accentColor: "#445566" }, draft: { accentColor: "#445566" }, failure: null,
     })
   })
   it("遅延中の先行保存が終わってから後続の最新値を直列送信する", async () => {
-    let resolveFirst: ((value: CommunityPreferencesValues) => void) | undefined
-    const save = vi.fn<SavePreferences>()
-      .mockImplementationOnce(() => new Promise<CommunityPreferencesValues>((resolve) => { resolveFirst = resolve }))
+    let resolveFirst: ((value: CommunityPreferencesSaveOutcome) => void) | undefined
+    const save = vi.fn<SaveCommunityPreferencesAction>()
+      .mockImplementationOnce(() => new Promise<CommunityPreferencesSaveOutcome>((resolve) => { resolveFirst = resolve }))
       .mockResolvedValueOnce({ accentColor: "#445566" })
     const { controller } = setup(save)
     controller.edit({ accentColor: "#AABBCC" })
     await vi.advanceTimersByTimeAsync(400)
     controller.edit({ accentColor: "#445566" })
     expect(save).toHaveBeenCalledTimes(1)
-    resolveFirst?.({ accentColor: "#AABBCC" })
+    resolveFirst?.(success({ accentColor: "#AABBCC" }))
     await vi.advanceTimersByTimeAsync(0)
     expect(save).toHaveBeenCalledTimes(2)
     expect(save).toHaveBeenNthCalledWith(2, { accentColor: "#445566" })
@@ -203,16 +195,16 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
   })
 
   it("先行Mutation処理中の未完成Draftが後続予約を無効化する", async () => {
-    let resolveFirst: ((value: CommunityPreferencesValues) => void) | undefined
-    const save = vi.fn<SavePreferences>().mockImplementation(
-      () => new Promise<CommunityPreferencesValues>((resolve) => { resolveFirst = resolve }),
+    let resolveFirst: ((value: CommunityPreferencesSaveOutcome) => void) | undefined
+    const save = vi.fn<SaveCommunityPreferencesAction>().mockImplementation(
+      () => new Promise<CommunityPreferencesSaveOutcome>((resolve) => { resolveFirst = resolve }),
     )
     const { controller } = setup(save)
     controller.edit({ accentColor: "#AABBCC" })
     await vi.advanceTimersByTimeAsync(400)
     controller.edit({ accentColor: "#445566" })
     controller.edit({ accentColor: "#445" })
-    resolveFirst?.({ accentColor: "#AABBCC" })
+    resolveFirst?.(success({ accentColor: "#AABBCC" }))
     await vi.advanceTimersByTimeAsync(0)
     expect(save).toHaveBeenCalledTimes(1)
     expect(controller.getSnapshot()).toMatchObject({
@@ -222,7 +214,7 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
 
   it("保存結果不明時の古い照会は新しいDraftの確認結果を上書きしない", async () => {
     const { controller, operations } = setup(
-      vi.fn<SavePreferences>().mockRejectedValue(new Error("unconfirmed")),
+      vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue({ kind: "unknown" }),
     )
     let resolveOld: ((value: CommunityPreferencesValues) => void) | undefined
     operations.observe
@@ -244,7 +236,7 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
   })
 
   it("結果不明のまま画面離脱しても後続変更を自動送信しない", async () => {
-    const save = vi.fn<SavePreferences>().mockRejectedValue(new Error("unconfirmed"))
+    const save = vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue({ kind: "unknown" })
     const { controller } = setup(save)
     controller.edit({ accentColor: "#AABBCC" })
     await vi.advanceTimersByTimeAsync(400)
