@@ -2,11 +2,11 @@
 
 import { Button, Stack, Text } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
-import { createCommunityPreferencesSaveController, type CommunityPreferencesSnapshot } from "./communityPreferencesSaveController"
+import type { createCommunityPreferencesSaveController, CommunityPreferencesSnapshot } from "./communityPreferencesSaveController"
 
 type Controller = ReturnType<typeof createCommunityPreferencesSaveController>
 
-/** Renders the existing Accent save failure and explicit recovery controls. */
+/** Preferencesの保存失敗と明示Recoveryの操作を表示する。 */
 export const CommunityPreferencesSaveFeedback = ({
   snapshot,
   controller,

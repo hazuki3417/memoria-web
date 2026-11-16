@@ -16,3 +16,10 @@ export type CommunityPreferencesSaveOutcome = ActionOutcome<
 export type SaveCommunityPreferencesAction = (
   patch: CommunityPreferencesPatch,
 ) => Promise<CommunityPreferencesSaveOutcome>
+
+/** 固定されたCommunityに対する保存・現在値照会・明示確認の契約。 */
+export type CommunityPreferencesSaveOperations = {
+  save: SaveCommunityPreferencesAction
+  observe: () => Promise<CommunityPreferencesValues>
+  confirm: (patch: CommunityPreferencesPatch) => void
+}

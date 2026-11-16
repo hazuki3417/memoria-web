@@ -7,16 +7,24 @@ import { CommunityPreferences } from "./CommunityPreferences"
 const mocks = vi.hoisted(() => ({
   connection: vi.fn(),
   alias: vi.fn(() => ({})),
+  save: vi.fn(() => ({})),
+  refreshError: vi.fn(),
 }))
 
-vi.mock("./useCommunityPreferencesConnection", () => ({
-  useCommunityPreferencesConnection: mocks.connection,
+vi.mock("@/infrastructure/graphql/generated", () => ({
+  useCommunityMySettingsQuery: mocks.connection,
+}))
+vi.mock("../useCommunitySettingsRefreshError", () => ({
+  useCommunitySettingsRefreshError: mocks.refreshError,
+}))
+vi.mock("./useCommunityPreferencesSave", () => ({
+  useCommunityPreferencesSave: mocks.save,
 }))
 vi.mock("./CommunityAliasSection/useCommunityAliasSave", () => ({
   useCommunityAliasSave: mocks.alias,
 }))
-vi.mock("./CommunityPreferencesSection", () => ({
-  CommunityPreferencesSection: () => createElement("div", null, "Community Preferences"),
+vi.mock("./CommunityPreferencesReady", () => ({
+  CommunityPreferencesReady: () => createElement("div", null, "Community Preferences"),
 }))
 
 describe("CommunityPreferencesのSection取得状態", () => {
@@ -30,6 +38,8 @@ describe("CommunityPreferencesのSection取得状態", () => {
     results = []
     mocks.connection.mockReset()
     mocks.alias.mockClear()
+    mocks.save.mockClear()
+    mocks.refreshError.mockClear()
   })
 
   afterEach(() => {
@@ -75,12 +85,14 @@ describe("CommunityPreferencesのSection取得状態", () => {
         community: { mySettings: { accentColor: "#123456", alias: null } },
       },
       loading: false,
-      snapshot: { failure: null },
-      controller: {},
-      canResave: false,
+      error: new Error("refresh failed"),
     })
     renderSection()
     expect(results.at(-1)?.status).toBe("ready")
     expect(element.textContent).toContain("Community Preferences")
+    expect(mocks.refreshError).toHaveBeenLastCalledWith(true)
+    expect(mocks.connection).toHaveBeenCalledWith({
+      variables: { communityId: "club-a" }, fetchPolicy: "network-only",
+    })
   })
 })

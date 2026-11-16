@@ -6,22 +6,27 @@ import { CommunityAliasSection } from "./CommunityAliasSection"
 import { CommunityPreferencesSaveFeedback } from "./CommunityPreferencesSaveFeedback"
 import { useCommunityPreferencesAutoSave } from "./useCommunityPreferencesAutoSave"
 import type { CommunityPreferencesValues } from "./communityPreferences"
+import type { CommunityPreferencesSaveOperations } from "./communityPreferencesSaveOutcome"
 import type { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
 /** Ready状態のPreferencesを保存Lifecycleへ接続する。Aliasの明示保存は独立させる。 */
-export const CommunityPreferencesSection = ({
+export const CommunityPreferencesReady = ({
   communityId,
-  settings,
+  preferences,
+  savedAlias,
+  operations,
   alias,
 }: {
   communityId: string
-  settings: CommunityPreferencesValues & { alias: string | null }
+  preferences: CommunityPreferencesValues
+  savedAlias: string | null
+  operations: CommunityPreferencesSaveOperations
   alias: ReturnType<typeof useCommunityAliasSave>
 }) => {
   const { snapshot, controller, canResave } =
-    useCommunityPreferencesAutoSave(communityId, settings)
+    useCommunityPreferencesAutoSave(communityId, preferences, operations)
   const failure = snapshot.failure
-  const accent = snapshot.confirmed?.accentColor ?? settings.accentColor
+  const accent = snapshot.confirmed?.accentColor ?? preferences.accentColor
   const lastDraft = snapshot.draft?.accentColor ?? accent
 
   return (
@@ -46,7 +51,7 @@ export const CommunityPreferencesSection = ({
         }
         aliasSection={
           <CommunityAliasSection
-            savedAlias={settings.alias}
+            savedAlias={savedAlias}
             onInspect={alias.inspectAlias}
             onSave={alias.saveAlias}
           />

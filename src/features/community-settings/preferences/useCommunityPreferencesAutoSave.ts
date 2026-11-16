@@ -2,14 +2,16 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react"
 import { useCommunityAccentPreview } from "@/features/application-shell/CommunityAccentPreviewContext"
-import { useCommunityPreferencesSave } from "./useCommunityPreferencesSave"
+import type { CommunityPreferencesSaveOperations } from "./communityPreferencesSaveOutcome"
 import { createCommunityPreferencesSaveController } from "./communityPreferencesSaveController"
-
 import { isCommunityAccentColor, type CommunityPreferencesValues } from "./communityPreferences"
 
 /** Ready画面の生存期間に限り保存Controllerを所有し、離脱時にQueueを閉じる。 */
-export const useCommunityPreferencesAutoSave = (communityId: string, initialPreferences: CommunityPreferencesValues) => {
-  const operations = useCommunityPreferencesSave(communityId)
+export const useCommunityPreferencesAutoSave = (
+  communityId: string,
+  initialPreferences: CommunityPreferencesValues,
+  operations: CommunityPreferencesSaveOperations,
+) => {
   const { setPreview, clearPreview } = useCommunityAccentPreview()
   const [controller, setController] = useState(createCommunityPreferencesSaveController)
 

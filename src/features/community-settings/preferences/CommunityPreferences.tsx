@@ -1,8 +1,10 @@
 "use client"
 
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
-import { CommunityPreferencesSection } from "./CommunityPreferencesSection"
-import { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
+import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
+import { CommunityPreferencesReady } from "./CommunityPreferencesReady"
+import { useCommunityPreferencesSave } from "./useCommunityPreferencesSave"
 import { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
 /** Community環境設定のQuery・Action・Host接続を提供し、Ready画面に保存の生存期間を委ねる。 */
@@ -13,17 +15,23 @@ export const CommunityPreferences = ({
   communityId: string
   render: SettingsSectionRender
 }) => {
-  const model = useCommunityPreferencesConnection(communityId)
+  const query = useCommunityMySettingsQuery({
+    variables: { communityId },
+    fetchPolicy: "network-only",
+  })
+  const operations = useCommunityPreferencesSave(communityId)
   const alias = useCommunityAliasSave(communityId)
-  const settings = model.data?.community?.mySettings
+  const settings = query.data?.community?.mySettings
+
+  useCommunitySettingsRefreshError(Boolean(query.data?.community && query.error))
 
   if (!settings) {
     return render(
-      model.loading
+      query.loading
         ? { status: "loading" }
         : {
             status: "error",
-            retry: () => { void model.refetch().catch(() => undefined) },
+            retry: () => { void query.refetch().catch(() => undefined) },
           },
     )
   }
@@ -31,10 +39,12 @@ export const CommunityPreferences = ({
   return render({
     status: "ready",
     content: (
-      <CommunityPreferencesSection
+      <CommunityPreferencesReady
         key={communityId}
         communityId={communityId}
-        settings={settings}
+        preferences={{ accentColor: settings.accentColor }}
+        savedAlias={settings.alias}
+        operations={operations}
         alias={alias}
       />
     ),

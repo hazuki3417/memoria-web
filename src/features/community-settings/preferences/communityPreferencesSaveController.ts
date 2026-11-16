@@ -3,7 +3,7 @@ import { resolveFormFailureValidation } from "@/ui/formValidation"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import { getCommunityBlockedFeedback } from "../communityBlockedFeedback"
 import { isCommunityAccentColor, type CommunityPreferencesDraft, type CommunityPreferencesPatch, type CommunityPreferencesValues } from "./communityPreferences"
-import type { CommunityPreferencesSaveOutcome, CommunityPreferencesSaveRejection, SaveCommunityPreferencesAction } from "./communityPreferencesSaveOutcome"
+import type { CommunityPreferencesSaveOutcome, CommunityPreferencesSaveRejection, CommunityPreferencesSaveOperations } from "./communityPreferencesSaveOutcome"
 
 export type CommunityPreferencesFailure = "rejected" | "blocked" | "unknown" | null
 export type CommunityPreferencesSnapshot = Readonly<{
@@ -17,10 +17,7 @@ export type CommunityPreferencesSnapshot = Readonly<{
   inspected: boolean
 }>
 
-type Operations = {
-  save: SaveCommunityPreferencesAction
-  observe: () => Promise<CommunityPreferencesValues>
-  confirm: (patch: CommunityPreferencesPatch) => void
+type Operations = CommunityPreferencesSaveOperations & {
   preview: (color: string) => number
   release: (owner: number) => void
 }
