@@ -42,7 +42,7 @@ export const fromGraphqlPersonalPreferences = (
   preferences: PreferencesProjection,
 ): PersonalPreferencesValues => {
   return {
-    personalAccentColor: preferences.personalAccentColor,
+    personalAccentColor: preferences.personalAccentColor.toUpperCase(),
     dateFormat: preferences.dateFormat,
     fileSizeUnit: preferences.fileSizeUnit,
     mediaThumbnailSize: preferences.mediaThumbnailSize,

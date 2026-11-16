@@ -21,6 +21,7 @@ export const CommunityPreferences = ({
   const query = useCommunityMySettingsQuery({
     variables: { communityId },
     fetchPolicy: "network-only",
+    refetchWritePolicy: "merge",
   })
   const operations = useCommunityPreferencesSave(communityId)
   const alias = useCommunityAliasSave(communityId)
@@ -29,9 +30,10 @@ export const CommunityPreferences = ({
     preview: (color: string) => setPreview(communityId, color),
     release: (owner: number) => clearPreview(communityId, owner),
   }), [communityId, setPreview, clearPreview])
-  const settings = query.data?.community?.mySettings
+  const community = query.data?.community
+  const settings = community?.id === communityId ? community.mySettings : undefined
 
-  useCommunitySettingsRefreshError(Boolean(query.data?.community && query.error))
+  useCommunitySettingsRefreshError(Boolean(settings && query.error))
 
   if (!settings) {
     return render(

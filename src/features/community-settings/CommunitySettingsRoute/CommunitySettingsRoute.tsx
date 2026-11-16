@@ -50,9 +50,12 @@ export function CommunitySettingsRoute({
   const { data: settingsData } = useCommunityMySettingsQuery({
     variables: { communityId },
     fetchPolicy: "cache-first",
+    refetchWritePolicy: "merge",
   })
   const preview = useOptionalCommunityAccentPreview()
-  const communityAccentColor = preview?.previews[communityId]?.color ?? settingsData?.community?.mySettings.accentColor
+  const community = settingsData?.community
+  const confirmedAccent = community?.id === communityId ? community.mySettings.accentColor : undefined
+  const communityAccentColor = preview?.previews[communityId]?.color ?? confirmedAccent
 
   let controller: (render: SettingsSectionRender) => ReactNode
 

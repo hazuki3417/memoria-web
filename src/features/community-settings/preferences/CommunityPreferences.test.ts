@@ -82,10 +82,19 @@ describe("CommunityPreferencesのSection取得状態", () => {
     expect(refetch).toHaveBeenCalledTimes(1)
   })
 
+  it("別Communityの取得値でReadyをMountしない", () => {
+    mocks.connection.mockReturnValue({
+      data: { community: { id: "club-b", mySettings: { accentColor: "#123456", alias: null } } },
+      loading: false,
+    })
+    renderSection()
+    expect(results.at(-1)?.status).toBe("error")
+  })
+
   it("確定済みの設定がある場合はReadyを維持する", () => {
     mocks.connection.mockReturnValue({
       data: {
-        community: { mySettings: { accentColor: "#123456", alias: null } },
+        community: { id: "club-a", mySettings: { accentColor: "#123456", alias: null } },
       },
       loading: false,
       error: new Error("refresh failed"),
@@ -95,7 +104,7 @@ describe("CommunityPreferencesのSection取得状態", () => {
     expect(element.textContent).toContain("Community Preferences")
     expect(mocks.refreshError).toHaveBeenLastCalledWith(true)
     expect(mocks.connection).toHaveBeenCalledWith({
-      variables: { communityId: "club-a" }, fetchPolicy: "network-only",
+      variables: { communityId: "club-a" }, fetchPolicy: "network-only", refetchWritePolicy: "merge",
     })
   })
 })

@@ -126,7 +126,7 @@ describe("Community Preferencesの保存Adapter", () => {
   })
 
   it("現在値照会はno-cacheで行い、明示確認までCacheを変更しない", async () => {
-    mocks.query.mockResolvedValue({ data: { community: { mySettings: { ...patch, alias: "別名" } } } })
+    mocks.query.mockResolvedValue({ data: { community: { id: "community-1", mySettings: { ...patch, alias: "別名" } } } })
     await expect(operations.observe()).resolves.toEqual(patch)
     expect(mocks.query).toHaveBeenCalledWith({
       query: "communityMySettings", variables: { communityId: "community-1" }, fetchPolicy: "no-cache", context: { settingsInspection: true, queryDeduplication: false },
@@ -135,6 +135,12 @@ describe("Community Preferencesの保存Adapter", () => {
     operations.confirm(patch)
     expect(mocks.patch).toHaveBeenCalledWith(mocks.cache, "community-1", patch)
     expect(mocks.mutate).not.toHaveBeenCalled()
+  })
+
+  it("別Communityの照会結果を採用しない", async () => {
+    mocks.query.mockResolvedValue({ data: { community: { id: "community-2", mySettings: { ...patch, alias: null } } } })
+    await expect(operations.observe()).rejects.toThrow("Community accent unavailable")
+    expect(mocks.patch).not.toHaveBeenCalled()
   })
 
   it("Communityを取得できない場合は現在値照会の失敗を返す", async () => {

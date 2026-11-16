@@ -14,7 +14,7 @@ describe("Personal PreferencesのGraphQL変換", () => {
   it("converts all account-synchronized preferences from GraphQL", () => {
     expect(
       fromGraphqlPersonalPreferences({
-        personalAccentColor: "#4287F5",
+        personalAccentColor: "#4287f5",
         dateFormat: DateFormat.DdMmYyyy,
         fileSizeUnit: FileSizeUnit.Binary,
         mediaThumbnailSize: MediaThumbnailSize.Large,

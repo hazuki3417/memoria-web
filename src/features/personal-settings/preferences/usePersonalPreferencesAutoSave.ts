@@ -252,6 +252,7 @@ export const usePersonalPreferencesAutoSave = (
 
   const discard = () => {
     if (activeAttempt.current || !stateRef.current.failure) return
+    accentDraft.current = null
     pending.current = {}
     observed.current = null
     inspectionGeneration.current += 1

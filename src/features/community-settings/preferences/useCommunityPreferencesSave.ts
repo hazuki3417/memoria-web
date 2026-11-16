@@ -98,8 +98,11 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
         fetchPolicy: "no-cache",
         context: settingsInspectionContext,
       })
-      const settings = result.data?.community?.mySettings
-      if (!settings?.accentColor || !isCommunityAccentColor(settings.accentColor)) throw new Error("Community accent unavailable")
+      const community = result.data?.community
+      const settings = community?.mySettings
+      if (community?.id !== communityId || !settings?.accentColor || !isCommunityAccentColor(settings.accentColor)) {
+        throw new Error("Community accent unavailable")
+      }
       return fromGraphqlCommunityPreferences(settings)
     }
 
@@ -110,7 +113,7 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
           variables: { communityId },
           returnPartialData: true,
         })?.community
-        return current?.id === communityId && current?.mySettings?.accentColor === color
+        return current?.id === communityId && current?.mySettings?.accentColor.toUpperCase() === color.toUpperCase()
       } catch {
         return false
       }

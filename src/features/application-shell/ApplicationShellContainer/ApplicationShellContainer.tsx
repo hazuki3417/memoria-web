@@ -81,7 +81,7 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
     loading: communitiesLoading,
     error: communitiesError,
     refetch: refetchCommunities,
-  } = useMyCommunitiesQuery()
+  } = useMyCommunitiesQuery({ refetchWritePolicy: "merge" })
   const communityRefreshInFlight = useRef(false)
   const refreshCommunities = async () => {
     if (
@@ -99,7 +99,7 @@ function ApplicationShellWithPreview({ children }: { children: ReactNode }) {
     }
   }
   const { data: currentUserData, loading: currentUserLoading } =
-    useCurrentUserQuery()
+    useCurrentUserQuery({ refetchWritePolicy: "merge" })
   const [createMutation] = useCreateCommunityMutation()
   const created = sortCommunitiesByDisplayName(
     communityData?.myCommunities.map((item) => ({

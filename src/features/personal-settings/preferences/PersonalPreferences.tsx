@@ -9,9 +9,10 @@ import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
 import { fromGraphqlPersonalPreferences } from "./personalPreferencesGraphqlAdapter"
 
 /** Profileと同じQuery・Action・Host接続の入口。Ready ViewがFormのLifetimeを所有する。 */
-export function PersonalPreferences({ render }: { render: SettingsSectionRender }) {
+export const PersonalPreferences = ({ render }: { render: SettingsSectionRender }) => {
   const query = usePersonalSettingsPreferencesQuery({
     fetchPolicy: "network-only",
+    refetchWritePolicy: "merge",
     notifyOnNetworkStatusChange: true,
   })
   const userId = query.data?.me?.id

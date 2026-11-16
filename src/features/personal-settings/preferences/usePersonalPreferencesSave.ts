@@ -106,7 +106,7 @@ export const usePersonalPreferencesSave = (userId?: string): PersonalPreferences
           query: PersonalSettingsAccentDocument,
           returnPartialData: true,
         })?.me
-        return Boolean(userId && current?.id === userId && current?.preferences?.personalAccentColor === color)
+        return Boolean(userId && current?.id === userId && current?.preferences?.personalAccentColor.toUpperCase() === color.toUpperCase())
       } catch {
         return false
       }

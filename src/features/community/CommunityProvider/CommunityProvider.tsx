@@ -47,7 +47,7 @@ export function useCommunity({
     variables: { communityId },
     skip: !includeMembers,
   })
-  const currentUser = useCurrentUserQuery({ skip: !includeMembers })
+  const currentUser = useCurrentUserQuery({ skip: !includeMembers, refetchWritePolicy: "merge" })
   return {
     communityId,
     name: community.data?.community?.name ?? null,

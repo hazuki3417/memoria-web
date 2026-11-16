@@ -93,8 +93,9 @@ export const useCommunityAliasSave = (communityId: string) => {
       fetchPolicy: "no-cache",
       context: settingsInspectionContext,
     })
-    if (!current.data?.community) throw new Error("Community unavailable")
-    return current.data.community.mySettings.alias
+    const community = current.data?.community
+    if (community?.id !== communityId) throw new Error("Community unavailable")
+    return community.mySettings.alias
   }
 
   /** Alias保存の確定Outcomeと、Unknown時だけ利用する現在値照会を提供する。 */
