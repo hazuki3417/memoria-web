@@ -1,7 +1,7 @@
 "use client"
 
 import { Stack } from "@mantine/core"
-import { CommunityPreferences } from "./CommunityPreferences"
+import { CommunityPreferencesView } from "./CommunityPreferencesView"
 import { CommunityAliasSection } from "./CommunityAliasSection"
 import { CommunityPreferencesSaveFeedback } from "./CommunityPreferencesSaveFeedback"
 import { useCommunityPreferencesAutoSave } from "./useCommunityPreferencesAutoSave"
@@ -25,7 +25,7 @@ export const CommunityPreferencesSection = ({
 
   return (
     <Stack gap="sm">
-      <CommunityPreferences
+      <CommunityPreferencesView
         key={communityId}
         accent={accent}
         initialDraft={lastDraft}
