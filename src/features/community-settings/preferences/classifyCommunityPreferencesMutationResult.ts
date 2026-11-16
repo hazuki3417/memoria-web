@@ -1,5 +1,6 @@
 import type { OperationUpdateCommunitySettingsMutation } from "@/infrastructure/graphql/generated"
 import { isCommunityAccentColor } from "./communityPreferences"
+import { fromGraphqlCommunityPreferences } from "./communityPreferencesGraphqlAdapter"
 import type { CommunityPreferencesSaveOutcome } from "./communityPreferencesSaveOutcome"
 
 type MutationResult = NonNullable<OperationUpdateCommunitySettingsMutation["updateCommunitySettings"]>
@@ -10,7 +11,7 @@ export const classifyCommunityPreferencesMutationResult = (
 ): CommunityPreferencesSaveOutcome => {
   switch (result.__typename) {
     case "UpdateCommunitySettingsSuccess": {
-      const color = result.settings.accentColor
+      const { accentColor: color } = fromGraphqlCommunityPreferences(result.settings)
       if (!color || !isCommunityAccentColor(color)) return { kind: "unknown" }
       return { kind: "success", value: { accentColor: color.toUpperCase() } }
     }

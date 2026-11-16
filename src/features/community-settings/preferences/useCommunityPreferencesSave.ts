@@ -15,6 +15,7 @@ import {
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { createActionAdapter } from "@/ui/Action"
 import { commitCommunitySettingsPatch } from "./communitySettingsCache"
+import { fromGraphqlCommunityPreferences, toGraphqlCommunityPreferencesPatch } from "./communityPreferencesGraphqlAdapter"
 import { isCommunityAccentColor, type CommunityPreferencesPatch, type CommunityPreferencesValues } from "./communityPreferences"
 import { classifyCommunityPreferencesMutationResult } from "./classifyCommunityPreferencesMutationResult"
 import type { CommunityPreferencesSaveOperations, CommunityPreferencesSaveOutcome, SaveCommunityPreferencesAction } from "./communityPreferencesSaveOutcome"
@@ -31,7 +32,7 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
         mutation: UpdateCommunitySettingsDocument,
         fetchPolicy: "no-cache",
         errorPolicy: "all",
-        variables: { input: { communityId, ...patch } },
+        variables: { input: toGraphqlCommunityPreferencesPatch(communityId, patch) },
       })
 
     const classifyError = (error: unknown): CommunityPreferencesSaveOutcome => {
@@ -80,9 +81,9 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
         variables: { communityId },
         fetchPolicy: "no-cache",
       })
-      const current = result.data?.community?.mySettings.accentColor
-      if (!current || !isCommunityAccentColor(current)) throw new Error("Community accent unavailable")
-      return { accentColor: current }
+      const settings = result.data?.community?.mySettings
+      if (!settings?.accentColor || !isCommunityAccentColor(settings.accentColor)) throw new Error("Community accent unavailable")
+      return fromGraphqlCommunityPreferences(settings)
     }
 
     return { save, observe, confirm }

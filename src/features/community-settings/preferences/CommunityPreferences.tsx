@@ -7,6 +7,7 @@ import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 import { CommunityPreferencesView } from "./CommunityPreferencesView"
 import { useCommunityPreferencesSave } from "./useCommunityPreferencesSave"
+import { fromGraphqlCommunityPreferences } from "./communityPreferencesGraphqlAdapter"
 import { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
 /** Community環境設定のQuery・Action・Host接続を提供し、Ready画面に保存の生存期間を委ねる。 */
@@ -48,7 +49,7 @@ export const CommunityPreferences = ({
     content: (
       <CommunityPreferencesView
         key={communityId}
-        accent={settings.accentColor}
+        accent={fromGraphqlCommunityPreferences(settings).accentColor}
         isPreview={false}
         operations={operations}
         preview={preview}
