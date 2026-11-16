@@ -8,7 +8,7 @@ import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsM
 
 const meta = {
   // Existing meta title preserves page-level Story IDs during ownership migration.
-  title: "features/settings/preferences/SettingsPreferences",
+  title: "features/personal-settings/preferences/PersonalPreferencesView",
   component: PersonalPreferencesView,
   args: {
     compact: false,

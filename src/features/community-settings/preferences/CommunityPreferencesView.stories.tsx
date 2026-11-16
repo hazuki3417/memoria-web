@@ -6,7 +6,7 @@ import { expect, fn, userEvent, within } from "storybook/test"
 import { CommunityPreferencesView } from "./CommunityPreferencesView"
 
 const meta = {
-  title: "Features/Community Settings/Accent Draft",
+  title: "features/community-settings/preferences/CommunityPreferencesView",
   component: CommunityPreferencesView,
   args: {
     accent: "#123456",
