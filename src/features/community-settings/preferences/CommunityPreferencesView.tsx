@@ -5,7 +5,7 @@ import { Box, Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING, type SaveStatusState } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
-import { CommunityPreferencesDisplaySection } from "./CommunityPreferencesDisplaySection"
+import { CommunityPreferencesDisplaySection } from "./CommunityPreferencesDisplaySection/CommunityPreferencesDisplaySection"
 import { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
 
 /** Preferences全体のHeader・Feedback・Alias/AccentをCompositionする。 */

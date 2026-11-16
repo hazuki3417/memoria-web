@@ -1,42 +1,21 @@
 "use client"
 
-import type { Dispatch, SetStateAction } from "react"
 import { Box, ColorInput, Stack, Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { SectionHeader } from "@/components/SectionHeader"
 import { SettingRow } from "@/components/SettingRow"
-import type { SaveStatusState } from "@/components/SaveStatus"
-import { useCommunityAccentForm } from "./useCommunityAccentForm"
+import type { useCommunityPreferencesForm } from "../useCommunityPreferencesForm"
 
-/** Accent固有の入力・Validation・Responsive表示を所有する。 */
-export function CommunityAccentSection({
-  accent,
-  initialDraft,
-  onAccentDraftChange,
-  setAccent,
-  isPreview,
-  restoreOnAccentChange,
-  preserveDraftOnAccentChange,
-  saveStatus,
-  accentError,
-  onDraftValidityChange,
+/** 表示Sectionは画面が所有するForm Modelを利用する。 */
+export const CommunityPreferencesDisplaySection = ({
+  model, isPreview, accentError,
 }: {
-  accent: string
-  initialDraft?: string
-  onAccentDraftChange?: (value: string) => void
-  setAccent: Dispatch<SetStateAction<string>>
+  model: ReturnType<typeof useCommunityPreferencesForm>
   isPreview: boolean
-  restoreOnAccentChange: boolean
-  preserveDraftOnAccentChange: boolean
-  saveStatus?: SaveStatusState
   accentError?: string
-  onDraftValidityChange?: (valid: boolean) => void
-}) {
+}) => {
   const compact = useMediaQuery("(max-width: 48em)")
-  const { field, fieldState, draftInvalid, onDraftChange } = useCommunityAccentForm({
-    accent, initialDraft, restoreOnAccentChange, preserveDraftOnAccentChange,
-    saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
-  })
+  const { field, fieldState, draftInvalid, onDraftChange } = model
 
   return (
     <Box>

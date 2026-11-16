@@ -7,7 +7,7 @@ import type { z } from "zod"
 import { communityPreferencesSchema } from "./communityPreferencesSchema"
 import type { SaveStatusState } from "@/components/SaveStatus"
 
-/** Owns Community Accent form draft, source reconciliation and validation. */
+/** Preferencesの入力Draft・取得値との同期・Validationを管理する。 */
 export const useCommunityPreferencesForm = ({
   accent,
   initialDraft,
@@ -85,6 +85,7 @@ export const useCommunityPreferencesForm = ({
     if (parsed.success) setAccent(parsed.data.accentDraft)
   }
 
+  // 各Sectionが入力状態・Validation・変更操作を利用できるようにする。
   return {
     field,
     fieldState,

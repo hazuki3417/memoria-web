@@ -5,14 +5,10 @@ import { useCommunityAccentPreview } from "@/features/application-shell/Communit
 import { useCommunityPreferencesSave } from "./useCommunityPreferencesSave"
 import { createCommunityPreferencesSaveController } from "./communityPreferencesSaveController"
 
-const isHex = (value: string) => /^#[0-9a-fA-F]{6}$/.test(value)
+import { isCommunityAccentColor, type CommunityPreferencesValues } from "./communityPreferences"
 
-/**
- * One Ready view owns its short-lived Queue, draft and explicit recovery.
- * The mutation closure retains its fixed Community ID and living Apollo client
- * after unmount, while preview and all form-local state are released.
- */
-export const useCommunityPreferencesAutoSave = (communityId: string, initialAccent: string) => {
+/** Ready画面の生存期間に限り保存Controllerを所有し、離脱時にQueueを閉じる。 */
+export const useCommunityPreferencesAutoSave = (communityId: string, initialPreferences: CommunityPreferencesValues) => {
   const operations = useCommunityPreferencesSave(communityId)
   const { setPreview, clearPreview } = useCommunityAccentPreview()
   const [controller, setController] = useState(createCommunityPreferencesSaveController)
@@ -27,8 +23,8 @@ export const useCommunityPreferencesAutoSave = (communityId: string, initialAcce
       preview: (value) => setPreview(communityId, value),
       release: (owner) => clearPreview(communityId, owner),
     })
-    controller.initialize(initialAccent)
-  }, [controller, communityId, initialAccent, operations, setPreview, clearPreview])
+    controller.initialize(initialPreferences)
+  }, [controller, communityId, initialPreferences, operations, setPreview, clearPreview])
 
   useEffect(() => {
     // React Strict Mode replays mount cleanup; a closed Queue cannot be reopened.
@@ -39,6 +35,7 @@ export const useCommunityPreferencesAutoSave = (communityId: string, initialAcce
     return () => { void controller.close() }
   }, [controller])
 
-  const canResave = Boolean(snapshot.draft && isHex(snapshot.draft))
+  const canResave = Boolean(snapshot.draft && isCommunityAccentColor(snapshot.draft.accentColor))
+  // Ready画面に保存状態とユーザーによるRecovery操作を提供する。
   return { controller, snapshot, canResave }
 }

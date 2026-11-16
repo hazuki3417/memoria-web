@@ -5,23 +5,24 @@ import { CommunityPreferencesView } from "./CommunityPreferencesView"
 import { CommunityAliasSection } from "./CommunityAliasSection"
 import { CommunityPreferencesSaveFeedback } from "./CommunityPreferencesSaveFeedback"
 import { useCommunityPreferencesAutoSave } from "./useCommunityPreferencesAutoSave"
+import type { CommunityPreferencesValues } from "./communityPreferences"
 import type { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
-/** Ready-only UI composition; its Accent Queue closes when this view unmounts. */
+/** Ready状態のPreferencesを保存Lifecycleへ接続する。Aliasの明示保存は独立させる。 */
 export const CommunityPreferencesSection = ({
   communityId,
   settings,
   alias,
 }: {
   communityId: string
-  settings: { accentColor: string; alias: string | null }
+  settings: CommunityPreferencesValues & { alias: string | null }
   alias: ReturnType<typeof useCommunityAliasSave>
 }) => {
   const { snapshot, controller, canResave } =
-    useCommunityPreferencesAutoSave(communityId, settings.accentColor)
+    useCommunityPreferencesAutoSave(communityId, settings)
   const failure = snapshot.failure
-  const accent = snapshot.confirmed ?? settings.accentColor
-  const lastDraft = snapshot.draft ?? accent
+  const accent = snapshot.confirmed?.accentColor ?? settings.accentColor
+  const lastDraft = snapshot.draft?.accentColor ?? accent
 
   return (
     <Stack gap="sm">
@@ -33,7 +34,7 @@ export const CommunityPreferencesSection = ({
         preserveDraftOnAccentChange={failure !== null}
         saveStatus={failure ? "attention" : snapshot.status}
         accentError={snapshot.validation?.fieldErrors.accentColor}
-        onAccentDraftChange={(value) => controller.edit(value)}
+        onAccentDraftChange={(value) => controller.edit({ accentColor: value })}
         saveFeedback={
           failure ? (
             <CommunityPreferencesSaveFeedback
