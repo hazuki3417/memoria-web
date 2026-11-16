@@ -3,12 +3,12 @@
 import { Stack } from "@mantine/core"
 import { CommunityPreferences } from "./CommunityPreferences"
 import { CommunityAliasSection } from "./CommunityAliasSection"
-import { CommunityAccentSaveFeedback } from "./ConnectedCommunityPreferences/CommunityAccentSaveFeedback"
-import { useCommunityAccentAutoSave } from "./useCommunityAccentAutoSave"
+import { CommunityPreferencesSaveFeedback } from "./CommunityPreferencesSaveFeedback"
+import { useCommunityPreferencesAutoSave } from "./useCommunityPreferencesAutoSave"
 import type { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
 /** Ready-only UI composition; its Accent Queue closes when this view unmounts. */
-export function CommunityPreferencesSection({
+export const CommunityPreferencesSection = ({
   communityId,
   settings,
   alias,
@@ -16,9 +16,9 @@ export function CommunityPreferencesSection({
   communityId: string
   settings: { accentColor: string; alias: string | null }
   alias: ReturnType<typeof useCommunityAliasSave>
-}) {
+}) => {
   const { snapshot, controller, canResave } =
-    useCommunityAccentAutoSave(communityId, settings.accentColor)
+    useCommunityPreferencesAutoSave(communityId, settings.accentColor)
   const failure = snapshot.failure
   const accent = snapshot.confirmed ?? settings.accentColor
   const lastDraft = snapshot.draft ?? accent
@@ -36,7 +36,7 @@ export function CommunityPreferencesSection({
         onAccentDraftChange={(value) => controller.edit(value)}
         saveFeedback={
           failure ? (
-            <CommunityAccentSaveFeedback
+            <CommunityPreferencesSaveFeedback
               snapshot={snapshot}
               controller={controller}
               canResave={canResave}
