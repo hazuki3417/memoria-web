@@ -16,6 +16,7 @@ export function ConnectedCommunityUsage({
   const query = useCommunitySettingsUsageQuery({
     variables: { communityId },
     fetchPolicy: "network-only",
+    refetchWritePolicy: "merge",
     notifyOnNetworkStatusChange: true,
   })
   const projection = query.data?.communityUsage

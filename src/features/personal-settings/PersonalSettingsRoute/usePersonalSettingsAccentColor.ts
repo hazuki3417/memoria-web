@@ -10,6 +10,7 @@ export function usePersonalSettingsAccentColor() {
   const personalPreview = usePersonalAccentPreview()
   const { data, error } = usePersonalSettingsAccentQuery({
     fetchPolicy: "network-only",
+    refetchWritePolicy: "merge",
   })
   usePersonalSettingsRefreshError(Boolean(data?.me && error))
 

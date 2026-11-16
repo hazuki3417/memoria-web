@@ -19,6 +19,7 @@ vi.mock("@apollo/client", () => ({
 }))
 vi.mock("@/infrastructure/graphql/generated", () => ({
   CommunityMySettingsDocument: "communityMySettings",
+  MyCommunitiesDocument: "myCommunities",
   UpdateCommunitySettingsDocument: "updateCommunitySettings",
 }))
 vi.mock("./communityPreferencesCache", () => ({
@@ -75,7 +76,7 @@ describe("Community Preferencesの保存Adapter", () => {
     mocks.patch.mockImplementationOnce(() => { throw new Error("cache failure") })
     mocks.refetchQueries.mockRejectedValueOnce(new Error("refetch failure"))
     await expect(operations.save(patch)).resolves.toEqual({ kind: "success", value: patch })
-    expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: ["communityMySettings"], onQueryUpdated: expect.any(Function) })
+    expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: ["communityMySettings", "myCommunities"], onQueryUpdated: expect.any(Function) })
   })
 
   it("Typed Successが併存するGraphQL Errorより優先される", async () => {

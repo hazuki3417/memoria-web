@@ -5,6 +5,7 @@ import { useApolloClient } from "@apollo/client"
 import { settingsInspectionContext } from "@/infrastructure/graphql/settingsCacheReadProtection"
 import {
   CommunityMySettingsDocument,
+  MyCommunitiesDocument,
   UpdateCommunitySettingsDocument,
   type OperationCommunityMySettingsQuery,
   type OperationUpdateCommunitySettingsMutation,
@@ -63,10 +64,14 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
       } catch {
         // Cache同期失敗は保存Outcomeとは別に扱う。
       }
-      void client.refetchQueries({
-        include: [CommunityMySettingsDocument],
-        onQueryUpdated: (query) => query.variables.communityId === communityId ? query.refetch() : false,
-      }).catch(() => undefined)
+      try {
+        void client.refetchQueries({
+          include: [CommunityMySettingsDocument, MyCommunitiesDocument],
+          onQueryUpdated: (query) => !query.variables.communityId || query.variables.communityId === communityId ? query.refetch() : false,
+        }).catch(() => undefined)
+      } catch {
+        // 保存Outcomeと取得同期は独立している。
+      }
     }
 
     const afterSuccess = (values: CommunityPreferencesValues) => {
@@ -94,12 +99,16 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
     }
 
     const isAccentConfirmed = (color: string) => {
-      const current = client.cache.readQuery<OperationCommunityMySettingsQuery>({
-        query: CommunityMySettingsDocument,
-        variables: { communityId },
-        returnPartialData: true,
-      })?.community
-      return current?.id === communityId && current?.mySettings?.accentColor === color
+      try {
+        const current = client.cache.readQuery<OperationCommunityMySettingsQuery>({
+          query: CommunityMySettingsDocument,
+          variables: { communityId },
+          returnPartialData: true,
+        })?.community
+        return current?.id === communityId && current?.mySettings?.accentColor === color
+      } catch {
+        return false
+      }
     }
 
     return { save, observe, confirm, isAccentConfirmed }

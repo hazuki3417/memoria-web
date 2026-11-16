@@ -63,7 +63,7 @@ describe("Personal PreferencesのAction Adapter", () => {
     mocks.mutate.mockResolvedValue(success)
     mocks.patch.mockReturnValueOnce(false)
     mocks.refetchQueries.mockRejectedValue(new Error("refetch failed"))
-    await expect(save.savePreferencesAction(patch)).resolves.toEqual({
+    await expect(save.save(patch)).resolves.toEqual({
       kind: "success", value: confirmed,
     })
     expect(mocks.mutate).toHaveBeenCalledWith({
@@ -85,7 +85,7 @@ describe("Personal PreferencesのAction Adapter", () => {
     mocks.mutate.mockResolvedValue({
       data: { updateUserPreferences: { __typename: "InputValidationFailure", violations } },
     })
-    await expect(save.savePreferencesAction(patch)).resolves.toMatchObject({
+    await expect(save.save(patch)).resolves.toMatchObject({
       kind: "rejected",
       reason: { kind: "validation", violations },
     })
@@ -94,8 +94,8 @@ describe("Personal PreferencesのAction Adapter", () => {
   it("Mutationの結果欠落と通信例外はUnknownとして返す", async () => {
     mocks.mutate.mockResolvedValueOnce({ data: null })
     mocks.mutate.mockRejectedValueOnce(new Error("network"))
-    await expect(save.savePreferencesAction(patch)).resolves.toEqual({ kind: "unknown" })
-    await expect(save.savePreferencesAction(patch)).resolves.toEqual({ kind: "unknown" })
+    await expect(save.save(patch)).resolves.toEqual({ kind: "unknown" })
+    await expect(save.save(patch)).resolves.toEqual({ kind: "unknown" })
     expect(mocks.refetchQueries).not.toHaveBeenCalled()
   })
 
@@ -103,7 +103,7 @@ describe("Personal PreferencesのAction Adapter", () => {
     mocks.mutate.mockResolvedValue({
       errors: [{ extensions: { code: "FORBIDDEN" } }],
     })
-    await expect(save.savePreferencesAction(patch)).resolves.toMatchObject({
+    await expect(save.save(patch)).resolves.toMatchObject({
       kind: "rejected", reason: { kind: "blocked" },
     })
   })
@@ -112,7 +112,7 @@ describe("Personal PreferencesのAction Adapter", () => {
     mocks.mutate.mockResolvedValue({
       ...success, errors: [{ extensions: { code: "INTERNAL" } }],
     })
-    await expect(save.savePreferencesAction(patch)).resolves.toMatchObject({
+    await expect(save.save(patch)).resolves.toMatchObject({
       kind: "success", value: confirmed,
     })
   })

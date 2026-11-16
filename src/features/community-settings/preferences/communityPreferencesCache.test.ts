@@ -190,7 +190,7 @@ describe("Community設定の生成FragmentとApollo Cache契約", () => {
       data: { myCommunities: [{ __typename: "Community", id: "community-1",
         mySettings: { __typename: "CommunitySettings", accentColor: "#334455" } }] },
     })
-    expect(cache.readQuery({ query: CommunityMySettingsDocument, variables: { communityId: "community-1" } })?.community?.mySettings)
+    expect(cache.readQuery<OperationCommunityMySettingsQuery>({ query: CommunityMySettingsDocument, variables: { communityId: "community-1" } })?.community?.mySettings)
       .toMatchObject({ accentColor: "#334455", alias: "My community" })
     const partial = createApolloCache()
     partial.writeQuery({

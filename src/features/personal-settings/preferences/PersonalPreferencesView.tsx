@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
 import { usePersonalPreferencesForm } from "./usePersonalPreferencesForm"
 import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
-import type { SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
+import type { PersonalPreferencesSaveOperations, SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
 import { PersonalPreferencesSaveFeedback } from "./PersonalPreferencesSaveFeedback"
 import { PersonalPreferencesDisplaySection } from "./PersonalPreferencesDisplaySection/PersonalPreferencesDisplaySection"
 import { PersonalPreferencesPreviewSection } from "./PersonalPreferencesPreviewSection/PersonalPreferencesPreviewSection"
@@ -16,8 +16,7 @@ export type PersonalPreferencesViewProps = {
   onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
   onSaveAction?: SavePersonalPreferencesAction
   onInspect?: () => Promise<UserPreferences>
-  onConfirm?: (patch: UserPreferencesPatch) => void
-  isAccentConfirmed?: (color: string) => boolean
+  operations?: PersonalPreferencesSaveOperations
 }
 
 /** 環境設定のHeader・Feedback・各Sectionを、保存処理から独立して描画する。 */
@@ -27,11 +26,13 @@ export function PersonalPreferencesView({
   onSave,
   onSaveAction,
   onInspect,
-  onConfirm,
-  isAccentConfirmed,
+  operations,
 }: PersonalPreferencesViewProps) {
-  const model = usePersonalPreferencesForm(initialPreferences, onSave, onInspect, onSaveAction, onConfirm, isAccentConfirmed)
-  const canSave = Boolean(onSave || onSaveAction)
+  const model = usePersonalPreferencesForm(
+    initialPreferences, onSave, operations?.observe ?? onInspect,
+    operations?.save ?? onSaveAction, operations?.confirm, operations?.isAccentConfirmed,
+  )
+  const canSave = Boolean(operations || onSave || onSaveAction)
   return (
     <Stack gap="xl">
       <PageHeader

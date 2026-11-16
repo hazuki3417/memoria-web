@@ -25,10 +25,11 @@ import { classifyPersonalPreferencesMutationResult } from "./classifyPersonalPre
 import type {
   PersonalPreferencesSaveRejection,
   SavePersonalPreferencesAction,
+  PersonalPreferencesSaveOperations,
 } from "./personalPreferencesSaveOutcome"
 
 /** PreferencesのMutationをTyped ActionOutcomeに分類する。 */
-export const usePersonalPreferencesSave = (userId?: string) => {
+export const usePersonalPreferencesSave = (userId?: string): PersonalPreferencesSaveOperations => {
   const client = useApolloClient()
   return useMemo(() => {
     const execute = (patch: UserPreferencesPatch) => {
@@ -72,9 +73,13 @@ export const usePersonalPreferencesSave = (userId?: string) => {
       } catch {
         // Cache同期失敗はMutation Outcomeから独立して扱う。
       }
-      void client.refetchQueries({
-        include: [CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument],
-      }).catch(() => undefined)
+      try {
+        void client.refetchQueries({
+          include: [CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument],
+        }).catch(() => undefined)
+      } catch {
+        // 明示採用でもCache取得の失敗を遠隔保存結果と混同しない。
+      }
     }
 
     const afterSuccess = (values: UserPreferences, attempted: UserPreferencesPatch) => {
@@ -96,11 +101,15 @@ export const usePersonalPreferencesSave = (userId?: string) => {
     }
 
     const isAccentConfirmed = (color: string) => {
-      const current = client.cache.readQuery<OperationPersonalSettingsAccentQuery>({
-        query: PersonalSettingsAccentDocument,
-        returnPartialData: true,
-      })?.me
-      return current?.id === userId && current?.preferences?.personalAccentColor === color
+      try {
+        const current = client.cache.readQuery<OperationPersonalSettingsAccentQuery>({
+          query: PersonalSettingsAccentDocument,
+          returnPartialData: true,
+        })?.me
+        return Boolean(userId && current?.id === userId && current?.preferences?.personalAccentColor === color)
+      } catch {
+        return false
+      }
     }
 
     const savePreferencesAction: SavePersonalPreferencesAction = createActionAdapter({
@@ -110,6 +119,6 @@ export const usePersonalPreferencesSave = (userId?: string) => {
       afterSuccess,
     })
 
-    return { savePreferencesAction, inspectPreferences, confirmPreferences, isAccentConfirmed }
+    return { save: savePreferencesAction, observe: inspectPreferences, confirm: confirmPreferences, isAccentConfirmed }
   }, [client, userId])
 }

@@ -4,6 +4,7 @@ import { useApolloClient } from "@apollo/client"
 import { settingsInspectionContext } from "@/infrastructure/graphql/settingsCacheReadProtection"
 import {
   CommunityMySettingsDocument,
+  MyCommunitiesDocument,
   useUpdateCommunitySettingsMutation,
 } from "@/infrastructure/graphql/generated"
 import {
@@ -58,10 +59,14 @@ export const useCommunityAliasSave = (communityId: string) => {
     } catch {
       // 保存OutcomeとCache同期失敗を区別する。
     }
-    void client.refetchQueries({
-      include: [CommunityMySettingsDocument],
-      onQueryUpdated: (query) => query.variables.communityId === communityId ? query.refetch() : false,
-    }).catch(() => undefined)
+    try {
+      void client.refetchQueries({
+        include: [CommunityMySettingsDocument, MyCommunitiesDocument],
+        onQueryUpdated: (query) => !query.variables.communityId || query.variables.communityId === communityId ? query.refetch() : false,
+      }).catch(() => undefined)
+    } catch {
+      // 保存Outcomeと取得同期は独立している。
+    }
   }
 
   const afterSuccess = (alias: string | null) => {

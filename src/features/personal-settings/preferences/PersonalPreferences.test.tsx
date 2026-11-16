@@ -20,14 +20,11 @@ vi.mock("@/infrastructure/graphql/generated", () => ({
 vi.mock("@mantine/hooks", () => ({
   useMediaQuery: (...args: unknown[]) => mocks.compact(...args),
 }))
-vi.mock("../usePersonalSettingsInspection", () => ({
-  usePersonalSettingsInspection: () => ({ inspectPreferences: mocks.inspect }),
-}))
 vi.mock("../usePersonalSettingsRefreshError", () => ({
   usePersonalSettingsRefreshError: (...args: unknown[]) => mocks.refreshError(...args),
 }))
 vi.mock("./usePersonalPreferencesSave", () => ({
-  usePersonalPreferencesSave: () => ({ savePreferencesAction: mocks.save, inspectPreferences: mocks.inspect }),
+  usePersonalPreferencesSave: () => ({ save: mocks.save, observe: mocks.inspect }),
 }))
 vi.mock("./userPreferencesGraphqlAdapter", () => ({
   fromGraphqlUserPreferences: () => defaultUserPreferences,
@@ -88,8 +85,7 @@ describe("PersonalPreferencesはProfileと同じQuery/Action/Hostの入口", () 
     expect(mocks.view).toHaveBeenCalledWith(expect.objectContaining({
       compact: true,
       initialPreferences: defaultUserPreferences,
-      onSaveAction: mocks.save,
-      onInspect: mocks.inspect,
+      operations: expect.objectContaining({ save: mocks.save, observe: mocks.inspect }),
     }))
     expect(mocks.refreshError).toHaveBeenCalledWith(false)
   })

@@ -15,8 +15,7 @@ export function PersonalPreferences({ render }: { render: SettingsSectionRender 
     notifyOnNetworkStatusChange: true,
   })
   const userId = query.data?.me?.id
-  const { savePreferencesAction, inspectPreferences, confirmPreferences, isAccentConfirmed } =
-    usePersonalPreferencesSave(userId)
+  const operations = usePersonalPreferencesSave(userId)
   const compact = useMediaQuery("(max-width: 48em)")
   const values = query.data?.me?.preferences
 
@@ -40,10 +39,7 @@ export function PersonalPreferences({ render }: { render: SettingsSectionRender 
         key={userId}
         compact={compact}
         initialPreferences={fromGraphqlUserPreferences(values)}
-        onSaveAction={savePreferencesAction}
-        onInspect={inspectPreferences}
-        onConfirm={confirmPreferences}
-        isAccentConfirmed={isAccentConfirmed}
+        operations={operations}
       />
     ),
   })

@@ -16,6 +16,7 @@ vi.mock("@apollo/client", () => ({
 }))
 vi.mock("@/infrastructure/graphql/generated", () => ({
   CommunityMySettingsDocument: { kind: "Document", name: "communityMySettings" },
+  MyCommunitiesDocument: { kind: "Document", name: "myCommunities" },
   useUpdateCommunitySettingsMutation: () => [mocks.mutation],
 }))
 vi.mock("../communityPreferencesCache", () => ({
@@ -77,7 +78,7 @@ describe("Community別名の保存ActionとApollo境界", () => {
       kind: "success", value: "確定した別名",
     })
     expect(mocks.patch).toHaveBeenCalledTimes(1)
-    expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: [expect.anything()], onQueryUpdated: expect.any(Function) })
+    expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: [expect.anything(), expect.anything()], onQueryUpdated: expect.any(Function) })
   })
 
   it("Typed Successに別のGraphQL Errorが併存してもMutationの確定結果を優先する", async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { createApolloCache } from "@/infrastructure/graphql/createApolloCache"
-import { CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument } from "@/infrastructure/graphql/generated"
+import { CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument, type OperationPersonalSettingsPreferencesQuery, type OperationPersonalSettingsAccentQuery } from "@/infrastructure/graphql/generated"
 import { commitPersonalPreferencesPatch } from "./personalPreferencesCache"
 import { defaultUserPreferences } from "./userPreferences"
 
@@ -19,7 +19,7 @@ describe("Personal PreferencesのCache境界", () => {
     expect(commitPersonalPreferencesPatch(cache, "user-1", {
       mediaDetailNavigationWrap: false, dateFormat: undefined,
     })).toBe(true)
-    expect(cache.readQuery({ query: PersonalSettingsPreferencesDocument })?.me.preferences).toMatchObject({
+    expect(cache.readQuery<OperationPersonalSettingsPreferencesQuery>({ query: PersonalSettingsPreferencesDocument })?.me?.preferences).toMatchObject({
       ...defaultUserPreferences, personalAccentColor: "#112233", mediaDetailNavigationWrap: false,
     })
   })
@@ -32,7 +32,7 @@ describe("Personal PreferencesのCache境界", () => {
     })
     const before = cache.extract()
     expect(commitPersonalPreferencesPatch(cache, "user-1", { personalAccentColor: "#AABBCC" })).toBe(false)
-    expect(cache.readQuery({ query: PersonalSettingsAccentDocument })?.me.preferences.personalAccentColor).toBe("#112233")
+    expect(cache.readQuery<OperationPersonalSettingsAccentQuery>({ query: PersonalSettingsAccentDocument })?.me?.preferences.personalAccentColor).toBe("#112233")
     expect(cache.extract()).toEqual(before)
   })
 })

@@ -9,6 +9,7 @@ import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshEr
 export function ConnectedPersonalUsage({ render }: { render: SettingsSectionRender }) {
   const personal = usePersonalUsageQuery({
     fetchPolicy: "network-only",
+    refetchWritePolicy: "merge",
     notifyOnNetworkStatusChange: true,
   })
 

@@ -13,3 +13,11 @@ export type SavePersonalPreferencesAction = Action<
   UserPreferences,
   PersonalPreferencesSaveRejection
 >
+
+/** 固定されたUserに対する保存・現在値照会・明示採用の契約。 */
+export type PersonalPreferencesSaveOperations = {
+  save: SavePersonalPreferencesAction
+  observe: () => Promise<UserPreferences>
+  confirm: (patch: UserPreferencesPatch) => void
+  isAccentConfirmed: (color: string) => boolean
+}

@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client"
 import { describe, expect, it } from "vitest"
 import { createApolloCache } from "@/infrastructure/graphql/createApolloCache"
 import { createSettingsCacheReadProtectionLink } from "@/infrastructure/graphql/settingsCacheReadProtection"
-import { CurrentUserDocument, PersonalSettingsPreferencesDocument } from "@/infrastructure/graphql/generated"
+import { CurrentUserDocument, PersonalSettingsPreferencesDocument, type OperationCurrentUserQuery } from "@/infrastructure/graphql/generated"
 import { defaultUserPreferences, type UserPreferencesPatch } from "./userPreferences"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
 
@@ -40,12 +40,12 @@ describe("Personal Preferencesの本番Save AdapterとApollo Cache", () => {
       actions = usePersonalPreferencesSave("user-1")
       return null
     }
-    const read = () => cache.readQuery({ query: CurrentUserDocument })?.me.preferences
+    const read = () => cache.readQuery<OperationCurrentUserQuery>({ query: CurrentUserDocument })?.me?.preferences
     try {
       await act(async () => root.render(createElement(ApolloProvider, { client, children: createElement(Harness) })))
       const old = client.query({ query: PersonalSettingsPreferencesDocument, fetchPolicy: "network-only" })
-      const observed = actions.inspectPreferences()
-      const saving = actions.savePreferencesAction({ personalAccentColor: "#AABBCC", fileSizeUnit: "BINARY" })
+      const observed = actions.observe()
+      const saving = actions.save({ personalAccentColor: "#AABBCC", fileSizeUnit: "BINARY" })
       expect(pending.map(entry => entry.name)).toEqual([
         "PersonalSettingsPreferences", "PersonalSettingsPreferences", "SaveUserPreferences",
       ])
@@ -58,7 +58,7 @@ describe("Personal Preferencesの本番Save AdapterとApollo Cache", () => {
       pending[1].finish(user({ personalAccentColor: "#445566", fileSizeUnit: "DECIMAL" }))
       await expect(observed).resolves.toMatchObject({ personalAccentColor: "#445566", fileSizeUnit: "DECIMAL" })
       expect(read()).toMatchObject({ personalAccentColor: "#AABBCC", fileSizeUnit: "BINARY" })
-      actions.confirmPreferences({ personalAccentColor: "#445566" })
+      actions.confirm({ personalAccentColor: "#445566" })
       expect(read()).toMatchObject({ personalAccentColor: "#445566", fileSizeUnit: "BINARY" })
       expect(actions.isAccentConfirmed("#445566")).toBe(true)
 
