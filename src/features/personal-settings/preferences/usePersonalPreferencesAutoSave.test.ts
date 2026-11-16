@@ -58,6 +58,55 @@ describe("Personal Preferencesの画面Lifetime保存", () => {
     expect(current.confirmed.personalAccentColor).toBe(defaultPersonalPreferences.personalAccentColor)
   })
 
+  it("予約を取り消した場合は送信せず保存待ちを解除する", async () => {
+    await act(async () => {
+      current.setAccentDraft("#AABBCC")
+      current.enqueue({ personalAccentColor: "#AABBCC" })
+      current.setAccentDraft("#AAB")
+    })
+    await act(async () => { await vi.advanceTimersByTimeAsync(400) })
+    expect(save).not.toHaveBeenCalled()
+    expect(current.saveStatus).toBe("idle")
+    expect(current.draftPatch).toEqual({})
+  })
+
+  it("先行Attemptが失敗した場合は未完成HEXで送信済みの変更を失わない", async () => {
+    let reject!: (error: Error) => void
+    save.mockImplementationOnce(() => new Promise((_resolve, fail) => { reject = fail }))
+    await act(async () => {
+      current.setAccentDraft("#AABBCC")
+      current.enqueue({ personalAccentColor: "#AABBCC" })
+      await vi.advanceTimersByTimeAsync(400)
+    })
+    await act(async () => {
+      current.enqueue({ personalAccentColor: "#445566" })
+      current.setAccentDraft("#445")
+      reject(new Error("lost response"))
+    })
+    expect(save).toHaveBeenCalledExactlyOnceWith({ personalAccentColor: "#AABBCC" })
+    expect(current.draftPatch).toEqual({ personalAccentColor: "#AABBCC" })
+    expect(current.saveError).toBe("unknown")
+    expect(current.saveStatus).toBe("attention")
+  })
+
+  it("先行Attemptの成功後は取消済みの後続Accentを保存待ちにしない", async () => {
+    let resolve!: (values: PersonalPreferencesValues) => void
+    save.mockImplementationOnce(() => new Promise(done => { resolve = done }))
+    await act(async () => {
+      current.enqueue({ personalAccentColor: "#AABBCC" })
+      await vi.advanceTimersByTimeAsync(400)
+    })
+    await act(async () => {
+      current.enqueue({ personalAccentColor: "#445566" })
+      current.setAccentDraft("#445")
+      resolve({ ...defaultPersonalPreferences, personalAccentColor: "#AABBCC" })
+    })
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(current.confirmed.personalAccentColor).toBe("#AABBCC")
+    expect(current.draftPatch).toEqual({})
+    expect(current.saveStatus).toBe("saved")
+  })
+
   it("未完成HEXだけが残る場合は離脱時にも送信しない", async () => {
     await act(async () => {
       current.setAccentDraft("#AABBCC")

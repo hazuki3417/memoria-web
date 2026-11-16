@@ -17,14 +17,14 @@ type PreferencesFormValues = z.input<typeof personalPreferencesSchema>
  * RHF owns editable Preference fields and the incomplete ColorInput draft.
  * 画面内AutoSaveQueueが送信順序を保持し、明示RetryをFeatureが判断する。
  */
-export function usePersonalPreferencesForm(
+export const usePersonalPreferencesForm = (
   initialPreferences: PersonalPreferencesValues,
   onSave?: SavePreferences,
   onInspect?: () => Promise<PersonalPreferencesValues>,
   onSaveAction?: SavePersonalPreferencesAction,
   onConfirm?: (patch: PersonalPreferencesPatch) => void,
   isAccentConfirmed?: (color: string) => boolean,
-) {
+) => {
   const {
     saveError,
     blockedFeedback,
@@ -101,10 +101,8 @@ export function usePersonalPreferencesForm(
         ? getValues("accentDraft")
         : draftPatch.personalAccentColor ?? initial.personalAccentColor,
     }, {
-      // Pendingの後続編集と未完成ColorInputだけを保持する。
-      keepDirtyValues: noPersistence
-        ? Object.keys(dirtyFields).length > 0
-        : Object.keys(draftPatch).length > 0 || incompleteAccent,
+      // Productionでは明示した有効Draftと未完成HEXだけを復元する。
+      keepDirtyValues: noPersistence && Object.keys(dirtyFields).length > 0,
     })
   }, [initial, reset, dirtyFields, draftPatch, getValues, onSave, onSaveAction])
 
@@ -121,8 +119,7 @@ export function usePersonalPreferencesForm(
   useEffect(() => {
     if (isAccentConfirmed && !saveError && !draftPatch.personalAccentColor &&
         preview?.color && preview.owner === previewOwner.current &&
-        preview.color === confirmed.personalAccentColor &&
-        isAccentConfirmed(preview.color)) releasePreview()
+        isAccentConfirmed(confirmed.personalAccentColor)) releasePreview()
   }, [confirmed, draftPatch, saveError, preview, isAccentConfirmed, initialPreferences, releasePreview])
 
   const values = watch()
@@ -153,7 +150,7 @@ export function usePersonalPreferencesForm(
 
   const changeAccentDraft = (value: string) => {
     clearErrors("personalAccentColor")
-    setAccentDraft(value)
+    const inFlightColor = setAccentDraft(value)
     setValue("accentDraft", value, { shouldDirty: true })
     const parsed = personalPreferencesSchema.shape.personalAccentColor.safeParse(value)
     if (parsed.success) {
@@ -161,7 +158,9 @@ export function usePersonalPreferencesForm(
       change("personalAccentColor", normalized)
       if (saveError !== "blocked" && preview) previewOwner.current = preview.setPreview(normalized)
     } else if (!saveError) {
-      releasePreview()
+      setValue("personalAccentColor", inFlightColor ?? confirmed.personalAccentColor)
+      if (inFlightColor && preview) previewOwner.current = preview.setPreview(inFlightColor)
+      else releasePreview()
     }
   }
 
