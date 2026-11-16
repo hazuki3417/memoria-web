@@ -5,10 +5,11 @@ import { Box, Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING, type SaveStatusState } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
-import { CommunityAccentSection } from "./CommunityAccentSection"
+import { CommunityPreferencesDisplaySection } from "./CommunityPreferencesDisplaySection"
+import { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
 
 /** Preferences全体のHeader・Feedback・Alias/AccentをCompositionする。 */
-export function CommunityPreferences({
+export const CommunityPreferences = ({
   accent,
   initialDraft,
   onAccentDraftChange,
@@ -34,7 +35,11 @@ export function CommunityPreferences({
   accentError?: string
   onDraftValidityChange?: (valid: boolean) => void
   aliasSection?: ReactNode
-}) {
+}) => {
+  const model = useCommunityPreferencesForm({
+    accent, initialDraft, restoreOnAccentChange, preserveDraftOnAccentChange,
+    saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
+  })
   return (
     <Stack gap="xl">
       <PageHeader
@@ -57,17 +62,10 @@ export function CommunityPreferences({
           {aliasSection}
         </Box>
       )}
-      <CommunityAccentSection
-        accent={accent}
-        initialDraft={initialDraft}
-        onAccentDraftChange={onAccentDraftChange}
-        setAccent={setAccent}
+      <CommunityPreferencesDisplaySection
+        model={model}
         isPreview={isPreview}
-        restoreOnAccentChange={restoreOnAccentChange}
-        preserveDraftOnAccentChange={preserveDraftOnAccentChange}
-        saveStatus={saveStatus}
         accentError={accentError}
-        onDraftValidityChange={onDraftValidityChange}
       />
     </Stack>
   )
