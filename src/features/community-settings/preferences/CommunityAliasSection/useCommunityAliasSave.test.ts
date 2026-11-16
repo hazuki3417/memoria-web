@@ -7,11 +7,12 @@ const mocks = vi.hoisted(() => ({
   mutation: vi.fn(),
   query: vi.fn(),
   patch: vi.fn(),
+  refetchQueries: vi.fn(),
   cache: {},
 }))
 
 vi.mock("@apollo/client", () => ({
-  useApolloClient: () => ({ query: mocks.query, cache: mocks.cache }),
+  useApolloClient: () => ({ query: mocks.query, cache: mocks.cache, refetchQueries: mocks.refetchQueries }),
 }))
 vi.mock("@/infrastructure/graphql/generated", () => ({
   CommunityMySettingsDocument: { kind: "Document", name: "communityMySettings" },
@@ -28,6 +29,8 @@ let actions!: Actions
 
 beforeEach(async () => {
   vi.resetAllMocks()
+  mocks.patch.mockReturnValue(true)
+  mocks.refetchQueries.mockResolvedValue([])
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
@@ -74,6 +77,7 @@ describe("Community別名の保存ActionとApollo境界", () => {
       kind: "success", value: "確定した別名",
     })
     expect(mocks.patch).toHaveBeenCalledTimes(1)
+    expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: [expect.anything()], onQueryUpdated: expect.any(Function) })
   })
 
   it("Typed Successに別のGraphQL Errorが併存してもMutationの確定結果を優先する", async () => {

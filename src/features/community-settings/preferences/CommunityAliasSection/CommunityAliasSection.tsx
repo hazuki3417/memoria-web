@@ -8,6 +8,7 @@ export type CommunityAliasSectionProps = {
   savedAlias: string | null
   onSave?: SaveCommunityAlias
   onInspect?: InspectCommunityAlias
+  onConfirm?: (alias: string | null) => void
 }
 
 const localSave: SaveCommunityAlias = async (alias) => ({ kind: "success", value: alias })
@@ -17,7 +18,8 @@ export const CommunityAliasSection = ({
   savedAlias,
   onSave = localSave,
   onInspect,
+  onConfirm,
 }: CommunityAliasSectionProps) => {
-  const model = useCommunityAliasForm({ savedAlias, onSave, onInspect })
+  const model = useCommunityAliasForm({ savedAlias, onSave, onInspect, onConfirm })
   return <CommunityAliasSectionView model={model} onInspect={onInspect} />
 }

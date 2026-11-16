@@ -52,9 +52,21 @@ export const useCommunityAliasSave = (communityId: string) => {
     return { kind: "unknown" }
   }
 
+  const confirmAlias = (alias: string | null) => {
+    try {
+      if (commitCommunitySettingsPatch(client.cache, communityId, { alias })) return
+    } catch {
+      // 保存OutcomeとCache同期失敗を区別する。
+    }
+    void client.refetchQueries({
+      include: [CommunityMySettingsDocument],
+      onQueryUpdated: (query) => query.variables.communityId === communityId ? query.refetch() : false,
+    }).catch(() => undefined)
+  }
+
   const afterSuccess = (alias: string | null) => {
     // 確定したAliasフィールドのみを更新し、並行保存のAccentを上書きしない。
-    commitCommunitySettingsPatch(client.cache, communityId, { alias })
+    confirmAlias(alias)
   }
 
   const saveAlias: SaveCommunityAlias = createActionAdapter({
@@ -76,5 +88,5 @@ export const useCommunityAliasSave = (communityId: string) => {
   }
 
   /** Alias保存の確定Outcomeと、Unknown時だけ利用する現在値照会を提供する。 */
-  return { inspectAlias, saveAlias }
+  return { inspectAlias, saveAlias, confirmAlias }
 }

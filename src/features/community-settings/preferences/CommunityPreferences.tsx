@@ -56,6 +56,7 @@ export const CommunityPreferences = ({
         alias={{
           savedAlias: settings.alias,
           onInspect: alias.inspectAlias,
+          onConfirm: alias.confirmAlias,
           onSave: alias.saveAlias,
         }}
       />
