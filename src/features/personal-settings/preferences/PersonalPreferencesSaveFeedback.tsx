@@ -6,22 +6,32 @@ import type { usePersonalPreferencesForm } from "./usePersonalPreferencesForm"
 type PreferencesModel = ReturnType<typeof usePersonalPreferencesForm>
 
 /** Owns the existing Preferences save error and explicit recovery presentation. */
-export function PersonalPreferencesSaveFeedback({ model }: { model: PreferencesModel }) {
+export const PersonalPreferencesSaveFeedback = ({ model }: { model: PreferencesModel }) => {
   const { saveError, blockedFeedback, validation, inspect, confirmObservation, retry, discard, inspected, observedMatches, canDiscard, canRetry } = model
+  let title = "保存できませんでした"
+  let description = "変更内容を保持しています。内容を確認して再試行してください。"
+  switch (saveError) {
+    case "blocked":
+      title = blockedFeedback?.title ?? "設定を変更できません"
+      description = blockedFeedback?.description ?? "画面を再読み込みして現在の状態を確認してください。"
+      break
+    case "validation":
+      title = "入力内容を確認してください"
+      description = validation?.formError
+        ? "入力した設定の一部を受け付けられませんでした。内容を確認してから、もう一度保存してください。"
+        : "入力項目のエラーを修正してから、もう一度保存してください。"
+      break
+    case "unknown":
+      title = "保存結果を確認できませんでした"
+      description = "変更内容は保持しています。現在の設定を確認してから、必要に応じて保存してください。"
+      break
+  }
   return (
     <>
       {saveError && (
         <FeedbackPanel
           kind={saveError === "unknown" ? "warning" : "error"}
-          title={
-            saveError === "blocked"
-              ? blockedFeedback?.title ?? "設定を変更できません"
-              : saveError === "validation"
-                ? "入力内容を確認してください"
-                : saveError === "unknown"
-                  ? "保存結果を確認できませんでした"
-                  : "保存できませんでした"
-          }
+          title={title}
           role="alert"
           actions={
             saveError === "blocked" ? undefined : (
@@ -52,23 +62,7 @@ export function PersonalPreferencesSaveFeedback({ model }: { model: PreferencesM
           }
         >
           <Stack gap="xs">
-            {saveError === "validation" ? (
-              <span>
-                {validation?.formError
-                  ? "入力した設定の一部を受け付けられませんでした。内容を確認してから、もう一度保存してください。"
-                  : "入力項目のエラーを修正してから、もう一度保存してください。"}
-              </span>
-            ) : saveError === "blocked" ? (
-              <span>{blockedFeedback?.description ?? "画面を再読み込みして現在の状態を確認してください。"}</span>
-            ) : saveError === "unknown" ? (
-              <span>
-                変更内容は保持しています。現在の設定を確認してから、必要に応じて保存してください。
-              </span>
-            ) : (
-              <span>
-                変更内容を保持しています。内容を確認して再試行してください。
-              </span>
-            )}
+            <span>{description}</span>
             {saveError === "unknown" && inspected && (
               <span>
                 {observedMatches

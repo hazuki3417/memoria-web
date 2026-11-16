@@ -20,14 +20,14 @@ export type PersonalPreferencesViewProps = {
 }
 
 /** 環境設定のHeader・Feedback・各Sectionを、保存処理から独立して描画する。 */
-export function PersonalPreferencesView({
+export const PersonalPreferencesView = ({
   compact = false,
   initialPreferences = defaultPersonalPreferences,
   onSave,
   onSaveAction,
   onInspect,
   operations,
-}: PersonalPreferencesViewProps) {
+}: PersonalPreferencesViewProps) => {
   const model = usePersonalPreferencesForm(
     initialPreferences, onSave, operations?.observe ?? onInspect,
     operations?.save ?? onSaveAction, operations?.confirm, operations?.isAccentConfirmed,

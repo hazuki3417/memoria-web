@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { useCommunityAccentPreview } from "@/features/application-shell/CommunityAccentPreviewContext"
+import { useCommunityAccentPreview } from "@/features/application-shell"
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"

@@ -23,7 +23,7 @@ vi.mock("./useCommunityPreferencesSave", () => ({
 vi.mock("./CommunityAliasSection/useCommunityAliasSave", () => ({
   useCommunityAliasSave: mocks.alias,
 }))
-vi.mock("@/features/application-shell/CommunityAccentPreviewContext", () => ({
+vi.mock("@/features/application-shell", () => ({
   useCommunityAccentPreview: () => ({ setPreview: vi.fn(), clearPreview: vi.fn() }),
 }))
 vi.mock("./CommunityPreferencesView", () => ({

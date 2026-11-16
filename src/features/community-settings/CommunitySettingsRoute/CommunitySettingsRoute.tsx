@@ -9,7 +9,7 @@ import { CommunityPreferences } from "../preferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
 import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
-import { useOptionalCommunityAccentPreview } from "@/features/application-shell/CommunityAccentPreviewContext"
+import { useOptionalCommunityAccentPreview } from "@/features/application-shell"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
