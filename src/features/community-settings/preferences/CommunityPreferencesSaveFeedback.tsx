@@ -2,23 +2,17 @@
 
 import { Button, Stack, Text } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
-import type { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
+import type { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
 
-type Connection = ReturnType<typeof useCommunityPreferencesConnection>
-
-/** Renders the existing Accent save failure and explicit recovery controls. */
-export function CommunityAccentSaveFeedback({
-  communityId,
-  snapshot,
-  controller,
-  canResave,
+/** Preferencesの保存失敗と明示Recoveryの操作を表示する。 */
+export const CommunityPreferencesSaveFeedback = ({
+  model,
 }: {
-  communityId: string
-  snapshot: Connection["snapshot"]
-  controller: Connection["controller"]
-  canResave: boolean
-}) {
+  model: ReturnType<typeof useCommunityPreferencesForm>
+}) => {
+  const { snapshot, canResave, inspect, confirmObservation, retry, discard } = model
   const failure = snapshot.failure
+  if (!failure) return null
   return (
     <FeedbackPanel
       kind={failure === "unknown" ? "warning" : "error"}
@@ -39,7 +33,7 @@ export function CommunityAccentSaveFeedback({
             <Button
               size="xs"
               variant="light"
-              onClick={() => void controller.inspect(communityId)}
+              onClick={() => void inspect()}
             >
               現在の状態を確認
             </Button>
@@ -48,7 +42,7 @@ export function CommunityAccentSaveFeedback({
             <Button
               size="xs"
               variant="light"
-              onClick={() => controller.confirmObservation(communityId)}
+              onClick={() => confirmObservation()}
             >
               確認完了
             </Button>
@@ -59,7 +53,7 @@ export function CommunityAccentSaveFeedback({
               <Button
                 size="xs"
                 disabled={!canResave}
-                onClick={() => controller.retry(communityId)}
+                onClick={() => retry()}
               >
                 もう一度保存
               </Button>
@@ -68,7 +62,7 @@ export function CommunityAccentSaveFeedback({
             size="xs"
             variant="subtle"
             color="gray"
-            onClick={() => controller.discard(communityId)}
+            onClick={() => discard()}
           >
             変更を破棄
           </Button>
@@ -78,7 +72,7 @@ export function CommunityAccentSaveFeedback({
     >
       <Stack gap="xs">
         <Text size="sm">
-          画面の色は最後に保存を確認できた状態に戻しています。入力した色は保持しています。
+          選択した色は保存が確定していなくても表示を維持しています。入力した色は保持しています。
           {failure === "unknown"
             ? " 現在の設定を確認してから、必要なら保存してください。"
             : failure === "blocked"

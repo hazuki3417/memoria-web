@@ -1,101 +1,64 @@
 "use client"
 
-import type { Dispatch, ReactNode, SetStateAction } from "react"
-import { Box, ColorInput, Stack, Text } from "@mantine/core"
-import { useMediaQuery } from "@mantine/hooks"
-import { PageHeader } from "@/components/PageHeader"
-import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING, type SaveStatusState } from "@/components/SaveStatus"
-import { SectionHeader } from "@/components/SectionHeader"
-import { SettingRow } from "@/components/SettingRow"
-import { useCommunityAccentForm } from "./useCommunityAccentForm"
+import { useMemo } from "react"
+import { useCommunityAccentPreview } from "@/features/application-shell/CommunityAccentPreviewContext"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
+import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
+import { CommunityPreferencesView } from "./CommunityPreferencesView"
+import { useCommunityPreferencesSave } from "./useCommunityPreferencesSave"
+import { fromGraphqlCommunityPreferences } from "./communityPreferencesGraphqlAdapter"
+import { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
-export function CommunityPreferences({
-  accent,
-  initialDraft,
-  onAccentDraftChange,
-  setAccent,
-  isPreview = true,
-  restoreOnAccentChange = false,
-  preserveDraftOnAccentChange = false,
-  saveStatus,
-  saveFeedback,
-  accentError,
-  onDraftValidityChange,
-  aliasSection,
+/** Community環境設定のQuery・Action・Host接続を提供し、Ready画面に保存の生存期間を委ねる。 */
+export const CommunityPreferences = ({
+  communityId,
+  render,
 }: {
-  accent: string
-  initialDraft?: string
-  onAccentDraftChange?: (value: string) => void
-  setAccent: Dispatch<SetStateAction<string>>
-  isPreview?: boolean
-  restoreOnAccentChange?: boolean
-  preserveDraftOnAccentChange?: boolean
-  saveStatus?: SaveStatusState
-  saveFeedback?: ReactNode
-  accentError?: string
-  onDraftValidityChange?: (valid: boolean) => void
-  aliasSection?: ReactNode
-}) {
-  const compact = useMediaQuery("(max-width: 48em)")
-  const { field, fieldState, draftInvalid, onDraftChange } = useCommunityAccentForm({
-    accent, initialDraft, restoreOnAccentChange, preserveDraftOnAccentChange,
-    saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
+  communityId: string
+  render: SettingsSectionRender
+}) => {
+  const query = useCommunityMySettingsQuery({
+    variables: { communityId },
+    fetchPolicy: "network-only",
   })
+  const operations = useCommunityPreferencesSave(communityId)
+  const alias = useCommunityAliasSave(communityId)
+  const { setPreview, clearPreview } = useCommunityAccentPreview()
+  const preview = useMemo(() => ({
+    preview: (color: string) => setPreview(communityId, color),
+    release: (owner: number) => clearPreview(communityId, owner),
+  }), [communityId, setPreview, clearPreview])
+  const settings = query.data?.community?.mySettings
 
-  return (
-    <Stack gap="xl">
-      <PageHeader
-        title="環境設定"
-        description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
-        titleAccessory={
-          saveStatus !== undefined ? (
-            <SaveStatus
-              state={saveStatus}
-              announce
-              timing={SETTINGS_SAVE_STATUS_TIMING}
-            />
-          ) : undefined
-        }
+  useCommunitySettingsRefreshError(Boolean(query.data?.community && query.error))
+
+  if (!settings) {
+    return render(
+      query.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void query.refetch().catch(() => undefined) },
+          },
+    )
+  }
+
+  return render({
+    status: "ready",
+    content: (
+      <CommunityPreferencesView
+        key={communityId}
+        accent={fromGraphqlCommunityPreferences(settings).accentColor}
+        isPreview={false}
+        operations={operations}
+        preview={preview}
+        alias={{
+          savedAlias: settings.alias,
+          onInspect: alias.inspectAlias,
+          onSave: alias.saveAlias,
+        }}
       />
-      {saveFeedback}
-      {aliasSection && (
-        <Box>
-          <SectionHeader>表示名</SectionHeader>
-          {aliasSection}
-        </Box>
-      )}
-      <Box>
-        <SectionHeader>表示</SectionHeader>
-        <Stack gap="xl">
-          <SettingRow
-            compact={compact}
-            label="Community Accent Color"
-            description="このCommunityで使用するアクセントカラーを選びます。"
-          >
-            <ColorInput
-              aria-label="Communityアクセントカラー"
-              error={
-                accentError ??
-                (fieldState.isTouched &&
-                draftInvalid
-                  ? "HEXカラーコード（#RRGGBB）を入力してください。"
-                  : undefined)
-              }
-              format="hex"
-              name={field.name}
-              ref={field.ref}
-              onBlur={field.onBlur}
-              value={field.value}
-              onChange={onDraftChange}
-            />
-          </SettingRow>
-          {isPreview && (
-            <Text size="sm" c="dimmed">
-              色の選択はプレビューです。保存・Contextへの反映はまだ行われません。
-            </Text>
-          )}
-        </Stack>
-      </Box>
-    </Stack>
-  )
+    ),
+  })
 }

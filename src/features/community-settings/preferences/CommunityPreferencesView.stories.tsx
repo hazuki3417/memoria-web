@@ -3,11 +3,11 @@ import { FeedbackPanel } from "@/components/Feedback"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
-import { CommunityPreferences } from "./CommunityPreferences"
+import { CommunityPreferencesView } from "./CommunityPreferencesView"
 
 const meta = {
-  title: "Features/Community Settings/Accent Draft",
-  component: CommunityPreferences,
+  title: "features/community-settings/preferences/CommunityPreferencesView",
+  component: CommunityPreferencesView,
   args: {
     accent: "#123456",
     setAccent: fn(),
@@ -20,12 +20,12 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof CommunityPreferences>
+} satisfies Meta<typeof CommunityPreferencesView>
 export default meta
 type Story = StoryObj<typeof meta>
 
 function AccentRefreshFixture(
-  args: ComponentProps<typeof CommunityPreferences>,
+  args: ComponentProps<typeof CommunityPreferencesView>,
 ) {
   const [accent, setAccent] = useState(args.accent)
   const [preserveDraft, setPreserveDraft] = useState(false)
@@ -42,7 +42,7 @@ function AccentRefreshFixture(
       >
         保存失敗の復元を再現
       </Button>
-      <CommunityPreferences
+      <CommunityPreferencesView
         {...args}
         accent={accent}
         preserveDraftOnAccentChange={preserveDraft}
@@ -168,7 +168,7 @@ export const AccentErrorWithDetails: Story = {
     saveStatus: "attention",
     saveFeedback: (
       <FeedbackPanel kind="error" title="保存できませんでした" role="alert">
-        Shellは確定色に戻しました。ColorInputの変更内容は保持しています。
+        選択した色は保存結果が未確定でも表示を維持しています。ColorInputの変更内容は保持しています。
       </FeedbackPanel>
     ),
   },
@@ -193,7 +193,7 @@ export const AccentUnknownBeforeInspection: Story = {
           </>
         }
       >
-        最後に確認できた色を表示しています。入力内容は保持しています。
+        選択した色を表示しています。入力内容は保持しています。
         現在値を確認してから必要な操作を選んでください。
       </FeedbackPanel>
     ),
@@ -265,5 +265,42 @@ export const AccentValidationPanel: Story = {
         入力内容を修正したうえで再保存するか、変更を破棄してください。
       </FeedbackPanel>
     ),
+  },
+}
+
+/** Productionと同じView/Form/AutoSaveの経路で、Aliasの編集中Draftを保護する。 */
+export const AccentRecoveryPreservesAliasDraft: Story = {
+  name: "Interaction · Accentの明示破棄でAlias Draftを保持",
+  tags: ["interaction"],
+  args: {
+    accent: "#123456",
+    isPreview: false,
+    operations: {
+      save: fn(async () => ({ kind: "unknown" as const })),
+      observe: fn(async () => ({ accentColor: "#123456" })),
+      confirm: fn(),
+    },
+    preview: { preview: fn(() => 1), release: fn() },
+    alias: {
+      savedAlias: "保存済み別名",
+      onSave: fn(async (value: string | null) => ({ kind: "success" as const, value })),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const aliasInput = canvas.getByRole("textbox", { name: "Community別名" })
+    const accentInput = canvas.getByRole("textbox", { name: "Communityアクセントカラー" })
+    await userEvent.clear(aliasInput)
+    await userEvent.type(aliasInput, "未保存の別名")
+    await userEvent.clear(accentInput)
+    await userEvent.type(accentInput, "#AABBCC")
+    await expect(await canvas.findByText("保存結果を確認できませんでした")).toBeVisible()
+    await expect(args.operations?.save).toHaveBeenCalledWith({ accentColor: "#AABBCC" })
+    await expect(args.preview?.preview).toHaveBeenCalledWith("#AABBCC")
+    await userEvent.click(canvas.getByRole("button", { name: "変更を破棄" }))
+    await expect(accentInput).toHaveValue("#123456")
+    await expect(aliasInput).toHaveValue("未保存の別名")
+    await expect(args.alias?.onSave).not.toHaveBeenCalled()
+    await expect(args.preview?.release).toHaveBeenCalledWith(1)
   },
 }
