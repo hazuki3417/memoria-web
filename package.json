@@ -60,6 +60,7 @@
     "@types/react-dom": "^19",
     "@vitest/browser-playwright": "^4.1.11",
     "@vitest/coverage-v8": "^4.1.11",
+    "jose": "6.2.13",
     "jsdom": "^28.1.0",
     "msw": "^2.15.0",
     "orval": "^8.45.0",
