@@ -6,7 +6,7 @@ import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 import { PersonalPreferencesView } from "./PersonalPreferencesView"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
-import { fromGraphqlUserPreferences } from "./userPreferencesGraphqlAdapter"
+import { fromGraphqlPersonalPreferences } from "./personalPreferencesGraphqlAdapter"
 
 /** Profileと同じQuery・Action・Host接続の入口。Ready ViewがFormのLifetimeを所有する。 */
 export function PersonalPreferences({ render }: { render: SettingsSectionRender }) {
@@ -38,7 +38,7 @@ export function PersonalPreferences({ render }: { render: SettingsSectionRender 
       <PersonalPreferencesView
         key={userId}
         compact={compact}
-        initialPreferences={fromGraphqlUserPreferences(values)}
+        initialPreferences={fromGraphqlPersonalPreferences(values)}
         operations={operations}
       />
     ),

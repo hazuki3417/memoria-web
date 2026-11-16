@@ -1,25 +1,25 @@
 import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
+import { defaultPersonalPreferences, type PersonalPreferencesValues, type PersonalPreferencesPatch } from "./personalPreferences"
 import { usePersonalPreferencesAutoSave } from "./usePersonalPreferencesAutoSave"
 
 type Controller = ReturnType<typeof usePersonalPreferencesAutoSave>
 let root: Root
 let host: HTMLDivElement
 let current!: Controller
-let save: ReturnType<typeof vi.fn<(patch: UserPreferencesPatch) => Promise<UserPreferences>>>
+let save: ReturnType<typeof vi.fn<(patch: PersonalPreferencesPatch) => Promise<PersonalPreferencesValues>>>
 
-const renderHook = (onInspect?: () => Promise<UserPreferences>) => {
+const renderHook = (onInspect?: () => Promise<PersonalPreferencesValues>) => {
   root.render(createElement(() => {
-    current = usePersonalPreferencesAutoSave(save, defaultUserPreferences, onInspect)
+    current = usePersonalPreferencesAutoSave(save, defaultPersonalPreferences, onInspect)
     return null
   }))
 }
 
 beforeEach(async () => {
   vi.useFakeTimers()
-  save = vi.fn(async (patch: UserPreferencesPatch) => ({ ...defaultUserPreferences, ...patch }))
+  save = vi.fn(async (patch: PersonalPreferencesPatch) => ({ ...defaultPersonalPreferences, ...patch }))
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
@@ -55,7 +55,7 @@ describe("Personal Preferencesの画面Lifetime保存", () => {
     })
     await act(async () => { await vi.advanceTimersByTimeAsync(400) })
     expect(save).toHaveBeenCalledExactlyOnceWith({ mediaDetailNavigationWrap: true })
-    expect(current.confirmed.personalAccentColor).toBe(defaultUserPreferences.personalAccentColor)
+    expect(current.confirmed.personalAccentColor).toBe(defaultPersonalPreferences.personalAccentColor)
   })
 
   it("未完成HEXだけが残る場合は離脱時にも送信しない", async () => {
@@ -114,7 +114,7 @@ describe("Personal Preferencesの画面Lifetime保存", () => {
     save.mockRejectedValueOnce(new Error("lost response"))
     await act(async () => root.unmount())
     root = createRoot(host)
-    await act(async () => renderHook(async () => ({ ...defaultUserPreferences, mediaDetailNavigationWrap: true })))
+    await act(async () => renderHook(async () => ({ ...defaultPersonalPreferences, mediaDetailNavigationWrap: true })))
     await act(async () => { current.enqueue({ mediaDetailNavigationWrap: true }) })
     await act(async () => { await vi.advanceTimersByTimeAsync(400) })
     expect(current.saveError).toBe("unknown")

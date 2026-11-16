@@ -4,7 +4,7 @@ import { Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
 import { usePersonalPreferencesForm } from "./usePersonalPreferencesForm"
-import { defaultUserPreferences, type UserPreferences, type UserPreferencesPatch } from "./userPreferences"
+import { defaultPersonalPreferences, type PersonalPreferencesValues, type PersonalPreferencesPatch } from "./personalPreferences"
 import type { PersonalPreferencesSaveOperations, SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
 import { PersonalPreferencesSaveFeedback } from "./PersonalPreferencesSaveFeedback"
 import { PersonalPreferencesDisplaySection } from "./PersonalPreferencesDisplaySection/PersonalPreferencesDisplaySection"
@@ -12,17 +12,17 @@ import { PersonalPreferencesPreviewSection } from "./PersonalPreferencesPreviewS
 
 export type PersonalPreferencesViewProps = {
   compact?: boolean
-  initialPreferences?: UserPreferences
-  onSave?: (patch: UserPreferencesPatch) => Promise<UserPreferences>
+  initialPreferences?: PersonalPreferencesValues
+  onSave?: (patch: PersonalPreferencesPatch) => Promise<PersonalPreferencesValues>
   onSaveAction?: SavePersonalPreferencesAction
-  onInspect?: () => Promise<UserPreferences>
+  onInspect?: () => Promise<PersonalPreferencesValues>
   operations?: PersonalPreferencesSaveOperations
 }
 
 /** 環境設定のHeader・Feedback・各Sectionを、保存処理から独立して描画する。 */
 export function PersonalPreferencesView({
   compact = false,
-  initialPreferences = defaultUserPreferences,
+  initialPreferences = defaultPersonalPreferences,
   onSave,
   onSaveAction,
   onInspect,

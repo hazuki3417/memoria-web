@@ -1,12 +1,12 @@
 import type { ApolloCache } from "@apollo/client"
 import { protectConfirmedSettingsPatch } from "@/infrastructure/graphql/settingsCacheReadProtection"
-import type { UserPreferencesPatch } from "./userPreferences"
+import type { PersonalPreferencesPatch } from "./personalPreferences"
 
 /** 確定したFieldのみを対象Userの既存設定へ反映する。未取得Entityは生成しない。 */
 export const commitPersonalPreferencesPatch = (
   cache: ApolloCache<object>,
   userId: string,
-  patch: UserPreferencesPatch,
+  patch: PersonalPreferencesPatch,
 ): boolean => {
   const id = cache.identify({ __typename: "User", id: userId })
   if (!id) return false

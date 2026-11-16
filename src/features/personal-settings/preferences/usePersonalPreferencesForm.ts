@@ -7,10 +7,10 @@ import type { z } from "zod"
 import { personalPreferencesSchema } from "./personalPreferencesSchema"
 import { usePersonalPreferencesAutoSave } from "./usePersonalPreferencesAutoSave"
 import { usePersonalAccentPreview } from "./PersonalAccentPreview/PersonalAccentPreviewContext"
-import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import type { PersonalPreferencesValues, PersonalPreferencesPatch } from "./personalPreferences"
 import type { SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
 
-type SavePreferences = (patch: UserPreferencesPatch) => Promise<UserPreferences>
+type SavePreferences = (patch: PersonalPreferencesPatch) => Promise<PersonalPreferencesValues>
 type PreferencesFormValues = z.input<typeof personalPreferencesSchema>
 
 /**
@@ -18,11 +18,11 @@ type PreferencesFormValues = z.input<typeof personalPreferencesSchema>
  * 画面内AutoSaveQueueが送信順序を保持し、明示RetryをFeatureが判断する。
  */
 export function usePersonalPreferencesForm(
-  initialPreferences: UserPreferences,
+  initialPreferences: PersonalPreferencesValues,
   onSave?: SavePreferences,
-  onInspect?: () => Promise<UserPreferences>,
+  onInspect?: () => Promise<PersonalPreferencesValues>,
   onSaveAction?: SavePersonalPreferencesAction,
-  onConfirm?: (patch: UserPreferencesPatch) => void,
+  onConfirm?: (patch: PersonalPreferencesPatch) => void,
   isAccentConfirmed?: (color: string) => boolean,
 ) {
   const {
@@ -86,7 +86,7 @@ export function usePersonalPreferencesForm(
   const previousSource = useRef(initial)
   useEffect(() => {
     const previous = previousSource.current
-    if ((Object.keys(previous) as Array<keyof UserPreferences>).every(
+    if ((Object.keys(previous) as Array<keyof PersonalPreferencesValues>).every(
       (key) => previous[key] === initial[key],
     )) return
     previousSource.current = initial
@@ -126,7 +126,7 @@ export function usePersonalPreferencesForm(
   }, [confirmed, draftPatch, saveError, preview, isAccentConfirmed, initialPreferences, releasePreview])
 
   const values = watch()
-  const preferences: UserPreferences = {
+  const preferences: PersonalPreferencesValues = {
     personalAccentColor: values.personalAccentColor,
     dateFormat: values.dateFormat,
     fileSizeUnit: values.fileSizeUnit,
@@ -136,9 +136,9 @@ export function usePersonalPreferencesForm(
     mediaDetailInitialInfoMedium: values.mediaDetailInitialInfoMedium,
   }
 
-  const change = <K extends keyof UserPreferences>(
+  const change = <K extends keyof PersonalPreferencesValues>(
     key: K,
-    value: UserPreferences[K],
+    value: PersonalPreferencesValues[K],
   ) => {
     if (saveError === "blocked") return
     // Do not enqueue a value that violates the same schema as the RHF form.
@@ -148,7 +148,7 @@ export function usePersonalPreferencesForm(
     setValue(key, value as FieldPathValue<PreferencesFormValues, K>, {
       shouldDirty: true,
     })
-    enqueue({ [key]: value } as UserPreferencesPatch)
+    enqueue({ [key]: value } as PersonalPreferencesPatch)
   }
 
   const changeAccentDraft = (value: string) => {

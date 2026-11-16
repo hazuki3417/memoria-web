@@ -6,15 +6,15 @@ import { resolveFormFailureValidation } from "@/ui/formValidation"
 import { SettingsInputValidationError, classifySettingsSaveFailure } from "@/infrastructure/graphql/settingsMutationResult"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import { getPersonalPreferencesBlockedFeedback, type PersonalPreferencesBlockedFeedback } from "./personalPreferencesBlockedFeedback"
-import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
+import type { PersonalPreferencesValues, PersonalPreferencesPatch } from "./personalPreferences"
 import type { PersonalPreferencesSaveRejection, SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
 
 type Failure = "unknown" | "retryable" | "blocked" | "validation" | null
-type Save = (patch: UserPreferencesPatch) => Promise<UserPreferences>
+type Save = (patch: PersonalPreferencesPatch) => Promise<PersonalPreferencesValues>
 type Rejection = PersonalPreferencesSaveRejection
 type State = {
-  confirmed: UserPreferences
-  draftPatch: UserPreferencesPatch
+  confirmed: PersonalPreferencesValues
+  draftPatch: PersonalPreferencesPatch
   saveStatus: SaveStatusState
   failure: Failure
   blockedFeedback: PersonalPreferencesBlockedFeedback | null
@@ -27,10 +27,10 @@ type State = {
 /** 画面のLifetimeだけに属する保存Queue・Draft/Feedback・明示Recoveryを結合する。 */
 export function usePersonalPreferencesAutoSave(
   onSave?: Save,
-  initialPreferences?: UserPreferences,
-  onInspect?: () => Promise<UserPreferences>,
+  initialPreferences?: PersonalPreferencesValues,
+  onInspect?: () => Promise<PersonalPreferencesValues>,
   onSaveAction?: SavePersonalPreferencesAction,
-  onConfirm?: (patch: UserPreferencesPatch) => void,
+  onConfirm?: (patch: PersonalPreferencesPatch) => void,
 ) {
   const [state, setState] = useState<State>(() => ({
     confirmed: initialPreferences!,
@@ -53,10 +53,10 @@ export function usePersonalPreferencesAutoSave(
   actionRef.current = onSaveAction
   const inspectRef = useRef(onInspect)
   inspectRef.current = onInspect
-  const pending = useRef<UserPreferencesPatch>({})
-  const queueRef = useRef<AutoSaveQueue<UserPreferencesPatch> | null>(null)
-  const confirmedLocally = useRef(new Set<keyof UserPreferences>())
-  const observed = useRef<UserPreferences | null>(null)
+  const pending = useRef<PersonalPreferencesPatch>({})
+  const queueRef = useRef<AutoSaveQueue<PersonalPreferencesPatch> | null>(null)
+  const confirmedLocally = useRef(new Set<keyof PersonalPreferencesValues>())
+  const observed = useRef<PersonalPreferencesValues | null>(null)
   const inspectionGeneration = useRef(0)
   const accentDraft = useRef<string | null>(null)
 
@@ -67,16 +67,16 @@ export function usePersonalPreferencesAutoSave(
     setState(next)
   }
 
-  const makeQueue = (delayMs = 400): AutoSaveQueue<UserPreferencesPatch> => {
+  const makeQueue = (delayMs = 400): AutoSaveQueue<PersonalPreferencesPatch> => {
     const generation = lifetimeGeneration.current
     const action = actionRef.current
     const save = saveRef.current
     const active = () => mounted.current && lifetimeGeneration.current === generation
-    return createAutoSaveQueue<UserPreferencesPatch, UserPreferences, Rejection>({
+    return createAutoSaveQueue<PersonalPreferencesPatch, PersonalPreferencesValues, Rejection>({
       delayMs,
       shouldExecute: (patch) => Object.values(patch).some(value => value !== undefined),
-      execute: async (queued): Promise<ActionOutcome<UserPreferences, Rejection>> => {
-        const patch = Object.fromEntries(Object.entries(queued).filter(([, value]) => value !== undefined)) as UserPreferencesPatch
+      execute: async (queued): Promise<ActionOutcome<PersonalPreferencesValues, Rejection>> => {
+        const patch = Object.fromEntries(Object.entries(queued).filter(([, value]) => value !== undefined)) as PersonalPreferencesPatch
         if (active()) emit({ saveStatus: "saving" })
         try {
           if (action) return await action(patch)
@@ -96,7 +96,7 @@ export function usePersonalPreferencesAutoSave(
         if (outcome.kind === "success") {
           const confirmed = { ...stateRef.current.confirmed }
           const nextPending = { ...pending.current }
-          for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
+          for (const key of Object.keys(attempted) as Array<keyof PersonalPreferencesValues>) {
             if (attempted[key] === undefined) continue
             Object.assign(confirmed, { [key]: outcome.value[key] })
             confirmedLocally.current.add(key)
@@ -129,7 +129,7 @@ export function usePersonalPreferencesAutoSave(
     })
   }
 
-  const enqueue = (patch: UserPreferencesPatch) => {
+  const enqueue = (patch: PersonalPreferencesPatch) => {
     if ((!saveRef.current && !actionRef.current) || stateRef.current.failure === "blocked") return
     pending.current = { ...pending.current, ...patch }
     observed.current = null
@@ -165,7 +165,7 @@ export function usePersonalPreferencesAutoSave(
     if (!initialPreferences || stateRef.current.failure) return
     const confirmed = { ...stateRef.current.confirmed }
     let changed = false
-    for (const key of Object.keys(initialPreferences) as Array<keyof UserPreferences>) {
+    for (const key of Object.keys(initialPreferences) as Array<keyof PersonalPreferencesValues>) {
       if (confirmedLocally.current.has(key)) {
         if (initialPreferences[key] === confirmed[key]) confirmedLocally.current.delete(key)
         else continue
@@ -192,7 +192,7 @@ export function usePersonalPreferencesAutoSave(
         stateRef.current.failure !== "unknown" || pending.current !== patchAtStart ||
         accentDraft.current !== rawAtStart) return
       observed.current = current
-      const keys = Object.keys(pending.current) as Array<keyof UserPreferences>
+      const keys = Object.keys(pending.current) as Array<keyof PersonalPreferencesValues>
       emit({
         inspected: true,
         observedMatches: keys.length > 0 && keys.every(key => current[key] === pending.current[key]) &&
@@ -208,8 +208,8 @@ export function usePersonalPreferencesAutoSave(
     const current = observed.current
     if (!current || stateRef.current.failure !== "unknown" || !stateRef.current.observedMatches) return
     const confirmed = { ...stateRef.current.confirmed }
-    const adopted: UserPreferencesPatch = {}
-    for (const key of Object.keys(pending.current) as Array<keyof UserPreferences>) {
+    const adopted: PersonalPreferencesPatch = {}
+    for (const key of Object.keys(pending.current) as Array<keyof PersonalPreferencesValues>) {
       Object.assign(confirmed, { [key]: current[key] })
       Object.assign(adopted, { [key]: current[key] })
       confirmedLocally.current.add(key)

@@ -5,18 +5,18 @@ import { describe, expect, it } from "vitest"
 import { createApolloCache } from "@/infrastructure/graphql/createApolloCache"
 import { createSettingsCacheReadProtectionLink } from "@/infrastructure/graphql/settingsCacheReadProtection"
 import { CurrentUserDocument, PersonalSettingsPreferencesDocument, type OperationCurrentUserQuery } from "@/infrastructure/graphql/generated"
-import { defaultUserPreferences, type UserPreferencesPatch } from "./userPreferences"
+import { defaultPersonalPreferences, type PersonalPreferencesPatch } from "./personalPreferences"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
 
-const preferences = (patch: UserPreferencesPatch = {}) => ({
-  __typename: "UserPreferences", ...defaultUserPreferences, ...patch,
+const preferences = (patch: PersonalPreferencesPatch = {}) => ({
+  __typename: "UserPreferences", ...defaultPersonalPreferences, ...patch,
 })
-const user = (patch: UserPreferencesPatch = {}) => ({
+const user = (patch: PersonalPreferencesPatch = {}) => ({
   me: { __typename: "User", id: "user-1",
     profile: { __typename: "UserProfile", nickname: "User" },
     preferences: preferences(patch) },
 })
-const mutation = (patch: UserPreferencesPatch) => ({
+const mutation = (patch: PersonalPreferencesPatch) => ({
   updateUserPreferences: { __typename: "UpdateUserPreferencesSuccess", preferences: preferences(patch) },
 })
 

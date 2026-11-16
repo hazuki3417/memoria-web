@@ -18,8 +18,8 @@ import {
   classifySettingsSaveFailure,
 } from "@/infrastructure/graphql/settingsMutationResult"
 import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
-import type { UserPreferences, UserPreferencesPatch } from "./userPreferences"
-import { fromGraphqlUserPreferences, toGraphqlUserPreferencesPatch } from "./userPreferencesGraphqlAdapter"
+import type { PersonalPreferencesValues, PersonalPreferencesPatch } from "./personalPreferences"
+import { fromGraphqlPersonalPreferences, toGraphqlPersonalPreferencesPatch } from "./personalPreferencesGraphqlAdapter"
 import { commitPersonalPreferencesPatch } from "./personalPreferencesCache"
 import { classifyPersonalPreferencesMutationResult } from "./classifyPersonalPreferencesMutationResult"
 import type {
@@ -32,14 +32,14 @@ import type {
 export const usePersonalPreferencesSave = (userId?: string): PersonalPreferencesSaveOperations => {
   const client = useApolloClient()
   return useMemo(() => {
-    const execute = (patch: UserPreferencesPatch) => {
+    const execute = (patch: PersonalPreferencesPatch) => {
       if (!userId) throw new Error("Current User unavailable")
       return client.mutate<
         OperationSaveUserPreferencesMutation,
         OperationSaveUserPreferencesMutationVariables
       >({
         mutation: SaveUserPreferencesDocument,
-        variables: { input: toGraphqlUserPreferencesPatch(patch) },
+        variables: { input: toGraphqlPersonalPreferencesPatch(patch) },
         fetchPolicy: "no-cache",
         errorPolicy: "all",
       })
@@ -47,7 +47,7 @@ export const usePersonalPreferencesSave = (userId?: string): PersonalPreferences
 
     const classifyError = (
       error: unknown,
-    ): ActionOutcome<UserPreferences, PersonalPreferencesSaveRejection> => {
+    ): ActionOutcome<PersonalPreferencesValues, PersonalPreferencesSaveRejection> => {
       const kind = classifySettingsSaveFailure(error)
       if (kind === "blocked") return { kind: "rejected", reason: { kind, error } }
       if (kind === "retryable") return { kind: "rejected", reason: { kind } }
@@ -57,7 +57,7 @@ export const usePersonalPreferencesSave = (userId?: string): PersonalPreferences
 
     const classify = (
       response: Awaited<ReturnType<typeof execute>>,
-    ): ActionOutcome<UserPreferences, PersonalPreferencesSaveRejection> => {
+    ): ActionOutcome<PersonalPreferencesValues, PersonalPreferencesSaveRejection> => {
       const result = response.data?.updateUserPreferences
       if (result) return classifyPersonalPreferencesMutationResult(result)
       if (response.errors?.length) {
@@ -66,7 +66,7 @@ export const usePersonalPreferencesSave = (userId?: string): PersonalPreferences
       return { kind: "unknown" }
     }
 
-    const confirmPreferences = (patch: UserPreferencesPatch) => {
+    const confirmPreferences = (patch: PersonalPreferencesPatch) => {
       if (!userId) return
       try {
         if (commitPersonalPreferencesPatch(client.cache, userId, patch)) return
@@ -82,22 +82,22 @@ export const usePersonalPreferencesSave = (userId?: string): PersonalPreferences
       }
     }
 
-    const afterSuccess = (values: UserPreferences, attempted: UserPreferencesPatch) => {
-      const patch: UserPreferencesPatch = {}
-      for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
+    const afterSuccess = (values: PersonalPreferencesValues, attempted: PersonalPreferencesPatch) => {
+      const patch: PersonalPreferencesPatch = {}
+      for (const key of Object.keys(attempted) as Array<keyof PersonalPreferencesValues>) {
         if (attempted[key] !== undefined) Object.assign(patch, { [key]: values[key] })
       }
       confirmPreferences(patch)
     }
 
-    const inspectPreferences = async (): Promise<UserPreferences> => {
+    const inspectPreferences = async (): Promise<PersonalPreferencesValues> => {
       const result = await client.query<OperationPersonalSettingsPreferencesQuery>({
         query: PersonalSettingsPreferencesDocument,
         fetchPolicy: "no-cache",
         context: settingsInspectionContext,
       })
       if (!userId || result.data?.me?.id !== userId) throw new Error("Current User unavailable")
-      return fromGraphqlUserPreferences(result.data.me.preferences)
+      return fromGraphqlPersonalPreferences(result.data.me.preferences)
     }
 
     const isAccentConfirmed = (color: string) => {

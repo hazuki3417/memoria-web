@@ -2,7 +2,7 @@ import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { SettingsSectionResult } from "@/ui/SettingsSectionHost"
-import { defaultUserPreferences } from "./userPreferences"
+import { defaultPersonalPreferences } from "./personalPreferences"
 import { PersonalPreferences } from "./PersonalPreferences"
 
 const mocks = vi.hoisted(() => ({
@@ -26,8 +26,8 @@ vi.mock("../usePersonalSettingsRefreshError", () => ({
 vi.mock("./usePersonalPreferencesSave", () => ({
   usePersonalPreferencesSave: () => ({ save: mocks.save, observe: mocks.inspect }),
 }))
-vi.mock("./userPreferencesGraphqlAdapter", () => ({
-  fromGraphqlUserPreferences: () => defaultUserPreferences,
+vi.mock("./personalPreferencesGraphqlAdapter", () => ({
+  fromGraphqlPersonalPreferences: () => defaultPersonalPreferences,
 }))
 vi.mock("./PersonalPreferencesView", () => ({
   PersonalPreferencesView: (props: unknown) => { mocks.view(props); return null },
@@ -84,7 +84,7 @@ describe("PersonalPreferencesはProfileと同じQuery/Action/Hostの入口", () 
     expect(renderHost).toHaveBeenCalledWith(expect.objectContaining({ status: "ready" }))
     expect(mocks.view).toHaveBeenCalledWith(expect.objectContaining({
       compact: true,
-      initialPreferences: defaultUserPreferences,
+      initialPreferences: defaultPersonalPreferences,
       operations: expect.objectContaining({ save: mocks.save, observe: mocks.inspect }),
     }))
     expect(mocks.refreshError).toHaveBeenCalledWith(false)

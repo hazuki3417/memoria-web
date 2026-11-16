@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { createApolloCache } from "@/infrastructure/graphql/createApolloCache"
 import { CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument, type OperationPersonalSettingsPreferencesQuery, type OperationPersonalSettingsAccentQuery } from "@/infrastructure/graphql/generated"
 import { commitPersonalPreferencesPatch } from "./personalPreferencesCache"
-import { defaultUserPreferences } from "./userPreferences"
+import { defaultPersonalPreferences } from "./personalPreferences"
 
 describe("Personal PreferencesのCache境界", () => {
   it("部分取得と確定Patchは他Fieldを維持し、falseとundefinedを区別する", () => {
@@ -10,7 +10,7 @@ describe("Personal PreferencesのCache境界", () => {
     cache.writeQuery({
       query: CurrentUserDocument,
       data: { me: { __typename: "User", id: "user-1", profile: { __typename: "UserProfile", nickname: "User" },
-        preferences: { __typename: "UserPreferences", ...defaultUserPreferences, mediaDetailNavigationWrap: true } } },
+        preferences: { __typename: "UserPreferences", ...defaultPersonalPreferences, mediaDetailNavigationWrap: true } } },
     })
     cache.writeQuery({
       query: PersonalSettingsAccentDocument,
@@ -20,7 +20,7 @@ describe("Personal PreferencesのCache境界", () => {
       mediaDetailNavigationWrap: false, dateFormat: undefined,
     })).toBe(true)
     expect(cache.readQuery<OperationPersonalSettingsPreferencesQuery>({ query: PersonalSettingsPreferencesDocument })?.me?.preferences).toMatchObject({
-      ...defaultUserPreferences, personalAccentColor: "#112233", mediaDetailNavigationWrap: false,
+      ...defaultPersonalPreferences, personalAccentColor: "#112233", mediaDetailNavigationWrap: false,
     })
   })
 

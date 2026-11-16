@@ -1,7 +1,7 @@
 import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { defaultUserPreferences } from "./userPreferences"
+import { defaultPersonalPreferences } from "./personalPreferences"
 import { usePersonalPreferencesSave } from "./usePersonalPreferencesSave"
 
 const mocks = vi.hoisted(() => ({
@@ -52,7 +52,7 @@ afterEach(async () => {
 
 describe("Personal PreferencesのAction Adapter", () => {
   const patch = { fileSizeUnit: "BINARY" as const }
-  const confirmed = { ...defaultUserPreferences, fileSizeUnit: "BINARY" as const }
+  const confirmed = { ...defaultPersonalPreferences, fileSizeUnit: "BINARY" as const }
   const success = {
     data: {
       updateUserPreferences: { __typename: "UpdateUserPreferencesSuccess", preferences: confirmed },
