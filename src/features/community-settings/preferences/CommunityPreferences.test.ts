@@ -23,8 +23,11 @@ vi.mock("./useCommunityPreferencesSave", () => ({
 vi.mock("./CommunityAliasSection/useCommunityAliasSave", () => ({
   useCommunityAliasSave: mocks.alias,
 }))
-vi.mock("./CommunityPreferencesReady", () => ({
-  CommunityPreferencesReady: () => createElement("div", null, "Community Preferences"),
+vi.mock("@/features/application-shell/CommunityAccentPreviewContext", () => ({
+  useCommunityAccentPreview: () => ({ setPreview: vi.fn(), clearPreview: vi.fn() }),
+}))
+vi.mock("./CommunityPreferencesView", () => ({
+  CommunityPreferencesView: () => createElement("div", null, "Community Preferences"),
 }))
 
 describe("CommunityPreferencesのSection取得状態", () => {

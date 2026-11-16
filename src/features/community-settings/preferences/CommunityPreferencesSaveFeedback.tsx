@@ -2,21 +2,17 @@
 
 import { Button, Stack, Text } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
-import type { createCommunityPreferencesSaveController, CommunityPreferencesSnapshot } from "./communityPreferencesSaveController"
-
-type Controller = ReturnType<typeof createCommunityPreferencesSaveController>
+import type { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
 
 /** Preferencesの保存失敗と明示Recoveryの操作を表示する。 */
 export const CommunityPreferencesSaveFeedback = ({
-  snapshot,
-  controller,
-  canResave,
+  model,
 }: {
-  snapshot: CommunityPreferencesSnapshot
-  controller: Controller
-  canResave: boolean
+  model: ReturnType<typeof useCommunityPreferencesForm>
 }) => {
+  const { snapshot, canResave, inspect, confirmObservation, retry, discard } = model
   const failure = snapshot.failure
+  if (!failure) return null
   return (
     <FeedbackPanel
       kind={failure === "unknown" ? "warning" : "error"}
@@ -37,7 +33,7 @@ export const CommunityPreferencesSaveFeedback = ({
             <Button
               size="xs"
               variant="light"
-              onClick={() => void controller.inspect()}
+              onClick={() => void inspect()}
             >
               現在の状態を確認
             </Button>
@@ -46,7 +42,7 @@ export const CommunityPreferencesSaveFeedback = ({
             <Button
               size="xs"
               variant="light"
-              onClick={() => controller.confirmObservation()}
+              onClick={() => confirmObservation()}
             >
               確認完了
             </Button>
@@ -57,7 +53,7 @@ export const CommunityPreferencesSaveFeedback = ({
               <Button
                 size="xs"
                 disabled={!canResave}
-                onClick={() => controller.retry()}
+                onClick={() => retry()}
               >
                 もう一度保存
               </Button>
@@ -66,7 +62,7 @@ export const CommunityPreferencesSaveFeedback = ({
             size="xs"
             variant="subtle"
             color="gray"
-            onClick={() => controller.discard()}
+            onClick={() => discard()}
           >
             変更を破棄
           </Button>

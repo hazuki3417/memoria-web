@@ -6,17 +6,21 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { communityPreferencesSchema } from "./communityPreferencesSchema"
 import type { SaveStatusState } from "@/components/SaveStatus"
+import type { CommunityPreferencesSaveOperations } from "./communityPreferencesSaveOutcome"
+import { useCommunityPreferencesAutoSave, type CommunityPreferencesAccentPreview } from "./useCommunityPreferencesAutoSave"
 
 /** Preferencesの入力Draft・取得値との同期・Validationを管理する。 */
 export const useCommunityPreferencesForm = ({
-  accent,
-  initialDraft,
+  accent: sourceAccent,
+  initialDraft: sourceDraft,
   restoreOnAccentChange,
-  preserveDraftOnAccentChange,
-  saveStatus,
+  preserveDraftOnAccentChange: preserveDraft,
+  saveStatus: suppliedSaveStatus,
   onAccentDraftChange,
   onDraftValidityChange,
   setAccent,
+  operations,
+  preview,
 }: {
   accent: string
   initialDraft?: string
@@ -25,8 +29,16 @@ export const useCommunityPreferencesForm = ({
   saveStatus?: SaveStatusState
   onAccentDraftChange?: (value: string) => void
   onDraftValidityChange?: (valid: boolean) => void
-  setAccent: Dispatch<SetStateAction<string>>
+  setAccent?: Dispatch<SetStateAction<string>>
+  operations?: CommunityPreferencesSaveOperations
+  preview?: CommunityPreferencesAccentPreview
 }) => {
+  const autoSave = useCommunityPreferencesAutoSave(sourceAccent, operations, preview)
+  const { snapshot } = autoSave
+  const accent = operations ? snapshot.confirmed?.accentColor ?? sourceAccent : sourceAccent
+  const initialDraft = operations ? snapshot.draft?.accentColor ?? accent : sourceDraft
+  const preserveDraftOnAccentChange = operations ? snapshot.failure !== null : preserveDraft
+  const saveStatus = operations ? (snapshot.failure ? "attention" : snapshot.status) : suppliedSaveStatus
   const { control, getValues, reset } = useForm<
     z.input<typeof communityPreferencesSchema>
   >({
@@ -37,7 +49,7 @@ export const useCommunityPreferencesForm = ({
   const { field, fieldState } = useController({ control, name: "accentDraft" })
 
   // Refresh an untouched input; preserve an incomplete draft unless the
-  // owning save controller explicitly restores its last confirmed value.
+  // AutoSaveの明示破棄が復元する its last confirmed value.
   const previousAccent = useRef(accent)
   const previousInitialDraft = useRef(initialDraft)
   useEffect(() => {
@@ -59,7 +71,7 @@ export const useCommunityPreferencesForm = ({
     reset,
   ])
 
-  // Explicit controller discard restores the input without remounting Alias controls.
+  // 明示破棄でAlias controlsを再Mountせず入力を復元する。
   // Normal server refetch and pending input must not overwrite the live RHF Draft.
   useEffect(() => {
     if (
@@ -79,14 +91,17 @@ export const useCommunityPreferencesForm = ({
 
   const onDraftChange = (next: string) => {
     field.onChange(next)
+    autoSave.edit({ accentColor: next })
     onAccentDraftChange?.(next)
     const parsed = communityPreferencesSchema.safeParse({ accentDraft: next })
     onDraftValidityChange?.(parsed.success)
-    if (parsed.success) setAccent(parsed.data.accentDraft)
+    if (parsed.success) setAccent?.(parsed.data.accentDraft)
   }
 
   // 各Sectionが入力状態・Validation・変更操作を利用できるようにする。
   return {
+    ...autoSave,
+    saveStatus,
     field,
     fieldState,
     draftInvalid: !communityPreferencesSchema.safeParse({ accentDraft: field.value }).success,

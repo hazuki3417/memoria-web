@@ -1,9 +1,11 @@
 "use client"
 
+import { useMemo } from "react"
+import { useCommunityAccentPreview } from "@/features/application-shell/CommunityAccentPreviewContext"
 import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
-import { CommunityPreferencesReady } from "./CommunityPreferencesReady"
+import { CommunityPreferencesView } from "./CommunityPreferencesView"
 import { useCommunityPreferencesSave } from "./useCommunityPreferencesSave"
 import { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
@@ -21,6 +23,11 @@ export const CommunityPreferences = ({
   })
   const operations = useCommunityPreferencesSave(communityId)
   const alias = useCommunityAliasSave(communityId)
+  const { setPreview, clearPreview } = useCommunityAccentPreview()
+  const preview = useMemo(() => ({
+    preview: (color: string) => setPreview(communityId, color),
+    release: (owner: number) => clearPreview(communityId, owner),
+  }), [communityId, setPreview, clearPreview])
   const settings = query.data?.community?.mySettings
 
   useCommunitySettingsRefreshError(Boolean(query.data?.community && query.error))
@@ -39,13 +46,17 @@ export const CommunityPreferences = ({
   return render({
     status: "ready",
     content: (
-      <CommunityPreferencesReady
+      <CommunityPreferencesView
         key={communityId}
-        communityId={communityId}
-        preferences={{ accentColor: settings.accentColor }}
-        savedAlias={settings.alias}
+        accent={settings.accentColor}
+        isPreview={false}
         operations={operations}
-        alias={alias}
+        preview={preview}
+        alias={{
+          savedAlias: settings.alias,
+          onInspect: alias.inspectAlias,
+          onSave: alias.saveAlias,
+        }}
       />
     ),
   })
