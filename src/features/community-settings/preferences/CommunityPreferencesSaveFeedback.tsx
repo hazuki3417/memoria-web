@@ -2,9 +2,9 @@
 
 import { Button, Stack, Text } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
-import { createCommunityAccentSaveController, type AccentSnapshot } from "./communityAccentSaveController"
+import { createCommunityPreferencesSaveController, type CommunityPreferencesSnapshot } from "./communityPreferencesSaveController"
 
-type Controller = ReturnType<typeof createCommunityAccentSaveController>
+type Controller = ReturnType<typeof createCommunityPreferencesSaveController>
 
 /** Renders the existing Accent save failure and explicit recovery controls. */
 export const CommunityPreferencesSaveFeedback = ({
@@ -12,7 +12,7 @@ export const CommunityPreferencesSaveFeedback = ({
   controller,
   canResave,
 }: {
-  snapshot: AccentSnapshot
+  snapshot: CommunityPreferencesSnapshot
   controller: Controller
   canResave: boolean
 }) => {
