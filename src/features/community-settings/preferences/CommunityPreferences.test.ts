@@ -2,7 +2,7 @@ import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { SettingsSectionResult } from "@/ui/SettingsSectionHost"
-import { ConnectedCommunityPreferences } from "./ConnectedCommunityPreferences"
+import { CommunityPreferences } from "./CommunityPreferences"
 
 const mocks = vi.hoisted(() => ({
   connection: vi.fn(),
@@ -12,14 +12,14 @@ const mocks = vi.hoisted(() => ({
 vi.mock("./useCommunityPreferencesConnection", () => ({
   useCommunityPreferencesConnection: mocks.connection,
 }))
-vi.mock("../CommunityAliasSection/useCommunityAliasSave", () => ({
+vi.mock("./CommunityAliasSection/useCommunityAliasSave", () => ({
   useCommunityAliasSave: mocks.alias,
 }))
-vi.mock("../CommunityPreferencesSection", () => ({
+vi.mock("./CommunityPreferencesSection", () => ({
   CommunityPreferencesSection: () => createElement("div", null, "Community Preferences"),
 }))
 
-describe("ConnectedCommunityPreferencesのSection取得状態", () => {
+describe("CommunityPreferencesのSection取得状態", () => {
   let root: Root
   let element: HTMLDivElement
   let results: SettingsSectionResult[]
@@ -39,7 +39,7 @@ describe("ConnectedCommunityPreferencesのSection取得状態", () => {
   function renderSection() {
     act(() => {
       root.render(
-        createElement(ConnectedCommunityPreferences, {
+        createElement(CommunityPreferences, {
           communityId: "club-a",
           render: (next) => {
             results.push(next)

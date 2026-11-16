@@ -3,11 +3,11 @@ import { FeedbackPanel } from "@/components/Feedback"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
-import { CommunityPreferences } from "./CommunityPreferences"
+import { CommunityPreferencesView } from "./CommunityPreferencesView"
 
 const meta = {
   title: "Features/Community Settings/Accent Draft",
-  component: CommunityPreferences,
+  component: CommunityPreferencesView,
   args: {
     accent: "#123456",
     setAccent: fn(),
@@ -20,12 +20,12 @@ const meta = {
       </Box>
     ),
   ],
-} satisfies Meta<typeof CommunityPreferences>
+} satisfies Meta<typeof CommunityPreferencesView>
 export default meta
 type Story = StoryObj<typeof meta>
 
 function AccentRefreshFixture(
-  args: ComponentProps<typeof CommunityPreferences>,
+  args: ComponentProps<typeof CommunityPreferencesView>,
 ) {
   const [accent, setAccent] = useState(args.accent)
   const [preserveDraft, setPreserveDraft] = useState(false)
@@ -42,7 +42,7 @@ function AccentRefreshFixture(
       >
         保存失敗の復元を再現
       </Button>
-      <CommunityPreferences
+      <CommunityPreferencesView
         {...args}
         accent={accent}
         preserveDraftOnAccentChange={preserveDraft}

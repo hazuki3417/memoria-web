@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { ConnectedCommunityGeneral } from "../general/ConnectedCommunityGeneral"
 import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
-import { ConnectedCommunityPreferences } from "../preferences/ConnectedCommunityPreferences"
+import { CommunityPreferences } from "../preferences/CommunityPreferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
 import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
@@ -76,7 +76,7 @@ export function CommunitySettingsRoute({
       break
     case "preferences":
       controller = (render) => (
-        <ConnectedCommunityPreferences communityId={communityId} render={render} />
+        <CommunityPreferences communityId={communityId} render={render} />
       )
       break
   }

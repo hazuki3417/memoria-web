@@ -1,72 +1,42 @@
 "use client"
 
-import type { Dispatch, ReactNode, SetStateAction } from "react"
-import { Box, Stack } from "@mantine/core"
-import { PageHeader } from "@/components/PageHeader"
-import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING, type SaveStatusState } from "@/components/SaveStatus"
-import { SectionHeader } from "@/components/SectionHeader"
-import { CommunityPreferencesDisplaySection } from "./CommunityPreferencesDisplaySection"
-import { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
+import { CommunityPreferencesSection } from "./CommunityPreferencesSection"
+import { useCommunityPreferencesConnection } from "./useCommunityPreferencesConnection"
+import { useCommunityAliasSave } from "./CommunityAliasSection/useCommunityAliasSave"
 
-/** Preferences全体のHeader・Feedback・Alias/AccentをCompositionする。 */
+/** Community環境設定のQuery・Action・Host接続を提供し、Ready画面に保存の生存期間を委ねる。 */
 export const CommunityPreferences = ({
-  accent,
-  initialDraft,
-  onAccentDraftChange,
-  setAccent,
-  isPreview = true,
-  restoreOnAccentChange = false,
-  preserveDraftOnAccentChange = false,
-  saveStatus,
-  saveFeedback,
-  accentError,
-  onDraftValidityChange,
-  aliasSection,
+  communityId,
+  render,
 }: {
-  accent: string
-  initialDraft?: string
-  onAccentDraftChange?: (value: string) => void
-  setAccent: Dispatch<SetStateAction<string>>
-  isPreview?: boolean
-  restoreOnAccentChange?: boolean
-  preserveDraftOnAccentChange?: boolean
-  saveStatus?: SaveStatusState
-  saveFeedback?: ReactNode
-  accentError?: string
-  onDraftValidityChange?: (valid: boolean) => void
-  aliasSection?: ReactNode
+  communityId: string
+  render: SettingsSectionRender
 }) => {
-  const model = useCommunityPreferencesForm({
-    accent, initialDraft, restoreOnAccentChange, preserveDraftOnAccentChange,
-    saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
+  const model = useCommunityPreferencesConnection(communityId)
+  const alias = useCommunityAliasSave(communityId)
+  const settings = model.data?.community?.mySettings
+
+  if (!settings) {
+    return render(
+      model.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void model.refetch().catch(() => undefined) },
+          },
+    )
+  }
+
+  return render({
+    status: "ready",
+    content: (
+      <CommunityPreferencesSection
+        key={communityId}
+        communityId={communityId}
+        settings={settings}
+        alias={alias}
+      />
+    ),
   })
-  return (
-    <Stack gap="xl">
-      <PageHeader
-        title="環境設定"
-        description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
-        titleAccessory={
-          saveStatus !== undefined ? (
-            <SaveStatus
-              state={saveStatus}
-              announce
-              timing={SETTINGS_SAVE_STATUS_TIMING}
-            />
-          ) : undefined
-        }
-      />
-      {saveFeedback}
-      {aliasSection && (
-        <Box>
-          <SectionHeader>表示名</SectionHeader>
-          {aliasSection}
-        </Box>
-      )}
-      <CommunityPreferencesDisplaySection
-        model={model}
-        isPreview={isPreview}
-        accentError={accentError}
-      />
-    </Stack>
-  )
 }

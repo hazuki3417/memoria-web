@@ -8,7 +8,7 @@ import { CommunityGeneral } from "../general/CommunityGeneral"
 import { CommunityMembers } from "../members"
 import type { CommunityMember } from "../members"
 import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
-import { CommunityPreferences } from "../preferences/CommunityPreferences"
+import { CommunityPreferencesView } from "../preferences/CommunityPreferencesView"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import type { SaveCommunityName } from "../general/CommunityNameSection/communityNameSaveOutcome"
@@ -92,7 +92,7 @@ export function CommunitySettingsStoryNavigation({
       content = props.usageContent
       break
     case "preferences":
-      content = preferencesContent ?? <CommunityPreferences accent={accent} setAccent={setAccent} />
+      content = preferencesContent ?? <CommunityPreferencesView accent={accent} setAccent={setAccent} />
       break
   }
 
