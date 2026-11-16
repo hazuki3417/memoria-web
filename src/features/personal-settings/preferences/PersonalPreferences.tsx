@@ -41,6 +41,7 @@ export const PersonalPreferences = ({ render }: { render: SettingsSectionRender 
         compact={compact}
         initialPreferences={fromGraphqlPersonalPreferences(values)}
         operations={operations}
+        sourceReady={!query.loading && !query.error}
       />
     ),
   })

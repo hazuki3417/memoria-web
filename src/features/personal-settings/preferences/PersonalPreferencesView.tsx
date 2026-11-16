@@ -17,6 +17,7 @@ export type PersonalPreferencesViewProps = {
   onSaveAction?: SavePersonalPreferencesAction
   onInspect?: () => Promise<PersonalPreferencesValues>
   operations?: PersonalPreferencesSaveOperations
+  sourceReady?: boolean
 }
 
 /** 環境設定のHeader・Feedback・各Sectionを、保存処理から独立して描画する。 */
@@ -27,10 +28,11 @@ export const PersonalPreferencesView = ({
   onSaveAction,
   onInspect,
   operations,
+  sourceReady = true,
 }: PersonalPreferencesViewProps) => {
   const model = usePersonalPreferencesForm(
     initialPreferences, onSave, operations?.observe ?? onInspect,
-    operations?.save ?? onSaveAction, operations?.confirm, operations?.isAccentConfirmed,
+    operations?.save ?? onSaveAction, operations?.confirm, operations?.isAccentConfirmed, sourceReady,
   )
   const canSave = Boolean(operations || onSave || onSaveAction)
   return (

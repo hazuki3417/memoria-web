@@ -46,6 +46,7 @@ type Lifetime = {
   closed: boolean
   runningColor: string | null
   sourceAccent: string | null
+  sourceReady: boolean
   previewColor: string | null
 }
 
@@ -81,6 +82,7 @@ export const useCommunityPreferencesAutoSave = (
   initialAccent: string,
   operations?: CommunityPreferencesSaveOperations,
   preview?: CommunityPreferencesAccentPreview,
+  sourceReady = true,
 ) => {
   const [snapshot, setSnapshot] = useState<Snapshot>(initialSnapshot)
   const ownerRef = useRef<Lifetime | null>(null)
@@ -106,6 +108,7 @@ export const useCommunityPreferencesAutoSave = (
       closed: false,
       runningColor: null,
       sourceAccent: null,
+      sourceReady: false,
       previewColor: null,
     }
     ownerRef.current = owner
@@ -125,8 +128,9 @@ export const useCommunityPreferencesAutoSave = (
     if (!owner || !isCommunityAccentColor(initialAccent)) return
     const color = normalize(initialAccent)
     const { confirmed, draft, failure, status } = owner.snapshot
-    const sourceChanged = owner.sourceAccent !== color
+    const sourceChanged = owner.sourceAccent !== color || (sourceReady && !owner.sourceReady)
     owner.sourceAccent = color
+    owner.sourceReady = sourceReady
     if (failure || owner.runningColor !== null || status === "pending" || status === "saving") return
     // 同じ取得snapshotの再Renderでは、直前の確定値を巻き戻さない。
     // 通常Queryの応答順序はApolloが調停する。変化した正常な取得値を拒否し続けない。
@@ -139,7 +143,7 @@ export const useCommunityPreferencesAutoSave = (
     const nextDraft = draft && !isCommunityAccentColor(draft.accentColor) ? draft : values
     if (confirmed?.accentColor === color && draft === nextDraft) return
     emit(owner, { confirmed: values, draft: nextDraft })
-  }, [initialAccent, operations, preview, snapshot])
+  }, [initialAccent, operations, preview, snapshot, sourceReady])
 
   const makeQueue = (owner: Lifetime, delayMs = 400): AutoSaveQueue<Attempt> => {
     const shouldExecute = (attempt: Attempt) =>

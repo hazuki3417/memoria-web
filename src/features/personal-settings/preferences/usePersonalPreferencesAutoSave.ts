@@ -31,6 +31,7 @@ export const usePersonalPreferencesAutoSave = (
   onInspect?: () => Promise<PersonalPreferencesValues>,
   onSaveAction?: SavePersonalPreferencesAction,
   onConfirm?: (patch: PersonalPreferencesPatch) => void,
+  sourceReady = true,
 ) => {
   const [state, setState] = useState<State>(() => ({
     confirmed: initialPreferences!,
@@ -57,6 +58,7 @@ export const usePersonalPreferencesAutoSave = (
   const queueRef = useRef<AutoSaveQueue<PersonalPreferencesPatch> | null>(null)
   const activeAttempt = useRef<PersonalPreferencesPatch | null>(null)
   const previousSource = useRef(initialPreferences)
+  const previousSourceReady = useRef(sourceReady)
   const observed = useRef<PersonalPreferencesValues | null>(null)
   const inspectionGeneration = useRef(0)
   const accentDraft = useRef<string | null>(null)
@@ -177,21 +179,23 @@ export const usePersonalPreferencesAutoSave = (
   useEffect(() => {
     if (!initialPreferences) return
     const previous = previousSource.current
+    const refreshed = sourceReady && !previousSourceReady.current
     previousSource.current = initialPreferences
+    previousSourceReady.current = sourceReady
     if (stateRef.current.failure) return
     const confirmed = { ...stateRef.current.confirmed }
     let changed = false
     for (const key of Object.keys(initialPreferences) as Array<keyof PersonalPreferencesValues>) {
       // 同じQuery snapshotの再Renderは再取得ではない。
       // 通常取得の順序調停はApollo側が所有し、変化した取得値を無期限に拒否しない。
-      if (previous?.[key] === initialPreferences[key] || key in pending.current) continue
+      if ((!refreshed && previous?.[key] === initialPreferences[key]) || key in pending.current) continue
       if (confirmed[key] !== initialPreferences[key]) {
         Object.assign(confirmed, { [key]: initialPreferences[key] })
         changed = true
       }
     }
     if (changed) emit({ confirmed })
-  }, [initialPreferences])
+  }, [initialPreferences, sourceReady])
 
   const inspect = async () => {
     if (stateRef.current.failure !== "unknown" || !inspectRef.current) return

@@ -22,6 +22,7 @@ export const CommunityPreferences = ({
     variables: { communityId },
     fetchPolicy: "network-only",
     refetchWritePolicy: "merge",
+    notifyOnNetworkStatusChange: true,
   })
   const operations = useCommunityPreferencesSave(communityId)
   const alias = useCommunityAliasSave(communityId)
@@ -54,6 +55,7 @@ export const CommunityPreferences = ({
         accent={fromGraphqlCommunityPreferences(settings).accentColor}
         isPreview={false}
         operations={operations}
+        sourceReady={!query.loading && !query.error}
         preview={preview}
         alias={{
           savedAlias: settings.alias,

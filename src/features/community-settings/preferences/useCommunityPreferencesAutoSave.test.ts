@@ -25,8 +25,9 @@ const setup = (save?: ReturnType<typeof vi.fn<SaveCommunityPreferencesAction>>, 
   const preview = { preview: operations.preview, release: operations.release }
 
   let sourceAccent = "#112233"
+  let sourceReady = true
   const Harness = () => {
-    current = useCommunityPreferencesAutoSave(sourceAccent, operations, preview)
+    current = useCommunityPreferencesAutoSave(sourceAccent, operations, preview, sourceReady)
     render(current.snapshot)
     return null
   }
@@ -41,8 +42,9 @@ const setup = (save?: ReturnType<typeof vi.fn<SaveCommunityPreferencesAction>>, 
   const autoSave = {
     edit: (draft: CommunityPreferencesDraft) => { act(() => current.edit(draft)) },
     getSnapshot: () => current.snapshot,
-    refresh: (color: string) => {
+    refresh: (color: string, ready = true) => {
       sourceAccent = color
+      sourceReady = ready
       act(() => root.render(strict ? createElement(StrictMode, null, createElement(Harness)) : createElement(Harness)))
     },
     retry: () => { act(() => current.retry()) },
@@ -274,6 +276,17 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
     expect(autoSave.getSnapshot()).toMatchObject({
       confirmed: { accentColor: "#778899" }, draft: { accentColor: "#778899" },
     })
+  })
+
+  it("同値の正常再取得も取得完了として扱う", async () => {
+    const { autoSave } = setup(vi.fn<SaveCommunityPreferencesAction>().mockResolvedValue(success({ accentColor: "#AABBCC" })))
+    autoSave.edit({ accentColor: "#AABBCC" })
+    await act(async () => { await vi.advanceTimersByTimeAsync(400) })
+    expect(autoSave.getSnapshot().confirmed?.accentColor).toBe("#AABBCC")
+    autoSave.refresh("#112233", false)
+    expect(autoSave.getSnapshot().confirmed?.accentColor).toBe("#AABBCC")
+    autoSave.refresh("#112233", true)
+    expect(autoSave.getSnapshot().confirmed?.accentColor).toBe("#112233")
   })
 
   it("保存結果不明時の古い照会は新しいDraftの確認結果を上書きしない", async () => {

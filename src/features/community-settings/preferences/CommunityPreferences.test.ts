@@ -104,7 +104,7 @@ describe("CommunityPreferencesのSection取得状態", () => {
     expect(element.textContent).toContain("Community Preferences")
     expect(mocks.refreshError).toHaveBeenLastCalledWith(true)
     expect(mocks.connection).toHaveBeenCalledWith({
-      variables: { communityId: "club-a" }, fetchPolicy: "network-only", refetchWritePolicy: "merge",
+      variables: { communityId: "club-a" }, fetchPolicy: "network-only", refetchWritePolicy: "merge", notifyOnNetworkStatusChange: true,
     })
   })
 })

@@ -24,6 +24,7 @@ export const usePersonalPreferencesForm = (
   onSaveAction?: SavePersonalPreferencesAction,
   onConfirm?: (patch: PersonalPreferencesPatch) => void,
   isAccentConfirmed?: (color: string) => boolean,
+  sourceReady = true,
 ) => {
   const {
     saveError,
@@ -41,7 +42,7 @@ export const usePersonalPreferencesForm = (
     inspect,
     confirmObservation,
     discard,
-  } = usePersonalPreferencesAutoSave(onSave, initialPreferences, onInspect, onSaveAction, onConfirm)
+  } = usePersonalPreferencesAutoSave(onSave, initialPreferences, onInspect, onSaveAction, onConfirm, sourceReady)
   const preview = usePersonalAccentPreview()
   const previewOwner = useRef<number | null>(null)
   const clearPreview = preview?.clearPreview

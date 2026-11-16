@@ -135,6 +135,25 @@ describe("Personal Preferencesの画面Lifetime保存", () => {
     expect(current.confirmed.personalAccentColor).toBe("#778899")
   })
 
+  it("同値の正常再取得も新しい取得完了として扱う", async () => {
+    await act(async () => root.unmount())
+    root = createRoot(host)
+    const Harness = ({ ready }: { ready: boolean }) => {
+      current = usePersonalPreferencesAutoSave(save, defaultPersonalPreferences, undefined, undefined, undefined, ready)
+      return null
+    }
+    await act(async () => root.render(createElement(Harness, { ready: true })))
+    await act(async () => {
+      current.enqueue({ personalAccentColor: "#AABBCC" })
+      await vi.advanceTimersByTimeAsync(400)
+    })
+    expect(current.confirmed.personalAccentColor).toBe("#AABBCC")
+    await act(async () => root.render(createElement(Harness, { ready: false })))
+    expect(current.confirmed.personalAccentColor).toBe("#AABBCC")
+    await act(async () => root.render(createElement(Harness, { ready: true })))
+    expect(current.confirmed.personalAccentColor).toBe(defaultPersonalPreferences.personalAccentColor)
+  })
+
   it("未送信PatchはUnmount時に一度だけ送信試行し、次画面へDraftを保持しない", async () => {
     await act(async () => { current.enqueue({ mediaDetailNavigationWrap: true }) })
     await act(async () => root.unmount())
