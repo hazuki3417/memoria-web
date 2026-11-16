@@ -73,8 +73,11 @@ export function CommunityAccentPreviewProvider({
   )
 }
 
+/** Storyや独立したNavigationではPreview Providerが存在しない場合がある。 */
+export const useOptionalCommunityAccentPreview = () => useContext(CommunityAccentPreviewContext)
+
 export function useCommunityAccentPreview() {
-  const context = useContext(CommunityAccentPreviewContext)
+  const context = useOptionalCommunityAccentPreview()
   if (!context) {
     throw new Error("CommunityAccentPreviewProvider is required")
   }

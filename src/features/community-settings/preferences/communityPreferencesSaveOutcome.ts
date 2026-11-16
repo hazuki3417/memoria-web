@@ -22,4 +22,5 @@ export type CommunityPreferencesSaveOperations = {
   save: SaveCommunityPreferencesAction
   observe: () => Promise<CommunityPreferencesValues>
   confirm: (patch: CommunityPreferencesPatch) => void
+  isAccentConfirmed?: (color: string) => boolean
 }

@@ -45,6 +45,7 @@ type Lifetime = {
   inspectionGeneration: number
   closed: boolean
   running: boolean
+  awaitingEcho: string | null
 }
 
 const initialSnapshot: Snapshot = {
@@ -96,6 +97,7 @@ export const useCommunityPreferencesAutoSave = (
       inspectionGeneration: 0,
       closed: false,
       running: false,
+      awaitingEcho: null,
     }
     ownerRef.current = owner
     setSnapshot(initialSnapshot)
@@ -111,12 +113,22 @@ export const useCommunityPreferencesAutoSave = (
 
   useEffect(() => {
     const owner = ownerRef.current
-    if (!owner || !isCommunityAccentColor(initialAccent) ||
-        owner.snapshot.confirmed !== null || owner.snapshot.draft !== null) return
-    const values = { accentColor: normalize(initialAccent) }
+    if (!owner || !isCommunityAccentColor(initialAccent)) return
+    const color = normalize(initialAccent)
+    const { confirmed, draft, failure, status } = owner.snapshot
+    if (owner.awaitingEcho !== null) {
+      if (color !== owner.awaitingEcho) return
+      owner.awaitingEcho = null
+      if (!failure && draft && normalize(draft.accentColor) === color &&
+          (!owner.operations.isAccentConfirmed || owner.operations.isAccentConfirmed(color))) releasePreview(owner)
+    }
+    if (failure || owner.running || (status !== "idle" && status !== "saved") ||
+        (draft && confirmed && normalize(draft.accentColor) !== confirmed.accentColor)) return
+    if (confirmed?.accentColor === color && draft?.accentColor === color) return
+    const values = { accentColor: color }
     owner.snapshot = { ...owner.snapshot, confirmed: values, draft: values }
     setSnapshot(owner.snapshot)
-  }, [initialAccent, operations, preview])
+  }, [initialAccent, operations, preview, snapshot])
 
   const makeQueue = (owner: Lifetime, delayMs = 400): AutoSaveQueue<Attempt> => {
     const shouldExecute = (attempt: Attempt) =>
@@ -150,7 +162,9 @@ export const useCommunityPreferencesAutoSave = (
           const color = outcome.value.accentColor
           const pendingDraft = owner.snapshot.draft
           const latest = attempted.revision === owner.revision
-          if (latest) releasePreview(owner)
+          owner.awaitingEcho = color
+          if (latest && pendingDraft && normalize(pendingDraft.accentColor) === color &&
+              (!owner.operations.isAccentConfirmed || owner.operations.isAccentConfirmed(color))) releasePreview(owner)
           emit(owner, {
             confirmed: { accentColor: color },
             status: !latest || unsent || (pendingDraft && normalize(pendingDraft.accentColor) !== color)
@@ -188,16 +202,18 @@ export const useCommunityPreferencesAutoSave = (
     owner.inspectionGeneration += 1
     emit(owner, { draft, validation: null, observedMatches: false, inspected: false })
     if (!isCommunityAccentColor(value)) {
-      releasePreview(owner)
+      if (!owner.snapshot.failure) releasePreview(owner)
       emit(owner, { status: owner.snapshot.failure ? "attention" : owner.running ? "saving" : "pending" })
       return
     }
+    const color = normalize(value)
     if (owner.snapshot.failure) {
+      // Blockedは操作停止。それ以外の有効な新規入力は表示だけ即時反映する。
+      if (owner.snapshot.failure !== "blocked" && owner.preview) owner.previewOwner = owner.preview.preview(color)
       // 停止したQueueの自動再送は行わない。
       emit(owner, { status: "attention" })
       return
     }
-    const color = normalize(value)
     if (color === owner.snapshot.confirmed?.accentColor && !owner.running) {
       releasePreview(owner)
       emit(owner, { status: "idle" })
@@ -237,7 +253,8 @@ export const useCommunityPreferencesAutoSave = (
         !isCommunityAccentColor(owner.snapshot.draft.accentColor)) return
     const color = normalize(owner.snapshot.draft.accentColor)
     owner.operations.confirm({ accentColor: color })
-    releasePreview(owner)
+    owner.awaitingEcho = color
+    if (!owner.operations.isAccentConfirmed || owner.operations.isAccentConfirmed(color)) releasePreview(owner)
     emit(owner, {
       confirmed: { accentColor: color }, status: "idle", failure: null,
       blockedFeedback: null, validation: null, inspected: false, observedMatches: false,

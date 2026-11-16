@@ -9,6 +9,7 @@ import { CommunityPreferences } from "../preferences"
 import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
 import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
+import { useOptionalCommunityAccentPreview } from "@/features/application-shell/CommunityAccentPreviewContext"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
@@ -50,7 +51,8 @@ export function CommunitySettingsRoute({
     variables: { communityId },
     fetchPolicy: "cache-first",
   })
-  const communityAccentColor = settingsData?.community?.mySettings.accentColor
+  const preview = useOptionalCommunityAccentPreview()
+  const communityAccentColor = preview?.previews[communityId]?.color ?? settingsData?.community?.mySettings.accentColor
 
   let controller: (render: SettingsSectionRender) => ReactNode
 

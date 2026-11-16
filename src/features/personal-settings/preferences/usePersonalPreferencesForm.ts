@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { useController, useForm, type FieldPathValue } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
@@ -43,6 +43,12 @@ export function usePersonalPreferencesForm(
     discard,
   } = usePersonalPreferencesAutoSave(onSave, initialPreferences, onInspect, onSaveAction, onConfirm)
   const preview = usePersonalAccentPreview()
+  const previewOwner = useRef<number | null>(null)
+  const clearPreview = preview?.clearPreview
+  const releasePreview = useCallback(() => {
+    if (previewOwner.current !== null) clearPreview?.(previewOwner.current)
+    previewOwner.current = null
+  }, [clearPreview])
   const initial = confirmed ?? initialPreferences
   const {
     control,
@@ -107,16 +113,17 @@ export function usePersonalPreferencesForm(
     if (previousDiscardRevision.current === discardRevision) return
     previousDiscardRevision.current = discardRevision
     reset({ ...confirmed, accentDraft: confirmed.personalAccentColor })
-    preview?.setColor(null)
-  }, [discardRevision, confirmed, reset, preview])
+    releasePreview()
+  }, [discardRevision, confirmed, reset, releasePreview])
 
-  useEffect(() => () => { preview?.setColor(null) }, [preview?.setColor])
+  useEffect(() => releasePreview, [releasePreview])
 
   useEffect(() => {
     if (isAccentConfirmed && !saveError && !draftPatch.personalAccentColor &&
-        preview?.color && preview.color === confirmed.personalAccentColor &&
-        isAccentConfirmed(preview.color)) preview.setColor(null)
-  }, [confirmed, draftPatch, saveError, preview, isAccentConfirmed, initialPreferences])
+        preview?.color && preview.owner === previewOwner.current &&
+        preview.color === confirmed.personalAccentColor &&
+        isAccentConfirmed(preview.color)) releasePreview()
+  }, [confirmed, draftPatch, saveError, preview, isAccentConfirmed, initialPreferences, releasePreview])
 
   const values = watch()
   const preferences: UserPreferences = {
@@ -152,7 +159,9 @@ export function usePersonalPreferencesForm(
     if (parsed.success) {
       const normalized = parsed.data.toUpperCase()
       change("personalAccentColor", normalized)
-      if (saveError !== "blocked") preview?.setColor(normalized)
+      if (saveError !== "blocked" && preview) previewOwner.current = preview.setPreview(normalized)
+    } else if (!saveError) {
+      releasePreview()
     }
   }
 

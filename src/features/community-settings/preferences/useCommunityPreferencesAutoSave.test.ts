@@ -126,6 +126,7 @@ describe("Ready画面単位のCommunity Accent AutoSave", () => {
     })
     expect(operations.release).not.toHaveBeenCalled()
     autoSave.edit({ accentColor: "#445566" })
+    expect(operations.preview).toHaveBeenLastCalledWith("#445566")
     await act(async () => { await vi.advanceTimersByTimeAsync(500) })
     expect(save).toHaveBeenCalledTimes(1)
     autoSave.retry()

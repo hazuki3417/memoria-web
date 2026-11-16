@@ -30,85 +30,84 @@ import type {
 export const usePersonalPreferencesSave = (userId?: string) => {
   const client = useApolloClient()
   return useMemo(() => {
+    const execute = (patch: UserPreferencesPatch) => {
+      if (!userId) throw new Error("Current User unavailable")
+      return client.mutate<
+        OperationSaveUserPreferencesMutation,
+        OperationSaveUserPreferencesMutationVariables
+      >({
+        mutation: SaveUserPreferencesDocument,
+        variables: { input: toGraphqlUserPreferencesPatch(patch) },
+        fetchPolicy: "no-cache",
+        errorPolicy: "all",
+      })
+    }
 
-  const execute = (patch: UserPreferencesPatch) => {
-    if (!userId) throw new Error("Current User unavailable")
-    return client.mutate<
-      OperationSaveUserPreferencesMutation,
-      OperationSaveUserPreferencesMutationVariables
-    >({
-      mutation: SaveUserPreferencesDocument,
-      variables: { input: toGraphqlUserPreferencesPatch(patch) },
-      fetchPolicy: "no-cache",
-      errorPolicy: "all",
+    const classifyError = (
+      error: unknown,
+    ): ActionOutcome<UserPreferences, PersonalPreferencesSaveRejection> => {
+      const kind = classifySettingsSaveFailure(error)
+      if (kind === "blocked") return { kind: "rejected", reason: { kind, error } }
+      if (kind === "retryable") return { kind: "rejected", reason: { kind } }
+      // ErrorのみでのValidation扱いはTyped Violationが欠けるため採用しない。
+      return { kind: "unknown" }
+    }
+
+    const classify = (
+      response: Awaited<ReturnType<typeof execute>>,
+    ): ActionOutcome<UserPreferences, PersonalPreferencesSaveRejection> => {
+      const result = response.data?.updateUserPreferences
+      if (result) return classifyPersonalPreferencesMutationResult(result)
+      if (response.errors?.length) {
+        return classifyError(new SettingsGraphQLExecutionError(response.errors))
+      }
+      return { kind: "unknown" }
+    }
+
+    const confirmPreferences = (patch: UserPreferencesPatch) => {
+      if (!userId) return
+      try {
+        if (commitPersonalPreferencesPatch(client.cache, userId, patch)) return
+      } catch {
+        // Cache同期失敗はMutation Outcomeから独立して扱う。
+      }
+      void client.refetchQueries({
+        include: [CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument],
+      }).catch(() => undefined)
+    }
+
+    const afterSuccess = (values: UserPreferences, attempted: UserPreferencesPatch) => {
+      const patch: UserPreferencesPatch = {}
+      for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
+        if (attempted[key] !== undefined) Object.assign(patch, { [key]: values[key] })
+      }
+      confirmPreferences(patch)
+    }
+
+    const inspectPreferences = async (): Promise<UserPreferences> => {
+      const result = await client.query<OperationPersonalSettingsPreferencesQuery>({
+        query: PersonalSettingsPreferencesDocument,
+        fetchPolicy: "no-cache",
+      })
+      if (!userId || result.data?.me?.id !== userId) throw new Error("Current User unavailable")
+      return fromGraphqlUserPreferences(result.data.me.preferences)
+    }
+
+    const isAccentConfirmed = (color: string) => {
+      const current = client.cache.readQuery<OperationPersonalSettingsAccentQuery>({
+        query: PersonalSettingsAccentDocument,
+        returnPartialData: true,
+      })?.me
+      return current?.id === userId && current?.preferences?.personalAccentColor === color
+    }
+
+    const savePreferencesAction: SavePersonalPreferencesAction = createActionAdapter({
+      execute,
+      classify,
+      classifyError,
+      afterSuccess,
     })
-  }
 
-  const classifyError = (
-    error: unknown,
-  ): ActionOutcome<UserPreferences, PersonalPreferencesSaveRejection> => {
-    const kind = classifySettingsSaveFailure(error)
-    if (kind === "blocked") return { kind: "rejected", reason: { kind, error } }
-    if (kind === "retryable") return { kind: "rejected", reason: { kind } }
-    // ErrorのみでのValidation扱いはTyped Violationが欠けるため採用しない。
-    return { kind: "unknown" }
-  }
-
-  const classify = (
-    response: Awaited<ReturnType<typeof execute>>,
-  ): ActionOutcome<UserPreferences, PersonalPreferencesSaveRejection> => {
-    const result = response.data?.updateUserPreferences
-    if (result) return classifyPersonalPreferencesMutationResult(result)
-    if (response.errors?.length) {
-      return classifyError(new SettingsGraphQLExecutionError(response.errors))
-    }
-    return { kind: "unknown" }
-  }
-
-  const confirmPreferences = (patch: UserPreferencesPatch) => {
-    if (!userId) return
-    try {
-      if (commitPersonalPreferencesPatch(client.cache, userId, patch)) return
-    } catch {
-      // Cache同期失敗はMutation Outcomeから独立して扱う。
-    }
-    void client.refetchQueries({
-      include: [CurrentUserDocument, PersonalSettingsAccentDocument, PersonalSettingsPreferencesDocument],
-    }).catch(() => undefined)
-  }
-
-  const afterSuccess = (values: UserPreferences, attempted: UserPreferencesPatch) => {
-    const patch: UserPreferencesPatch = {}
-    for (const key of Object.keys(attempted) as Array<keyof UserPreferences>) {
-      if (attempted[key] !== undefined) Object.assign(patch, { [key]: values[key] })
-    }
-    confirmPreferences(patch)
-  }
-
-  const inspectPreferences = async (): Promise<UserPreferences> => {
-    const result = await client.query<OperationPersonalSettingsPreferencesQuery>({
-      query: PersonalSettingsPreferencesDocument,
-      fetchPolicy: "no-cache",
-    })
-    if (!userId || result.data?.me?.id !== userId) throw new Error("Current User unavailable")
-    return fromGraphqlUserPreferences(result.data.me.preferences)
-  }
-
-  const isAccentConfirmed = (color: string) => {
-    const current = client.cache.readQuery<OperationPersonalSettingsAccentQuery>({
-      query: PersonalSettingsAccentDocument,
-      returnPartialData: true,
-    })?.me
-    return current?.id === userId && current?.preferences?.personalAccentColor === color
-  }
-
-  const savePreferencesAction: SavePersonalPreferencesAction = createActionAdapter({
-    execute,
-    classify,
-    classifyError,
-    afterSuccess,
-  })
-
-  return { savePreferencesAction, inspectPreferences, confirmPreferences, isAccentConfirmed }
+    return { savePreferencesAction, inspectPreferences, confirmPreferences, isAccentConfirmed }
   }, [client, userId])
 }

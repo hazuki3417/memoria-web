@@ -46,6 +46,29 @@ describe("Personal Preferencesの画面Lifetime保存", () => {
     expect(current.confirmed).toMatchObject({ dateFormat: "DD_MM_YYYY", mediaThumbnailSize: "LARGE" })
   })
 
+  it("未完成HEXは直前のAccent予約だけを無効化する", async () => {
+    await act(async () => {
+      current.setAccentDraft("#AABBCC")
+      current.enqueue({ personalAccentColor: "#AABBCC" })
+      current.enqueue({ mediaDetailNavigationWrap: true })
+      current.setAccentDraft("#AAB")
+    })
+    await act(async () => { await vi.advanceTimersByTimeAsync(400) })
+    expect(save).toHaveBeenCalledExactlyOnceWith({ mediaDetailNavigationWrap: true })
+    expect(current.confirmed.personalAccentColor).toBe(defaultUserPreferences.personalAccentColor)
+  })
+
+  it("未完成HEXだけが残る場合は離脱時にも送信しない", async () => {
+    await act(async () => {
+      current.setAccentDraft("#AABBCC")
+      current.enqueue({ personalAccentColor: "#AABBCC" })
+      current.setAccentDraft("#AAB")
+    })
+    await act(async () => root.unmount())
+    expect(save).not.toHaveBeenCalled()
+    root = createRoot(host)
+  })
+
   it("未送信PatchはUnmount時に一度だけ送信試行し、次画面へDraftを保持しない", async () => {
     await act(async () => { current.enqueue({ mediaDetailNavigationWrap: true }) })
     await act(async () => root.unmount())

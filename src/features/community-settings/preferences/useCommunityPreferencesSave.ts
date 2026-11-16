@@ -5,6 +5,7 @@ import { useApolloClient } from "@apollo/client"
 import {
   CommunityMySettingsDocument,
   UpdateCommunitySettingsDocument,
+  type OperationCommunityMySettingsQuery,
   type OperationUpdateCommunitySettingsMutation,
   type OperationUpdateCommunitySettingsMutationVariables,
 } from "@/infrastructure/graphql/generated"
@@ -90,6 +91,15 @@ export const useCommunityPreferencesSave = (communityId: string): CommunityPrefe
       return fromGraphqlCommunityPreferences(settings)
     }
 
-    return { save, observe, confirm }
+    const isAccentConfirmed = (color: string) => {
+      const current = client.cache.readQuery<OperationCommunityMySettingsQuery>({
+        query: CommunityMySettingsDocument,
+        variables: { communityId },
+        returnPartialData: true,
+      })?.community
+      return current?.id === communityId && current?.mySettings?.accentColor === color
+    }
+
+    return { save, observe, confirm, isAccentConfirmed }
   }, [client, communityId])
 }
