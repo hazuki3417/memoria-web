@@ -79,6 +79,21 @@ describe("Community Preferencesの保存Adapter", () => {
     expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: ["communityMySettings", "myCommunities"], onQueryUpdated: expect.any(Function) })
   })
 
+  it("Cache欠落時は一覧と対象CommunityだけをRefetchする", () => {
+    mocks.patch.mockReturnValueOnce(false)
+    operations.confirm(patch)
+    expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
+    const { onQueryUpdated } = mocks.refetchQueries.mock.calls[0][0]
+    const result = Promise.resolve({})
+    const refetch = vi.fn().mockReturnValue(result)
+
+    expect(onQueryUpdated({ variables: undefined, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: {}, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: { communityId: "community-1" }, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: { communityId: "community-2" }, refetch })).toBe(false)
+    expect(refetch).toHaveBeenCalledTimes(3)
+  })
+
   it("Typed Successが併存するGraphQL Errorより優先される", async () => {
     mocks.mutate.mockResolvedValue({ ...success, errors: [{ extensions: { code: "INTERNAL" } }] })
     await expect(operations.save(patch)).resolves.toEqual({ kind: "success", value: patch })

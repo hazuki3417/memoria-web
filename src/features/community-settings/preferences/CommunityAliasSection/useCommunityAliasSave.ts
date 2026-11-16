@@ -62,7 +62,12 @@ export const useCommunityAliasSave = (communityId: string) => {
     try {
       void client.refetchQueries({
         include: [CommunityMySettingsDocument, MyCommunitiesDocument],
-        onQueryUpdated: (query) => !query.variables.communityId || query.variables.communityId === communityId ? query.refetch() : false,
+        onQueryUpdated: (query) => {
+          const targetId = query.variables?.communityId
+          return targetId === undefined || targetId === communityId
+            ? query.refetch()
+            : false
+        },
       }).catch(() => undefined)
     } catch {
       // 保存Outcomeと取得同期は独立している。

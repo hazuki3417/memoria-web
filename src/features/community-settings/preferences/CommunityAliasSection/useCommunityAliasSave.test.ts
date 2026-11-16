@@ -81,6 +81,21 @@ describe("Community別名の保存ActionとApollo境界", () => {
     expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: [expect.anything(), expect.anything()], onQueryUpdated: expect.any(Function) })
   })
 
+  it("Cache欠落時は一覧と対象CommunityだけをRefetchする", () => {
+    mocks.patch.mockReturnValueOnce(false)
+    actions.confirmAlias("確定した別名")
+    expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
+    const { onQueryUpdated } = mocks.refetchQueries.mock.calls[0][0]
+    const result = Promise.resolve({})
+    const refetch = vi.fn().mockReturnValue(result)
+
+    expect(onQueryUpdated({ variables: undefined, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: {}, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: { communityId: "community-1" }, refetch })).toBe(result)
+    expect(onQueryUpdated({ variables: { communityId: "community-2" }, refetch })).toBe(false)
+    expect(refetch).toHaveBeenCalledTimes(3)
+  })
+
   it("Typed Successに別のGraphQL Errorが併存してもMutationの確定結果を優先する", async () => {
     mocks.mutation.mockResolvedValue({
       data: { updateCommunitySettings: {
