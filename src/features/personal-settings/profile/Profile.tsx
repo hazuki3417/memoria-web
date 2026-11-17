@@ -6,7 +6,7 @@ import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshEr
 import { ProfileView } from "./ProfileView"
 import { useProfileSave } from "./useProfileSave"
 
-/** Profile設定画面に必要なデータ取得・保存・現状照会を接続し、取得状態に応じて適切な画面を提供する。 */
+/** Profile設定画面に必要なデータ取得・保存を接続し、取得状態に応じて画面を提供する。 */
 export const Profile = ({
   render,
 }: {
@@ -16,7 +16,7 @@ export const Profile = ({
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
-  const { saveProfile, inspectProfile } = useProfileSave()
+  const { saveProfile } = useProfileSave()
   const nickname = query.data?.me?.profile.nickname
 
   usePersonalSettingsRefreshError(nickname !== undefined && Boolean(query.error))
@@ -38,7 +38,6 @@ export const Profile = ({
       <ProfileView
         initialNickname={nickname}
         onSave={saveProfile}
-        onInspect={inspectProfile}
       />
     ),
   })

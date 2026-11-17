@@ -4,7 +4,6 @@ import { useApolloClient } from "@apollo/client"
 import {
   CurrentUserDocument,
   PersonalSettingsProfileDocument,
-  type OperationPersonalSettingsProfileQuery,
   useUpdateMemoriaUserProfileMutation,
 } from "@/infrastructure/graphql/generated"
 import {
@@ -15,7 +14,7 @@ import { createActionAdapter, type ActionOutcome } from "@/ui/Action"
 import { classifyProfileMutationResult } from "./classifyProfileMutationResult"
 import type { ProfileSaveRejection, SaveProfile } from "./profileSaveOutcome"
 
-/** Profile保存を共通Actionとして実行し、更新結果の判定と結果不明時の現状確認を画面へ提供する。 */
+/** Profile保存のMutation結果を分類し、確定後の更新を接続する。 */
 export const useProfileSave = () => {
   const client = useApolloClient()
   const [updateProfile] = useUpdateMemoriaUserProfileMutation()
@@ -58,15 +57,6 @@ export const useProfileSave = () => {
     afterSuccess,
   })
 
-  const inspectProfile = async (): Promise<string> => {
-    const result = await client.query<OperationPersonalSettingsProfileQuery>({
-      query: PersonalSettingsProfileDocument,
-      fetchPolicy: "no-cache",
-    })
-    if (!result.data?.me) throw new Error("Current profile unavailable")
-    return result.data.me.profile.nickname
-  }
-
-  /** Nicknameの保存操作と、保存状態が不明な場合に現在値を確認する操作を提供する。 */
-  return { saveProfile, inspectProfile }
+  /** Nicknameの保存操作を提供する。 */
+  return { saveProfile }
 }

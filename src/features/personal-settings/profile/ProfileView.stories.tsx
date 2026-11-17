@@ -58,25 +58,11 @@ export const InitiallySaving: Story = {
   },
 }
 
-export const InitiallyRetryable: Story = {
-  name: "Interaction · 保存失敗状態も初期ニックネームを改変しない",
-  tags: ["interaction"],
-  args: { initialSaveState: "retryable-error" },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await expect(canvas.getByRole("textbox", { name: /ニックネーム/ })).toHaveValue(
-      "テストユーザー",
-    )
-    await expect(canvas.getByRole("alert")).toBeVisible()
-    await expect(canvas.getByRole("button", { name: "再試行" })).toBeDisabled()
-  },
-}
-
 function ProfileRefreshFixture(args: ComponentProps<typeof ProfileView>) {
   const [nickname, setNickname] = useState(args.initialNickname ?? "テストユーザー")
   return (
     <>
-      <Button onClick={() => setNickname("サーバー更新後の名前")}>
+      <Button onClick={() => setNickname("テストユーザー")}>
         プロフィール再取得を再現
       </Button>
       <ProfileView {...args} initialNickname={nickname} />
@@ -85,20 +71,20 @@ function ProfileRefreshFixture(args: ComponentProps<typeof ProfileView>) {
 }
 
 export const RefreshWhileUntouched: Story = {
-  name: "Interaction · 未編集ならプロフィールの更新値を反映",
+  name: "Interaction · 未編集でも表示後のQuery値は自動反映しない",
   tags: ["interaction"],
   render: (args) => <ProfileRefreshFixture {...args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "プロフィール再取得を再現" }))
     await expect(canvas.getByRole("textbox", { name: /ニックネーム/ })).toHaveValue(
-      "サーバー更新後の名前",
+      "テストユーザー",
     )
   },
 }
 
 export const RefreshArrivesWhileEditingThenReverted: Story = {
-  name: "Interaction · 編集中に届いた再取得値をDraft復帰後に採用",
+  name: "Interaction · 編集終了後もQuery値を自動採用しない",
   tags: ["interaction"],
   render: (args) => <ProfileRefreshFixture {...args} />,
   play: async ({ canvasElement }) => {
@@ -111,7 +97,7 @@ export const RefreshArrivesWhileEditingThenReverted: Story = {
     await expect(input).toHaveValue("編集中のDraft")
     await userEvent.clear(input)
     await userEvent.type(input, "テストユーザー")
-    await expect(input).toHaveValue("サーバー更新後の名前")
+    await expect(input).toHaveValue("テストユーザー")
     await expect(save).toBeDisabled()
   },
 }
@@ -203,7 +189,7 @@ export const ProfileValidationContract: Story = {
 }
 
 export const ProfileSaveFailed: Story = {
-  name: "Interaction · 保存失敗と再試行",
+  name: "Interaction · 保存失敗後も通常の更新から再保存",
   tags: ["interaction"],
   args: {
     onSave: fn()
@@ -221,7 +207,7 @@ export const ProfileSaveFailed: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "更新" }))
     await expect(await canvas.findByRole("alert")).toBeVisible()
     await expect(input).toHaveValue("変更後の名前")
-    await userEvent.click(canvas.getByRole("button", { name: "再試行" }))
+    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
     await expect(args.onSave).toHaveBeenCalledTimes(2)
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
   },
@@ -250,41 +236,22 @@ export const ProfileServerFieldValidation: Story = {
 }
 
 export const ProfileUnknownOutcome: Story = {
-  name: "Interaction · Unknown照会一致で明示確認・二重送信なし",
+  name: "Interaction · 保存結果不明は再送せず再読み込みを案内",
   tags: ["interaction"],
-  args: {
-    onSave: fn(async () => { return unknown() }),
-    onInspect: fn(async () => "変更した名前"),
-  },
+  args: { onSave: fn(async () => unknown()) },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
     await userEvent.clear(input)
-    await userEvent.type(input, "変更した名前")
+    await userEvent.type(input, "保存したか不明")
     await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      "プロフィールの保存結果を確認できませんでした",
-    )
-    await expect(input).toHaveValue("変更した名前")
-    await expect(input).toBeEnabled()
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("ページを再読み込みして状態を確認してください")
+    await expect(input).toHaveValue("保存したか不明")
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
-    await expect(args.onSave).toHaveBeenCalledTimes(1)
-
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(args.onInspect).toHaveBeenCalledTimes(1)
-    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
-    await expect(canvas.getByRole("alert")).toHaveTextContent(
-      "保存結果は不明です。自動で再送せず、現在の状態を確認してください。",
-    )
-    await userEvent.click(canvas.getByRole("button", { name: "確認完了" }))
-    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
-    await expect(input).toHaveValue("変更した名前")
-    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
+    await expect(canvas.queryByRole("button", { name: "現在の状態を確認" })).not.toBeInTheDocument()
     await expect(args.onSave).toHaveBeenCalledTimes(1)
   },
 }
-
-
 
 export const ProfileTrimmedUnchanged: Story = {
   name: "Interaction · 前後の空白のみの変更は保存不可",
@@ -394,7 +361,7 @@ export const ProfileServerFormValidation: Story = {
 
 
 export const ProfileRefreshAfterRevert: Story = {
-  name: "Interaction · 編集を元に戻した後は再取得へ追従",
+  name: "Interaction · 編集を元に戻してもQuery値は採用しない",
   tags: ["interaction"],
   render: (args) => <ProfileRefreshFixture {...args} />,
   play: async ({ canvasElement }) => {
@@ -408,127 +375,8 @@ export const ProfileRefreshAfterRevert: Story = {
     await userEvent.type(input, "テストユーザー")
     await expect(save).toBeDisabled()
     await userEvent.click(canvas.getByRole("button", { name: "プロフィール再取得を再現" }))
-    await expect(input).toHaveValue("サーバー更新後の名前")
+    await expect(input).toHaveValue("テストユーザー")
     await expect(save).toBeDisabled()
-  },
-}
-
-
-export const ProfileUnknownInspectFailure: Story = {
-  name: "Interaction · Unknown照会失敗はDraft保持と再照会のみ",
-  tags: ["interaction"],
-  args: {
-    onSave: fn(async () => { return unknown() }),
-    onInspect: fn(async () => { throw new Error("read failed") }),
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
-    await userEvent.clear(input)
-    await userEvent.type(input, "保存できたか不明")
-    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(canvas.getByRole("alert")).toHaveTextContent("保存結果は不明です。自動で再送せず、現在の状態を確認してください。")
-    await expect(input).toHaveValue("保存できたか不明")
-    await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
-    await expect(args.onSave).toHaveBeenCalledTimes(1)
-    await expect(args.onInspect).toHaveBeenCalledTimes(1)
-  },
-}
-
-export const ProfileUnknownDiscard: Story = {
-  name: "Interaction · 不一致の現在値を選んでDraftを破棄",
-  tags: ["interaction"],
-  args: {
-    onSave: fn(async () => { return unknown() }),
-    onInspect: fn(async () => "確認した現在値"),
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
-    await userEvent.clear(input)
-    await userEvent.type(input, "未確定の入力")
-    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(await canvas.findByRole("button", { name: "変更を破棄" })).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "変更を破棄" }))
-    await expect(input).toHaveValue("確認した現在値")
-    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
-    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
-    await expect(args.onSave).toHaveBeenCalledTimes(1)
-  },
-}
-
-export const ProfileUnknownExplicitRetry: Story = {
-  name: "Interaction · 照会不一致のあと手動で一度だけ再保存",
-  tags: ["interaction"],
-  args: {
-    onSave: fn()
-      .mockResolvedValueOnce(unknown())
-      .mockImplementation((nickname: string) => Promise.resolve(success(nickname))),
-    onInspect: fn(async () => "以前の名前"),
-  },
-  play: async ({ canvasElement, args }) => {
-    args.onSave?.mockReset()
-    args.onSave?.mockResolvedValueOnce(unknown())
-    args.onSave?.mockImplementation((nickname: string) => Promise.resolve(success(nickname)))
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
-    await userEvent.clear(input)
-    await userEvent.type(input, "もう一度保存する名前")
-    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toBeVisible()
-    await expect(args.onSave).toHaveBeenCalledTimes(1)
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "もう一度保存" }))
-    await expect(args.onSave).toHaveBeenCalledTimes(2)
-    await expect(args.onSave).toHaveBeenLastCalledWith("もう一度保存する名前")
-    await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
-    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
-  },
-}
-
-function PendingInspectionFixture(args: ComponentProps<typeof ProfileView>) {
-  const resolveInspection = useRef<((value: string) => void) | null>(null)
-  return (
-    <>
-      <Button onClick={() => resolveInspection.current?.("古い照会結果")}>
-        遅延照会を返す
-      </Button>
-      <ProfileView
-        {...args}
-        onSave={async () => { return unknown() }}
-        onInspect={() =>
-          new Promise<string>((resolve) => {
-            resolveInspection.current = resolve
-          })
-        }
-      />
-    </>
-  )
-}
-
-export const ProfileUnknownStaleInspection: Story = {
-  name: "Interaction · 照会中のDraft変更は古い照会結果を無効化",
-  tags: ["interaction"],
-  render: (args) => <PendingInspectionFixture {...args} />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
-    await userEvent.clear(input)
-    await userEvent.type(input, "最初のDraft")
-    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await userEvent.type(input, "と追加入力")
-    await userEvent.click(canvas.getByRole("button", { name: "遅延照会を返す" }))
-    await expect(input).toHaveValue("最初のDraftと追加入力")
-    await expect(canvas.queryByRole("button", { name: "確認完了" })).not.toBeInTheDocument()
-    await expect(canvas.queryByRole("button", { name: "もう一度保存" })).not.toBeInTheDocument()
-    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
   },
 }
 
@@ -562,29 +410,6 @@ export const ProfileSuccessNotification: Story = {
     await expect(page.getAllByText("プロフィールを更新しました。")).toHaveLength(1)
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
     notifications.clean()
-  },
-}
-
-export const ProfileUnknownInspectionInvalidation: Story = {
-  name: "Interaction · 現在値確認のあと再編集したら確認を無効化",
-  tags: ["interaction"],
-  args: {
-    onSave: fn(async () => { return unknown() }),
-    onInspect: fn(async () => "保存されたか不明"),
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
-    await userEvent.clear(input)
-    await userEvent.type(input, "保存されたか不明")
-    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
-    await userEvent.type(input, "を再編集")
-    await expect(canvas.queryByRole("button", { name: "確認完了" })).not.toBeInTheDocument()
-    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
-    await expect(args.onSave).toHaveBeenCalledTimes(1)
   },
 }
 
@@ -628,7 +453,7 @@ export const ProfileFormErrorVisual: Story = {
 }
 
 export const ProfileRetryableVisual: Story = {
-  name: "Visual · Profile Retryable Error",
+  name: "Visual · Profile Save Error",
   tags: ["visual"],
   args: { onSave: fn(async () => { return retryable() }) },
   play: async ({ canvasElement }) => {
@@ -638,47 +463,7 @@ export const ProfileRetryableVisual: Story = {
     await userEvent.type(input, "修正した名前")
     await userEvent.click(canvas.getByRole("button", { name: "更新" }))
     await expect(await canvas.findByRole("alert")).toHaveTextContent("プロフィールを保存できませんでした")
-    await expect(canvas.getByRole("button", { name: "再試行" })).toBeEnabled()
-  },
-}
-
-export const ProfileUnknownDiffersVisual: Story = {
-  name: "Visual · Profile Unknown Current vs Draft",
-  tags: ["visual"],
-  args: {
-    onSave: fn(async () => { return unknown() }),
-    onInspect: fn(async () => "確認した現在値"),
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
-    await userEvent.clear(input)
-    await userEvent.type(input, "未確定の名前")
-    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
-    await expect(canvas.getByRole("alert")).toHaveTextContent("保存結果は不明です。自動で再送せず、現在の状態を確認してください。")
-  },
-}
-
-export const ProfileUnknownMatchesVisual: Story = {
-  name: "Visual · Profile Unknown Current Matches Draft",
-  tags: ["visual"],
-  args: {
-    onSave: fn(async () => { return unknown() }),
-    onInspect: fn(async () => "入力した名前"),
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
-    await userEvent.clear(input)
-    await userEvent.type(input, "入力した名前")
-    await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toBeVisible()
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(await canvas.findByRole("button", { name: "確認完了" })).toBeVisible()
-    await expect(canvas.getByRole("alert")).toHaveTextContent("保存結果は不明です。自動で再送せず、現在の状態を確認してください。")
+    await expect(canvas.getByRole("button", { name: "更新" })).toBeEnabled()
   },
 }
 
@@ -709,7 +494,6 @@ export const UnexpectedActionError: Story = {
     onSave: fn(async () => {
       throw new Error("Unexpected adapter failure")
     }),
-    onInspect: fn(async () => "現在の名前"),
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
