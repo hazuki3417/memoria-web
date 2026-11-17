@@ -18,6 +18,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 FROM node:24-bookworm-slim AS runtime
+LABEL org.opencontainers.image.source="https://github.com/hazuki3417/memoria-web"
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules

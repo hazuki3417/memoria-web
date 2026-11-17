@@ -81,13 +81,20 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v7
-      - name: Build reviewed runtime image for linux/amd64
+      - name: Build runtime image for GHCR
         env:
           IMAGE_OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
           image="ghcr.io/${IMAGE_OWNER,,}/memoria-web:${GITHUB_SHA}"
-          docker build --platform linux/amd64 -f docker/runtime/Dockerfile --target runtime -t "$image" .
+          MEMORIA_WEB_IMAGE="$image" docker compose --env-file .env.example -f docker-compose.yml build web
+      - name: Smoke-test the exact image being published
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${IMAGE_OWNER,,}/memoria-web:${GITHUB_SHA}"
+          MEMORIA_WEB_IMAGE="$image" docker compose --env-file .env.example -f docker-compose.yml up -d --no-build --wait --wait-timeout 120 web
       - name: Login to GHCR with short-lived workflow token
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,3 +112,17 @@ jobs:
             exit 1
           fi
           printf 'Image: `%s@%s`\n' "${image%:*}" "$digest" >> "$GITHUB_STEP_SUMMARY"
+      - name: Collect GHCR image smoke logs on failure
+        if: failure()
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+        run: |
+          image="ghcr.io/${IMAGE_OWNER,,}/memoria-web:${GITHUB_SHA}"
+          MEMORIA_WEB_IMAGE="$image" docker compose --env-file .env.example -f docker-compose.yml logs --no-color web
+      - name: Clean up GHCR image smoke containers
+        if: always()
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+        run: |
+          image="ghcr.io/${IMAGE_OWNER,,}/memoria-web:${GITHUB_SHA}"
+          MEMORIA_WEB_IMAGE="$image" docker compose --env-file .env.example -f docker-compose.yml down --remove-orphans
