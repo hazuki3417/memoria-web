@@ -8,14 +8,14 @@ import type { SettingsSectionResult } from "@/ui/SettingsSectionHost"
 type NavigationProps = {
   section?: CommunitySettingsSection
   onSectionChange: (section: CommunitySettingsSection) => void
-  children: ReactNode
+  content: ReactNode
 }
 
 let rendered: NavigationProps
 
 // Verify the Storybook adapter without mounting feature forms or Mantine UI.
-vi.mock("../CommunitySettingsLayout", () => ({
-  CommunitySettingsLayout: (props: NavigationProps) => {
+vi.mock("../CommunitySettingsView", () => ({
+  CommunitySettingsView: (props: NavigationProps) => {
     rendered = props
     return null
   },
@@ -37,8 +37,8 @@ describe("Community Settings Storybook Navigation Adapter", () => {
     const props = { section: "general" as const, onSectionChange }
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
     expect(rendered.section).toBe("general")
-    expect(isValidElement(rendered.children)).toBe(true)
-    const hostChildren = (rendered.children as ReactElement<{
+    expect(isValidElement(rendered.content)).toBe(true)
+    const hostChildren = (rendered.content as ReactElement<{
       children: (render: (state: SettingsSectionResult) => ReactNode) => ReactNode
     }>).props.children
     const sectionContent = hostChildren((state) => state.status === "ready" ? state.content : null)
@@ -59,14 +59,14 @@ describe("Community Settings Storybook Navigation Adapter", () => {
       onSectionChange: vi.fn(),
     }
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, props)))
-    expect((rendered.children as ReactElement<{ label: string }>).props.label)
+    expect((rendered.content as ReactElement<{ label: string }>).props.label)
       .toBe("Community設定を読み込み中")
 
     act(() => root.render(createElement(CommunitySettingsStoryNavigation, {
       ...props,
       usageState: "loading",
     })))
-    expect((rendered.children as ReactElement<{ label: string }>).props.label)
+    expect((rendered.content as ReactElement<{ label: string }>).props.label)
       .toBe("利用状況を読み込み中")
   })
 
@@ -80,6 +80,6 @@ describe("Community Settings Storybook Navigation Adapter", () => {
       ),
     )
     expect(rendered.section).toBe("preferences")
-    expect(isValidElement(rendered.children)).toBe(true)
+    expect(isValidElement(rendered.content)).toBe(true)
   })
 })

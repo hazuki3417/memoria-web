@@ -7,7 +7,7 @@ import { CommunityGeneral } from "../general"
 import { CommunityMembers } from "../members"
 import { CommunityPreferences } from "../preferences"
 import { CommunityUsage } from "../usage"
-import { CommunitySettingsLayout } from "../CommunitySettingsLayout"
+import { CommunitySettingsView } from "../CommunitySettingsView"
 import { useCommunitySettingsAccentColor } from "./useCommunitySettingsAccentColor"
 import {
   getCommunitySettingsSections,
@@ -78,21 +78,22 @@ export const CommunitySettingsRoute = ({
   const { label, errorTitle } = sectionStatusMessages[section]
 
   return (
-    <CommunitySettingsLayout
+    <CommunitySettingsView
       key={communityId}
       communityId={communityId}
       section={section}
-      accentColor={communityAccentColor}
+      communityAccentColor={communityAccentColor}
       onSectionChange={(nextSection) => {
         const target = getCommunitySettingsSections(communityId).find(
           (item) => item.id === nextSection,
         )
         if (target) router.push(target.href)
       }}
-    >
-      <SettingsSectionHost label={label} errorTitle={errorTitle}>
-        {controller}
-      </SettingsSectionHost>
-    </CommunitySettingsLayout>
+      content={
+        <SettingsSectionHost label={label} errorTitle={errorTitle}>
+          {controller}
+        </SettingsSectionHost>
+      }
+    />
   )
 }

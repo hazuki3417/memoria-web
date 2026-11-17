@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import type { ReactNode } from "react"
 import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
-import { PersonalSettingsLayout } from "../PersonalSettingsLayout"
+import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { Profile } from "../profile"
 import { PersonalPreferences } from "../preferences"
@@ -63,15 +63,16 @@ export const PersonalSettingsRoute = ({ section }: PersonalSettingsRouteProps) =
   const { label, errorTitle } = sectionStatusMessages[section]
 
   return (
-    <PersonalSettingsLayout
+    <PersonalSettingsView
       key={section}
       section={section}
-      accentColor={personalAccentColor}
+      personalAccentColor={personalAccentColor}
       onSectionChange={onSectionChange}
-    >
-      <SettingsSectionHost label={label} errorTitle={errorTitle}>
-        {controller}
-      </SettingsSectionHost>
-    </PersonalSettingsLayout>
+      content={
+        <SettingsSectionHost label={label} errorTitle={errorTitle}>
+          {controller}
+        </SettingsSectionHost>
+      }
+    />
   )
 }

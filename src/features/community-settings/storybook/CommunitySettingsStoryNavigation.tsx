@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CommunitySettingsLayout } from "../CommunitySettingsLayout"
+import { CommunitySettingsView } from "../CommunitySettingsView"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import type { ReactNode } from "react"
 import { CommunityGeneralView } from "../general/CommunityGeneralView"
@@ -97,12 +97,10 @@ export const CommunitySettingsStoryNavigation = ({
   }
 
   return (
-    <CommunitySettingsLayout
+    <CommunitySettingsView
       communityId={communityId}
       section={currentSection}
-      accentColor={props.communityAccentColor}
-      onSectionChange={(next) => setCurrentSection(next)}
-    >
+      content={
         <SettingsSectionHost
           label={currentSection === "usage" && props.usageState !== undefined
             ? "利用状況を読み込み中"
@@ -115,6 +113,9 @@ export const CommunitySettingsStoryNavigation = ({
             return render(state === "ready" ? { status: "ready", content } : { status: state })
           }}
         </SettingsSectionHost>
-    </CommunitySettingsLayout>
+      }
+      communityAccentColor={props.communityAccentColor}
+      onSectionChange={(next) => setCurrentSection(next)}
+    />
   )
 }

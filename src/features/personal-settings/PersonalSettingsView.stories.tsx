@@ -5,7 +5,7 @@ import { expect, userEvent, within } from "storybook/test"
 import { PersonalSettingsPreferencesDocument, PersonalSettingsProfileDocument, PersonalUsageDocument } from "@/infrastructure/graphql/generated"
 import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { graphqlUsageFixture } from "@/features/usage/usageStoryFixtures"
-import { PersonalSettingsLayout } from "./PersonalSettingsLayout"
+import { PersonalSettingsView } from "./PersonalSettingsView"
 import type { PersonalSettingsSection } from "./personalSettingsSections"
 import { Account } from "./account"
 import { PersonalPreferences } from "./preferences"
@@ -39,23 +39,23 @@ const PersonalSettingsStory = () => {
   }
   return (
     <MockedProvider addTypename={false} mocks={[{ ...profileMock, maxUsageCount: 2 }, preferencesMock, usageMock]}>
-      <PersonalSettingsLayout
+      <PersonalSettingsView
         key={section}
         section={section}
         onSectionChange={setSection}
-        accentColor="#10B981"
-      >
-        <SettingsSectionHost label="Personal設定を読み込み中">
-          {renderSection}
-        </SettingsSectionHost>
-      </PersonalSettingsLayout>
+        personalAccentColor="#10B981"
+        content={
+          <SettingsSectionHost label="Personal設定を読み込み中">
+            {renderSection}
+          </SettingsSectionHost>
+        }
+      />
     </MockedProvider>
   )
 }
 
 const meta = {
-  id: "features-personal-settings-personalsettingsview",
-  title: "features/personal-settings/PersonalSettings",
+  title: "features/personal-settings/PersonalSettingsView",
   component: PersonalSettingsStory,
 } satisfies Meta<typeof PersonalSettingsStory>
 export default meta
