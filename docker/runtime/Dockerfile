@@ -29,4 +29,7 @@ COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/storybook-assets ./storybook-assets
 USER node
 EXPOSE 3000
+# Next.js processの生存だけでなく公開Login画面のHTTP応答を確認する。
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=6 \
+  CMD node -e "fetch('http://127.0.0.1:3000/login',{redirect:'manual'}).then(r=>process.exit(r.status>=200&&r.status<400?0:1)).catch(()=>process.exit(1))"
 CMD ["npm", "run", "start", "--", "--hostname", "0.0.0.0", "--port", "3000"]

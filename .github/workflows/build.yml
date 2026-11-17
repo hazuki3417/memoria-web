@@ -59,3 +59,11 @@ jobs:
         run: docker compose --env-file .env.example -f docker-compose.yml config --quiet
       - name: Build Development runtime image
         run: MEMORIA_WEB_IMAGE="memoria-web:${GITHUB_SHA}" docker compose --env-file .env.example -f docker-compose.yml build web
+      - name: Verify Web runtime starts and responds
+        run: MEMORIA_WEB_IMAGE="memoria-web:${GITHUB_SHA}" docker compose --env-file .env.example -f docker-compose.yml up -d --no-build --wait --wait-timeout 120 web
+      - name: Collect runtime logs when failed
+        if: failure()
+        run: MEMORIA_WEB_IMAGE="memoria-web:${GITHUB_SHA}" docker compose --env-file .env.example -f docker-compose.yml logs --no-color web
+      - name: Clean up runtime containers
+        if: always()
+        run: MEMORIA_WEB_IMAGE="memoria-web:${GITHUB_SHA}" docker compose --env-file .env.example -f docker-compose.yml down --remove-orphans

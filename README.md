@@ -78,7 +78,7 @@ docker build -f docker/runtime/Dockerfile -t "memoria-web:$(git rev-parse HEAD)"
 
 起動時には [Auth0設定手順](docs/auth0-login-logout-setup.md) の6つのAuth0 / Origin設定（AUTH0_DOMAIN、AUTH0_CLIENT_ID、AUTH0_CLIENT_SECRET、AUTH0_SECRET、APP_BASE_URL、AUTH0_AUDIENCE）とサーバー用 `MEMORIA_GRAPHQL_URL` を注入します。Docker network内でAPIに到達するURLを指定してください。AWS Development環境の実行用Composeは [memoria-IaC](https://github.com/hazuki3417/memoria-IaC) が所有します。Web imageのローカル確認用ComposeはこのRepositoryに配置します。実環境のSecretを含むファイルはGitに登録しません。
 
-CIでComposeの設定とDocker imageのbuildを検証します。ログイン・画像の操作・実際の環境変数注入はローカルおよびDevelopment環境の結合確認で検証します。
+CIでComposeの設定、Docker imageのbuild、公開ログイン画面のlocalhost HTTP応答を利用した起動healthを検証します。ログイン・画像の操作・実際の環境変数注入はローカルおよびDevelopment環境の結合確認で検証します。
 
 ### ローカルでのWeb runtime確認
 
@@ -110,7 +110,7 @@ docker compose logs -f web
 docker compose down
 ```
 
-Windowsのブラウザで `http://localhost:3000` を開きます。Webのみの起動確認と、Auth0ログイン・実APIとの結合確認は区別してください。実際にログインしてサービスを利用するには有効な開発用Auth0設定、起動済みAPIおよび必要な開発データが必要です。
+Windowsのブラウザで `http://localhost:3000` を開きます。Web imageには`/login`へのHTTP応答で確認するhealthcheckを設定し、CIのCompose起動はhealth状態まで確認します。HTTPの起動確認と、Auth0ログイン・実APIとの結合確認は区別してください。実際にログインしてサービスを利用するには有効な開発用Auth0設定、起動済みAPIおよび必要な開発データが必要です。
 
 ローカル用のimage tagは `memoria-web:local-development` とし、deploy対象には使用しません。AWS向けには前節のcommit SHA / digestを使用します。コンテナによるVRTを実行する場合はIntegration用ファイルを明示して `docker compose -f docker-compose.integration.yml --profile vrt run --rm vrt` を使用します。既存の `npm run test:visual` とVS CodeのVRT taskは従来のDevbox上での直接実行を維持します。実際のDocker build・起動・ログイン・VRT回帰検証は未実施です。
 
