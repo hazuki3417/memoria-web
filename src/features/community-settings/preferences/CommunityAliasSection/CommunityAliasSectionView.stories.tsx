@@ -7,9 +7,8 @@ import type { SaveCommunityAlias } from "./communityAliasSaveOutcome"
 
 type FixtureArgs = {
   savedAlias: string | null
-  initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
+  initialSaveState?: "idle" | "saving" | "blocked"
   result: "success" | "unknown" | "validation" | "retryable"
-  inspectionAvailable: boolean
 }
 
 /** Viewの表示状態と操作を独立して検証するため、Form Modelを注入する。 */
@@ -17,7 +16,6 @@ const AliasViewFixture = ({
   savedAlias,
   initialSaveState,
   result,
-  inspectionAvailable,
 }: FixtureArgs) => {
   const onSave: SaveCommunityAlias = async (alias) => {
     if (result === "unknown") return { kind: "unknown" }
@@ -31,9 +29,8 @@ const AliasViewFixture = ({
     }
     return { kind: "success", value: alias }
   }
-  const onInspect = inspectionAvailable ? async (): Promise<string | null> => null : undefined
-  const model = useCommunityAliasForm({ savedAlias, onSave, onInspect, initialSaveState })
-  return <CommunityAliasSectionView model={model} onInspect={onInspect} />
+  const model = useCommunityAliasForm({ savedAlias, onSave, initialSaveState })
+  return <CommunityAliasSectionView model={model} />
 }
 
 const meta = {
@@ -43,7 +40,6 @@ const meta = {
     savedAlias: "元の別名",
     initialSaveState: "idle",
     result: "success",
-    inspectionAvailable: false,
   },
   decorators: [(Story) => <Box maw={560} p="md"><Story /></Box>],
 } satisfies Meta<typeof AliasViewFixture>
@@ -84,21 +80,21 @@ export const Saving: Story = {
 }
 
 export const Blocked: Story = {
-  name: "Visual · 保存不可でも既存どおりDraftは編集できる",
+  name: "Visual · 保存不可は入力を停止する",
   tags: ["visual"],
   args: { initialSaveState: "blocked" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("alert")).toBeVisible()
-    await expect(canvas.getByRole("textbox", { name: "Community別名" })).toBeEnabled()
+    await expect(canvas.getByRole("textbox", { name: "Community別名" })).toBeDisabled()
     await expect(canvas.getByRole("button", { name: "保存" })).toBeDisabled()
   },
 }
 
 export const Unknown: Story = {
-  name: "Visual · Aliasの結果不明時は照会操作を提供",
+  name: "Visual · Aliasの結果不明時は再読み込みを案内",
   tags: ["visual"],
-  args: { result: "unknown", inspectionAvailable: true },
+  args: { result: "unknown" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: "Community別名" })
@@ -106,7 +102,7 @@ export const Unknown: Story = {
     await userEvent.type(input, "変更する別名")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(await canvas.findByRole("alert")).toBeVisible()
-    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("ページを再読み込みして状態を確認してください")
     await expect(input).toHaveValue("変更する別名")
   },
 }

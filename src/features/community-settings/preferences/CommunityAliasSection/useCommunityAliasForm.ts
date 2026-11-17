@@ -5,35 +5,25 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
 import { showNotification } from "@/components/Feedback"
-import { useExplicitSaveProcess, createSavedValueQueryEcho } from "@/ui/Action"
+import { useExplicitSaveProcess } from "@/ui/Action"
 import { resolveFormInputValidation } from "@/ui/formValidation"
 import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
 import { communityAliasSchema } from "./communityAliasSchema"
 import type { SaveCommunityAlias } from "./communityAliasSaveOutcome"
 
-export type InspectCommunityAlias = () => Promise<string | null>
-
-type Inspection =
-  | { status: "idle" | "checking" | "failed" }
-  | { status: "matches" | "differs"; alias: string | null }
-
 type SaveStatus =
-  | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
+  | { kind: "idle" | "saving" | "error" | "unknown" }
   | { kind: "blocked"; error: unknown }
 
-/** Aliasのnull解除、編集中Draft、結果不明時の観測と明示復旧を所有する。 */
+/** Aliasのnull解除、未保存Draft、入力検証と明示保存を管理する。 */
 export const useCommunityAliasForm = ({
   savedAlias,
   onSave,
-  onInspect,
-  onConfirm,
   initialSaveState = "idle",
 }: {
   savedAlias: string | null
   onSave: SaveCommunityAlias
-  onInspect?: InspectCommunityAlias
-  onConfirm?: (alias: string | null) => void
-  initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
+  initialSaveState?: "idle" | "saving" | "blocked"
 }) => {
   const form = useForm<
     z.input<typeof communityAliasSchema>,
@@ -48,19 +38,12 @@ export const useCommunityAliasForm = ({
   const { field, fieldState } = useController({ control, name: "alias" })
   const text = useWatch({ control, name: "alias" }) ?? ""
   const normalized = text.trim()
-  const inputAlias = normalized || null
   const baseline = form.formState.defaultValues?.alias ?? ""
   const changed = normalized !== baseline.trim()
   const validation = communityAliasSchema.safeParse({ alias: text })
   const invalid = !validation.success
 
-  const matchesAlias = (observed: string | null, submitted: string | null) => {
-    return observed === submitted
-  }
-  const { process, snapshot: processState } = useExplicitSaveProcess({
-    execute: onSave,
-    recovery: onInspect ? { inspect: onInspect, matches: matchesAlias } : undefined,
-  })
+  const { process, snapshot: processState } = useExplicitSaveProcess({ execute: onSave })
   const [status, setStatus] = useState<SaveStatus>(
     initialSaveState === "blocked"
       ? { kind: "blocked", error: null }
@@ -68,55 +51,25 @@ export const useCommunityAliasForm = ({
   )
   const [formInvalid, setFormInvalid] = useState(false)
   const alive = useRef(true)
-  const queryEcho = useRef(createSavedValueQueryEcho(savedAlias))
 
   useEffect(() => {
     alive.current = true
     return () => { alive.current = false }
   }, [])
 
-  useEffect(() => {
-    if (
-      queryEcho.current.observe(savedAlias) &&
-      !changed &&
-      !processState.busy &&
-      status.kind === "idle" &&
-      baseline !== (savedAlias ?? "")
-    ) {
-      reset({ alias: savedAlias ?? "" })
-    }
-  }, [savedAlias, changed, baseline, reset, processState.busy, status.kind])
-
   const saving = processState.busy || status.kind === "saving" || form.formState.isSubmitting
   const blocked = status.kind === "blocked"
   const unknown = status.kind === "unknown"
-  const inspection = processState.inspection
-  const failure: "retryable" | "blocked" | "unknown" | null = status.kind === "retryable-error" ? "retryable"
+  const failure: "retryable" | "blocked" | "unknown" | null =
+    status.kind === "error" ? "retryable"
     : status.kind === "blocked" ? "blocked"
     : status.kind === "unknown" ? "unknown" : null
   const blockedFeedback = status.kind === "blocked"
     ? getCommunityBlockedFeedback(status.error, "Community別名")
     : null
-  const canResaveInspected =
-    unknown &&
-    inspection.kind === "differs" &&
-    !invalid &&
-    inputAlias !== (inspection.kind === "differs" ? inspection.value : null)
-
-  const adopt = (alias: string | null) => {
-    process.invalidateInspection()
-    queryEcho.current.adopt(alias)
-    reset({ alias: alias ?? "" })
-    clearErrors()
-    setFormInvalid(false)
-    setStatus({ kind: "idle" })
-  }
 
   const submitAlias = async ({ alias }: z.output<typeof communityAliasSchema>) => {
-    if (
-      process.getSnapshot().busy || blocked || status.kind === "saving" ||
-      (unknown && !canResaveInspected) || (!changed && !canResaveInspected)
-    ) return
+    if (process.getSnapshot().busy || blocked || unknown || status.kind === "saving" || !changed) return
 
     setFormInvalid(false)
     clearErrors("alias")
@@ -124,7 +77,10 @@ export const useCommunityAliasForm = ({
     if (!alive.current || outcome === null) return
 
     if (outcome.kind === "success") {
-      adopt(outcome.value)
+      reset({ alias: outcome.value ?? "" })
+      clearErrors()
+      setFormInvalid(false)
+      setStatus({ kind: "idle" })
       showNotification({
         kind: "success",
         title: "Community別名を保存",
@@ -148,51 +104,23 @@ export const useCommunityAliasForm = ({
           setStatus({ kind: "blocked", error: reason.error })
           break
         case "retryable":
-          setStatus({ kind: "retryable-error" })
+          setStatus({ kind: "error" })
           break
       }
     }
   }
 
-  const save = handleSubmit(submitAlias)
-
-  const inspect = async () => {
-    if (!unknown || !onInspect || inspection.kind === "checking") return
-    await process.inspect(inputAlias)
-  }
-  const confirmObservation = () => {
-    if (
-      unknown && inspection.kind === "matches" &&
-      inputAlias === inspection.value
-    ) {
-      onConfirm?.(inspection.value)
-      adopt(inspection.value)
-    }
-  }
-  const discardUnconfirmed = () => {
-    if (unknown && inspection.kind === "differs") {
-      onConfirm?.(inspection.value)
-      adopt(inspection.value)
-    }
-  }
   const onAliasChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.onChange(event.currentTarget.value)
     clearErrors("alias")
-    if (unknown) process.invalidateInspection()
+    if (status.kind === "error") setStatus({ kind: "idle" })
     // Form Level Validationは次の保存まで維持する。
   }
 
-  const displayedInspection: Inspection = inspection.kind === "matches" || inspection.kind === "differs"
-    ? { status: inspection.kind, alias: inspection.value }
-    : { status: inspection.kind }
-
-  /** Formの値・保存状態・復旧操作をUIに渡す。 */
   return {
     field, fieldState, text, saving, failure, formInvalid, blockedFeedback,
-    inspection: displayedInspection,
-    inspect, canResaveInspected, confirmObservation, discardUnconfirmed,
     normalized, validation, showClientError: fieldState.isTouched || form.formState.isSubmitted,
-    changed, invalid, save, onAliasChange, blocked, unknown,
+    changed, invalid, save: handleSubmit(submitAlias), onAliasChange, blocked, unknown,
     saveLabel: "保存",
   }
 }

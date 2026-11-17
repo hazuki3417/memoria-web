@@ -160,27 +160,4 @@ describe("Community別名の保存ActionとApollo境界", () => {
     await expect(actions.saveAlias("別名")).resolves.toEqual({ kind: "unknown" })
     expect(mocks.patch).not.toHaveBeenCalled()
   })
-  it("Inspectionは固定したCommunityの現在値をno-cacheで照会する", async () => {
-    mocks.query.mockResolvedValue({
-      data: { community: { id: "community-1", mySettings: { alias: null } } },
-    })
-    await expect(actions.inspectAlias()).resolves.toBeNull()
-    expect(mocks.query).toHaveBeenCalledWith({
-      query: { kind: "Document", name: "communityMySettings" },
-      variables: { communityId: "community-1" },
-      fetchPolicy: "no-cache", context: { settingsInspection: true, queryDeduplication: false },
-    })
-    expect(mocks.patch).not.toHaveBeenCalled()
-    expect(mocks.mutation).not.toHaveBeenCalled()
-  })
-  it("別Communityの別名は照会結果として採用しない", async () => {
-    mocks.query.mockResolvedValue({ data: { community: { id: "community-2", mySettings: { alias: "別名" } } } })
-    await expect(actions.inspectAlias()).rejects.toThrow("Community unavailable")
-    expect(mocks.patch).not.toHaveBeenCalled()
-  })
-
-  it("InspectionでCommunityを取得できない場合は呼出元へ失敗を返す", async () => {
-    mocks.query.mockResolvedValue({ data: { community: null } })
-    await expect(actions.inspectAlias()).rejects.toThrow("Community unavailable")
-  })
 })
