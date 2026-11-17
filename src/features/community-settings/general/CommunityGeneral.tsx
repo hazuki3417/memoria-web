@@ -34,7 +34,7 @@ export const CommunityGeneral = ({
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   })
-  const { onSaveName, onInspectName } = useCommunityNameSave(communityId)
+  const { onSaveName } = useCommunityNameSave(communityId)
   const name = query.data?.community?.name
   const members = query.data?.communityMembers
   const selfId = query.data?.me?.id
@@ -56,7 +56,7 @@ export const CommunityGeneral = ({
     status: "ready",
     content: (
       <CommunityGeneralView
-        name={{ communityName: name, onSaveName, onInspectName }}
+        name={{ communityName: name, onSaveName }}
         invitation={unavailableInvitation}
         invitationAvailable={false}
         communityId={communityId}

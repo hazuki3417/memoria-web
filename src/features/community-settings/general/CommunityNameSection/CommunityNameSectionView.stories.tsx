@@ -8,9 +8,8 @@ import type { SaveCommunityName } from "./communityNameSaveOutcome"
 type ViewFixtureProps = {
   isAdmin: boolean
   initialName: string
-  initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
+  initialSaveState?: "idle" | "saving" | "blocked"
   outcome?: "success" | "unknown" | "validation" | "retryable"
-  inspectionAvailable?: boolean
 }
 
 /** Viewに必要なForm ModelだけをStoryから注入し、実際の表示責務を検証する。 */
@@ -19,7 +18,6 @@ const CommunityNameSectionViewFixture = ({
   initialName,
   initialSaveState,
   outcome = "success",
-  inspectionAvailable = false,
 }: ViewFixtureProps) => {
   const onSave: SaveCommunityName = async (name) => {
     if (outcome === "unknown") return { kind: "unknown" }
@@ -35,14 +33,12 @@ const CommunityNameSectionViewFixture = ({
     }
     return { kind: "success", value: name }
   }
-  const onInspectName = inspectionAvailable ? async () => "サーバーに残るCommunity名" : undefined
   const form = useCommunityNameForm({
     initialName,
     initialSaveState,
     onSave,
-    onInspect: onInspectName,
   })
-  return <CommunityNameSectionView form={form} isAdmin={isAdmin} onInspectName={onInspectName} />
+  return <CommunityNameSectionView form={form} isAdmin={isAdmin} />
 }
 
 const meta = {
@@ -53,7 +49,6 @@ const meta = {
     initialName: "家族のアルバム",
     initialSaveState: "idle",
     outcome: "success",
-    inspectionAvailable: false,
   },
   decorators: [
     (Story) => (
@@ -111,9 +106,9 @@ export const Blocked: Story = {
 }
 
 export const Unknown: Story = {
-  name: "Visual · 保存結果不明の照会操作",
+  name: "Visual · 保存結果不明の案内",
   tags: ["visual"],
-  args: { outcome: "unknown", inspectionAvailable: true },
+  args: { outcome: "unknown" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox", { name: /Community名/ })
@@ -121,7 +116,7 @@ export const Unknown: Story = {
     await userEvent.type(input, "未確定のCommunity名")
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(await canvas.findByRole("alert")).toBeVisible()
-    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeVisible()
+    await expect(canvas.getByRole("alert")).toHaveTextContent("ページを再読み込みして状態を確認してください")
     await expect(input).toHaveValue("未確定のCommunity名")
   },
 }

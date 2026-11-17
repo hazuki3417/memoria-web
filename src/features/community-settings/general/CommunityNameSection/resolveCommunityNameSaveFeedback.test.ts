@@ -16,7 +16,7 @@ describe("Community名の保存Feedback", () => {
 
   it("検証エラーは再試行可能エラーより優先する", () => {
     const result = resolveCommunityNameSaveFeedback({
-      status: { kind: "retryable-error" },
+      status: { kind: "error" },
       formInvalid: true,
     })
     expect(result?.type).toBe("validation")
@@ -25,10 +25,10 @@ describe("Community名の保存Feedback", () => {
 
   it("再試行可能な失敗を案内する", () => {
     const result = resolveCommunityNameSaveFeedback({
-      ...base, status: { kind: "retryable-error" },
+      ...base, status: { kind: "error" },
     })
     expect(result?.type).toBe("retryable")
-    expect(result?.description).toBe("再試行してください。")
+    expect(result?.description).toBe("入力内容を確認し、もう一度保存してください。")
   })
 
   it("Unknownは入力エラーより優先し、自動再送を要求しない", () => {
