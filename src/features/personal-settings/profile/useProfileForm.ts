@@ -70,11 +70,16 @@ export const useProfileForm = ({
   }, [])
 
   useEffect(() => {
-    if (!queryEcho.current.observe(initialNickname)) return
-    if (!form.formState.isDirty && !processState.busy && status.kind === "idle") {
+    if (
+      queryEcho.current.observe(initialNickname) &&
+      !form.formState.isDirty &&
+      !processState.busy &&
+      status.kind === "idle" &&
+      baseline !== (initialNickname)
+    ) {
       reset({ nickname: initialNickname })
     }
-  }, [initialNickname, form.formState.isDirty, reset, processState.busy, status.kind])
+  }, [initialNickname, form.formState.isDirty, baseline, reset, processState.busy, status.kind])
 
   const saving = processState.busy || status.kind === "saving" || form.formState.isSubmitting
   const blocked = status.kind === "blocked"

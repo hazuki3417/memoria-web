@@ -74,11 +74,16 @@ export const useCommunityNameForm = ({
   }, [])
 
   useEffect(() => {
-    if (!queryEcho.current.observe(initialName)) return
-    if (!form.formState.isDirty && !processState.busy && status.kind === "idle") {
+    if (
+      queryEcho.current.observe(initialName) &&
+      !form.formState.isDirty &&
+      !processState.busy &&
+      status.kind === "idle" &&
+      baseline !== (initialName)
+    ) {
       reset({ name: initialName })
     }
-  }, [initialName, form.formState.isDirty, reset, processState.busy, status.kind])
+  }, [initialName, form.formState.isDirty, baseline, reset, processState.busy, status.kind])
 
   const saving = processState.busy || status.kind === "saving" || form.formState.isSubmitting
   const blocked = status.kind === "blocked"

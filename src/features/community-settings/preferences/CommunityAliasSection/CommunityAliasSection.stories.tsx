@@ -175,6 +175,25 @@ export const AliasRefreshWhileUntouched: Story = {
   },
 }
 
+export const AliasRefreshArrivesWhileEditingThenReverted: Story = {
+  name: "Interaction · 編集中の再取得値をDraft復帰後に採用",
+  tags: ["interaction"],
+  render: (args) => <AliasRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: "Community別名" })
+    const save = canvas.getByRole("button", { name: "保存" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "編集中のDraft")
+    await userEvent.click(canvas.getByRole("button", { name: "Alias再取得を再現" }))
+    await expect(input).toHaveValue("編集中のDraft")
+    await userEvent.clear(input)
+    await userEvent.type(input, "元の別名")
+    await expect(input).toHaveValue("取得した新しい別名")
+    await expect(save).toBeDisabled()
+  },
+}
+
 export const AliasRefreshWhileEditing: Story = {
   name: "Interaction · Alias編集中は再取得でDraftを失わない",
   tags: ["interaction"],

@@ -191,6 +191,25 @@ export const NameRefreshWhileUntouched: Story = {
   },
 }
 
+export const NameRefreshArrivesWhileEditingThenReverted: Story = {
+  name: "Interaction · 編集中の再取得値をDraft復帰後に採用",
+  tags: ["interaction"],
+  render: (args) => <CommunityNameRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /Community名/ })
+    const save = canvas.getByRole("button", { name: "保存" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "編集中のDraft")
+    await userEvent.click(canvas.getByRole("button", { name: "サーバー再取得を再現" }))
+    await expect(input).toHaveValue("編集中のDraft")
+    await userEvent.clear(input)
+    await userEvent.type(input, "家族のアルバム")
+    await expect(input).toHaveValue("サーバー更新後のCommunity名")
+    await expect(save).toBeDisabled()
+  },
+}
+
 export const NameRefreshWhileEditing: Story = {
   name: "Interaction · 編集中のDraftをServer更新から保護",
   tags: ["interaction"],

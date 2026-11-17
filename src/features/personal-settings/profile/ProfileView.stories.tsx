@@ -97,6 +97,25 @@ export const RefreshWhileUntouched: Story = {
   },
 }
 
+export const RefreshArrivesWhileEditingThenReverted: Story = {
+  name: "Interaction · 編集中に届いた再取得値をDraft復帰後に採用",
+  tags: ["interaction"],
+  render: (args) => <ProfileRefreshFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByRole("textbox", { name: /ニックネーム/ })
+    const save = canvas.getByRole("button", { name: "更新" })
+    await userEvent.clear(input)
+    await userEvent.type(input, "編集中のDraft")
+    await userEvent.click(canvas.getByRole("button", { name: "プロフィール再取得を再現" }))
+    await expect(input).toHaveValue("編集中のDraft")
+    await userEvent.clear(input)
+    await userEvent.type(input, "テストユーザー")
+    await expect(input).toHaveValue("サーバー更新後の名前")
+    await expect(save).toBeDisabled()
+  },
+}
+
 export const RefreshWhileEditing: Story = {
   name: "Interaction · 編集中はプロフィールのDraftを保護",
   tags: ["interaction"],

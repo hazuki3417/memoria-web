@@ -76,11 +76,16 @@ export const useCommunityAliasForm = ({
   }, [])
 
   useEffect(() => {
-    if (!queryEcho.current.observe(savedAlias)) return
-    if (!changed && !processState.busy && status.kind === "idle") {
+    if (
+      queryEcho.current.observe(savedAlias) &&
+      !changed &&
+      !processState.busy &&
+      status.kind === "idle" &&
+      baseline !== (savedAlias ?? "")
+    ) {
       reset({ alias: savedAlias ?? "" })
     }
-  }, [savedAlias, changed, reset, processState.busy, status.kind])
+  }, [savedAlias, changed, baseline, reset, processState.busy, status.kind])
 
   const saving = processState.busy || status.kind === "saving" || form.formState.isSubmitting
   const blocked = status.kind === "blocked"
