@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
 import { showNotification } from "@/components/Feedback"
-import { useExplicitSaveProcess } from "@/ui/Action"
+import { useExplicitSaveProcess, createSavedValueQueryEcho } from "@/ui/Action"
 import { resolveFormInputValidation } from "@/ui/formValidation"
 import { profileSchema } from "./profileSchema"
 import type { SaveProfile } from "./profileSaveOutcome"
@@ -60,7 +60,7 @@ export const useProfileForm = ({
   )
   const [formInvalid, setFormInvalid] = useState(false)
   const alive = useRef(true)
-  const queryEcho = useRef({ observed: initialNickname, confirmed: null as string | null })
+  const queryEcho = useRef(createSavedValueQueryEcho(initialNickname))
 
   useEffect(() => {
     alive.current = true
@@ -70,12 +70,7 @@ export const useProfileForm = ({
   }, [])
 
   useEffect(() => {
-    if (queryEcho.current.observed === initialNickname) return
-    queryEcho.current.observed = initialNickname
-    if (queryEcho.current.confirmed !== null) {
-      if (initialNickname !== queryEcho.current.confirmed) return
-      queryEcho.current.confirmed = null
-    }
+    if (!queryEcho.current.observe(initialNickname)) return
     if (!form.formState.isDirty && !processState.busy && status.kind === "idle") {
       reset({ nickname: initialNickname })
     }
@@ -93,7 +88,7 @@ export const useProfileForm = ({
 
   const adopt = (value: string) => {
     process.invalidateInspection()
-    queryEcho.current.confirmed = value === initialNickname ? null : value
+    queryEcho.current.adopt(value)
     reset({ nickname: value })
     clearErrors()
     setFormInvalid(false)

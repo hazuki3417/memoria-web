@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
 import { showNotification } from "@/components/Feedback"
-import { useExplicitSaveProcess } from "@/ui/Action"
+import { useExplicitSaveProcess, createSavedValueQueryEcho } from "@/ui/Action"
 import { resolveFormInputValidation } from "@/ui/formValidation"
 import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
 import { communityAliasSchema } from "./communityAliasSchema"
@@ -68,11 +68,7 @@ export const useCommunityAliasForm = ({
   )
   const [formInvalid, setFormInvalid] = useState(false)
   const alive = useRef(true)
-  const queryEcho = useRef({
-    observed: savedAlias,
-    confirmed: null as string | null,
-    awaiting: false,
-  })
+  const queryEcho = useRef(createSavedValueQueryEcho(savedAlias))
 
   useEffect(() => {
     alive.current = true
@@ -80,12 +76,7 @@ export const useCommunityAliasForm = ({
   }, [])
 
   useEffect(() => {
-    if (queryEcho.current.observed === savedAlias) return
-    queryEcho.current.observed = savedAlias
-    if (queryEcho.current.awaiting) {
-      if (savedAlias !== queryEcho.current.confirmed) return
-      queryEcho.current.awaiting = false
-    }
+    if (!queryEcho.current.observe(savedAlias)) return
     if (!changed && !processState.busy && status.kind === "idle") {
       reset({ alias: savedAlias ?? "" })
     }
@@ -109,8 +100,7 @@ export const useCommunityAliasForm = ({
 
   const adopt = (alias: string | null) => {
     process.invalidateInspection()
-    queryEcho.current.confirmed = alias
-    queryEcho.current.awaiting = alias !== savedAlias
+    queryEcho.current.adopt(alias)
     reset({ alias: alias ?? "" })
     clearErrors()
     setFormInvalid(false)

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useController, useForm, useWatch } from "react-hook-form"
 import type { z } from "zod"
 import { showNotification } from "@/components/Feedback"
-import { useExplicitSaveProcess } from "@/ui/Action"
+import { useExplicitSaveProcess, createSavedValueQueryEcho } from "@/ui/Action"
 import { resolveFormInputValidation } from "@/ui/formValidation"
 import { communityNameSchema } from "./communityNameSchema"
 import type { SaveCommunityName } from "./communityNameSaveOutcome"
@@ -64,7 +64,7 @@ export const useCommunityNameForm = ({
   )
   const [formInvalid, setFormInvalid] = useState(false)
   const alive = useRef(true)
-  const queryEcho = useRef({ observed: initialName, confirmed: null as string | null })
+  const queryEcho = useRef(createSavedValueQueryEcho(initialName))
 
   useEffect(() => {
     alive.current = true
@@ -74,12 +74,7 @@ export const useCommunityNameForm = ({
   }, [])
 
   useEffect(() => {
-    if (queryEcho.current.observed === initialName) return
-    queryEcho.current.observed = initialName
-    if (queryEcho.current.confirmed !== null) {
-      if (initialName !== queryEcho.current.confirmed) return
-      queryEcho.current.confirmed = null
-    }
+    if (!queryEcho.current.observe(initialName)) return
     if (!form.formState.isDirty && !processState.busy && status.kind === "idle") {
       reset({ name: initialName })
     }
@@ -97,7 +92,7 @@ export const useCommunityNameForm = ({
 
   const adopt = (value: string) => {
     process.invalidateInspection()
-    queryEcho.current.confirmed = value === initialName ? null : value
+    queryEcho.current.adopt(value)
     reset({ name: value })
     clearErrors()
     setFormInvalid(false)
