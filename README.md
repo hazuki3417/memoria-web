@@ -6,7 +6,7 @@ MemoriaのWebアプリケーションです。Next.js、React、Mantine、Apollo
 
 - [memoria-api](https://github.com/hazuki3417/memoria-api): GraphQL APIと永続化
 - [memoria-design](https://github.com/hazuki3417/memoria-design): プロダクト設計とアーキテクチャの正本
-- [memoria-IaC](https://github.com/hazuki3417/memoria-IaC): AWS CDKによる実行環境
+- [memoria-IaC](https://github.com/hazuki3417/memoria-IaC): Terraformによる実行環境
 
 UI・GraphQL開発の作業規則は[AGENTS.md](./AGENTS.md)を参照してください。Application Architectureの正本は[memoria-designのFrontend実装規約](https://github.com/hazuki3417/memoria-design/blob/develop/content/system/web/implementation-conventions.mdx)です。
 
@@ -35,7 +35,7 @@ npm run dev:storybook
 
 WindowsのWebブラウザから、起動時に表示される`localhost` URLへアクセスします。APIと結合確認する場合は、`memoria-api`も別のWSLターミナルとDevboxで起動します。
 
-`node_modules`をWindows、macOS、他のLinux環境からコピーまたは共有せず、依存関係は`package.json`とlockfileへ記録します。共通の環境構成とトラブルシューティングは[memoria-designのローカル開発環境](https://github.com/hazuki3417/memoria-design/blob/develop/pages/local-development.mdx)を参照してください。
+`node_modules`をWindows、macOS、他のLinux環境からコピーまたは共有せず、依存関係は`package.json`とlockfileへ記録します。共通の環境構成とトラブルシューティングは[memoria-designのローカル開発環境](https://github.com/hazuki3417/memoria-design/blob/develop/content/local-development.mdx)を参照してください。
 
 Devbox shellを終了する場合は`exit`を実行します。
 
@@ -79,6 +79,12 @@ docker build -f docker/runtime/Dockerfile -t "memoria-web:$(git rev-parse HEAD)"
 起動時には [Auth0設定手順](docs/auth0-login-logout-setup.md) の6つのAuth0 / Origin設定（AUTH0_DOMAIN、AUTH0_CLIENT_ID、AUTH0_CLIENT_SECRET、AUTH0_SECRET、APP_BASE_URL、AUTH0_AUDIENCE）とサーバー用 `MEMORIA_GRAPHQL_URL` を注入します。Docker network内でAPIに到達するURLを指定してください。AWS Development環境の実行用Composeは [memoria-IaC](https://github.com/hazuki3417/memoria-IaC) が所有します。Web imageのローカル確認用ComposeはこのRepositoryに配置します。実環境のSecretを含むファイルはGitに登録しません。
 
 CIでComposeの設定、Docker imageのbuild、公開ログイン画面のlocalhost HTTP応答を利用した起動healthを検証します。ログイン・画像の操作・実際の環境変数注入はローカルおよびDevelopment環境の結合確認で検証します。
+
+### Development向けGHCRイメージ
+
+`develop`統合後のNext.js Build Workflowは、既存のCompose image buildと`/login`起動確認が成功した場合だけ、発行専用Jobで`ghcr.io/hazuki3417/memoria-web:<commit-sha>`をGHCRへPushします。Pull Requestでは公開せず、GHCRに対する`packages: write`権限は発行Jobに限定します。Private Packageを維持し、最初のPublish時はGitHub PackagesのRepository連携とActions権限を確認します。
+
+EC2上での実行には、GitHub ActionsのPush結果で確認したManifest Digestを`ghcr.io/hazuki3417/memoria-web@sha256:...`形式で指定します。各環境への反映は自動化せず、`memoria-IaC/runtime/development/pull-images.sh`による認証付き手動Pullと既存起動Scriptを使用します。EC2にRegistry Credentialを常時保存しません。Build Jobの検証とGHCR発行・実環境でのログイン・画像操作の検証は別です。
 
 ### ローカルでのWeb runtime確認
 
