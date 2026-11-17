@@ -238,21 +238,18 @@ export const MutationTransportUnknown: Story = {
     )
     await expect(input).toBeEnabled()
     await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
-    await expect(canvas.getByRole("button", { name: "現在の状態を確認" })).toBeEnabled()
+    await expect(canvas.queryByRole("button", { name: "現在の状態を確認" })).not.toBeInTheDocument()
   },
 }
 
 
 
 export const MutationExecutionUnknown: Story = {
-  name: "Interaction · GraphQL実行エラー後は状態照会から手動復旧",
+  name: "Interaction · GraphQL結果不明では再送せず再読み込みを案内",
   tags: ["interaction"],
   decorators: [
     (Story) => (
-      <MockedProvider
-        mocks={[profileSuccess, saveExecutionUnknown, profileSuccess]}
-        addTypename={false}
-      >
+      <MockedProvider mocks={[profileSuccess, saveExecutionUnknown]} addTypename={false}>
         <Story />
       </MockedProvider>
     ),
@@ -263,14 +260,8 @@ export const MutationExecutionUnknown: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, "変更した名前")
     await userEvent.click(canvas.getByRole("button", { name: "更新" }))
-    await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      "プロフィールの保存結果を確認できませんでした",
-    )
-    await expect(input).toBeEnabled()
-    await expect(canvas.getByRole("button", { name: "更新" })).toBeDisabled()
-    await userEvent.click(canvas.getByRole("button", { name: "現在の状態を確認" }))
-    await expect(await canvas.findByRole("button", { name: "もう一度保存" })).toBeEnabled()
-    await expect(canvas.getByRole("button", { name: "変更を破棄" })).toBeVisible()
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("ページを再読み込みして")
+    await expect(canvas.queryByRole("button", { name: "現在の状態を確認" })).not.toBeInTheDocument()
     await expect(input).toHaveValue("変更した名前")
   },
 }
