@@ -53,6 +53,42 @@ export const CommunityPreferencesView = ({
     saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
     operations, preview, sourceReady,
   })
+  return (
+    <CommunityPreferencesContent
+      model={model}
+      aliasSection={aliasSection}
+      alias={alias}
+      isPreview={isPreview}
+      saveFeedback={saveFeedback}
+      accentError={accentError}
+      productionLayout={Boolean(operations)}
+    />
+  )
+}
+
+type PreferencesModel = ReturnType<typeof useCommunityPreferencesForm>
+
+/**
+ * Production / Story / Prototypeで同じVisual Compositionを共有する。
+ * 保存・Query・PreviewのSource選択は呼び出し元とFormが所有する。
+ */
+const CommunityPreferencesContent = ({
+  model,
+  aliasSection,
+  alias,
+  isPreview,
+  saveFeedback,
+  accentError,
+  productionLayout,
+}: {
+  model: PreferencesModel
+  aliasSection?: ReactNode
+  alias?: ComponentProps<typeof CommunityAliasSection>
+  isPreview: boolean
+  saveFeedback?: ReactNode
+  accentError?: string
+  productionLayout: boolean
+}) => {
   const aliasContent = alias ? <CommunityAliasSection {...alias} /> : aliasSection
   const content = (
     <Stack gap="xl">
@@ -84,5 +120,5 @@ export const CommunityPreferencesView = ({
     </Stack>
   )
   // Productionの既存外側Stackを維持し、Preview Storyの外側構造を変更しない。
-  return operations ? <Stack gap="sm">{content}</Stack> : content
+  return productionLayout ? <Stack gap="sm">{content}</Stack> : content
 }

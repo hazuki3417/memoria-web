@@ -24,7 +24,6 @@ export type CommunitySettingsStoryProps = {
   section?: CommunitySettingsSection
   communityName?: string
   onSaveName?: SaveCommunityName
-  onInspectName?: () => Promise<string>
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
   onRemoveMember?: (userId: string) => Promise<boolean>
@@ -68,7 +67,6 @@ export const CommunitySettingsStoryNavigation = ({
           name={{
             communityName: props.communityName,
             onSaveName: props.onSaveName,
-            onInspectName: props.onInspectName,
           }}
           invitation={invitation}
           invitationAvailable={invitationMode === "preview"}

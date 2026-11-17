@@ -15,7 +15,7 @@ import { UsageContent, type UsageScenario } from "./UsageContent"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
-type ProfileSaveState = "idle" | "saving" | "retryable-error" | "blocked"
+type ProfileSaveState = "idle" | "saving" | "blocked"
 
 // Storybook / Prototype専用。製品本体へモックの成功動作を混入させない。
 const saveMockProfile: SaveProfile = async (nickname) => {
