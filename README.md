@@ -66,3 +66,15 @@ GraphQLクライアントは再実装予定です。API契約の正本は`memori
 - セットアップ・コマンド・実装固有の注意: READMEと`AGENTS.md`
 - タスク要件: Issue
 - 変更内容と検証結果: PR
+
+## Development実行用Docker image
+
+ローカルのNext.js開発やVRTとは別に、`Dockerfile` で既存のNext.js production buildを実行し、非rootのNode.js 24 containerから起動します。画面・認証・API契約は変更しません。イメージの識別子はソースのcommit SHAとし、実際の環境変数やSecretをbuild context、build args、imageに含めません。Build時に使用するAuth0の値はCIと同じダミーです。
+
+```sh
+docker build -t "memoria-web:$(git rev-parse HEAD)" .
+```
+
+起動時には [Auth0設定手順](docs/auth0-login-logout-setup.md) の6つのAuth0 / Origin設定（AUTH0_DOMAIN、AUTH0_CLIENT_ID、AUTH0_CLIENT_SECRET、AUTH0_SECRET、APP_BASE_URL、AUTH0_AUDIENCE）とサーバー用 `MEMORIA_GRAPHQL_URL` を注入します。Docker network内でAPIに到達するURLを指定してください。実行用Composeは [memoria-IaC](https://github.com/hazuki3417/memoria-IaC) が所有します。実環境のSecretを含むファイルはGitに登録しません。
+
+CIでDocker imageのbuildを検証します。ログイン・画像の操作・実際の環境変数注入はDevelopment環境の結合確認で検証します。
