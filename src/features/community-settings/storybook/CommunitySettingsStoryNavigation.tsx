@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CommunitySettingsView } from "../CommunitySettingsView"
+import { CommunitySettingsLayout } from "../CommunitySettingsLayout"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import type { ReactNode } from "react"
 import { CommunityGeneralView } from "../general/CommunityGeneralView"
@@ -44,14 +44,14 @@ export type CommunitySettingsStoryProps = {
  * Storybook-only adapter: keeps section changes inside Canvas.
  * Production route navigation is supplied independently by CommunitySettingsRoute.
  */
-export function CommunitySettingsStoryNavigation({
+export const CommunitySettingsStoryNavigation = ({
   section = "general",
   onSectionChange: _onSectionChange,
   preferencesContent,
   invitationMode = "preview",
   invitation: suppliedInvitation,
   ...props
-}: CommunitySettingsStoryProps) {
+}: CommunitySettingsStoryProps) => {
   const [currentSection, setCurrentSection] =
     useState<CommunitySettingsSection>(section)
   const [accent, setAccent] = useState("#7950f2")
@@ -97,10 +97,12 @@ export function CommunitySettingsStoryNavigation({
   }
 
   return (
-    <CommunitySettingsView
+    <CommunitySettingsLayout
       communityId={communityId}
       section={currentSection}
-      content={
+      accentColor={props.communityAccentColor}
+      onSectionChange={(next) => setCurrentSection(next)}
+    >
         <SettingsSectionHost
           label={currentSection === "usage" && props.usageState !== undefined
             ? "利用状況を読み込み中"
@@ -113,9 +115,6 @@ export function CommunitySettingsStoryNavigation({
             return render(state === "ready" ? { status: "ready", content } : { status: state })
           }}
         </SettingsSectionHost>
-      }
-      communityAccentColor={props.communityAccentColor}
-      onSectionChange={(next) => setCurrentSection(next)}
-    />
+    </CommunitySettingsLayout>
   )
 }

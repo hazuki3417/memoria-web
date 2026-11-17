@@ -4,23 +4,21 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 import { Usage as UsageComponent } from "@/features/usage"
 import { sampleUsage, zeroUsage } from "@/features/usage/usageStoryFixtures"
-import { CommunitySettingsView } from "./CommunitySettingsView"
 import { CommunitySettingsStoryNavigation } from "./storybook/CommunitySettingsStoryNavigation"
 import type { SaveCommunityName } from "./general/CommunityNameSection/communityNameSaveOutcome"
 
 type CommunityNameOutcome = Awaited<ReturnType<SaveCommunityName>>
 const saveUnknown = (): CommunityNameOutcome => ({ kind: "unknown" })
 
-type ScreenStoryArgs = ComponentProps<typeof CommunitySettingsView> &
-  ComponentProps<typeof CommunitySettingsStoryNavigation>
+type ScreenStoryArgs = ComponentProps<typeof CommunitySettingsStoryNavigation>
 
-/** 画面全体を所有するViewのStory。NavigationはStory専用の実行Adapterで接続する。 */
+/** 画面全体のStory。NavigationはStory専用の実行Adapterで接続する。 */
 const meta = {
-  title: "features/community-settings/CommunitySettingsView",
-  component: CommunitySettingsView,
+  id: "features-community-settings-communitysettingsview",
+  title: "features/community-settings/CommunitySettings",
+  component: CommunitySettingsStoryNavigation,
   render: (args: ScreenStoryArgs) => <CommunitySettingsStoryNavigation {...args} />,
   args: {
-    content: null,
     onSectionChange: () => undefined,
     invitationMode: "preview",
     communityId: "photo-club",

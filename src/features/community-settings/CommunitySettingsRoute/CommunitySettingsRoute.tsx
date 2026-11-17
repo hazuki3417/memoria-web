@@ -7,9 +7,8 @@ import { CommunityGeneral } from "../general"
 import { CommunityMembers } from "../members"
 import { CommunityPreferences } from "../preferences"
 import { CommunityUsage } from "../usage"
-import { CommunitySettingsView } from "../CommunitySettingsView"
-import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
-import { useOptionalCommunityAccentPreview } from "@/features/application-shell"
+import { CommunitySettingsLayout } from "../CommunitySettingsLayout"
+import { useCommunitySettingsAccentColor } from "./useCommunitySettingsAccentColor"
 import {
   getCommunitySettingsSections,
   type CommunitySettingsSection,
@@ -45,17 +44,7 @@ export const CommunitySettingsRoute = ({
   section = "general",
 }: CommunitySettingsRouteProps) => {
   const router = useRouter()
-  // The enclosing CommunityAccessBoundary owns access verification.
-  // Settings reads its own accent; myCommunities remains Switcher-only.
-  const { data: settingsData } = useCommunityMySettingsQuery({
-    variables: { communityId },
-    fetchPolicy: "cache-first",
-    refetchWritePolicy: "merge",
-  })
-  const preview = useOptionalCommunityAccentPreview()
-  const community = settingsData?.community
-  const confirmedAccent = community?.id === communityId ? community.mySettings.accentColor : undefined
-  const communityAccentColor = preview?.previews[communityId]?.color ?? confirmedAccent
+  const { communityAccentColor } = useCommunitySettingsAccentColor(communityId)
 
   let controller: (render: SettingsSectionRender) => ReactNode
 
@@ -89,22 +78,21 @@ export const CommunitySettingsRoute = ({
   const { label, errorTitle } = sectionStatusMessages[section]
 
   return (
-    <CommunitySettingsView
+    <CommunitySettingsLayout
       key={communityId}
       communityId={communityId}
       section={section}
-      communityAccentColor={communityAccentColor}
-      content={
-        <SettingsSectionHost label={label} errorTitle={errorTitle}>
-          {controller}
-        </SettingsSectionHost>
-      }
+      accentColor={communityAccentColor}
       onSectionChange={(nextSection) => {
         const target = getCommunitySettingsSections(communityId).find(
           (item) => item.id === nextSection,
         )
         if (target) router.push(target.href)
       }}
-    />
+    >
+      <SettingsSectionHost label={label} errorTitle={errorTitle}>
+        {controller}
+      </SettingsSectionHost>
+    </CommunitySettingsLayout>
   )
 }
