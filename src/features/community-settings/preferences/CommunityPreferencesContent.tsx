@@ -1,12 +1,11 @@
 "use client"
 
-import type { ComponentProps, ReactNode } from "react"
+import type { ReactNode } from "react"
 import { Box, Stack } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING } from "@/components/SaveStatus"
 import { SectionHeader } from "@/components/SectionHeader"
 import { CommunityPreferencesDisplaySection } from "./CommunityPreferencesDisplaySection/CommunityPreferencesDisplaySection"
-import { CommunityAliasSection } from "./CommunityAliasSection"
 import { CommunityPreferencesSaveFeedback } from "./CommunityPreferencesSaveFeedback"
 import type { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
 
@@ -19,7 +18,6 @@ type PreferencesModel = ReturnType<typeof useCommunityPreferencesForm>
 export const CommunityPreferencesContent = ({
   model,
   aliasSection,
-  alias,
   isPreview,
   saveFeedback,
   accentError,
@@ -27,13 +25,11 @@ export const CommunityPreferencesContent = ({
 }: {
   model: PreferencesModel
   aliasSection?: ReactNode
-  alias?: ComponentProps<typeof CommunityAliasSection>
   isPreview: boolean
   saveFeedback?: ReactNode
   accentError?: string
   productionLayout: boolean
 }) => {
-  const aliasContent = alias ? <CommunityAliasSection {...alias} /> : aliasSection
   const content = (
     <Stack gap="xl">
       <PageHeader
@@ -50,10 +46,10 @@ export const CommunityPreferencesContent = ({
         }
       />
       {saveFeedback ?? <CommunityPreferencesSaveFeedback model={model} />}
-      {aliasContent && (
+      {aliasSection && (
         <Box>
           <SectionHeader>表示名</SectionHeader>
-          {aliasContent}
+          {aliasSection}
         </Box>
       )}
       <CommunityPreferencesDisplaySection

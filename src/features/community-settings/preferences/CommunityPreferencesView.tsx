@@ -35,7 +35,7 @@ export const CommunityPreferencesView = ({
   return (
     <CommunityPreferencesContent
       model={model}
-      alias={alias}
+      aliasSection={alias ? <CommunityAliasSection {...alias} /> : undefined}
       isPreview={false}
       productionLayout
     />

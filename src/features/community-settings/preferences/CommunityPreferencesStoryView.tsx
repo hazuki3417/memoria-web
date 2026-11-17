@@ -55,8 +55,7 @@ export const CommunityPreferencesStoryView = ({
   return (
     <CommunityPreferencesContent
       model={model}
-      aliasSection={aliasSection}
-      alias={alias}
+      aliasSection={alias ? <CommunityAliasSection {...alias} /> : aliasSection}
       isPreview={isPreview}
       saveFeedback={saveFeedback}
       accentError={accentError}
