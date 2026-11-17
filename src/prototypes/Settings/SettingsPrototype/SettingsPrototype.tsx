@@ -7,11 +7,11 @@ import {
   PersonalSettingsView,
   type SaveProfile,
   ProfileView,
-  PersonalPreferencesView,
   Account,
   type PersonalSettingsSection,
 } from "@/features/personal-settings"
 import { UsageContent, type UsageScenario } from "./UsageContent"
+import { PersonalPreferencesStoryView } from "@/features/personal-settings/preferences/PersonalPreferencesStoryView"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 
@@ -57,7 +57,7 @@ export function SettingsPrototype({
       )
       break
     case "preferences":
-      content = <PersonalPreferencesView compact={compact} />
+      content = <PersonalPreferencesStoryView compact={compact} />
       break
     case "usage":
       content = (

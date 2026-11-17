@@ -2,7 +2,7 @@ import { Box, Button } from "@mantine/core"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, waitFor, within } from "storybook/test"
-import { PersonalPreferencesView } from "./PersonalPreferencesView"
+import { PersonalPreferencesStoryView as PersonalPreferencesView } from "./PersonalPreferencesStoryView"
 import { defaultPersonalPreferences, type PersonalPreferencesPatch } from "./personalPreferences"
 import { SettingsInputValidationError } from "@/infrastructure/graphql/settingsMutationResult"
 
