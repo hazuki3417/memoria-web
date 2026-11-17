@@ -11,8 +11,6 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/components/Feedback", () => ({
   showNotification: mocks.notify,
 }))
-vi.mock("@apollo/client", () => ({
-}))
 vi.mock("@/infrastructure/graphql/generated", () => ({
   MyCommunitiesDocument: { kind: "Document", name: "myCommunities" },
   useUpdateCommunityMutation: () => [mocks.rename],

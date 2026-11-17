@@ -81,9 +81,15 @@ describe("Community別名の保存ActionとApollo境界", () => {
     expect(mocks.refetchQueries).toHaveBeenCalledWith({ include: [expect.anything(), expect.anything()], onQueryUpdated: expect.any(Function) })
   })
 
-  it("Cache欠落時は一覧と対象CommunityだけをRefetchする", () => {
+  it("Cache欠落時は一覧と対象CommunityだけをRefetchする", async () => {
     mocks.patch.mockReturnValueOnce(false)
-    actions.confirmAlias("確定した別名")
+    mocks.mutation.mockResolvedValue({
+      data: { updateCommunitySettings: {
+        __typename: "UpdateCommunitySettingsSuccess",
+        settings: { alias: "確定した別名", accentColor: "#112233" },
+      } },
+    })
+    await expect(actions.saveAlias("確定した別名")).resolves.toEqual({ kind: "success", value: "確定した別名" })
     expect(mocks.refetchQueries).toHaveBeenCalledTimes(1)
     const { onQueryUpdated } = mocks.refetchQueries.mock.calls[0][0]
     const result = Promise.resolve({})

@@ -99,7 +99,7 @@ export const AliasRetry: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "保存" }))
     await expect(
       await canvas.findByText(
-        "入力内容を保持しています。再度保存してください。",
+        "入力内容を保持しています。もう一度保存してください。",
       ),
     ).toBeVisible()
     await expect(input).toHaveValue("未保存の別名")

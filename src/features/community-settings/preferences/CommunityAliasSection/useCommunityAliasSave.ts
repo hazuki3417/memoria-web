@@ -86,5 +86,5 @@ export const useCommunityAliasSave = (communityId: string) => {
   })
 
   /** Alias保存の確定結果とCache更新を提供する。 */
-  return { saveAlias, confirmAlias }
+  return { saveAlias }
 }
