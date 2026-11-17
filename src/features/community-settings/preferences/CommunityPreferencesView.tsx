@@ -1,6 +1,7 @@
 "use client"
 
 import type { ComponentProps } from "react"
+import { Stack } from "@mantine/core"
 import { CommunityAliasSection } from "./CommunityAliasSection"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 import { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
@@ -33,11 +34,12 @@ export const CommunityPreferencesView = ({
   })
 
   return (
-    <CommunityPreferencesContent
-      model={model}
-      aliasSection={alias ? <CommunityAliasSection {...alias} /> : undefined}
-      isPreview={false}
-      productionLayout
-    />
+    <Stack gap="sm">
+      <CommunityPreferencesContent
+        model={model}
+        aliasSection={alias ? <CommunityAliasSection {...alias} /> : undefined}
+        isPreview={false}
+      />
+    </Stack>
   )
 }

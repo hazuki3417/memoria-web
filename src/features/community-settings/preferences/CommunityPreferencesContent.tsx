@@ -21,16 +21,14 @@ export const CommunityPreferencesContent = ({
   isPreview,
   saveFeedback,
   accentError,
-  productionLayout,
 }: {
   model: PreferencesModel
   aliasSection?: ReactNode
   isPreview: boolean
   saveFeedback?: ReactNode
   accentError?: string
-  productionLayout: boolean
 }) => {
-  const content = (
+  return (
     <Stack gap="xl">
       <PageHeader
         title="環境設定"
@@ -59,6 +57,4 @@ export const CommunityPreferencesContent = ({
       />
     </Stack>
   )
-  // Productionの既存外側Stackを維持し、Preview Storyの外側構造を変更しない。
-  return productionLayout ? <Stack gap="sm">{content}</Stack> : content
 }

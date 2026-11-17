@@ -1,6 +1,7 @@
 "use client"
 
 import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from "react"
+import { Stack } from "@mantine/core"
 import type { SaveStatusState } from "@/components/SaveStatus"
 import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
 import { CommunityAliasSection } from "./CommunityAliasSection"
@@ -52,14 +53,14 @@ export const CommunityPreferencesStoryView = ({
     saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
     operations, preview, sourceReady,
   })
-  return (
+  const content = (
     <CommunityPreferencesContent
       model={model}
       aliasSection={alias ? <CommunityAliasSection {...alias} /> : aliasSection}
       isPreview={isPreview}
       saveFeedback={saveFeedback}
       accentError={accentError}
-      productionLayout={Boolean(operations)}
     />
   )
+  return operations ? <Stack gap="sm">{content}</Stack> : content
 }
