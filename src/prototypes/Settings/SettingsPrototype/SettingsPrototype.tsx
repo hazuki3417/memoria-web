@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import type { SaveProfile } from "@/features/personal-settings/profile/profileSaveOutcome"
 import { Text } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import {
-  PersonalSettingsLayout,
+  PersonalSettingsView,
+  type SaveProfile,
   ProfileView,
   PersonalPreferencesView,
   Account,
@@ -110,9 +110,7 @@ export function SettingsPrototype({
       onOpenSettings={() => undefined}
       onLogout={() => undefined}
     >
-      <PersonalSettingsLayout section={section} onSectionChange={setSection}>
-        {content}
-      </PersonalSettingsLayout>
+      <PersonalSettingsView section={section} onSectionChange={setSection} content={content} />
       <Text
         pos="absolute"
         style={{

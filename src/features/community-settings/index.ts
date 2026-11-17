@@ -1,3 +1,4 @@
+export { getCommunitySettingsSections } from "./communitySettingsSections"
 export type { CommunitySettingsSection } from "./communitySettingsSections"
 export { CommunitySettingsRoute } from "./CommunitySettingsRoute"
 export { CommunityUsage } from "./usage"
