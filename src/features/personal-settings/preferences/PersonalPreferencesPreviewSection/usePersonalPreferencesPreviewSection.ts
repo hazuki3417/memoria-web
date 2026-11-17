@@ -2,10 +2,13 @@
 
 import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
 
-type PreferencesForm = ReturnType<typeof usePersonalPreferencesForm>
+export type PersonalPreferencesPreviewSectionInput = Pick<
+  ReturnType<typeof usePersonalPreferencesForm>,
+  "preferences" | "change" | "fieldErrors"
+>
 
 /** Preview Sectionが利用する値と操作だけを共有Formから投影する。 */
-export function usePersonalPreferencesPreviewSection(model: PreferencesForm) {
+export function usePersonalPreferencesPreviewSection(model: PersonalPreferencesPreviewSectionInput) {
   const { preferences, change, fieldErrors } = model
   return {
     preferences, fieldErrors,
