@@ -1,22 +1,28 @@
-# EC2へ配置するWeb runtime imageをローカルで確認する。
-# VRT用のcompose.yamlとは別のprojectとして起動する。
-name: memoria-web-integration
-
 services:
-  web:
-    image: "${MEMORIA_WEB_IMAGE:-memoria-web:local-integration}"
+  vrt:
+    image: memoria-vrt-node24:playwright-1.64.1
     build:
-      context: .
-      dockerfile: docker/runtime/Dockerfile
+      dockerfile_inline: |
+        FROM ${MEMORIA_VRT_IMAGE:-mcr.microsoft.com/playwright:v1.64.1-noble}
+        COPY --from=node:24-bookworm-slim /usr/local/bin/node /usr/local/bin/node
+    profiles: [vrt]
     init: true
+    ipc: host
+    working_dir: /workspace
     environment:
-      APP_BASE_URL: http://localhost:3000
-      AUTH0_DOMAIN: "${AUTH0_DOMAIN:?AUTH0_DOMAIN is required}"
-      AUTH0_CLIENT_ID: "${AUTH0_CLIENT_ID:?AUTH0_CLIENT_ID is required}"
-      AUTH0_CLIENT_SECRET: "${AUTH0_CLIENT_SECRET:?AUTH0_CLIENT_SECRET is required}"
-      AUTH0_SECRET: "${AUTH0_SECRET:?AUTH0_SECRET is required}"
-      AUTH0_AUDIENCE: "${AUTH0_AUDIENCE:?AUTH0_AUDIENCE is required}"
-      # Docker Desktopからホスト側に公開されたローカルAPIへ接続する。
-      MEMORIA_GRAPHQL_URL: "${MEMORIA_GRAPHQL_URL:-http://host.docker.internal:8080/graphql}"
-    ports:
-      - "127.0.0.1:3000:3000"
+      CI: "1"
+      HOME: /tmp
+    volumes:
+      - .:/workspace
+      - vrt-node-modules:/workspace/node_modules
+    entrypoint: ["/bin/bash", "-euc"]
+    command:
+      - |
+        node -e 'if (Number(process.versions.node.split(".")[0]) !== 24) { console.error("VRT requires Node.js 24; got " + process.version); process.exit(1) }'
+        node -e 'const lock = require("./package-lock.json"); if (lock.packages["node_modules/playwright"].version !== "1.64.1") { console.error("VRT requires Playwright 1.64.1"); process.exit(1) }'
+        # Named volumes are initialized as root. The official Playwright image runs as root by default.
+        npm ci
+        npm run "test:visual$${VRT_UPDATE:+:update}"
+
+volumes:
+  vrt-node-modules:

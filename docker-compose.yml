@@ -1,0 +1,22 @@
+# EC2へ配置するWeb runtime imageをローカルで確認する。
+# VRT・開発支援用のdocker-compose.integration.ymlとは別projectで起動する。
+name: memoria-web-development
+
+services:
+  web:
+    image: "${MEMORIA_WEB_IMAGE:-memoria-web:local-development}"
+    build:
+      context: .
+      dockerfile: docker/runtime/Dockerfile
+    init: true
+    environment:
+      APP_BASE_URL: http://localhost:3000
+      AUTH0_DOMAIN: "${AUTH0_DOMAIN:?AUTH0_DOMAIN is required}"
+      AUTH0_CLIENT_ID: "${AUTH0_CLIENT_ID:?AUTH0_CLIENT_ID is required}"
+      AUTH0_CLIENT_SECRET: "${AUTH0_CLIENT_SECRET:?AUTH0_CLIENT_SECRET is required}"
+      AUTH0_SECRET: "${AUTH0_SECRET:?AUTH0_SECRET is required}"
+      AUTH0_AUDIENCE: "${AUTH0_AUDIENCE:?AUTH0_AUDIENCE is required}"
+      # Docker Desktopからホスト側に公開されたローカルAPIへ接続する。
+      MEMORIA_GRAPHQL_URL: "${MEMORIA_GRAPHQL_URL:-http://host.docker.internal:8080/graphql}"
+    ports:
+      - "127.0.0.1:3000:3000"

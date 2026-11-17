@@ -70,10 +70,23 @@ jobs:
       - name: Capture source commit
         id: source
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Select VRT Compose file from target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          # 移行前の対象branchには旧VRT定義が残る。新旧どちらも明示指定する。
+          if [[ -f compose.yaml ]]; then
+            echo "VRT_COMPOSE_FILE=compose.yaml" >> "$GITHUB_ENV"
+          elif [[ -f docker-compose.integration.yml ]]; then
+            echo "VRT_COMPOSE_FILE=docker-compose.integration.yml" >> "$GITHUB_ENV"
+          else
+            echo "VRT Compose definition not found." >&2
+            exit 1
+          fi
       - name: Verify Compose configuration
-        run: docker compose --profile vrt config --quiet
+        run: docker compose -f "$VRT_COMPOSE_FILE" --profile vrt config --quiet
       - name: Generate candidate screenshots
-        run: docker compose --profile vrt run --rm -e VRT_UPDATE=1 vrt
+        run: docker compose -f "$VRT_COMPOSE_FILE" --profile vrt run --rm -e VRT_UPDATE=1 vrt
       - name: Upload candidate images for inspection
         if: success()
         uses: actions/upload-artifact@v7

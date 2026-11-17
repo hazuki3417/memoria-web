@@ -81,34 +81,36 @@ CIでComposeの設定とDocker imageのbuildを検証します。ログイン・
 
 ### ローカルでのWeb runtime確認
 
-通常のDevboxによる開発は変更しません。EC2へ配置するDockerfile自体のbuild・実行、APIとの手動結合確認を行う場合に `docker-compose.integration.yml` を使用します。既存の `compose.yaml` はVRT専用のまま維持し、VRT workflowやnamed volumeを変更しません。ローカルruntime確認は別Compose project `memoria-web-integration` として実行します。
+APIと同じく、通常の開発環境の常駐サービスは `docker-compose.yml`、VRT・CIで利用する検証や開発支援タスクは `docker-compose.integration.yml` に分離します。通常のDevboxによる開発も引き続き利用できます。EC2へ配置するDockerfile自体のbuild・実行、APIとの手動結合確認は `docker-compose.yml` で行います。Webの常駐サービスは `memoria-web-development` projectで起動し、VRTは別projectのまま維持します。
 
 前提はWSL2 UbuntuとDocker Desktop（WSL integration有効）です。API側の標準開発サービスを既存手順で起動し、APIのhost port 8080とhealthを確認します。WebからはDocker Desktopの `host.docker.internal:8080/graphql` に接続します。別の接続先が必要な場合に限り `MEMORIA_GRAPHQL_URL` を設定します（container内のlocalhostはWeb自身です）。このComposeはAPI・DB・Redis・VRTを起動しません。
 
-初回のみ、Repository rootで次の設定ファイルを用意してください。
+初回のみ、Repository rootで次の設定ファイルを用意してください。既存の `.env` がある場合は上書きせず、必要な項目を確認してください。
 
 ```sh
-(umask 077; cp -n .env.integration.example .env.integration)
-chmod 600 .env.integration
+(umask 077; cp -n .env.example .env)
+chmod 600 .env
 ```
 
-`.env.integration` のダミー値を実際の開発用Auth0設定に置き換え、十分に強いsession secret（例：`openssl rand -hex 32`）を使用します。Auth0のDomain / AudienceはAPIの設定と一致させ、Callback URL `http://localhost:3000/auth/callback`、Logout URL `http://localhost:3000/login` を確認します。このファイルはGitとDocker build contextから除外し、設定値をログに出力しません。Webはhostのloopback:3000のみで公開するため、Next.jsの開発サーバーなど同じportを使うprocessは先に停止してください。
+`.env` のダミー値を実際の開発用Auth0設定に置き換え、十分に強いsession secret（例：`openssl rand -hex 32`）を使用します。Auth0のDomain / AudienceはAPIの設定と一致させ、Callback URL `http://localhost:3000/auth/callback`、Logout URL `http://localhost:3000/login` を確認します。このファイルはGitとDocker build contextから除外し、設定値をログに出力しません。Webはhostのloopback:3000のみで公開するため、Next.jsの開発サーバーなど同じportを使うprocessは先に停止してください。
 
 ```sh
 # 構成の検証（展開済みSecretを出力しない）
-docker compose --env-file .env.integration -f docker-compose.integration.yml config --quiet
+docker compose config --quiet
 
 # buildと起動
-docker compose --env-file .env.integration -f docker-compose.integration.yml up -d --build
+docker compose up -d --build
 
 # 状態・ログ
-docker compose --env-file .env.integration -f docker-compose.integration.yml ps
-docker compose --env-file .env.integration -f docker-compose.integration.yml logs -f web
+docker compose ps
+docker compose logs -f web
 
 # 停止・作成したcontainer / networkの削除（APIやVRTには影響しない）
-docker compose --env-file .env.integration -f docker-compose.integration.yml down
+docker compose down
 ```
 
 Windowsのブラウザで `http://localhost:3000` を開きます。Webのみの起動確認と、Auth0ログイン・実APIとの結合確認は区別してください。実際にログインしてサービスを利用するには有効な開発用Auth0設定、起動済みAPIおよび必要な開発データが必要です。
 
-ローカル用のimage tagは `memoria-web:local-integration` とし、deploy対象には使用しません。AWS向けには前節のcommit SHA / digestを使用します。VRTを実行する場合は従来どおり `docker compose --profile vrt run --rm vrt` を使用します。実際のDocker build・起動・ログイン・VRT回帰検証は未実施です。
+ローカル用のimage tagは `memoria-web:local-development` とし、deploy対象には使用しません。AWS向けには前節のcommit SHA / digestを使用します。VRTを実行する場合はIntegration用ファイルを明示して `docker compose -f docker-compose.integration.yml --profile vrt run --rm vrt` を使用します。実際のDocker build・起動・ログイン・VRT回帰検証は未実施です。
+
+以前の作業ブランチで `.env.integration` を作成した場合は、既存の `.env` を上書きせず必要な設定を移してください。以前の `memoria-web-integration` projectが起動中の場合は、新しいprojectの起動前に停止してください（旧設定を利用できる場合は旧ファイルで停止し、更新後は `docker compose -p memoria-web-integration --env-file .env.integration -f docker-compose.yml down` を使用できます）。

@@ -61,14 +61,14 @@ VRTはStorybookのCanvasを `iframe.html` で読み込む。まず `#storybook-r
 
 ## Docker Composeでの撮影（Phase 1）
 
-`compose.yaml`の`vrt`サービスは`profiles: [vrt]`により通常の`docker compose up`では起動しない。**常駐サービスではなくone-shot**として`docker compose run --rm`で実行し、終了時にコンテナを削除する。Storybookの起動・停止はPlaywright設定のwebServerが担当する。
+`docker-compose.integration.yml`の`vrt`サービスは`profiles: [vrt]`により通常の`docker compose up`では起動しない。**常駐サービスではなくone-shot**として`docker compose run --rm`で実行し、終了時にコンテナを削除する。Storybookの起動・停止はPlaywright設定のwebServerが担当する。通常のWeb起動用 `docker-compose.yml` と分離し、VRTのservice定義、image、named volume、撮影・比較処理は変更しない。Integration用ファイルを明示して実行する。
 
 ```bash
 # 通常比較（Baselineを変更しない）
-docker compose --profile vrt run --rm vrt
+docker compose -f docker-compose.integration.yml --profile vrt run --rm vrt
 
 # Baseline初回生成・意図した変更時の明示更新
-docker compose --profile vrt run --rm -e VRT_UPDATE=1 vrt
+docker compose -f docker-compose.integration.yml --profile vrt run --rm -e VRT_UPDATE=1 vrt
 
 # HTML Reportの確認
 npm run test:visual:report
@@ -94,7 +94,7 @@ GitHubの「Actions」→「VRT Docker Compose smoke test」→「Run workflow�
 /vrt baseline feature/group-browser
 ```
 
-GitHubプラグイン経由でも、明示された対象ブランチを用いて同じIssueへコメントすれば依頼できる。ただし、`issue_comment` で起動するWorkflow定義は**デフォルトブランチ（現在は `develop`）のもの**を使い、`checkout.ref` に指定した作業ブランチのWorkflow定義は使わない。したがって、作業ブランチ側でArtifactのアップロード・ダウンロード・`git add` を `tests/vrt/baselines/` に変更していても、デフォルトブランチが旧 `e2e/storybook-visual/__screenshots__/` を参照する間は候補生成後に失敗する。今回のRun #41023645018では120件の撮影が成功し、旧パスを参照したArtifactアップロードが失敗した。修正の反映後、別の対象ブランチからIssue #147経由でPR生成フローを再検証する。手動の `workflow_dispatch` には `target_branch` を指定する。
+GitHubプラグイン経由でも、明示された対象ブランチを用いて同じIssueへコメントすれば依頼できる。ただし、`issue_comment` で起動するWorkflow定義は**デフォルトブランチ（現在は `develop`）のもの**を使い、`checkout.ref` に指定した作業ブランチのWorkflow定義は使わない。したがって、作業ブランチ側でArtifactのアップロード・ダウンロード・`git add` を `tests/vrt/baselines/` に変更していても、デフォルトブランチが旧 `e2e/storybook-visual/__screenshots__/` を参照する間は候補生成後に失敗する。今回のRun #41023645018では120件の撮影が成功し、旧パスを参照したArtifactアップロードが失敗した。修正の反映後、別の対象ブランチからIssue #147経由でPR生成フローを再検証する。手動の `workflow_dispatch` には `target_branch` を指定する。新しいBaseline生成Workflowはcheckoutした対象branchに旧 `compose.yaml` があればそれを、なければ `docker-compose.integration.yml` を明示指定する。このWorkflowがデフォルトブランチへ統合されるまでは、新しいファイル配置のbranchに対して旧 `issue_comment` 経路を使用しない。
 
 対象ブランチの最新コミットを読み取り専用ジョブでDocker撮影し、候補画像をArtifactへ保存。別の書き込み権限付きジョブが**画像だけ**を`chore/vrt-baseline-<branch-hash>`へコミットし、対象ブランチ宛てのPRを作成・更新する。撮影時点から対象ブランチが変わった場合はエラーにして再依頼する。同一対象への再実行では既存の未マージPRを使用し、自動生成専用ブランチを`--force-with-lease`で安全に置き換える（レビュー済み画像に差分が再発するため再レビュー必須）。差分がなければ新規コミットを作らない。PR承認・マージは**人間のみ**が実行する。
 
