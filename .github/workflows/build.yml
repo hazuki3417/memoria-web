@@ -26,6 +26,8 @@ on:
       - 'scripts/link-dev-assets.mjs'
       - 'public/**'
       - 'storybook-assets/**'
+  push:
+    branches: [develop]
   workflow_dispatch:
 
 permissions:
@@ -67,3 +69,35 @@ jobs:
       - name: Clean up runtime containers
         if: always()
         run: MEMORIA_WEB_IMAGE="memoria-web:${GITHUB_SHA}" docker compose --env-file .env.example -f docker-compose.yml down --remove-orphans
+
+  publish-ghcr:
+    name: GHCR / Web Image
+    needs: build
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build reviewed runtime image for linux/amd64
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${IMAGE_OWNER,,}/memoria-web:${GITHUB_SHA}"
+          docker build --platform linux/amd64 -f docker/runtime/Dockerfile --target runtime -t "$image" .
+      - name: Login to GHCR with short-lived workflow token
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+      - name: Publish commit-specific private image
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${IMAGE_OWNER,,}/memoria-web:${GITHUB_SHA}"
+          docker push "$image"
+          echo "Web image: \`$image\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "デプロイ時はPush出力のdigestを確認して \`ghcr.io/.../memoria-web@sha256:...\` を指定してください。" >> "$GITHUB_STEP_SUMMARY"
