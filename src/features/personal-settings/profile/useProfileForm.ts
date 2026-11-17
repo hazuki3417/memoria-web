@@ -75,7 +75,7 @@ export const useProfileForm = ({
       !form.formState.isDirty &&
       !processState.busy &&
       status.kind === "idle" &&
-      baseline !== (initialNickname)
+      baseline !== initialNickname
     ) {
       reset({ nickname: initialNickname })
     }

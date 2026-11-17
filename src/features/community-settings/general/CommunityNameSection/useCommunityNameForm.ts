@@ -79,7 +79,7 @@ export const useCommunityNameForm = ({
       !form.formState.isDirty &&
       !processState.busy &&
       status.kind === "idle" &&
-      baseline !== (initialName)
+      baseline !== initialName
     ) {
       reset({ name: initialName })
     }
