@@ -99,9 +99,9 @@ jobs:
           set -euo pipefail
           image="ghcr.io/${IMAGE_OWNER,,}/memoria-web:${GITHUB_SHA}"
           docker push "$image" | tee "$RUNNER_TEMP/ghcr-push.log"
-          digest="$(sed -nE 's/.*digest: (sha256:[0-9a-f]{64}).*/\\1/p' "$RUNNER_TEMP/ghcr-push.log" | tail -n 1)"
+          digest="$(sed -nE 's/.*digest: (sha256:[0-9a-f]{64}).*/\1/p' "$RUNNER_TEMP/ghcr-push.log" | tail -n 1)"
           if [[ ! "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
             echo "GHCR PushのManifest Digestを取得できません。" >&2
             exit 1
           fi
-          printf 'Image: \`%s@%s\`\\n' "${image%:*}" "$digest" >> "$GITHUB_STEP_SUMMARY"
+          printf 'Image: `%s@%s`\n' "${image%:*}" "$digest" >> "$GITHUB_STEP_SUMMARY"
