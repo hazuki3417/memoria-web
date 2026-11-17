@@ -76,7 +76,7 @@ npm ci
 npm run dev:next
 ```
 
-Storybookは`npm run dev:storybook`で起動します。シークレット、ローカル環境ファイル、Playwrightレポート、build生成物をコミットしません。
+Storybookは`npm run dev:storybook`で起動します。DockerによるWebの常駐サービスとVRTの実行手順はREADMEおよび`tests/vrt/README.md`を参照します。シークレット、ローカル環境ファイル、Playwrightレポート、build生成物をコミットしません。
 
 ### Storybook・画面設計の正本
 
@@ -92,8 +92,9 @@ Storybookは`npm run dev:storybook`で起動します。シークレット、ロ
 Quality Gateは再実装期間中のため一時停止しています。変更内容に応じてローカルでBiome、TypeScript、Vitest、Next.js build、Storybook build、VRTを実行します。
 
 ```sh
-npm run check
-npm run typecheck
+npm run check:format
+npm run check:lint
+npm run check:type
 npm run test:unit
 npm run build
 npm run build:storybook

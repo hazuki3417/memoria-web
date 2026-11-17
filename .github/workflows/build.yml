@@ -6,6 +6,8 @@ on:
     paths:
       - 'src/app/**'
       - 'src/components/**'
+      - 'src/ui/**'
+      - 'src/hooks/**'
       - 'src/features/**'
       - 'src/infrastructure/**'
       - 'src/lib/**'
@@ -20,6 +22,7 @@ on:
       - '.github/workflows/build.yml'
       - '.dockerignore'
       - 'next.config.mjs'
+      - 'tsconfig.json'
       - 'scripts/link-dev-assets.mjs'
       - 'public/**'
       - 'storybook-assets/**'

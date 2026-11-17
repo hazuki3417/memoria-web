@@ -44,8 +44,9 @@ Devbox shellを終了する場合は`exit`を実行します。
 Quality Gateは再実装期間中のため一時停止しています。ローカルでは変更内容に応じて次を実行します。
 
 ```sh
-npm run check
-npm run typecheck
+npm run check:format
+npm run check:lint
+npm run check:type
 npm run test:unit
 npm run build
 npm run build:storybook
@@ -111,6 +112,6 @@ docker compose down
 
 Windowsのブラウザで `http://localhost:3000` を開きます。Webのみの起動確認と、Auth0ログイン・実APIとの結合確認は区別してください。実際にログインしてサービスを利用するには有効な開発用Auth0設定、起動済みAPIおよび必要な開発データが必要です。
 
-ローカル用のimage tagは `memoria-web:local-development` とし、deploy対象には使用しません。AWS向けには前節のcommit SHA / digestを使用します。VRTを実行する場合はIntegration用ファイルを明示して `docker compose -f docker-compose.integration.yml --profile vrt run --rm vrt` を使用します。実際のDocker build・起動・ログイン・VRT回帰検証は未実施です。
+ローカル用のimage tagは `memoria-web:local-development` とし、deploy対象には使用しません。AWS向けには前節のcommit SHA / digestを使用します。コンテナによるVRTを実行する場合はIntegration用ファイルを明示して `docker compose -f docker-compose.integration.yml --profile vrt run --rm vrt` を使用します。既存の `npm run test:visual` とVS CodeのVRT taskは従来のDevbox上での直接実行を維持します。実際のDocker build・起動・ログイン・VRT回帰検証は未実施です。
 
 以前の作業ブランチで `.env.integration` を作成した場合は、既存の `.env` を上書きせず必要な設定を移してください。以前の `memoria-web-integration` projectが起動中の場合は、新しいprojectの起動前に停止してください（旧設定を利用できる場合は旧ファイルで停止し、更新後は `docker compose -p memoria-web-integration --env-file .env.integration -f docker-compose.yml down` を使用できます）。

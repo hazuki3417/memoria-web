@@ -19,7 +19,7 @@ npm run test:visual:update
 npm run test:visual
 ```
 
-Storybookはテスト起動時に自動起動します。基準画像は `tests/vrt/__screenshots__` に保存し、表示変更の意図を確認したうえでコミットしてください。
+Storybookはテスト起動時に自動起動します。基準画像は `tests/vrt/baselines/` に保存し、表示変更の意図を確認したうえでコミットしてください。
 
 `index.json` の `type: story` のうち、`vrt` タグが明示的に付いたStoryだけを撮影します（Opt-in方式）。すべてのVRT対象Storyを、固定の **Compact (375×812)、Medium (1024×768)、Wide (1440×900)** の3幅で撮影します。Storyごとの撮影幅設定は設けません。代表値の定義は `.storybook/responsiveViewports.ts` に置きます。正式な分類境界は Compact: 768px未満 / Medium: 768px以上1408px未満 / Wide: 1408px以上です。代表撮影幅はレイアウト切替点を意味しません。 `vrt-modal` タグはPortal上のModalの可視性確認にのみ使用します。
 
@@ -61,7 +61,7 @@ VRTはStorybookのCanvasを `iframe.html` で読み込む。まず `#storybook-r
 
 ## Docker Composeでの撮影（Phase 1）
 
-`docker-compose.integration.yml`の`vrt`サービスは`profiles: [vrt]`により通常の`docker compose up`では起動しない。**常駐サービスではなくone-shot**として`docker compose run --rm`で実行し、終了時にコンテナを削除する。Storybookの起動・停止はPlaywright設定のwebServerが担当する。通常のWeb起動用 `docker-compose.yml` と分離し、VRTのservice定義、image、named volume、撮影・比較処理は変更しない。Integration用ファイルを明示して実行する。
+`docker-compose.integration.yml`の`vrt`サービスは`profiles: [vrt]`により通常の`docker compose up`では起動しない。**常駐サービスではなくone-shot**として`docker compose -f docker-compose.integration.yml --profile vrt run --rm vrt`で実行し、終了時にコンテナを削除する。Storybookの起動・停止はPlaywright設定のwebServerが担当する。通常のWeb起動用 `docker-compose.yml` と分離し、VRTのservice定義、image、named volume、撮影・比較処理は変更しない。Integration用ファイルを明示して実行する。
 
 ```bash
 # 通常比較（Baselineを変更しない）
@@ -74,7 +74,7 @@ docker compose -f docker-compose.integration.yml --profile vrt run --rm -e VRT_U
 npm run test:visual:report
 ```
 
-公式Playwright Dockerイメージ`mcr.microsoft.com/playwright:v1.62.1-noble`を共通利用する。環境変数`MEMORIA_VRT_IMAGE`でイメージを上書きできるが、生成と比較では同一イメージを指定する。タグはまだdigest未固定であり、実機検証後に固定する。Playwrightはlockfileの`1.62.1`を要求し、Node.js 24との互換性を撮影前に検査する。公式イメージのNode.js 24対応は未確認であり、不一致の場合は**撮影を開始せず失敗する**。専用イメージの必要性は結果を踏まえ再協議する。
+公式Playwright Dockerイメージ`mcr.microsoft.com/playwright:v1.64.1-noble`を共通利用する。環境変数`MEMORIA_VRT_IMAGE`でイメージを上書きできるが、生成と比較では同一イメージを指定する。タグはまだdigest未固定であり、実機検証後に固定する。Playwrightはlockfileの`1.64.1`を要求し、Node.js 24との互換性を撮影前に検査する。公式イメージのNode.js 24対応は未確認であり、不一致の場合は**撮影を開始せず失敗する**。専用イメージの必要性は結果を踏まえ再協議する。
 
 Composeはソースをbind mountし、Linux用依存関係をnamed volume`vrt-node-modules`へ分離する。one-shot起動ごとに`npm ci`を実行し、依存状態をlockfileに合わせる。公式Playwrightイメージのデフォルトユーザー（root）で実行し、初期状態でroot所有のnamed volumeへ`npm ci`を書き込めるようにする。これは初回CIで発生した`EACCES`への暫定対応であり、bind mount先に生成されるBaselineやレポートがroot所有になる可能性がある。実運用前にファイル所有権と非root化を検討する。Linux/WSL2での動作、フォント・画像一致、Baselineの再現性、実際のテスト成功はいずれも未検証。PR上の動作確認専用Workflow（`.github/workflows/vrt-compose.yml`）を追加する。これはCompose設定・実行環境と通常比較を検証し、Baselineを更新・コミットしない。承認済みBaselineが存在しない間、比較は失敗する可能性があるため、環境構築の失敗とBaseline未登録を区別する。通常のQuality Gateへの統合・必須チェック化は後続Phaseで判断する。
 
