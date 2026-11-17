@@ -14,7 +14,7 @@ on:
       - '!src/**/*.stories.*'
       - 'package.json'
       - 'package-lock.json'
-      - 'Dockerfile'
+      - 'docker/runtime/**'
       - '.dockerignore'
       - 'next.config.mjs'
       - 'scripts/link-dev-assets.mjs'
@@ -50,4 +50,4 @@ jobs:
       - name: Next.js production build
         run: npm run build:next
       - name: Build Development runtime image
-        run: docker build -t "memoria-web:${GITHUB_SHA}" .
+        run: docker build -f docker/runtime/Dockerfile -t "memoria-web:${GITHUB_SHA}" .
