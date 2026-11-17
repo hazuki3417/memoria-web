@@ -6,7 +6,7 @@ import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { usePersonalSettingsRefreshError } from "../usePersonalSettingsRefreshError"
 
 /** Usage-scoped read and retry; status UI belongs to the common Host. */
-export const ConnectedPersonalUsage = ({ render }: { render: SettingsSectionRender }) => {
+export const PersonalUsage = ({ render }: { render: SettingsSectionRender }) => {
   const personal = usePersonalUsageQuery({
     fetchPolicy: "network-only",
     refetchWritePolicy: "merge",

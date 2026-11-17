@@ -6,9 +6,9 @@ import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSe
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { Profile } from "../profile"
-import { PersonalPreferences } from "../preferences/PersonalPreferences"
-import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
-import { Account } from "../account/Account"
+import { PersonalPreferences } from "../preferences"
+import { PersonalUsage } from "../usage"
+import { Account } from "../account"
 import { usePersonalSettingsAccentColor } from "./usePersonalSettingsAccentColor"
 
 const sectionStatusMessages = {
@@ -56,7 +56,7 @@ export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
       controller = (render) => render({ status: "ready", content: <Account /> })
       break
     case "usage":
-      controller = (render) => <ConnectedPersonalUsage render={render} />
+      controller = (render) => <PersonalUsage render={render} />
       break
   }
 

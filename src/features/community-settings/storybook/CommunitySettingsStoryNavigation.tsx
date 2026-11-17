@@ -4,8 +4,8 @@ import { useState } from "react"
 import { CommunitySettingsView } from "../CommunitySettingsView"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import type { ReactNode } from "react"
-import { CommunityGeneral } from "../general/CommunityGeneral"
-import { CommunityMembers } from "../members"
+import { CommunityGeneralView } from "../general/CommunityGeneralView"
+import { CommunityMembersView } from "../members/CommunityMembersView"
 import type { CommunityMember } from "../members"
 import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
 import { CommunityPreferencesView } from "../preferences"
@@ -64,7 +64,7 @@ export function CommunitySettingsStoryNavigation({
   switch (currentSection) {
     case "general":
       content = (
-        <CommunityGeneral
+        <CommunityGeneralView
           name={{
             communityName: props.communityName,
             onSaveName: props.onSaveName,
@@ -79,7 +79,7 @@ export function CommunitySettingsStoryNavigation({
       break
     case "members":
       content = (
-        <CommunityMembers
+        <CommunityMembersView
           members={props.members}
           onChangeRole={props.onChangeMemberRole}
           onRemoveMember={props.onRemoveMember}

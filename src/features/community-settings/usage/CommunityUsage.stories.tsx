@@ -6,13 +6,14 @@ import { expect, userEvent, within } from "storybook/test"
 import { graphqlUsageFixture, emptyGraphqlUsageFixture } from "@/features/usage/usageStoryFixtures"
 import { CommunitySettingsUsageDocument } from "@/infrastructure/graphql/generated"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
-import { ConnectedCommunityUsage } from "./ConnectedCommunityUsage"
+import { CommunityUsage } from "./CommunityUsage"
 
 const meta = {
-  title: "features/community-settings/usage/ConnectedCommunityUsage",
-  component: ConnectedCommunityUsage,
+  id: "features-community-settings-usage-connectedcommunityusage",
+  title: "features/community-settings/usage/CommunityUsage",
+  component: CommunityUsage,
   args: { communityId: "club-a", render: () => null },
-} satisfies Meta<typeof ConnectedCommunityUsage>
+} satisfies Meta<typeof CommunityUsage>
 export default meta
 type Story = StoryObj<typeof meta>
 
@@ -55,10 +56,10 @@ const otherCommunityUsage = {
 }
 
 
-function ConnectedCommunityUsageStory({ communityId }: { communityId: string }) {
+function CommunityUsageStory({ communityId }: { communityId: string }) {
   return (
     <SettingsSectionHost label="利用状況を読み込み中" errorTitle="利用状況を取得できませんでした">
-      {(render) => <ConnectedCommunityUsage communityId={communityId} render={render} />}
+      {(render) => <CommunityUsage communityId={communityId} render={render} />}
     </SettingsSectionHost>
   )
 }
@@ -68,12 +69,12 @@ function CommunitySwitchScenario() {
   return (
     <>
       <Button onClick={() => setCommunityId("club-b")}>Community Bへ切り替え</Button>
-      <ConnectedCommunityUsageStory communityId={communityId} />
+      <CommunityUsageStory communityId={communityId} />
     </>
   )
 }
 
-const connectedRender = () => <ConnectedCommunityUsageStory communityId="club-a" />
+const connectedRender = () => <CommunityUsageStory communityId="club-a" />
 
 // SC-02・ST-04・FM-01: Apolloの実HookとAdapterを通したCommunity Usage表示。
 export const CommunityReady: Story = {

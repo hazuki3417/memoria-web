@@ -4,14 +4,14 @@ import { GraphQLError } from "graphql"
 import { expect, userEvent, waitFor, within } from "storybook/test"
 import { CommunitySettingsGeneralDocument, CommunitySettingsNameInspectionDocument, UpdateCommunityDocument } from "@/infrastructure/graphql/generated"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
-import { ConnectedCommunityGeneral } from "./ConnectedCommunityGeneral"
+import { CommunityGeneral } from "./CommunityGeneral"
 
 /** Production General Controller and its Section-scoped Query. */
-function ConnectedCommunityGeneralStory() {
+function CommunityGeneralStory() {
   return (
     <SettingsSectionHost label="Community設定を読み込み中">
       {(render) => (
-        <ConnectedCommunityGeneral communityId="club-a" render={render} />
+        <CommunityGeneral communityId="club-a" render={render} />
       )}
     </SettingsSectionHost>
   )
@@ -54,9 +54,10 @@ const generalFailure = {
 const generalLoading = { ...generalSuccess, delay: 15_000 }
 
 const meta = {
-  title: "features/community-settings/general/ConnectedCommunityGeneral",
-  component: ConnectedCommunityGeneralStory,
-} satisfies Meta<typeof ConnectedCommunityGeneralStory>
+  id: "features-community-settings-general-connectedcommunitygeneral",
+  title: "features/community-settings/general/CommunityGeneral",
+  component: CommunityGeneralStory,
+} satisfies Meta<typeof CommunityGeneralStory>
 export default meta
 type Story = StoryObj<typeof meta>
 

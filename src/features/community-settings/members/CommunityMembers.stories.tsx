@@ -3,14 +3,14 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import { CommunitySettingsMembersDocument } from "@/infrastructure/graphql/generated"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
-import { ConnectedCommunityMembers } from "./ConnectedCommunityMembers"
+import { CommunityMembers } from "./CommunityMembers"
 
 /** Query/Mutation are owned by the selected Members controller. */
-function ConnectedCommunityMembersStory() {
+function CommunityMembersStory() {
   return (
     <SettingsSectionHost label="Community設定を読み込み中">
       {(render) => (
-        <ConnectedCommunityMembers
+        <CommunityMembers
           communityId="club-a"
           onLeaveSuccess={() => undefined}
           render={render}
@@ -44,9 +44,10 @@ const membersFailure = {
 const membersLoading = { ...membersSuccess, delay: 15_000 }
 
 const meta = {
-  title: "features/community-settings/members/ConnectedCommunityMembers",
-  component: ConnectedCommunityMembersStory,
-} satisfies Meta<typeof ConnectedCommunityMembersStory>
+  id: "features-community-settings-members-connectedcommunitymembers",
+  title: "features/community-settings/members/CommunityMembers",
+  component: CommunityMembersStory,
+} satisfies Meta<typeof CommunityMembersStory>
 export default meta
 type Story = StoryObj<typeof meta>
 

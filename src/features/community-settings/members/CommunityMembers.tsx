@@ -1,53 +1,65 @@
 "use client"
 
-import { Stack } from "@mantine/core"
-import { PageHeader } from "@/components/PageHeader"
+import { useCommunitySettingsMembersQuery } from "@/infrastructure/graphql/generated"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
+import { CommunityMembersView } from "./CommunityMembersView"
 import type { CommunityMember } from "@/features/community/CommunityProvider"
-import { CommunityMemberRemovalModal } from "./CommunityMemberRemovalModal"
-import { CommunityMemberRoleModal } from "./CommunityMemberRoleModal"
-import { CommunityLeaveModal } from "./CommunityLeaveModal"
-import { CommunityMembersTableSection } from "./CommunityMembersTableSection"
-import { CommunityLeaveSection } from "./CommunityLeaveSection"
-import {
-  useCommunityMembersState,
-  type CommunityMembersActions,
-} from "./useCommunityMembersState"
+import { useCommunityMemberRemovalAction } from "./useCommunityMemberRemovalAction"
+import { useCommunityLeaveAction } from "./useCommunityLeaveAction"
+import { useCommunityRoleChangeAction } from "./useCommunityRoleChangeAction"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
-
-const previewMembers: CommunityMember[] = [
-  { id: "self", name: "ユーザー", role: "admin", isSelf: true },
-  { id: "m1", name: "山田 花子", role: "admin" },
-  { id: "m2", name: "佐藤 葵", role: "member" },
-  { id: "m3", name: "鈴木 太郎", role: "member" },
-]
-
-// The API defines the default order: self first, then nickname ascending.
-export function CommunityMembers({
-  members = previewMembers,
-  onLeave,
+/** Members owns only the selected listing and relevant member actions. */
+export const CommunityMembers = ({
+  communityId,
   onLeaveSuccess,
-  onChangeRole,
-  onRemoveMember,
-}: { members?: CommunityMember[] } & CommunityMembersActions) {
-  const state = useCommunityMembersState({
-    members, onLeave, onLeaveSuccess, onChangeRole, onRemoveMember,
+  render,
+}: {
+  communityId: string
+  onLeaveSuccess: () => void
+  render: SettingsSectionRender
+}) => {
+  const query = useCommunitySettingsMembersQuery({
+    variables: { communityId },
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
   })
-  return (
-    <Stack gap="xl">
-      <PageHeader
-        title="メンバー"
-        description="Communityの参加者と役割を確認します。"
-      />
-      <CommunityMembersTableSection
-        members={members}
-        state={state}
-        onChangeRole={onChangeRole}
+  const { onRemoveMember } = useCommunityMemberRemovalAction(communityId)
+  const { onLeaveCommunity } = useCommunityLeaveAction(communityId)
+  const { onChangeMemberRole } = useCommunityRoleChangeAction(communityId)
+  const members = query.data?.communityMembers
+  const selfId = query.data?.me?.id
+  const ready = Boolean(query.data?.community && members && selfId !== undefined)
+
+  useCommunitySettingsRefreshError(Boolean(ready && query.error))
+  if (!ready || !members || selfId === undefined) {
+    return render(
+      query.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void query.refetch().catch(() => undefined) },
+          },
+    )
+  }
+
+  const viewMembers: CommunityMember[] = members.map((member) => ({
+    id: member.userId,
+    name: member.nickname,
+    role: member.role,
+    isSelf: member.userId === selfId,
+  }))
+
+  return render({
+    status: "ready",
+    content: (
+      <CommunityMembersView
+        members={viewMembers}
+        onChangeRole={onChangeMemberRole}
         onRemoveMember={onRemoveMember}
+        onLeave={onLeaveCommunity}
+        onLeaveSuccess={onLeaveSuccess}
       />
-      <CommunityLeaveSection state={state} onLeave={onLeave} />
-      <CommunityMemberRemovalModal state={state} />
-      <CommunityMemberRoleModal state={state} onChangeRole={onChangeRole} />
-      <CommunityLeaveModal state={state} onLeave={onLeave} />
-    </Stack>
-  )
+    ),
+  })
 }

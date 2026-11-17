@@ -11,7 +11,7 @@ import { Account } from "./account"
 import { PersonalPreferences } from "./preferences"
 import { defaultPersonalPreferences } from "./preferences/personalPreferences"
 import { Profile } from "./profile"
-import { ConnectedPersonalUsage } from "./usage/ConnectedPersonalUsage"
+import { PersonalUsage } from "./usage"
 
 const profileMock = {
   request: { query: PersonalSettingsProfileDocument },
@@ -34,7 +34,7 @@ const PersonalSettingsStory = () => {
       case "profile": return <Profile render={render} />
       case "preferences": return <PersonalPreferences render={render} />
       case "account": return render({ status: "ready", content: <Account /> })
-      case "usage": return <ConnectedPersonalUsage render={render} />
+      case "usage": return <PersonalUsage render={render} />
     }
   }
   return (

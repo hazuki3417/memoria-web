@@ -3,10 +3,10 @@
 import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSectionHost"
-import { ConnectedCommunityGeneral } from "../general/ConnectedCommunityGeneral"
-import { ConnectedCommunityMembers } from "../members/ConnectedCommunityMembers"
+import { CommunityGeneral } from "../general"
+import { CommunityMembers } from "../members"
 import { CommunityPreferences } from "../preferences"
-import { ConnectedCommunityUsage } from "../usage/ConnectedCommunityUsage"
+import { CommunityUsage } from "../usage"
 import { CommunitySettingsView } from "../CommunitySettingsView"
 import { useCommunityMySettingsQuery } from "@/infrastructure/graphql/generated"
 import { useOptionalCommunityAccentPreview } from "@/features/application-shell"
@@ -62,12 +62,12 @@ export const CommunitySettingsRoute = ({
   switch (section) {
     case "general":
       controller = (render) => (
-        <ConnectedCommunityGeneral communityId={communityId} render={render} />
+        <CommunityGeneral communityId={communityId} render={render} />
       )
       break
     case "members":
       controller = (render) => (
-        <ConnectedCommunityMembers
+        <CommunityMembers
           communityId={communityId}
           onLeaveSuccess={() => router.push("/dashboard")}
           render={render}
@@ -76,7 +76,7 @@ export const CommunitySettingsRoute = ({
       break
     case "usage":
       controller = (render) => (
-        <ConnectedCommunityUsage communityId={communityId} render={render} />
+        <CommunityUsage communityId={communityId} render={render} />
       )
       break
     case "preferences":
