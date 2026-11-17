@@ -15,6 +15,9 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'docker/runtime/**'
+      - 'docker-compose.integration.yml'
+      - '.env.integration.example'
+      - '.github/workflows/build.yml'
       - '.dockerignore'
       - 'next.config.mjs'
       - 'scripts/link-dev-assets.mjs'
@@ -49,5 +52,7 @@ jobs:
       - run: npm ci
       - name: Next.js production build
         run: npm run build:next
+      - name: Validate local runtime Compose configuration
+        run: docker compose --env-file .env.integration.example -f docker-compose.integration.yml config --quiet
       - name: Build Development runtime image
-        run: docker build -f docker/runtime/Dockerfile -t "memoria-web:${GITHUB_SHA}" .
+        run: MEMORIA_WEB_IMAGE="memoria-web:${GITHUB_SHA}" docker compose --env-file .env.integration.example -f docker-compose.integration.yml build web
