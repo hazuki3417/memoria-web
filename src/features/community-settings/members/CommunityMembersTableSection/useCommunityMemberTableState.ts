@@ -8,10 +8,10 @@ import {
   type CommunityMemberSortKey,
 } from "./communityMemberTableRows"
 
-/** Owns the search, stable default ordering and three-state column sorting. */
+/** Owns name search and two-direction single-column sorting. */
 export function useCommunityMemberTableState(members: CommunityMember[]) {
   const [query, setQuery] = useState("")
-  const [sort, setSort] = useState<CommunityMemberSort>(null)
+  const [sort, setSort] = useState<CommunityMemberSort>({ key: "name", direction: "asc" })
   const rows = useMemo(
     () => selectCommunityMemberRows(members, query, sort),
     [members, query, sort],
@@ -20,11 +20,11 @@ export function useCommunityMemberTableState(members: CommunityMember[]) {
     setSort((current) => {
       if (current?.key !== key) return { key, direction: "asc" }
       if (current.direction === "asc") return { key, direction: "desc" }
-      return null
+      return { key, direction: "asc" }
     })
   }
   const ariaSort = (key: CommunityMemberSortKey): "ascending" | "descending" | "none" =>
-    sort?.key === key
+    sort.key === key
       ? sort.direction === "asc"
         ? "ascending"
         : "descending"
