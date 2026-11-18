@@ -16,7 +16,7 @@ import {
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { FeedbackPanel, showNotification } from "@/components/Feedback"
-import type { CommunityDeletionAcceptanceOutcome } from "@/features/community-deletion"
+import type { CommunityDeletionAcceptanceOutcome } from "../useCommunityDeletionAcceptance"
 
 type Props = {
   communityId: string

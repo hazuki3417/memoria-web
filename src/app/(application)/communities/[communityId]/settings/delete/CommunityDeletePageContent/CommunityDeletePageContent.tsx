@@ -3,8 +3,7 @@
 import { Alert, Button, Stack } from "@mantine/core"
 import { useParams } from "next/navigation"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
-import { CommunityDeletionConfirmation } from "@/features/community-settings"
-import { useCommunityDeletionAcceptance } from "@/features/community-deletion"
+import { CommunityDeletionConfirmation, useCommunityDeletionAcceptance } from "@/features/community-deletion"
 import { useCommunityDeletionSnapshotQuery } from "@/infrastructure/graphql/generated"
 
 export function CommunityDeletePageContent() {
