@@ -4,11 +4,8 @@ import { Alert, Button, Stack } from "@mantine/core"
 import { useParams } from "next/navigation"
 import { LoadingBoundary } from "@/components/LoadingBoundary/LoadingBoundary"
 import { CommunityDeletionConfirmation } from "@/features/community-settings"
-import {
-  MyCommunitiesDocument,
-  useAcceptCommunityDeletionMutation,
-  useCommunityDeletionSnapshotQuery,
-} from "@/infrastructure/graphql/generated"
+import { useCommunityDeletionAcceptance } from "@/features/community-deletion"
+import { useCommunityDeletionSnapshotQuery } from "@/infrastructure/graphql/generated"
 
 export function CommunityDeletePageContent() {
   const { communityId } = useParams<{ communityId: string }>()
@@ -16,7 +13,7 @@ export function CommunityDeletePageContent() {
     variables: { communityId },
     fetchPolicy: "network-only",
   })
-  const [acceptDeletion] = useAcceptCommunityDeletionMutation()
+  const { acceptDeletion } = useCommunityDeletionAcceptance(communityId)
   const snapshot = data?.communityDeletionSnapshot
 
   if (loading)
@@ -45,28 +42,7 @@ export function CommunityDeletePageContent() {
       communityName={snapshot.name}
       managedMediaCount={snapshot.managedMediaCount}
       isAdministrator
-      onDelete={async () => {
-        try {
-          const result = await acceptDeletion({
-            variables: { input: { communityId, revision: snapshot.revision } },
-            refetchQueries: [MyCommunitiesDocument],
-            awaitRefetchQueries: true,
-          })
-          if (!result.data?.acceptCommunityDeletion.accepted)
-            throw new Error("ACCEPTANCE_UNCONFIRMED")
-        } catch (caught) {
-          const graphError = caught as {
-            graphQLErrors?: Array<{ extensions?: { code?: string } }>
-          }
-          if (
-            graphError.graphQLErrors?.some(
-              (item) => item.extensions?.code === "CONFLICT",
-            )
-          )
-            throw new Error("REVIEW_CHANGED")
-          throw caught
-        }
-      }}
+      onDelete={() => acceptDeletion(snapshot.revision)}
       onReviewChanged={() => void refetch()}
     />
   )

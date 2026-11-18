@@ -1,0 +1,1 @@
+export { useCommunityDeletionAcceptance } from "./useCommunityDeletionAcceptance"
