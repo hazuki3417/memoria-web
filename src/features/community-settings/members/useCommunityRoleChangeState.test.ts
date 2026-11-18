@@ -14,7 +14,7 @@ let host: HTMLDivElement | undefined
 let root: Root | undefined
 let state!: ReturnType<typeof useCommunityRoleChangeState>
 
-async function mount({
+const mount = async ({
   onChangeRole,
   adminCount = 2,
   adminLimitReached = false,
@@ -22,7 +22,7 @@ async function mount({
   onChangeRole?: (userId: string, role: "admin" | "member") => Promise<boolean>
   adminCount?: number
   adminLimitReached?: boolean
-}) {
+}) => {
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
@@ -97,7 +97,7 @@ describe("Role変更の既存State制約", () => {
       state.setSelectedRole("admin")
     })
     let pending!: Promise<void>
-    await act(async () => {
+    act(() => {
       pending = state.confirmRoleChange()
     })
     expect(state.roleBusy).toBe(true)

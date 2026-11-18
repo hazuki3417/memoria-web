@@ -19,7 +19,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-async function confirmDeletion(canvasElement: HTMLElement) {
+const confirmDeletion = async (canvasElement: HTMLElement) => {
   const canvas = within(canvasElement)
   await userEvent.click(canvas.getByRole("button", { name: "次へ" }))
   await userEvent.click(canvas.getByRole("button", { name: "次へ" }))

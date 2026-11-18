@@ -290,9 +290,9 @@ export const RemoveMemberFailureContract: Story = {
 
 /** A self demotion uses the same row menu and role Modal, not the leave action. */
 /** Mirrors a refreshed membership after confirmed self demotion. */
-function SelfDemotionUpdatedMembershipFixture(
+const SelfDemotionUpdatedMembershipFixture = (
   args: ComponentProps<typeof CommunitySettingsStoryNavigation>,
-) {
+) => {
   const [members, setMembers] = useState<Array<{
     id: string
     name: string
@@ -308,6 +308,7 @@ function SelfDemotionUpdatedMembershipFixture(
       section="members"
       role={members[0].role}
       members={members}
+      onLeaveCommunity={async () => undefined}
       onChangeMemberRole={async (userId, role) => {
         setMembers((current) => current.map((member) =>
           member.id === userId ? { ...member, role } : member,
