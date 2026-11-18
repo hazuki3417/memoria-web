@@ -16,13 +16,14 @@ import {
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { FeedbackPanel, showNotification } from "@/components/Feedback"
+import type { CommunityDeletionAcceptanceOutcome } from "@/features/community-deletion"
 
 type Props = {
   communityId: string
   communityName: string
   managedMediaCount: number
   isAdministrator: boolean
-  onDelete?: () => Promise<void>
+  onDelete?: () => Promise<CommunityDeletionAcceptanceOutcome>
   onReviewChanged?: () => void
   onNavigate?: (href: string) => void
 }
@@ -63,31 +64,58 @@ export function CommunityDeletionConfirmation({
     setBusy(true)
     setError("")
     try {
-      await onDelete()
-      setCompleted(true)
-      showNotification({
-        kind: "success",
-        title: "Community削除の受付",
-        description:
-          "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
-      })
-      navigate("/dashboard")
-    } catch (caught) {
-      const changed =
-        caught instanceof Error && caught.message === "REVIEW_CHANGED"
-      setError(
-        changed
-          ? "削除対象の状態が変わりました。最新の内容で確認をやり直してください。"
-          : "削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。",
-      )
-      if (changed) onReviewChanged?.()
-      else setOutcomeUnknown(true)
-      showNotification({
-        kind: "error",
-        title: "Communityを削除",
-        description:
-          "最新の状態を確認してください。結果不明の操作を無条件に再実行しないでください。",
-      })
+      const result = await onDelete()
+      switch (result.kind) {
+        case "accepted":
+          setCompleted(true)
+          showNotification({
+            kind: "success",
+            title: "Community削除の受付",
+            description:
+              "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
+          })
+          if (result.sync === "failed") {
+            showNotification({
+              kind: "warning",
+              title: "Community一覧を更新できませんでした",
+              description:
+                "削除受付は完了しています。Dashboardで最新のCommunity一覧を確認してください。削除を再送しないでください。",
+            })
+          }
+          navigate("/dashboard")
+          break
+        case "review-changed":
+          setError("削除対象の状態が変わりました。最新の内容で確認をやり直してください。")
+          showNotification({
+            kind: "warning",
+            title: "削除対象の状態が変更されました",
+            description: "最新の内容を取得し、削除の影響を改めて確認してください。",
+          })
+          onReviewChanged?.()
+          break
+        case "not-accepted":
+          setError("削除は受け付けられませんでした。最新の削除対象を確認してください。")
+          showNotification({
+            kind: "warning",
+            title: "Community削除は受け付けられませんでした",
+            description: "最新の確認情報を取得して、削除の影響を再確認してください。",
+          })
+          onReviewChanged?.()
+          break
+        case "unknown":
+          setOutcomeUnknown(true)
+          setError("削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。")
+          showNotification({
+            kind: "warning",
+            title: "Community削除の受付結果は不明です",
+            description: "成立の有無を断定できません。同じ削除を自動再送せず、最新の状態を確認してください。",
+          })
+          break
+      }
+    } catch {
+      // UI側の予期しない失敗も二重削除を避けるためUnknown扱いにする。
+      setOutcomeUnknown(true)
+      setError("削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。")
     } finally {
       setBusy(false)
     }
