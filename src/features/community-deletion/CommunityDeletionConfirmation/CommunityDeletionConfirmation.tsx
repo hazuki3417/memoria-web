@@ -80,19 +80,23 @@ export function CommunityDeletionConfirmation({
       switch (result.kind) {
         case "accepted":
           setCompleted(true)
-          showNotification({
-            kind: "success",
-            title: "Community削除の受付",
-            description:
-              "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
-          })
-          if (result.sync === "failed") {
+          try {
             showNotification({
-              kind: "warning",
-              title: "Community一覧を更新できませんでした",
+              kind: "success",
+              title: "Community削除の受付",
               description:
-                "削除受付は完了しています。Dashboardで最新のCommunity一覧を確認してください。削除を再送しないでください。",
+                "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
             })
+            if (result.sync === "failed") {
+              showNotification({
+                kind: "warning",
+                title: "Community一覧を更新できませんでした",
+                description:
+                  "削除受付は完了しています。Dashboardで最新のCommunity一覧を確認してください。削除を再送しないでください。",
+              })
+            }
+          } catch {
+            // 通知の表示失敗は確定済みの受付やDashboard遷移を妨げない。
           }
           navigate("/dashboard")
           break
