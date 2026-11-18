@@ -125,8 +125,7 @@ export function CommunityMembersTableSection({
                         </Table.Td>
                         {self?.role === "admin" && (
                           <Table.Td w={52}>
-                            {!member.isSelf && (
-                              <Menu position="bottom-end" withinPortal>
+                            <Menu position="bottom-end" withinPortal>
                                 <Menu.Target>
                                   <Button
                                     size="compact-xs"
@@ -147,7 +146,8 @@ export function CommunityMembersTableSection({
                                   >
                                     役割を変更
                                   </Menu.Item>
-                                  <Menu.Item
+                                  {!member.isSelf && (
+                                    <Menu.Item
                                     disabled={
                                       !onRemoveMember ||
                                       (member.role === "admin" &&
@@ -157,10 +157,10 @@ export function CommunityMembersTableSection({
                                     color="red"
                                   >
                                     除外
-                                  </Menu.Item>
+                                    </Menu.Item>
+                                  )}
                                 </Menu.Dropdown>
                               </Menu>
-                            )}
                           </Table.Td>
                         )}
                       </Table.Tr>
