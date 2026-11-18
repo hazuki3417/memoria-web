@@ -65,8 +65,18 @@ export function CommunityDeletionConfirmation({
     if (!canDelete || !onDelete) return
     setBusy(true)
     setError("")
+    let result: CommunityDeletionAcceptanceOutcome
     try {
-      const result = await onDelete()
+      result = await onDelete()
+    } catch {
+      // Callback側の予期しない例外は確定していないMutationとして扱う。
+      setOutcomeUnknown(true)
+      setError("削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。")
+      setBusy(false)
+      return
+    }
+    // 確定した結果を表示処理の例外でUnknownへ格下げしない。
+    try {
       switch (result.kind) {
         case "accepted":
           setCompleted(true)
@@ -116,10 +126,6 @@ export function CommunityDeletionConfirmation({
           })
           break
       }
-    } catch {
-      // UI側の予期しない失敗も二重削除を避けるためUnknown扱いにする。
-      setOutcomeUnknown(true)
-      setError("削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。")
     } finally {
       setBusy(false)
     }

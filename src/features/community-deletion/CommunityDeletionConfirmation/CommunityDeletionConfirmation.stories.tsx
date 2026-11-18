@@ -59,6 +59,7 @@ export const RevisionChanged: Story = {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toHaveTextContent("最新の内容で確認をやり直してください")
     await expect(args.onReviewChanged).toHaveBeenCalledTimes(1)
+    await expect(canvas.getByRole("button", { name: "Communityを削除する" })).toBeDisabled()
     await expect(args.onNavigate).not.toHaveBeenCalled()
   },
 }
@@ -72,6 +73,7 @@ export const NotAccepted: Story = {
     const canvas = within(canvasElement)
     await expect(await canvas.findByRole("alert")).toHaveTextContent("削除は受け付けられませんでした")
     await expect(args.onReviewChanged).toHaveBeenCalledTimes(1)
+    await expect(canvas.getByRole("button", { name: "Communityを削除する" })).toBeDisabled()
     await expect(args.onNavigate).not.toHaveBeenCalled()
   },
 }

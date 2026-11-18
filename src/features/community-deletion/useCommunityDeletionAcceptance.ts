@@ -16,7 +16,7 @@ export type CommunityDeletionAcceptanceOutcome =
  * 受理結果をMutationのtyped payloadから先に確定し、
  * MyCommunitiesの同期失敗が受理結果を取り消さないようにする。
  */
-export function useCommunityDeletionAcceptance(communityId: string) {
+export const useCommunityDeletionAcceptance = (communityId: string) => {
   const client = useApolloClient()
   const [accept] = useAcceptCommunityDeletionMutation()
 
@@ -54,7 +54,7 @@ export function useCommunityDeletionAcceptance(communityId: string) {
         query: MyCommunitiesDocument,
         fetchPolicy: "network-only",
       })
-      const synced = !refreshed.error && !refreshed.errors?.length
+      const synced = !!refreshed.data && !refreshed.error && !refreshed.errors?.length
       return { kind: "accepted", sync: synced ? "succeeded" : "failed" }
     } catch {
       // 受付は確定済み。再取得失敗によってMutationを再送しない。

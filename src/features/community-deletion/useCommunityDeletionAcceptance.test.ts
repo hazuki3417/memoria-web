@@ -60,6 +60,15 @@ describe("Community削除受付の確定結果と後続同期の独立契約", (
     expect(mocks.accept).toHaveBeenCalledTimes(1)
   })
 
+  it("一覧取得でdataが欠落した場合は同期成功と断定しない", async () => {
+    mocks.accept.mockResolvedValue({ data: { acceptCommunityDeletion: { accepted: true } } })
+    mocks.query.mockResolvedValue({})
+    await expect(action.acceptDeletion("revision-1")).resolves.toEqual({
+      kind: "accepted", sync: "failed",
+    })
+    expect(mocks.accept).toHaveBeenCalledTimes(1)
+  })
+
   it("Refetch結果のGraphQL Errorでも同期失敗として分離する", async () => {
     mocks.accept.mockResolvedValue({ data: { acceptCommunityDeletion: { accepted: true } } })
     mocks.query.mockResolvedValue({ errors: [{ message: "unavailable" }] })
