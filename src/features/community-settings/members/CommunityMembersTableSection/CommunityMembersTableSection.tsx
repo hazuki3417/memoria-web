@@ -3,7 +3,7 @@
 import { Badge, Box, Button, Group, Menu, ScrollArea, Table, Text, TextInput } from "@mantine/core"
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { SectionHeader } from "@/components/SectionHeader"
-import { UsageSortHeader } from "@/features/usage/UsageSortHeader"
+import { SortHeader } from "@/ui/SortHeader"
 import type { CommunityMember } from "@/features/community/CommunityProvider"
 import { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "../communityMemberLimits"
 import type { useCommunityMembersState, CommunityMembersActions } from "../useCommunityMembersState"
@@ -81,7 +81,7 @@ export function CommunityMembersTableSection({
                   <Table.Thead>
                     <Table.Tr>
                       <Table.Th w="45%" aria-sort={ariaSort("name")}>
-                        <UsageSortHeader
+                        <SortHeader
                           label="名前"
                           direction={
                             sort?.key === "name" ? sort.direction : null
@@ -92,7 +92,7 @@ export function CommunityMembersTableSection({
                         />
                       </Table.Th>
                       <Table.Th aria-sort={ariaSort("role")}>
-                        <UsageSortHeader
+                        <SortHeader
                           label="役割"
                           direction={
                             sort?.key === "role" ? sort.direction : null
