@@ -10,6 +10,11 @@ const mocks = vi.hoisted(() => ({
   remove: vi.fn(),
   leave: vi.fn(),
   notify: vi.fn(),
+  refetch: vi.fn(),
+}))
+
+vi.mock("@apollo/client", () => ({
+  useApolloClient: () => ({ refetchQueries: mocks.refetch }),
 }))
 
 vi.mock("@/components/Feedback", () => ({
@@ -34,6 +39,7 @@ let actions!: Actions
 
 beforeEach(async () => {
   vi.resetAllMocks()
+  mocks.refetch.mockResolvedValue([])
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
@@ -64,10 +70,14 @@ describe("Communityメンバー管理のMutation契約", () => {
     expect(mocks.remove).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: { input: { communityId: "community-1", userId: "user-2" } },
-        awaitRefetchQueries: true,
       }),
     )
-    expect(mocks.remove.mock.calls[0][0].refetchQueries).toHaveLength(2)
+    expect(mocks.refetch).toHaveBeenCalledWith({
+      include: [
+        { kind: "Document", name: "communityMembers" },
+        { kind: "Document", name: "communitySettingsMembers" },
+      ],
+    })
     expect(mocks.notify).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "success" }),
     )
@@ -98,10 +108,14 @@ describe("Communityメンバー管理のMutation契約", () => {
             role: "ADMIN",
           },
         },
-        awaitRefetchQueries: true,
       }),
     )
-    expect(mocks.changeRole.mock.calls[0][0].refetchQueries).toHaveLength(2)
+    expect(mocks.refetch).toHaveBeenCalledWith({
+      include: [
+        { kind: "Document", name: "communityMembers" },
+        { kind: "Document", name: "communitySettingsMembers" },
+      ],
+    })
     expect(mocks.notify).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "success" }),
     )
@@ -144,6 +158,64 @@ describe("Communityメンバー管理のMutation契約", () => {
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
+  it("除外Mutation成功後のRefetch失敗は確定成功と同期失敗警告に分ける", async () => {
+    mocks.remove.mockResolvedValue({ data: { removeCommunityMember: { success: true } } })
+    mocks.refetch.mockRejectedValue(new Error("refetch failed"))
+    await expect(actions.onRemoveMember("user-2")).resolves.toBe(true)
+    expect(mocks.notify).toHaveBeenCalledOnce()
+    expect(mocks.notify).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "warning",
+      description: expect.stringContaining("除外は完了しています"),
+    }))
+    expect(mocks.remove).toHaveBeenCalledTimes(1)
+  })
+
+  it("Role変更確定後にRefetch結果がGraphQLエラーでも再送しない", async () => {
+    mocks.changeRole.mockResolvedValue({ data: { changeCommunityMemberRole: { success: true } } })
+    mocks.refetch.mockResolvedValue([{ errors: [{ message: "network" }] }])
+    await expect(actions.onChangeMemberRole("user-2", "admin")).resolves.toBe(true)
+    expect(mocks.notify).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "warning",
+      description: expect.stringContaining("役割変更は完了しています"),
+    }))
+    expect(mocks.changeRole).toHaveBeenCalledTimes(1)
+  })
+
+  it("Mutation拒否とMutation結果不明ではRefetchも成功通知も行わない", async () => {
+    mocks.remove.mockResolvedValue({ data: { removeCommunityMember: { success: false } } })
+    mocks.changeRole.mockRejectedValue(new Error("unknown"))
+    await expect(actions.onRemoveMember("user-2")).resolves.toBe(false)
+    await expect(actions.onChangeMemberRole("user-2", "member")).resolves.toBe(false)
+    expect(mocks.refetch).not.toHaveBeenCalled()
+    expect(mocks.notify).not.toHaveBeenCalled()
+  })
+
+  it("退会確定後のRefetch失敗でもDashboardへ進むため成功Outcomeを返す", async () => {
+    mocks.leave.mockResolvedValue({ data: { leaveCommunity: { success: true } } })
+    mocks.refetch.mockRejectedValue(new Error("my communities unavailable"))
+    await expect(actions.onLeaveCommunity()).resolves.toBeUndefined()
+    expect(mocks.notify).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "warning",
+      description: expect.stringContaining("退会は成立しています"),
+    }))
+    expect(mocks.leave).toHaveBeenCalledTimes(1)
+  })
+
+  it("Refetch待機中は成功通知せず、完了後にMutation成功を確定表示する", async () => {
+    let resolveRefetch!: (value: never[]) => void
+    mocks.remove.mockResolvedValue({ data: { removeCommunityMember: { success: true } } })
+    mocks.refetch.mockReturnValue(new Promise((resolve) => {
+      resolveRefetch = resolve
+    }))
+    const attempt = actions.onRemoveMember("user-2")
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(mocks.notify).not.toHaveBeenCalled()
+    resolveRefetch([])
+    await expect(attempt).resolves.toBe(true)
+    expect(mocks.notify).toHaveBeenCalledWith(expect.objectContaining({ kind: "success" }))
+  })
+
   it("退会成功時はMyCommunitiesを再取得し、失敗は例外を伝搬", async () => {
     mocks.leave
       .mockResolvedValueOnce({ data: { leaveCommunity: { success: true } } })
@@ -152,10 +224,11 @@ describe("Communityメンバー管理のMutation契約", () => {
     expect(mocks.leave).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: { communityId: "community-1" },
-        awaitRefetchQueries: true,
       }),
     )
-    expect(mocks.leave.mock.calls[0][0].refetchQueries).toHaveLength(1)
+    expect(mocks.refetch).toHaveBeenCalledWith({
+      include: [{ kind: "Document", name: "myCommunities" }],
+    })
     await expect(actions.onLeaveCommunity()).rejects.toThrow("leave failed")
   })
 })
