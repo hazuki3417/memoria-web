@@ -103,21 +103,29 @@ export function CommunityDeletionConfirmation({
         case "review-changed":
           setReviewBlocked(true)
           setError("削除対象の状態が変わりました。最新の内容で確認をやり直してください。")
-          showNotification({
-            kind: "warning",
-            title: "削除対象の状態が変更されました",
-            description: "最新の内容を取得し、削除の影響を改めて確認してください。",
-          })
+          try {
+            showNotification({
+              kind: "warning",
+              title: "削除対象の状態が変更されました",
+              description: "最新の内容を取得し、削除の影響を改めて確認してください。",
+            })
+          } catch {
+            // 通知できなくても最新Reviewの取得を続行する。
+          }
           onReviewChanged?.()
           break
         case "not-accepted":
           setReviewBlocked(true)
           setError("削除は受け付けられませんでした。最新の削除対象を確認してください。")
-          showNotification({
-            kind: "warning",
-            title: "Community削除は受け付けられませんでした",
-            description: "最新の確認情報を取得して、削除の影響を再確認してください。",
-          })
+          try {
+            showNotification({
+              kind: "warning",
+              title: "Community削除は受け付けられませんでした",
+              description: "最新の確認情報を取得して、削除の影響を再確認してください。",
+            })
+          } catch {
+            // 通知できなくても最新Reviewの取得を続行する。
+          }
           onReviewChanged?.()
           break
         case "unknown":
