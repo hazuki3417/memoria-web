@@ -289,6 +289,56 @@ export const RemoveMemberFailureContract: Story = {
 }
 
 /** A self demotion uses the same row menu and role Modal, not the leave action. */
+/** Mirrors a refreshed membership after confirmed self demotion. */
+function SelfDemotionUpdatedMembershipFixture(
+  args: ComponentProps<typeof CommunitySettingsStoryNavigation>,
+) {
+  const [members, setMembers] = useState<Array<{
+    id: string
+    name: string
+    role: "admin" | "member"
+    isSelf?: boolean
+  }>>([
+    { id: "user-1", name: "テストユーザー", role: "admin", isSelf: true },
+    { id: "user-2", name: "家族メンバー", role: "admin" },
+  ])
+  return (
+    <CommunitySettingsStoryNavigation
+      {...args}
+      section="members"
+      role={members[0].role}
+      members={members}
+      onChangeMemberRole={async (userId, role) => {
+        setMembers((current) => current.map((member) =>
+          member.id === userId ? { ...member, role } : member,
+        ))
+        return true
+      }}
+    />
+  )
+}
+
+export const SelfDemotionPermissionsUpdated: Story = {
+  name: "Interaction · 自己降格後は管理操作を失い閲覧・退会を維持",
+  tags: ["interaction"],
+  render: (args) => <SelfDemotionUpdatedMembershipFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const page = within(canvasElement.ownerDocument.body)
+    await userEvent.click(canvas.getByRole("button", { name: "テストユーザーの管理操作" }))
+    await userEvent.click(await page.findByRole("menuitem", { name: "役割を変更" }))
+    const dialog = await page.findByRole("dialog", { name: "役割を変更" })
+    await userEvent.click(within(dialog).getByRole("radio", { name: /^Member/ }))
+    await userEvent.click(within(dialog).getByRole("button", { name: "変更する" }))
+    await waitFor(() => {
+      expect(canvas.queryByRole("button", { name: "テストユーザーの管理操作" })).not.toBeInTheDocument()
+      expect(canvas.queryByRole("button", { name: "家族メンバーの管理操作" })).not.toBeInTheDocument()
+    })
+    await expect(canvas.getByText("テストユーザー")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "Communityから退会する" })).toBeEnabled()
+  },
+}
+
 export const SelfAdministratorDemotion: Story = {
   name: "Interaction · 自分のAdministrator降格と管理権限喪失の確認",
   tags: ["interaction"],
