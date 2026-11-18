@@ -4,7 +4,9 @@ import { Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { CommunityMembersActions } from "./useCommunityMembersState"
 import type { useCommunityMembersState } from "./useCommunityMembersState"
-type MembersState = ReturnType<typeof useCommunityMembersState>
+type MembersState = Pick<ReturnType<typeof useCommunityMembersState>,
+  "opened" | "busy" | "error" | "blocked" | "close" | "leave"
+>
 
 /** Leave confirmation and its completion/error UI. */
 export function CommunityLeaveModal({

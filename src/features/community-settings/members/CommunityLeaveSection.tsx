@@ -4,7 +4,9 @@ import { Box, Button, Group, Stack, Text } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import type { useCommunityMembersState, CommunityMembersActions } from "./useCommunityMembersState"
 
-type MembersState = ReturnType<typeof useCommunityMembersState>
+type MembersState = Pick<ReturnType<typeof useCommunityMembersState>,
+  "done" | "setOpened" | "blocked"
+>
 
 /** Leave Community entry and last-Administrator explanation. */
 export function CommunityLeaveSection({

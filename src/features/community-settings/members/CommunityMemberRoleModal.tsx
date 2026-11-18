@@ -4,7 +4,9 @@ import { Badge, Button, Group, Modal, Radio, Stack, Text } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { CommunityMembersActions } from "./useCommunityMembersState"
 import type { useCommunityMembersState } from "./useCommunityMembersState"
-type MembersState = ReturnType<typeof useCommunityMembersState>
+type MembersState = Pick<ReturnType<typeof useCommunityMembersState>,
+  "roleTarget" | "setRoleTarget" | "roleBusy" | "roleError" | "setRoleError" | "selectedRole" | "setSelectedRole" | "adminLimitReached" | "adminCount" | "confirmRoleChange"
+>
 
 /** Role change confirmation and last-admin capacity guidance. */
 export function CommunityMemberRoleModal({

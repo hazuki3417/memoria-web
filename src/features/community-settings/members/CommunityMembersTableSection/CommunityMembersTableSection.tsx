@@ -8,7 +8,9 @@ import type { CommunityMember } from "@/features/community/CommunityProvider"
 import { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "../communityMemberLimits"
 import type { useCommunityMembersState, CommunityMembersActions } from "../useCommunityMembersState"
 
-type MembersState = ReturnType<typeof useCommunityMembersState>
+type MembersState = Pick<ReturnType<typeof useCommunityMembersState>,
+  "query" | "setQuery" | "sort" | "setRoleError" | "setRoleTarget" | "setSelectedRole" | "setRemoveError" | "setRemoveTarget" | "self" | "adminCount" | "memberLimitReached" | "adminLimitReached" | "rows" | "changeSort" | "ariaSort"
+>
 
 /** Member count, search, sorting and administrative row operations. */
 export function CommunityMembersTableSection({

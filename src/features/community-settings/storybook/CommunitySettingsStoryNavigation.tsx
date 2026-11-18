@@ -6,6 +6,7 @@ import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import type { ReactNode } from "react"
 import { CommunityGeneralView } from "../general/CommunityGeneralView"
 import { CommunityMembersView } from "../members/CommunityMembersView"
+import { previewCommunityMembers } from "./communityMembersStoryFixtures"
 import type { CommunityMember } from "../members"
 import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
 import { CommunityPreferencesStoryView as CommunityPreferencesView } from "../preferences/CommunityPreferencesStoryView"
@@ -78,7 +79,7 @@ export const CommunitySettingsStoryNavigation = ({
     case "members":
       content = (
         <CommunityMembersView
-          members={props.members}
+          members={props.members ?? previewCommunityMembers}
           onChangeRole={props.onChangeMemberRole}
           onRemoveMember={props.onRemoveMember}
           onLeave={props.onLeaveCommunity}

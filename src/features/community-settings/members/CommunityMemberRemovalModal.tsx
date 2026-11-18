@@ -3,7 +3,9 @@
 import { Button, Group, Modal, Stack, Text } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { useCommunityMembersState } from "./useCommunityMembersState"
-type MembersState = ReturnType<typeof useCommunityMembersState>
+type MembersState = Pick<ReturnType<typeof useCommunityMembersState>,
+  "removeTarget" | "setRemoveTarget" | "removeBusy" | "removeError" | "setRemoveError" | "confirmRemoval"
+>
 
 /** Removal confirmation and result-unknown warning. */
 export function CommunityMemberRemovalModal({ state }: { state: MembersState }) {

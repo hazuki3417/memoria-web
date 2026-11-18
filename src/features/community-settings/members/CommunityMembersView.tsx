@@ -13,22 +13,14 @@ import {
   type CommunityMembersActions,
 } from "./useCommunityMembersState"
 
-
-const previewMembers: CommunityMember[] = [
-  { id: "self", name: "ユーザー", role: "admin", isSelf: true },
-  { id: "m1", name: "山田 花子", role: "admin" },
-  { id: "m2", name: "佐藤 葵", role: "member" },
-  { id: "m3", name: "鈴木 太郎", role: "member" },
-]
-
 // The API defines the default order: self first, then nickname ascending.
 export const CommunityMembersView = ({
-  members = previewMembers,
+  members,
   onLeave,
   onLeaveSuccess,
   onChangeRole,
   onRemoveMember,
-}: { members?: CommunityMember[] } & CommunityMembersActions) => {
+}: { members: CommunityMember[] } & CommunityMembersActions) => {
   const state = useCommunityMembersState({
     members, onLeave, onLeaveSuccess, onChangeRole, onRemoveMember,
   })
