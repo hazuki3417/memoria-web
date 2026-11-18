@@ -4,9 +4,9 @@ export type CommunityMemberSortKey = "name" | "role"
 export type CommunityMemberSort = {
   key: CommunityMemberSortKey
   direction: "asc" | "desc"
-}
+} | null
 
-/** Local name search and single-column sorting, initially by Japanese name order. */
+/** Filters members while preserving API order unless a column sort is selected. */
 export function selectCommunityMemberRows(
   members: CommunityMember[],
   query: string,
@@ -18,6 +18,7 @@ export function selectCommunityMemberRows(
       member.name.toLocaleLowerCase("ja-JP").includes(normalizedQuery),
     )
     .sort((a, b) => {
+      if (!sort) return 0 // Preserve the API's self-first, then name order.
       const left = sort.key === "name" ? a.name : a.role
       const right = sort.key === "name" ? b.name : b.role
       const result = left.localeCompare(right, "ja-JP", { numeric: true })

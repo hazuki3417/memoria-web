@@ -13,7 +13,7 @@ import {
   type CommunityMembersActions,
 } from "./useCommunityMembersState"
 
-// 表示順はClient側の名前昇順（ja-JP）。APIの取得順には依存しない。
+// The API defines the default order: self first, then nickname ascending.
 export const CommunityMembersView = ({
   members,
   onLeave,

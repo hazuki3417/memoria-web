@@ -9,19 +9,19 @@ const members: CommunityMember[] = [
 ]
 
 describe("selectCommunityMemberRows", () => {
-  it("defaults to Japanese name ascending, independent of API/self-first order", () => {
-    expect(selectCommunityMemberRows(members, "", { key: "name", direction: "asc" }).map((member) => member.id)).toEqual([
-      "two",
-      "ten",
+  it("preserves the API order when no sort is selected", () => {
+    expect(selectCommunityMemberRows(members, "", null).map((member) => member.id)).toEqual([
       "self",
+      "ten",
+      "two",
     ])
     expect(members.map((member) => member.id)).toEqual(["self", "ten", "two"])
   })
 
   it("trims and case-folds the search without mutating the source", () => {
-    expect(selectCommunityMemberRows(members, "  MEMBER  ", { key: "name", direction: "asc" }).map((member) => member.id)).toEqual([
-      "two",
+    expect(selectCommunityMemberRows(members, "  MEMBER  ", null).map((member) => member.id)).toEqual([
       "ten",
+      "two",
     ])
     expect(members).toHaveLength(3)
   })
