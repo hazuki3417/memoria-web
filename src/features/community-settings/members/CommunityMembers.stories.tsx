@@ -37,6 +37,20 @@ const membersSuccess = {
     },
   },
 }
+const membersUnsorted = {
+  request,
+  result: {
+    data: {
+      community: { id: "club-a" },
+      communityMembers: [
+        { userId: "user-a", nickname: "Member 10", role: "admin" },
+        { userId: "user-b", nickname: "Member 2", role: "member" },
+      ],
+      me: { id: "user-a" },
+    },
+  },
+}
+
 const membersFailure = {
   request,
   error: new Error("Community Members取得失敗"),
@@ -68,6 +82,35 @@ export const Ready: Story = {
     await expect(within(table).getByText("参加者B")).toBeVisible()
     await expect(within(table).getByText("自分")).toBeVisible()
     await expect(canvas.queryByRole("alert")).not.toBeInTheDocument()
+  },
+}
+
+export const NameSortContract: Story = {
+  name: "Interaction · 名前昇順の初期表示と昇降順切替",
+  tags: ["interaction"],
+  decorators: [
+    (Story) => (
+      <MockedProvider mocks={[membersUnsorted]} addTypename={false}>
+        <Story />
+      </MockedProvider>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const table = await canvas.findByRole("table")
+    const nameHeader = within(table).getByRole("columnheader", { name: /名前/ })
+    const rows = within(table).getAllByRole("row")
+    await expect(nameHeader).toHaveAttribute("aria-sort", "ascending")
+    await expect(rows[1]).toHaveTextContent("Member 2")
+    await expect(rows[2]).toHaveTextContent("Member 10")
+
+    await userEvent.click(within(nameHeader).getByRole("button", { name: "名前で並べ替え" }))
+    await expect(nameHeader).toHaveAttribute("aria-sort", "descending")
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("Member 10")
+
+    await userEvent.click(within(nameHeader).getByRole("button", { name: "名前で並べ替え" }))
+    await expect(nameHeader).toHaveAttribute("aria-sort", "ascending")
+    await expect(within(table).getAllByRole("row")[1]).toHaveTextContent("Member 2")
   },
 }
 
