@@ -46,6 +46,7 @@ export function CommunityDeletionConfirmation({
   const [error, setError] = useState("")
   const [completed, setCompleted] = useState(false)
   const [outcomeUnknown, setOutcomeUnknown] = useState(false)
+  const [reviewBlocked, setReviewBlocked] = useState(false)
   const settingsPath = `/communities/${encodeURIComponent(communityId)}/settings`
   const navigate = (href: string) =>
     onNavigate ? onNavigate(href) : router.push(href)
@@ -57,7 +58,8 @@ export function CommunityDeletionConfirmation({
     !!onDelete &&
     !busy &&
     !completed &&
-    !outcomeUnknown
+    !outcomeUnknown &&
+    !reviewBlocked
 
   const remove = async () => {
     if (!canDelete || !onDelete) return
@@ -85,6 +87,7 @@ export function CommunityDeletionConfirmation({
           navigate("/dashboard")
           break
         case "review-changed":
+          setReviewBlocked(true)
           setError("削除対象の状態が変わりました。最新の内容で確認をやり直してください。")
           showNotification({
             kind: "warning",
@@ -94,6 +97,7 @@ export function CommunityDeletionConfirmation({
           onReviewChanged?.()
           break
         case "not-accepted":
+          setReviewBlocked(true)
           setError("削除は受け付けられませんでした。最新の削除対象を確認してください。")
           showNotification({
             kind: "warning",
@@ -284,7 +288,7 @@ export function CommunityDeletionConfirmation({
                   }
                   role="alert"
                   actions={
-                    outcomeUnknown && onReviewChanged ? (
+                    (outcomeUnknown || reviewBlocked) && onReviewChanged ? (
                       <Button variant="default" onClick={onReviewChanged}>
                         最新の状態を確認する
                       </Button>
