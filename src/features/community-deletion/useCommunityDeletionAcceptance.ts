@@ -48,12 +48,13 @@ export function useCommunityDeletionAcceptance(communityId: string) {
     if (accepted !== true) return { kind: "unknown" }
 
     try {
-      const refreshed = await client.refetchQueries({
-        include: [MyCommunitiesDocument],
+      // refetchQueriesは監視中のQueryが存在しない場合、通信なしで空配列を返し得る。
+      // 対象Communityを離れる前にMyCommunitiesを必ずnetwork-onlyで取得する。
+      const refreshed = await client.query({
+        query: MyCommunitiesDocument,
+        fetchPolicy: "network-only",
       })
-      const synced = refreshed.every(
-        (query) => !query.error && !query.errors?.length,
-      )
+      const synced = !refreshed.error && !refreshed.errors?.length
       return { kind: "accepted", sync: synced ? "succeeded" : "failed" }
     } catch {
       // 受付は確定済み。再取得失敗によってMutationを再送しない。
