@@ -37,7 +37,8 @@ describe("Community名の保存Feedback", () => {
       formInvalid: true,
     })
     expect(result?.type).toBe("unknown")
-    expect(result?.description).toContain("自動で再送せず")
+    expect(result?.description).toContain("自動で再送しません")
+    expect(result?.description).toContain("ページを再読み込みして状態を確認してください")
   })
 
   it("BlockedはCommunity固有の公開エラー理由を表示する", () => {
