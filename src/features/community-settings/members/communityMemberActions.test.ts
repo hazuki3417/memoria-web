@@ -115,6 +115,35 @@ describe("Communityメンバー管理のMutation契約", () => {
     expect(mocks.notify).not.toHaveBeenCalled()
   })
 
+  it("除外はMutation Promiseが完了するまで成功を通知しない", async () => {
+    let resolveMutation!: (value: { data: { removeCommunityMember: { success: boolean } } }) => void
+    mocks.remove.mockReturnValue(new Promise((resolve) => {
+      resolveMutation = resolve
+    }))
+    const attempt = actions.onRemoveMember("user-2")
+    expect(mocks.notify).not.toHaveBeenCalled()
+    resolveMutation({ data: { removeCommunityMember: { success: true } } })
+    await expect(attempt).resolves.toBe(true)
+    expect(mocks.notify).toHaveBeenCalledTimes(1)
+  })
+
+  it("役割変更はMutation Promiseの拒否時に成功と断定しない", async () => {
+    mocks.changeRole.mockRejectedValue(new Error("mutation or refetch failed"))
+    await expect(actions.onChangeMemberRole("user-2", "member")).resolves.toBe(false)
+    expect(mocks.notify).not.toHaveBeenCalled()
+  })
+
+  it("退会はMutation Promiseの完了まで継続し、拒否時は成功を返さない", async () => {
+    let rejectMutation!: (reason: Error) => void
+    mocks.leave.mockReturnValue(new Promise((_resolve, reject) => {
+      rejectMutation = reject
+    }))
+    const attempt = actions.onLeaveCommunity()
+    rejectMutation(new Error("mutation or refetch failed"))
+    await expect(attempt).rejects.toThrow("mutation or refetch failed")
+    expect(mocks.notify).not.toHaveBeenCalled()
+  })
+
   it("退会成功時はMyCommunitiesを再取得し、失敗は例外を伝搬", async () => {
     mocks.leave
       .mockResolvedValueOnce({ data: { leaveCommunity: { success: true } } })
