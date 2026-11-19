@@ -133,6 +133,20 @@ describe("Community削除の受付結果と通知例外の独立契約", () => {
     expect(mocks.delete).toHaveBeenCalledTimes(1)
   })
 
+  it("Unknownの警告通知が例外でも再送を禁止し、確認画面に結果不明を表示する", async () => {
+    mocks.delete.mockResolvedValue({ kind: "unknown" })
+    mocks.notify.mockImplementation(() => { throw new Error("notification unavailable") })
+    await mount()
+    await submit()
+    expect(mocks.delete).toHaveBeenCalledTimes(1)
+    expect(mocks.navigate).not.toHaveBeenCalled()
+    expect(host?.textContent).toContain("削除受付の結果を確認できませんでした")
+    const deleteButton = [...(host?.querySelectorAll("button") ?? [])].find(
+      (element) => element.textContent === "Communityを削除する",
+    )
+    expect(deleteButton?.disabled).toBe(true)
+  })
+
   it.each(["review-changed", "not-accepted"] as const)(
     "%sで通知例外が起きても最新Reviewを取得し、古い確認から再送しない",
     async (kind) => {
