@@ -7,15 +7,16 @@ let root: Root | undefined
 let host: HTMLDivElement | undefined
 let model!: ReturnType<typeof useCommunityDeletionPendingOperation>
 
-const mount = async () => {
+const Fixture = ({ communityId }: { communityId: string }) => {
+  model = useCommunityDeletionPendingOperation(communityId)
+  return null
+}
+
+const mount = async (communityId = "community-1") => {
   host = document.createElement("div")
   document.body.appendChild(host)
   root = createRoot(host)
-  const Fixture = () => {
-    model = useCommunityDeletionPendingOperation("community-1")
-    return null
-  }
-  await act(async () => { root?.render(createElement(Fixture)) })
+  await act(async () => { root?.render(createElement(Fixture, { communityId })) })
 }
 
 const unmount = async () => {
@@ -60,6 +61,21 @@ describe("Community削除Operationの再Mountをまたぐ再送禁止", () => {
     await act(async () => { model.clearRejected() })
     expect(model.operation).toBeNull()
     expect(window.sessionStorage.getItem("memoria:community-deletion:community-1")).toBeNull()
+  })
+
+  it("Communityを切り替えても別Communityの操作ロックを流用しない", async () => {
+    await mount()
+    await act(async () => { model.begin("revision-1") })
+    await act(async () => {
+      root?.render(createElement(Fixture, { communityId: "community-2" }))
+    })
+    expect(model.status).toBe("ready")
+    expect(model.operation).toBeNull()
+    await act(async () => {
+      root?.render(createElement(Fixture, { communityId: "community-1" }))
+    })
+    expect(model.recovering).toBe(true)
+    expect(model.operation?.revision).toBe("revision-1")
   })
 
   it("操作記録が破損している場合は削除を開始できない", async () => {
