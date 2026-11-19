@@ -112,6 +112,15 @@ describe("Community削除の結果不明時の取得専用Recovery", () => {
     expect(mocks.push).toHaveBeenCalledWith("/dashboard")
   })
 
+  it("受付照会の想定外例外でも結果不明のロックを維持する", async () => {
+    mocks.inspect.mockRejectedValue(new Error("unexpected query failure"))
+    await renderRoute()
+    await click("受付状況を確認する")
+    expect(host?.textContent).toContain("受付結果を確定できません")
+    expect(mocks.accept).not.toHaveBeenCalled()
+    expect(mocks.push).not.toHaveBeenCalled()
+  })
+
   it("受付記録が未検出ならUnknownを維持し、削除を再送しない", async () => {
     mocks.inspect.mockResolvedValue(false)
     await renderRoute()
