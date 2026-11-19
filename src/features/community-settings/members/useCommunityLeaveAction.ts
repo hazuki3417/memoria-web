@@ -21,11 +21,15 @@ export function useCommunityLeaveAction(communityId: string) {
       // 成立済み退会は再送せずDashboardへの遷移を継続する。
     }
     if (!synced) {
-      showNotification({
-        kind: "warning",
-        title: "退会は完了しましたが情報を更新できませんでした",
-        description: "退会は成立しています。Dashboardで最新のCommunity一覧を確認してください。",
-      })
+      try {
+        showNotification({
+          kind: "warning",
+          title: "退会は完了しましたが情報を更新できませんでした",
+          description: "退会は成立しています。Dashboardで最新のCommunity一覧を確認してください。",
+        })
+      } catch {
+        // 通知例外で成立済み退会後のDashboard遷移を妨げない。
+      }
     }
   }
 
