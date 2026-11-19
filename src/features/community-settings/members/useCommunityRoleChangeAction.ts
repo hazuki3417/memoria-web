@@ -36,13 +36,17 @@ export function useCommunityRoleChangeAction(communityId: string) {
     } catch {
       // Mutationで確定済みの変更は自動再送しない。
     }
-    showNotification(synced
-      ? { kind: "success", title: "メンバーの役割を変更", description: "メンバーの役割を変更しました。" }
-      : {
-          kind: "warning",
-          title: "役割を変更しましたが表示を更新できませんでした",
-          description: "役割変更は完了しています。ページを再読み込みして最新の役割を確認してください。操作を再送しないでください。",
-        })
+    try {
+      showNotification(synced
+        ? { kind: "success", title: "メンバーの役割を変更", description: "メンバーの役割を変更しました。" }
+        : {
+            kind: "warning",
+            title: "役割を変更しましたが表示を更新できませんでした",
+            description: "役割変更は完了しています。ページを再読み込みして最新の役割を確認してください。操作を再送しないでください。",
+          })
+    } catch {
+      // 通知例外が確定済みの役割変更を失敗へ格下げしない。
+    }
     return true
   }
 
