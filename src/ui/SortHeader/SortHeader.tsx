@@ -11,13 +11,13 @@ export type SortHeaderProps = {
   onSort: () => void
 }
 
-export function SortHeader({
+export const SortHeader = ({
   label,
   direction,
   align,
   disabled,
   onSort,
-}: SortHeaderProps) {
+}: SortHeaderProps) => {
   let Icon = IconArrowsSort
 
   if (direction === "asc") {
