@@ -4,10 +4,19 @@ import { useMantineColorScheme } from "@mantine/core"
 import type { usePersonalPreferencesForm } from "../usePersonalPreferencesForm"
 import type { PersonalPreferencesValues } from "../personalPreferences"
 
-type PreferencesForm = ReturnType<typeof usePersonalPreferencesForm>
+export type PersonalPreferencesDisplaySectionInput = Pick<
+  ReturnType<typeof usePersonalPreferencesForm>,
+  | "preferences"
+  | "accentDraft"
+  | "accentOnBlur"
+  | "accentDraftError"
+  | "change"
+  | "changeAccentDraft"
+  | "fieldErrors"
+>
 
 /** 表示Section固有のTheme操作と、共有Formから必要な設定操作を組み立てる。 */
-export const usePersonalPreferencesDisplaySection = (model: PreferencesForm) => {
+export const usePersonalPreferencesDisplaySection = (model: PersonalPreferencesDisplaySectionInput) => {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
   const {
     preferences, accentDraft, accentOnBlur, accentDraftError,

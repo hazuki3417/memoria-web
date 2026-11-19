@@ -6,9 +6,9 @@ import { SettingsSectionHost, type SettingsSectionRender } from "@/ui/SettingsSe
 import { PersonalSettingsView } from "../PersonalSettingsView"
 import type { PersonalSettingsSection } from "../personalSettingsSections"
 import { Profile } from "../profile"
-import { PersonalPreferences } from "../preferences/PersonalPreferences"
-import { ConnectedPersonalUsage } from "../usage/ConnectedPersonalUsage"
-import { Account } from "../account/Account"
+import { PersonalPreferences } from "../preferences"
+import { PersonalUsage } from "../usage"
+import { Account } from "../account"
 import { usePersonalSettingsAccentColor } from "./usePersonalSettingsAccentColor"
 
 const sectionStatusMessages = {
@@ -34,7 +34,7 @@ const sectionStatusMessages = {
 export type PersonalSettingsRouteProps = { section: PersonalSettingsSection }
 
 /** Selects one Controller; the same Host governs every Section status. */
-export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
+export const PersonalSettingsRoute = ({ section }: PersonalSettingsRouteProps) => {
   const router = useRouter()
   const { personalAccentColor } = usePersonalSettingsAccentColor()
 
@@ -56,7 +56,7 @@ export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
       controller = (render) => render({ status: "ready", content: <Account /> })
       break
     case "usage":
-      controller = (render) => <ConnectedPersonalUsage render={render} />
+      controller = (render) => <PersonalUsage render={render} />
       break
   }
 
@@ -66,13 +66,13 @@ export function PersonalSettingsRoute({ section }: PersonalSettingsRouteProps) {
     <PersonalSettingsView
       key={section}
       section={section}
+      personalAccentColor={personalAccentColor}
+      onSectionChange={onSectionChange}
       content={
         <SettingsSectionHost label={label} errorTitle={errorTitle}>
           {controller}
         </SettingsSectionHost>
       }
-      personalAccentColor={personalAccentColor}
-      onSectionChange={onSectionChange}
     />
   )
 }

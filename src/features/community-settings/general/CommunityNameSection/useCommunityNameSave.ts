@@ -1,7 +1,6 @@
 "use client"
 
-import { useApolloClient } from "@apollo/client"
-import { CommunitySettingsNameInspectionDocument, MyCommunitiesDocument, useUpdateCommunityMutation } from "@/infrastructure/graphql/generated"
+import { MyCommunitiesDocument, useUpdateCommunityMutation } from "@/infrastructure/graphql/generated"
 import {
   SettingsGraphQLExecutionError,
   classifySettingsSaveFailure,
@@ -12,7 +11,6 @@ import type { CommunityNameSaveRejection, SaveCommunityName } from "./communityN
 
 /** Community IDを固定したMutationを実行し、結果の確実性を失わず保存結果を提供する。 */
 export const useCommunityNameSave = (communityId: string) => {
-  const client = useApolloClient()
   const [updateCommunity] = useUpdateCommunityMutation()
 
   const classifyError = (error: unknown): ActionOutcome<string, CommunityNameSaveRejection> => {
@@ -47,17 +45,5 @@ export const useCommunityNameSave = (communityId: string) => {
     classifyError,
   })
 
-  /** MutationのOutcomeを変更せず、結果不明時にはCacheを介さず現在の名前を照会する。 */
-  const onInspectName = async (): Promise<string> => {
-    const current = await client.query({
-      query: CommunitySettingsNameInspectionDocument,
-      variables: { communityId },
-      fetchPolicy: "no-cache",
-    })
-    if (!current.data?.community) throw new Error("Community not available")
-    return current.data.community.name
-  }
-
-  /** Community名の保存Actionと、読み取り専用の現在値照会を提供する。 */
-  return { onSaveName, onInspectName }
+  return { onSaveName }
 }

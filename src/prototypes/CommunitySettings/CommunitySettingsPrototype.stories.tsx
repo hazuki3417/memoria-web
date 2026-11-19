@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { CommunitySettingsStoryNavigation } from "@/features/community-settings/storybook/CommunitySettingsStoryNavigation"
+import { CommunitySettingsStoryNavigation } from "@/features/community-settings/storybook"
 import { getApplicationNavigation } from "@/features/application-shell"
 import { PrototypeApplicationShell } from "@/prototypes/PrototypeApplicationShell"
 

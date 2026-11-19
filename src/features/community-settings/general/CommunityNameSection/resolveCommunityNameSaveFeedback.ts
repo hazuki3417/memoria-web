@@ -2,7 +2,7 @@ import { resolveSaveFeedback, type SaveFeedback, type SaveFeedbackMessages, type
 import { getCommunityBlockedFeedback } from "../../communityBlockedFeedback"
 type FeedbackInput = {
   status:
-    | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
+    | { kind: "idle" | "saving" | "error" | "unknown" }
     | { kind: "blocked"; error: unknown }
   formInvalid: boolean
 }
@@ -14,11 +14,11 @@ const messages = {
   },
   retryable: {
     title: "Community名を保存できませんでした",
-    description: "再試行してください。",
+    description: "入力内容を確認し、もう一度保存してください。",
   },
   unknown: {
     title: "Community名の保存結果を確認できませんでした",
-    description: "保存結果は不明です。自動で再送せず、現在の状態を確認してください。",
+    description: "保存されたか確認できません。自動で再送しません。ページを再読み込みして状態を確認してください。",
   },
   blocked: {
     title: "Community名を変更できません",
@@ -35,7 +35,7 @@ export const resolveCommunityNameSaveFeedback = ({
     status.kind === "blocked" ? "blocked"
     : status.kind === "unknown" ? "unknown"
     : formInvalid ? "validation"
-    : status.kind === "retryable-error" ? "retryable"
+    : status.kind === "error" ? "retryable"
     : null
 
   const feedback = resolveSaveFeedback(type, messages)

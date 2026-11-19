@@ -75,6 +75,24 @@ describe("PersonalPreferencesはProfileと同じQuery/Action/Hostの入口", () 
     expect(mocks.view).not.toHaveBeenCalled()
   })
 
+  it("再取得中も取得済みのPreferences Viewを維持し、sourceReadyをfalseにする", async () => {
+    mocks.query.mockReturnValue({
+      data: { me: { id: "user-1", preferences: {} } },
+      loading: true,
+      error: undefined,
+      refetch,
+    })
+
+    await act(async () => root.render(createElement(PersonalPreferences, { render: renderHost })))
+
+    expect(renderHost).toHaveBeenCalledWith(expect.objectContaining({ status: "ready" }))
+    expect(mocks.view).toHaveBeenCalledWith(expect.objectContaining({
+      initialPreferences: defaultPersonalPreferences,
+      sourceReady: false,
+      operations: expect.objectContaining({ save: mocks.save, observe: mocks.inspect }),
+    }))
+  })
+
   it("Ready時だけViewへ初期値・Action・Inspectionを接続する", async () => {
     mocks.compact.mockReturnValue(true)
     mocks.query.mockReturnValue({

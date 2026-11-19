@@ -11,13 +11,13 @@ export type PersonalSettingsViewProps = {
   onSectionChange: (section: PersonalSettingsSection) => void
 }
 
-/** Layoutへの接続のみを所有し、各Sectionの取得状態は解釈しない。 */
-export function PersonalSettingsView({
+/** Production・Storybook・Prototypeから画面UIへ接続する境界。Sectionの取得や遷移の実行は利用側が所有する。 */
+export const PersonalSettingsView = ({
   section,
   content,
   personalAccentColor,
   onSectionChange,
-}: PersonalSettingsViewProps) {
+}: PersonalSettingsViewProps) => {
   return (
     <PersonalSettingsLayout
       accentColor={personalAccentColor}

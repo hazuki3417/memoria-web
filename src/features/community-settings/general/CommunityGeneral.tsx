@@ -1,45 +1,67 @@
 "use client"
 
-import { Stack } from "@mantine/core"
-import { PageHeader } from "@/components/PageHeader"
-import {
-  CommunityNameSection,
-  type CommunityNameSectionProps,
-} from "./CommunityNameSection"
-import {
-  CommunityInvitationSection,
-  type CommunityInvitationSectionProps,
-} from "./CommunityInvitationSection"
-import { CommunityDangerZone } from "./CommunityDangerZone"
+import { useCommunitySettingsGeneralQuery } from "@/infrastructure/graphql/generated"
+import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
+import { CommunityGeneralView } from "./CommunityGeneralView"
+import { useCommunityNameSave } from "./CommunityNameSection/useCommunityNameSave"
+import type { CommunityInvitationSectionProps } from "./CommunityInvitationSection"
+import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
-export type CommunityGeneralProps = {
-  isAdmin: boolean
-  communityId: string
-  name: Omit<CommunityNameSectionProps, "isAdmin">
-  invitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available">
-  invitationAvailable: boolean
+// Production Invitation API is not connected. Preview actions remain unavailable.
+const unavailableInvitation: Omit<CommunityInvitationSectionProps, "isAdmin" | "available"> = {
+  active: false,
+  invitation: "none",
+  invitationUrl: "",
+  expiresAt: "",
+  busy: false,
+  issue: () => undefined,
+  copyInvitation: async () => undefined,
+  confirm: null,
+  setConfirm: () => undefined,
+  changeInvitation: () => undefined,
 }
 
-export function CommunityGeneral({
-  isAdmin,
+/** Fetch only the Community name and fields required to determine admin. */
+export const CommunityGeneral = ({
   communityId,
-  name,
-  invitation,
-  invitationAvailable,
-}: CommunityGeneralProps) {
-  return (
-    <Stack gap="xl">
-      <PageHeader
-        title="Community Settings"
-        description="Communityの基本情報と管理"
+  render,
+}: {
+  communityId: string
+  render: SettingsSectionRender
+}) => {
+  const query = useCommunitySettingsGeneralQuery({
+    variables: { communityId },
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+  })
+  const { onSaveName } = useCommunityNameSave(communityId)
+  const name = query.data?.community?.name
+  const members = query.data?.communityMembers
+  const selfId = query.data?.me?.id
+  const ready = name !== undefined && members !== undefined && selfId !== undefined
+
+  useCommunitySettingsRefreshError(Boolean(ready && query.error))
+  if (!ready) {
+    return render(
+      query.loading
+        ? { status: "loading" }
+        : {
+            status: "error",
+            retry: () => { void query.refetch().catch(() => undefined) },
+          },
+    )
+  }
+
+  return render({
+    status: "ready",
+    content: (
+      <CommunityGeneralView
+        name={{ communityName: name, onSaveName }}
+        invitation={unavailableInvitation}
+        invitationAvailable={false}
+        communityId={communityId}
+        isAdmin={members.some((member) => member.userId === selfId && member.role === "admin")}
       />
-      <CommunityNameSection {...name} isAdmin={isAdmin} />
-      <CommunityInvitationSection
-        {...invitation}
-        isAdmin={isAdmin}
-        available={invitationAvailable}
-      />
-      {isAdmin && <CommunityDangerZone communityId={communityId} />}
-    </Stack>
-  )
+    ),
+  })
 }

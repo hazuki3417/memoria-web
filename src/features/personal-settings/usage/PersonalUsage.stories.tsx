@@ -3,13 +3,13 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { expect, userEvent, within } from "storybook/test"
 import { PersonalUsageDocument } from "@/infrastructure/graphql/generated"
 import { graphqlUsageFixture, emptyGraphqlUsageFixture } from "@/features/usage/usageStoryFixtures"
-import { ConnectedPersonalUsage } from "./ConnectedPersonalUsage"
+import { PersonalUsage } from "./PersonalUsage"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 
-function ConnectedPersonalUsageStory() {
+const PersonalUsageStory = () => {
   return (
     <SettingsSectionHost label="利用状況を読み込み中" errorTitle="利用状況を取得できませんでした">
-      {(render) => <ConnectedPersonalUsage render={render} />}
+      {(render) => <PersonalUsage render={render} />}
     </SettingsSectionHost>
   )
 }
@@ -36,9 +36,9 @@ const personalLoading = { ...personalDecimal, delay: 15_000 }
 
 const meta = {
   id: "features-settings-usage-connectedpersonalusage",
-  title: "features/personal-settings/usage/ConnectedPersonalUsage",
-  component: ConnectedPersonalUsageStory,
-} satisfies Meta<typeof ConnectedPersonalUsageStory>
+  title: "features/personal-settings/usage/PersonalUsage",
+  component: PersonalUsageStory,
+} satisfies Meta<typeof PersonalUsageStory>
 export default meta
 type Story = StoryObj<typeof meta>
 

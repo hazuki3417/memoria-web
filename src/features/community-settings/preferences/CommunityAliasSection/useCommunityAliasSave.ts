@@ -1,7 +1,6 @@
 "use client"
 
 import { useApolloClient } from "@apollo/client"
-import { settingsInspectionContext } from "@/infrastructure/graphql/settingsCacheReadProtection"
 import {
   CommunityMySettingsDocument,
   MyCommunitiesDocument,
@@ -21,7 +20,7 @@ import type {
 } from "./communityAliasSaveOutcome"
 import { commitCommunitySettingsPatch } from "../communityPreferencesCache"
 
-/** Community ID固定のAlias保存と、Cacheに影響しない結果不明時の照会を提供する。 */
+/** Community ID固定のAlias保存と確定Cache反映を提供する。 */
 export const useCommunityAliasSave = (communityId: string) => {
   const client = useApolloClient()
   const [mutation] = useUpdateCommunitySettingsMutation()
@@ -86,18 +85,6 @@ export const useCommunityAliasSave = (communityId: string) => {
     afterSuccess,
   })
 
-  const inspectAlias = async (): Promise<string | null> => {
-    const current = await client.query({
-      query: CommunityMySettingsDocument,
-      variables: { communityId },
-      fetchPolicy: "no-cache",
-      context: settingsInspectionContext,
-    })
-    const community = current.data?.community
-    if (community?.id !== communityId) throw new Error("Community unavailable")
-    return community.mySettings.alias
-  }
-
-  /** Alias保存の確定Outcomeと、Unknown時だけ利用する現在値照会を提供する。 */
-  return { inspectAlias, saveAlias, confirmAlias }
+  /** Alias保存の確定結果とCache更新を提供する。 */
+  return { saveAlias }
 }

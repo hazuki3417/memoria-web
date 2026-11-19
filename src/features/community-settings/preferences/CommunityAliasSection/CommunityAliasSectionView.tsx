@@ -2,15 +2,14 @@
 
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { CommunityAliasSaveFeedback } from "./CommunityAliasSaveFeedback"
-import type { useCommunityAliasForm, InspectCommunityAlias } from "./useCommunityAliasForm"
+import type { useCommunityAliasForm } from "./useCommunityAliasForm"
 
 export type CommunityAliasSectionViewProps = {
   model: ReturnType<typeof useCommunityAliasForm>
-  onInspect?: InspectCommunityAlias
 }
 
-/** Community別名の表示・編集・保存・Recovery操作を提供する。 */
-export const CommunityAliasSectionView = ({ model, onInspect }: CommunityAliasSectionViewProps) => {
+/** Community別名の表示・編集・保存操作を提供する。 */
+export const CommunityAliasSectionView = ({ model }: CommunityAliasSectionViewProps) => {
   const {
     field, fieldState, text, saving, blocked, unknown, validation,
     showClientError, changed, invalid, save, onAliasChange, saveLabel,
@@ -27,7 +26,7 @@ export const CommunityAliasSectionView = ({ model, onInspect }: CommunityAliasSe
         ref={field.ref}
         onBlur={field.onBlur}
         value={text}
-        disabled={saving}
+        disabled={saving || blocked}
         onChange={onAliasChange}
         error={
           fieldState.error?.type === "server"
@@ -37,7 +36,7 @@ export const CommunityAliasSectionView = ({ model, onInspect }: CommunityAliasSe
               : undefined
         }
       />
-      <CommunityAliasSaveFeedback model={model} onInspect={onInspect} />
+      <CommunityAliasSaveFeedback model={model} />
       <Box>
         <Button
           size="sm"

@@ -12,14 +12,14 @@ export type CommunitySettingsViewProps = {
   onSectionChange: (section: CommunitySettingsSection) => void
 }
 
-/** Layoutへの接続のみを所有し、各Sectionの取得状態は解釈しない。 */
-export function CommunitySettingsView({
+/** Production・Storybook・Prototypeから画面UIへ接続する境界。Sectionの取得や遷移の実行は利用側が所有する。 */
+export const CommunitySettingsView = ({
   communityId,
   section,
   content,
   communityAccentColor,
   onSectionChange,
-}: CommunitySettingsViewProps) {
+}: CommunitySettingsViewProps) => {
   return (
     <CommunitySettingsLayout
       communityId={communityId}

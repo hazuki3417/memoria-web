@@ -3,16 +3,15 @@
 import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { SectionHeader } from "@/components/SectionHeader"
 import { CommunityNameSaveFeedback } from "./CommunityNameSaveFeedback"
-import type { InspectCommunityName, useCommunityNameForm } from "./useCommunityNameForm"
+import type { useCommunityNameForm } from "./useCommunityNameForm"
 
 export type CommunityNameSectionViewProps = {
   isAdmin: boolean
   form: ReturnType<typeof useCommunityNameForm>
-  onInspectName?: InspectCommunityName
 }
 
-/** Community名の表示と操作だけを担う。保存・検証・Recoveryの状態はSectionから受け取る。 */
-export const CommunityNameSectionView = ({ isAdmin, form, onInspectName }: CommunityNameSectionViewProps) => {
+/** Community名の表示と操作だけを担う。保存・検証の状態はSectionから受け取る。 */
+export const CommunityNameSectionView = ({ isAdmin, form }: CommunityNameSectionViewProps) => {
   const { field, fieldState, validation } = form
   const error =
     fieldState.error?.type === "server"
@@ -25,7 +24,7 @@ export const CommunityNameSectionView = ({ isAdmin, form, onInspectName }: Commu
     <Box>
       <SectionHeader>基本情報</SectionHeader>
       <Stack gap="md" maw={540}>
-        <CommunityNameSaveFeedback model={form} onInspect={onInspectName} />
+        <CommunityNameSaveFeedback model={form} />
         <TextInput
           label="Community名"
           name={field.name}

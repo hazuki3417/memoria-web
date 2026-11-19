@@ -4,11 +4,12 @@ import { useState } from "react"
 import { CommunitySettingsView } from "../CommunitySettingsView"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import type { ReactNode } from "react"
-import { CommunityGeneral } from "../general/CommunityGeneral"
-import { CommunityMembers } from "../members"
+import { CommunityGeneralView } from "../general/CommunityGeneralView"
+import { CommunityMembersView } from "../members/CommunityMembersView"
+import { previewCommunityMembers } from "./communityMembersStoryFixtures"
 import type { CommunityMember } from "../members"
 import type { CommunityInvitationSectionProps } from "../general/CommunityInvitationSection"
-import { CommunityPreferencesView } from "../preferences"
+import { CommunityPreferencesStoryView as CommunityPreferencesView } from "../preferences/CommunityPreferencesStoryView"
 import type { CommunitySettingsSection } from "../communitySettingsSections"
 import type { PageStatus } from "@/components/PageStatusBoundary/PageStatusBoundary"
 import type { SaveCommunityName } from "../general/CommunityNameSection/communityNameSaveOutcome"
@@ -24,7 +25,6 @@ export type CommunitySettingsStoryProps = {
   section?: CommunitySettingsSection
   communityName?: string
   onSaveName?: SaveCommunityName
-  onInspectName?: () => Promise<string>
   members?: CommunityMember[]
   onChangeMemberRole?: (userId: string, role: Role) => Promise<boolean>
   onRemoveMember?: (userId: string) => Promise<boolean>
@@ -44,14 +44,14 @@ export type CommunitySettingsStoryProps = {
  * Storybook-only adapter: keeps section changes inside Canvas.
  * Production route navigation is supplied independently by CommunitySettingsRoute.
  */
-export function CommunitySettingsStoryNavigation({
+export const CommunitySettingsStoryNavigation = ({
   section = "general",
   onSectionChange: _onSectionChange,
   preferencesContent,
   invitationMode = "preview",
   invitation: suppliedInvitation,
   ...props
-}: CommunitySettingsStoryProps) {
+}: CommunitySettingsStoryProps) => {
   const [currentSection, setCurrentSection] =
     useState<CommunitySettingsSection>(section)
   const [accent, setAccent] = useState("#7950f2")
@@ -64,11 +64,10 @@ export function CommunitySettingsStoryNavigation({
   switch (currentSection) {
     case "general":
       content = (
-        <CommunityGeneral
+        <CommunityGeneralView
           name={{
             communityName: props.communityName,
             onSaveName: props.onSaveName,
-            onInspectName: props.onInspectName,
           }}
           invitation={invitation}
           invitationAvailable={invitationMode === "preview"}
@@ -79,8 +78,8 @@ export function CommunitySettingsStoryNavigation({
       break
     case "members":
       content = (
-        <CommunityMembers
-          members={props.members}
+        <CommunityMembersView
+          members={props.members ?? previewCommunityMembers}
           onChangeRole={props.onChangeMemberRole}
           onRemoveMember={props.onRemoveMember}
           onLeave={props.onLeaveCommunity}

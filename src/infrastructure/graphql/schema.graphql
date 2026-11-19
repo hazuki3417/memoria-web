@@ -130,6 +130,7 @@ extend type Query {
 input AcceptCommunityDeletionInput {
   communityId: ID!
   revision: String!
+  operationId: ID
 }
 
 type AcceptCommunityDeletionPayload {
@@ -138,6 +139,10 @@ type AcceptCommunityDeletionPayload {
 
 extend type Mutation {
   acceptCommunityDeletion(input: AcceptCommunityDeletionInput!): AcceptCommunityDeletionPayload!
+}
+
+extend type Query {
+  communityDeletionAcceptance(operationId: ID!): AcceptCommunityDeletionPayload
 }
 
 # Group / Media schema snapshot synchronized from memoria-api executable SDL.
