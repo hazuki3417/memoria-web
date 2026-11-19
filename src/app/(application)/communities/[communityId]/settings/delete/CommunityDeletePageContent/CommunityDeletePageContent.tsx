@@ -48,6 +48,9 @@ export const CommunityDeletePageContent = () => {
         // 記録未検出・権限確認失敗・通信失敗から未受付を推測しない。
         setCheckFailed(true)
       }
+    } catch {
+      // 照会HookやNavigationの想定外例外も受付未成立の証拠にはしない。
+      setCheckFailed(true)
     } finally {
       setChecking(false)
     }
