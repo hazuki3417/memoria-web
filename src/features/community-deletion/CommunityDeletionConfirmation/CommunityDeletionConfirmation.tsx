@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import {
   Box,
   Button,
@@ -25,7 +24,7 @@ type Props = {
   isAdministrator: boolean
   onDelete?: () => Promise<CommunityDeletionAcceptanceOutcome>
   onReviewChanged?: () => void
-  onNavigate?: (href: string) => void
+  onNavigate: (href: string) => void
 }
 
 export function CommunityDeletionConfirmation({
@@ -37,7 +36,6 @@ export function CommunityDeletionConfirmation({
   onReviewChanged,
   onNavigate,
 }: Props) {
-  const router = useRouter()
   const [step, setStep] = useState(0)
   const compact = useMediaQuery("(max-width: 48em)")
   const [cancelOpened, setCancelOpened] = useState(false)
@@ -48,8 +46,7 @@ export function CommunityDeletionConfirmation({
   const [outcomeUnknown, setOutcomeUnknown] = useState(false)
   const [reviewBlocked, setReviewBlocked] = useState(false)
   const settingsPath = `/communities/${encodeURIComponent(communityId)}/settings`
-  const navigate = (href: string) =>
-    onNavigate ? onNavigate(href) : router.push(href)
+  const navigate = onNavigate
   const cancel = () =>
     confirmation ? setCancelOpened(true) : navigate(settingsPath)
   const canDelete =
