@@ -145,6 +145,7 @@ export const CommunityDeletePageContent = () => {
       communityName={snapshot.name}
       managedMediaCount={snapshot.managedMediaCount}
       isAdministrator
+      onNavigate={(href) => router.push(href)}
       onDelete={() => deleteSnapshot(snapshot.revision)}
       onReviewChanged={() => void refetch()}
     />
