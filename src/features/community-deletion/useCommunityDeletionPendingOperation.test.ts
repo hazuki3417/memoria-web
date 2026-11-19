@@ -46,7 +46,7 @@ describe("Community削除Operationの再Mountをまたぐ再送禁止", () => {
     expect(operationId).toBe("operation-fixed")
     expect(model.operation).toEqual({ operationId: "operation-fixed", revision: "revision-1" })
     expect(model.begin("revision-1")).toBeNull()
-    await act(async () => { model.markUnknown() })
+    await act(async () => { model.markUnknown("operation-fixed") })
     expect(model.recovering).toBe(true)
     await unmount()
     await mount()
@@ -55,10 +55,35 @@ describe("Community削除Operationの再Mountをまたぐ再送禁止", () => {
     expect(model.begin("revision-1")).toBeNull()
   })
 
+  it("Stateの再描画前に連続実行されても別Operationを保存・送信しない", async () => {
+    await mount()
+    let first: string | null = null
+    let second: string | null = null
+    await act(async () => {
+      first = model.begin("revision-1")
+      second = model.begin("revision-1")
+    })
+    expect(first).toBe("operation-fixed")
+    expect(second).toBeNull()
+    expect(model.operation?.operationId).toBe("operation-fixed")
+  })
+
+  it("古いOutcomeが別OperationのLockを解除できない", async () => {
+    await mount()
+    await act(async () => { model.begin("revision-1") })
+    await act(async () => { model.clearRejected("operation-previous") })
+    expect(model.operation?.operationId).toBe("operation-fixed")
+    expect(window.sessionStorage.getItem("memoria:community-deletion:community-1")).toContain("operation-fixed")
+    await act(async () => { model.markUnknown("operation-previous") })
+    expect(model.recovering).toBe(false)
+    await act(async () => { model.markUnknown("operation-fixed") })
+    expect(model.recovering).toBe(true)
+  })
+
   it("確定的な未受付のときだけ保存済みロックを解除できる", async () => {
     await mount()
     await act(async () => { model.begin("revision-1") })
-    await act(async () => { model.clearRejected() })
+    await act(async () => { model.clearRejected("operation-fixed") })
     expect(model.operation).toBeNull()
     expect(window.sessionStorage.getItem("memoria:community-deletion:community-1")).toBeNull()
   })
