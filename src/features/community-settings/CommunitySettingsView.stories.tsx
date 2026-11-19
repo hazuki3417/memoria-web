@@ -382,7 +382,9 @@ export const LastAdministratorDemotionBlocked: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "テストユーザーの管理操作" }))
     await userEvent.click(await page.findByRole("menuitem", { name: "役割を変更" }))
     const dialog = await page.findByRole("dialog", { name: "役割を変更" })
-    await expect(within(dialog).getByText("最後のAdministratorはMemberに変更できません。")).toBeVisible()
+    await waitFor(() =>
+      expect(within(dialog).getByText("最後のAdministratorはMemberに変更できません。")).toBeVisible(),
+    )
     await expect(within(dialog).getByRole("radio", { name: /^Member/ })).toBeDisabled()
     await expect(within(dialog).getByRole("button", { name: "変更する" })).toBeDisabled()
     await expect(args.onChangeMemberRole).not.toHaveBeenCalled()
