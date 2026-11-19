@@ -10,7 +10,7 @@ export type CommunityDeletionPendingOperation = {
 type PendingState =
   | { status: "loading" }
   | { status: "unavailable" }
-  | { status: "ready"; operation: CommunityDeletionPendingOperation | null }
+  | { status: "ready"; operation: CommunityDeletionPendingOperation | null; recovered: boolean }
 
 const storageKey = (communityId: string) => `memoria:community-deletion:${communityId}`
 
@@ -25,7 +25,7 @@ export const useCommunityDeletionPendingOperation = (communityId: string) => {
     try {
       const raw = window.sessionStorage.getItem(storageKey(communityId))
       if (!raw) {
-        setState({ status: "ready", operation: null })
+        setState({ status: "ready", operation: null, recovered: false })
         return
       }
       const value: unknown = JSON.parse(raw)
@@ -38,7 +38,7 @@ export const useCommunityDeletionPendingOperation = (communityId: string) => {
         setState({ status: "unavailable" })
         return
       }
-      setState({ status: "ready", operation: {
+      setState({ status: "ready", recovered: true, operation: {
         operationId: value.operationId, revision: value.revision,
       } })
     } catch {
@@ -52,7 +52,7 @@ export const useCommunityDeletionPendingOperation = (communityId: string) => {
       const operationId = crypto.randomUUID()
       const operation = { operationId, revision }
       window.sessionStorage.setItem(storageKey(communityId), JSON.stringify(operation))
-      setState({ status: "ready", operation })
+      setState({ status: "ready", operation, recovered: false })
       return operationId
     } catch {
       setState({ status: "unavailable" })
@@ -60,12 +60,18 @@ export const useCommunityDeletionPendingOperation = (communityId: string) => {
     }
   }
 
+  const markUnknown = () => {
+    setState((current) => current.status === "ready" && current.operation
+      ? { ...current, recovered: true }
+      : current)
+  }
+
   const clearRejected = () => {
     // 明示未受付・Revision競合など、成立していないと確定した場合のみ解除する。
     if (state.status !== "ready") return
     try {
       window.sessionStorage.removeItem(storageKey(communityId))
-      setState({ status: "ready", operation: null })
+      setState({ status: "ready", operation: null, recovered: false })
     } catch {
       setState({ status: "unavailable" })
     }
@@ -74,7 +80,9 @@ export const useCommunityDeletionPendingOperation = (communityId: string) => {
   return {
     status: state.status,
     operation: state.status === "ready" ? state.operation : null,
+    recovering: state.status === "ready" && state.recovered,
     begin,
+    markUnknown,
     clearRejected,
   }
 }
