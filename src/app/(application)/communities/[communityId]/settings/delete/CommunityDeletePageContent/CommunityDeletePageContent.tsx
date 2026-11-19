@@ -57,9 +57,9 @@ export const CommunityDeletePageContent = () => {
     const operationId = pending.begin(revision)
     if (!operationId) return { kind: "unknown" as const }
     const result = await acceptDeletion(revision, operationId)
-    if (result.kind === "unknown") pending.markUnknown()
+    if (result.kind === "unknown") pending.markUnknown(operationId)
     if (result.kind === "not-accepted" || result.kind === "review-changed") {
-      pending.clearRejected()
+      pending.clearRejected(operationId)
     }
     // acceptedの記録はDashboardへの遷移まで維持し、途中離脱時にも再送できないようにする。
     return result
