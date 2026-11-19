@@ -231,4 +231,34 @@ describe("Communityメンバー管理のMutation契約", () => {
     })
     await expect(actions.onLeaveCommunity()).rejects.toThrow("leave failed")
   })
+
+  it.each(["role", "removal"] as const)(
+    "%s成立後の通知例外は確定した成功を取り消さない",
+    async (kind) => {
+      mocks.notify.mockImplementation(() => { throw new Error("notification unavailable") })
+      if (kind === "role") {
+        mocks.changeRole.mockResolvedValue({
+          data: { changeCommunityMemberRole: { success: true } },
+        })
+        await expect(actions.onChangeMemberRole("user-2", "admin")).resolves.toBe(true)
+        expect(mocks.changeRole).toHaveBeenCalledTimes(1)
+      } else {
+        mocks.remove.mockResolvedValue({
+          data: { removeCommunityMember: { success: true } },
+        })
+        await expect(actions.onRemoveMember("user-2")).resolves.toBe(true)
+        expect(mocks.remove).toHaveBeenCalledTimes(1)
+      }
+      expect(mocks.notify).toHaveBeenCalledTimes(1)
+    },
+  )
+
+  it("退会成立後の同期警告が例外でも成功Outcomeを維持する", async () => {
+    mocks.leave.mockResolvedValue({ data: { leaveCommunity: { success: true } } })
+    mocks.refetch.mockRejectedValue(new Error("refetch unavailable"))
+    mocks.notify.mockImplementation(() => { throw new Error("notification unavailable") })
+    await expect(actions.onLeaveCommunity()).resolves.toBeUndefined()
+    expect(mocks.leave).toHaveBeenCalledTimes(1)
+    expect(mocks.notify).toHaveBeenCalledTimes(1)
+  })
 })
