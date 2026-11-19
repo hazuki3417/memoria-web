@@ -1,6 +1,6 @@
 "use client"
 
-import { PersonalPreferencesContent } from "./PersonalPreferencesContent"
+import { PersonalPreferencesLayout } from "./PersonalPreferencesLayout"
 import { usePersonalPreferencesForm } from "./usePersonalPreferencesForm"
 import { defaultPersonalPreferences, type PersonalPreferencesValues, type PersonalPreferencesPatch } from "./personalPreferences"
 import type { PersonalPreferencesSaveOperations, SavePersonalPreferencesAction } from "./personalPreferencesSaveOutcome"
@@ -28,7 +28,7 @@ export const PersonalPreferencesStoryView = ({
     operations?.save ?? onSaveAction, operations?.confirm, operations?.isAccentConfirmed, sourceReady,
   )
   return (
-    <PersonalPreferencesContent
+    <PersonalPreferencesLayout
       compact={compact}
       model={model}
       canSave={Boolean(operations || onSave || onSaveAction)}
