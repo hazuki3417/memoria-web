@@ -32,7 +32,9 @@ export const useCommunityDeletionPendingOperation = (communityId: string) => {
       if (
         !value || typeof value !== "object" ||
         !("operationId" in value) || typeof value.operationId !== "string" ||
-        !("revision" in value) || typeof value.revision !== "string"
+        value.operationId.length === 0 ||
+        !("revision" in value) || typeof value.revision !== "string" ||
+        value.revision.length === 0
       ) {
         // 不正・破損した記録を消すと、受付結果不明の操作を再送できてしまう。
         setState({ status: "unavailable", communityId })
