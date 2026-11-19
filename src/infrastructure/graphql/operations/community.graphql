@@ -42,6 +42,12 @@ mutation AcceptCommunityDeletion($input: AcceptCommunityDeletionInput!) {
   acceptCommunityDeletion(input: $input) { accepted }
 }
 
+# 受付時のMembership消失後も操作した本人だけが照会する。
+# nullは未受付を意味しない。
+query CommunityDeletionAcceptance($operationId: ID!) {
+  communityDeletionAcceptance(operationId: $operationId) { accepted }
+}
+
 query CommunityUsage($communityId: ID!) {
   communityUsage(communityId: $communityId) {
     mediaCount
