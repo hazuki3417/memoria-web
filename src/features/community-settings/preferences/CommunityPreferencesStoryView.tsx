@@ -3,7 +3,7 @@
 import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from "react"
 import { Stack } from "@mantine/core"
 import type { SaveStatusState } from "@/components/SaveStatus"
-import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
+import { CommunityPreferencesLayout } from "./CommunityPreferencesLayout"
 import { CommunityAliasSection } from "./CommunityAliasSection"
 import { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
 import type { CommunityPreferencesSaveOperations } from "./communityPreferencesSaveOutcome"
@@ -54,7 +54,7 @@ export const CommunityPreferencesStoryView = ({
     operations, preview, sourceReady,
   })
   const content = (
-    <CommunityPreferencesContent
+    <CommunityPreferencesLayout
       model={model}
       aliasSection={alias ? <CommunityAliasSection {...alias} /> : aliasSection}
       isPreview={isPreview}
