@@ -7,7 +7,7 @@ import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import { CommunityGeneral } from "./CommunityGeneral"
 
 /** Production General Controller and its Section-scoped Query. */
-function CommunityGeneralStory() {
+const CommunityGeneralStory = () => {
   return (
     <SettingsSectionHost label="Community設定を読み込み中">
       {(render) => (
