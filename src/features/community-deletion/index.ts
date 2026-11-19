@@ -1,3 +1,5 @@
 export { useCommunityDeletionAcceptance } from "./useCommunityDeletionAcceptance"
 export type { CommunityDeletionAcceptanceOutcome } from "./useCommunityDeletionAcceptance"
 export { CommunityDeletionConfirmation } from "./CommunityDeletionConfirmation"
+export { useCommunityDeletionPendingOperation } from "./useCommunityDeletionPendingOperation"
+export type { CommunityDeletionPendingOperation } from "./useCommunityDeletionPendingOperation"
