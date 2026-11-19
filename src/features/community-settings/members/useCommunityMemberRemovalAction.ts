@@ -27,13 +27,17 @@ export function useCommunityMemberRemovalAction(communityId: string) {
     } catch {
       // 操作自体は成立しているため、自動再送しない。
     }
-    showNotification(synced
-      ? { kind: "success", title: "メンバーを除外", description: "メンバーを除外しました。" }
-      : {
-          kind: "warning",
-          title: "メンバーを除外しましたが表示を更新できませんでした",
-          description: "除外は完了しています。ページを再読み込みして参加状態を確認してください。再度除外を送信しないでください。",
-        })
+    try {
+      showNotification(synced
+        ? { kind: "success", title: "メンバーを除外", description: "メンバーを除外しました。" }
+        : {
+            kind: "warning",
+            title: "メンバーを除外しましたが表示を更新できませんでした",
+            description: "除外は完了しています。ページを再読み込みして参加状態を確認してください。再度除外を送信しないでください。",
+          })
+    } catch {
+      // 通知例外が確定済みの除外を失敗へ格下げしない。
+    }
     return true
   }
 
