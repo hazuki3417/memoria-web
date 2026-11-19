@@ -1,6 +1,6 @@
 "use client"
 
-import { PersonalPreferencesContent } from "./PersonalPreferencesContent"
+import { PersonalPreferencesLayout } from "./PersonalPreferencesLayout"
 import { usePersonalPreferencesForm } from "./usePersonalPreferencesForm"
 import type { PersonalPreferencesValues } from "./personalPreferences"
 import { defaultPersonalPreferences } from "./personalPreferences"
@@ -29,5 +29,5 @@ export const PersonalPreferencesView = ({
     operations.isAccentConfirmed,
     sourceReady,
   )
-  return <PersonalPreferencesContent compact={compact} model={model} canSave />
+  return <PersonalPreferencesLayout compact={compact} model={model} canSave />
 }
