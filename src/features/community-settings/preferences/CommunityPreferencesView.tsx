@@ -3,7 +3,7 @@
 import type { ComponentProps } from "react"
 import { Stack } from "@mantine/core"
 import { CommunityAliasSection } from "./CommunityAliasSection"
-import { CommunityPreferencesContent } from "./CommunityPreferencesContent"
+import { CommunityPreferencesLayout } from "./CommunityPreferencesLayout"
 import { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
 import type { CommunityPreferencesSaveOperations } from "./communityPreferencesSaveOutcome"
 import type { CommunityPreferencesAccentPreview } from "./useCommunityPreferencesAutoSave"
@@ -35,7 +35,7 @@ export const CommunityPreferencesView = ({
 
   return (
     <Stack gap="sm">
-      <CommunityPreferencesContent
+      <CommunityPreferencesLayout
         model={model}
         aliasSection={alias ? <CommunityAliasSection {...alias} /> : undefined}
         isPreview={false}
