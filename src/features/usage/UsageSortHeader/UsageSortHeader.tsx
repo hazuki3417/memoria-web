@@ -12,6 +12,6 @@ type UsageSortHeaderProps = {
 }
 
 /** Usageの既存public component / Story contractを維持して共通UIへ委譲する。 */
-export function UsageSortHeader(props: UsageSortHeaderProps) {
+export const UsageSortHeader = (props: UsageSortHeaderProps) => {
   return <SortHeader {...props} />
 }
