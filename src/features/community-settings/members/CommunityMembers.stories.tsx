@@ -6,7 +6,7 @@ import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 import { CommunityMembers } from "./CommunityMembers"
 
 /** Query/Mutation are owned by the selected Members controller. */
-function CommunityMembersStory() {
+const CommunityMembersStory = () => {
   return (
     <SettingsSectionHost label="Community設定を読み込み中">
       {(render) => (
