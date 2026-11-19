@@ -121,6 +121,29 @@ describe("Community削除の結果不明時の取得専用Recovery", () => {
     expect(mocks.push).not.toHaveBeenCalled()
   })
 
+  it("受付Callbackが例外を投げてもOperationを解除せずUnknownを返す", async () => {
+    mocks.pending.mockReturnValue({
+      status: "ready",
+      operation: null,
+      recovering: false,
+      begin: mocks.begin,
+      markUnknown: mocks.markUnknown,
+      clearRejected: mocks.clearRejected,
+    })
+    mocks.begin.mockReturnValue("operation-1")
+    mocks.accept.mockRejectedValue(new Error("unexpected callback failure"))
+    await renderRoute()
+    expect(mocks.confirmation).toHaveBeenCalled()
+    const confirmation = mocks.confirmation.mock.lastCall?.[0] as {
+      onDelete: () => Promise<{ kind: string }>
+    }
+    let result: { kind: string } | undefined
+    await act(async () => { result = await confirmation.onDelete() })
+    expect(result).toEqual({ kind: "unknown" })
+    expect(mocks.markUnknown).toHaveBeenCalledWith("operation-1")
+    expect(mocks.clearRejected).not.toHaveBeenCalled()
+  })
+
   it("保存状態が破損した場合は削除Confirmationを表示しない", async () => {
     mocks.pending.mockReturnValue({ status: "unavailable", operation: null, recovering: false })
     await renderRoute()
