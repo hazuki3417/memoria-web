@@ -8,7 +8,7 @@ export type PersonalPreferencesPreviewSectionInput = Pick<
 >
 
 /** Preview Sectionが利用する値と操作だけを共有Formから投影する。 */
-export function usePersonalPreferencesPreviewSection(model: PersonalPreferencesPreviewSectionInput) {
+export const usePersonalPreferencesPreviewSection = (model: PersonalPreferencesPreviewSectionInput) => {
   const { preferences, change, fieldErrors } = model
   return {
     preferences, fieldErrors,
