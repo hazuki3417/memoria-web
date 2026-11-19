@@ -153,6 +153,57 @@ describe("Community削除の結果不明時の取得専用Recovery", () => {
     expect(mocks.clearRejected).not.toHaveBeenCalled()
   })
 
+  it.each(["succeeded", "failed"] as const)(
+    "受付が確定した場合(sync=%s)はOperationを解放せず結果を返す",
+    async (sync) => {
+      mocks.pending.mockReturnValue({
+        status: "ready",
+        operation: null,
+        recovering: false,
+        begin: mocks.begin,
+        markUnknown: mocks.markUnknown,
+        clearRejected: mocks.clearRejected,
+      })
+      mocks.begin.mockReturnValue("operation-1")
+      mocks.accept.mockResolvedValue({ kind: "accepted", sync })
+      await renderRoute()
+      const confirmation = mocks.confirmation.mock.lastCall?.[0] as {
+        onDelete: () => Promise<{ kind: string; sync?: string }>
+      }
+      let result: { kind: string; sync?: string } | undefined
+      await act(async () => { result = await confirmation.onDelete() })
+      expect(result).toEqual({ kind: "accepted", sync })
+      expect(mocks.accept).toHaveBeenCalledWith("revision-1", "operation-1")
+      expect(mocks.markUnknown).not.toHaveBeenCalled()
+      expect(mocks.clearRejected).not.toHaveBeenCalled()
+    },
+  )
+
+  it.each(["not-accepted", "review-changed"] as const)(
+    "確定的な%sのときだけ対象OperationのLockを解除する",
+    async (kind) => {
+      mocks.pending.mockReturnValue({
+        status: "ready",
+        operation: null,
+        recovering: false,
+        begin: mocks.begin,
+        markUnknown: mocks.markUnknown,
+        clearRejected: mocks.clearRejected,
+      })
+      mocks.begin.mockReturnValue("operation-1")
+      mocks.accept.mockResolvedValue({ kind })
+      await renderRoute()
+      const confirmation = mocks.confirmation.mock.lastCall?.[0] as {
+        onDelete: () => Promise<{ kind: string }>
+      }
+      let result: { kind: string } | undefined
+      await act(async () => { result = await confirmation.onDelete() })
+      expect(result).toEqual({ kind })
+      expect(mocks.clearRejected).toHaveBeenCalledWith("operation-1")
+      expect(mocks.markUnknown).not.toHaveBeenCalled()
+    },
+  )
+
   it("保存状態が破損した場合は削除Confirmationを表示しない", async () => {
     mocks.pending.mockReturnValue({ status: "unavailable", operation: null, recovering: false })
     await renderRoute()
