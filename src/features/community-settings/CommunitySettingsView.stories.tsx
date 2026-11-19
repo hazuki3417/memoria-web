@@ -50,7 +50,7 @@ export const General: Story = {
 }
 
 /** Mirrors the production key={communityId} remount boundary without a Router mock. */
-function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettingsStoryNavigation>) {
+const CommunitySwitchFixture = (args: ComponentProps<typeof CommunitySettingsStoryNavigation>) => {
   const [communityId, setCommunityId] = useState("photo-club")
   const communityName =
     communityId === "photo-club" ? "家族のアルバム" : "旅行の思い出"
@@ -132,7 +132,7 @@ export const InvitationContextChangeReset: Story = {
 
 
 /** Switching from Administrator to Member must immediately hide an issued preview secret. */
-function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettingsStoryNavigation>) {
+const InvitationRoleChangeFixture = (args: ComponentProps<typeof CommunitySettingsStoryNavigation>) => {
   const [role, setRole] = useState<"admin" | "member">("admin")
   return (
     <>
