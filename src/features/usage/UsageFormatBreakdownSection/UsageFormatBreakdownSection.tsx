@@ -10,7 +10,7 @@ import {
 } from "../sortUsageFormats"
 import type { FileSizeUnit } from "../formatFileSize"
 import { UsageFileSize } from "../UsageFileSize"
-import { UsageSortHeader } from "../UsageSortHeader"
+import { SortHeader } from "@/ui/SortHeader"
 import { usagePercent } from "../usagePercent"
 import { usageFormatColors as formatColors } from "../usageFormatColors"
 import type { UsageData } from "../usageTypes"
@@ -52,7 +52,7 @@ export function UsageFormatBreakdownSection({
     return sort.direction === "asc" ? "ascending" : "descending"
   }
   const sortHeader = (key: UsageSortKey, label: string) => (
-    <UsageSortHeader
+    <SortHeader
       label={label}
       direction={sort?.key === key ? sort.direction : null}
       align={key === "format" ? "left" : "right"}
