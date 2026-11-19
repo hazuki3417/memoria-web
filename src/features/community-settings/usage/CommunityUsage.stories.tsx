@@ -56,7 +56,7 @@ const otherCommunityUsage = {
 }
 
 
-function CommunityUsageStory({ communityId }: { communityId: string }) {
+const CommunityUsageStory = ({ communityId }: { communityId: string }) => {
   return (
     <SettingsSectionHost label="利用状況を読み込み中" errorTitle="利用状況を取得できませんでした">
       {(render) => <CommunityUsage communityId={communityId} render={render} />}
@@ -64,7 +64,7 @@ function CommunityUsageStory({ communityId }: { communityId: string }) {
   )
 }
 
-function CommunitySwitchScenario() {
+const CommunitySwitchScenario = () => {
   const [communityId, setCommunityId] = useState("club-a")
   return (
     <>
