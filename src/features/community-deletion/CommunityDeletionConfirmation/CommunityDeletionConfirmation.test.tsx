@@ -1,4 +1,4 @@
-import { act, createElement } from "react"
+import { act, createElement, type ReactNode } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { CommunityDeletionConfirmation } from "./CommunityDeletionConfirmation"
@@ -22,19 +22,19 @@ vi.mock("@/components/Feedback", async () => {
   return {
     showNotification: mocks.notify,
     FeedbackPanel: ({ children, actions, role }: {
-      children?: React.ReactNode
-      actions?: React.ReactNode
+      children?: ReactNode
+      actions?: ReactNode
       role?: string
     }) => createElement("div", { role }, children, actions),
   }
 })
 vi.mock("@mantine/core", async () => {
   const { createElement } = await import("react")
-  const Container = ({ children }: { children?: React.ReactNode }) =>
+  const Container = ({ children }: { children?: ReactNode }) =>
     createElement("div", null, children)
   const Stepper = Object.assign(Container, { Step: Container })
   const Button = ({ children, onClick, disabled, loading }: {
-    children?: React.ReactNode
+    children?: ReactNode
     onClick?: () => void
     disabled?: boolean
     loading?: boolean
@@ -48,7 +48,7 @@ vi.mock("@mantine/core", async () => {
     disabled,
     onClick: () => onChange({ currentTarget: { value: "家族のアルバム" } }),
   }, label)
-  const Modal = ({ opened, children }: { opened: boolean; children?: React.ReactNode }) =>
+  const Modal = ({ opened, children }: { opened: boolean; children?: ReactNode }) =>
     opened ? createElement("div", null, children) : null
   return {
     Box: Container, Group: Container, Stack: Container, Text: Container,
@@ -111,9 +111,13 @@ describe("Community削除の受付結果と通知例外の独立契約", () => {
       await mount()
       await submit()
       expect(mocks.delete).toHaveBeenCalledTimes(1)
-      expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith("/dashboard")
+      expect(mocks.navigate).toHaveBeenCalledTimes(1)
+      expect(mocks.navigate).toHaveBeenCalledWith("/dashboard")
       expect(host?.textContent).not.toContain("削除受付の結果を確認できませんでした")
-      expect(host?.querySelector("button:last-child")?.disabled).toBe(true)
+      const deleteButton = [...(host?.querySelectorAll("button") ?? [])].find(
+        (element) => element.textContent === "Communityを削除する",
+      )
+      expect(deleteButton?.disabled).toBe(true)
     },
   )
 
@@ -124,7 +128,8 @@ describe("Community削除の受付結果と通知例外の独立契約", () => {
     await mount()
     await submit()
     expect(mocks.notify).toHaveBeenCalledTimes(2)
-    expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith("/dashboard")
+    expect(mocks.navigate).toHaveBeenCalledTimes(1)
+      expect(mocks.navigate).toHaveBeenCalledWith("/dashboard")
     expect(mocks.delete).toHaveBeenCalledTimes(1)
   })
 
