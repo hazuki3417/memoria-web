@@ -130,6 +130,23 @@ describe("Community削除の結果不明時の取得専用Recovery", () => {
     expect(mocks.push).not.toHaveBeenCalled()
   })
 
+  it("Confirmationの設定画面・Dashboard遷移をRouteのRouterへ委譲する", async () => {
+    mocks.pending.mockReturnValue({
+      status: "ready",
+      operation: null,
+      recovering: false,
+      begin: mocks.begin,
+      markUnknown: mocks.markUnknown,
+      clearRejected: mocks.clearRejected,
+    })
+    await renderRoute()
+    const confirmation = mocks.confirmation.mock.lastCall?.[0] as {
+      onNavigate: (href: string) => void
+    }
+    await act(async () => { confirmation.onNavigate("/dashboard") })
+    expect(mocks.push).toHaveBeenCalledWith("/dashboard")
+  })
+
   it("受付Callbackが例外を投げてもOperationを解除せずUnknownを返す", async () => {
     mocks.pending.mockReturnValue({
       status: "ready",
