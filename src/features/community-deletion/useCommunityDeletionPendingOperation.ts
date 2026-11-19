@@ -49,6 +49,9 @@ export const useCommunityDeletionPendingOperation = (communityId: string) => {
   const begin = (revision: string): string | null => {
     if (state.status !== "ready" || state.communityId !== communityId || state.operation) return null
     try {
+      // React State更新前の連続操作でも、保存済みの受付Attemptを上書きしない。
+      // 不明・破損を含め既存の値があれば、新しいMutationの発行は許可しない。
+      if (window.sessionStorage.getItem(storageKey(communityId)) !== null) return null
       const operationId = crypto.randomUUID()
       const operation = { operationId, revision }
       window.sessionStorage.setItem(storageKey(communityId), JSON.stringify(operation))
@@ -60,19 +63,30 @@ export const useCommunityDeletionPendingOperation = (communityId: string) => {
     }
   }
 
-  const markUnknown = () => {
-    setState((current) => current.status === "ready" && current.communityId === communityId && current.operation
+  const markUnknown = (operationId: string) => {
+    setState((current) => current.status === "ready" &&
+      current.communityId === communityId &&
+      current.operation?.operationId === operationId
       ? { ...current, recovered: true }
       : current)
   }
 
-  const clearRejected = () => {
-    // 明示未受付・Revision競合など、成立していないと確定した場合のみ解除する。
+  const clearRejected = (operationId: string) => {
+    // 確定的な拒否が返ったAttemptだけを解除する。古い応答では後続Attemptを解放しない。
     if (state.status !== "ready" || state.communityId !== communityId) return
     try {
+      const raw = window.sessionStorage.getItem(storageKey(communityId))
+      if (!raw) {
+        setState({ status: "unavailable", communityId })
+        return
+      }
+      const stored: unknown = JSON.parse(raw)
+      if (!stored || typeof stored !== "object" || !("operationId" in stored) ||
+        stored.operationId !== operationId) return
       window.sessionStorage.removeItem(storageKey(communityId))
       setState({ status: "ready", communityId, operation: null, recovered: false })
     } catch {
+      // 破損やStorage異常は未受付の根拠ではない。
       setState({ status: "unavailable", communityId })
     }
   }
