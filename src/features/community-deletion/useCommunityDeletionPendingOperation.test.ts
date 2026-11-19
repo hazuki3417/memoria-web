@@ -103,6 +103,16 @@ describe("Community削除Operationの再Mountをまたぐ再送禁止", () => {
     expect(model.operation?.revision).toBe("revision-1")
   })
 
+  it.each([
+    '{"operationId":"","revision":"revision-1"}',
+    '{"operationId":"operation-1","revision":""}',
+  ])("不完全な永続Operation(%s)から削除を再開しない", async (raw) => {
+    window.sessionStorage.setItem("memoria:community-deletion:community-1", raw)
+    await mount()
+    expect(model.status).toBe("unavailable")
+    expect(model.begin("revision-1")).toBeNull()
+  })
+
   it("操作記録が破損している場合は削除を開始できない", async () => {
     window.sessionStorage.setItem("memoria:community-deletion:community-1", "invalid json")
     await mount()
