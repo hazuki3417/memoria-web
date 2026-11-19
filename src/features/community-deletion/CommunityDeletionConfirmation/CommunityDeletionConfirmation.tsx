@@ -131,11 +131,15 @@ export function CommunityDeletionConfirmation({
         case "unknown":
           setOutcomeUnknown(true)
           setError("削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。")
-          showNotification({
-            kind: "warning",
-            title: "Community削除の受付結果は不明です",
-            description: "成立の有無を断定できません。同じ削除を自動再送せず、最新の状態を確認してください。",
-          })
+          try {
+            showNotification({
+              kind: "warning",
+              title: "Community削除の受付結果は不明です",
+              description: "成立の有無を断定できません。同じ削除を自動再送せず、最新の状態を確認してください。",
+            })
+          } catch {
+            // 通知が失敗しても、受付結果不明と再送禁止を維持する。
+          }
           break
       }
     } finally {
