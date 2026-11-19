@@ -6,7 +6,7 @@ import { graphqlUsageFixture, emptyGraphqlUsageFixture } from "@/features/usage/
 import { PersonalUsage } from "./PersonalUsage"
 import { SettingsSectionHost } from "@/ui/SettingsSectionHost"
 
-function PersonalUsageStory() {
+const PersonalUsageStory = () => {
   return (
     <SettingsSectionHost label="利用状況を読み込み中" errorTitle="利用状況を取得できませんでした">
       {(render) => <PersonalUsage render={render} />}
