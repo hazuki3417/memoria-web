@@ -129,7 +129,7 @@ describe("Community削除の受付結果と通知例外の独立契約", () => {
     await submit()
     expect(mocks.notify).toHaveBeenCalledTimes(2)
     expect(mocks.navigate).toHaveBeenCalledTimes(1)
-      expect(mocks.navigate).toHaveBeenCalledWith("/dashboard")
+    expect(mocks.navigate).toHaveBeenCalledWith("/dashboard")
     expect(mocks.delete).toHaveBeenCalledTimes(1)
   })
 
