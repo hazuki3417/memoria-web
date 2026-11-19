@@ -2,6 +2,7 @@
 
 import { useApolloClient } from "@apollo/client"
 import {
+  CommunityDeletionAcceptanceDocument,
   MyCommunitiesDocument,
   useAcceptCommunityDeletionMutation,
 } from "@/infrastructure/graphql/generated"
@@ -22,11 +23,12 @@ export const useCommunityDeletionAcceptance = (communityId: string) => {
 
   const acceptDeletion = async (
     revision: string,
+    operationId: string,
   ): Promise<CommunityDeletionAcceptanceOutcome> => {
     let accepted: boolean | undefined
     try {
       const result = await accept({
-        variables: { input: { communityId, revision } },
+        variables: { input: { communityId, revision, operationId } },
       })
       accepted = result.data?.acceptCommunityDeletion?.accepted
     } catch (caught) {
@@ -62,5 +64,20 @@ export const useCommunityDeletionAcceptance = (communityId: string) => {
     }
   }
 
-  return { acceptDeletion }
+  const inspectAcceptance = async (operationId: string): Promise<boolean> => {
+    try {
+      const inspected = await client.query({
+        query: CommunityDeletionAcceptanceDocument,
+        variables: { operationId },
+        fetchPolicy: "network-only",
+      })
+      return inspected.data?.communityDeletionAcceptance?.accepted === true &&
+        !inspected.error && !inspected.errors?.length
+    } catch {
+      // 未検出や通信例外を「未受付」と判定しない。
+      return false
+    }
+  }
+
+  return { acceptDeletion, inspectAcceptance }
 }
