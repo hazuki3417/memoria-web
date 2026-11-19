@@ -56,13 +56,19 @@ export const CommunityDeletePageContent = () => {
   const deleteSnapshot = async (revision: string) => {
     const operationId = pending.begin(revision)
     if (!operationId) return { kind: "unknown" as const }
-    const result = await acceptDeletion(revision, operationId)
-    if (result.kind === "unknown") pending.markUnknown(operationId)
-    if (result.kind === "not-accepted" || result.kind === "review-changed") {
-      pending.clearRejected(operationId)
+    try {
+      const result = await acceptDeletion(revision, operationId)
+      if (result.kind === "unknown") pending.markUnknown(operationId)
+      if (result.kind === "not-accepted" || result.kind === "review-changed") {
+        pending.clearRejected(operationId)
+      }
+      // acceptedの記録はDashboardへの遷移まで維持し、途中離脱時にも再送できないようにする。
+      return result
+    } catch {
+      // 想定外の例外でも、送信前に保存したOperationを消さず取得専用の復旧へ遷移する。
+      pending.markUnknown(operationId)
+      return { kind: "unknown" as const }
     }
-    // acceptedの記録はDashboardへの遷移まで維持し、途中離脱時にも再送できないようにする。
-    return result
   }
 
   if (pending.status === "loading") {
