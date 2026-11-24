@@ -3,11 +3,14 @@
 import { useMediaQuery } from "@mantine/hooks"
 import type { useCommunityPreferencesForm } from "../useCommunityPreferencesForm"
 
-type PreferencesForm = ReturnType<typeof useCommunityPreferencesForm>
+export type CommunityPreferencesDisplaySectionInput = Pick<
+  ReturnType<typeof useCommunityPreferencesForm>,
+  "field" | "fieldState" | "draftInvalid" | "onDraftChange"
+>
 
 /** 表示Sectionに必要な入力状態とResponsive条件を組み立てる。 */
 export const useCommunityPreferencesDisplaySection = (
-  model: PreferencesForm,
+  model: CommunityPreferencesDisplaySectionInput,
   accentError?: string,
 ) => {
   const compact = useMediaQuery("(max-width: 48em)")

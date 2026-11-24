@@ -3,12 +3,14 @@
 import { Badge, Box, Button, Group, Menu, ScrollArea, Table, Text, TextInput } from "@mantine/core"
 import { IconDots, IconSearch } from "@tabler/icons-react"
 import { SectionHeader } from "@/components/SectionHeader"
-import { UsageSortHeader } from "@/features/usage/UsageSortHeader"
+import { SortHeader } from "@/ui/SortHeader"
 import type { CommunityMember } from "@/features/community/CommunityProvider"
 import { COMMUNITY_MEMBER_LIMIT, COMMUNITY_ADMIN_LIMIT } from "../communityMemberLimits"
 import type { useCommunityMembersState, CommunityMembersActions } from "../useCommunityMembersState"
 
-type MembersState = ReturnType<typeof useCommunityMembersState>
+type MembersState = Pick<ReturnType<typeof useCommunityMembersState>,
+  "query" | "setQuery" | "sort" | "setRoleError" | "setRoleTarget" | "setSelectedRole" | "setRemoveError" | "setRemoveTarget" | "self" | "adminCount" | "memberLimitReached" | "adminLimitReached" | "rows" | "changeSort" | "ariaSort"
+>
 
 /** Member count, search, sorting and administrative row operations. */
 export function CommunityMembersTableSection({
@@ -79,7 +81,7 @@ export function CommunityMembersTableSection({
                   <Table.Thead>
                     <Table.Tr>
                       <Table.Th w="45%" aria-sort={ariaSort("name")}>
-                        <UsageSortHeader
+                        <SortHeader
                           label="名前"
                           direction={
                             sort?.key === "name" ? sort.direction : null
@@ -90,7 +92,7 @@ export function CommunityMembersTableSection({
                         />
                       </Table.Th>
                       <Table.Th aria-sort={ariaSort("role")}>
-                        <UsageSortHeader
+                        <SortHeader
                           label="役割"
                           direction={
                             sort?.key === "role" ? sort.direction : null
@@ -123,8 +125,7 @@ export function CommunityMembersTableSection({
                         </Table.Td>
                         {self?.role === "admin" && (
                           <Table.Td w={52}>
-                            {!member.isSelf && (
-                              <Menu position="bottom-end" withinPortal>
+                            <Menu position="bottom-end" withinPortal>
                                 <Menu.Target>
                                   <Button
                                     size="compact-xs"
@@ -145,7 +146,8 @@ export function CommunityMembersTableSection({
                                   >
                                     役割を変更
                                   </Menu.Item>
-                                  <Menu.Item
+                                  {!member.isSelf && (
+                                    <Menu.Item
                                     disabled={
                                       !onRemoveMember ||
                                       (member.role === "admin" &&
@@ -155,10 +157,10 @@ export function CommunityMembersTableSection({
                                     color="red"
                                   >
                                     除外
-                                  </Menu.Item>
+                                    </Menu.Item>
+                                  )}
                                 </Menu.Dropdown>
                               </Menu>
-                            )}
                           </Table.Td>
                         )}
                       </Table.Tr>

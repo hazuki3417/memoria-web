@@ -53,14 +53,11 @@ export const CommunityPreferences = ({
       <CommunityPreferencesView
         key={communityId}
         accent={fromGraphqlCommunityPreferences(settings).accentColor}
-        isPreview={false}
         operations={operations}
         sourceReady={!query.loading && !query.error}
         preview={preview}
         alias={{
           savedAlias: settings.alias,
-          onInspect: alias.inspectAlias,
-          onConfirm: alias.confirmAlias,
           onSave: alias.saveAlias,
         }}
       />

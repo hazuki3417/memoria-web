@@ -3,7 +3,7 @@ import { FeedbackPanel } from "@/components/Feedback"
 import { useState, type ComponentProps } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
-import { CommunityPreferencesView } from "./CommunityPreferencesView"
+import { CommunityPreferencesStoryView as CommunityPreferencesView } from "./CommunityPreferencesStoryView"
 
 const meta = {
   title: "features/community-settings/preferences/CommunityPreferencesView",

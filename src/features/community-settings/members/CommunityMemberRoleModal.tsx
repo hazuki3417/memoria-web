@@ -4,7 +4,9 @@ import { Badge, Button, Group, Modal, Radio, Stack, Text } from "@mantine/core"
 import { FeedbackPanel } from "@/components/Feedback"
 import type { CommunityMembersActions } from "./useCommunityMembersState"
 import type { useCommunityMembersState } from "./useCommunityMembersState"
-type MembersState = ReturnType<typeof useCommunityMembersState>
+type MembersState = Pick<ReturnType<typeof useCommunityMembersState>,
+  "roleTarget" | "setRoleTarget" | "roleBusy" | "roleError" | "setRoleError" | "selectedRole" | "setSelectedRole" | "adminLimitReached" | "adminCount" | "confirmRoleChange"
+>
 
 /** Role change confirmation and last-admin capacity guidance. */
 export function CommunityMemberRoleModal({
@@ -55,6 +57,13 @@ export function CommunityMemberRoleModal({
               />
             </Stack>
           </Radio.Group>
+          {roleTarget?.role === "admin" && selectedRole === "member" && adminCount > 1 && (
+            <Text size="sm" c="orange">
+              {roleTarget.isSelf
+                ? "Memberに変更すると、Community設定や参加者を管理する権限を失います。変更後も参加者の閲覧と退会は可能です。"
+                : `${roleTarget.name}はAdministrator権限を失い、Community設定や参加者を管理できなくなります。`}
+            </Text>
+          )}
           {roleTarget?.role === "admin" && adminCount <= 1 && (
             <Text size="sm" c="red">
               最後のAdministratorはMemberに変更できません。

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import {
   Box,
   Button,
@@ -16,15 +15,16 @@ import {
 } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { FeedbackPanel, showNotification } from "@/components/Feedback"
+import type { CommunityDeletionAcceptanceOutcome } from "../useCommunityDeletionAcceptance"
 
 type Props = {
   communityId: string
   communityName: string
   managedMediaCount: number
   isAdministrator: boolean
-  onDelete?: () => Promise<void>
+  onDelete?: () => Promise<CommunityDeletionAcceptanceOutcome>
   onReviewChanged?: () => void
-  onNavigate?: (href: string) => void
+  onNavigate: (href: string) => void
 }
 
 export function CommunityDeletionConfirmation({
@@ -36,7 +36,6 @@ export function CommunityDeletionConfirmation({
   onReviewChanged,
   onNavigate,
 }: Props) {
-  const router = useRouter()
   const [step, setStep] = useState(0)
   const compact = useMediaQuery("(max-width: 48em)")
   const [cancelOpened, setCancelOpened] = useState(false)
@@ -45,9 +44,9 @@ export function CommunityDeletionConfirmation({
   const [error, setError] = useState("")
   const [completed, setCompleted] = useState(false)
   const [outcomeUnknown, setOutcomeUnknown] = useState(false)
+  const [reviewBlocked, setReviewBlocked] = useState(false)
   const settingsPath = `/communities/${encodeURIComponent(communityId)}/settings`
-  const navigate = (href: string) =>
-    onNavigate ? onNavigate(href) : router.push(href)
+  const navigate = onNavigate
   const cancel = () =>
     confirmation ? setCancelOpened(true) : navigate(settingsPath)
   const canDelete =
@@ -56,38 +55,90 @@ export function CommunityDeletionConfirmation({
     !!onDelete &&
     !busy &&
     !completed &&
-    !outcomeUnknown
+    !outcomeUnknown &&
+    !reviewBlocked
 
   const remove = async () => {
     if (!canDelete || !onDelete) return
     setBusy(true)
     setError("")
+    let result: CommunityDeletionAcceptanceOutcome
     try {
-      await onDelete()
-      setCompleted(true)
-      showNotification({
-        kind: "success",
-        title: "Community削除の受付",
-        description:
-          "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
-      })
-      navigate("/dashboard")
-    } catch (caught) {
-      const changed =
-        caught instanceof Error && caught.message === "REVIEW_CHANGED"
-      setError(
-        changed
-          ? "削除対象の状態が変わりました。最新の内容で確認をやり直してください。"
-          : "削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。",
-      )
-      if (changed) onReviewChanged?.()
-      else setOutcomeUnknown(true)
-      showNotification({
-        kind: "error",
-        title: "Communityを削除",
-        description:
-          "最新の状態を確認してください。結果不明の操作を無条件に再実行しないでください。",
-      })
+      result = await onDelete()
+    } catch {
+      // Callback側の予期しない例外は確定していないMutationとして扱う。
+      setOutcomeUnknown(true)
+      setError("削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。")
+      setBusy(false)
+      return
+    }
+    // 確定した結果を表示処理の例外でUnknownへ格下げしない。
+    try {
+      switch (result.kind) {
+        case "accepted":
+          setCompleted(true)
+          try {
+            showNotification({
+              kind: "success",
+              title: "Community削除の受付",
+              description:
+                "Communityの削除を受け付けました。Mediaの物理削除は後続処理で行われます。",
+            })
+            if (result.sync === "failed") {
+              showNotification({
+                kind: "warning",
+                title: "Community一覧を更新できませんでした",
+                description:
+                  "削除受付は完了しています。Dashboardで最新のCommunity一覧を確認してください。削除を再送しないでください。",
+              })
+            }
+          } catch {
+            // 通知の表示失敗は確定済みの受付やDashboard遷移を妨げない。
+          }
+          navigate("/dashboard")
+          break
+        case "review-changed":
+          setReviewBlocked(true)
+          setError("削除対象の状態が変わりました。最新の内容で確認をやり直してください。")
+          try {
+            showNotification({
+              kind: "warning",
+              title: "削除対象の状態が変更されました",
+              description: "最新の内容を取得し、削除の影響を改めて確認してください。",
+            })
+          } catch {
+            // 通知できなくても最新Reviewの取得を続行する。
+          }
+          onReviewChanged?.()
+          break
+        case "not-accepted":
+          setReviewBlocked(true)
+          setError("削除は受け付けられませんでした。最新の削除対象を確認してください。")
+          try {
+            showNotification({
+              kind: "warning",
+              title: "Community削除は受け付けられませんでした",
+              description: "最新の確認情報を取得して、削除の影響を再確認してください。",
+            })
+          } catch {
+            // 通知できなくても最新Reviewの取得を続行する。
+          }
+          onReviewChanged?.()
+          break
+        case "unknown":
+          setOutcomeUnknown(true)
+          setError("削除受付の結果を確認できませんでした。再実行せず、最新の状態を確認してください。")
+          try {
+            showNotification({
+              kind: "warning",
+              title: "Community削除の受付結果は不明です",
+              description: "成立の有無を断定できません。同じ削除を自動再送せず、最新の状態を確認してください。",
+            })
+          } catch {
+            // 通知が失敗しても、受付結果不明と再送禁止を維持する。
+          }
+          break
+      }
     } finally {
       setBusy(false)
     }
@@ -256,7 +307,7 @@ export function CommunityDeletionConfirmation({
                   }
                   role="alert"
                   actions={
-                    outcomeUnknown && onReviewChanged ? (
+                    (outcomeUnknown || reviewBlocked) && onReviewChanged ? (
                       <Button variant="default" onClick={onReviewChanged}>
                         最新の状態を確認する
                       </Button>

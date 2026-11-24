@@ -2,23 +2,22 @@
 
 import { Group, UnstyledButton } from "@mantine/core"
 import { IconArrowDown, IconArrowsSort, IconArrowUp } from "@tabler/icons-react"
-import type { UsageSortDirection } from "../sortUsageFormats"
 
-type UsageSortHeaderProps = {
+export type SortHeaderProps = {
   label: string
-  direction: UsageSortDirection | null
+  direction: "asc" | "desc" | null
   align: "left" | "right"
   disabled: boolean
   onSort: () => void
 }
 
-export function UsageSortHeader({
+export const SortHeader = ({
   label,
   direction,
   align,
   disabled,
   onSort,
-}: UsageSortHeaderProps) {
+}: SortHeaderProps) => {
   let Icon = IconArrowsSort
 
   if (direction === "asc") {

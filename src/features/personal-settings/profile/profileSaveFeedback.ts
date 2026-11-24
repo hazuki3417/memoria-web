@@ -20,11 +20,11 @@ const messages = {
   },
   retryable: {
     title: "プロフィールを保存できませんでした",
-    description: "再試行してください。",
+    description: "入力内容を確認し、もう一度保存してください。",
   },
   unknown: {
     title: "プロフィールの保存結果を確認できませんでした",
-    description: "保存結果は不明です。自動で再送せず、現在の状態を確認してください。",
+    description: "保存されたか確認できません。自動で再送しません。ページを再読み込みして状態を確認してください。",
   },
   blocked: {
     title: "プロフィールを変更できません",
@@ -78,12 +78,12 @@ export const getProfileSaveFeedback = ({
   formInvalid,
   blockedMessage,
 }: ProfileFeedbackInput): SaveFeedback | null => {
-  // 保存不可・結果不明の復旧を入力エラーより優先し、同時に複数表示しない。
+  // 保存不可・結果不明を入力エラーより優先し、同時に複数表示しない。
   const type: SaveFeedbackType | null =
     status.kind === "blocked" ? "blocked"
     : status.kind === "unknown" ? "unknown"
     : formInvalid ? "validation"
-    : status.kind === "retryable-error" ? "retryable"
+    : status.kind === "error" ? "retryable"
     : null
 
   const feedback = resolveSaveFeedback(type, messages)

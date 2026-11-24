@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, fn, userEvent, within } from "storybook/test"
-import { UsageSortHeader } from "./UsageSortHeader"
+import { SortHeader } from "./SortHeader"
 
+// UsageからUIへ移設しても、既存VRT BaselineとInteraction StoryのIDを変更しない。
 const meta = {
-  title: "features/usage/UsageSortHeader",
-  component: UsageSortHeader,
+  id: "features-usage-usagesortheader",
+  title: "ui/SortHeader",
+  component: SortHeader,
   args: {
     label: "使用量",
     direction: null,
@@ -12,7 +14,7 @@ const meta = {
     disabled: false,
     onSort: fn(),
   },
-} satisfies Meta<typeof UsageSortHeader>
+} satisfies Meta<typeof SortHeader>
 
 export default meta
 type Story = StoryObj<typeof meta>

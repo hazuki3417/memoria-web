@@ -1,7 +1,6 @@
 "use client"
 
-import type { useCommunityPreferencesForm } from "../useCommunityPreferencesForm"
-import { useCommunityPreferencesDisplaySection } from "./useCommunityPreferencesDisplaySection"
+import { useCommunityPreferencesDisplaySection, type CommunityPreferencesDisplaySectionInput } from "./useCommunityPreferencesDisplaySection"
 import { CommunityPreferencesDisplaySectionView } from "./CommunityPreferencesDisplaySectionView"
 
 /** 表示Section固有の入力・操作をViewへ結合する。FormとQueueはPreferencesが所有する。 */
@@ -10,7 +9,7 @@ export const CommunityPreferencesDisplaySection = ({
   isPreview,
   accentError,
 }: {
-  model: ReturnType<typeof useCommunityPreferencesForm>
+  model: CommunityPreferencesDisplaySectionInput
   isPreview: boolean
   accentError?: string
 }) => {

@@ -1,0 +1,1 @@
+export { CommunityGeneral } from "./CommunityGeneral"

@@ -1,0 +1,122 @@
+import { act, createElement } from "react"
+import { createRoot, type Root } from "react-dom/client"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { useCommunityDeletionPendingOperation } from "./useCommunityDeletionPendingOperation"
+
+let root: Root | undefined
+let host: HTMLDivElement | undefined
+let model!: ReturnType<typeof useCommunityDeletionPendingOperation>
+
+const Fixture = ({ communityId }: { communityId: string }) => {
+  model = useCommunityDeletionPendingOperation(communityId)
+  return null
+}
+
+const mount = async (communityId = "community-1") => {
+  host = document.createElement("div")
+  document.body.appendChild(host)
+  root = createRoot(host)
+  await act(async () => { root?.render(createElement(Fixture, { communityId })) })
+}
+
+const unmount = async () => {
+  if (root) await act(async () => { root?.unmount() })
+  host?.remove()
+  root = undefined
+  host = undefined
+}
+
+beforeEach(() => {
+  window.sessionStorage.clear()
+  vi.stubGlobal("crypto", { randomUUID: () => "operation-fixed" })
+})
+
+afterEach(async () => {
+  await unmount()
+  vi.unstubAllGlobals()
+  window.sessionStorage.clear()
+})
+
+describe("Community削除Operationの再Mountをまたぐ再送禁止", () => {
+  it("送信前にOperation IDを永続化し、結果不明のまま再Mountしても再送できない", async () => {
+    await mount()
+    expect(model.status).toBe("ready")
+    let operationId: string | null = null
+    await act(async () => { operationId = model.begin("revision-1") })
+    expect(operationId).toBe("operation-fixed")
+    expect(model.operation).toEqual({ operationId: "operation-fixed", revision: "revision-1" })
+    expect(model.begin("revision-1")).toBeNull()
+    await act(async () => { model.markUnknown("operation-fixed") })
+    expect(model.recovering).toBe(true)
+    await unmount()
+    await mount()
+    expect(model.recovering).toBe(true)
+    expect(model.operation).toEqual({ operationId: "operation-fixed", revision: "revision-1" })
+    expect(model.begin("revision-1")).toBeNull()
+  })
+
+  it("Stateの再描画前に連続実行されても別Operationを保存・送信しない", async () => {
+    await mount()
+    let first: string | null = null
+    let second: string | null = null
+    await act(async () => {
+      first = model.begin("revision-1")
+      second = model.begin("revision-1")
+    })
+    expect(first).toBe("operation-fixed")
+    expect(second).toBeNull()
+    expect(model.operation?.operationId).toBe("operation-fixed")
+  })
+
+  it("古いOutcomeが別OperationのLockを解除できない", async () => {
+    await mount()
+    await act(async () => { model.begin("revision-1") })
+    await act(async () => { model.clearRejected("operation-previous") })
+    expect(model.operation?.operationId).toBe("operation-fixed")
+    expect(window.sessionStorage.getItem("memoria:community-deletion:community-1")).toContain("operation-fixed")
+    await act(async () => { model.markUnknown("operation-previous") })
+    expect(model.recovering).toBe(false)
+    await act(async () => { model.markUnknown("operation-fixed") })
+    expect(model.recovering).toBe(true)
+  })
+
+  it("確定的な未受付のときだけ保存済みロックを解除できる", async () => {
+    await mount()
+    await act(async () => { model.begin("revision-1") })
+    await act(async () => { model.clearRejected("operation-fixed") })
+    expect(model.operation).toBeNull()
+    expect(window.sessionStorage.getItem("memoria:community-deletion:community-1")).toBeNull()
+  })
+
+  it("Communityを切り替えても別Communityの操作ロックを流用しない", async () => {
+    await mount()
+    await act(async () => { model.begin("revision-1") })
+    await act(async () => {
+      root?.render(createElement(Fixture, { communityId: "community-2" }))
+    })
+    expect(model.status).toBe("ready")
+    expect(model.operation).toBeNull()
+    await act(async () => {
+      root?.render(createElement(Fixture, { communityId: "community-1" }))
+    })
+    expect(model.recovering).toBe(true)
+    expect(model.operation?.revision).toBe("revision-1")
+  })
+
+  it.each([
+    '{"operationId":"","revision":"revision-1"}',
+    '{"operationId":"operation-1","revision":""}',
+  ])("不完全な永続Operation(%s)から削除を再開しない", async (raw) => {
+    window.sessionStorage.setItem("memoria:community-deletion:community-1", raw)
+    await mount()
+    expect(model.status).toBe("unavailable")
+    expect(model.begin("revision-1")).toBeNull()
+  })
+
+  it("操作記録が破損している場合は削除を開始できない", async () => {
+    window.sessionStorage.setItem("memoria:community-deletion:community-1", "invalid json")
+    await mount()
+    expect(model.status).toBe("unavailable")
+    expect(model.begin("revision-1")).toBeNull()
+  })
+})

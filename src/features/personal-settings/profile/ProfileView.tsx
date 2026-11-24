@@ -4,29 +4,26 @@ import { Box, Button, Stack, TextInput } from "@mantine/core"
 import { PageHeader } from "@/components/PageHeader"
 import { SectionHeader } from "@/components/SectionHeader"
 import { ProfileSaveFeedback } from "./ProfileSaveFeedback"
-import { useProfileForm, type InspectProfile } from "./useProfileForm"
+import { useProfileForm } from "./useProfileForm"
 import type { SaveProfile } from "./profileSaveOutcome"
 
 const blockedDescription =
   "現在の状態では保存を続けられません。ページを再読み込みして、プロフィールの状態を確認してください。"
 
-/** 利用者がNicknameを編集・保存し、保存失敗や結果不明時の案内と復旧操作を利用できる画面を提供する。 */
+/** 利用者がNicknameを編集・保存し、保存失敗や結果不明時の案内を利用できる画面を提供する。 */
 export const ProfileView = ({
   onSave,
-  onInspect,
   initialNickname = "ユーザー",
   initialSaveState = "idle",
   blockedMessage = blockedDescription,
 }: {
   onSave: SaveProfile
-  onInspect?: InspectProfile
   initialNickname?: string
-  initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
+  initialSaveState?: "idle" | "saving" | "blocked"
   blockedMessage?: string
 }) => {
   const form = useProfileForm({
     onSave,
-    onInspect,
     initialNickname,
     initialSaveState,
   })
@@ -50,7 +47,6 @@ export const ProfileView = ({
         <Stack gap="md" maw={540}>
           <ProfileSaveFeedback
             model={form}
-            onInspect={onInspect}
             blockedMessage={blockedMessage}
           />
           <TextInput

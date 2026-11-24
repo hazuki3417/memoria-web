@@ -10,30 +10,26 @@ import { resolveFormInputValidation } from "@/ui/formValidation"
 import { profileSchema } from "./profileSchema"
 import type { SaveProfile } from "./profileSaveOutcome"
 
-export type InspectProfile = () => Promise<string>
-
 type SaveStatus =
-  | { kind: "idle" | "saving" | "retryable-error" | "unknown" }
+  | { kind: "idle" | "saving" | "error" | "unknown" }
   | { kind: "blocked"; error: unknown }
 
-/** ProfileのNickname編集・入力検証・明示保存・結果不明時の復旧操作を画面から利用できるようにする。 */
+/** ProfileのNickname Draft・検証・明示保存を管理する。 */
 export const useProfileForm = ({
   onSave,
-  onInspect,
   initialNickname,
   initialSaveState = "idle",
 }: {
   onSave: SaveProfile
-  onInspect?: InspectProfile
   initialNickname: string
-  initialSaveState?: "idle" | "saving" | "retryable-error" | "blocked"
+  initialSaveState?: "idle" | "saving" | "blocked"
 }) => {
   const form = useForm<z.input<typeof profileSchema>, unknown, z.output<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     mode: "onChange",
     defaultValues: { nickname: initialNickname },
   })
-  const { control, reset, getValues, handleSubmit, setError, clearErrors } = form
+  const { control, reset, handleSubmit, setError, clearErrors } = form
   const { field, fieldState } = useController({ control, name: "nickname" })
   const nickname = useWatch({ control, name: "nickname" }) ?? initialNickname
   const normalized = nickname.trim()
@@ -42,17 +38,7 @@ export const useProfileForm = ({
   const validation = profileSchema.safeParse({ nickname })
   const invalid = !validation.success
 
-  const matchesNickname = (observed: string, submitted: string) => {
-    return observed === submitted
-  }
-
-  const { process, snapshot: processState } = useExplicitSaveProcess({
-    execute: onSave,
-    recovery: onInspect
-      ? { inspect: onInspect, matches: matchesNickname }
-      : undefined,
-  })
-
+  const { process, snapshot: processState } = useExplicitSaveProcess({ execute: onSave })
   const [status, setStatus] = useState<SaveStatus>(
     initialSaveState === "blocked"
       ? { kind: "blocked", error: null }
@@ -60,54 +46,18 @@ export const useProfileForm = ({
   )
   const [formInvalid, setFormInvalid] = useState(false)
   const alive = useRef(true)
-  const queryEcho = useRef({ observed: initialNickname, confirmed: null as string | null })
 
   useEffect(() => {
     alive.current = true
-    return () => {
-      alive.current = false
-    }
+    return () => { alive.current = false }
   }, [])
-
-  useEffect(() => {
-    if (queryEcho.current.observed === initialNickname) return
-    queryEcho.current.observed = initialNickname
-    if (queryEcho.current.confirmed !== null) {
-      if (initialNickname !== queryEcho.current.confirmed) return
-      queryEcho.current.confirmed = null
-    }
-    if (!form.formState.isDirty && !processState.busy && status.kind === "idle") {
-      reset({ nickname: initialNickname })
-    }
-  }, [initialNickname, form.formState.isDirty, reset, processState.busy, status.kind])
 
   const saving = processState.busy || status.kind === "saving" || form.formState.isSubmitting
   const blocked = status.kind === "blocked"
   const unknown = status.kind === "unknown"
-  const inspection = processState.inspection
-  const canRetryInspected =
-    unknown &&
-    inspection.kind === "differs" &&
-    !invalid &&
-    normalized !== inspection.value
-
-  const adopt = (value: string) => {
-    process.invalidateInspection()
-    queryEcho.current.confirmed = value === initialNickname ? null : value
-    reset({ nickname: value })
-    clearErrors()
-    setFormInvalid(false)
-    setStatus({ kind: "idle" })
-  }
 
   const submitNickname = async ({ nickname: input }: z.output<typeof profileSchema>) => {
-    if (
-      process.getSnapshot().busy ||
-      blocked ||
-      status.kind === "saving" ||
-      (unknown && !canRetryInspected) ||
-      (!dirty && !canRetryInspected)
-    ) return
+    if (process.getSnapshot().busy || blocked || unknown || status.kind === "saving" || !dirty) return
 
     setFormInvalid(false)
     clearErrors("nickname")
@@ -115,7 +65,10 @@ export const useProfileForm = ({
     if (!alive.current || outcome === null) return
 
     if (outcome.kind === "success") {
-      adopt(outcome.value)
+      reset({ nickname: outcome.value })
+      clearErrors()
+      setFormInvalid(false)
+      setStatus({ kind: "idle" })
       showNotification({
         kind: "success",
         title: "プロフィールを保存",
@@ -136,47 +89,21 @@ export const useProfileForm = ({
           break
         }
         case "blocked":
-          setStatus({
-            kind: "blocked",
-            error: reason.error,
-          })
+          setStatus({ kind: "blocked", error: reason.error })
           break
         case "retryable":
-          setStatus({ kind: "retryable-error" })
+          setStatus({ kind: "error" })
           break
       }
     }
   }
 
-  const save = handleSubmit(submitNickname)
-
-  const inspectCurrentProfile = async () => {
-    if (!unknown || !onInspect || inspection.kind === "checking") return
-    await process.inspect(getValues("nickname").trim())
-  }
-
-  const confirmObservedProfile = () => {
-    if (
-      unknown &&
-      inspection.kind === "matches" &&
-      getValues("nickname").trim() === inspection.value
-    ) {
-      // 現在値が一致しても以前のMutationが成功した証拠にはならない。
-      adopt(inspection.value)
-    }
-  }
-
-  const discardUnconfirmedDraft = () => {
-    if (unknown && inspection.kind === "differs") adopt(inspection.value)
-  }
-
   const onDraftChange = (event: ChangeEvent<HTMLInputElement>) => {
     field.onChange(event)
     clearErrors("nickname")
-    if (status.kind === "unknown") process.invalidateInspection()
+    if (status.kind === "error") setStatus({ kind: "idle" })
   }
 
-  /** 入力状態と検証結果、保存可否・Feedback状態、保存・復旧に必要な画面操作を提供する。 */
   return {
     field,
     fieldState,
@@ -188,15 +115,10 @@ export const useProfileForm = ({
     blocked,
     unknown,
     status,
-    inspection,
     formInvalid,
     normalized,
-    canRetryInspected,
-    saveLabel: saving ? "更新中" : status.kind === "retryable-error" ? "再試行" : "更新",
-    save,
+    saveLabel: saving ? "更新中" : "更新",
+    save: handleSubmit(submitNickname),
     onDraftChange,
-    inspectCurrentProfile,
-    confirmObservedProfile,
-    discardUnconfirmedDraft,
   }
 }

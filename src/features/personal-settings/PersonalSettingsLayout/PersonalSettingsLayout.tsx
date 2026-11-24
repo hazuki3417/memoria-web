@@ -16,12 +16,12 @@ type PersonalSettingsLayoutProps = {
   accentColor?: string
 }
 
-export function PersonalSettingsLayout({
+export const PersonalSettingsLayout = ({
   section,
   onSectionChange,
   children,
   accentColor,
-}: PersonalSettingsLayoutProps) {
+}: PersonalSettingsLayoutProps) => {
   const compact = useMediaQuery("(max-width: 48em)")
   const sections = getPersonalSettingsSections()
 

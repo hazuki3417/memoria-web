@@ -16,7 +16,7 @@ describe("Profile保存Feedbackの単一表示", () => {
   it("入力検証と再試行可能エラーが重なった場合は具体的な検証案内を1件だけ返す", () => {
     const feedback = getProfileSaveFeedback({
       ...base,
-      status: { kind: "retryable-error" },
+      status: { kind: "error" },
       formInvalid: true,
     })
     expect(feedback?.type).toBe("validation")
@@ -26,10 +26,10 @@ describe("Profile保存Feedbackの単一表示", () => {
   it("検証エラーがない場合は再試行を案内する", () => {
     const feedback = getProfileSaveFeedback({
       ...base,
-      status: { kind: "retryable-error" },
+      status: { kind: "error" },
     })
     expect(feedback?.type).toBe("retryable")
-    expect(feedback?.description).toBe("再試行してください。")
+    expect(feedback?.description).toBe("入力内容を確認し、もう一度保存してください。")
   })
 
   it("結果不明は入力エラーより優先し、自動再送を防ぐ説明を返す", () => {
@@ -40,13 +40,13 @@ describe("Profile保存Feedbackの単一表示", () => {
     })
     expect(feedback?.type).toBe("unknown")
     expect(feedback?.kind).toBe("warning")
-    expect(feedback?.description).toBe("保存結果は不明です。自動で再送せず、現在の状態を確認してください。")
+    expect(feedback?.description).toBe("保存されたか確認できません。自動で再送しません。ページを再読み込みして状態を確認してください。")
   })
 
   it("結果不明の案内は照会状態を引数にせず共通の説明を返す", () => {
     const feedback = getProfileSaveFeedback({ ...base, status: { kind: "unknown" } })
     expect(feedback?.description).not.toContain("現在のニックネーム")
-    expect(feedback?.description).toContain("現在の状態を確認")
+    expect(feedback?.description).toContain("ページを再読み込みして")
   })
 
   it.each([

@@ -1,5 +1,6 @@
+export { getCommunitySettingsSections } from "./communitySettingsSections"
 export type { CommunitySettingsSection } from "./communitySettingsSections"
 export { CommunitySettingsRoute } from "./CommunitySettingsRoute"
-export { ConnectedCommunityUsage } from "./usage/ConnectedCommunityUsage"
-export { CommunityDeletionConfirmation } from "./general/CommunityDeletionConfirmation"
+export { CommunitySettingsView } from "./CommunitySettingsView"
+export { CommunityUsage } from "./usage"
 export type { CommunitySettingsRouteProps } from "./CommunitySettingsRoute"

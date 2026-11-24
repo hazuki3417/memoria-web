@@ -20,13 +20,13 @@ type CommunitySettingsLayoutProps = {
 }
 
 /** Owns Community-specific navigation and responsive layout, not form or route state. */
-export function CommunitySettingsLayout({
+export const CommunitySettingsLayout = ({
   communityId,
   section,
   onSectionChange,
   accentColor,
   children,
-}: CommunitySettingsLayoutProps) {
+}: CommunitySettingsLayoutProps) => {
   const compact = useMediaQuery("(max-width: 48em)")
   const sections = getCommunitySettingsSections(communityId)
 

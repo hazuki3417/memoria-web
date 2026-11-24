@@ -21,6 +21,7 @@ export type Scalars = {
 
 export type AcceptCommunityDeletionInput = {
   communityId: Scalars['ID']['input'];
+  operationId?: InputMaybe<Scalars['ID']['input']>;
   revision: Scalars['String']['input'];
 };
 
@@ -565,6 +566,7 @@ export enum ProcessingStatus {
 export type Query = {
   __typename?: 'Query';
   community?: Maybe<Community>;
+  communityDeletionAcceptance?: Maybe<AcceptCommunityDeletionPayload>;
   communityDeletionSnapshot: CommunityDeletionSnapshot;
   communityMembers: Array<CommunityMember>;
   communityUsage: CommunityUsage;
@@ -581,6 +583,11 @@ export type Query = {
 
 export type QueryCommunityArgs = {
   communityId: Scalars['ID']['input'];
+};
+
+
+export type QueryCommunityDeletionAcceptanceArgs = {
+  operationId: Scalars['ID']['input'];
 };
 
 
@@ -780,6 +787,7 @@ export type UserUsage = {
 
 export type OperationAcceptCommunityDeletionInput = {
   communityId: string | number;
+  operationId?: string | number | null | undefined;
   revision: string;
 };
 
@@ -1007,6 +1015,13 @@ export type OperationAcceptCommunityDeletionMutationVariables = Exact<{
 
 
 export type OperationAcceptCommunityDeletionMutation = { acceptCommunityDeletion: { accepted: boolean } };
+
+export type OperationCommunityDeletionAcceptanceQueryVariables = Exact<{
+  operationId: string | number;
+}>;
+
+
+export type OperationCommunityDeletionAcceptanceQuery = { communityDeletionAcceptance: { accepted: boolean } | null };
 
 export type OperationCommunityUsageQueryVariables = Exact<{
   communityId: string | number;
@@ -1649,6 +1664,49 @@ export function useAcceptCommunityDeletionMutation(baseOptions?: Apollo.Mutation
 export type AcceptCommunityDeletionMutationHookResult = ReturnType<typeof useAcceptCommunityDeletionMutation>;
 export type AcceptCommunityDeletionMutationResult = Apollo.MutationResult<OperationAcceptCommunityDeletionMutation>;
 export type AcceptCommunityDeletionMutationOptions = Apollo.BaseMutationOptions<OperationAcceptCommunityDeletionMutation, OperationAcceptCommunityDeletionMutationVariables>;
+export const CommunityDeletionAcceptanceDocument = gql`
+    query CommunityDeletionAcceptance($operationId: ID!) {
+  communityDeletionAcceptance(operationId: $operationId) {
+    accepted
+  }
+}
+    `;
+
+/**
+ * __useCommunityDeletionAcceptanceQuery__
+ *
+ * To run a query within a React component, call `useCommunityDeletionAcceptanceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommunityDeletionAcceptanceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommunityDeletionAcceptanceQuery({
+ *   variables: {
+ *      operationId: // value for 'operationId'
+ *   },
+ * });
+ */
+export function useCommunityDeletionAcceptanceQuery(baseOptions: Apollo.QueryHookOptions<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables> & ({ variables: OperationCommunityDeletionAcceptanceQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>(CommunityDeletionAcceptanceDocument, options);
+      }
+export function useCommunityDeletionAcceptanceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>(CommunityDeletionAcceptanceDocument, options);
+        }
+// @ts-expect-error
+export function useCommunityDeletionAcceptanceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>): Apollo.UseSuspenseQueryResult<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>;
+export function useCommunityDeletionAcceptanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>): Apollo.UseSuspenseQueryResult<OperationCommunityDeletionAcceptanceQuery | undefined, OperationCommunityDeletionAcceptanceQueryVariables>;
+export function useCommunityDeletionAcceptanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>(CommunityDeletionAcceptanceDocument, options);
+        }
+export type CommunityDeletionAcceptanceQueryHookResult = ReturnType<typeof useCommunityDeletionAcceptanceQuery>;
+export type CommunityDeletionAcceptanceLazyQueryHookResult = ReturnType<typeof useCommunityDeletionAcceptanceLazyQuery>;
+export type CommunityDeletionAcceptanceSuspenseQueryHookResult = ReturnType<typeof useCommunityDeletionAcceptanceSuspenseQuery>;
+export type CommunityDeletionAcceptanceQueryResult = Apollo.QueryResult<OperationCommunityDeletionAcceptanceQuery, OperationCommunityDeletionAcceptanceQueryVariables>;
 export const CommunityUsageDocument = gql`
     query CommunityUsage($communityId: ID!) {
   communityUsage(communityId: $communityId) {

@@ -1,25 +1,21 @@
 "use client"
 
 import { CommunityAliasSectionView } from "./CommunityAliasSectionView"
-import { useCommunityAliasForm, type InspectCommunityAlias } from "./useCommunityAliasForm"
+import { useCommunityAliasForm } from "./useCommunityAliasForm"
 import type { SaveCommunityAlias } from "./communityAliasSaveOutcome"
 
 export type CommunityAliasSectionProps = {
   savedAlias: string | null
   onSave?: SaveCommunityAlias
-  onInspect?: InspectCommunityAlias
-  onConfirm?: (alias: string | null) => void
 }
 
 const localSave: SaveCommunityAlias = async (alias) => ({ kind: "success", value: alias })
 
-/** Community別名のForm・Action・復旧を接続し、Viewへ委譲する。 */
+/** Community別名のForm・Actionを接続し、Viewへ委譲する。 */
 export const CommunityAliasSection = ({
   savedAlias,
   onSave = localSave,
-  onInspect,
-  onConfirm,
 }: CommunityAliasSectionProps) => {
-  const model = useCommunityAliasForm({ savedAlias, onSave, onInspect, onConfirm })
-  return <CommunityAliasSectionView model={model} onInspect={onInspect} />
+  const model = useCommunityAliasForm({ savedAlias, onSave })
+  return <CommunityAliasSectionView model={model} />
 }

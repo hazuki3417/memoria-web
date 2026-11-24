@@ -6,7 +6,7 @@ import type { SettingsSectionRender } from "@/ui/SettingsSectionHost"
 import { useCommunitySettingsRefreshError } from "../useCommunitySettingsRefreshError"
 
 /** One scoped read obtains the Usage and unit required by the active Section. */
-export const ConnectedCommunityUsage = ({
+export const CommunityUsage = ({
   communityId,
   render,
 }: {

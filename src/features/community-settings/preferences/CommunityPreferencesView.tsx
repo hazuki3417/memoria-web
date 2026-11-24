@@ -1,88 +1,45 @@
 "use client"
 
-import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from "react"
-import { Box, Stack } from "@mantine/core"
-import { PageHeader } from "@/components/PageHeader"
-import { SaveStatus, SETTINGS_SAVE_STATUS_TIMING, type SaveStatusState } from "@/components/SaveStatus"
-import { SectionHeader } from "@/components/SectionHeader"
-import { CommunityPreferencesDisplaySection } from "./CommunityPreferencesDisplaySection/CommunityPreferencesDisplaySection"
-import { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
+import type { ComponentProps } from "react"
+import { Stack } from "@mantine/core"
 import { CommunityAliasSection } from "./CommunityAliasSection"
-import { CommunityPreferencesSaveFeedback } from "./CommunityPreferencesSaveFeedback"
+import { CommunityPreferencesLayout } from "./CommunityPreferencesLayout"
+import { useCommunityPreferencesForm } from "./useCommunityPreferencesForm"
 import type { CommunityPreferencesSaveOperations } from "./communityPreferencesSaveOutcome"
 import type { CommunityPreferencesAccentPreview } from "./useCommunityPreferencesAutoSave"
 
-/** Preferences全体のHeader・Feedback・Alias/AccentをCompositionする。 */
+export type CommunityPreferencesViewProps = {
+  accent: string
+  operations: CommunityPreferencesSaveOperations
+  preview: CommunityPreferencesAccentPreview
+  alias?: ComponentProps<typeof CommunityAliasSection>
+  sourceReady?: boolean
+}
+
+/** 本番のAccent AutoSaveとAliasを共有画面UIへ接続する。 */
 export const CommunityPreferencesView = ({
   accent,
-  initialDraft,
-  onAccentDraftChange,
-  setAccent,
-  isPreview = true,
-  restoreOnAccentChange = false,
-  preserveDraftOnAccentChange = false,
-  saveStatus,
-  saveFeedback,
-  accentError,
-  onDraftValidityChange,
-  aliasSection,
-  alias,
   operations,
   preview,
+  alias,
   sourceReady = true,
-}: {
-  accent: string
-  initialDraft?: string
-  onAccentDraftChange?: (value: string) => void
-  setAccent?: Dispatch<SetStateAction<string>>
-  isPreview?: boolean
-  restoreOnAccentChange?: boolean
-  preserveDraftOnAccentChange?: boolean
-  saveStatus?: SaveStatusState
-  saveFeedback?: ReactNode
-  accentError?: string
-  onDraftValidityChange?: (valid: boolean) => void
-  aliasSection?: ReactNode
-  alias?: ComponentProps<typeof CommunityAliasSection>
-  operations?: CommunityPreferencesSaveOperations
-  preview?: CommunityPreferencesAccentPreview
-  sourceReady?: boolean
-}) => {
+}: CommunityPreferencesViewProps) => {
   const model = useCommunityPreferencesForm({
-    accent, initialDraft, restoreOnAccentChange, preserveDraftOnAccentChange,
-    saveStatus, onAccentDraftChange, onDraftValidityChange, setAccent,
-    operations, preview, sourceReady,
+    accent,
+    restoreOnAccentChange: false,
+    preserveDraftOnAccentChange: false,
+    operations,
+    preview,
+    sourceReady,
   })
-  const aliasContent = alias ? <CommunityAliasSection {...alias} /> : aliasSection
-  const content = (
-    <Stack gap="xl">
-      <PageHeader
-        title="環境設定"
-        description="このCommunityでの自分専用の表示設定です。他のメンバーには影響しません。"
-        titleAccessory={
-          model.saveStatus !== undefined ? (
-            <SaveStatus
-              state={model.saveStatus}
-              announce
-              timing={SETTINGS_SAVE_STATUS_TIMING}
-            />
-          ) : undefined
-        }
-      />
-      {saveFeedback ?? <CommunityPreferencesSaveFeedback model={model} />}
-      {aliasContent && (
-        <Box>
-          <SectionHeader>表示名</SectionHeader>
-          {aliasContent}
-        </Box>
-      )}
-      <CommunityPreferencesDisplaySection
+
+  return (
+    <Stack gap="sm">
+      <CommunityPreferencesLayout
         model={model}
-        isPreview={isPreview}
-        accentError={accentError ?? model.snapshot.validation?.fieldErrors.accentColor}
+        aliasSection={alias ? <CommunityAliasSection {...alias} /> : undefined}
+        isPreview={false}
       />
     </Stack>
   )
-  // Productionの既存外側Stackを維持し、Preview Storyの外側構造を変更しない。
-  return operations ? <Stack gap="sm">{content}</Stack> : content
 }

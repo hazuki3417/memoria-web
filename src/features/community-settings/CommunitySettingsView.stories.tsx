@@ -50,7 +50,7 @@ export const General: Story = {
 }
 
 /** Mirrors the production key={communityId} remount boundary without a Router mock. */
-function CommunitySwitchFixture(args: ComponentProps<typeof CommunitySettingsStoryNavigation>) {
+const CommunitySwitchFixture = (args: ComponentProps<typeof CommunitySettingsStoryNavigation>) => {
   const [communityId, setCommunityId] = useState("photo-club")
   const communityName =
     communityId === "photo-club" ? "家族のアルバム" : "旅行の思い出"
@@ -132,7 +132,7 @@ export const InvitationContextChangeReset: Story = {
 
 
 /** Switching from Administrator to Member must immediately hide an issued preview secret. */
-function InvitationRoleChangeFixture(args: ComponentProps<typeof CommunitySettingsStoryNavigation>) {
+const InvitationRoleChangeFixture = (args: ComponentProps<typeof CommunitySettingsStoryNavigation>) => {
   const [role, setRole] = useState<"admin" | "member">("admin")
   return (
     <>
@@ -285,6 +285,131 @@ export const RemoveMemberFailureContract: Story = {
       )
       await expect(within(dialog).getByRole("button", { name: "除外する" })).toBeDisabled()
     })
+  },
+}
+
+/** A self demotion uses the same row menu and role Modal, not the leave action. */
+/** Mirrors a refreshed membership after confirmed self demotion. */
+const SelfDemotionUpdatedMembershipFixture = (
+  args: ComponentProps<typeof CommunitySettingsStoryNavigation>,
+) => {
+  const [members, setMembers] = useState<Array<{
+    id: string
+    name: string
+    role: "admin" | "member"
+    isSelf?: boolean
+  }>>([
+    { id: "user-1", name: "テストユーザー", role: "admin", isSelf: true },
+    { id: "user-2", name: "家族メンバー", role: "admin" },
+  ])
+  return (
+    <CommunitySettingsStoryNavigation
+      {...args}
+      section="members"
+      role={members[0].role}
+      members={members}
+      onLeaveCommunity={async () => undefined}
+      onChangeMemberRole={async (userId, role) => {
+        setMembers((current) => current.map((member) =>
+          member.id === userId ? { ...member, role } : member,
+        ))
+        return true
+      }}
+    />
+  )
+}
+
+export const SelfDemotionPermissionsUpdated: Story = {
+  name: "Interaction · 自己降格後は管理操作を失い閲覧・退会を維持",
+  tags: ["interaction"],
+  render: (args) => <SelfDemotionUpdatedMembershipFixture {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const page = within(canvasElement.ownerDocument.body)
+    await userEvent.click(canvas.getByRole("button", { name: "テストユーザーの管理操作" }))
+    await userEvent.click(await page.findByRole("menuitem", { name: "役割を変更" }))
+    const dialog = await page.findByRole("dialog", { name: "役割を変更" })
+    await userEvent.click(within(dialog).getByRole("radio", { name: /^Member/ }))
+    await userEvent.click(within(dialog).getByRole("button", { name: "変更する" }))
+    await waitFor(() => {
+      expect(canvas.queryByRole("button", { name: "テストユーザーの管理操作" })).not.toBeInTheDocument()
+      expect(canvas.queryByRole("button", { name: "家族メンバーの管理操作" })).not.toBeInTheDocument()
+    })
+    await expect(canvas.getByText("テストユーザー")).toBeVisible()
+    await expect(canvas.getByRole("button", { name: "Communityから退会する" })).toBeEnabled()
+  },
+}
+
+export const SelfAdministratorDemotion: Story = {
+  name: "Interaction · 自分のAdministrator降格と管理権限喪失の確認",
+  tags: ["interaction"],
+  args: {
+    section: "members",
+    members: [
+      { id: "user-1", name: "テストユーザー", role: "admin", isSelf: true },
+      { id: "user-2", name: "家族メンバー", role: "admin" },
+    ],
+    onChangeMemberRole: fn(async () => true),
+    onRemoveMember: fn(async () => true),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const page = within(canvasElement.ownerDocument.body)
+    await userEvent.click(canvas.getByRole("button", { name: "テストユーザーの管理操作" }))
+    await expect(page.queryByRole("menuitem", { name: "除外" })).not.toBeInTheDocument()
+    await userEvent.click(await page.findByRole("menuitem", { name: "役割を変更" }))
+    const dialog = await page.findByRole("dialog", { name: "役割を変更" })
+    await expect(within(dialog).getByRole("button", { name: "変更する" })).toBeDisabled()
+    await userEvent.click(within(dialog).getByRole("radio", { name: /^Member/ }))
+    await expect(within(dialog).getByText(/Community設定や参加者を管理する権限を失います/)).toBeVisible()
+    await expect(within(dialog).getByText(/参加者の閲覧と退会は可能/)).toBeVisible()
+    await userEvent.click(within(dialog).getByRole("button", { name: "変更する" }))
+    await expect(args.onChangeMemberRole).toHaveBeenCalledWith("user-1", "member")
+    await expect(args.onRemoveMember).not.toHaveBeenCalled()
+  },
+}
+
+export const LastAdministratorDemotionBlocked: Story = {
+  name: "Interaction · 最後のAdministratorは自分を降格できない",
+  tags: ["interaction"],
+  args: {
+    section: "members",
+    onChangeMemberRole: fn(async () => true),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const page = within(canvasElement.ownerDocument.body)
+    await userEvent.click(canvas.getByRole("button", { name: "テストユーザーの管理操作" }))
+    await userEvent.click(await page.findByRole("menuitem", { name: "役割を変更" }))
+    const dialog = await page.findByRole("dialog", { name: "役割を変更" })
+    await waitFor(() =>
+      expect(within(dialog).getByText("最後のAdministratorはMemberに変更できません。")).toBeVisible(),
+    )
+    await expect(within(dialog).getByRole("radio", { name: /^Member/ })).toBeDisabled()
+    await expect(within(dialog).getByRole("button", { name: "変更する" })).toBeDisabled()
+    await expect(args.onChangeMemberRole).not.toHaveBeenCalled()
+  },
+}
+
+export const OtherAdministratorDemotionWarning: Story = {
+  name: "Interaction · 他Administrator降格時の管理権限喪失説明",
+  tags: ["interaction"],
+  args: {
+    section: "members",
+    members: [
+      { id: "user-1", name: "テストユーザー", role: "admin", isSelf: true },
+      { id: "user-2", name: "家族メンバー", role: "admin" },
+    ],
+    onChangeMemberRole: fn(async () => true),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const page = within(canvasElement.ownerDocument.body)
+    await userEvent.click(canvas.getByRole("button", { name: "家族メンバーの管理操作" }))
+    await userEvent.click(await page.findByRole("menuitem", { name: "役割を変更" }))
+    const dialog = await page.findByRole("dialog", { name: "役割を変更" })
+    await userEvent.click(within(dialog).getByRole("radio", { name: /^Member/ }))
+    await expect(within(dialog).getByText(/家族メンバーはAdministrator権限を失い/)).toBeVisible()
   },
 }
 
